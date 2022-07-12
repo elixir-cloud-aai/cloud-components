@@ -4,10 +4,20 @@
   ],
   "imageSize": 100,
   "commit": false,
-  "contributors": [],
+  "contributors": [
+    {
+      "login": "git-anurag-hub",
+      "name": "Anurag Gupta",
+      "avatar_url": "https://avatars.githubusercontent.com/u/58766532?v=4",
+      "profile": "https://gupta-anurag.vercel.app/",
+      "contributions": [
+        "test"
+      ]
+    }
+  ],
   "badgeTemplate": "[badge-all-contributors-image]: https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg?style=flat-square&color=%23F6DA80%20",
   "contributorsPerLine": 7,
-  "projectName": "{{web-components.slug}}",
+  "projectName": "wc-template",
   "projectOwner": "elixir-cloud-aai",
   "repoType": "github",
   "repoHost": "https://github.com",
