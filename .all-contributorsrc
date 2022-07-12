@@ -5,7 +5,7 @@
   "imageSize": 100,
   "commit": false,
   "contributors": [],
-  "[badge-all-contributors-image]: https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg?style=flat-square&color=%23F6DA80%20","
+  "badgeTemplate": "[badge-all-contributors-image]: https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg?style=flat-square&color=%23F6DA80%20",
   "contributorsPerLine": 7,
   "projectName": "{{web-components.slug}}",
   "projectOwner": "elixir-cloud-aai",
