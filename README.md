@@ -31,7 +31,7 @@ We believe that any contribution should be duly acknowledged. Therefore, we try
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://git.scicore.unibas.ch/kanitz"><img src="https://avatars.githubusercontent.com/u/10855418?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Alex Kanitz</b></sub></a><br /><a href="#content-uniqueg" title="Content">🖋</a> <a href="#ideas-uniqueg" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-uniqueg" title="Maintenance">🚧</a> <a href="#mentoring-uniqueg" title="Mentoring">🧑‍🏫</a> <a href="#projectManagement-uniqueg" title="Project Management">📆</a></td>
+    <td align="center"><a href="https://git.scicore.unibas.ch/kanitz"><img src="https://avatars.githubusercontent.com/u/10855418?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Alex Kanitz</b></sub></a><br /><a href="#content-uniqueg" title="Content">🖋</a> <a href="#ideas-uniqueg" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-uniqueg" title="Maintenance">🚧</a> <a href="#mentoring-uniqueg" title="Mentoring">🧑‍🏫</a> <a href="#projectManagement-uniqueg" title="Project Management">📆</a> <a href="https://github.com/elixir-cloud-aai/wc-template/commits?author=uniqueg" title="Tests">⚠️</a></td>
   </tr>
 </table>
 
