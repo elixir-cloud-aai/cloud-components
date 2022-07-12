@@ -11,17 +11,6 @@
 
 Fixes #(issue)
 
-## Contributions
-
-> We strongly encourage you to ask the [All Contributors
-> bot][all-contributors-bot] to add your contributions to the [contributors
-> page][CONTRIBUTORS]. Please refer to the list of available [contribution
-> types][contribution-types]. If you do not want your contributions
-> acknowledged, please delete the line.
-
-@all-contributors please add @[YOUR_GH_HANDLE] for CONTRIBUTION_TYPE_1,
-CONTRIBUTION_TYPE_2, ...
-
 ## Checklist
 
 > Please go through the following checklist to ensure that your change is ready
@@ -54,6 +43,12 @@ CONTRIBUTION_TYPE_2, ...
       works
 - [ ] New and existing unit tests pass locally with my changes
 - [ ] I have not reduced the existing code coverage
+- [ ] I have asked the [@all-contributors bot][all-contributors-bot] to
+      acknowledge my contributions by commenting on this PR with a request of
+      the form `@all-contributors please add @YOUR_GH_HANDLE for TYPE_1,
+      TYPE_2, ...`, where `TYPE_1` etc. refer to [contribution types supported
+      by the All Contributors Specification][all-contributors-types] OR I do
+      not want my contributions to be acknowledged
 
 ## Comments
 
@@ -63,6 +58,8 @@ CONTRIBUTION_TYPE_2, ...
 > _not_ be squased when merging, please explain why you think the PR warrants
 > or requires multiple commits to be added to the history.
 
+[all-contributors-bot]: <https://allcontributors.org/docs/en/bot/overview>
+[all-contributors-types]: <https://allcontributors.org/docs/en/emoji-key>
 [contributing]: CONTRIBUTING.md
 [conventional-commits]: <https://www.conventionalcommits.org/en/v1.0.0/>
 [jsdoc]: <https://jsdoc.app/index.html>

@@ -1,26 +1,13 @@
 {
   "files": [
-    "README.md"
+    "CONTRIBUTORS"
   ],
   "imageSize": 100,
   "commit": false,
-  "contributors": [
-    {
-      "login": "uniqueg",
-      "name": "Alex Kanitz",
-      "avatar_url": "https://avatars.githubusercontent.com/u/10855418?v=4",
-      "profile": "https://git.scicore.unibas.ch/kanitz",
-      "contributions": [
-        "content",
-        "ideas",
-        "maintenance",
-        "mentoring",
-        "projectManagement"
-      ]
-    }
-  ],
+  "contributors": [],
+  "[badge-all-contributors-image]: https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg?style=flat-square&color=%23F6DA80%20","
   "contributorsPerLine": 7,
-  "projectName": "wc-template",
+  "projectName": "{{web-components.slug}}",
   "projectOwner": "elixir-cloud-aai",
   "repoType": "github",
   "repoHost": "https://github.com",

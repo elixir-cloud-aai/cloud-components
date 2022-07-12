@@ -1,9 +1,10 @@
 # {{web-component.title}}
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[badge-all-contributors-image]: https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square&color=%23F6DA80%20
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![License][badge-license-image]][badge-license-url]
+[![All Contributors][badge-all-contributors-image]][contributors]
 [![Chat][badge-chat-image]][badge-chat-url]
 
 ## Synopsis
@@ -25,21 +26,13 @@ you are interested in contributing.
 
 ## Contributors
 
-We believe that any contribution should be duly acknowledged. Therefore, we try
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tr>
-    <td align="center"><a href="https://git.scicore.unibas.ch/kanitz"><img src="https://avatars.githubusercontent.com/u/10855418?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Alex Kanitz</b></sub></a><br /><a href="#content-uniqueg" title="Content">🖋</a> <a href="#ideas-uniqueg" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-uniqueg" title="Maintenance">🚧</a> <a href="#mentoring-uniqueg" title="Mentoring">🧑‍🏫</a> <a href="#projectManagement-uniqueg" title="Project Management">📆</a></td>
-  </tr>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-our best to implement the [All Contributors Specification][all-contributors].
+We believe that any contribution should be duly acknowledged. Therefore, we
+implement the [All Contributors Specification][all-contributors] and encourage
+you to comment on any issue or PR you contributed to with a request to the
+[@all-contributors bot][all-contributors-bot] of the form `@all-contributors
+please add @<YOUR_GITHUB_HANDLE for TYPE_1, TYPE_2, ...`, where `TYPE_1` etc.
+refer to [contribution types supported by the All Contributors
+Specification][all-contributors-types].
 
 Information about contributors, including information about the specific they
 have made to the project, are listed in [`CONTRIBUTORS`][contributors].
@@ -88,6 +81,8 @@ To get in touch with use, please use one of the following routes:
 [![logo-elixir-cloud-aai][logo-elixir-cloud-aai]][elixir-cloud-aai]
 
 [all-contributors]: <https://allcontributors.org/docs/en/specification>
+[all-contributors-bot]: <https://allcontributors.org/docs/en/bot/overview>
+[all-contributors-types]: <https://allcontributors.org/docs/en/emoji-key>
 [badge-license-image]:<https://img.shields.io/badge/license-Apache%202.0-blue.svg>
 [badge-license-url]:<http://www.apache.org/licenses/LICENSE-2.0>
 [badge-chat-image]: <https://img.shields.io/static/v1?label=chat&message=Slack&color=ff6994>
