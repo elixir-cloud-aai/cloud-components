@@ -6,11 +6,13 @@ key][all-contributors-types]) for their valuable contributions:
 <!-- markdownlint-disable -->
 <table>
   <tr>
+    <td align="center"><a href="https://github.com/tanya17-05"><img src="https://avatars.githubusercontent.com/u/95133237?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tanya Kumari</b></sub></a><br /><a href="https://github.com/elixir-cloud-aai/wc-template/commits?author=tanya17-05" title="Code">💻</a></td>
   </tr>
 </table>
 
-<!-- markdownlint-enable -->
+<!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 [all-contributors-types]: <https://allcontributors.org/docs/en/emoji-key>
