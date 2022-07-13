@@ -4,10 +4,20 @@
   ],
   "imageSize": 100,
   "commit": false,
-  "contributors": [],
+  "contributors": [
+    {
+      "login": "tanya17-05",
+      "name": "Tanya Kumari",
+      "avatar_url": "https://avatars.githubusercontent.com/u/95133237?v=4",
+      "profile": "https://github.com/tanya17-05",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
   "badgeTemplate": "[badge-all-contributors-image]: https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg?style=flat-square&color=%23F6DA80%20",
   "contributorsPerLine": 7,
-  "projectName": "{{web-components.slug}}",
+  "projectName": "wc-template",
   "projectOwner": "elixir-cloud-aai",
   "repoType": "github",
   "repoHost": "https://github.com",
