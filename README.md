@@ -1,4 +1,4 @@
-# {{web-component.title}}
+# ELIXIR Cloud Components
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [badge-all-contributors-image]: https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square&color=%23F6DA80%20
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
@@ -35,7 +35,7 @@ refer to [contribution types supported by the All Contributors
 Specification][all-contributors-types].
 
 Information about contributors, including information about the specific they
-have made to the project, are listed in [`CONTRIBUTORS`][contributors].
+have made to the project, are listed in [`CONTRIBUTORS.md`][contributors].
 
 ## Code of Conduct
 
@@ -90,7 +90,7 @@ To get in touch with use, please use one of the following routes:
 [email]: <alexander.kanitz@alumni.ethz.ch>
 [code-of-conduct]: CODE_OF_CONDUCT.md
 [contributing]: CONTRIBUTING.md
-[contributors]: CONTRIBUTORS
+[contributors]: CONTRIBUTORS.md
 [elixir]: <https://elixir-europe.org/>
 [elixir-cloud-aai]: <https://elixir-cloud.dcc.sib.swiss/>
 [elixir-compute]: <https://elixir-europe.org/platforms/compute>
