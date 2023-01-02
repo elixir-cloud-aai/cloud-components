@@ -1,0 +1,25 @@
+{
+  "name": "wc-template",
+  "version": "1.0.0",
+  "description": "<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section --> [badge-all-contributors-image]: https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square&color=%23F6DA80%20 <!-- ALL-CONTRIBUTORS-BADGE:END -->",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elixir-cloud-aai/wc-template.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/elixir-cloud-aai/wc-template/issues"
+  },
+  "homepage": "https://github.com/elixir-cloud-aai/wc-template#readme",
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "lerna": "^6.3.0"
+  }
+}

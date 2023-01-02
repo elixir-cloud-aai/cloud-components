@@ -1,0 +1,20 @@
+{
+  "name": "elixir-ui-components",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@microsoft/fast-colors": "^5.3.1",
+    "@microsoft/fast-components": "^2.30.6",
+    "@microsoft/fast-element": "^1.11.0",
+    "@microsoft/fast-foundation": "^2.47.1-0"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.4"
+  }
+}
