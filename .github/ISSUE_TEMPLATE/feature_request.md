@@ -1,10 +1,9 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: 'feat: '
-labels: 'status: new, type: feature'
+title: "feat: "
+labels: "status: new, type: feature"
 assignees: git-anurag-hub
-
 ---
 
 **Is your feature request related to a problem? Please describe.**
@@ -35,6 +34,6 @@ assignees: git-anurag-hub
 > `TYPE_1` etc. refer to [contribution types supported by the All Contributors
 > Specification][all-contributors-types], e.g., `idea`.
 
-[all-contributors-bot]: <https://allcontributors.org/docs/en/bot/overview>
-[all-contributors-types]: <https://allcontributors.org/docs/en/emoji-key>
+[all-contributors-bot]: https://allcontributors.org/docs/en/bot/overview
+[all-contributors-types]: https://allcontributors.org/docs/en/emoji-key
 [contributors]: ../../CONTRIBUTORS

@@ -1,10 +1,9 @@
 ---
 name: Another issue
 about: Any issue that is neither a bug nor a feature request
-title: ''
-labels: 'status: new'
+title: ""
+labels: "status: new"
 assignees: git-anurag-hub
-
 ---
 
 **Please describe your issue.**
@@ -26,6 +25,6 @@ assignees: git-anurag-hub
 > `TYPE_1` etc. refer to [contribution types supported by the All Contributors
 > Specification][all-contributors-types].
 
-[all-contributors-bot]: <https://allcontributors.org/docs/en/bot/overview>
-[all-contributors-types]: <https://allcontributors.org/docs/en/emoji-key>
+[all-contributors-bot]: https://allcontributors.org/docs/en/bot/overview
+[all-contributors-types]: https://allcontributors.org/docs/en/emoji-key
 [contributors]: ../../CONTRIBUTORS

@@ -5,4 +5,4 @@ import { FoundationElement } from "@microsoft/fast-foundation";
  *
  * @public
  */
- export class Welcome extends FoundationElement { }
+export class Welcome extends FoundationElement {}

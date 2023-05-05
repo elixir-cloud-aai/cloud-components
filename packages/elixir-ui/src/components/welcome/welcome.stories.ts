@@ -4,14 +4,10 @@ import Template from "./fixtures/base.html";
 import "./define.js";
 import { welcome } from "./define.js";
 
-DesignSystem.getOrCreate().withPrefix(
-    designSystem.prefix
-).register(
-    welcome()
-);
+DesignSystem.getOrCreate().withPrefix(designSystem.prefix).register(welcome());
 
 export default {
-    title: "welcome",
+  title: "welcome",
 };
 
 export const Welcome: () => "*.html" = () => Template;

@@ -7,7 +7,7 @@
 > change. Please use bullet points for the description. For very trivial issues
 > that are duly explained by the PR title, a description can be omitted.
 
-- 
+-
 
 Fixes #(issue)
 
@@ -46,7 +46,7 @@ Fixes #(issue)
 - [ ] I have asked the [@all-contributors bot][all-contributors-bot] to
       acknowledge my contributions by commenting on this PR with a request of
       the form `@all-contributors please add @YOUR_GH_HANDLE for TYPE_1,
-      TYPE_2, ...`, where `TYPE_1` etc. refer to [contribution types supported
+    TYPE_2, ...`, where `TYPE_1` etc. refer to [contribution types supported
       by the All Contributors Specification][all-contributors-types] OR I do
       not want my contributions to be acknowledged
 
@@ -58,8 +58,8 @@ Fixes #(issue)
 > _not_ be squased when merging, please explain why you think the PR warrants
 > or requires multiple commits to be added to the history.
 
-[all-contributors-bot]: <https://allcontributors.org/docs/en/bot/overview>
-[all-contributors-types]: <https://allcontributors.org/docs/en/emoji-key>
+[all-contributors-bot]: https://allcontributors.org/docs/en/bot/overview
+[all-contributors-types]: https://allcontributors.org/docs/en/emoji-key
 [contributing]: CONTRIBUTING.md
-[conventional-commits]: <https://www.conventionalcommits.org/en/v1.0.0/>
-[jsdoc]: <https://jsdoc.app/index.html>
+[conventional-commits]: https://www.conventionalcommits.org/en/v1.0.0/
+[jsdoc]: https://jsdoc.app/index.html
