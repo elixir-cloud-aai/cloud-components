@@ -1,7 +1,7 @@
 {
   "name": "elixir-ui",
   "description": "A FAST project",
-  "main": "./src/components/index.ts",
+  "main": "./www/main.js",
   "private": true,
   "type": "module",
   "version": "0.1.0",
@@ -10,10 +10,10 @@
   "repository": "",
   "scripts": {
     "build": "webpack --config=./webpack.prod.cjs",
-    "dev": "webpack-dev-server --config=./webpack.dev.cjs --history-api-fallback --progress",
+    "dev": "webpack --watch --config=./webpack.dev.cjs",
     "eslint": "eslint . --ext .ts",
     "eslint:fix": "eslint . --ext .ts --fix",
-    "start": "webpack-dev-server --config=./webpack.dev.cjs --history-api-fallback --progress",
+    "start": "webpack serve --config=./webpack.dev.cjs --history-api-fallback --progress",
     "start:storybook": "start-storybook -p 3000 -h localhost",
     "test": "npm run eslint && npx playwright test",
     "test:serve": "node ./test-server.cjs",

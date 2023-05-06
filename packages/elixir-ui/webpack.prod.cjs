@@ -24,6 +24,7 @@ module.exports = merge(baseConfig, {
     },
   },
   output: {
-    filename: "bundle/[name].[contenthash].js",
+    filename: "bundle/[name].js",
+    // globalObject: "this",
   },
 });

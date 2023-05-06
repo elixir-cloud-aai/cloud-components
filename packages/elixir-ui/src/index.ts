@@ -1,1 +1,3 @@
-import "./design-system.js";
+import { designSystem } from "./design-system.js";
+
+export { designSystem };

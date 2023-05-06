@@ -5,11 +5,17 @@ const baseConfig = require("./webpack.common.cjs");
 
 module.exports = merge(baseConfig, {
   devServer: {
-    open: true,
+    devMiddleware: {
+      writeToDisk: true,
+    },
+    // open: true,
     // port: 3000,
   },
+  target: "web",
   mode: "development",
   output: {
     filename: "[name].js",
+    globalObject: "this",
+    // libraryTarget: "umd",
   },
 });

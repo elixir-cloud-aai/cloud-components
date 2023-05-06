@@ -1,6 +1,6 @@
-import welcome from "elixir-ui";
+"use client";
+import "elixir-ui";
 
 export default function Home() {
-  console.log(welcome);
-  return <main></main>;
+  return <fast-welcome></fast-welcome>;
 }
