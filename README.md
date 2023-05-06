@@ -1,5 +1,7 @@
 # ELIXIR Cloud Components
 
+Elixir Cloud Components is lightweight, fast, and reusable web-components developed by Elixir Cloud and AAI Community for managing and accessing various services.
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 
 [badge-all-contributors-image]: https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square&color=%23F6DA80%20
@@ -10,11 +12,41 @@
 [![All Contributors][badge-all-contributors-image]][contributors]
 [![Chat][badge-chat-image]][badge-chat-url]
 
-## Synopsis
+## Introduction
 
-## Usage
+This repository follows the monorepo architecture (using [TurboRepo](https://turbo.build/repo)) and contains various packages/apps:
 
-## Configuration
+### Packages
+
+| Name      | Description                                                                                                                                | Version   | Status      |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ----------- |
+| elixir-ui | This package serves as an abstraction layer for other packages, providing a streamlined approach for extracting common design token logic. | [0.0.1]() | In progress |
+
+### Apps
+
+| Name          | Description                                                                                                            | Deployment |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------- |
+| example-usage | This application serves as a comprehensive guide for users on how to utilize the packages available in the sample app. | [NA]()     |
+
+## Getting Started
+
+To get started with this project, follow these steps:
+
+> Note: All of the following commands should be executed on all the packages & apps. In case you want to execute the script on any one particular app/package, you can define the [workspace tag](https://turbo.build/repo/docs/handbook/package-installation#addingremovingupgrading-packages) along with any of the below commands.
+
+1. Install the dependencies involved by running the following command:
+
+   ```
+   npm install
+   ```
+
+2. Run the development server by running the following command:
+
+   ```
+   npm run dev
+   ```
+
+This will start the development server on your local machine and allow you to start working on the project.
 
 ## Contributing
 
