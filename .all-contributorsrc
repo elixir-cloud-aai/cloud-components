@@ -1,10 +1,29 @@
 {
   "files": [
-    "CONTRIBUTORS"
+    "CONTRIBUTORS.md"
   ],
   "imageSize": 100,
   "commit": false,
   "contributors": [
+    {
+      "login": "tanya17-05",
+      "name": "Tanya Kumari",
+      "avatar_url": "https://avatars.githubusercontent.com/u/95133237?v=4",
+      "profile": "https://github.com/tanya17-05",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "uniqueg",
+      "name": "Alex Kanitz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10855418?v=4",
+      "profile": "https://github.com/uniqueg",
+      "contributions": [
+        "maintenance",
+        "ideas"
+      ]
+    },
     {
       "login": "git-anurag-hub",
       "name": "Anurag Gupta",
