@@ -14,7 +14,11 @@ Elixir Cloud Components is lightweight, fast, and reusable web-components develo
 
 ## Introduction
 
-This repository follows the monorepo architecture (using [TurboRepo](https://turbo.build/repo)) and contains various packages/apps:
+This repository follows the monorepo architecture (using [TurboRepo](https://turbo.build/repo)) that follows the common convention of having having top-level `apps/` and `packages/` directories. 
+The apps folder should contain workspaces for launchable apps, such as a [Next.js](https://nextjs.org/) or [Svelte](https://svelte.dev/) app.
+The packages folder should contain workspaces for packages used by either an app or another package.
+
+Workspaces are the building blocks of your monorepo. Each app and package you add to your monorepo will be inside its own workspace. 
 
 ### Packages
 
