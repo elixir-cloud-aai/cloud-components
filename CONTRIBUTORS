@@ -5,9 +5,11 @@ key][all-contributors-types]) for their valuable contributions:
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 <table>
-  <tr>
-    <td align="center"><a href="https://gupta-anurag.vercel.app/"><img src="https://avatars.githubusercontent.com/u/58766532?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Anurag Gupta</b></sub></a><br /><a href="https://github.com/elixir-cloud-aai/wc-template/commits?author=git-anurag-hub" title="Tests">⚠️</a></td>
-  </tr>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://gupta-anurag.vercel.app/"><img src="https://avatars.githubusercontent.com/u/58766532?v=4?s=100" width="100px;" alt="Anurag Gupta"/><br /><sub><b>Anurag Gupta</b></sub></a><br /><a href="https://github.com/elixir-cloud-aai/cloud-components/commits?author=git-anurag-hub" title="Tests">⚠️</a> <a href="#ideas-git-anurag-hub" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-git-anurag-hub" title="Maintenance">🚧</a></td>
+    </tr>
+  </tbody>
 </table>
 
 <!-- markdownlint-restore -->
