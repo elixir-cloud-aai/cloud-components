@@ -16,4 +16,4 @@ key][all-contributors-types]) for their valuable contributions:
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-[all-contributors-types]: https://allcontributors.org/docs/en/emoji-key
+[all-contributors-types]: <https://allcontributors.org/docs/en/emoji-key>

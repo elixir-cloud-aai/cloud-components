@@ -1,9 +1,10 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: "bug: "
-labels: "status: new, type: bug"
+title: 'bug: '
+labels: 'status: new, type: bug'
 assignees: git-anurag-hub
+
 ---
 
 **Describe the bug**
@@ -29,16 +30,16 @@ assignees: git-anurag-hub
 
 **Desktop (please complete the following information):**
 
-- OS version: [e.g. iOS 15]
-- Browser version: [e.g. Chrome 103.0.5060.114]
-- Any other relevant info, like the JS framework version you are using
+ - OS version: [e.g. iOS 15]
+ - Browser version: [e.g. Chrome 103.0.5060.114]
+ - Any other relevant info, like the JS framework version you are using
 
 **Smartphone (please complete the following information):**
 
-- Device: [e.g. Samsung SM-S901x]
-- OS version: [e.g. iOS 15]
-- Browser version: [e.g. Chrome 103.0.5060.114]
-- Any other relevant info, like the JS framework version you are using
+ - Device: [e.g. Samsung SM-S901x]
+ - OS version: [e.g. iOS 15]
+ - Browser version: [e.g. Chrome 103.0.5060.114]
+ - Any other relevant info, like the JS framework version you are using
 
 **Additional context**
 
@@ -54,6 +55,6 @@ assignees: git-anurag-hub
 > `TYPE_1` etc. refer to [contribution types supported by the All Contributors
 > Specification][all-contributors-types], e.g., `bug`.
 
-[all-contributors-bot]: https://allcontributors.org/docs/en/bot/overview
-[all-contributors-types]: https://allcontributors.org/docs/en/emoji-key
+[all-contributors-bot]: <https://allcontributors.org/docs/en/bot/overview>
+[all-contributors-types]: <https://allcontributors.org/docs/en/emoji-key>
 [contributors]: ../../CONTRIBUTORS
