@@ -1,19 +1,56 @@
 # ELIXIR Cloud Components
+
+Elixir Cloud Components is lightweight, fast, and reusable web-components developed by Elixir Cloud and AAI Community for managing and accessing various services.
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [badge-all-contributors-image]: https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square&color=%23F6DA80%20
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![License][badge-license-image]][badge-license-url]
 [![All Contributors][badge-all-contributors-image]][contributors]
 [![Chat][badge-chat-image]][badge-chat-url]
 
-## Synopsis
+## Introduction
 
-{{web-component.synopsis}}
+This repository follows the monorepo architecture (using [TurboRepo](https://turbo.build/repo)) that follows the common convention of having having top-level `apps/` and `packages/` directories. 
+The apps folder should contain workspaces for launchable apps, such as a [Next.js](https://nextjs.org/) or [Svelte](https://svelte.dev/) app.
+The packages folder should contain workspaces for packages used by either an app or another package.
 
-## Usage
+Workspaces are the building blocks of your monorepo. Each app and package you add to your monorepo will be inside its own workspace. 
 
-## Configuration
+### Packages
+
+| Name      | Description                                                                                                                                | Version   | Status      |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ----------- |
+| elixir-ui | This package serves as an abstraction layer for other packages, providing a streamlined approach for extracting common design token logic. | [0.0.1]() | In progress |
+
+### Apps
+
+| Name          | Description                                                                                                            | Deployment |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------- |
+| example-usage | This application serves as a comprehensive guide for users on how to utilize the packages available in the sample app. | [NA]()     |
+
+## Getting Started
+
+To get started with this project, follow these steps:
+
+> Note: All of the following commands should be executed on all the packages & apps. In case you want to execute the script on any one particular app/package, you can define the [workspace tag](https://turbo.build/repo/docs/handbook/package-installation#addingremovingupgrading-packages) along with any of the below commands.
+
+1. Install the dependencies involved by running the following command:
+
+   ```
+   npm install
+   ```
+
+2. Run the development server by running the following command:
+
+   ```
+   npm run dev
+   ```
+
+This will start the development server on your local machine and allow you to start working on the project.
 
 ## Contributing
 
@@ -67,12 +104,12 @@ the umbrella of the [ELIXIR][elixir] [Compute Platform][elixir-compute].
 
 To get in touch with use, please use one of the following routes:
 
-* For filing bug reports, feature requests or other code-related issues, please
+- For filing bug reports, feature requests or other code-related issues, please
   make use of the project's [issue tracker][issues].
-* For more general discussions or questions on usage, please use the
+- For more general discussions or questions on usage, please use the
   organization's [discussion forum][forum]. If the issue is related to this
   project, please indicate its name in your message body.
-* For private/personal issues, more involved communication, or if you would
+- For private/personal issues, more involved communication, or if you would
   like to join our team as a regular contributor, you can either join our
   [chat board][badge-chat-url] or send an [email][email] to the community
   leaders.
@@ -80,21 +117,21 @@ To get in touch with use, please use one of the following routes:
 [![logo-elixir][logo-elixir]][elixir]
 [![logo-elixir-cloud-aai][logo-elixir-cloud-aai]][elixir-cloud-aai]
 
-[all-contributors]: <https://allcontributors.org/docs/en/specification>
-[all-contributors-bot]: <https://allcontributors.org/docs/en/bot/overview>
-[all-contributors-types]: <https://allcontributors.org/docs/en/emoji-key>
-[badge-license-image]:<https://img.shields.io/badge/license-Apache%202.0-blue.svg>
-[badge-license-url]:<http://www.apache.org/licenses/LICENSE-2.0>
-[badge-chat-image]: <https://img.shields.io/static/v1?label=chat&message=Slack&color=ff6994>
-[badge-chat-url]: <https://join.slack.com/t/elixir-cloud/shared_invite/enQtNzA3NTQ5Mzg2NjQ3LTZjZGI1OGQ5ZTRiOTRkY2ExMGUxNmQyODAxMDdjM2EyZDQ1YWM0ZGFjOTJhNzg5NjE0YmJiZTZhZDVhOWE4MWM>
-[email]: <alexander.kanitz@alumni.ethz.ch>
+[all-contributors]: https://allcontributors.org/docs/en/specification
+[all-contributors-bot]: https://allcontributors.org/docs/en/bot/overview
+[all-contributors-types]: https://allcontributors.org/docs/en/emoji-key
+[badge-license-image]: https://img.shields.io/badge/license-Apache%202.0-blue.svg
+[badge-license-url]: http://www.apache.org/licenses/LICENSE-2.0
+[badge-chat-image]: https://img.shields.io/static/v1?label=chat&message=Slack&color=ff6994
+[badge-chat-url]: https://join.slack.com/t/elixir-cloud/shared_invite/enQtNzA3NTQ5Mzg2NjQ3LTZjZGI1OGQ5ZTRiOTRkY2ExMGUxNmQyODAxMDdjM2EyZDQ1YWM0ZGFjOTJhNzg5NjE0YmJiZTZhZDVhOWE4MWM
+[email]: alexander.kanitz@alumni.ethz.ch
 [code-of-conduct]: CODE_OF_CONDUCT.md
 [contributing]: CONTRIBUTING.md
 [contributors]: CONTRIBUTORS.md
-[elixir]: <https://elixir-europe.org/>
-[elixir-cloud-aai]: <https://elixir-cloud.dcc.sib.swiss/>
-[elixir-compute]: <https://elixir-europe.org/platforms/compute>
-[ga4gh]: <https://ga4gh.org/>
+[elixir]: https://elixir-europe.org/
+[elixir-cloud-aai]: https://elixir-cloud.dcc.sib.swiss/
+[elixir-compute]: https://elixir-europe.org/platforms/compute
+[ga4gh]: https://ga4gh.org/
 [license]: LICENSE
 [logo-elixir]: images/logo-elixir.svg
 [logo-elixir-cloud-aai]: images/logo-elixir-cloud-aai.svg
