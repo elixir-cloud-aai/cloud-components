@@ -20,15 +20,17 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/10855418?v=4",
       "profile": "https://github.com/uniqueg",
       "contributions": [
-        "maintenance"
+        "maintenance",
+        "ideas"
       ]
     }
   ],
   "badgeTemplate": "[badge-all-contributors-image]: https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg?style=flat-square&color=%23F6DA80%20",
   "contributorsPerLine": 7,
-  "projectName": "wc-template",
+  "projectName": "cloud-components",
   "projectOwner": "elixir-cloud-aai",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "angular"
 }
