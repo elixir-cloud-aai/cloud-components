@@ -1,6 +1,6 @@
 {
   "name": "elixir-ui",
-  "description": "A FAST project",
+  "description": "Suite of web components for building Elixir UIs",
   "main": "./www/main.js",
   "private": true,
   "type": "module",
