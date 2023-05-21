@@ -1,12 +1,27 @@
 {
+  "name": "cloud-components",
+  "version": "1.0.0",
+  "description": "Elixir Cloud Components is lightweight, fast, and reusable web-components developed by Elixir Cloud and AAI Community for managing and accessing various services.",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elixir-cloud-aai/cloud-components.git"
+  },
+  "bugs": {
+    "url": "https://github.com/elixir-cloud-aai/cloud-components/issues"
+  },
+  "homepage": "https://github.com/elixir-cloud-aai/cloud-components#readme",
   "scripts": {
     "build": "turbo run build",
-    "cz": "cz",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "cz": "cz",
+    "release": "standard-version",
+    "release:minor": "standard-version --release-as minor",
+    "release:patch": "standard-version --release-as patch",
+    "release:major": "standard-version --release-as major"
   },
   "devDependencies": {
     "@commitlint/cli": "17.6.3",
@@ -15,11 +30,11 @@
     "@microsoft/fast-cli": "^1.0.0-alpha.6",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.32.0",
+    "husky": "^8.0.0",
     "prettier": "^2.5.1",
-    "turbo": "latest",
-    "husky": "^8.0.0"
+    "standard-version": "^9.5.0",
+    "turbo": "latest"
   },
-  "name": "elixir-components",
   "packageManager": "npm@9.2.0",
   "workspaces": [
     "apps/*",
