@@ -2,21 +2,32 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
+    "cz": "cz",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "prepare": "husky install"
   },
   "devDependencies": {
+    "@commitlint/cli": "17.6.3",
+    "@commitlint/config-conventional": "17.6.3",
     "@microsoft/cfp-template": "^1.0.0-alpha.6",
     "@microsoft/fast-cli": "^1.0.0-alpha.6",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.32.0",
     "prettier": "^2.5.1",
-    "turbo": "latest"
+    "turbo": "latest",
+    "husky": "^8.0.0"
   },
   "name": "elixir-components",
   "packageManager": "npm@9.2.0",
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
 }
