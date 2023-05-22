@@ -52,6 +52,12 @@ To get started with this project, follow these steps:
 
 This will start the development server on your local machine and allow you to start working on the project.
 
+3. If you want to start a new package run:
+
+   ```
+   npm run new
+   ```
+
 ## Contributing
 
 This project is a community effort and lives off _your_ contributions, be it in

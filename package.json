@@ -15,7 +15,7 @@
     "prettier": "^2.5.1",
     "turbo": "latest"
   },
-  "name": "elixir-components",
+  "name": "elixir-cloud-components",
   "packageManager": "npm@9.2.0",
   "workspaces": [
     "apps/*",
