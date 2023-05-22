@@ -12,6 +12,7 @@
     "build": "",
     "dev": "",
     "lint": "npm run eslint",
+    "test": "",
     "eslint": "eslint . --ext .ts",
     "eslint:fix": "eslint . --ext .ts --fix"
   },

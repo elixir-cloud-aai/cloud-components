@@ -11,6 +11,7 @@
   "scripts": {
     "build": "webpack --config=./webpack.prod.cjs",
     "dev": "webpack --watch --config=./webpack.dev.cjs",
+    "lint": "npm run eslint",
     "eslint": "eslint . --ext .ts",
     "eslint:fix": "eslint . --ext .ts --fix",
     "start": "webpack serve --config=./webpack.dev.cjs --history-api-fallback --progress",
