@@ -1,9 +1,5 @@
 {
   "root": true,
   "extends": ["elixir"],
-  "settings": {
-    "next": {
-      "rootDir": ["apps/*/"]
-    }
-  }
+  "settings": {}
 }
