@@ -1,6 +1,6 @@
 {
   "name": "elixir-ui",
-  "description": "A FAST project",
+  "description": "Suite of web components for building Elixir UIs",
   "main": "./www/main.js",
   "private": true,
   "type": "module",
@@ -11,6 +11,7 @@
   "scripts": {
     "build": "webpack --config=./webpack.prod.cjs",
     "dev": "webpack --watch --config=./webpack.dev.cjs",
+    "lint": "npm run eslint",
     "eslint": "eslint . --ext .ts",
     "eslint:fix": "eslint . --ext .ts --fix",
     "start": "webpack serve --config=./webpack.dev.cjs --history-api-fallback --progress",

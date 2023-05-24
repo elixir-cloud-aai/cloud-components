@@ -1,61 +1,23 @@
-# ELIXIR Cloud Components
+# PACKAGE_NAME Components
 
-Elixir Cloud Components is lightweight, fast, and reusable web-components developed by Elixir Cloud and AAI Community for managing and accessing various services.
-
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-
-[badge-all-contributors-image]: https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square&color=%23F6DA80%20
-
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
-
-[![License][badge-license-image]][badge-license-url]
-[![All Contributors][badge-all-contributors-image]][contributors]
-[![Chat][badge-chat-image]][badge-chat-url]
+PACKAGE_DESCRIPTION
 
 ## Introduction
+...
 
-This repository follows the monorepo architecture (using [TurboRepo](https://turbo.build/repo)) that follows the common convention of having having top-level `apps/` and `packages/` directories. 
-The apps folder should contain workspaces for launchable apps, such as a [Next.js](https://nextjs.org/) or [Svelte](https://svelte.dev/) app.
-The packages folder should contain workspaces for packages used by either an app or another package.
-
-Workspaces are the building blocks of your monorepo. Each app and package you add to your monorepo will be inside its own workspace. 
-
-### Packages
-
-| Name      | Description                                                                                                                                | Version   | Status      |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ----------- |
-| elixir-ui | This package serves as an abstraction layer for other packages, providing a streamlined approach for extracting common design token logic. | [0.0.1]() | In progress |
-
-### Apps
-
-| Name          | Description                                                                                                            | Deployment |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------- |
-| example-usage | This application serves as a comprehensive guide for users on how to utilize the packages available in the sample app. | [NA]()     |
+### Components
+| Component              | Issue  | Status             |
+|------------------------|--------|--------------------|
+|                        |        |                    |
 
 ## Getting Started
 
 To get started with this project, follow these steps:
 
-> Note: All of the following commands should be executed on all the packages & apps. In case you want to execute the script on any one particular app/package, you can define the [workspace tag](https://turbo.build/repo/docs/handbook/package-installation#addingremovingupgrading-packages) along with any of the below commands.
-
-1. Install the dependencies involved by running the following command:
+1. Add your steps here
 
    ```
-   npm install
-   ```
-
-2. Run the development server by running the following command:
-
-   ```
-   npm run dev
-   ```
-
-This will start the development server on your local machine and allow you to start working on the project.
-
-3. If you want to start a new package run:
-
-   ```
-   npm run new
+   Add your commands here
    ```
 
 ## Contributing
@@ -122,6 +84,8 @@ To get in touch with use, please use one of the following routes:
 
 [![logo-elixir][logo-elixir]][elixir]
 [![logo-elixir-cloud-aai][logo-elixir-cloud-aai]][elixir-cloud-aai]
+
+> Note: This repo is created using the template PACKAGE_NAME.
 
 [all-contributors]: https://allcontributors.org/docs/en/specification
 [all-contributors-bot]: https://allcontributors.org/docs/en/bot/overview

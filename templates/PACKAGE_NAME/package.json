@@ -1,0 +1,23 @@
+{
+  "name": "PACKAGE_NAME",
+  "description": "PACKAGE_DESCRIPTION",
+  "main": "index.js",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "author": "",
+  "license": "ISC",
+  "repository": "",
+  "scripts": {
+    "build": "",
+    "dev": "",
+    "test": "",
+    "lint": "npx eslint .",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "devDependencies": {
+    "eslint": "^8.41.0",
+    "eslint-config-elixir": "*",
+    "typescript": "^5.0.4"
+  }
+}
