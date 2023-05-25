@@ -1,1 +1,1 @@
-declare module "elixir-ui";
+declare module 'elixir-ui';
