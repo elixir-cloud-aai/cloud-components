@@ -6,11 +6,11 @@ module.exports = [
     fields: [
       {
         templateVariable: "PACKAGE_NAME",
-        question: "What is the package's name?",
+        question: "What is the package's name? \n Package names MUST contain the following particles (particles in parentheses MAY be included, parts in angular brackets MUST be included only if applicable):\n library-domain(-subdomains)[-organization][-product] \n",
         errorMessage:
-          "Package name must be in snake_case and be lower case. Example: my_package",
+          "Package name must be in kebab-case and be lower case. Example: ecc-client-ga4gh-service-registry",
         isValid: function (value) {
-          return !!value.match(/^[a-z0-9]+(_[a-z0-9]+)*$/);
+          return !!value.match(/^[a-z0-9]+(-[a-z0-9]+)*$/);
         },
       },
       {
