@@ -9,15 +9,44 @@
   "license": "ISC",
   "repository": "",
   "scripts": {
-    "build": "",
-    "dev": "",
-    "test": "",
+    "start": "EXTEND_ESLINT=true react-scripts start",
+    "build": "EXTEND_ESLINT=true react-scripts build",
+    "test": "EXTEND_ESLINT=true react-scripts test",
     "lint": "npx eslint .",
     "lint:fix": "npm run lint -- --fix"
   },
   "devDependencies": {
+    "@types/react": "^18.2.7",
+    "@types/react-dom": "^18.2.4",
     "eslint": "^8.41.0",
     "eslint-config-elixir": "*",
     "typescript": "^5.0.4"
+  },
+  "eslintConfig": {
+    "extends": "react-app",
+    "rules": {
+      "no-unused-expressions": "off"
+    }
+  },
+  "dependencies": {
+    "@microsoft/fast-components": "^2.30.6",
+    "@microsoft/fast-element": "^2.0.0-beta.3",
+    "@microsoft/fast-foundation": "^3.0.0-alpha.4",
+    "@microsoft/fast-react-wrapper": "^0.3.18",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "^5.0.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
