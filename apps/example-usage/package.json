@@ -7,17 +7,22 @@
     "build": "next build",
     "start": "next start",
     "test": "",
-    "lint": "next lint"
+    "lint": "npx eslint .",
+    "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
     "@types/node": "20.0.0",
     "@types/react": "18.2.5",
     "@types/react-dom": "18.2.3",
     "elixir-ui": "*",
-    "eslint-config-elixir":"*",
     "next": "13.4.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "typescript": "5.0.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.41.0",
+    "eslint-config-elixir": "*",
+    "eslint-config-next": "^13.4.4"
   }
 }
