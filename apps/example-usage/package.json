@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "test": "",
-    "lint": "npx eslint .",
+    "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
@@ -15,7 +15,7 @@
     "@types/react": "18.2.5",
     "@types/react-dom": "18.2.3",
     "elixir-ui": "*",
-    "eslint-config-elixir":"*",
+    "eslint-config-elixir": "*",
     "next": "13.4.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
