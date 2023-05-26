@@ -18,5 +18,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      - run: npm i --force
-      - run: npm run lint
+      - name: Install dependencies
+        run: npm i
+      - name: Run linting checks
+        run: npm run lint
