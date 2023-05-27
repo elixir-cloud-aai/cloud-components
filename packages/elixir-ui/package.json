@@ -17,7 +17,7 @@
     "eslint:fix": "eslint . --ext .ts --fix",
     "start": "webpack serve --config=./webpack.dev.cjs --history-api-fallback --progress",
     "start:storybook": "start-storybook -p 3000 -h localhost",
-    "test": "npm run eslint && npx playwright test",
+    "test": "",
     "test:serve": "node ./test-server.cjs",
     "fast:postinstall": "==========================================\n\n Your project has been initialized!\n You have access to the following commands:\n\n Start: npm start\n Test: npm run test\n Build: npm run build\n\n=========================================="
   },

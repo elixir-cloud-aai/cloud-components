@@ -6,7 +6,7 @@
       "dependsOn": ["^topo"]
     },
     "build": {
-      "outputs": [],
+      "outputs": ["www/**", ".next/**", "dist/**"],
       "dependsOn": ["^build"]
     },
     "test": {
