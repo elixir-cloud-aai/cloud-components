@@ -10,7 +10,7 @@ module.exports = [
         errorMessage:
           "Package name must be in snake_case and be lower case. Example: my_package",
         isValid: function (value) {
-          return !!value.match(/^[a-z0-9]+(_[a-z0-9]+)*$/);
+          return !!value.match(/^[a-z0-9]+(-[a-z0-9]+)*$/);
         },
       },
       {
