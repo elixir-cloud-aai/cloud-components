@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/nameTag/NameTag.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "NameTag",
+          "members": [
+            {
+              "kind": "field",
+              "name": "greeting",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Hello'"
+            },
+            {
+              "kind": "field",
+              "name": "tokens",
+              "type": {
+                "text": "object"
+              },
+              "default": "{}"
+            }
+          ],
+          "superclass": {
+            "name": "FASTElement",
+            "package": "@microsoft/fast-element"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "NameTag",
+            "module": "src/nameTag/NameTag.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/nameTag/Style.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles",
+          "default": "css`\n  .header {\n    background-color: #f7f7f7;\n    padding: 20px;\n    text-align: center;\n    font-family: Arial, sans-serif;\n    border-bottom: 1px solid #ddd;\n  }\n\n  .header h3 {\n    font-size: 36px;\n    margin: 0;\n    text-transform: uppercase;\n    color: #333;\n  }\n\n  .header h4 {\n    font-size: 24px;\n    margin: 10px 0;\n    font-family: Georgia, serif;\n    color: #666;\n  }\n\n  .body {\n    padding: 20px;\n    font-size: 24px;\n    text-align: center;\n    font-family: Georgia, serif;\n    color: #333;\n    line-height: 1.5;\n  }\n\n  .footer {\n    background-color: #333;\n    color: #fff;\n    padding: 20px;\n    text-align: center;\n    font-family: Arial, sans-serif;\n  }\n\n  .footer p {\n    margin: 0;\n  }\n\n  .footer a {\n    color: #fff;\n    text-decoration: none;\n  }\n\n  .footer a:hover {\n    text-decoration: underline;\n  }\n`"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "styles",
+            "module": "src/nameTag/Style.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/nameTag/Template.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "template",
+          "default": "html<NameTag>`\n  <div class=\"header\">\n    <h3>${(x) => x.greeting.toUpperCase()}</h3>\n    <h4>my name is</h4>\n  </div>\n\n  <div class=\"body\">TODO: Name Here</div>\n\n  <div class=\"footer\"></div>\n`"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "template",
+            "module": "src/nameTag/Template.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/nameTag/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "NameTag",
+            "module": "src/nameTag/index.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/nameTag/name-tag.ts",
+      "declarations": [],
+      "exports": []
+    }
+  ]
+}
