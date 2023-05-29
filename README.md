@@ -57,6 +57,25 @@ This will start the development server on your local machine and allow you to st
    ```
    npm run new
    ```
+4. Run linter by the following command:
+   
+   ```
+   npm run lint
+   ```
+
+5. Run all test using the following command.
+
+   ```
+   npm run test
+   ``` 
+   Note : Since packages have interdependency, you need to run `dev` script atleast once before running `lint` and `test` scripts globally.
+
+Above commands are global commands, they run for the entire monorepo which includes all the pacakges, apps and docs etc but these commands can be coupled with `-w` or `-workspace` flag to run them on a specific repo/workspace inside this monorepo.
+
+for example, to run test script on the package 'elixir-ui', use the following command: 
+```
+npm run test -w=elixir-ui
+```
 
 ## Contributing
 
