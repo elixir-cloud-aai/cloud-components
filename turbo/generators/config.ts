@@ -19,6 +19,15 @@ function validateNotEmpty(input:string) {
 }
 
 export default function generator(plop: PlopTypes.NodePlopAPI): void {
+  /**
+   * custom action to log error when the package name length is long.
+   * 'error': Name of the action
+   */
+  plop.setActionType('error', (config) => {
+    const { name } = (config as { name: string });
+    return Promise.reject(Error(`${name} is too long for the package, please shorten it to 128 character or below.`));
+  });
+
   plop.setGenerator('packages', {
     description: 'Generate a base config for new package',
     prompts: [
@@ -66,63 +75,57 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
       },
     ],
     actions: (data: any) => {
-      if (data) {
-        // Take the prompt value and convert it into kebab-case
-        const library = data.library || '';
-        const libraryDomain = data.libraryDomain === '__custom__' ? data.customLibraryDomain : data.libraryDomain;
-        const librarySubDomain = data.librarySubDomain || '';
-        const organisation = data.organisation || '';
-        const product = data.product || '';
+      // Take the prompt value and convert it into kebab-case
+      const library = data.library || '';
+      const libraryDomain = data.libraryDomain === '__custom__' ? data.customLibraryDomain : data.libraryDomain;
+      const librarySubDomain = data.librarySubDomain || '';
+      const organisation = data.organisation || '';
+      const product = data.product || '';
 
-        const name = [library, libraryDomain, librarySubDomain, organisation, product].filter(Boolean).join('-');
-        const kebabName = kebabCase(name);
+      const names = [library, libraryDomain, librarySubDomain, organisation, product].filter(Boolean).join('-');
+      const kebabName = kebabCase(names);
 
-        if (kebabName.length > 128) {
-          return [
-            {
-              type: 'run',
-              // Empty template to not generate any file
-              template: '',
-              // Error message
-              message: 'Package name is too long, please shorten it. (Package name cannot be greater than 128 characters)',
-            },
-          ];
-        }
-        // Add a new field "name" to inquirer.Answers
-        data.name = kebabName;
+      // Add a new field "name" to inquirer.Answers
+      data.name = kebabName as string;
+
+      // all the actions to create the template
+      const actions = [
+        {
+          type: 'addMany',
+          destination: '{{ turbo.paths.root }}/packages/{{ name }}',
+          templateFiles: 'templates/**/*.hbs',
+          stripExtensions: ['hbs'],
+          abortOnFail: true,
+        },
+        {
+          type: 'add',
+          path: '{{ turbo.paths.root }}/packages/{{ name }}/.eslintrc',
+          templateFile: 'templates/.eslintrc.hbs',
+        },
+        {
+          type: 'add',
+          path: '{{ turbo.paths.root }}/packages/{{ name }}/.eslintignore',
+          templateFile: 'templates/.eslintignore.hbs',
+        },
+        {
+          type: 'add',
+          path: '{{ turbo.paths.root }}/packages/{{ name }}/.gitignore',
+          templateFile: 'templates/.gitignore.hbs',
+        },
+      ];
+
+      // If the name length is out of bound, log error.
+      if (kebabName.length > 128) {
         return [
           {
-            type: 'addMany',
-            destination: '{{ turbo.paths.root }}/packages/{{ name }}',
-            templateFiles: 'templates/**/*.hbs',
-            stripExtensions: ['hbs'],
-            abortOnFail: true,
-          },
-          {
-            type: 'add',
-            path: '{{ turbo.paths.root }}/packages/{{ name }}/.eslintrc',
-            templateFile: 'templates/.eslintrc.hbs',
-          },
-          {
-            type: 'add',
-            path: '{{ turbo.paths.root }}/packages/{{ name }}/.eslintignore',
-            templateFile: 'templates/.eslintignore.hbs',
-          },
-          {
-            type: 'add',
-            path: '{{ turbo.paths.root }}/packages/{{ name }}/.gitignore',
-            templateFile: 'templates/.gitignore.hbs',
+            type: 'error',
+            name: kebabName,
           },
         ];
       }
-      return [
-        {
-          type: 'run',
-          template: '',
-          // Error message
-          message: 'Please try again, some internal error occured',
-        },
-      ];
+
+      // else create the template
+      return actions;
     },
   });
 }
