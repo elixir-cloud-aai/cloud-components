@@ -73,7 +73,7 @@ This will start the development server on your local machine and allow you to st
 <a id="point-6"></a>
 
 >Above commands are global commands, they run for the entire monorepo which includes all the packages, apps and docs etc but these commands can be coupled with `-w` or `-workspace` flag to run them on a specific repo/workspace inside this monorepo.
-1. To run test script on the package `elixir-ui`, use the following command:
+6. To run test script on the package `elixir-ui`, use the following command:
     
    ```
    npm run test -w=elixir-ui
