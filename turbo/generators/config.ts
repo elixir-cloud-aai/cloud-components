@@ -41,7 +41,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         type: 'list',
         name: 'libraryDomain',
         message: 'Select domain of the package:',
-        choices: ['client', 'dashboard', { name: 'Fill custom input for this field', value: '__custom__' }],
+        choices: ['client', { name: 'Fill custom input for this field', value: '__custom__' }],
       },
       {
         // If custom input selected for subdomain take the input
