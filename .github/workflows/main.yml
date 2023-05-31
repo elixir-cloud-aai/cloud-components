@@ -1,7 +1,9 @@
-name: Pull Request Checks
+name: Streamlined PR Evaluation & Deployment Workflow
 
 on:
   pull_request:
+    branches: ['main']
+  push:
     branches: ['main']
 
 jobs:
