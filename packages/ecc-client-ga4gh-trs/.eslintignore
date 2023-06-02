@@ -12,17 +12,3 @@ dist
 
 # Never lint coverage output
 coverage
-
-# Never lint 
-**/.git
-**/.svn
-**/.hg
-**/node_modules
-
-/.github/*
-CONTRIBUTING.md
-LICENSE
-README.md
-CONTRIBUTORS.md
-CODE_OF_CONDUCT.md
-```

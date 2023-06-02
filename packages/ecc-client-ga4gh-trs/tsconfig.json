@@ -1,20 +1,26 @@
 {
     "compilerOptions": {
-      "target": "es5",
-      "lib": ["dom", "dom.iterable", "esnext"],
-      "allowJs": true,
-      "skipLibCheck": true,
-      "esModuleInterop": true,
-      "allowSyntheticDefaultImports": true,
-      "strict": true,
-      "forceConsistentCasingInFileNames": true,
-      "module": "esnext",
-      "moduleResolution": "node",
-      "resolveJsonModule": true,
-      "isolatedModules": true,
-      "noEmit": true,
-      "jsx": "react-jsx"
+        "declaration": true,
+        "esModuleInterop": true,
+        "strictNullChecks": true,
+        "moduleResolution": "node",
+        "declarationDir": "dist/dts",
+        "outDir": "dist/esm",
+        "experimentalDecorators": true,
+        "noImplicitAny": false,
+        "strictPropertyInitialization": false,
+        "importsNotUsedAsValues": "error",
+        "target": "es2015",
+        "module": "ESNext",
+        "importHelpers": true,
+        "types": [
+            "node"
+        ],
+        "lib": [
+            "DOM",
+            "ES2015",
+            "ES2016.Array.Include"
+        ]
     },
     "include": ["src"]
-  }
-  
+}
