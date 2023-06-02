@@ -8,7 +8,7 @@ module.exports = merge(baseConfig, {
         open: true,
         port: 3000,
     },
-    "devtool": "inline-source-map"
+    devtool: "inline-source-map",
     mode: "development",
     output: {
         filename: "[name].js",
