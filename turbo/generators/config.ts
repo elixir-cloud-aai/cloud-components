@@ -41,15 +41,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         type: 'list',
         name: 'libraryDomain',
         message: 'Select domain of the package:',
-        choices: ['client', { name: 'Fill custom input for this field', value: '__custom__' }],
-      },
-      {
-        // If custom input selected for subdomain take the input
-        type: 'input',
-        name: 'customLibraryDomain',
-        message: 'Enter custom library domain:',
-        when: (data) => data.libraryDomain === '__custom__',
-        validate: validateNotEmpty,
+        choices: ['client', 'utils'],
       },
       {
         type: 'input',
@@ -77,7 +69,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
     actions: (data: any) => {
       // Take the prompt value and convert it into kebab-case
       const library = data.library || '';
-      const libraryDomain = data.libraryDomain === '__custom__' ? data.customLibraryDomain : data.libraryDomain;
+      const libraryDomain = data.libraryDomain || '';
       const librarySubDomain = data.librarySubDomain || '';
       const organisation = data.organisation || '';
       const product = data.product || '';
