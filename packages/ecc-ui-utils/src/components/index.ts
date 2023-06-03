@@ -1,3 +1,4 @@
-import welcome from "./welcome/define.js";
+// Export all the components here, look at the example below.
+// import test-comp from "./test-comp/define.js";
 
-export default [welcome()];
+// export default [testComp()];
