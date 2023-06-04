@@ -36,7 +36,7 @@ Workspaces are the building blocks of your monorepo. Each app and package you ad
 
 To get started with this project, follow these steps:
 
-> Note: All of the following commands should be executed on all the packages & apps. In case you want to execute the script on any one particular app/package, you can define the [workspace tag](https://turbo.build/repo/docs/handbook/package-installation#addingremovingupgrading-packages) along with any of the below commands.
+> Note: All of the following commands should be executed on all the packages & apps. In case you want to execute the script on any one particular app/package, you can define the [workspace tag](https://turbo.build/repo/docs/handbook/package-installation#addingremovingupgrading-packages) along with any of the below commands ([refer to point 6](#point-6)).
 
 1. Install the dependencies involved by running the following command:
 
@@ -45,7 +45,7 @@ To get started with this project, follow these steps:
    ```
 
 2. Run the development server by running the following command:
-
+   
    ```
    npm run dev
    ```
@@ -56,6 +56,27 @@ This will start the development server on your local machine and allow you to st
 
    ```
    npm run new
+   ```
+4. Run linter by the following command:
+   
+   ```
+   npm run lint
+   ```
+
+5. Run all test using the following command.
+
+   ```
+   npm run test
+   ``` 
+> Note: Since packages have interdependency, you need to run `dev` script atleast once before running `lint` and `test` scripts globally.
+
+<a id="point-6"></a>
+
+>Above commands are global commands, they run for the entire monorepo which includes all the packages, apps and docs etc but these commands can be coupled with `-w` or `-workspace` flag to run them on a specific repo/workspace inside this monorepo.
+6. To run test script on the package `elixir-ui`, use the following command:
+    
+   ```
+   npm run test -w=elixir-ui
    ```
 
 ## Contributing
