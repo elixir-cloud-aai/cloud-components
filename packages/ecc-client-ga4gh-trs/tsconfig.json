@@ -14,7 +14,7 @@
         "target": "es2015",
         "module": "ESNext",
         "importHelpers": true,
-        "sourceMap": true
+        "sourceMap": true,
         "types": [
             "node"
         ],
