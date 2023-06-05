@@ -20,7 +20,6 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "clean": "rm -rf node_modules && rm -rf */*/node_modules",
     "new": "turbo gen",
-    "new": "cookiecutter",
     "prepare": "husky install",
     "cz": "cz",
     "release": "standard-version",
