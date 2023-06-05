@@ -28,8 +28,8 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
     return Promise.reject(Error(`${name} is too long for the package, please shorten it to 128 character or below.`));
   });
 
-  plop.setGenerator('packages', {
-    description: 'Generate a base config for new package',
+  plop.setGenerator('package', {
+    description: 'Generate a new package in the packages directory',
     prompts: [
       {
         type: 'list',
@@ -46,17 +46,17 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
       {
         type: 'input',
         name: 'librarySubDomain',
-        message: 'Enter library Subdomain (to skip press ENTER) :',
+        message: 'Enter library Subdomain (to skip press ENTER):',
       },
       {
         type: 'input',
         name: 'organisation',
-        message: 'Enter organization name if applicable (to skip press ENTER) :',
+        message: 'Enter organization name if applicable (to skip press ENTER):',
       },
       {
         type: 'input',
         name: 'product',
-        message: 'Enter product name (cannot be left blank) :',
+        message: 'Enter product name:',
         validate: validateNotEmpty,
       },
       {
@@ -85,24 +85,24 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         {
           type: 'addMany',
           destination: '{{ turbo.paths.root }}/packages/{{ name }}',
-          templateFiles: 'templates/**/*.hbs',
+          templateFiles: 'templates/package/**/*.hbs',
           stripExtensions: ['hbs'],
           abortOnFail: true,
         },
         {
           type: 'add',
           path: '{{ turbo.paths.root }}/packages/{{ name }}/.eslintrc',
-          templateFile: 'templates/.eslintrc.hbs',
+          templateFile: 'templates/package/.eslintrc.hbs',
         },
         {
           type: 'add',
           path: '{{ turbo.paths.root }}/packages/{{ name }}/.eslintignore',
-          templateFile: 'templates/.eslintignore.hbs',
+          templateFile: 'templates/package/.eslintignore.hbs',
         },
         {
           type: 'add',
           path: '{{ turbo.paths.root }}/packages/{{ name }}/.gitignore',
-          templateFile: 'templates/.gitignore.hbs',
+          templateFile: 'templates/package/.gitignore.hbs',
         },
       ];
 
