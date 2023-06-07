@@ -1,0 +1,15 @@
+**/.git
+**/.svn
+**/.hg
+node_modules
+dist
+build
+www
+
+/.github/*
+CONTRIBUTING.md
+LICENSE
+README.md
+CONTRIBUTORS.md
+CODE_OF_CONDUCT.md
+```

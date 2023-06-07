@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "lint": "npx eslint .",
+    "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix"
   },
   "author": "",
@@ -14,7 +14,6 @@
     "@typescript-eslint/parser": "^5.59.7",
     "eslint": "^8.41.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-turbo": "1.9.9",
-    "eslint-plugin-import": "^2.27.5"
+    "eslint-config-turbo": "1.9.9"
   }
 }
