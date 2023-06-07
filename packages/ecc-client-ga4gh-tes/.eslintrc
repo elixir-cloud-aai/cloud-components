@@ -1,0 +1,26 @@
+{
+  "extends": [
+    "elixir",
+    "@open-wc",
+    "airbnb-typescript/base",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/typescript",
+    "prettier"
+  ],
+  "plugins": ["import", "prettier"],
+  "rules": {
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["error"],
+    "import/no-unresolved": "off",
+    "import/extensions": [
+      "error",
+      "always",
+      {
+        "ignorePackages": true
+      }
+    ]
+  },
+  "parserOptions": {
+    "project": ["./tsconfig.json"]
+  }
+}
