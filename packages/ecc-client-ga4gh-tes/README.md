@@ -3,8 +3,7 @@
 Web componets for TES
 
 ## Introduction
-...
-
+This package provides a collection of Web Components for interacting with TES (Task Execution System). It offers functionalities for listing, creating, and deleting task runs. These components facilitate seamless integration and enhanced user experience when working with TES tasks.
 ### Components
 | Component              | Issue  | Status             |
 |------------------------|--------|--------------------|
@@ -14,11 +13,13 @@ Web componets for TES
 
 To get started with this project, follow these steps:
 
-1. Add your steps here
+- `start` runs your app for development, reloading on file changes
+- `start:build` runs your app after it has been built using the build command
+- `build` builds your app and outputs it in your `dist` directory
+- `test` runs your test suite with Web Test Runner
+- `lint` runs the linter for your project
 
-   ```
-   Add your commands here
-   ```
+
 
 ## Contributing
 
