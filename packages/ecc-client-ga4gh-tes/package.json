@@ -1,6 +1,6 @@
 {
   "name": "ecc-client-ga4gh-tes",
-  "description": "Web componets for TES",
+  "description": "Web components for TES",
   "main": "index.js",
   "private": true,
   "type": "module",

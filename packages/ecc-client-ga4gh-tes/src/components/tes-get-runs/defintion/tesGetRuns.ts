@@ -8,6 +8,10 @@ import { fetchTasks } from "../../../data/index.js";
 import template from "./tesGetRuns.template.js";
 import styles from "./tesGetRuns.styles.js";
 
+interface Task {
+  id: string;
+  state: string;
+}
 @customElement({
   name: "ecc-tes-get-runs",
   template,
@@ -18,26 +22,27 @@ export default class TESGetRuns extends FASTElement {
 
   @attr nextPageToken = "";
 
-  @observable data: object = {};
+  @observable data: Task[] = [];
 
   async connectedCallback() {
+    super.connectedCallback();
     const newData = await fetchTasks();
-    if (newData) {
-      this.data = newData;
+    if (newData && newData.tasks) {
+      this.data = newData.tasks;
     }
   }
 
-  async pageSizeChanged() {
-    const newData = await fetchTasks(this.pageSize);
-    if (newData) {
-      this.data = newData;
-    }
-  }
+  // async pageSizeChanged() {
+  //   const newData = await fetchTasks(this.pageSize);
+  //   if (newData && newData.tasks) {
+  //     this.data = newData.tasks;
+  //   }
+  // }
 
-  async nextPageTokenChanged() {
-    const newData = await fetchTasks(this.pageSize, this.nextPageToken);
-    if (newData) {
-      this.data = newData;
-    }
-  }
+  // async nextPageTokenChanged() {
+  //   const newData = await fetchTasks(this.pageSize, this.nextPageToken);
+  //   if (newData && newData.tasks) {
+  //     this.data = newData.tasks;
+  //   }
+  // }
 }
