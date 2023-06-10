@@ -30,7 +30,18 @@ export default class TESGetRuns extends FASTElement {
     if (newData && newData.tasks) {
       this.data = newData.tasks;
     }
+    // this.addEventListener("click", this.handleClick);
   }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    // this.removeEventListener("click", this.handleClick);
+  }
+
+  // handleClick = () => {
+  //   console.log("from runs", this.id);
+  //   // Todo : extended run tast view
+  // };
 
   // async pageSizeChanged() {
   //   const newData = await fetchTasks(this.pageSize);

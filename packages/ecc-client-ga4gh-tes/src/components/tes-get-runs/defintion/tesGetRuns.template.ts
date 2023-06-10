@@ -8,7 +8,7 @@ const template = html<TESGetRuns>`
       (x) => x.data,
       html<TESGetRun>`
         <ecc-tes-get-run
-          class="run-container"
+          class="run-item"
           @click=${(x) => x.handleClick()}
           id=${(x) => x.id}
           state=${(x) => x.state}

@@ -1,11 +1,11 @@
-import { html } from "@microsoft/fast-element";
+import { html, when, repeat } from "@microsoft/fast-element";
 import TESGetRun from "./tesGetRun.js";
 // import TESStatusBadge from "../../tes-status-badge/index.js";
 
 const template = html<TESGetRun>`
-  <div class="run-body">
+  <div class="container">
     ${(x) => html`
-      <div class="container">
+      <div class="collapsed-container">
         <div class="right">
           <span class="id">
             <span class="id-heading">RUN ID:</span>
@@ -54,6 +54,79 @@ const template = html<TESGetRun>`
         </div>
       </div>
     `}
+    ${when(
+      (x) => x.expanded,
+      html<TESGetRun>`
+        <div class="expanded-container">
+          ${(x) =>
+            html`
+              <div class="meta-data">
+                <div class="name">Name: ${x.data.name}</div>
+                <div class="description">
+                  Description: ${x.data.description}
+                </div>
+                <div class="creation-time">
+                  Creation Time: ${x.data.creation_time}
+                </div>
+              </div>
+            `}
+          <div class="executors">
+            Executors:
+            <ul>
+              ${repeat(
+                (x) => x.data.executors,
+                html`
+                  <li>
+                    <div>Image: ${(executor) => executor.image}</div>
+                    <ul>
+                      ${repeat(
+                        (executor) => executor.command,
+                        html`<li>${(x) => x}</li>`
+                      )}
+                    </ul>
+                  </li>
+                `
+              )}
+            </ul>
+          </div>
+          <div class="logs">
+            Logs:
+            <ul>
+              ${when(
+                (x) => x.data.logs && x.data.logs.length > 0,
+                html`
+                  ${repeat(
+                    (x) => x.data.logs,
+                    html`
+                      <li>
+                        <div>Start Time: ${(x) => x.start_time}</div>
+                        <div>End Time: ${(x) => x.end_time}</div>
+                        ${when(
+                          (x) => x.logs && x.logs.length > 0,
+                          html`
+                            <div>Stdout: ${(x) => x.logs[0].stdout}</div>
+                            <div>Exit Code: ${(x) => x.logs[0].exit_code}</div>
+                          `
+                        )}
+                        ${when(
+                          (x) => x.metadata && x.metadata.USER_ID,
+                          html`
+                            <div>
+                              Metadata User ID: ${(x) => x.metadata.USER_ID}
+                            </div>
+                          `
+                        )}
+                      </li>
+                    `
+                  )}
+                `
+              )}
+            </ul>
+          </div>
+        </div>
+        </div>
+      `
+    )}
   </div>
 `;
 

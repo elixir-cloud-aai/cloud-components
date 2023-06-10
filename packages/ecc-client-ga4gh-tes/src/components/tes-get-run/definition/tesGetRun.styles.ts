@@ -1,11 +1,11 @@
 import { css } from "@microsoft/fast-element";
 
 const styles = css`
-  .run-body {
+  .container {
     display: block;
   }
 
-  .container {
+  .collapsed-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
