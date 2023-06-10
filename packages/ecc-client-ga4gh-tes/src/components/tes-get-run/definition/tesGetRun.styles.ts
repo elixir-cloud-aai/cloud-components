@@ -1,27 +1,56 @@
 import { css } from "@microsoft/fast-element";
 
 const styles = css`
-  .block-list {
-    margin: 16px;
+  .run-body {
+    display: block;
   }
 
-  .block-component {
+  .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f5f5f5;
+    transition: background-color 0.3s ease;
+  }
+
+  .container:hover {
+    background-color: #e0e0e0;
+  }
+
+  .right {
+    margin-right: 10px;
+  }
+
+  .left {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px;
-    border: 1px solid #ccc;
-    margin-bottom: 8px;
   }
 
-  .block-component .id {
+  .id {
+    display: flex;
+    align-items: center;
+  }
+
+  .id-heading {
+    margin-right: 5px;
     font-weight: bold;
-    margin-right: 16px;
+    font-size: 0.8rem;
   }
 
-  .block-component .status {
-    flex-grow: 1;
-    text-align: right;
+  .delete-icon,
+  .reload-icon {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    margin: 10px;
+  }
+
+  .delete-icon:hover,
+  .reload-icon:hover {
+    transform: scale(1.1);
   }
 `;
 
