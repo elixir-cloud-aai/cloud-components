@@ -1,16 +1,13 @@
-name: PR Evaluation & Deployment Workflow
+name: PR Evaluation
 
 on:
   pull_request:
-    types: edited
-    branches: ['main']
-  push:
+    types: [opened, synchronize, reopened, ready_for_review, edited]
     branches: ['main']
 
 jobs:
-
-  lint_pr: 
-    name: Validate PR title
+  semantic_pr: 
+    name: Semantic PR title
     runs-on: ubuntu-latest
     steps:
       - uses: amannn/action-semantic-pull-request@v5
@@ -44,9 +41,23 @@ jobs:
             didn't match the configured pattern. Please ensure that the subject
             doesn't start with an uppercase character & not have more than 50 characters.
 
+  detect-unresolved-conflicts:
+    name: Detect unresolved merge conflicts
+    runs-on: ubuntu-latest
+    if: ${{ github.event.action != 'edited' }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: List files with merge conflict markers
+        run: git --no-pager grep "<<<<<<<" ":(exclude).github/" || true
+      - name: Fail or succeed job if any files with merge conflict markers have been checked in
+        # Find lines containing "<<<<<<<", then count the number of lines.
+        # 0 matching lines results in exit code 0, i.e. success.
+        run: exit $(git grep "<<<<<<<" ":(exclude).github/" | wc --lines)
+
   linters:
     name: Linting checks
     runs-on: ubuntu-latest
+    if: ${{ github.event.action != 'edited' }}
     strategy:
       matrix:
         node-version: [18.x, 20.x]
@@ -72,6 +83,7 @@ jobs:
   tests:
     name: Test checks
     runs-on: ubuntu-latest
+    if: ${{ github.event.action != 'edited' }}
     strategy:
       matrix:
         node-version: [18.x, 20.x]
@@ -93,3 +105,33 @@ jobs:
       
       - name: Run tests
         run: npm run test
+
+  passed-evaluation: 
+    name: PR passed the evaluation
+    needs: [semantic_pr, detect-unresolved-conflicts, linters, tests]
+    if: ${{ always() && !contains(needs.*.result, 'failure') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            ✅ This PR has passed the evaluation. Please provide a description, complete the checklist, and assign reviewers.
+
+  failed-evaluation:
+    name: PR failed the evaluation
+    needs: [semantic_pr, detect-unresolved-conflicts, linters, tests]
+    if: ${{ always() && contains(needs.*.result, 'failure') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            ❌ This PR has failed the evaluations. Please fix the issues and try again.
