@@ -44,7 +44,6 @@ jobs:
   detect-unresolved-conflicts:
     name: Detect unresolved merge conflicts
     runs-on: ubuntu-latest
-    if: ${{ github.event.action !== 'edited' }}
     steps:
       - uses: actions/checkout@v3
       - name: List files with merge conflict markers
@@ -57,7 +56,6 @@ jobs:
   linters:
     name: Linting checks
     runs-on: ubuntu-latest
-    if: ${{ github.event.action !== 'edited' }}
     strategy:
       matrix:
         node-version: [18.x, 20.x]
@@ -83,7 +81,6 @@ jobs:
   tests:
     name: Test checks
     runs-on: ubuntu-latest
-    if: ${{ github.event.action !== 'edited' }}
     strategy:
       matrix:
         node-version: [18.x, 20.x]
