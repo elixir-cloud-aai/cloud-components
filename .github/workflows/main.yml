@@ -120,5 +120,5 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
-            ✅ This PR has passed the evaluation till commit ${GITHUB_SHA}.
+            ✅ This PR has passed the evaluation till commit ${{GITHUB_SHA}}.
             Please provide a description, complete the checklist, and assign reviewers.
