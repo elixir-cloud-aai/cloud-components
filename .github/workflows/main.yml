@@ -2,6 +2,7 @@ name: PR Evaluation & Deployment Workflow
 
 on:
   pull_request:
+    types: edited
     branches: ['main']
   push:
     branches: ['main']
