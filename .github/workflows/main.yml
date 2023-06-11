@@ -9,7 +9,7 @@ on:
 
 jobs:
   semantic_pr: 
-    name: Validate PR title
+    name: Semantic PR title
     if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
@@ -43,6 +43,19 @@ jobs:
             The subject "{subject}" found in the pull request title "{title}"
             didn't match the configured pattern. Please ensure that the subject
             doesn't start with an uppercase character & not have more than 50 characters.
+
+  detect-unresolved-conflicts:
+    name: Detect unresolved merge conflicts
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: List files with merge conflict markers
+        run: git --no-pager grep "<<<<<<<" ":(exclude).github/" || true
+      - name: Fail or succeed job if any files with merge conflict markers have been checked in
+        # Find lines containing "<<<<<<<", then count the number of lines.
+        # 0 matching lines results in exit code 0, i.e. success.
+        run: exit $(git grep "<<<<<<<" ":(exclude).github/" | wc --lines)
 
   linters:
     name: Linting checks
@@ -93,3 +106,12 @@ jobs:
       
       - name: Run tests
         run: npm run test
+
+  ready-to-review: 
+    name: PR Ready to Review
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: [semantic_pr, detect-unresolved-conflicts, linters, tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo PR Ready to Review
+        run: echo "PR Ready to Review"
