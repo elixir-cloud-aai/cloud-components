@@ -1,4 +1,4 @@
-name: PR Evaluation & Deployment Workflow
+name: Streamline PR Evaluation & Deployment Workflow
 
 on:
   pull_request:
