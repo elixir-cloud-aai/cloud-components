@@ -113,5 +113,11 @@ jobs:
     needs: [semantic_pr, detect-unresolved-conflicts, linters, tests]
     runs-on: ubuntu-latest
     steps:
-      - name: Echo PR Ready to Review
-        run: echo "PR Ready to Review"
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            :tada: This PR is ready to be reviewed! :tada:
