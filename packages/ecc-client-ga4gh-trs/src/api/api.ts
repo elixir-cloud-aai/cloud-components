@@ -1,19 +1,3 @@
-// // api.ts
-// import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-
-// export const api = createApi({
-//   reducerPath: 'api',
-//   baseQuery: fetchBaseQuery({ baseUrl: 'https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2/' }),
-//   endpoints: (builder) => ({
-//     getToolClasses: builder.query<Array<{description: string, id: string, name: string}>, void>({
-//       query: () => 'toolClasses',
-//     }),
-//   }),
-// })
-
-// export const { useGetToolClassesQuery } = api
-
-// api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 interface ToolsParams {
@@ -77,6 +61,11 @@ interface Tool {
   versions: Version[];
 }
 
+interface ToolVersionParams {
+  id: string;
+  version_id: string;
+  type: string;
+}
 
 export const api = createApi({
   reducerPath: 'api',
@@ -94,7 +83,13 @@ export const api = createApi({
     getToolById: builder.query<Tool, string>({
       query: (id) => `tools/${id}`,
     }),
+    getToolVersion: builder.query<Array<{file_type: string, path: string}>, ToolVersionParams>({
+      query: ({id, version_id, type}) => `tools/${id}/versions/${version_id}/${type}/files`,
+    }),
+    getToolVersionTests: builder.query<Array<any>, ToolVersionParams>({
+      query: ({id, version_id, type}) => `tools/${id}/versions/${version_id}/${type}/tests`,
+    }),
   }),
 })
 
-export const { useGetToolClassesQuery, useGetToolsQuery, useGetToolByIdQuery } = api
+export const { useGetToolClassesQuery, useGetToolsQuery, useGetToolByIdQuery, useGetToolVersionQuery, useGetToolVersionTestsQuery } = api

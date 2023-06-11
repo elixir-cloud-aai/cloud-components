@@ -3,10 +3,17 @@ import {
   useGetToolByIdQuery,
   useGetToolClassesQuery,
   useGetToolsQuery,
-  
+  useGetToolVersionQuery,
+  useGetToolVersionTestsQuery
 } from "../../api/api";
 
-const ToolClassesComponent: React.FC = () => {
+interface ToolVersionProps {
+  id: string;
+  version_id: string;
+  type: string;
+}
+
+const ToolClassesComponent: React.FC<ToolVersionProps> = ({ id, version_id, type })  => {
   const { data: toolClassesData = [], isFetching } =
     useGetToolClassesQuery() ?? {};
   const {
@@ -19,6 +26,8 @@ const ToolClassesComponent: React.FC = () => {
     error: toolByIdError,
     isLoading: toolByIdLoading
   } = useGetToolByIdQuery("JB7HQW");
+  const { data: filesData, error: filesError, isLoading: loadingFiles } = useGetToolVersionQuery({ id, version_id, type });
+  const { data: testsData, error: testsError, isLoading: loadingTests } = useGetToolVersionTestsQuery({ id, version_id, type });
 
   if (isFetching || toolsLoading || toolByIdLoading) {
     return <div>Loading...</div>;
@@ -111,6 +120,23 @@ const ToolClassesComponent: React.FC = () => {
           </div>
         ))}
       </div>
+      <div>
+      <h2>Tool Version Files</h2>
+      {filesData?.map((file, index) => (
+        <div key={index}>
+          <p>File Type: {file.file_type}</p>
+          <p>Path: {file.path}</p>
+        </div>
+      ))}
+    </div>
+    <div>
+      <h2>Tool Version Tests</h2>
+      {testsData?.map((test, index) => (
+        <div key={index}>
+          <p>Test: {JSON.stringify(test)}</p>
+        </div>
+      ))}
+    </div>
     </>
   );
 };
