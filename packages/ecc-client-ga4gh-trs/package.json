@@ -19,6 +19,7 @@
     "dependencies": {
         "@microsoft/fast-element": "2.0.0-beta.3",
         "@microsoft/fast-foundation": "3.0.0-alpha.4",
+        "@microsoft/fast-react-wrapper": "^0.3.18",
         "@reduxjs/toolkit": "^1.9.5",
         "react": "^16.14.0",
         "react-dom": "^16.14.0",
