@@ -17,8 +17,9 @@
         "fast:postinstall": "==========================================\n\n Your project has been initialized!\n You have access to the following commands:\n\n Start: npm start\n Test: npm run test\n Build: npm run build\n\n=========================================="
     },
     "dependencies": {
+        "@microsoft/fast-components": "^2.30.6",
         "@microsoft/fast-element": "2.0.0-beta.3",
-        "@microsoft/fast-foundation": "3.0.0-alpha.4",
+        "@microsoft/fast-foundation": "^3.0.0-alpha.4",
         "@microsoft/fast-react-wrapper": "^0.3.18",
         "@reduxjs/toolkit": "^1.9.5",
         "react": "^16.14.0",
@@ -26,6 +27,7 @@
         "react-redux": "^8.0.7"
     },
     "devDependencies": {
+        "@babel/plugin-proposal-decorators": "^7.22.5",
         "@playwright/test": "^1.21.0",
         "@storybook/builder-webpack5": "6.5.9",
         "@storybook/html": "^7.0.18",
