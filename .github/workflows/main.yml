@@ -2,7 +2,7 @@ name: PR Evaluation & Deployment Workflow
 
 on:
   pull_request:
-    types: edited
+    types: [opened, synchronize, reopened, ready_for_review, edited]
     branches: ['main']
   push:
     branches: ['main']
@@ -120,10 +120,5 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
-            ✅ This PR has successfully passed the evaluation. 
-            Please add description & complete the checklist of the PR & assign the reviewers.
-
-            
-
-
-            
+            ✅ This PR has passed the evaluation till commit ${GITHUB_SHA}.
+            Please provide a description, complete the checklist, and assign reviewers.
