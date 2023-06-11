@@ -52,6 +52,8 @@ export default class TESGetRun extends FASTElement {
 
   @observable expanded = false;
 
+  @observable isLoading = true;
+
   @observable data: TaskData = {
     id: this.id,
     state: this.state,
@@ -75,5 +77,6 @@ export default class TESGetRun extends FASTElement {
   handleClick = async () => {
     this.expanded = !this.expanded;
     this.data = await fetchTask(this.id);
+    this.isLoading = false;
   };
 }

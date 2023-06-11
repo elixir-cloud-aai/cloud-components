@@ -55,7 +55,11 @@ const template = html<TESGetRun>`
       </div>
     `}
     ${when(
-      (x) => x.expanded,
+      (x) => x.isLoading && x.expanded,
+      html`<div class="loader">Loading</div>`
+    )}
+    ${when(
+      (x) => x.expanded && !x.isLoading,
       html<TESGetRun>`
         <div class="expanded-container">
           <div class="meta-data">

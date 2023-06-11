@@ -24,12 +24,15 @@ export default class TESGetRuns extends FASTElement {
 
   @observable data: Task[] = [];
 
+  @observable isLoading = true;
+
   async connectedCallback() {
     super.connectedCallback();
     const newData = await fetchTasks();
     if (newData && newData.tasks) {
       this.data = newData.tasks;
     }
+    this.isLoading = false;
     // this.addEventListener("click", this.handleClick);
   }
 
