@@ -13,12 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: print 
-        run: echo "github.event.changes: ${{ github.event.changes }}"
+        run: echo ${{ toJson(github) }}
 
   semantic_pr: 
     name: Semantic PR title
     runs-on: ubuntu-latest
-    # if: ${{ github.event.action != 'edited' || ('changes' in github.event && 'title' in github.event.changes) }}
+    # if: ${{ github.event.action != 'edited' || ('changes' in github.event && 'title' in github.event.event) }}
     steps:
       - uses: amannn/action-semantic-pull-request@v5
         env:
