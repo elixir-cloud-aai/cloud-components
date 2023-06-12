@@ -1,11 +1,11 @@
 import { FASTElement, attr, customElement, observable } from "@microsoft/fast-element";
-import template from "./Accordion.template";
-import styles from "./Accordion.styles";
+import template from "./accordion.template";
+import styles from "./accordion.styles";
 import React from "react";
 import { provideReactWrapper } from "@microsoft/fast-react-wrapper";
 
 @customElement({
-  name: "fast-accordion",
+  name: "accordion",
   template: template,
   styles: styles,
 })

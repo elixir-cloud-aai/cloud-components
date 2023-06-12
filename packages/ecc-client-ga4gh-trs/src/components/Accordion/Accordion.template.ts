@@ -8,7 +8,6 @@ const template = html`
             <p>Content for section 1.</p>
         </div>
     </div>
-    <!-- Repeat for other accordion items -->
 </div>
 
 `;

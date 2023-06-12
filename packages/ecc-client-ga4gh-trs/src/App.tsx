@@ -2,7 +2,7 @@ import React from "react";
 import { ToolClassesComponent } from "./components/toolAPITesting/tool";
 import { Provider } from "react-redux";
 import { store } from "./api/store";
-import { Accordion } from "./components/Accordion/Accordion";
+import { Accordion } from "./components/accordion/accordion";
 
 const App = () => {
   return (
