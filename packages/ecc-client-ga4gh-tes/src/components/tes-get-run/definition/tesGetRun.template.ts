@@ -1,6 +1,5 @@
 import { html, when, repeat } from "@microsoft/fast-element";
 import TESGetRun from "./tesGetRun.js";
-// import TESStatusBadge from "../../tes-status-badge/index.js";
 
 const template = html<TESGetRun>`
   <div class="container">
@@ -56,7 +55,7 @@ const template = html<TESGetRun>`
     `}
     ${when(
       (x) => x.isLoading && x.expanded,
-      html`<div class="loader">Loading</div>`
+      html`<ecc-tes-loader></ecc-tes-loader>`
     )}
     ${when(
       (x) => x.expanded && !x.isLoading,
