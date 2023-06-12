@@ -118,7 +118,7 @@ jobs:
   passed-evaluation: 
     name: PR passed the evaluation
     needs: [semantic_pr, detect-unresolved-conflicts, linters, tests]
-    if: ${{ always() && !contains(needs.*.result, 'failure') }}
+    if: ${{ always() && needsAny() && !contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -133,7 +133,7 @@ jobs:
   failed-evaluation:
     name: PR failed the evaluation
     needs: [semantic_pr, detect-unresolved-conflicts, linters, tests]
-    if: ${{ always() && contains(needs.*.result, 'failure') }}
+    if: ${{ always() && needsAny() && contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
