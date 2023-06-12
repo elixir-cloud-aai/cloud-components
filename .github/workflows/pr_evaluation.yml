@@ -53,6 +53,8 @@ jobs:
         # Find lines containing "<<<<<<<", then count the number of lines.
         # 0 matching lines results in exit code 0, i.e. success.
         run: exit $(git grep "<<<<<<<" ":(exclude).github/" | wc --lines)
+      - name: Print github event
+        run: echo "${{ toJson(github.event) }}"
 
   linters:
     name: Linting checks
