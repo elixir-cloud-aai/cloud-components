@@ -16,7 +16,7 @@ module.exports = {
         extensions: [".ts", ".tsx", ".js", ".jsx"],
         plugins: [
             new ResolveTypeScriptPlugin()
-        ]
+        ],
     },
     output: {
         path: outDir,
@@ -36,6 +36,13 @@ module.exports = {
                         ],
                     },
                 },
+            },
+            {
+                test: /\.(css|scss)$/,
+                use: [
+                    "style-loader",
+                    "css-loader",
+                ]
             },
         ],
     },
