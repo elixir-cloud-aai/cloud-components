@@ -40,6 +40,8 @@ jobs:
             The subject "{subject}" found in the pull request title "{title}"
             didn't match the configured pattern. Please ensure that the subject
             doesn't start with an uppercase character & not have more than 50 characters.
+      - name: Print github event
+        run: echo "${{ toJson(github.event) }}"
 
   detect-unresolved-conflicts:
     name: Detect unresolved merge conflicts
@@ -53,8 +55,6 @@ jobs:
         # Find lines containing "<<<<<<<", then count the number of lines.
         # 0 matching lines results in exit code 0, i.e. success.
         run: exit $(git grep "<<<<<<<" ":(exclude).github/" | wc --lines)
-      - name: Print github event
-        run: echo "${{ toJson(github.event) }}"
 
   linters:
     name: Linting checks
