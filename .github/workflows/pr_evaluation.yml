@@ -9,6 +9,7 @@ jobs:
   semantic_pr: 
     name: Semantic PR title
     runs-on: ubuntu-latest
+    if: ${{ github.event.action != 'edited' && github.event.changes.title }}
     steps:
       - uses: amannn/action-semantic-pull-request@v5
         env:
