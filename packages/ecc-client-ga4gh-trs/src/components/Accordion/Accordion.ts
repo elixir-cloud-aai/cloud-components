@@ -17,8 +17,21 @@ class _Accordion extends FASTElement {
   public content: string = "Content";
 
 
+  connectedCallback() {
+    super.connectedCallback();
+    this.toggleAccordion();
+  }
 
-  //function to toggle the accordion
+  toggleAccordion() {
+    const accordionHeaders = this.shadowRoot?.querySelectorAll('.accordion-header');
+
+    accordionHeaders?.forEach(header => {
+        header.addEventListener('click', () => {
+            const accordionItem = header.parentElement;
+            accordionItem?.classList.toggle('active');
+        });
+    });
+  }
 }
 
 export const Accordion = provideReactWrapper(React).wrap(_Accordion);
