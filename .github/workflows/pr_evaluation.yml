@@ -9,7 +9,7 @@ jobs:
   semantic_pr: 
     name: Semantic PR title
     runs-on: ubuntu-latest
-    if: ${{ github.event.action != 'edited' || github.event.pull_request.title != github.event.changes.title.from }}
+    if: ${{ github.event.action != 'edited' || ('changes' in github.event && 'title' in github.event.changes) }}
     steps:
       - uses: amannn/action-semantic-pull-request@v5
         env:
@@ -41,8 +41,6 @@ jobs:
             The subject "{subject}" found in the pull request title "{title}"
             didn't match the configured pattern. Please ensure that the subject
             doesn't start with an uppercase character & not have more than 50 characters.
-      - name: Print github event
-        run: echo "${{ toJson(github.event) }}"
 
   detect-unresolved-conflicts:
     name: Detect unresolved merge conflicts
