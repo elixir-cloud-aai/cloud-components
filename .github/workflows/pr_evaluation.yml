@@ -6,19 +6,18 @@ on:
     branches: ['main']
 
 jobs:
-
-  print_debug:
-    name: Print debug info
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: print 
-        run: echo ${{ toJson(github).event }}
+  # print_debug:
+  #   name: Print debug info
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: print 
+  #       run: echo ${{ toJson(github).event }}
 
   semantic_pr: 
     name: Semantic PR title
     runs-on: ubuntu-latest
-    if: ${{ github.event.action != 'edited' || (contains(github.event.keys(), 'changes') && contains(github.event.changes.keys(), 'title')) }}
+    if: ${{ github.event.action != 'edited' || github.event.changes.title }}
     steps:
       - uses: amannn/action-semantic-pull-request@v5
         env:
