@@ -11,7 +11,7 @@ jobs:
   semantic_pr: 
     name: Semantic PR title
     runs-on: ubuntu-latest
-    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/check') }}
+    if: ${{ contains(github.event.comment.body, '/check') }}
     # if: ${{ github.event.action != 'edited' || github.event.changes.title }}
     steps:
       - uses: amannn/action-semantic-pull-request@v5
@@ -48,7 +48,7 @@ jobs:
   detect-unresolved-conflicts:
     name: Detect unresolved merge conflicts
     runs-on: ubuntu-latest
-    if:  ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/check') }}
+    if:  ${{ contains(github.event.comment.body, '/check') }}
     # if: ${{ github.event.action != 'edited' }}
     steps:
       - uses: actions/checkout@v3
@@ -62,7 +62,7 @@ jobs:
   linters:
     name: Linting checks
     runs-on: ubuntu-latest
-    if: ${{  github.event.issue.pull_request && contains(github.event.comment.body, '/check') }}
+    if: ${{ contains(github.event.comment.body, '/check') }}
     # if: ${{ github.event.action != 'edited' }}
     strategy:
       matrix:
@@ -89,7 +89,7 @@ jobs:
   tests:
     name: Test checks
     runs-on: ubuntu-latest
-    if: ${{  github.event.issue.pull_request && contains(github.event.comment.body, '/check') }}
+    if: ${{ contains(github.event.comment.body, '/check') }}
     # if: ${{ github.event.action != 'edited' }}
     strategy:
       matrix:
@@ -116,7 +116,7 @@ jobs:
   passed-evaluation: 
     name: PR passed the evaluation
     needs: [semantic_pr, detect-unresolved-conflicts, linters, tests]
-    if: ${{ (github.event.issue.pull_request && contains(github.event.comment.body, '/check')) && (always() && !contains(needs.*.result, 'failure')) }}
+    if: ${{ contains(github.event.comment.body, '/check') && (always() && !contains(needs.*.result, 'failure')) }}
     # if: ${{ (always() && !contains(needs.*.result, 'failure')) && (github.event.action != 'edited' || github.event.changes.title) }}
     runs-on: ubuntu-latest
     steps:
@@ -132,7 +132,7 @@ jobs:
   failed-evaluation:
     name: PR failed the evaluation
     needs: [semantic_pr, detect-unresolved-conflicts, linters, tests]
-    if: ${{ (github.event.issue.pull_request && contains(github.event.comment.body, '/check')) && (always() && contains(needs.*.result, 'failure')) }}
+    if: ${{ contains(github.event.comment.body, '/check') && (always() && contains(needs.*.result, 'failure')) }}
     # if: ${{ (always() && contains(needs.*.result, 'failure')) && (github.event.action != 'edited' || github.event.changes.title) }}
     runs-on: ubuntu-latest
     steps:
