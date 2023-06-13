@@ -13,7 +13,7 @@ const template = html<TESGetRuns>`
         ${when((x) => x.id === "", loading)}
         <ecc-tes-get-run
           class="run-item"
-          @click=${(x) => x.handleClick()}
+          @click=${(x) => x.handleClick}
           id=${(x) => x.id}
           state=${(x) => x.state}
         >
