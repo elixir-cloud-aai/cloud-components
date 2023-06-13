@@ -23,6 +23,7 @@
     "start": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds\""
   },
   "dependencies": {
+    "@microsoft/fast-components": "^2.30.6",
     "@microsoft/fast-element": "^1.12.0",
     "@microsoft/fast-foundation": "^2.49.0"
   },
