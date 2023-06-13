@@ -1,0 +1,22 @@
+.sidebar {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .sidebar button {
+    transition: 0.3s;
+    width: 100%;
+  }
+  
+  .sidebarContent {
+    float: left;
+  }
+  
+  .buttons{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 200px;
+    width: 20%;
+
+  }

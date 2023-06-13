@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { ToolClassesComponent } from "./components/toolAPITesting/tool";
+import { ToolClassesComponent } from "./components/ToolDetailsTestComponent/ToolDetailsTestComponent";
 import { Provider } from "react-redux";
 import { store } from "./api/store";
 import { Accordion } from "./components/accordion/Accordion";
 import { Search } from "./components/search/Search";
 import { InputBox } from "./components/inputbox/InputBox";
-import ClipboardCopyComponent from "./components/testingComp/copytotheClipboard";
+import ClipboardCopyComponent from "./components/ClipboardCopyComponent/ClipboardCopyComponent";
 import TRScomponent from "./components/TRScomponent/TRScomponent";
 import styles from "./app.module.css";
 
