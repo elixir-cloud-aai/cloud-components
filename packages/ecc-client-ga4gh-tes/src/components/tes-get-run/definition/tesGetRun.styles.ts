@@ -1,10 +1,7 @@
 import { css } from "@microsoft/fast-element";
 
 const styles = css`
-  .container {
-    display: block;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  .slot-heading {
     color: black;
   }
 
@@ -15,9 +12,6 @@ const styles = css`
     height: 100%;
     justify-content: space-between;
     align-items: center;
-  }
-
-  .container:hover {
   }
 
   .right {
@@ -41,8 +35,7 @@ const styles = css`
     font-size: 0.8rem;
   }
 
-  .delete-icon,
-  .reload-icon {
+  .delete-icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -51,8 +44,7 @@ const styles = css`
     transition: color 0.2s ease, transform 0.2s ease;
   }
 
-  .delete-icon:hover,
-  .reload-icon:hover {
+  .delete-icon:hover {
     transform: scale(1.1);
   }
 
@@ -63,6 +55,8 @@ const styles = css`
 
   .meta-data {
     margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
   }
 
   .name,

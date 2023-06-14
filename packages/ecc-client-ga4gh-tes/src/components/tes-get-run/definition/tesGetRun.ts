@@ -50,8 +50,6 @@ export default class TESGetRun extends FASTElement {
 
   @attr state = "";
 
-  @observable expanded = false;
-
   @observable isLoading = true;
 
   @observable data: TaskData = {
@@ -66,17 +64,36 @@ export default class TESGetRun extends FASTElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.addEventListener("click", this.handleClick);
+    // Add event listener to handle accordion open event
+    this.addEventListener("change", this.handleFetch);
+    const delButton = this.shadowRoot?.querySelector("fast-button");
+    if (!this.isLoading && delButton) {
+      // delButton.addEventListener("click", this.handleDelete);
+      delButton.addEventListener("click", this.handleDelete.bind(this));
+    }
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    this.removeEventListener("click", this.handleClick);
+    this.removeEventListener("change", this.handleFetch);
+    const delButton = this.shadowRoot?.querySelector("fast-button");
+    if (!this.isLoading && delButton) {
+      delButton.addEventListener("click", this.handleDelete.bind(this));
+    }
   }
 
-  handleClick = async () => {
-    this.expanded = !this.expanded;
-    this.data = await fetchTask(this.id);
-    this.isLoading = false;
+  // Handles deletion of this task
+  handleDelete = async () => {
+    // TODO
+    console.log(this.id);
+  };
+
+  // Fetched the task with this ID
+  handleFetch = async () => {
+    // Only fetch the data if not already fetched
+    if (this.isLoading) {
+      this.data = await fetchTask(this.id);
+      this.isLoading = false;
+    }
   };
 }

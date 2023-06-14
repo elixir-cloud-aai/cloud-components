@@ -33,30 +33,9 @@ export default class TESGetRuns extends FASTElement {
       this.data = newData.tasks;
     }
     this.isLoading = false;
-    // this.addEventListener("click", this.handleClick);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    // this.removeEventListener("click", this.handleClick);
   }
-
-  // handleClick = () => {
-  //   console.log("from runs", this.id);
-  //   // Todo : extended run tast view
-  // };
-
-  // async pageSizeChanged() {
-  //   const newData = await fetchTasks(this.pageSize);
-  //   if (newData && newData.tasks) {
-  //     this.data = newData.tasks;
-  //   }
-  // }
-
-  // async nextPageTokenChanged() {
-  //   const newData = await fetchTasks(this.pageSize, this.nextPageToken);
-  //   if (newData && newData.tasks) {
-  //     this.data = newData.tasks;
-  //   }
-  // }
 }
