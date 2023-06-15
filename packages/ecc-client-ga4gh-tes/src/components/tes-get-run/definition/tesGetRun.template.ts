@@ -1,12 +1,14 @@
 import {
   provideFASTDesignSystem,
   fastAccordionItem,
+  fastSkeleton,
   fastButton,
 } from "@microsoft/fast-components";
 import { html, when, repeat } from "@microsoft/fast-element";
 import TESGetRun from "./tesGetRun.js";
 
 provideFASTDesignSystem().register(
+  fastSkeleton(),
   fastButton(),
   fastAccordionItem({
     collapsedIcon: `<svg
@@ -57,7 +59,29 @@ const template = html<TESGetRun>`
         </div>
       `}
     </span>
-    ${when((x) => x.isLoading, html`<ecc-tes-loader></ecc-tes-loader>`)}
+    ${when(
+      (x) => x.isLoading,
+      html` <fast-skeleton
+          style="border-radius: 4px; margin-top: 10px; height: 20px; width: 20%"
+          shape="rect"
+        ></fast-skeleton>
+        <fast-skeleton
+          style="border-radius: 4px; margin-top: 10px; height: 20px; width: 40%"
+          shape="rect"
+        ></fast-skeleton>
+        <fast-skeleton
+          style="border-radius: 4px; margin-top: 10px; height: 20px; width:25%"
+          shape="rect"
+        ></fast-skeleton>
+        <fast-skeleton
+          style="border-radius: 4px;height: 80px;margin-top: 20px;margin-bottom: 10px;"
+          shape="rect"
+        ></fast-skeleton>
+        <fast-skeleton
+          style="border-radius: 4px;height: 80px;margin-top: 20px;margin-bottom: 10px;"
+          shape="rect"
+        ></fast-skeleton>`
+    )}
     ${when(
       (x) => !x.isLoading,
       html<TESGetRun>`
