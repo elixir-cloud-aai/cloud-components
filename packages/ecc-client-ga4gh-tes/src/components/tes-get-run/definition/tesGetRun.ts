@@ -7,6 +7,7 @@ import {
 import template from "./tesGetRun.template.js";
 import styles from "./tesGetRun.styles.js";
 import { fetchTask } from "../../../data/index.js";
+import { deleteTask } from "../../../data/Post/tesPost.js";
 
 interface TaskData {
   id: string;
@@ -84,8 +85,7 @@ export default class TESGetRun extends FASTElement {
 
   // Handles deletion of this task
   handleDelete = async () => {
-    // TODO
-    console.log(this.id);
+    await deleteTask(this.id);
   };
 
   // Fetched the task with this ID
