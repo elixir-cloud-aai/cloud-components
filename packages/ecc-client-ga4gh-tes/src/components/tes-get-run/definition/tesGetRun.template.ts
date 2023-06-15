@@ -3,6 +3,7 @@ import {
   fastAccordionItem,
   fastSkeleton,
   fastButton,
+  fastBadge,
 } from "@microsoft/fast-components";
 import { html, when, repeat } from "@microsoft/fast-element";
 import TESGetRun from "./tesGetRun.js";
@@ -10,6 +11,7 @@ import TESGetRun from "./tesGetRun.js";
 provideFASTDesignSystem().register(
   fastSkeleton(),
   fastButton(),
+  fastBadge(),
   fastAccordionItem({
     collapsedIcon: `<svg
       xmlns="http://www.w3.org/2000/svg"
@@ -53,7 +55,52 @@ const template = html<TESGetRun>`
           </div>
           <div class="left">
             <div class="status-badge">
-              <ecc-tes-status-badge status=${x.state}></ecc-tes-status-badge>
+              <div>
+                <style>
+                  /* For example purposes only. App authors needs to define */
+                  fast-badge {
+                    --badge-fill-error: #d32f2f;
+                    --badge-fill-processing: #ffc107;
+                    --badge-fill-cancelled: #cccccc;
+                    --badge-fill-complete: #4caf50;
+                    --badge-fill-transparent: transparent;
+                    --badge-color-black: #000000;
+                    --badge-color-white: #ffffff;
+                  }
+                </style>
+                ${when(
+                  () => x?.state === "COMPLETE",
+                  html`
+                    <fast-badge fill="complete" color="white"
+                      >${x.state}</fast-badge
+                    >
+                  `
+                )}
+                ${when(
+                  () => x?.state === "SYSTEM_ERROR",
+                  html`
+                    <fast-badge fill="error" color="white"
+                      >${x.state}</fast-badge
+                    >
+                  `
+                )}
+                ${when(
+                  () => x?.state === "PROCESSING",
+                  html`
+                    <fast-badge fill="processing" color="white"
+                      >${x.state}</fast-badge
+                    >
+                  `
+                )}
+                ${when(
+                  () => x?.state === "CANCELLED",
+                  html`
+                    <fast-badge fill="cancelled" color="white"
+                      >${x.state}</fast-badge
+                    >
+                  `
+                )}
+              </div>
             </div>
           </div>
         </div>
