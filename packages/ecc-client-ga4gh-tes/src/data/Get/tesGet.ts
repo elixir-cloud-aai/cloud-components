@@ -9,11 +9,13 @@ import { getTasksURL } from "../baseURL.js";
  *                           - 'MINIMAL': Task message will include ONLY the fields: Task.Id, Task.State.
  *                           - 'BASIC': Task message will include all fields EXCEPT: Task.ExecutorLog.stdout, Task.ExecutorLog.stderr, Input.content, TaskLog.system_logs.
  *                           - 'FULL': Task message includes all fields.
+ * @param {string} [namePrefix] - OPTIONAL. Filter the list to include tasks where the name matches this prefix. If unspecified, no task name filtering is done.
  */
 const fetchTasks = async (
   pageSize = 5,
   nextPageToken = "",
-  view = "MINIMAL"
+  view = "MINIMAL",
+  namePrefix = ""
 ) => {
   let url = `${getTasksURL}?`;
 
@@ -30,6 +32,10 @@ const fetchTasks = async (
   // Append nextPageToken parameter if provided
   if (nextPageToken.length > 0) {
     url += `page_token=${nextPageToken}&`;
+  }
+
+  if (namePrefix.length > 0) {
+    url += `name_prefix=${namePrefix}&`;
   }
 
   try {
