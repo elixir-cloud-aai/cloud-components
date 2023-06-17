@@ -37,6 +37,13 @@ export default class TESGetRuns extends FASTElement {
 
   @observable pageNumberArray: number[] = [];
 
+  // Seach input for name_prefix filter
+  @observable searchInput = "";
+
+  @observable stateInput = "ALL";
+
+  @observable unfilterdData: Task[] = [];
+
   @observable isLoading = true;
 
   async connectedCallback() {
@@ -49,7 +56,7 @@ export default class TESGetRuns extends FASTElement {
    *Fetches data of 3*pageSize length and sets it as cache
    * @param token token for the next page for cache data
    */
-  fetchData = async (token: string) => {
+  fetchData = async (token: string, namePrefix: string | null = null) => {
     this.isLoading = true;
 
     // Reset data
@@ -59,10 +66,19 @@ export default class TESGetRuns extends FASTElement {
     if (token !== "") this.firstPageNumber += this.pageNumberOffset;
 
     // Fetch new data
-    const newData = await fetchTasks(this.pageSize * 3, token);
+    let newData = [];
+    if (!namePrefix) newData = await fetchTasks(this.pageSize * 3, token);
+    else
+      newData = await fetchTasks(
+        this.pageSize * 3,
+        token,
+        "MINIMAL",
+        namePrefix
+      );
     if (newData && newData.tasks) {
       this.cachedData = newData.tasks;
       this.data = this.cachedData.slice(0, this.pageSize);
+      this.unfilterdData = this.data;
       this.nextPageToken = newData.next_page_token;
       this.pageNumberOffset = Math.ceil(this.cachedData.length / this.pageSize);
       const array = [];
@@ -74,8 +90,11 @@ export default class TESGetRuns extends FASTElement {
     this.isLoading = false;
   };
 
+  // Cache new data
   handleNext = async () => {
-    await this.fetchData(this.nextPageToken as string);
+    if (this.searchInput !== "") {
+      await this.fetchData(this.nextPageToken as string, this.searchInput);
+    } else await this.fetchData(this.nextPageToken as string, this.searchInput);
   };
 
   /**
@@ -89,5 +108,33 @@ export default class TESGetRuns extends FASTElement {
     const endIndex: number = (idx + 1) * this.pageSize;
 
     this.data = this.cachedData.slice(startIndex, endIndex);
+
+    // Set unfiltered data for state filterinng
+    this.unfilterdData = this.data;
+
+    // Reset state filter
+    this.stateInput = "ALL";
   };
+
+  handleNameInput(event: Event) {
+    this.searchInput = (event.target as HTMLInputElement).value;
+
+    // reset the pages
+    this.firstPageNumber = 1;
+    this.pageNumberOffset = 0;
+
+    // Fetch new data
+    this.fetchData("", this.searchInput);
+  }
+
+  handleStateInput(event: Event) {
+    this.stateInput = (event.target as HTMLInputElement).value;
+
+    // Filter data on current page based on the filter input
+    if (this.stateInput === "ALL") this.data = this.unfilterdData;
+    else
+      this.data = this.unfilterdData.filter(
+        (task) => task.state === this.stateInput
+      );
+  }
 }
