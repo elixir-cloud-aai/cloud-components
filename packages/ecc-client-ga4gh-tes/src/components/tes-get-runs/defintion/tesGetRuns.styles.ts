@@ -6,6 +6,17 @@ const styles = css`
   }
 
   .search {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  fast-text-field {
+    width: 100%;
+  }
+
+  fast-select {
+    width: 25%;
   }
 
   .list {
@@ -16,7 +27,17 @@ const styles = css`
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin: auto;
+    width: 100%;
+    align-items: center;
+  }
+
+  @media (max-width: 450px) {
+    .search {
+      flex-direction: column;
+    }
+    fast-select {
+      width: 100%;
+    }
   }
 `;
 
