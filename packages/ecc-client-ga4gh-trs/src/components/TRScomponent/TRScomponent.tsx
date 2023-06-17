@@ -10,6 +10,7 @@ import {
 import ClipboardCopyComponent from "../ClipboardCopyComponent/ClipboardCopyComponent";
 import VerticalNavbar from "../Sidebar/Sidebar";
 import Sidebar from "../Sidebar/Sidebar";
+import Search from "../Search/Search";
 
 interface ToolVersionProps {
   id: string;
@@ -37,6 +38,9 @@ const TRScomponent: React.FC<ToolVersionProps> = () => {
 
   return (
     <Grid.Container gap={1}>
+       <Spacer y={1} />
+      <Search />
+      <Spacer y={1} />
       {toolsData?.map((tool, index) => (
         <Grid
           css={{

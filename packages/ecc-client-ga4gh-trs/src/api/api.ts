@@ -80,6 +80,12 @@ export const api = createApi({
         return `tools?${query.toString()}`;
       },
     }),
+    searchTools: builder.query<Array<any>, ToolsParams>({
+      query: (params) => {
+        const query = new URLSearchParams(params as Record<string, string>);
+        return `tools?${query.toString()}`;
+      },
+    }),
     getToolById: builder.query<Tool, string>({
       query: (id) => `tools/${id}`,
     }),
@@ -92,4 +98,4 @@ export const api = createApi({
   }),
 })
 
-export const { useGetToolClassesQuery, useGetToolsQuery, useGetToolByIdQuery, useGetToolVersionQuery, useGetToolVersionTestsQuery } = api
+export const { useGetToolClassesQuery, useGetToolsQuery, useSearchToolsQuery,useGetToolByIdQuery, useGetToolVersionQuery, useGetToolVersionTestsQuery } = api
