@@ -93,7 +93,7 @@ const template = html<TESGetRun>`
                   `
                 )}
                 ${when(
-                  () => x?.state === "CANCELLED",
+                  () => x?.state === "CANCELED",
                   html`
                     <fast-badge fill="cancelled" color="white"
                       >${x.state}</fast-badge
