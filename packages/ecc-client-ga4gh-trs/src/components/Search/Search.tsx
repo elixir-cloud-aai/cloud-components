@@ -3,35 +3,52 @@ import React, { useState } from "react";
 import styles from "./search.module.css";
 import { useSearchToolsQuery } from "../../api/api";
 
-const Search = () => {
-  const [searchQuery, setSearchQuery] = useState<string>();
-  const { data, error, isLoading } = useSearchToolsQuery({
-    toolname: searchQuery,
+interface InputField {
+  name: string;
+  placeholder: string;
+  label: string;
+}
+
+const Search = ({ onSearch }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showCard, setShowCard] = useState(false);
+  const [input, setInput] = useState("");
+  const [filterForm, setFilterForm] = useState({
+    id: "",
+    alias: "",
+    toolname: "",
+    organization: "",
+    description: "",
+    checker: false,
+    registry: "",
+    toolClass: "",
   });
 
-  const [showCard, setShowCard] = useState(false);
+  const { data, error, isLoading, refetch } = useSearchToolsQuery({
+    ...filterForm,
+    name: searchQuery,
+  });
 
   const toggleCard = () => {
     setShowCard((prevShowCard) => !prevShowCard);
   };
 
-  interface InputField {
-    placeholder: string;
-    label: string;
-  }
-
   const inputFields = [
-    { placeholder: "id", label: "Tool ID" },
-    { placeholder: "alias", label: "Alias" },
-    { placeholder: "toolname", label: "Tool Name" },
-    { placeholder: "org", label: "Organization" },
-    { placeholder: "description", label: "Description" },
-    { placeholder: "checker", label: "Checker" },
-    { placeholder: "registry", label: "Registry" },
-    { placeholder: "toolclass", label: "Tool Class" },
-    { placeholder: "name", label: "Name" },
-    { placeholder: "limit", label: "Limit" },
-    { placeholder: "offset", label: "Offset" },
+    { name: "id", placeholder: "id", label: "Tool ID" },
+    { name: "alias", placeholder: "alias", label: "Alias" },
+    { name: "toolname", placeholder: "toolname", label: "Tool Name" },
+    {
+      name: "organization",
+      placeholder: "organization",
+      label: "Organization",
+    },
+    { name: "description", placeholder: "description", label: "Description" },
+    { name: "checker", placeholder: "checker", label: "Checker" },
+    { name: "registry", placeholder: "registry", label: "Registry" },
+    { name: "toolClass", placeholder: "toolclass", label: "Tool Class" },
+    { name: "name", placeholder: "name", label: "Name" },
+    { name: "limit", placeholder: "limit", label: "Limit" },
+    { name: "offset", placeholder: "offset", label: "Offset" },
   ];
   const chunk = (array: InputField[], size: number): InputField[][] => {
     let result: InputField[][] = [];
@@ -41,7 +58,18 @@ const Search = () => {
     return result;
   };
 
-  const inputFieldChunks = chunk(inputFields, 3);
+  const inputFieldChunks = chunk(inputFields, 4);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFilterForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleChange = (e) => {
+    setSearchQuery(e.target.value); 
+    onSearch(e.target.value); 
+  };
+
   return (
     <>
       <div className={`${styles.input}`}>
@@ -50,7 +78,7 @@ const Search = () => {
           size="xl"
           placeholder="Search"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleChange}
           contentLeft={
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -81,7 +109,7 @@ const Search = () => {
       <div className={styles.filtersCard}>
         {showCard && (
           <Card variant="bordered" className={styles.card}>
-            <h3>Filters</h3>
+            <h3 className={styles.filterHeader}>Filters</h3>
             <div className={styles.inputForm}>
               {inputFieldChunks.map((chunk, chunkIndex) => (
                 <Row key={chunkIndex} gap={1}>
@@ -91,12 +119,16 @@ const Search = () => {
                         fullWidth
                         placeholder={field.placeholder}
                         label={field.label}
+                        name={field.name}
+                        onChange={handleInputChange}
+                        aria-labelledby={index.toString()}
                       />
                     </Col>
                   ))}
                 </Row>
               ))}
             </div>
+            <Button>apply</Button>
           </Card>
         )}
       </div>

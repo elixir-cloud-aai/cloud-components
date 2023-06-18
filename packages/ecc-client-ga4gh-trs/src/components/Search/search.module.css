@@ -1,16 +1,20 @@
-.input{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: 100%;
+.input {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
 }
 
-.filtersCard{
-    /* padding: 20px 0; */
-    padding-top: 20px;
-    width: 100%;
+.filtersCard {
+  /* padding: 20px 0; */
+  padding-top: 20px;
+  width: 100%;
 }
 
-.card{
-    padding: 10px;
+.filterHeader {
+  margin-left: 20px;
+}
+
+.card {
+  padding: 10px;
 }

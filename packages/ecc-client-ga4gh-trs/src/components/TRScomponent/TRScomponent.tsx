@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Collapse, Grid, Navbar, Spacer, Text } from "@nextui-org/react";
 import {
   useGetToolByIdQuery,
   useGetToolClassesQuery,
-  useGetToolsQuery,
-  useGetToolVersionQuery,
-  useGetToolVersionTestsQuery,
+  useGetToolsQuery
 } from "../../api/api";
 import ClipboardCopyComponent from "../ClipboardCopyComponent/ClipboardCopyComponent";
 import VerticalNavbar from "../Sidebar/Sidebar";
@@ -19,6 +17,7 @@ interface ToolVersionProps {
 }
 
 const TRScomponent: React.FC<ToolVersionProps> = () => {
+  const [searchText, setSearchText] = useState("");
   const { data: toolClassesData = [], isFetching } =
     useGetToolClassesQuery() ?? {};
   const {
@@ -32,16 +31,26 @@ const TRScomponent: React.FC<ToolVersionProps> = () => {
     isLoading: toolByIdLoading,
   } = useGetToolByIdQuery("JB7HQW");
 
+  // function to handle search text updates
+  const handleSearchText = useCallback((text) => {
+    setSearchText(text);
+  }, []);
+
+  // function to filter tools based on search text
+  const filteredTools = toolsData?.filter((tool) =>
+    tool.name.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   if (isFetching || toolsLoading || toolByIdLoading) {
     return <div>Loading...</div>;
   }
 
   return (
     <Grid.Container gap={1}>
-       <Spacer y={1} />
-      <Search />
       <Spacer y={1} />
-      {toolsData?.map((tool, index) => (
+      <Search onSearch={handleSearchText} />
+      <Spacer y={1} />
+      {filteredTools?.map((tool, index) => (
         <Grid
           css={{
             width: "100%",

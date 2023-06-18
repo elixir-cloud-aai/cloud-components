@@ -1,6 +1,6 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-interface ToolsParams {
+export interface ToolsParams {
   id?: string;
   alias?: string;
   toolClass?: string;
@@ -16,8 +16,24 @@ interface ToolsParams {
   limit?: number;
 }
 
+export interface IToolParams {
+  id?: string;
+  alias?: string;
+  toolClass?: string;
+  descriptorType?: string;
+  registry?: string;
+  organization?: string;
+  name?: string;
+  toolname?: string;
+  description?: string;
+  author?: string;
+  checker?: boolean;
+  offset?: string;
+  limit?: number;
+}
+
 interface Image {
-  checksum: Array<{checksum: string, type: string}>;
+  checksum: Array<{ checksum: string; type: string }>;
   image_name: string;
   image_type: string;
   registry_host: string;
@@ -41,13 +57,13 @@ interface Version {
   verified_source: string[];
 }
 
-interface ToolClass {
+export interface ToolClass {
   description: string;
   id: string;
   name: string;
 }
 
-interface Tool {
+export interface Tool {
   aliases: string[];
   checker_url: string;
   description: string;
@@ -61,41 +77,59 @@ interface Tool {
   versions: Version[];
 }
 
-interface ToolVersionParams {
+export interface ToolVersionParams {
   id: string;
   version_id: string;
   type: string;
 }
 
 export const api = createApi({
-  reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2/' }),
+  reducerPath: "api",
+  baseQuery: fetchBaseQuery({
+    baseUrl: "https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2/",
+  }),
   endpoints: (builder) => ({
-    getToolClasses: builder.query<Array<{description: string, id: string, name: string}>, void>({
-      query: () => 'toolClasses',
+    getToolClasses: builder.query<
+      Array<{ description: string; id: string; name: string }>,
+      void
+    >({
+      query: () => "toolClasses",
     }),
-    getTools: builder.query<Array<any>, ToolsParams>({
+    getTools: builder.query<Array<any>, IToolParams>({
       query: (params) => {
         const query = new URLSearchParams(params as Record<string, string>);
         return `tools?${query.toString()}`;
       },
     }),
-    searchTools: builder.query<Array<any>, ToolsParams>({
+    searchTools: builder.query<Array<any>, IToolParams>({
       query: (params) => {
         const query = new URLSearchParams(params as Record<string, string>);
+        
         return `tools?${query.toString()}`;
       },
     }),
     getToolById: builder.query<Tool, string>({
       query: (id) => `tools/${id}`,
     }),
-    getToolVersion: builder.query<Array<{file_type: string, path: string}>, ToolVersionParams>({
-      query: ({id, version_id, type}) => `tools/${id}/versions/${version_id}/${type}/files`,
+    getToolVersion: builder.query<
+      Array<{ file_type: string; path: string }>,
+      ToolVersionParams
+    >({
+      query: ({ id, version_id, type }) =>
+        `tools/${id}/versions/${version_id}/${type}/files`,
     }),
     getToolVersionTests: builder.query<Array<any>, ToolVersionParams>({
-      query: ({id, version_id, type}) => `tools/${id}/versions/${version_id}/${type}/tests`,
+      query: ({ id, version_id, type }) =>
+        `tools/${id}/versions/${version_id}/${type}/tests`,
     }),
   }),
-})
+});
 
-export const { useGetToolClassesQuery, useGetToolsQuery, useSearchToolsQuery,useGetToolByIdQuery, useGetToolVersionQuery, useGetToolVersionTestsQuery } = api
+export const {
+  useGetToolClassesQuery,
+  useGetToolsQuery,
+  useSearchToolsQuery,
+  useGetToolByIdQuery,
+  useGetToolVersionQuery,
+  useGetToolVersionTestsQuery,
+} = api;
