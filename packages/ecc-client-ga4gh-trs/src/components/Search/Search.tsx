@@ -1,7 +1,7 @@
 import { Button, Input, Card, Row, Col } from "@nextui-org/react";
 import React, { useState } from "react";
 import styles from "./search.module.css";
-import { useSearchToolsQuery } from "../../api/api";
+import type { IToolParams } from "../../api/api";
 
 interface InputField {
   name: string;
@@ -9,25 +9,16 @@ interface InputField {
   label: string;
 }
 
-const Search = ({ onSearch }) => {
+interface ISearchProps {
+  onSearch: (searchQuery: string) => void;
+  form: IToolParams;
+  setForm: (form: IToolParams) => void;
+  onApply: () => void;
+}
+
+const Search = ({ onSearch, form, setForm, onApply }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showCard, setShowCard] = useState(false);
-  const [input, setInput] = useState("");
-  const [filterForm, setFilterForm] = useState({
-    id: "",
-    alias: "",
-    toolname: "",
-    organization: "",
-    description: "",
-    checker: false,
-    registry: "",
-    toolClass: "",
-  });
-
-  const { data, error, isLoading, refetch } = useSearchToolsQuery({
-    ...filterForm,
-    name: searchQuery,
-  });
 
   const toggleCard = () => {
     setShowCard((prevShowCard) => !prevShowCard);
@@ -46,9 +37,6 @@ const Search = ({ onSearch }) => {
     { name: "checker", placeholder: "checker", label: "Checker" },
     { name: "registry", placeholder: "registry", label: "Registry" },
     { name: "toolClass", placeholder: "toolclass", label: "Tool Class" },
-    { name: "name", placeholder: "name", label: "Name" },
-    { name: "limit", placeholder: "limit", label: "Limit" },
-    { name: "offset", placeholder: "offset", label: "Offset" },
   ];
   const chunk = (array: InputField[], size: number): InputField[][] => {
     let result: InputField[][] = [];
@@ -62,12 +50,12 @@ const Search = ({ onSearch }) => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFilterForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleChange = (e) => {
-    setSearchQuery(e.target.value); 
-    onSearch(e.target.value); 
+    setSearchQuery(e.target.value);
+    onSearch(e.target.value);
   };
 
   return (
@@ -128,7 +116,7 @@ const Search = ({ onSearch }) => {
                 </Row>
               ))}
             </div>
-            <Button>apply</Button>
+            <Button onClick={onApply}>apply</Button>
           </Card>
         )}
       </div>

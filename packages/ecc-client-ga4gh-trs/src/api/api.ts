@@ -1,21 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-export interface ToolsParams {
-  id?: string;
-  alias?: string;
-  toolClass?: string;
-  descriptorType?: string;
-  registry?: string;
-  organization?: string;
-  nameOfImage?: string;
-  toolname?: string;
-  descriptor?: string;
-  author?: string;
-  checker?: boolean;
-  offset?: string;
-  limit?: number;
-}
-
 export interface IToolParams {
   id?: string;
   alias?: string;
@@ -97,15 +81,33 @@ export const api = createApi({
     }),
     getTools: builder.query<Array<any>, IToolParams>({
       query: (params) => {
-        const query = new URLSearchParams(params as Record<string, string>);
-        return `tools?${query.toString()}`;
-      },
-    }),
-    searchTools: builder.query<Array<any>, IToolParams>({
-      query: (params) => {
-        const query = new URLSearchParams(params as Record<string, string>);
-        
-        return `tools?${query.toString()}`;
+        const {
+          id,
+          alias,
+          toolname,
+          organization,
+          description,
+          checker,
+          registry,
+          toolClass,
+          limit = 10,
+          offset,
+        } = params;
+        const queryParams = [
+          id && `id=${id}`,
+          alias && `alias=${alias}`,
+          toolname && `toolname=${toolname}`,
+          organization && `organization=${organization}`,
+          description && `description=${description}`,
+          checker && `checker=${checker}`,
+          registry && `registry=${registry}`,
+          toolClass && `toolClass=${toolClass}`,
+          limit && `limit=${limit}`,
+          offset && `offset=${offset}`,
+        ]
+          .filter(Boolean)
+          .join("&");
+        return `tools?${queryParams}`;
       },
     }),
     getToolById: builder.query<Tool, string>({
@@ -128,7 +130,6 @@ export const api = createApi({
 export const {
   useGetToolClassesQuery,
   useGetToolsQuery,
-  useSearchToolsQuery,
   useGetToolByIdQuery,
   useGetToolVersionQuery,
   useGetToolVersionTestsQuery,

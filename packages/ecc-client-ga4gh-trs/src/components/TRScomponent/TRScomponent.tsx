@@ -1,14 +1,9 @@
-import React, { useCallback, useState } from "react";
-import { Collapse, Grid, Navbar, Spacer, Text } from "@nextui-org/react";
-import {
-  useGetToolByIdQuery,
-  useGetToolClassesQuery,
-  useGetToolsQuery
-} from "../../api/api";
+import React, { useCallback, useEffect, useState } from "react";
+import { Collapse, Grid, Pagination, Spacer } from "@nextui-org/react";
 import ClipboardCopyComponent from "../ClipboardCopyComponent/ClipboardCopyComponent";
-import VerticalNavbar from "../Sidebar/Sidebar";
 import Sidebar from "../Sidebar/Sidebar";
 import Search from "../Search/Search";
+import { getToolById, getTools } from "../../requests/ga4gh";
 
 interface ToolVersionProps {
   id: string;
@@ -18,44 +13,70 @@ interface ToolVersionProps {
 
 const TRScomponent: React.FC<ToolVersionProps> = () => {
   const [searchText, setSearchText] = useState("");
-  const { data: toolClassesData = [], isFetching } =
-    useGetToolClassesQuery() ?? {};
-  const {
-    data: toolsData,
-    error: toolsError,
-    isLoading: toolsLoading,
-  } = useGetToolsQuery({ limit: 10, toolClass: "string" }); // we can add params here
-  const {
-    data: toolByIdData,
-    error: toolByIdError,
-    isLoading: toolByIdLoading,
-  } = useGetToolByIdQuery("JB7HQW");
+  const [filterForm, setFilterForm] = useState({
+    id: "",
+    alias: "",
+    toolname: "",
+    organization: "",
+    description: "",
+    checker: undefined,
+    registry: "",
+    toolClass: "string",
+    limit: 5,
+    offset: "0",
+  });
+  const [filteredTools, setFilteredTools] = useState<any>([]);
+  const [selectedTool, setSelectedTool] = useState<any>(undefined);
 
-  // function to handle search text updates
+  useEffect(() => {
+    getTools(filterForm).then((res) => {
+      setFilteredTools(res);
+    });
+  }, []);
+
   const handleSearchText = useCallback((text) => {
     setSearchText(text);
   }, []);
 
-  // function to filter tools based on search text
-  const filteredTools = toolsData?.filter((tool) =>
-    tool.name.toLowerCase().includes(searchText.toLowerCase())
-  );
+  useEffect(() => {
+    if (filteredTools.length > 0) {
+      setFilteredTools(
+        filteredTools.filter((tool) =>
+          tool.name.toLowerCase().includes(searchText.toLowerCase())
+        )
+      );
+    }
+  }, [searchText]);
 
-  if (isFetching || toolsLoading || toolByIdLoading) {
-    return <div>Loading...</div>;
-  }
+  const handleApply = () => {
+    getTools(filterForm).then((res) => {
+      setFilteredTools(res);
+    });
+  };
+
+  const handleClick = (toolId: string) => {
+    getToolById(toolId).then((res) => {
+      setSelectedTool(res);
+    });
+  };
 
   return (
     <Grid.Container gap={1}>
       <Spacer y={1} />
-      <Search onSearch={handleSearchText} />
+      <Search
+        onSearch={handleSearchText}
+        form={filterForm}
+        setForm={setFilterForm}
+        onApply={handleApply}
+      />
       <Spacer y={1} />
-      {filteredTools?.map((tool, index) => (
+      {filteredTools?.map((tool) => (
         <Grid
           css={{
             width: "100%",
           }}
-          key={index}
+          key={tool.id}
+          onClick={() => handleClick(tool.id)}
         >
           <Collapse bordered title={tool.name} subtitle={tool.description}>
             <>
@@ -84,68 +105,80 @@ const TRScomponent: React.FC<ToolVersionProps> = () => {
               <>
                 <Spacer y={1} />
                 <h4>Versions:</h4>
-                <Sidebar
-                  items={
-                    toolByIdData?.versions?.map((version, index) => ({
-                      title: `Version ${index + 1}`,
-                      content: (
-                        <div key={index}>
-                          <h4>Version {index + 1}</h4>
-                          <p>ID: {version.id}</p>
-                          <p>Name: {version.name}</p>
-                          <p>Meta Version: {version.meta_version}</p>
-                          <p>Author: {version.author.join(", ")}</p>
-                          <p>
-                            Descriptor Type:{" "}
-                            {version.descriptor_type.join(", ")}
-                          </p>
-                          <p>
-                            Container File:{" "}
-                            {version.containerfile ? "Yes" : "No"}
-                          </p>
-                          <p>
-                            Is Production:{" "}
-                            {version.is_production ? "Yes" : "No"}
-                          </p>
-                          <p>Signed: {version.signed ? "Yes" : "No"}</p>
-                          <p>Verified: {version.verified ? "Yes" : "No"}</p>
-                          <p>
-                            Verified Source:{" "}
-                            {version.verified_source.join(", ")}
-                          </p>
-                          <p>URL: {version.url}</p>
-                          <h5>Images:</h5>
-                          {version.images.map((image, imageIndex) => (
-                            <div key={imageIndex}>
-                              <p>Image Name: {image.image_name}</p>
-                              <p>Image Type: {image.image_type}</p>
-                              <p>Registry Host: {image.registry_host}</p>
-                              <p>Size: {image.size}</p>
-                              <p>Updated: {image.updated}</p>
-                              <p>
-                                Checksum:{" "}
-                                {image.checksum
-                                  .map((c) => `${c.type}: ${c.checksum}`)
-                                  .join(", ")}
-                              </p>
-                            </div>
-                          ))}
-                          <h5>Included Apps:</h5>
-                          <ul>
-                            {version.included_apps.map((app, appIndex) => (
-                              <li key={appIndex}>{app}</li>
+                {selectedTool?.versions ? (
+                  <Sidebar
+                    items={
+                      selectedTool?.versions?.map((version, index) => ({
+                        title: `Version ${index + 1}`,
+                        content: (
+                          <div key={index}>
+                            <h4>Version {index + 1}</h4>
+                            <p>ID: {version.id}</p>
+                            <p>Name: {version.name}</p>
+                            <p>Meta Version: {version.meta_version}</p>
+                            <p>Author: {version.author.join(", ")}</p>
+                            <p>
+                              Descriptor Type:{" "}
+                              {version.descriptor_type.join(", ")}
+                            </p>
+                            <p>
+                              Container File:{" "}
+                              {version.containerfile ? "Yes" : "No"}
+                            </p>
+                            <p>
+                              Is Production:{" "}
+                              {version.is_production ? "Yes" : "No"}
+                            </p>
+                            <p>Signed: {version.signed ? "Yes" : "No"}</p>
+                            <p>Verified: {version.verified ? "Yes" : "No"}</p>
+                            <p>
+                              Verified Source:{" "}
+                              {version.verified_source.join(", ")}
+                            </p>
+                            <p>URL: {version.url}</p>
+                            <h5>Images:</h5>
+                            {version.images.map((image, imageIndex) => (
+                              <div key={imageIndex}>
+                                <p>Image Name: {image.image_name}</p>
+                                <p>Image Type: {image.image_type}</p>
+                                <p>Registry Host: {image.registry_host}</p>
+                                <p>Size: {image.size}</p>
+                                <p>Updated: {image.updated}</p>
+                                <p>
+                                  Checksum:{" "}
+                                  {image.checksum
+                                    .map((c) => `${c.type}: ${c.checksum}`)
+                                    .join(", ")}
+                                </p>
+                              </div>
                             ))}
-                          </ul>
-                        </div>
-                      ),
-                    })) ?? []
-                  }
-                />
+                            <h5>Included Apps:</h5>
+                            <ul>
+                              {version.included_apps.map((app, appIndex) => (
+                                <li key={appIndex}>{app}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ),
+                      })) ?? []
+                    }
+                  />
+                ) : null}
               </>
             </>
           </Collapse>
         </Grid>
       ))}
+      <Pagination
+        total={Math.ceil(filteredTools.length / filterForm.limit)}
+        initialPage={1}
+        onChange={(e) => {
+          setFilterForm((prev) => ({
+            ...prev,
+            offset: String((e - 1) * prev.limit),
+          }));
+        }}
+      />
     </Grid.Container>
   );
 };
