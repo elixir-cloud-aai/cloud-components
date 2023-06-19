@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styles from "./clipboard-copy-component.module.css";
 import { Button, Input, Textarea } from "@nextui-org/react";
+//write import from images folder
 
 interface IClipboardCopyComponentProps {
   label?: string;

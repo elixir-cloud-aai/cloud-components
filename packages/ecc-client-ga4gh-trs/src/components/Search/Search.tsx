@@ -1,7 +1,7 @@
-import { Button, Input, Card, Row, Col } from "@nextui-org/react";
+import { Button, Input, Card, Row, Col, Spacer } from "@nextui-org/react";
 import React, { useState } from "react";
 import styles from "./search.module.css";
-import type { IToolParams } from "../../api/api";
+import type { IToolParams } from "../../ts/types";
 
 interface InputField {
   name: string;
@@ -116,7 +116,8 @@ const Search = ({ onSearch, form, setForm, onApply }) => {
                 </Row>
               ))}
             </div>
-            <Button onClick={onApply}>apply</Button>
+            <Spacer y={1} />
+            <Button onClick={onApply}>Apply</Button>
           </Card>
         )}
       </div>

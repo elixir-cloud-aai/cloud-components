@@ -4,6 +4,8 @@ import ClipboardCopyComponent from "../ClipboardCopyComponent/ClipboardCopyCompo
 import Sidebar from "../Sidebar/Sidebar";
 import Search from "../Search/Search";
 import { getToolById, getTools } from "../../requests/ga4gh";
+import styles from "./trs-component.module.css";
+
 
 interface ToolVersionProps {
   id: string;
@@ -169,7 +171,9 @@ const TRScomponent: React.FC<ToolVersionProps> = () => {
           </Collapse>
         </Grid>
       ))}
-      <Pagination
+      <Spacer y={1} />
+      <div className={styles.pagination}>
+      <Pagination 
         total={Math.ceil(filteredTools.length / filterForm.limit)}
         initialPage={1}
         onChange={(e) => {
@@ -178,7 +182,7 @@ const TRScomponent: React.FC<ToolVersionProps> = () => {
             offset: String((e - 1) * prev.limit),
           }));
         }}
-      />
+      /></div>
     </Grid.Container>
   );
 };
