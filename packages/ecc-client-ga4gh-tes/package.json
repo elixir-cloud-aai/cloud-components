@@ -1,7 +1,7 @@
 {
   "name": "ecc-client-ga4gh-tes",
   "description": "Web components for TES",
-  "main": "index.js",
+  "main": "./out-tsc/src/index.js",
   "private": true,
   "type": "module",
   "version": "0.1.0",
@@ -9,7 +9,7 @@
   "license": "ISC",
   "repository": "",
   "scripts": {
-    "dev": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\"",
+    "dev": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds\"",
     "lint:fix": "npm run lint -- --fix",
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore && prettier \"**/*.ts\" --check --ignore-path .gitignore",
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore && prettier \"**/*.ts\" --write --ignore-path .gitignore",
