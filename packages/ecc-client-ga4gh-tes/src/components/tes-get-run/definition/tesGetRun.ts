@@ -8,37 +8,7 @@ import template from './tesGetRun.template.js';
 import styles from './tesGetRun.styles.js';
 import { fetchTask } from '../../../data/index.js';
 import { deleteTask } from '../../../data/Post/tesPost.js';
-
-interface TaskData {
-  id: string;
-  state: string;
-  name: string;
-  description: string;
-  executors: Executor[];
-  logs: Log[];
-  creation_time: string;
-}
-
-interface Executor {
-  image: string;
-  command: string[];
-}
-
-interface Log {
-  logs: LogEntry[];
-  metadata: {
-    USER_ID: string;
-  };
-  start_time: string;
-  end_time: string;
-}
-
-interface LogEntry {
-  start_time: string;
-  end_time: string;
-  stdout: string;
-  exit_code: number;
-}
+import TaskData from './TaskData.js';
 
 @customElement({
   name: 'ecc-tes-get-run',
