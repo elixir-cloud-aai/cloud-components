@@ -3,17 +3,17 @@ import {
   attr,
   customElement,
   observable,
-} from "@microsoft/fast-element";
-import { fetchTasks } from "../../../data/index.js";
-import template from "./tesGetRuns.template.js";
-import styles from "./tesGetRuns.styles.js";
+} from '@microsoft/fast-element';
+import { fetchTasks } from '../../../data/index.js';
+import template from './tesGetRuns.template.js';
+import styles from './tesGetRuns.styles.js';
 
 interface Task {
   id: string;
   state: string;
 }
 @customElement({
-  name: "ecc-tes-get-runs",
+  name: 'ecc-tes-get-runs',
   template,
   styles,
 })
@@ -21,7 +21,7 @@ export default class TESGetRuns extends FASTElement {
   // Number of Task to be listed at once
   @attr pageSize = 5;
 
-  @observable nextPageToken = "";
+  @observable nextPageToken = '';
 
   // Data to be rendered
   @observable data: Task[] = [];
@@ -38,9 +38,9 @@ export default class TESGetRuns extends FASTElement {
   @observable pageNumberArray: number[] = [];
 
   // Seach input for name_prefix filter
-  @observable searchInput = "";
+  @observable searchInput = '';
 
-  @observable stateInput = "ALL";
+  @observable stateInput = 'ALL';
 
   @observable unfilterdData: Task[] = [];
 
@@ -49,32 +49,33 @@ export default class TESGetRuns extends FASTElement {
   async connectedCallback() {
     super.connectedCallback();
     // Since this is the first call, fetch the first page, no token needed
-    await this.fetchData("");
+    await this.fetchData('');
   }
 
   /**
    *Fetches data of 3*pageSize length and sets it as cache
    * @param token token for the next page for cache data
    */
-  fetchData = async (token: string, namePrefix = "") => {
+  fetchData = async (token: string, namePrefix = '') => {
     this.isLoading = true;
 
     // Reset data
     this.data = [];
 
     // Next first page number would start after offset of this data
-    if (token !== "") this.firstPageNumber += this.pageNumberOffset;
+    if (token !== '') this.firstPageNumber += this.pageNumberOffset;
 
     // Fetch new data
     let newData = [];
-    if (namePrefix === "") newData = await fetchTasks(this.pageSize * 3, token);
-    else
+    if (namePrefix === '') newData = await fetchTasks(this.pageSize * 3, token);
+    else {
       newData = await fetchTasks(
         this.pageSize * 3,
         token,
-        "MINIMAL",
-        namePrefix
+        'MINIMAL',
+        namePrefix,
       );
+    }
     if (newData && newData.tasks) {
       this.cachedData = newData.tasks;
       this.data = this.cachedData.slice(0, this.pageSize);
@@ -111,7 +112,7 @@ export default class TESGetRuns extends FASTElement {
     this.unfilterdData = this.data;
 
     // Reset state filter
-    this.stateInput = "ALL";
+    this.stateInput = 'ALL';
   };
 
   handleNameInput(event: Event) {
@@ -122,17 +123,18 @@ export default class TESGetRuns extends FASTElement {
     this.pageNumberOffset = 0;
 
     // Fetch new data
-    this.fetchData("", this.searchInput);
+    this.fetchData('', this.searchInput);
   }
 
   handleStateInput(event: Event) {
     this.stateInput = (event.target as HTMLInputElement).value;
 
     // Filter data on current page based on the filter input
-    if (this.stateInput === "ALL") this.data = this.unfilterdData;
-    else
+    if (this.stateInput === 'ALL') this.data = this.unfilterdData;
+    else {
       this.data = this.unfilterdData.filter(
-        (task) => task.state === this.stateInput
+        task => task.state === this.stateInput,
       );
+    }
   }
 }

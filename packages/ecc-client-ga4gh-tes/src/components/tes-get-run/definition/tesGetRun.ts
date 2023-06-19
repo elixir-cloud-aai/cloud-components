@@ -3,11 +3,11 @@ import {
   attr,
   customElement,
   observable,
-} from "@microsoft/fast-element";
-import template from "./tesGetRun.template.js";
-import styles from "./tesGetRun.styles.js";
-import { fetchTask } from "../../../data/index.js";
-import { deleteTask } from "../../../data/Post/tesPost.js";
+} from '@microsoft/fast-element';
+import template from './tesGetRun.template.js';
+import styles from './tesGetRun.styles.js';
+import { fetchTask } from '../../../data/index.js';
+import { deleteTask } from '../../../data/Post/tesPost.js';
 
 interface TaskData {
   id: string;
@@ -41,24 +41,24 @@ interface LogEntry {
 }
 
 @customElement({
-  name: "ecc-tes-get-run",
+  name: 'ecc-tes-get-run',
   template,
   styles,
-  shadowOptions: { mode: "open" },
+  shadowOptions: { mode: 'open' },
 })
 export default class TESGetRun extends FASTElement {
-  @attr id = "";
+  @attr id = '';
 
-  @attr state = "";
+  @attr state = '';
 
   @observable isLoading = true;
 
   @observable data: TaskData = {
     id: this.id,
     state: this.state,
-    name: "",
-    description: "",
-    creation_time: "",
+    name: '',
+    description: '',
+    creation_time: '',
     executors: [],
     logs: [],
   };
@@ -66,20 +66,20 @@ export default class TESGetRun extends FASTElement {
   connectedCallback() {
     super.connectedCallback();
     // Add event listener to handle accordion open event
-    this.addEventListener("change", this.handleFetch);
-    const delButton = this.shadowRoot?.querySelector("fast-button");
+    this.addEventListener('change', this.handleFetch);
+    const delButton = this.shadowRoot?.querySelector('fast-button');
     if (!this.isLoading && delButton) {
       // delButton.addEventListener("click", this.handleDelete);
-      delButton.addEventListener("click", this.handleDelete.bind(this));
+      delButton.addEventListener('click', this.handleDelete.bind(this));
     }
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    this.removeEventListener("change", this.handleFetch);
-    const delButton = this.shadowRoot?.querySelector("fast-button");
+    this.removeEventListener('change', this.handleFetch);
+    const delButton = this.shadowRoot?.querySelector('fast-button');
     if (!this.isLoading && delButton) {
-      delButton.addEventListener("click", this.handleDelete.bind(this));
+      delButton.addEventListener('click', this.handleDelete.bind(this));
     }
   }
 

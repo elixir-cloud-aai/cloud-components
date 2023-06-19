@@ -1,4 +1,4 @@
-import { postTaskURL } from "../baseURL.js";
+import { postTaskURL } from '../baseURL.js';
 
 /**
  *This mathod deletes a specific task
@@ -8,7 +8,7 @@ const deleteTask = async (id: string) => {
   const url = `${postTaskURL}/${id}:cancel`;
   try {
     const response = await fetch(url, {
-      method: "DELETE",
+      method: 'DELETE',
     });
     return response;
   } catch (error) {

@@ -1,3 +1,3 @@
-import { fetchTask, fetchTasks } from "./Get/tesGet.js";
+import { fetchTask, fetchTasks } from './Get/tesGet.js';
 
 export { fetchTask, fetchTasks };

@@ -1,3 +1,3 @@
-import TESGetRun from "./definition/tesGetRun.js";
+import TESGetRun from './definition/tesGetRun.js';
 
 export default TESGetRun;

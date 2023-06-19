@@ -6,10 +6,10 @@ import {
   fastSelect,
   fastOption,
   fastTextField,
-} from "@microsoft/fast-components";
-import { html, repeat, when } from "@microsoft/fast-element";
-import TESGetRuns from "./tesGetRuns.js";
-import TESGetRun from "../../tes-get-run/index.js";
+} from '@microsoft/fast-components';
+import { html, repeat, when } from '@microsoft/fast-element';
+import TESGetRuns from './tesGetRuns.js';
+import TESGetRun from '../../tes-get-run/index.js';
 
 provideFASTDesignSystem().register(
   fastAccordion(),
@@ -17,7 +17,7 @@ provideFASTDesignSystem().register(
   fastSkeleton(),
   fastSelect(),
   fastOption(),
-  fastTextField()
+  fastTextField(),
 );
 
 const template = html<TESGetRuns>`
@@ -25,12 +25,12 @@ const template = html<TESGetRuns>`
     <div class="search">
       <fast-text-field
         placeholder="Search by name_prefix"
-        :value=${(x) => x.searchInput}
+        :value=${x => x.searchInput}
         @input=${(x, c) => x.handleNameInput(c.event)}
       >
       </fast-text-field>
       <fast-select
-        :value=${(x) => x.stateInput}
+        :value=${x => x.stateInput}
         @input=${(x, c) => x.handleStateInput(c.event)}
       >
         <fast-option value="ALL">All</fast-option>
@@ -43,10 +43,10 @@ const template = html<TESGetRuns>`
     <div class="list">
       <fast-accordion>
         ${when(
-          (x) => x.isLoading,
-          html` ${repeat(
-            (x) => Array.from(Array(parseInt(x.pageSize, 10))),
-            html`
+    x => x.isLoading,
+    html` ${repeat(
+      x => Array.from(Array(parseInt(x.pageSize, 10))),
+      html`
               <fast-accordion-item>
                 <fast-skeleton
                   style="border-radius: 4px;height: 100%;margin-bottom: 10px;"
@@ -54,28 +54,28 @@ const template = html<TESGetRuns>`
                   slot="heading"
                 ></fast-skeleton>
               </fast-accordion-item>
-            `
-          )}`
-        )}
+            `,
+    )}`,
+  )}
         ${repeat(
-          (x) => x.data,
-          html<TESGetRun>`
+    x => x.data,
+    html<TESGetRun>`
             <ecc-tes-get-run
               class="run-item"
-              id=${(x) => x.id}
-              state=${(x) => x.state}
+              id=${x => x.id}
+              state=${x => x.state}
             >
             </ecc-tes-get-run>
-          `
-        )}
+          `,
+  )}
       </fast-accordion>
     </div>
     <div class="pagination">
       ${when(
-        (x) => x.isLoading,
-        html` ${repeat(
-          () => Array.from(Array(4)),
-          html`
+    x => x.isLoading,
+    html` ${repeat(
+      () => Array.from(Array(4)),
+      html`
             <fast-button appearance="outline">
               <fast-skeleton
                 style="border-radius: 4px;height: 100%;margin-bottom: 10px;"
@@ -83,29 +83,28 @@ const template = html<TESGetRuns>`
                 slot="heading"
               ></fast-skeleton>
             </fast-button>
-          `
-        )}`
-      )}
+          `,
+    )}`,
+  )}
       ${when(
-        (x) => !x.isLoading,
-        html`
+    x => !x.isLoading,
+    html`
           ${repeat(
-            (x) =>
-              Array.from(
-                { length: x.pageNumberOffset },
-                (_, index) => index + x.firstPageNumber
-              ),
-            html`<fast-button
+    x => Array.from(
+      { length: x.pageNumberOffset },
+      (_, index) => index + x.firstPageNumber,
+    ),
+    html`<fast-button
               appearance="outline"
               style="color:black"
               @click=${(x, c) => c.parent.handleClick(x)}
-              >${(x) => x}</fast-button
-            >`
-          )}
+              >${x => x}</fast-button
+            >`,
+  )}
           <fast-button
             appearance="neutral"
-            ?disabled=${(x) => x.nextPageToken === undefined}
-            @click=${(x) => x.handleNext()}
+            ?disabled=${x => x.nextPageToken === undefined}
+            @click=${x => x.handleNext()}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -118,8 +117,8 @@ const template = html<TESGetRuns>`
               />
             </svg>
           </fast-button>
-        `
-      )}
+        `,
+  )}
     </div>
   </div>
 `;

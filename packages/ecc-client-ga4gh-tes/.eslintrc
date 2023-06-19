@@ -4,10 +4,9 @@
     "@open-wc",
     "airbnb-typescript/base",
     "plugin:@typescript-eslint/recommended",
-    "plugin:import/typescript",
-    "prettier"
+    "plugin:import/typescript"
   ],
-  "plugins": ["import", "prettier"],
+  "plugins": ["import"],
   "rules": {
     "no-unused-vars": "off",
     "wc/guard-super-call": "off",

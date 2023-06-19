@@ -4,9 +4,9 @@ import {
   fastSkeleton,
   fastButton,
   fastBadge,
-} from "@microsoft/fast-components";
-import { html, when, repeat } from "@microsoft/fast-element";
-import TESGetRun from "./tesGetRun.js";
+} from '@microsoft/fast-components';
+import { html, when, repeat } from '@microsoft/fast-element';
+import TESGetRun from './tesGetRun.js';
 
 provideFASTDesignSystem().register(
   fastSkeleton(),
@@ -39,13 +39,13 @@ provideFASTDesignSystem().register(
         d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8Zm7-8a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 4.293V.5A.5.5 0 0 1 8 0Zm-.5 11.707-1.146 1.147a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 11.707V15.5a.5.5 0 0 1-1 0v-3.793Z"
       />
     </svg>`,
-  })
+  }),
 );
 
 const template = html<TESGetRun>`
   <fast-accordion-item>
     <span slot="heading" class="slot-heading">
-      ${(x) => html`
+      ${x => html`
         <div class="collapsed-container">
           <div class="right">
             <span class="id">
@@ -69,37 +69,37 @@ const template = html<TESGetRun>`
                   }
                 </style>
                 ${when(
-                  () => x?.state === "COMPLETE",
-                  html`
+    () => x?.state === 'COMPLETE',
+    html`
                     <fast-badge fill="complete" color="white"
                       >${x.state}</fast-badge
                     >
-                  `
-                )}
+                  `,
+  )}
                 ${when(
-                  () => x?.state === "SYSTEM_ERROR",
-                  html`
+    () => x?.state === 'SYSTEM_ERROR',
+    html`
                     <fast-badge fill="error" color="white"
                       >${x.state}</fast-badge
                     >
-                  `
-                )}
+                  `,
+  )}
                 ${when(
-                  () => x?.state === "PROCESSING",
-                  html`
+    () => x?.state === 'PROCESSING',
+    html`
                     <fast-badge fill="processing" color="white"
                       >${x.state}</fast-badge
                     >
-                  `
-                )}
+                  `,
+  )}
                 ${when(
-                  () => x?.state === "CANCELED",
-                  html`
+    () => x?.state === 'CANCELED',
+    html`
                     <fast-badge fill="cancelled" color="white"
                       >${x.state}</fast-badge
                     >
-                  `
-                )}
+                  `,
+  )}
               </div>
             </div>
           </div>
@@ -107,8 +107,8 @@ const template = html<TESGetRun>`
       `}
     </span>
     ${when(
-      (x) => x.isLoading,
-      html` <fast-skeleton
+    x => x.isLoading,
+    html` <fast-skeleton
           style="border-radius: 4px; margin-top: 10px; height: 20px; width: 20%"
           shape="rect"
         ></fast-skeleton>
@@ -127,33 +127,33 @@ const template = html<TESGetRun>`
         <fast-skeleton
           style="border-radius: 4px;height: 80px;margin-top: 20px;margin-bottom: 10px;"
           shape="rect"
-        ></fast-skeleton>`
-    )}
+        ></fast-skeleton>`,
+  )}
     ${when(
-      (x) => !x.isLoading,
-      html<TESGetRun>`
+    x => !x.isLoading,
+    html<TESGetRun>`
         <div class="expanded-container">
           <div class="meta-data">
             <div class="meta-data-left">
               <div class="name">
                 <span class="title"> Name: </span>
-                ${(x) => x.data.name}
+                ${x => x.data.name}
               </div>
               <div class="description">
                 <span class="title"> Description: </span>
-                ${(x) => x.data.description}
+                ${x => x.data.description}
               </div>
               <div class="creation-time">
                 <span class="title"> Creation Time: </span>
-                ${(x) => x.data.creation_time}
+                ${x => x.data.creation_time}
               </div>
             </div>
             ${when(
-              (x) => x.state === "RUNNING",
-              html`<div class="meta-data-right">
+    x => x.state === 'RUNNING',
+    html`<div class="meta-data-right">
                 <fast-button
                   class="delete-button"
-                  @click=${(x) => x.handleDelete()}
+                  @click=${x => x.handleDelete()}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -171,83 +171,82 @@ const template = html<TESGetRun>`
                     />
                   </svg>
                 </fast-button>
-              </div>`
-            )}
+              </div>`,
+  )}
           </div>
           <div class="executors">
             <div class="section-heading">
               <span class="title">Executors: </span>
             </div>
             ${repeat(
-              (x) => x.data.executors,
-              html`
+    x => x.data.executors,
+    html`
                 <div class="executor">
                   <div class="image">
                     <span class="title">Image: </span>
-                    ${(executor) => executor.image}
+                    ${executor => executor.image}
                   </div>
                   <div class="command-list">
                     <span class="title">Commands: </span>
 
                     ${repeat(
-                      (executor) => executor.command,
-                      html`<li class="command">${(x) => x}</li>`
-                    )}
+    executor => executor.command,
+    html`<li class="command">${x => x}</li>`,
+  )}
                   </div>
                 </div>
-              `
-            )}
+              `,
+  )}
           </div>
           <div class="logs">
             <div class="section-heading">
               <span class="title"> Logs </span>
             </div>
             ${when(
-              (x) => x.data.logs && x.data.logs.length > 0,
-              html`
+    x => x.data.logs && x.data.logs.length > 0,
+    html`
                 ${repeat(
-                  (x) => x.data.logs,
-                  html`
+    x => x.data.logs,
+    html`
                     <div class="log-entry">
                       <div class="start-time">
-                        <span class="title">Start Time:</span> ${(x) =>
-                          x.start_time}
+                        <span class="title">Start Time:</span> ${x => x.start_time}
                       </div>
                       <div class="end-time">
                         <span class="title">End Time:</span>
-                        ${(x) => x.end_time}
+                        ${x => x.end_time}
                       </div>
                       ${when(
-                        (x) => x.logs && x.logs.length > 0,
-                        html`
+    x => x.logs && x.logs.length > 0,
+    html`
                           <div class="stdout">
                             <span class="title">Stdout:</span>
-                            ${(x) => x.logs[0].stdout}
+                            ${x => x.logs[0].stdout}
                           </div>
                           <div class="exit-code">
                             <span class="title">Exit Code: </span>
-                            ${(x) => x.logs[0].exit_code}
+                            ${x => x.logs[0].exit_code}
                           </div>
-                        `
-                      )}
+                        `,
+  )}
                       ${when(
-                        (x) => x.metadata && x.metadata.USER_ID,
-                        html`
+    x => x.metadata && x.metadata.USER_ID,
+    html`
                           <div class="user-id">
                             <span class="title">Metadata User ID: </span>
-                            ${(x) => x.metadata.USER_ID}
+                            ${x => x.metadata.USER_ID}
                           </div>
-                        `
-                      )}
+                        `,
+  )}
                     </div>
-                  `
-                )}
-              `
-            )}
+                  `,
+  )}
+              `,
+  )}
           </div>
         </div>
-      `
-    )}
+      `,
+  )}
   </fast-accordion-item>
 `;
 

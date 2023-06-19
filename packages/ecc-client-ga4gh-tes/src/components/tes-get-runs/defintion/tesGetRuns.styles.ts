@@ -1,4 +1,4 @@
-import { css } from "@microsoft/fast-element";
+import { css } from '@microsoft/fast-element';
 
 const styles = css`
   .container {
