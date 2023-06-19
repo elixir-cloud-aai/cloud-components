@@ -21,7 +21,7 @@ export default class TESGetRuns extends FASTElement {
   // Number of Task to be listed at once
   @attr pageSize = 5;
 
-  @observable nextPageToken: string | null = null;
+  @observable nextPageToken = "";
 
   // Data to be rendered
   @observable data: Task[] = [];
@@ -56,7 +56,7 @@ export default class TESGetRuns extends FASTElement {
    *Fetches data of 3*pageSize length and sets it as cache
    * @param token token for the next page for cache data
    */
-  fetchData = async (token: string, namePrefix: string | null = null) => {
+  fetchData = async (token: string, namePrefix = "") => {
     this.isLoading = true;
 
     // Reset data
@@ -67,7 +67,7 @@ export default class TESGetRuns extends FASTElement {
 
     // Fetch new data
     let newData = [];
-    if (!namePrefix) newData = await fetchTasks(this.pageSize * 3, token);
+    if (namePrefix === "") newData = await fetchTasks(this.pageSize * 3, token);
     else
       newData = await fetchTasks(
         this.pageSize * 3,
@@ -92,9 +92,7 @@ export default class TESGetRuns extends FASTElement {
 
   // Cache new data
   handleNext = async () => {
-    if (this.searchInput !== "") {
-      await this.fetchData(this.nextPageToken as string, this.searchInput);
-    } else await this.fetchData(this.nextPageToken as string, this.searchInput);
+    this.fetchData(this.nextPageToken as string, this.searchInput);
   };
 
   /**
