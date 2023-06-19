@@ -80,32 +80,6 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
       // Add a new field "name" to inquirer.Answers
       data.name = kebabName as string;
 
-      // all the actions to create the template
-      const actions = [
-        {
-          type: 'addMany',
-          destination: '{{ turbo.paths.root }}/packages/{{ name }}',
-          templateFiles: 'templates/package/**/*.hbs',
-          stripExtensions: ['hbs'],
-          abortOnFail: true,
-        },
-        {
-          type: 'add',
-          path: '{{ turbo.paths.root }}/packages/{{ name }}/.eslintrc',
-          templateFile: 'templates/package/.eslintrc.hbs',
-        },
-        {
-          type: 'add',
-          path: '{{ turbo.paths.root }}/packages/{{ name }}/.eslintignore',
-          templateFile: 'templates/package/.eslintignore.hbs',
-        },
-        {
-          type: 'add',
-          path: '{{ turbo.paths.root }}/packages/{{ name }}/.gitignore',
-          templateFile: 'templates/package/.gitignore.hbs',
-        },
-      ];
-
       // If the name length is out of bound, log error.
       if (kebabName.length > 128) {
         return [
@@ -115,6 +89,32 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
           },
         ];
       }
+
+      // all the actions to create the template
+      const actions = [
+        {
+          type: 'addMany',
+          destination: '{{ turbo.paths.root }}/packages/{{ name }}',
+          templateFiles: 'template-package/**/*.hbs',
+          stripExtensions: ['hbs'],
+          abortOnFail: true,
+        },
+        {
+          type: 'add',
+          path: '{{ turbo.paths.root }}/packages/{{ name }}/.eslintrc',
+          templateFile: 'template-package/.eslintrc.hbs',
+        },
+        {
+          type: 'add',
+          path: '{{ turbo.paths.root }}/packages/{{ name }}/.eslintignore',
+          templateFile: 'template-package/.eslintignore.hbs',
+        },
+        {
+          type: 'add',
+          path: '{{ turbo.paths.root }}/packages/{{ name }}/.gitignore',
+          templateFile: 'template-package/.gitignore.hbs',
+        },
+      ];
 
       // else create the template
       return actions;
