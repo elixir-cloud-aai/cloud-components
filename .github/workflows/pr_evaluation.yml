@@ -1,17 +1,16 @@
-name: PR Evaluation & Deployment Workflow
+name: PR Evaluation
 
 on:
   pull_request:
-    types: edited
-    branches: ['main']
-  push:
+    types: [opened, synchronize, reopened, ready_for_review, edited]
     branches: ['main']
 
 jobs:
 
-  lint_pr: 
-    name: Validate PR title
+  semantic_pr: 
+    name: Semantic PR title
     runs-on: ubuntu-latest
+    if: ${{ github.event.action != 'edited' || github.event.changes.title != null }}
     steps:
       - uses: amannn/action-semantic-pull-request@v5
         env:
@@ -31,8 +30,6 @@ jobs:
             ci
             chore
             revert
-          # Configure that a scope must always be provided.
-          requireScope: true
           # Configure additional validation for the subject based on a regex.
           # This example ensures the subject doesn't start with an uppercase character & has more than 50 chars.
           subjectPattern: ^(?![A-Z])(?=.{1,50}$).+$
@@ -44,12 +41,23 @@ jobs:
             didn't match the configured pattern. Please ensure that the subject
             doesn't start with an uppercase character & not have more than 50 characters.
 
+  detect-unresolved-conflicts:
+    name: Detect unresolved merge conflicts
+    runs-on: ubuntu-latest
+    needs: semantic_pr
+    steps:
+      - uses: actions/checkout@v3
+      - name: List files with merge conflict markers
+        run: git --no-pager grep "<<<<<<<" ":(exclude).github/" || true
+      - name: Fail or succeed job if any files with merge conflict markers have been checked in
+        # Find lines containing "<<<<<<<", then count the number of lines.
+        # 0 matching lines results in exit code 0, i.e. success.
+        run: exit $(git grep "<<<<<<<" ":(exclude).github/" | wc --lines)
+
   linters:
     name: Linting checks
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
+    needs: semantic_pr
 
     steps:
       - name: Check out code
@@ -57,10 +65,10 @@ jobs:
         with:
           fetch-depth: 2
       
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 20.x
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20.x
           cache: 'npm'
 
       - name: Install dependencies
@@ -72,6 +80,7 @@ jobs:
   tests:
     name: Test checks
     runs-on: ubuntu-latest
+    needs: semantic_pr
     strategy:
       matrix:
         node-version: [18.x, 20.x]
