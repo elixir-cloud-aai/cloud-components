@@ -1,0 +1,934 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "out-tsc/src/index.js",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/data/baseURL.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "serviceInfoURL",
+          "default": "`${baseURL}/service-info`"
+        },
+        {
+          "kind": "variable",
+          "name": "getTasksURL",
+          "default": "`${baseURL}/tasks`"
+        },
+        {
+          "kind": "variable",
+          "name": "postTaskURL",
+          "default": "`${baseURL}/tasks`"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "serviceInfoURL",
+          "declaration": {
+            "name": "serviceInfoURL",
+            "module": "src/data/baseURL.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getTasksURL",
+          "declaration": {
+            "name": "getTasksURL",
+            "module": "src/data/baseURL.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "postTaskURL",
+          "declaration": {
+            "name": "postTaskURL",
+            "module": "src/data/baseURL.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/data/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "fetchTask",
+          "declaration": {
+            "name": "fetchTask",
+            "module": "src/data/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "fetchTasks",
+          "declaration": {
+            "name": "fetchTasks",
+            "module": "src/data/index.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/index.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "components",
+          "type": {
+            "text": "array"
+          },
+          "default": "[TESGetRuns, TESGetRun]"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "components",
+            "module": "src/components/index.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "out-tsc/src/components/index.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "components",
+          "type": {
+            "text": "array"
+          },
+          "default": "[TESGetRuns, TESGetRun]"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "components",
+            "module": "out-tsc/src/components/index.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "out-tsc/src/data/baseURL.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "serviceInfoURL",
+          "default": "`${baseURL}/service-info`"
+        },
+        {
+          "kind": "variable",
+          "name": "getTasksURL",
+          "default": "`${baseURL}/tasks`"
+        },
+        {
+          "kind": "variable",
+          "name": "postTaskURL",
+          "default": "`${baseURL}/tasks`"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "serviceInfoURL",
+          "declaration": {
+            "name": "serviceInfoURL",
+            "module": "out-tsc/src/data/baseURL.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getTasksURL",
+          "declaration": {
+            "name": "getTasksURL",
+            "module": "out-tsc/src/data/baseURL.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "postTaskURL",
+          "declaration": {
+            "name": "postTaskURL",
+            "module": "out-tsc/src/data/baseURL.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "out-tsc/src/data/index.js",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "fetchTask",
+          "declaration": {
+            "name": "fetchTask",
+            "module": "out-tsc/src/data/index.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "fetchTasks",
+          "declaration": {
+            "name": "fetchTasks",
+            "module": "out-tsc/src/data/index.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/data/Get/tesGet.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "fetchTasks",
+          "parameters": [
+            {
+              "name": "pageSize",
+              "default": "5",
+              "description": "OPTIONAL. Number of tasks to return in one page. Must be less than 2048. Defaults to 256.",
+              "optional": true,
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "name": "nextPageToken",
+              "default": "\"\"",
+              "description": "OPTIONAL. Page token used to retrieve the next page of results. If unspecified, returns the first page of results.",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "view",
+              "default": "\"MINIMAL\"",
+              "description": "OPTIONAL. Affects the fields included in the returned Task messages. See TaskView below.\n    - 'MINIMAL': Task message will include ONLY the fields: Task.Id, Task.State.\n    - 'BASIC': Task message will include all fields EXCEPT: Task.ExecutorLog.stdout, Task.ExecutorLog.stderr, Input.content, TaskLog.system_logs.\n    - 'FULL': Task message includes all fields.",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "namePrefix",
+              "default": "\"\"",
+              "description": "OPTIONAL. Filter the list to include tasks where the name matches this prefix. If unspecified, no task name filtering is done.",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Fetches tasks based on the specified parameters."
+        },
+        {
+          "kind": "function",
+          "name": "fetchTask",
+          "parameters": [
+            {
+              "name": "id",
+              "type": {
+                "text": "string"
+              },
+              "description": "ID of the specific task",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "fetchTasks",
+          "declaration": {
+            "name": "fetchTasks",
+            "module": "src/data/Get/tesGet.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "fetchTask",
+          "declaration": {
+            "name": "fetchTask",
+            "module": "src/data/Get/tesGet.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/data/Post/tesPost.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "deleteTask",
+          "parameters": [
+            {
+              "name": "id",
+              "type": {
+                "text": "string"
+              },
+              "description": "ID of the task to be deleted"
+            }
+          ],
+          "description": "This mathod deletes a specific task"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "deleteTask",
+          "declaration": {
+            "name": "deleteTask",
+            "module": "src/data/Post/tesPost.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/tes-get-run/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "TESGetRun",
+            "module": "src/components/tes-get-run/index.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/tes-get-runs/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "TESGetRuns",
+            "module": "src/components/tes-get-runs/index.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "out-tsc/src/components/tes-get-run/index.js",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "TESGetRun",
+            "module": "out-tsc/src/components/tes-get-run/index.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "out-tsc/src/components/tes-get-runs/index.js",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "TESGetRuns",
+            "module": "out-tsc/src/components/tes-get-runs/index.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "out-tsc/src/data/Get/tesGet.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "fetchTasks",
+          "parameters": [
+            {
+              "name": "pageSize",
+              "default": "5",
+              "description": "OPTIONAL. Number of tasks to return in one page. Must be less than 2048. Defaults to 256.",
+              "optional": true,
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "name": "nextPageToken",
+              "default": "\"\"",
+              "description": "OPTIONAL. Page token used to retrieve the next page of results. If unspecified, returns the first page of results.",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "view",
+              "default": "\"MINIMAL\"",
+              "description": "OPTIONAL. Affects the fields included in the returned Task messages. See TaskView below.\n    - 'MINIMAL': Task message will include ONLY the fields: Task.Id, Task.State.\n    - 'BASIC': Task message will include all fields EXCEPT: Task.ExecutorLog.stdout, Task.ExecutorLog.stderr, Input.content, TaskLog.system_logs.\n    - 'FULL': Task message includes all fields.",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "namePrefix",
+              "default": "\"\"",
+              "description": "OPTIONAL. Filter the list to include tasks where the name matches this prefix. If unspecified, no task name filtering is done.",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Fetches tasks based on the specified parameters."
+        },
+        {
+          "kind": "function",
+          "name": "fetchTask",
+          "parameters": [
+            {
+              "name": "id",
+              "description": "ID of the specific task",
+              "optional": true,
+              "type": {
+                "text": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "fetchTasks",
+          "declaration": {
+            "name": "fetchTasks",
+            "module": "out-tsc/src/data/Get/tesGet.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "fetchTask",
+          "declaration": {
+            "name": "fetchTask",
+            "module": "out-tsc/src/data/Get/tesGet.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "out-tsc/src/data/Post/tesPost.js",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "deleteTask",
+          "parameters": [
+            {
+              "name": "id",
+              "description": "ID of the task to be deleted"
+            }
+          ],
+          "description": "This mathod deletes a specific task"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "deleteTask",
+          "declaration": {
+            "name": "deleteTask",
+            "module": "out-tsc/src/data/Post/tesPost.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/tes-get-run/definition/tesGetRun.styles.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles",
+          "default": "css`\n  .slot-heading {\n    color: black;\n  }\n\n  .collapsed-container {\n    display: flex;\n    border: none;\n    width: 100%;\n    height: 100%;\n    justify-content: space-between;\n    align-items: center;\n  }\n\n  .right {\n    margin-right: 10px;\n  }\n\n  .left {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n  }\n\n  .id {\n    display: flex;\n    align-items: center;\n  }\n\n  .title {\n    margin-right: 5px;\n    font-weight: bold;\n    font-size: 0.8rem;\n  }\n\n  .delete-icon {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    margin: 10px;\n    transition: color 0.2s ease, transform 0.2s ease;\n  }\n\n  .delete-icon:hover {\n    transform: scale(1.1);\n  }\n\n  .expanded-container {\n    padding: 1rem;\n    color: black;\n  }\n\n  .meta-data {\n    margin-bottom: 1rem;\n    display: flex;\n    justify-content: space-between;\n  }\n\n  .name,\n  .description,\n  .creation-time {\n    margin-bottom: 0.5rem;\n    font-weight: bold;\n  }\n\n  .section-heading {\n    margin-bottom: 0.5rem;\n    font-weight: bold;\n  }\n\n  .executor {\n    padding: 0.5rem;\n    margin-bottom: 1rem;\n    border-radius: 4px;\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n  }\n\n  .image {\n    margin-bottom: 0.5rem;\n  }\n\n  .command-list {\n    margin-top: 0.5rem;\n  }\n\n  .command {\n    padding: 0.2rem 1rem;\n  }\n\n  .log-entry {\n    padding: 0.5rem;\n    margin-bottom: 1rem;\n    border-radius: 4px;\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n  }\n\n  .start-time,\n  .end-time {\n    margin-bottom: 0.5rem;\n    font-weight: bold;\n  }\n\n  .stdout,\n  .exit-code,\n  .user-id {\n    margin-bottom: 0.5rem;\n    font-size: 0.9rem;\n  }\n`"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "styles",
+            "module": "src/components/tes-get-run/definition/tesGetRun.styles.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/tes-get-run/definition/tesGetRun.template.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "template",
+          "default": "html<TESGetRun>`\n  <fast-accordion-item>\n    <span slot=\"heading\" class=\"slot-heading\">\n      ${(x) => html`\n        <div class=\"collapsed-container\">\n          <div class=\"right\">\n            <span class=\"id\">\n              <span class=\"title\">RUN ID:</span>\n              <span>${x.id}</span>\n            </span>\n          </div>\n          <div class=\"left\">\n            <div class=\"status-badge\">\n              <div>\n                <style>\n                  /* For example purposes only. App authors needs to define */\n                  fast-badge {\n                    --badge-fill-error: #d32f2f;\n                    --badge-fill-processing: #ffc107;\n                    --badge-fill-cancelled: #cccccc;\n                    --badge-fill-complete: #4caf50;\n                    --badge-fill-transparent: transparent;\n                    --badge-color-black: #000000;\n                    --badge-color-white: #ffffff;\n                  }\n                </style>\n                ${when(\n                  () => x?.state === \"COMPLETE\",\n                  html`\n                    <fast-badge fill=\"complete\" color=\"white\"\n                      >${x.state}</fast-badge\n                    >\n                  `\n                )}\n                ${when(\n                  () => x?.state === \"SYSTEM_ERROR\",\n                  html`\n                    <fast-badge fill=\"error\" color=\"white\"\n                      >${x.state}</fast-badge\n                    >\n                  `\n                )}\n                ${when(\n                  () => x?.state === \"PROCESSING\",\n                  html`\n                    <fast-badge fill=\"processing\" color=\"white\"\n                      >${x.state}</fast-badge\n                    >\n                  `\n                )}\n                ${when(\n                  () => x?.state === \"CANCELED\",\n                  html`\n                    <fast-badge fill=\"cancelled\" color=\"white\"\n                      >${x.state}</fast-badge\n                    >\n                  `\n                )}\n              </div>\n            </div>\n          </div>\n        </div>\n      `}\n    </span>\n    ${when(\n      (x) => x.isLoading,\n      html` <fast-skeleton\n          style=\"border-radius: 4px; margin-top: 10px; height: 20px; width: 20%\"\n          shape=\"rect\"\n        ></fast-skeleton>\n        <fast-skeleton\n          style=\"border-radius: 4px; margin-top: 10px; height: 20px; width: 40%\"\n          shape=\"rect\"\n        ></fast-skeleton>\n        <fast-skeleton\n          style=\"border-radius: 4px; margin-top: 10px; height: 20px; width:25%\"\n          shape=\"rect\"\n        ></fast-skeleton>\n        <fast-skeleton\n          style=\"border-radius: 4px;height: 80px;margin-top: 20px;margin-bottom: 10px;\"\n          shape=\"rect\"\n        ></fast-skeleton>\n        <fast-skeleton\n          style=\"border-radius: 4px;height: 80px;margin-top: 20px;margin-bottom: 10px;\"\n          shape=\"rect\"\n        ></fast-skeleton>`\n    )}\n    ${when(\n      (x) => !x.isLoading,\n      html<TESGetRun>`\n        <div class=\"expanded-container\">\n          <div class=\"meta-data\">\n            <div class=\"meta-data-left\">\n              <div class=\"name\">\n                <span class=\"title\"> Name: </span>\n                ${(x) => x.data.name}\n              </div>\n              <div class=\"description\">\n                <span class=\"title\"> Description: </span>\n                ${(x) => x.data.description}\n              </div>\n              <div class=\"creation-time\">\n                <span class=\"title\"> Creation Time: </span>\n                ${(x) => x.data.creation_time}\n              </div>\n            </div>\n            ${when(\n              (x) => x.state === \"RUNNING\",\n              html`<div class=\"meta-data-right\">\n                <fast-button\n                  class=\"delete-button\"\n                  @click=${(x) => x.handleDelete()}\n                >\n                  <svg\n                    xmlns=\"http://www.w3.org/2000/svg\"\n                    width=\"16\"\n                    height=\"16\"\n                    fill=\"currentColor\"\n                    class=\"bi bi-trash\"\n                    viewBox=\"0 0 16 16\"\n                  >\n                    <path\n                      d=\"M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z\"\n                    />\n                    <path\n                      d=\"M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z\"\n                    />\n                  </svg>\n                </fast-button>\n              </div>`\n            )}\n          </div>\n          <div class=\"executors\">\n            <div class=\"section-heading\">\n              <span class=\"title\">Executors: </span>\n            </div>\n            ${repeat(\n              (x) => x.data.executors,\n              html`\n                <div class=\"executor\">\n                  <div class=\"image\">\n                    <span class=\"title\">Image: </span>\n                    ${(executor) => executor.image}\n                  </div>\n                  <div class=\"command-list\">\n                    <span class=\"title\">Commands: </span>\n\n                    ${repeat(\n                      (executor) => executor.command,\n                      html`<li class=\"command\">${(x) => x}</li>`\n                    )}\n                  </div>\n                </div>\n              `\n            )}\n          </div>\n          <div class=\"logs\">\n            <div class=\"section-heading\">\n              <span class=\"title\"> Logs </span>\n            </div>\n            ${when(\n              (x) => x.data.logs && x.data.logs.length > 0,\n              html`\n                ${repeat(\n                  (x) => x.data.logs,\n                  html`\n                    <div class=\"log-entry\">\n                      <div class=\"start-time\">\n                        <span class=\"title\">Start Time:</span> ${(x) =>\n                          x.start_time}\n                      </div>\n                      <div class=\"end-time\">\n                        <span class=\"title\">End Time:</span>\n                        ${(x) => x.end_time}\n                      </div>\n                      ${when(\n                        (x) => x.logs && x.logs.length > 0,\n                        html`\n                          <div class=\"stdout\">\n                            <span class=\"title\">Stdout:</span>\n                            ${(x) => x.logs[0].stdout}\n                          </div>\n                          <div class=\"exit-code\">\n                            <span class=\"title\">Exit Code: </span>\n                            ${(x) => x.logs[0].exit_code}\n                          </div>\n                        `\n                      )}\n                      ${when(\n                        (x) => x.metadata && x.metadata.USER_ID,\n                        html`\n                          <div class=\"user-id\">\n                            <span class=\"title\">Metadata User ID: </span>\n                            ${(x) => x.metadata.USER_ID}\n                          </div>\n                        `\n                      )}\n                    </div>\n                  `\n                )}\n              `\n            )}\n          </div>\n        </div>\n      `\n    )}\n  </fast-accordion-item>\n`"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "template",
+            "module": "src/components/tes-get-run/definition/tesGetRun.template.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/tes-get-run/definition/tesGetRun.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "TESGetRun",
+          "members": [
+            {
+              "kind": "field",
+              "name": "id",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\""
+            },
+            {
+              "kind": "field",
+              "name": "state",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\""
+            },
+            {
+              "kind": "field",
+              "name": "isLoading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "data",
+              "type": {
+                "text": "TaskData"
+              },
+              "default": "{\n    id: this.id,\n    state: this.state,\n    name: \"\",\n    description: \"\",\n    creation_time: \"\",\n    executors: [],\n    logs: [],\n  }"
+            },
+            {
+              "kind": "field",
+              "name": "handleDelete",
+              "default": "async () => {\n    await deleteTask(this.id);\n  }"
+            },
+            {
+              "kind": "field",
+              "name": "handleFetch",
+              "default": "async () => {\n    // Only fetch the data if not already fetched\n    if (this.isLoading) {\n      this.data = await fetchTask(this.id);\n      this.isLoading = false;\n    }\n  }"
+            }
+          ],
+          "superclass": {
+            "name": "FASTElement",
+            "package": "@microsoft/fast-element"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "TESGetRun",
+            "module": "src/components/tes-get-run/definition/tesGetRun.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/tes-get-runs/defintion/tesGetRuns.styles.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles",
+          "default": "css`\n  .container {\n    display: block;\n  }\n\n  .search {\n    display: flex;\n    justify-content: center;\n    align-items: center;\n  }\n\n  fast-text-field {\n    width: 100%;\n  }\n\n  fast-select {\n    width: 25%;\n  }\n\n  .list {\n    padding-bottom: 1rem;\n  }\n\n  .pagination {\n    display: flex;\n    justify-content: center;\n    gap: 10px;\n    width: 100%;\n    align-items: center;\n  }\n\n  @media (max-width: 450px) {\n    .search {\n      flex-direction: column;\n    }\n    fast-select {\n      width: 100%;\n    }\n  }\n`"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "styles",
+            "module": "src/components/tes-get-runs/defintion/tesGetRuns.styles.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/tes-get-runs/defintion/tesGetRuns.template.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "template",
+          "default": "html<TESGetRuns>`\n  <div class=\"container\">\n    <div class=\"search\">\n      <fast-text-field\n        placeholder=\"Search by name_prefix\"\n        :value=${(x) => x.searchInput}\n        @input=${(x, c) => x.handleNameInput(c.event)}\n      >\n      </fast-text-field>\n      <fast-select\n        :value=${(x) => x.stateInput}\n        @input=${(x, c) => x.handleStateInput(c.event)}\n      >\n        <fast-option value=\"ALL\">All</fast-option>\n        <fast-option value=\"COMPLETE\">Completed</fast-option>\n        <fast-option value=\"PROCESSING\">Processing</fast-option>\n        <fast-option value=\"SYSTEM_ERROR\">Error</fast-option>\n        <fast-option value=\"CANCELED\">Cancelled</fast-option>\n      </fast-select>\n    </div>\n    <div class=\"list\">\n      <fast-accordion>\n        ${when(\n          (x) => x.isLoading,\n          html` ${repeat(\n            (x) => Array.from(Array(parseInt(x.pageSize, 10))),\n            html`\n              <fast-accordion-item>\n                <fast-skeleton\n                  style=\"border-radius: 4px;height: 100%;margin-bottom: 10px;\"\n                  shape=\"rect\"\n                  slot=\"heading\"\n                ></fast-skeleton>\n              </fast-accordion-item>\n            `\n          )}`\n        )}\n        ${repeat(\n          (x) => x.data,\n          html<TESGetRun>`\n            <ecc-tes-get-run\n              class=\"run-item\"\n              id=${(x) => x.id}\n              state=${(x) => x.state}\n            >\n            </ecc-tes-get-run>\n          `\n        )}\n      </fast-accordion>\n    </div>\n    <div class=\"pagination\">\n      ${when(\n        (x) => x.isLoading,\n        html` ${repeat(\n          () => Array.from(Array(4)),\n          html`\n            <fast-button appearance=\"outline\">\n              <fast-skeleton\n                style=\"border-radius: 4px;height: 100%;margin-bottom: 10px;\"\n                shape=\"rect\"\n                slot=\"heading\"\n              ></fast-skeleton>\n            </fast-button>\n          `\n        )}`\n      )}\n      ${when(\n        (x) => !x.isLoading,\n        html`\n          ${repeat(\n            (x) =>\n              Array.from(\n                { length: x.pageNumberOffset },\n                (_, index) => index + x.firstPageNumber\n              ),\n            html`<fast-button\n              appearance=\"outline\"\n              style=\"color:black\"\n              @click=${(x, c) => c.parent.handleClick(x)}\n              >${(x) => x}</fast-button\n            >`\n          )}\n          <fast-button\n            appearance=\"neutral\"\n            ?disabled=${(x) => x.nextPageToken === undefined}\n            @click=${(x) => x.handleNext()}\n          >\n            <svg\n              xmlns=\"http://www.w3.org/2000/svg\"\n              viewBox=\"0 0 24 24\"\n              fill=\"currentColor\"\n              class=\"w-6 h-6\"\n            >\n              <path\n                d=\"M5.055 7.06c-1.25-.714-2.805.189-2.805 1.628v8.123c0 1.44 1.555 2.342 2.805 1.628L12 14.471v2.34c0 1.44 1.555 2.342 2.805 1.628l7.108-4.061c1.26-.72 1.26-2.536 0-3.256L14.805 7.06C13.555 6.346 12 7.25 12 8.688v2.34L5.055 7.06z\"\n              />\n            </svg>\n          </fast-button>\n        `\n      )}\n    </div>\n  </div>\n`"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "template",
+            "module": "src/components/tes-get-runs/defintion/tesGetRuns.template.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/tes-get-runs/defintion/tesGetRuns.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "TESGetRuns",
+          "members": [
+            {
+              "kind": "field",
+              "name": "pageSize",
+              "type": {
+                "text": "number"
+              },
+              "default": "5"
+            },
+            {
+              "kind": "field",
+              "name": "nextPageToken",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "data",
+              "type": {
+                "text": "Task[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "cachedData",
+              "type": {
+                "text": "Task[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "firstPageNumber",
+              "type": {
+                "text": "number"
+              },
+              "default": "1"
+            },
+            {
+              "kind": "field",
+              "name": "pageNumberOffset",
+              "type": {
+                "text": "number"
+              },
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "pageNumberArray",
+              "type": {
+                "text": "number[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "searchInput",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\""
+            },
+            {
+              "kind": "field",
+              "name": "stateInput",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"ALL\""
+            },
+            {
+              "kind": "field",
+              "name": "unfilterdData",
+              "type": {
+                "text": "Task[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "isLoading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "fetchData",
+              "default": "async (token: string, namePrefix: string | null = null) => {\n    this.isLoading = true;\n\n    // Reset data\n    this.data = [];\n\n    // Next first page number would start after offset of this data\n    if (token !== \"\") this.firstPageNumber += this.pageNumberOffset;\n\n    // Fetch new data\n    let newData = [];\n    if (!namePrefix) newData = await fetchTasks(this.pageSize * 3, token);\n    else\n      newData = await fetchTasks(\n        this.pageSize * 3,\n        token,\n        \"MINIMAL\",\n        namePrefix\n      );\n    if (newData && newData.tasks) {\n      this.cachedData = newData.tasks;\n      this.data = this.cachedData.slice(0, this.pageSize);\n      this.unfilterdData = this.data;\n      this.nextPageToken = newData.next_page_token;\n      this.pageNumberOffset = Math.ceil(this.cachedData.length / this.pageSize);\n      const array = [];\n      for (let i = 0; i < this.pageNumberOffset; i += 1) {\n        array.push(i + this.firstPageNumber);\n      }\n      this.pageNumberArray = array;\n    }\n    this.isLoading = false;\n  }",
+              "description": "Fetches data of 3*pageSize length and sets it as cache",
+              "parameters": [
+                {
+                  "description": "token for the next page for cache data",
+                  "name": "token"
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "handleNext",
+              "default": "async () => {\n    if (this.searchInput !== \"\") {\n      await this.fetchData(this.nextPageToken as string, this.searchInput);\n    } else await this.fetchData(this.nextPageToken as string, this.searchInput);\n  }"
+            },
+            {
+              "kind": "field",
+              "name": "handleClick",
+              "default": "(pageNumber: number): void => {\n    const idx: number = pageNumber - this.firstPageNumber;\n\n    const startIndex: number = idx * this.pageSize;\n    const endIndex: number = (idx + 1) * this.pageSize;\n\n    this.data = this.cachedData.slice(startIndex, endIndex);\n\n    // Set unfiltered data for state filterinng\n    this.unfilterdData = this.data;\n\n    // Reset state filter\n    this.stateInput = \"ALL\";\n  }",
+              "description": "This method is fired when user, click to change pages within cache",
+              "parameters": [
+                {
+                  "description": "Page number of pagination",
+                  "name": "pageNumber"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "handleNameInput",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "handleStateInput",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            }
+          ],
+          "superclass": {
+            "name": "FASTElement",
+            "package": "@microsoft/fast-element"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "TESGetRuns",
+            "module": "src/components/tes-get-runs/defintion/tesGetRuns.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "out-tsc/src/components/tes-get-run/definition/tesGetRun.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "TESGetRun",
+          "default": "class TESGetRun extends FASTElement {\n    constructor() {\n        super(...arguments);\n        this.id = \"\";\n        this.state = \"\";\n        this.isLoading = true;\n        this.data = {\n            id: this.id,\n            state: this.state,\n            name: \"\",\n            description: \"\",\n            creation_time: \"\",\n            executors: [],\n            logs: [],\n        };\n        // Handles deletion of this task\n        this.handleDelete = async () => {\n            await deleteTask(this.id);\n        };\n        // Fetched the task with this ID\n        this.handleFetch = async () => {\n            // Only fetch the data if not already fetched\n            if (this.isLoading) {\n                this.data = await fetchTask(this.id);\n                this.isLoading = false;\n            }\n        };\n    }\n    connectedCallback() {\n        var _a;\n        super.connectedCallback();\n        // Add event listener to handle accordion open event\n        this.addEventListener(\"change\", this.handleFetch);\n        const delButton = (_a = this.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelector(\"fast-button\");\n        if (!this.isLoading && delButton) {\n            // delButton.addEventListener(\"click\", this.handleDelete);\n            delButton.addEventListener(\"click\", this.handleDelete.bind(this));\n        }\n    }\n    disconnectedCallback() {\n        var _a;\n        super.disconnectedCallback();\n        this.removeEventListener(\"change\", this.handleFetch);\n        const delButton = (_a = this.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelector(\"fast-button\");\n        if (!this.isLoading && delButton) {\n            delButton.addEventListener(\"click\", this.handleDelete.bind(this));\n        }\n    }\n}"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "TESGetRun",
+            "module": "out-tsc/src/components/tes-get-run/definition/tesGetRun.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "out-tsc/src/components/tes-get-run/definition/tesGetRun.styles.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles",
+          "default": "css `\n  .slot-heading {\n    color: black;\n  }\n\n  .collapsed-container {\n    display: flex;\n    border: none;\n    width: 100%;\n    height: 100%;\n    justify-content: space-between;\n    align-items: center;\n  }\n\n  .right {\n    margin-right: 10px;\n  }\n\n  .left {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n  }\n\n  .id {\n    display: flex;\n    align-items: center;\n  }\n\n  .title {\n    margin-right: 5px;\n    font-weight: bold;\n    font-size: 0.8rem;\n  }\n\n  .delete-icon {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    margin: 10px;\n    transition: color 0.2s ease, transform 0.2s ease;\n  }\n\n  .delete-icon:hover {\n    transform: scale(1.1);\n  }\n\n  .expanded-container {\n    padding: 1rem;\n    color: black;\n  }\n\n  .meta-data {\n    margin-bottom: 1rem;\n    display: flex;\n    justify-content: space-between;\n  }\n\n  .name,\n  .description,\n  .creation-time {\n    margin-bottom: 0.5rem;\n    font-weight: bold;\n  }\n\n  .section-heading {\n    margin-bottom: 0.5rem;\n    font-weight: bold;\n  }\n\n  .executor {\n    padding: 0.5rem;\n    margin-bottom: 1rem;\n    border-radius: 4px;\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n  }\n\n  .image {\n    margin-bottom: 0.5rem;\n  }\n\n  .command-list {\n    margin-top: 0.5rem;\n  }\n\n  .command {\n    padding: 0.2rem 1rem;\n  }\n\n  .log-entry {\n    padding: 0.5rem;\n    margin-bottom: 1rem;\n    border-radius: 4px;\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n  }\n\n  .start-time,\n  .end-time {\n    margin-bottom: 0.5rem;\n    font-weight: bold;\n  }\n\n  .stdout,\n  .exit-code,\n  .user-id {\n    margin-bottom: 0.5rem;\n    font-size: 0.9rem;\n  }\n`"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "styles",
+            "module": "out-tsc/src/components/tes-get-run/definition/tesGetRun.styles.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "out-tsc/src/components/tes-get-run/definition/tesGetRun.template.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "template",
+          "default": "html `\n  <fast-accordion-item>\n    <span slot=\"heading\" class=\"slot-heading\">\n      ${(x) => html `\n        <div class=\"collapsed-container\">\n          <div class=\"right\">\n            <span class=\"id\">\n              <span class=\"title\">RUN ID:</span>\n              <span>${x.id}</span>\n            </span>\n          </div>\n          <div class=\"left\">\n            <div class=\"status-badge\">\n              <div>\n                <style>\n                  /* For example purposes only. App authors needs to define */\n                  fast-badge {\n                    --badge-fill-error: #d32f2f;\n                    --badge-fill-processing: #ffc107;\n                    --badge-fill-cancelled: #cccccc;\n                    --badge-fill-complete: #4caf50;\n                    --badge-fill-transparent: transparent;\n                    --badge-color-black: #000000;\n                    --badge-color-white: #ffffff;\n                  }\n                </style>\n                ${when(() => (x === null || x === void 0 ? void 0 : x.state) === \"COMPLETE\", html `\n                    <fast-badge fill=\"complete\" color=\"white\"\n                      >${x.state}</fast-badge\n                    >\n                  `)}\n                ${when(() => (x === null || x === void 0 ? void 0 : x.state) === \"SYSTEM_ERROR\", html `\n                    <fast-badge fill=\"error\" color=\"white\"\n                      >${x.state}</fast-badge\n                    >\n                  `)}\n                ${when(() => (x === null || x === void 0 ? void 0 : x.state) === \"PROCESSING\", html `\n                    <fast-badge fill=\"processing\" color=\"white\"\n                      >${x.state}</fast-badge\n                    >\n                  `)}\n                ${when(() => (x === null || x === void 0 ? void 0 : x.state) === \"CANCELED\", html `\n                    <fast-badge fill=\"cancelled\" color=\"white\"\n                      >${x.state}</fast-badge\n                    >\n                  `)}\n              </div>\n            </div>\n          </div>\n        </div>\n      `}\n    </span>\n    ${when((x) => x.isLoading, html ` <fast-skeleton\n          style=\"border-radius: 4px; margin-top: 10px; height: 20px; width: 20%\"\n          shape=\"rect\"\n        ></fast-skeleton>\n        <fast-skeleton\n          style=\"border-radius: 4px; margin-top: 10px; height: 20px; width: 40%\"\n          shape=\"rect\"\n        ></fast-skeleton>\n        <fast-skeleton\n          style=\"border-radius: 4px; margin-top: 10px; height: 20px; width:25%\"\n          shape=\"rect\"\n        ></fast-skeleton>\n        <fast-skeleton\n          style=\"border-radius: 4px;height: 80px;margin-top: 20px;margin-bottom: 10px;\"\n          shape=\"rect\"\n        ></fast-skeleton>\n        <fast-skeleton\n          style=\"border-radius: 4px;height: 80px;margin-top: 20px;margin-bottom: 10px;\"\n          shape=\"rect\"\n        ></fast-skeleton>`)}\n    ${when((x) => !x.isLoading, html `\n        <div class=\"expanded-container\">\n          <div class=\"meta-data\">\n            <div class=\"meta-data-left\">\n              <div class=\"name\">\n                <span class=\"title\"> Name: </span>\n                ${(x) => x.data.name}\n              </div>\n              <div class=\"description\">\n                <span class=\"title\"> Description: </span>\n                ${(x) => x.data.description}\n              </div>\n              <div class=\"creation-time\">\n                <span class=\"title\"> Creation Time: </span>\n                ${(x) => x.data.creation_time}\n              </div>\n            </div>\n            ${when((x) => x.state === \"RUNNING\", html `<div class=\"meta-data-right\">\n                <fast-button\n                  class=\"delete-button\"\n                  @click=${(x) => x.handleDelete()}\n                >\n                  <svg\n                    xmlns=\"http://www.w3.org/2000/svg\"\n                    width=\"16\"\n                    height=\"16\"\n                    fill=\"currentColor\"\n                    class=\"bi bi-trash\"\n                    viewBox=\"0 0 16 16\"\n                  >\n                    <path\n                      d=\"M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z\"\n                    />\n                    <path\n                      d=\"M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z\"\n                    />\n                  </svg>\n                </fast-button>\n              </div>`)}\n          </div>\n          <div class=\"executors\">\n            <div class=\"section-heading\">\n              <span class=\"title\">Executors: </span>\n            </div>\n            ${repeat((x) => x.data.executors, html `\n                <div class=\"executor\">\n                  <div class=\"image\">\n                    <span class=\"title\">Image: </span>\n                    ${(executor) => executor.image}\n                  </div>\n                  <div class=\"command-list\">\n                    <span class=\"title\">Commands: </span>\n\n                    ${repeat((executor) => executor.command, html `<li class=\"command\">${(x) => x}</li>`)}\n                  </div>\n                </div>\n              `)}\n          </div>\n          <div class=\"logs\">\n            <div class=\"section-heading\">\n              <span class=\"title\"> Logs </span>\n            </div>\n            ${when((x) => x.data.logs && x.data.logs.length > 0, html `\n                ${repeat((x) => x.data.logs, html `\n                    <div class=\"log-entry\">\n                      <div class=\"start-time\">\n                        <span class=\"title\">Start Time:</span> ${(x) => x.start_time}\n                      </div>\n                      <div class=\"end-time\">\n                        <span class=\"title\">End Time:</span>\n                        ${(x) => x.end_time}\n                      </div>\n                      ${when((x) => x.logs && x.logs.length > 0, html `\n                          <div class=\"stdout\">\n                            <span class=\"title\">Stdout:</span>\n                            ${(x) => x.logs[0].stdout}\n                          </div>\n                          <div class=\"exit-code\">\n                            <span class=\"title\">Exit Code: </span>\n                            ${(x) => x.logs[0].exit_code}\n                          </div>\n                        `)}\n                      ${when((x) => x.metadata && x.metadata.USER_ID, html `\n                          <div class=\"user-id\">\n                            <span class=\"title\">Metadata User ID: </span>\n                            ${(x) => x.metadata.USER_ID}\n                          </div>\n                        `)}\n                    </div>\n                  `)}\n              `)}\n          </div>\n        </div>\n      `)}\n  </fast-accordion-item>\n`"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "template",
+            "module": "out-tsc/src/components/tes-get-run/definition/tesGetRun.template.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "out-tsc/src/components/tes-get-runs/defintion/tesGetRuns.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "TESGetRuns",
+          "default": "class TESGetRuns extends FASTElement {\n    constructor() {\n        super(...arguments);\n        // Number of Task to be listed at once\n        this.pageSize = 5;\n        this.nextPageToken = null;\n        // Data to be rendered\n        this.data = [];\n        // Data cache for at max 3 times the pageSize\n        this.cachedData = [];\n        // First page number of every data cache\n        this.firstPageNumber = 1;\n        // Number of pageSize data present in the cache\n        this.pageNumberOffset = 0;\n        this.pageNumberArray = [];\n        // Seach input for name_prefix filter\n        this.searchInput = \"\";\n        this.stateInput = \"ALL\";\n        this.unfilterdData = [];\n        this.isLoading = true;\n        /**\n         *Fetches data of 3*pageSize length and sets it as cache\n         * @param token token for the next page for cache data\n         */\n        this.fetchData = async (token, namePrefix = null) => {\n            this.isLoading = true;\n            // Reset data\n            this.data = [];\n            // Next first page number would start after offset of this data\n            if (token !== \"\")\n                this.firstPageNumber += this.pageNumberOffset;\n            // Fetch new data\n            let newData = [];\n            if (!namePrefix)\n                newData = await fetchTasks(this.pageSize * 3, token);\n            else\n                newData = await fetchTasks(this.pageSize * 3, token, \"MINIMAL\", namePrefix);\n            if (newData && newData.tasks) {\n                this.cachedData = newData.tasks;\n                this.data = this.cachedData.slice(0, this.pageSize);\n                this.unfilterdData = this.data;\n                this.nextPageToken = newData.next_page_token;\n                this.pageNumberOffset = Math.ceil(this.cachedData.length / this.pageSize);\n                const array = [];\n                for (let i = 0; i < this.pageNumberOffset; i += 1) {\n                    array.push(i + this.firstPageNumber);\n                }\n                this.pageNumberArray = array;\n            }\n            this.isLoading = false;\n        };\n        // Cache new data\n        this.handleNext = async () => {\n            if (this.searchInput !== \"\") {\n                await this.fetchData(this.nextPageToken, this.searchInput);\n            }\n            else\n                await this.fetchData(this.nextPageToken, this.searchInput);\n        };\n        /**\n         *This method is fired when user, click to change pages within cache\n         * @param pageNumber Page number of pagination\n         */\n        this.handleClick = (pageNumber) => {\n            const idx = pageNumber - this.firstPageNumber;\n            const startIndex = idx * this.pageSize;\n            const endIndex = (idx + 1) * this.pageSize;\n            this.data = this.cachedData.slice(startIndex, endIndex);\n            // Set unfiltered data for state filterinng\n            this.unfilterdData = this.data;\n            // Reset state filter\n            this.stateInput = \"ALL\";\n        };\n    }\n    async connectedCallback() {\n        super.connectedCallback();\n        // Since this is the first call, fetch the first page, no token needed\n        await this.fetchData(\"\");\n    }\n    handleNameInput(event) {\n        this.searchInput = event.target.value;\n        // reset the pages\n        this.firstPageNumber = 1;\n        this.pageNumberOffset = 0;\n        // Fetch new data\n        this.fetchData(\"\", this.searchInput);\n    }\n    handleStateInput(event) {\n        this.stateInput = event.target.value;\n        // Filter data on current page based on the filter input\n        if (this.stateInput === \"ALL\")\n            this.data = this.unfilterdData;\n        else\n            this.data = this.unfilterdData.filter((task) => task.state === this.stateInput);\n    }\n}"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "TESGetRuns",
+            "module": "out-tsc/src/components/tes-get-runs/defintion/tesGetRuns.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "out-tsc/src/components/tes-get-runs/defintion/tesGetRuns.styles.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "styles",
+          "default": "css `\n  .container {\n    display: block;\n  }\n\n  .search {\n    display: flex;\n    justify-content: center;\n    align-items: center;\n  }\n\n  fast-text-field {\n    width: 100%;\n  }\n\n  fast-select {\n    width: 25%;\n  }\n\n  .list {\n    padding-bottom: 1rem;\n  }\n\n  .pagination {\n    display: flex;\n    justify-content: center;\n    gap: 10px;\n    width: 100%;\n    align-items: center;\n  }\n\n  @media (max-width: 450px) {\n    .search {\n      flex-direction: column;\n    }\n    fast-select {\n      width: 100%;\n    }\n  }\n`"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "styles",
+            "module": "out-tsc/src/components/tes-get-runs/defintion/tesGetRuns.styles.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "out-tsc/src/components/tes-get-runs/defintion/tesGetRuns.template.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "template",
+          "default": "html `\n  <div class=\"container\">\n    <div class=\"search\">\n      <fast-text-field\n        placeholder=\"Search by name_prefix\"\n        :value=${(x) => x.searchInput}\n        @input=${(x, c) => x.handleNameInput(c.event)}\n      >\n      </fast-text-field>\n      <fast-select\n        :value=${(x) => x.stateInput}\n        @input=${(x, c) => x.handleStateInput(c.event)}\n      >\n        <fast-option value=\"ALL\">All</fast-option>\n        <fast-option value=\"COMPLETE\">Completed</fast-option>\n        <fast-option value=\"PROCESSING\">Processing</fast-option>\n        <fast-option value=\"SYSTEM_ERROR\">Error</fast-option>\n        <fast-option value=\"CANCELED\">Cancelled</fast-option>\n      </fast-select>\n    </div>\n    <div class=\"list\">\n      <fast-accordion>\n        ${when((x) => x.isLoading, html ` ${repeat((x) => Array.from(Array(parseInt(x.pageSize, 10))), html `\n              <fast-accordion-item>\n                <fast-skeleton\n                  style=\"border-radius: 4px;height: 100%;margin-bottom: 10px;\"\n                  shape=\"rect\"\n                  slot=\"heading\"\n                ></fast-skeleton>\n              </fast-accordion-item>\n            `)}`)}\n        ${repeat((x) => x.data, html `\n            <ecc-tes-get-run\n              class=\"run-item\"\n              id=${(x) => x.id}\n              state=${(x) => x.state}\n            >\n            </ecc-tes-get-run>\n          `)}\n      </fast-accordion>\n    </div>\n    <div class=\"pagination\">\n      ${when((x) => x.isLoading, html ` ${repeat(() => Array.from(Array(4)), html `\n            <fast-button appearance=\"outline\">\n              <fast-skeleton\n                style=\"border-radius: 4px;height: 100%;margin-bottom: 10px;\"\n                shape=\"rect\"\n                slot=\"heading\"\n              ></fast-skeleton>\n            </fast-button>\n          `)}`)}\n      ${when((x) => !x.isLoading, html `\n          ${repeat((x) => Array.from({ length: x.pageNumberOffset }, (_, index) => index + x.firstPageNumber), html `<fast-button\n              appearance=\"outline\"\n              style=\"color:black\"\n              @click=${(x, c) => c.parent.handleClick(x)}\n              >${(x) => x}</fast-button\n            >`)}\n          <fast-button\n            appearance=\"neutral\"\n            ?disabled=${(x) => x.nextPageToken === undefined}\n            @click=${(x) => x.handleNext()}\n          >\n            <svg\n              xmlns=\"http://www.w3.org/2000/svg\"\n              viewBox=\"0 0 24 24\"\n              fill=\"currentColor\"\n              class=\"w-6 h-6\"\n            >\n              <path\n                d=\"M5.055 7.06c-1.25-.714-2.805.189-2.805 1.628v8.123c0 1.44 1.555 2.342 2.805 1.628L12 14.471v2.34c0 1.44 1.555 2.342 2.805 1.628l7.108-4.061c1.26-.72 1.26-2.536 0-3.256L14.805 7.06C13.555 6.346 12 7.25 12 8.688v2.34L5.055 7.06z\"\n              />\n            </svg>\n          </fast-button>\n        `)}\n    </div>\n  </div>\n`"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "template",
+            "module": "out-tsc/src/components/tes-get-runs/defintion/tesGetRuns.template.js"
+          }
+        }
+      ]
+    }
+  ]
+}

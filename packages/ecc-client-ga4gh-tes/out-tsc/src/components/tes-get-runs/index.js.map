@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","sourceRoot":"","sources":["../../../../src/components/tes-get-runs/index.ts"],"names":[],"mappings":"AAAA,OAAO,UAAU,MAAM,2BAA2B,CAAC;AAEnD,eAAe,UAAU,CAAC","sourcesContent":["import TESGetRuns from \"./defintion/tesGetRuns.js\";\n\nexport default TESGetRuns;\n"]}

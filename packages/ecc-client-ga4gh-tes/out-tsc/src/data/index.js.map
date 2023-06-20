@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","sourceRoot":"","sources":["../../../src/data/index.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,SAAS,EAAE,UAAU,EAAE,MAAM,iBAAiB,CAAC;AAExD,OAAO,EAAE,SAAS,EAAE,UAAU,EAAE,CAAC","sourcesContent":["import { fetchTask, fetchTasks } from \"./Get/tesGet.js\";\n\nexport { fetchTask, fetchTasks };\n"]}
