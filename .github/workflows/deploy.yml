@@ -1,14 +1,14 @@
-name: Streamlined PR Evaluation & Deployment Workflow
+name: Deployment Workflow
 
 on:
-  pull_request:
-    branches: ['main']
   push:
-    branches: ['main']
+    branches:
+      - main
 
 jobs:
   linters:
     name: Linting checks
+    if: ${{ github.event_name.pull_request.edited == 'false' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -34,6 +34,7 @@ jobs:
 
   tests:
     name: Test checks
+    if: ${{ github.event_name.pull_request.edited == 'false' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
