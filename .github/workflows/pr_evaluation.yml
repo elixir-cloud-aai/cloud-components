@@ -30,8 +30,6 @@ jobs:
             ci
             chore
             revert
-          # Configure that a scope must always be provided.
-          requireScope: true
           # Configure additional validation for the subject based on a regex.
           # This example ensures the subject doesn't start with an uppercase character & has more than 50 chars.
           subjectPattern: ^(?![A-Z])(?=.{1,50}$).+$
