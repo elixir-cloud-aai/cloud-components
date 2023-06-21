@@ -12,6 +12,12 @@ interface Task {
   id: string;
   state: string;
 }
+
+interface Data {
+  tasks: Task[],
+  next_page_token: string,
+}
+
 @customElement({
   name: 'ecc-tes-get-runs',
   template,
@@ -21,9 +27,7 @@ export default class TESGetRuns extends FASTElement {
   // Number of Task to be listed at once
   @attr pageSize = 5;
 
-  @observable nextPageToken = '';
-
-  @observable prevPageTokenStack = [];
+  @observable tokens : { [page:number]: string } = {};
 
   // Data to be rendered
   @observable data: Task[] = [];
@@ -36,7 +40,10 @@ export default class TESGetRuns extends FASTElement {
 
   @observable stateInput = 'ALL';
 
-  @observable unfilterdData: Task[] = [];
+  @observable unfilterdData: Data = {
+    tasks: [],
+    next_page_token: '',
+  };
 
   @observable isLoading = true;
 
@@ -44,6 +51,8 @@ export default class TESGetRuns extends FASTElement {
     super.connectedCallback();
     // Since this is the first call, fetch the first page, no token needed
     await this.fetchData('');
+    this.tokens[1] = '';
+    this.tokens[2] = this.unfilterdData.next_page_token;
   }
 
   /**
@@ -62,23 +71,38 @@ export default class TESGetRuns extends FASTElement {
     newData = await fetchTasks(this.pageSize, token, 'MINIMAL', namePrefix);
     if (newData && newData.tasks) {
       this.data = newData.tasks;
-      this.unfilterdData = this.data;
-      this.nextPageToken = newData.next_page_token;
+      this.unfilterdData = newData;
     }
     this.isLoading = false;
   };
 
   // Cache next click
   handleNext = async () => {
+    // Reset the state filter
     this.stateInput = 'ALL';
-    this.pageNumber += 1;
-    this.fetchData(this.nextPageToken as string, this.searchInput);
+
+    // Calculate the next page
+    const nextPageNumber = this.pageNumber + 1;
+    this.pageNumber = nextPageNumber; // Increment the pageNumber
+
+    // Get the next page token
+    const pageToken = this.tokens[this.pageNumber];
+
+    // Call the fetchData method with the nextPageToken and searchInput
+    await this.fetchData(pageToken as string, this.searchInput);
+
+    // Hash the token for next of the next page
+    this.tokens[nextPageNumber + 1] = this.unfilterdData.next_page_token;
   };
 
-  // // Handle prev click
-  // handlePrev = async () => {
-  //   // TODO : Implement prev click
-  // };
+  // Handle prev click
+  handlePrev = async () => {
+    this.stateInput = 'ALL';
+    const prevPageNumber = this.pageNumber - 1;
+    const prevPageToken = this.tokens[prevPageNumber];
+    await this.fetchData(prevPageToken, this.searchInput);
+    this.pageNumber -= 1;
+  };
 
   handleNameInput(event: Event) {
     this.searchInput = (event.target as HTMLInputElement).value;
@@ -94,9 +118,9 @@ export default class TESGetRuns extends FASTElement {
     this.stateInput = (event.target as HTMLInputElement).value;
 
     // Filter data on current page based on the filter input
-    if (this.stateInput === 'ALL') this.data = this.unfilterdData;
+    if (this.stateInput === 'ALL') this.data = this.unfilterdData.tasks;
     else {
-      this.data = this.unfilterdData.filter(
+      this.data = this.unfilterdData.tasks.filter(
         task => task.state === this.stateInput,
       );
     }

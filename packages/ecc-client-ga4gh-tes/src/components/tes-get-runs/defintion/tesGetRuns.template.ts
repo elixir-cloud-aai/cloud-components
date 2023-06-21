@@ -91,7 +91,7 @@ const template = html<TESGetRuns>`
     html`
           <fast-button
             appearance="neutral"
-            ?disabled=${x => x.prevPageTokenStack.length === 0}
+            ?disabled=${x => x.pageNumber === 1}
             @click=${x => x.handlePrev()}
           >
             <svg
@@ -108,7 +108,7 @@ const template = html<TESGetRuns>`
           <fast-button appearance="outline" style="color:black">${x => x.pageNumber}</fast-button>
           <fast-button
             appearance="neutral"
-            ?disabled=${x => x.nextPageToken === undefined}
+            ?disabled=${x => x.tokens[x.pageNumber + 1] === undefined}
             @click=${x => x.handleNext()}
           >
             <svg
