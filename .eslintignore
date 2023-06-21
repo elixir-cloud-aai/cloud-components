@@ -6,9 +6,6 @@ dist
 build
 www
 
-TODO: Remove this line
-packages/ecc-client-ga4gh-trs
-
 /.github/*
 CONTRIBUTING.md
 LICENSE
