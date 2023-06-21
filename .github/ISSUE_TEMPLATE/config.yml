@@ -1,0 +1,44 @@
+name: Bug Report
+description: File a bug report
+title: "[{{inputs.bug-type}}: "
+labels: ["triage"]
+blank_issues_enabled: true
+assignees:
+  - octocat
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please provide a detailed description of the bug.
+      placeholder: Describe the issue here...
+    validations:
+      required: true
+  - type: dropdown
+    id: bug-type
+    attributes:
+      label: Bug Type
+      description: Select the type of bug.
+      options:
+        - query
+        - fix
+        - feat
+        - docs
+        - style
+        - refactor
+        - perf
+        - test
+        - build
+        - ci
+        - chore
+        - revert
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        By submitting this issue, I agree to the [Code of Conduct](CODE_OF_CONDUCT.md).
