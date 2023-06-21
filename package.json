@@ -13,11 +13,10 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "lint": "turbo run lint --parallel",
-    "lint:fix": "turbo run lint:fix",
+    "lint": "eslint . && turbo run lint --parallel",
+    "lint:fix": "eslint . --fix && turbo run lint:fix",
     "test": "turbo run test --parallel",
     "test:watch": "turbo run test --watch",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "clean": "rm -rf node_modules && rm -rf */*/node_modules",
     "new": "turbo gen",
     "prepare": "husky install",
@@ -38,7 +37,6 @@
     "eslint": "^7.32.0",
     "eslint-config-elixir": "*",
     "husky": "^8.0.0",
-    "prettier": "^2.5.1",
     "standard-version": "^9.5.0",
     "turbo": "^1.10.4"
   },
