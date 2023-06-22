@@ -7,7 +7,8 @@ This package provides a collection of Web Components for interacting with TES (T
 ### Components
 | Component              | Issue  | Status             |
 |------------------------|--------|--------------------|
-|                        |        |                    |
+|    ecc-tes-get-run     |   #48  |       Done         |
+|    ecc-tes-get-runs    |   #48  |     In Progress    |
 
 ## Getting Started
 

@@ -50,7 +50,7 @@ export default class TESGetRun extends FASTElement {
     this.removeEventListener('change', this.handleFetch);
     const delButton = this.shadowRoot?.querySelector('fast-button');
     if (!this.isLoading && delButton) {
-      delButton.addEventListener('click', this.handleDelete.bind(this));
+      delButton.removeEventListener('click', this.handleDelete.bind(this));
     }
   }
 
