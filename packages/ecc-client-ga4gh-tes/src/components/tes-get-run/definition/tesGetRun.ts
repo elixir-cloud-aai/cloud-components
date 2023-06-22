@@ -38,20 +38,11 @@ export default class TESGetRun extends FASTElement {
     super.connectedCallback();
     // Add event listener to handle accordion open event
     this.addEventListener('change', this.handleFetch);
-    const delButton = this.shadowRoot?.querySelector('fast-button');
-    if (!this.isLoading && delButton) {
-      // delButton.addEventListener("click", this.handleDelete);
-      delButton.addEventListener('click', this.handleDelete.bind(this));
-    }
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this.removeEventListener('change', this.handleFetch);
-    const delButton = this.shadowRoot?.querySelector('fast-button');
-    if (!this.isLoading && delButton) {
-      delButton.removeEventListener('click', this.handleDelete.bind(this));
-    }
   }
 
   // Handles deletion of this task
