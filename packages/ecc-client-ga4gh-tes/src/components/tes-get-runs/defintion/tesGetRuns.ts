@@ -24,6 +24,9 @@ interface Data {
   styles,
 })
 export default class TESGetRuns extends FASTElement {
+  // Base URL, provided by app author
+  @attr baseURL = '';
+
   // Number of Task to be listed at once
   @attr pageSize = 5;
 
@@ -68,7 +71,7 @@ export default class TESGetRuns extends FASTElement {
 
     // Fetch new data
     let newData = [];
-    newData = await fetchTasks(this.pageSize, token, 'MINIMAL', namePrefix);
+    newData = await fetchTasks(this.baseURL, this.pageSize, token, 'MINIMAL', namePrefix);
     if (newData && newData.tasks) {
       this.data = newData.tasks;
       this.unfilterdData = newData;

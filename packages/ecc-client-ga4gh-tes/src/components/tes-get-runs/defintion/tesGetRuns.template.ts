@@ -42,8 +42,9 @@ const template = html<TESGetRuns>`
     </div>
     <div class="list">
       <fast-accordion>
+        <!-- If data is being fetched or base URL not provided then load skeleton -->
         ${when(
-    x => x.isLoading,
+    x => x.isLoading || x.baseURL.length === 0,
     html` ${repeat(
       x => Array.from(Array(parseInt(x.pageSize, 10))),
       html`
@@ -62,6 +63,7 @@ const template = html<TESGetRuns>`
     html<TESGetRun>`
             <ecc-tes-get-run
               class="run-item"
+              baseURL = ${(_, c) => c.parent.baseURL}
               id=${x => x.id}
               state=${x => x.state}
             >

@@ -1,8 +1,6 @@
-import { getTasksURL } from '../baseURL.js';
-
 /**
  * Fetches tasks based on the specified parameters.
- *
+ * @param {string} [baseURL] - The base URL for fetching tasks
  * @param {number} [pageSize] - OPTIONAL. Number of tasks to return in one page.
  *                                        Must be less than 2048. Defaults to 256.
  * @param {string} [nextPageToken] - OPTIONAL. Page token used to retrieve the next page
@@ -21,12 +19,13 @@ import { getTasksURL } from '../baseURL.js';
  *                                          done.
  */
 const fetchTasks = async (
+  baseURL : string,
   pageSize = 5,
   nextPageToken = '',
   view = 'MINIMAL',
   namePrefix = '',
 ) => {
-  let url = `${getTasksURL}?`;
+  let url = `${baseURL}/tasks?`;
 
   // Append pageSize parameter if provided
   if (pageSize) {
@@ -54,16 +53,18 @@ const fetchTasks = async (
     }
     return await response.json();
   } catch (error) {
-    throw new Error(`Error: ${error}`);
+    // eslint-disable-next-line no-console
+    return console.error(`Error: ${error}`);
   }
 };
 
 /**
- *
+ * Fetches full view of task with the specified ID
+ * @param {string} [baseURL] - Base URL for fetching task
  * @param {string} [id] - ID of the specific task
  */
-const fetchTask = async (id: string) => {
-  const url = `${getTasksURL}/${id}?view=FULL`;
+const fetchTask = async (baseURL: string, id: string) => {
+  const url = `${baseURL}/tasks/${id}?view=FULL`;
 
   try {
     const response = await fetch(url);
@@ -72,8 +73,26 @@ const fetchTask = async (id: string) => {
     }
     return await response.json();
   } catch (error) {
-    throw new Error(`Error: ${error}`);
+    // eslint-disable-next-line no-console
+    return console.error(`Error: ${error}`);
   }
 };
 
-export { fetchTasks, fetchTask };
+/**
+ *This mathod deletes a specific task
+ * @param id ID of the task to be deleted
+ */
+const deleteTask = async (baseURL: string, id: string) => {
+  const url = `${baseURL}/tasks/${id}:cancel`;
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+    });
+    return response;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    return console.error(`Error: ${error}`);
+  }
+};
+
+export { fetchTasks, fetchTask, deleteTask };

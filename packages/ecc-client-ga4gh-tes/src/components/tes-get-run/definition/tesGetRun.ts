@@ -6,8 +6,7 @@ import {
 } from '@microsoft/fast-element';
 import template from './tesGetRun.template.js';
 import styles from './tesGetRun.styles.js';
-import { fetchTask } from '../../../data/index.js';
-import { deleteTask } from '../../../data/Post/tesPost.js';
+import { fetchTask, deleteTask } from '../../../data/index.js';
 import TaskData from './TaskData.js';
 
 @customElement({
@@ -17,6 +16,8 @@ import TaskData from './TaskData.js';
   shadowOptions: { mode: 'open' },
 })
 export default class TESGetRun extends FASTElement {
+  @attr baseURL = '';
+
   @attr id = '';
 
   @attr state = '';
@@ -55,14 +56,15 @@ export default class TESGetRun extends FASTElement {
 
   // Handles deletion of this task
   handleDelete = async () => {
-    await deleteTask(this.id);
+    // Delete if baseURL is privided
+    if (this.baseURL.length !== 0) await deleteTask(this.baseURL, this.id);
   };
 
   // Fetched the task with this ID
   handleFetch = async () => {
-    // Only fetch the data if not already fetched
-    if (this.isLoading) {
-      this.data = await fetchTask(this.id);
+    // Only fetch the data if not already fetched and base URL is provided
+    if (this.isLoading && this.baseURL.length !== 0) {
+      this.data = await fetchTask(this.baseURL, this.id);
       this.isLoading = false;
     }
   };
