@@ -43,7 +43,7 @@ provideFASTDesignSystem().register(
 );
 
 const template = html<TESGetRun>`
-  <fast-accordion-item>
+  <fast-accordion-item @change=${x => x.handleFetch()}>
     <span slot="heading" class="slot-heading">
       ${x => html`
         <div class="collapsed-container">

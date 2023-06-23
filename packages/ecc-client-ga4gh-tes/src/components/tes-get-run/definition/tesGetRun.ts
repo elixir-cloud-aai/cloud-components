@@ -36,13 +36,10 @@ export default class TESGetRun extends FASTElement {
 
   connectedCallback() {
     super.connectedCallback();
-    // Add event listener to handle accordion open event
-    this.addEventListener('change', this.handleFetch);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    this.removeEventListener('change', this.handleFetch);
   }
 
   // Handles deletion of this task
