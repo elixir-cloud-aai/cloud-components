@@ -49,13 +49,19 @@ const fetchTasks = async (
   try {
     const response = await fetch(url);
     if (!response) {
-      // eslint-disable-next-line no-console
-      return console.error(`Error: ${response}`);
+      return {
+        isError: true,
+        breakpoint: 'fetchTasks',
+        error: 'No response from server',
+      };
     }
     return await response.json();
   } catch (error) {
-    // eslint-disable-next-line no-console
-    return console.error(`Error: ${error}`);
+    return {
+      isError: true,
+      breakpoint: 'fetchTasks',
+      error,
+    };
   }
 };
 
@@ -70,13 +76,19 @@ const fetchTask = async (baseURL: string, id: string) => {
   try {
     const response = await fetch(url);
     if (!response) {
-      // eslint-disable-next-line no-console
-      return console.error(`Error: ${response}`);
+      return {
+        isError: true,
+        breakpoint: 'fetchTask',
+        error: 'No response from server',
+      };
     }
     return await response.json();
   } catch (error) {
-    // eslint-disable-next-line no-console
-    return console.error(`Error: ${error}`);
+    return {
+      isError: true,
+      breakpoint: 'fetchTask',
+      error,
+    };
   }
 };
 
@@ -92,8 +104,11 @@ const deleteTask = async (baseURL: string, id: string) => {
     });
     return response;
   } catch (error) {
-    // eslint-disable-next-line no-console
-    return console.error(`Error: ${error}`);
+    return {
+      isError: true,
+      breakpoint: 'deleteTask',
+      error,
+    };
   }
 };
 
