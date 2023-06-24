@@ -10,7 +10,6 @@
         "experimentalDecorators": true,
         "noImplicitAny": false,
         "strictPropertyInitialization": false,
-        "importsNotUsedAsValues": "error",
         "target": "es2015",
         "module": "ESNext",
         "importHelpers": true,
