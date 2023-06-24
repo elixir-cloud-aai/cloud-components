@@ -1,6 +1,6 @@
 import { html, fixture, expect } from '@open-wc/testing';
 import { DesignSystem } from '@microsoft/fast-foundation';
-import TESGetRun from '../tesGetRun.js';
+import TESGetRun from '../definition/tesGetRun.js';
 
 DesignSystem.getOrCreate().register(TESGetRun);
 
