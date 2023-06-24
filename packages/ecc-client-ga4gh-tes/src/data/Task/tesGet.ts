@@ -48,8 +48,9 @@ const fetchTasks = async (
 
   try {
     const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+    if (!response) {
+      // eslint-disable-next-line no-console
+      return console.error(`Error: ${response}`);
     }
     return await response.json();
   } catch (error) {
@@ -68,8 +69,9 @@ const fetchTask = async (baseURL: string, id: string) => {
 
   try {
     const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+    if (!response) {
+      // eslint-disable-next-line no-console
+      return console.error(`Error: ${response}`);
     }
     return await response.json();
   } catch (error) {
