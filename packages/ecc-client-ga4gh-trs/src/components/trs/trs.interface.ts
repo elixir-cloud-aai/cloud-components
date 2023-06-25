@@ -46,7 +46,12 @@ interface Checksum {
   type: string;
 }
 
+interface IToolClass {
+  description: string;
+  id: string;
+  name: string;
+}
+
 // export default Tool,
 // export all interfaces below
-export type { Tool, Version, Image, Checksum };
-
+export type { Tool, Version, Image, Checksum, IToolClass };

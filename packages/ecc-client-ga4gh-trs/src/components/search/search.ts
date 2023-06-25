@@ -1,16 +1,20 @@
-import { FASTElement, attr, customElement, observable } from "@microsoft/fast-element";
+import {
+  FASTElement,
+  attr,
+  customElement,
+  observable,
+} from "@microsoft/fast-element";
 import { template } from "./search.template";
 import { styles } from "./search.styles";
 import { InputField } from "./search.interface";
 import { Tool } from "../trs/trs.interface";
 
 @customElement({
-  name: 'fast-search',
+  name: "fast-search",
   template,
   styles,
 })
-
- export class SearchField extends FASTElement {
+export class SearchField extends FASTElement {
   @observable searchQuery: string = "";
   @observable showCard: boolean = false;
   @observable inputFields: InputField[] = [
@@ -41,6 +45,4 @@ import { Tool } from "../trs/trs.interface";
     this.searchQuery = target.value;
     this.onSearch(target.value);
   }
-  }
-
- 
+}
