@@ -1,5 +1,5 @@
 import { html, repeat, when } from "@microsoft/fast-element";
-import { 
+import {
   provideFASTDesignSystem,
   fastTextField,
   fastSelect,
@@ -14,18 +14,17 @@ import {
 import { TRS } from "./trs.js";
 import { Tool, Version } from "./trs.interface.js";
 
-provideFASTDesignSystem()
-  .register(
-    fastTextField(),
-    fastSelect(),
-    fastOption(),
-    fastButton(),
-    fastAccordion(),
-    fastAccordionItem(),
-    fastTabs(),
-    fastTab(),
-    fastTabPanel(),
-  );
+provideFASTDesignSystem().register(
+  fastTextField(),
+  fastSelect(),
+  fastOption(),
+  fastButton(),
+  fastAccordion(),
+  fastAccordionItem(),
+  fastTabs(),
+  fastTab(),
+  fastTabPanel()
+);
 
 export const template = html<TRS>`
   ${when((x) => !x.ready, html<TRS>` Loading... `)}
@@ -252,8 +251,6 @@ export const template = html<TRS>`
     ${when(
       (x) => x.ready,
       html<TRS>`
-        <!-- rest of your code -->
-
         <div class="pagination">
           <fast-button
             @click="${(x) => x.handlePrevPage()}"

@@ -1,6 +1,5 @@
 import {
   FASTElement,
-  attr,
   customElement,
   observable,
 } from "@microsoft/fast-element";

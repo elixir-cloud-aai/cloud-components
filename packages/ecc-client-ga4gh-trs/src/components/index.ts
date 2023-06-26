@@ -1,6 +1,5 @@
-
 import { TRS } from "./trs/trs.js";
 
-const components = [TRS]
+const components = [TRS];
 
-export default components;  
+export default components;
