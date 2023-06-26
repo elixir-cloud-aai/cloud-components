@@ -1,12 +1,31 @@
 import { html, repeat, when } from "@microsoft/fast-element";
-import {
-  allComponents,
+import { 
   provideFASTDesignSystem,
+  fastTextField,
+  fastSelect,
+  fastOption,
+  fastButton,
+  fastAccordion,
+  fastAccordionItem,
+  fastTabs,
+  fastTab,
+  fastTabPanel,
 } from "@microsoft/fast-components";
 import { TRS } from "./trs.js";
 import { Tool, Version } from "./trs.interface.js";
 
-provideFASTDesignSystem().register(allComponents);
+provideFASTDesignSystem()
+  .register(
+    fastTextField(),
+    fastSelect(),
+    fastOption(),
+    fastButton(),
+    fastAccordion(),
+    fastAccordionItem(),
+    fastTabs(),
+    fastTab(),
+    fastTabPanel(),
+  );
 
 export const template = html<TRS>`
   ${when((x) => !x.ready, html<TRS>` Loading... `)}
