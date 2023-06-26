@@ -5,8 +5,8 @@ import {
   observable,
 } from '@microsoft/fast-element';
 import { fetchTasks } from '../../../data/index.js';
-import template from './tesGetRuns.template.js';
-import styles from './tesGetRuns.styles.js';
+import template from './tesRuns.template.js';
+import styles from './tesRuns.styles.js';
 
 interface Task {
   id: string;
@@ -19,11 +19,11 @@ interface Data {
 }
 
 @customElement({
-  name: 'ecc-tes-get-runs',
+  name: 'ecc-client-ga4gh-tes-runs',
   template,
   styles,
 })
-export default class TESGetRuns extends FASTElement {
+export default class TESRuns extends FASTElement {
   // Base URL, provided by app author
   @attr baseURL = '';
 

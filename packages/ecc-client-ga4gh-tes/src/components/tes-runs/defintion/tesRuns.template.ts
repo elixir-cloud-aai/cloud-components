@@ -8,8 +8,8 @@ import {
   fastTextField,
 } from '@microsoft/fast-components';
 import { html, repeat, when } from '@microsoft/fast-element';
-import TESGetRuns from './tesGetRuns.js';
-import TESGetRun from '../../tes-get-run/index.js';
+import TESRuns from './tesRuns.js';
+import TESRun from '../../tes-run/index.js';
 
 provideFASTDesignSystem().register(
   fastAccordion(),
@@ -20,7 +20,7 @@ provideFASTDesignSystem().register(
   fastTextField(),
 );
 
-const template = html<TESGetRuns>`
+const template = html<TESRuns>`
   <div class="container">
     <div class="search">
       <fast-text-field
@@ -60,14 +60,14 @@ const template = html<TESGetRuns>`
   )}
         ${repeat(
     x => x.data,
-    html<TESGetRun>`
-            <ecc-tes-get-run
+    html<TESRun>`
+            <ecc-client-ga4gh-tes-run
               class="run-item"
               baseURL=${(_, c) => c.parent.baseURL}
               id=${x => x.id}
               state=${x => x.state}
             >
-            </ecc-tes-get-run>
+            </ecc-client-ga4gh-tes-run>
           `,
   )}
       </fast-accordion>

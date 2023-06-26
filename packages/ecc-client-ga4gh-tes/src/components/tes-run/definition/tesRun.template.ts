@@ -6,7 +6,7 @@ import {
   fastBadge,
 } from '@microsoft/fast-components';
 import { html, when, repeat } from '@microsoft/fast-element';
-import TESGetRun from './tesGetRun.js';
+import TESRun from './tesRun.js';
 
 provideFASTDesignSystem().register(
   fastSkeleton(),
@@ -42,7 +42,7 @@ provideFASTDesignSystem().register(
   }),
 );
 
-const template = html<TESGetRun>`
+const template = html<TESRun>`
   <fast-accordion-item @change=${x => x.handleFetch()}>
     <span slot="heading" class="slot-heading">
       ${x => html`
@@ -131,7 +131,7 @@ const template = html<TESGetRun>`
   )}
     ${when(
     x => !x.isLoading,
-    html<TESGetRun>`
+    html<TESRun>`
         <div class="expanded-container">
           <div class="meta-data">
             <div class="meta-data-left">

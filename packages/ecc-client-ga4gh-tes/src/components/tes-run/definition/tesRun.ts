@@ -4,18 +4,18 @@ import {
   customElement,
   observable,
 } from '@microsoft/fast-element';
-import template from './tesGetRun.template.js';
-import styles from './tesGetRun.styles.js';
+import template from './tesRun.template.js';
+import styles from './tesRun.styles.js';
 import { fetchTask, deleteTask } from '../../../data/index.js';
 import TaskData from './TaskData.js';
 
 @customElement({
-  name: 'ecc-tes-get-run',
+  name: 'ecc-client-ga4gh-tes-run',
   template,
   styles,
   shadowOptions: { mode: 'open' },
 })
-export default class TESGetRun extends FASTElement {
+export default class TESRun extends FASTElement {
   @attr baseURL = '';
 
   @attr id = '';
