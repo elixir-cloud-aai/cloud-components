@@ -322,7 +322,7 @@ export const template = html<TRS>`
               ${repeat(
                 (x) => x.aliases,
                 html<string>`
-                  <fast-copy value="${(alias) => alias}"></fast-copy>
+                  <custom-copy value="${(alias) => alias}"></custom-copy>
                   <div class="space"></div>
                 `
               )}

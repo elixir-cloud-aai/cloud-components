@@ -3,7 +3,7 @@ import { template } from "./tabs.template";
 import { styles } from "./tabs.styles";
 
 @customElement({
-  name: "fast-tabs",
+  name: "custom-tabs",
   template,
   styles,
 })

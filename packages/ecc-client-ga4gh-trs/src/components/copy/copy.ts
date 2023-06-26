@@ -8,7 +8,7 @@ import { template } from "./copy.template";
 import { styles } from "./copy.styles";
 
 @customElement({
-  name: "fast-copy",
+  name: "custom-copy",
   template,
   styles,
 })
