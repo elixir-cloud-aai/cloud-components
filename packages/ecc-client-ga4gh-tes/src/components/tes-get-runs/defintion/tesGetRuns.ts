@@ -14,8 +14,8 @@ interface Task {
 }
 
 interface Data {
-  tasks: Task[],
-  next_page_token: string,
+  tasks: Task[];
+  next_page_token: string;
 }
 
 @customElement({
@@ -30,7 +30,7 @@ export default class TESGetRuns extends FASTElement {
   // Number of Task to be listed at once
   @attr pageSize = 5;
 
-  @observable tokens : { [page:number]: string } = {};
+  @observable tokens: { [page: number]: string } = {};
 
   // Data to be rendered
   @observable data: Task[] = [];
@@ -71,7 +71,13 @@ export default class TESGetRuns extends FASTElement {
 
     // Fetch new data
     let newData = [];
-    newData = await fetchTasks(this.baseURL, this.pageSize, token, 'MINIMAL', namePrefix);
+    newData = await fetchTasks(
+      this.baseURL,
+      this.pageSize,
+      token,
+      'MINIMAL',
+      namePrefix,
+    );
     if (newData && newData.tasks) {
       this.data = newData.tasks;
       this.unfilterdData = newData;

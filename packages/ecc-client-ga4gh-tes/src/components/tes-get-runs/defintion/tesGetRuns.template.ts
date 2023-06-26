@@ -63,7 +63,7 @@ const template = html<TESGetRuns>`
     html<TESGetRun>`
             <ecc-tes-get-run
               class="run-item"
-              baseURL = ${(_, c) => c.parent.baseURL}
+              baseURL=${(_, c) => c.parent.baseURL}
               id=${x => x.id}
               state=${x => x.state}
             >
@@ -107,7 +107,9 @@ const template = html<TESGetRuns>`
               />
             </svg>
           </fast-button>
-          <fast-button appearance="outline" style="color:black">${x => x.pageNumber}</fast-button>
+          <fast-button appearance="outline" style="color:black"
+            >${x => x.pageNumber}</fast-button
+          >
           <fast-button
             appearance="neutral"
             ?disabled=${x => x.tokens[x.pageNumber + 1] === undefined}

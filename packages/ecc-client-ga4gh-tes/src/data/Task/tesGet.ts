@@ -19,7 +19,7 @@
  *                                          done.
  */
 const fetchTasks = async (
-  baseURL : string,
+  baseURL: string,
   pageSize = 5,
   nextPageToken = '',
   view = 'MINIMAL',
