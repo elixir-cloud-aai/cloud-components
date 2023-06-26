@@ -1,4 +1,4 @@
-import { TRS } from "./trs/trs.js";
+import { TRS } from "./ecc-trs/ecc-trs.js";
 
 const components = [TRS];
 

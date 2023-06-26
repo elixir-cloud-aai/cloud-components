@@ -11,8 +11,8 @@ import {
   fastTab,
   fastTabPanel,
 } from "@microsoft/fast-components";
-import { TRS } from "./trs.js";
-import { Tool, Version } from "./trs.interface.js";
+import { TRS } from "./ecc-trs.js";
+import { Tool, Version } from "./ecc-trs.interface.js";
 
 provideFASTDesignSystem().register(
   fastTextField(),

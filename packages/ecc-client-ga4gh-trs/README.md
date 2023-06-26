@@ -3,21 +3,23 @@
 TRS component
 
 ## Introduction
-...
+This is a documentation for the Tool Registry Service (TRS) component. 
+
+Please note that the TRS component is currently in the process of being fully implemented, and while substantial progress has been made, it is not yet complete. This documentation will be updated as development continues and new features are added.
 
 ### Components
 | Component              | Issue  | Status             |
 |------------------------|--------|--------------------|
-|                        |        |                    |
+|ecc-client-ga4gh-trs    |  [#78](https://github.com/elixir-cloud-aai/cloud-components/issues/78)   |   In progress        |
 
 ## Getting Started
 
 To get started with this project, follow these steps:
 
-1. Add your steps here
+1. Start the project
 
    ```
-   Add your commands here
+   npm start
    ```
 
 ## Contributing

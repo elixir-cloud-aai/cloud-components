@@ -1,6 +1,7 @@
 {
     "name": "fast-project",
-    "description": "A FAST project",
+    "main": "index.js",
+    "description": "A TRS component",
     "private": true,
     "type": "module",
     "version": "0.1.0",

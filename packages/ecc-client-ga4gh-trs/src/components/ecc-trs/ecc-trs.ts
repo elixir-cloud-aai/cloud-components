@@ -3,12 +3,12 @@ import {
   customElement,
   observable,
 } from "@microsoft/fast-element";
-import { template } from "./trs.template";
-import { styles } from "./trs.styles";
-import { IToolClass } from "./trs.interface";
+import { template } from "./ecc-trs.template";
+import { styles } from "./ecc-trs.styles";
+import { IToolClass } from "./ecc-trs.interface";
 
 @customElement({
-  name: "fast-trs",
+  name: "ecc-client-ga4gh-trs",
   template,
   styles,
 })
