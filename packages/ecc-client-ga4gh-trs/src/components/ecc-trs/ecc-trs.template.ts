@@ -10,6 +10,7 @@ import {
   fastTabs,
   fastTab,
   fastTabPanel,
+  fastTooltip,
 } from "@microsoft/fast-components";
 import { TRS } from "./ecc-trs.js";
 import { Tool, Version } from "./ecc-trs.interface.js";
@@ -23,7 +24,8 @@ provideFASTDesignSystem().register(
   fastAccordionItem(),
   fastTabs(),
   fastTab(),
-  fastTabPanel()
+  fastTabPanel(),
+  fastTooltip()
 );
 
 export const template = html<TRS>`
@@ -57,7 +59,25 @@ export const template = html<TRS>`
           <h3>Filter</h3>
           <div class="filterContainer--grid">
             <label class="filterContainer--label">
-              <span>Tool Id</span>
+              <div>
+                <span>Tool Id</span>
+                <custom-tooltip>
+                  <svg
+                    slot="label"
+                    class="tooltipIcon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    width="16"
+                    height="16"
+                  >
+                    <path
+                      d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"
+                    ></path>
+                  </svg>
+                  A unique identifier of the tool, scoped to this registry, for
+                  example 123456.
+                </custom-tooltip>
+              </div>
               <fast-text-field
                 type="text"
                 name="id"
@@ -66,7 +86,27 @@ export const template = html<TRS>`
               />
             </label>
             <label class="filterContainer--label">
-              <span>Alias</span>
+              <div>
+                <span>Alias</span>
+                <custom-tooltip>
+                  <svg
+                    slot="label"
+                    class="tooltipIcon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    width="16"
+                    height="16"
+                  >
+                    <path
+                      d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"
+                    ></path>
+                  </svg>
+                  Support for this parameter is optional for tool registries
+                  that support aliases. If provided will only return entries
+                  with the given alias.
+                </custom-tooltip>
+              </div>
+
               <fast-text-field
                 type="text"
                 name="alias"
@@ -75,7 +115,24 @@ export const template = html<TRS>`
               />
             </label>
             <label class="filterContainer--label">
-              <span>Tool Class</span>
+              <div>
+                <span>Tool Class</span>
+                <custom-tooltip>
+                  <svg
+                    slot="label"
+                    class="tooltipIcon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    width="16"
+                    height="16"
+                  >
+                    <path
+                      d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"
+                    ></path>
+                  </svg>
+                  Filter tools by the name of the subclass.
+                </custom-tooltip>
+              </div>
               <fast-select
                 :value="${(x) => x.filterParams.toolClass}"
                 @change="${(x, c) => x.handleSelectToolClass(c.event)}"
@@ -91,7 +148,24 @@ export const template = html<TRS>`
               </fast-select>
             </label>
             <label class="filterContainer--label">
-              <span>Descriptor Type</span>
+              <div>
+                <span>Descriptor Type</span>
+                <custom-tooltip>
+                  <svg
+                    slot="label"
+                    class="tooltipIcon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    width="16"
+                    height="16"
+                  >
+                    <path
+                      d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"
+                    ></path>
+                  </svg>
+                  Filter tools by the name of the descriptor type.
+                </custom-tooltip>
+              </div>
               <fast-text-field
                 type="text"
                 name="descriptorType"
@@ -100,7 +174,24 @@ export const template = html<TRS>`
               />
             </label>
             <label class="filterContainer--label">
-              <span>Registry</span>
+              <div>
+                <span>Registry</span>
+                <custom-tooltip>
+                  <svg
+                    slot="label"
+                    class="tooltipIcon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    width="16"
+                    height="16"
+                  >
+                    <path
+                      d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"
+                    ></path>
+                  </svg>
+                  The image registry that contains the image.
+                </custom-tooltip>
+              </div>
               <fast-text-field
                 type="text"
                 name="registry"
@@ -109,7 +200,24 @@ export const template = html<TRS>`
               />
             </label>
             <label class="filterContainer--label">
-              <span>Organization</span>
+              <div>
+                <span>Organization</span>
+                <custom-tooltip>
+                  <svg
+                    slot="label"
+                    class="tooltipIcon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    width="16"
+                    height="16"
+                  >
+                    <path
+                      d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"
+                    ></path>
+                  </svg>
+                  The organization in the registry that published the image.
+                </custom-tooltip>
+              </div>
               <fast-text-field
                 type="text"
                 name="organization"
@@ -118,7 +226,25 @@ export const template = html<TRS>`
               />
             </label>
             <label class="filterContainer--label">
-              <span>Name </span>
+              <div>
+                <span>Name </span>
+                <custom-tooltip>
+                  <svg
+                    slot="label"
+                    class="tooltipIcon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    width="16"
+                    height="16"
+                  >
+                    <path
+                      d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"
+                    ></path>
+                  </svg>
+                  The name of the image.
+                </custom-tooltip>
+              </div>
+
               <fast-text-field
                 type="text"
                 name="name"
@@ -127,7 +253,26 @@ export const template = html<TRS>`
               />
             </label>
             <label class="filterContainer--label">
-              <span>Author</span>
+              <div>
+                <span>Author</span>
+
+                <custom-tooltip>
+                  <svg
+                    slot="label"
+                    class="tooltipIcon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    width="16"
+                    height="16"
+                  >
+                    <path
+                      d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"
+                    ></path>
+                  </svg>
+                  The author of the tool.
+                </custom-tooltip>
+              </div>
+
               <fast-text-field
                 type="text"
                 name="author"
@@ -193,6 +338,7 @@ export const template = html<TRS>`
                     <div>ID: ${(x) => x.id}</div>
                     <div>Author: ${(x) => x.author.join(", ")}</div>
                     <div>Meta Version: ${(x) => x.meta_version}</div>
+                    <div>
                   </fast-tab-panel>
                 `
               )}

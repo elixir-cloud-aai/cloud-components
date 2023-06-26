@@ -52,6 +52,4 @@ interface IToolClass {
   name: string;
 }
 
-// export default Tool,
-// export all interfaces below
 export type { Tool, Version, Image, Checksum, IToolClass };

@@ -16,7 +16,6 @@ export const styles: ElementStyles = css`
     border-collapse: collapse;
     margin: 25px 0;
     font-size: 0.9em;
-    font-family: sans-serif;
     min-width: 400px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
   }
@@ -85,6 +84,7 @@ export const styles: ElementStyles = css`
     padding: 8px;
     box-shadow: 0px 11px 20px 0px rgba(5, 16, 55, 0.1);
     background-color: #ffffff;
+    font: 400 14px/20px "Roboto", sans-serif;
   }
 
   .filterContainer--grid {
@@ -106,4 +106,10 @@ export const styles: ElementStyles = css`
     align-items: center;
     margin-top: 20px;
   }
+
+.tooltipIcon {
+  cursor: pointer;
+  fill: #009879;
+}
+
 `;

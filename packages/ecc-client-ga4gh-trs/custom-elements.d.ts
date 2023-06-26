@@ -10,5 +10,6 @@ declare namespace JSX {
     > & {
       "my-attribute-name": string;
     };
+
   }
 }
