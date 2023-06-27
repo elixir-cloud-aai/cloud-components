@@ -63,7 +63,10 @@ This will start the development server on your local machine and allow you to st
    npm run lint
    ```
 
-5. Run all test using the following command.
+> - By default, the "Unix" setting enforces the usage of Unix line endings, where LF (\n) is used.
+> - Conversely, the "Windows" setting enforces the usage of Windows line endings, where CRLF (\r\n) is used. Consequently, on Windows, eslint may generate errors. To resolve these errors, you can run `npm run lint:fix`, which will fix the issues. If any changes are made to the files, you can commit them, and Git will ignore that specific commit.
+
+1. Run all test using the following command.
 
    ```
    npm run test
@@ -73,7 +76,7 @@ This will start the development server on your local machine and allow you to st
 <a id="point-6"></a>
 
 >Above commands are global commands, they run for the entire monorepo which includes all the packages, apps and docs etc but these commands can be coupled with `-w` or `-workspace` flag to run them on a specific repo/workspace inside this monorepo.
-6. To run test script on the package `elixir-ui`, use the following command:
+1. To run test script on the package `elixir-ui`, use the following command:
     
    ```
    npm run test -w=elixir-ui
