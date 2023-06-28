@@ -21,13 +21,7 @@
         "@microsoft/fast-components": "^2.30.6",
         "@microsoft/fast-element": "2.0.0-beta.3",
         "@microsoft/fast-foundation": "^3.0.0-alpha.4",
-        "@microsoft/fast-react-wrapper": "^0.3.18",
-        "@nextui-org/react": "^1.0.0-beta.13",
-        "@reduxjs/toolkit": "^1.9.5",
-        "axios": "^1.4.0",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "react-redux": "^8.0.7"
+        "@microsoft/fast-react-wrapper": "^0.3.18"
     },
     "devDependencies": {
         "@babel/plugin-proposal-decorators": "^7.22.5",

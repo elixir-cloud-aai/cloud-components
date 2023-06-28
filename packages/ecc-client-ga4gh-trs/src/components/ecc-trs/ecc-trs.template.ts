@@ -394,25 +394,7 @@ export const template = html<TRS>`
         `
       )}
     </fast-accordion>
-    ${when(
-      (x) => x.ready,
-      html<TRS>`
-        <div class="pagination">
-          <fast-button
-            @click="${(x) => x.handlePrevPage()}"
-            ?disabled=${(x) => x.currentPage === 1}
-          >
-            Previous
-          </fast-button>
-          <span>Page ${(x) => x.currentPage} of ${(x) => x.pageCount}</span>
-          <fast-button
-            @click="${(x) => x.handleNextPage()}"
-            ?disabled=${(x) => x.currentPage === x.pageCount}
-          >
-            Next
-          </fast-button>
-        </div>
-      `
-    )}
-  </div>
+
+    <custom-pagination></custom-pagination>
+   
 `;
