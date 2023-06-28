@@ -1,3 +1,9 @@
+# Never lint playwright config
+playwright.*.ts
+
+# Never lint test files
+*.spec.ts
+
 # Never lint node_modules
 node_modules
 
@@ -6,17 +12,3 @@ dist
 
 # Never lint coverage output
 coverage
-
-# Never lint
-**/.git
-**/.svn
-**/.hg
-**/node_modules
-
-/.github/*
-CONTRIBUTING.md
-LICENSE
-README.md
-CONTRIBUTORS.md
-CODE_OF_CONDUCT.md
-```
