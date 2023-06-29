@@ -112,4 +112,46 @@ const deleteTask = async (baseURL: string, id: string) => {
   }
 };
 
-export { fetchTasks, fetchTask, deleteTask };
+/**
+ * Posts a new task.
+ * @param {string} baseURL - The base URL for posting the task.
+ * @param {object} taskData - The data of the task to be posted.
+ *                           This should be an object containing the necessary fields for the task.
+ *                           Modify the structure according to your task requirements.
+ */
+const postTask = async (baseURL: string, taskData: object) => {
+  const url = `${baseURL}/tasks`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(taskData),
+    });
+
+    if (!response) {
+      return {
+        isError: true,
+        breakpoint: 'postTask',
+        error: 'No response from server',
+      };
+    }
+
+    return await response.json();
+  } catch (error) {
+    return {
+      isError: true,
+      breakpoint: 'postTask',
+      error,
+    };
+  }
+};
+
+export {
+  fetchTasks,
+  fetchTask,
+  deleteTask,
+  postTask,
+};
