@@ -7,7 +7,11 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <meta name="WEB COMPONENTS - TES" content="Web Components for TES API" />
-    <link rel="icon" type="image/x-icon" href="./images/logo-elixir-cloud-aai.svg">
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="./images/logo-elixir-cloud-aai.svg"
+    />
     <base href="/" />
     <style>
       body {
@@ -28,7 +32,12 @@
   <body>
     <h1 class="title">WEB COMPONENTS - TES</h1>
     <div class="container">
-      <h2 class="comp-name">ecc-client-ga4gh-tes-run</h2>
+      <h2 class="comp-name">ecc-client-ga4gh-tes-create-run</h2>
+      <ecc-client-ga4gh-tes-create-run
+        pageSize="5"
+        baseURL="https://csc-tesk-noauth.rahtiapp.fi/v1"
+      ></ecc-client-ga4gh-tes-create-run>
+      <!-- <h2 class="comp-name">ecc-client-ga4gh-tes-run</h2>
       <ecc-client-ga4gh-tes-run
         baseURL="https://csc-tesk-noauth.rahtiapp.fi/v1"
         id="task-05b4ec40"
@@ -38,7 +47,7 @@
       <ecc-client-ga4gh-tes-runs
         pageSize="5"
         baseURL="https://csc-tesk-noauth.rahtiapp.fi/v1"
-      ></ecc-client-ga4gh-tes-runs>
+      ></ecc-client-ga4gh-tes-runs> -->
     </div>
     <script type="module" src="./out-tsc/src/index.js"></script>
   </body>

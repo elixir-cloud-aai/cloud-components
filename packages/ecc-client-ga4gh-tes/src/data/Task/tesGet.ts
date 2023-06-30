@@ -150,8 +150,5 @@ const postTask = async (baseURL: string, taskData: object) => {
 };
 
 export {
-  fetchTasks,
-  fetchTask,
-  deleteTask,
-  postTask,
+  fetchTasks, fetchTask, deleteTask, postTask,
 };
