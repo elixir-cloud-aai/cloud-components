@@ -2,43 +2,50 @@ import { css } from '@microsoft/fast-element';
 
 const styles = css`
   /* CSS styles for the form */
-  .form-container {
-    max-width: 500px;
+  .container {
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
   }
 
-  .input-field {
+  label {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin-right: 1rem;
+  }
+
+  .label-input {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    display: flex;
+    align-items: center;
   }
 
   .checkbox-field {
     margin-bottom: 10px;
   }
 
-  .submit-button {
-    background-color: #4caf50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
   .submit-button:hover {
     background-color: #45a049;
   }
 
-  .df{
+  .df {
     display: flex;
   }
 
+  .sec {
+    padding: 0.2rem 0.6rem;
+    margin: 0.2rem 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .sub-sec {
+    width: 100%;
+    height: 100%;
+    padding: 0.2rem 0.6rem;
+  }
 
   /* Media query for responsive layout */
   @media screen and (max-width: 600px) {
