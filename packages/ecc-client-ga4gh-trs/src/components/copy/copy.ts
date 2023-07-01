@@ -4,8 +4,8 @@ import {
   customElement,
   observable,
 } from "@microsoft/fast-element";
-import { template } from "./copy.template";
-import { styles } from "./copy.styles";
+import { template } from "./copy.template.js";
+import { styles } from "./copy.styles.js";
 
 @customElement({
   name: "custom-copy",

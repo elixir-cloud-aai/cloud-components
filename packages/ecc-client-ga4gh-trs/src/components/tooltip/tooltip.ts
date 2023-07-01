@@ -1,6 +1,6 @@
 import { FASTElement, customElement, observable } from "@microsoft/fast-element";
-import { template } from "./tooltip.template";
-import { styles } from "./tooltip.styles";
+import { template } from "./tooltip.template.js";
+import { styles } from "./tooltip.styles.js";
 
 @customElement({
   name: "custom-tooltip",

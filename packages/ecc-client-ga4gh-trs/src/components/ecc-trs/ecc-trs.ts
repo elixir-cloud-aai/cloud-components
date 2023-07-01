@@ -1,11 +1,13 @@
 import {
   FASTElement,
+  attr,
   customElement,
   observable,
+  volatile,
 } from "@microsoft/fast-element";
-import { template } from "./ecc-trs.template";
-import { styles } from "./ecc-trs.styles";
-import { IToolClass } from "./ecc-trs.interface";
+import { template } from "./ecc-trs.template.js";
+import { styles } from "./ecc-trs.styles.js";
+import { IToolClass } from "./ecc-trs.interface.js";
 
 @customElement({
   name: "ecc-client-ga4gh-trs",
@@ -38,14 +40,19 @@ export class TRS extends FASTElement {
 
   public baseUrl = "https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2";
 
+  constructor() {
+    super();
+  }
+
   async connectedCallback() {
     super.connectedCallback();
     await this.loadData();
     await this.loadTools();
   }
 
-  async disconnectedCallback() {
-    await super.disconnectedCallback();
+  disconnectedCallback() {
+    console.log("disconnected");
+    super.disconnectedCallback();
   }
 
   async loadData() {
@@ -98,8 +105,9 @@ export class TRS extends FASTElement {
   };
 
   handleApplyFilter = () => {
-    this.loadData();
-    this.isOpenFilter = false;
+    console.log(this.filterParams);
+    // this.loadData();
+    // this.isOpenFilter = false;
   };
 
   handleClearFilter = () => {
