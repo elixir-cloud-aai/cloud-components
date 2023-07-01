@@ -20,12 +20,12 @@ interface Executor {
   workdir: string;
 }
 
-interface Input {
+export interface Input {
   url: string;
   path: string;
 }
 
-interface Output {
+export interface Output {
   path: string;
   url: string;
   type: string;

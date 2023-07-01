@@ -18,15 +18,15 @@ const template = html<TESCreateRun>`
    <div class="meta">
       <div class="label-input">
          <label for="name">Name:</label>
-         <fast-text-field type="text" id="name" name="name" class="input" required>
+         <fast-text-field type="text" id="name" name="name" class="input" :value=${x => x.name} required>
       </div>
       <div class="label-input">
          <label for="description">Description:</label>
-         <fast-text-field type="text" id="description" name="description" class="input" required>
+         <fast-text-field type="text" id="description" name="description" class="input" :value=${x => x.description} required>
       </div>
       <div class="label-input">
          <label for="state">State:</label>
-         <fast-text-field type="text" id="state" name="state" class="input" required>
+         <fast-text-field type="text" id="state" name="state" class="input" :value=${x => x.state} required>
       </div>
    </div>
    <div class="executors">
@@ -95,15 +95,15 @@ const template = html<TESCreateRun>`
       <div class="resources sec">
          <div class="label-input">
             <label for="cpu-cores">CPU Cores:</label>
-            <fast-text-field type="number" id="cpu-cores" name="cpu-cores" class="input" required>
+            <fast-text-field type="number" id="cpu-cores" name="cpu-cores" class="input" :value=${x => x.cpu_cores} required>
          </div>
          <div class="label-input">
             <label for="disk-gb">Disk GB:</label>
-            <fast-text-field type="number" id="disk-gb" name="disk-gb" class="input" required>
+            <fast-text-field type="number" id="disk-gb" name="disk-gb" class="input" :value=${x => x.disk_gb} required>
          </div>
          <div class="label-input">
             <label for="ram-gb">RAM GB:</label>
-            <fast-text-field type="number" id="ram-gb" name="ram-gb" class="input" required>
+            <fast-text-field type="number" id="ram-gb" name="ram-gb" class="input" :value=${x => x.ram_gb} required>
          </div>
          <div class="label-input">
             <label for="zones">Zones:</label>
@@ -115,11 +115,11 @@ const template = html<TESCreateRun>`
       <div class="tags sec df">
          <div class="label-input">
             <label for="workflow-id">Workflow ID:</label>
-            <fast-text-field type="text" id="workflow-id" name="workflow-id" class="input" required>
+            <fast-text-field type="text" id="workflow-id" name="workflow-id" class="input" :value=${x => x.WORKFLOW_ID} required>
          </div>
          <div class="label-input">
             <label for="project-group">Project Group:</label>
-            <fast-text-field type="text" id="project-group" name="project-group" class="input" required>
+            <fast-text-field type="text" id="project-group" name="project-group" class="input" :value=${x => x.PROJECT_GROUP} required>
          </div>
       </div>
       <div class="volumes">

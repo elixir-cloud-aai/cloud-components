@@ -7,7 +7,11 @@ import {
 } from '@microsoft/fast-element';
 import template from './tesCreateRun.template.js';
 import styles from './tesCreateRun.styles.js';
-import CreateTaskData from './createTask.js';
+import CreateTaskData, {
+  Executor,
+  Input,
+  Output,
+} from './createTask.js';
 import { postTask } from '../../../data/Task/tesGet.js';
 
 @customElement({
@@ -18,6 +22,34 @@ import { postTask } from '../../../data/Task/tesGet.js';
 })
 export default class TESCreateRun extends FASTElement {
   @attr baseURL = '';
+
+  @attr name = '';
+
+  @attr state = 'UNKNOWN';
+
+  @attr description = '';
+
+  @attr executors: Executor[] = [];
+
+  @attr input: Input[] = [];
+
+  @attr output: Output[] = [];
+
+  @attr cpu_cores = 0;
+
+  @attr disk_gb = 0;
+
+  @attr preemptible = false;
+
+  @attr ram_gb = 0;
+
+  @attr zones: string[] = [];
+
+  @attr WORKFLOW_ID = '';
+
+  @attr PROJECT_GROUP = '';
+
+  @attr volumes: string[] = [];
 
   @attr testData: CreateTaskData = {
     description: 'string',
