@@ -118,6 +118,8 @@ const deleteTask = async (baseURL: string, id: string) => {
  * @param {object} taskData - The data of the task to be posted.
  *                           This should be an object containing the necessary fields for the task.
  *                           Modify the structure according to your task requirements.
+ * @returns {Promise<object>} - A promise that resolves to the parsed JSON response from the server,
+ *                              or an error object if an error occurs.
  */
 const postTask = async (baseURL: string, taskData: object) => {
   const url = `${baseURL}/tasks`;
