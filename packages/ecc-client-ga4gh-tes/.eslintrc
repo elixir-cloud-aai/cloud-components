@@ -4,9 +4,10 @@
     "@open-wc",
     "airbnb-typescript/base",
     "plugin:@typescript-eslint/recommended",
-    "plugin:import/typescript"
+    "plugin:import/typescript",
+    "prettier"
   ],
-  "plugins": ["import"],
+  "plugins": ["import", "prettier"],
   "rules": {
     "no-unused-vars": "off",
     "wc/guard-super-call": "off",
@@ -19,7 +20,9 @@
       {
         "ignorePackages": true
       }
-    ]
+    ],
+    // TODO: change off to error @javed
+    "prettier/prettier": "off"
   },
   "parserOptions": {
     "project": ["./tsconfig.json"]

@@ -13,7 +13,7 @@ provideFASTDesignSystem().register(fastButton());
 //   }
 // }
 
-const App = () => {
+const App = (): JSX.Element => {
   return (
     <div>
       <h1>Hello, world!</h1>
