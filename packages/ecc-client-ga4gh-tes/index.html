@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="WEB COMPONENTS - TES" content="Web Components for TES API" />
+    <link rel="icon" type="image/x-icon" href="./images/logo-elixir-cloud-aai.svg">
+    <base href="/" />
+    <style>
+      body {
+        padding: 0.2rem;
+      }
+      .title {
+        text-align: center;
+      }
+      .container {
+        padding: 0.4rem;
+      }
+      .comp-name {
+        text-decoration: underline;
+      }
+    </style>
+    <title>ecc-client-ga4gh-tes</title>
+  </head>
+  <body>
+    <h1 class="title">WEB COMPONENTS - TES</h1>
+    <div class="container">
+      <h2 class="comp-name">ecc-client-ga4gh-tes-run</h2>
+      <ecc-client-ga4gh-tes-run
+        baseURL="https://csc-tesk-noauth.rahtiapp.fi/v1"
+        id="task-05b4ec40"
+        state="SYSTEM_ERROR"
+      ></ecc-client-ga4gh-tes-run>
+      <h2 class="comp-name">ecc-client-ga4gh-tes-runs</h2>
+      <ecc-client-ga4gh-tes-runs
+        pageSize="5"
+        baseURL="https://csc-tesk-noauth.rahtiapp.fi/v1"
+      ></ecc-client-ga4gh-tes-runs>
+    </div>
+    <script type="module" src="./out-tsc/src/index.js"></script>
+  </body>
+</html>
