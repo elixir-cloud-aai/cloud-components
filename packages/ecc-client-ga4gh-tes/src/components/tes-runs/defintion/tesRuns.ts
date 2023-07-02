@@ -76,7 +76,7 @@ export default class TESRuns extends FASTElement {
       this.pageSize,
       token,
       'MINIMAL',
-      namePrefix,
+      namePrefix
     );
     if (newData && newData.tasks) {
       this.data = newData.tasks;
@@ -130,7 +130,7 @@ export default class TESRuns extends FASTElement {
     if (this.stateInput === 'ALL') this.data = this.unfilterdData.tasks;
     else {
       this.data = this.unfilterdData.tasks.filter(
-        task => task.state === this.stateInput,
+        (task) => task.state === this.stateInput
       );
     }
   }
