@@ -6,6 +6,12 @@ export const designSystem = {
   shadowRootMode: "open",
 };
 
-DesignSystem.getOrCreate()
-  .withPrefix(designSystem.prefix)
-  .register(...components);
+// DesignSystem.getOrCreate()
+//   .withPrefix(designSystem.prefix)
+//   .register(...components);
+
+components.forEach((component) => {
+  DesignSystem.getOrCreate()
+    .withPrefix(designSystem.prefix)
+    .register(component);
+});
