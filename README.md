@@ -63,6 +63,9 @@ This will start the development server on your local machine and allow you to st
    npm run lint
    ```
 
+> - By default, the "Unix" setting enforces the usage of Unix line endings, where LF (\n) is used.
+> - Conversely, the "Windows" setting enforces the usage of Windows line endings, where CRLF (\r\n) is used. Consequently, on Windows, eslint may generate errors. To resolve these errors, you can run `npm run lint:fix`, which will fix the issues. If any changes are made to the files, you can commit them, and Git will ignore that specific commit.
+
 5. Run all test using the following command.
 
    ```
