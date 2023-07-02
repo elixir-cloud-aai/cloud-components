@@ -23,7 +23,7 @@ const fetchTasks = async (
   pageSize = 5,
   nextPageToken = '',
   view = 'MINIMAL',
-  namePrefix = '',
+  namePrefix = ''
 ) => {
   let url = `${baseURL}/tasks?`;
 
