@@ -16,5 +16,13 @@ module.exports = {
     "prettier/prettier": "error",
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": ["error"],
+    "import/no-unresolved": "off",
+    "import/extensions": [
+      "error",
+      "always",
+      {
+        ignorePackages: true,
+      },
+    ],
   },
 };

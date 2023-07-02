@@ -1,7 +1,7 @@
 import { PlopTypes } from "@turbo/gen";
 
 // Convert a string to kebab-case
-function kebabCase(str) {
+function kebabCase(str: string) {
   return (
     str
       // Replace lowercase letter followed by an uppercase letter with a hyphen in between
