@@ -17,7 +17,7 @@ provideFASTDesignSystem().register(
   fastSkeleton(),
   fastSelect(),
   fastOption(),
-  fastTextField(),
+  fastTextField()
 );
 
 const template = html<TESRuns>`
@@ -25,12 +25,12 @@ const template = html<TESRuns>`
     <div class="search">
       <fast-text-field
         placeholder="Search by name_prefix"
-        :value=${x => x.searchInput}
+        :value=${(x) => x.searchInput}
         @input=${(x, c) => x.handleNameInput(c.event)}
       >
       </fast-text-field>
       <fast-select
-        :value=${x => x.stateInput}
+        :value=${(x) => x.stateInput}
         @input=${(x, c) => x.handleStateInput(c.event)}
       >
         <fast-option value="ALL">All</fast-option>
@@ -44,10 +44,10 @@ const template = html<TESRuns>`
       <fast-accordion>
         <!-- If data is being fetched or base URL not provided then load skeleton -->
         ${when(
-    x => x.isLoading || x.baseURL.length === 0,
-    html` ${repeat(
-      x => Array.from(Array(parseInt(x.pageSize, 10))),
-      html`
+          (x) => x.isLoading || x.baseURL.length === 0,
+          html` ${repeat(
+            (x) => Array.from(Array(parseInt(x.pageSize, 10))),
+            html`
               <fast-accordion-item>
                 <fast-skeleton
                   style="border-radius: 4px;height: 100%;margin-bottom: 10px;"
@@ -55,29 +55,29 @@ const template = html<TESRuns>`
                   slot="heading"
                 ></fast-skeleton>
               </fast-accordion-item>
-            `,
-    )}`,
-  )}
+            `
+          )}`
+        )}
         ${repeat(
-    x => x.data,
-    html<TESRun>`
+          (x) => x.data,
+          html<TESRun>`
             <ecc-client-ga4gh-tes-run
               class="run-item"
               baseURL=${(_, c) => c.parent.baseURL}
-              id=${x => x.id}
-              state=${x => x.state}
+              id=${(x) => x.id}
+              state=${(x) => x.state}
             >
             </ecc-client-ga4gh-tes-run>
-          `,
-  )}
+          `
+        )}
       </fast-accordion>
     </div>
     <div class="pagination">
       ${when(
-    x => x.isLoading,
-    html` ${repeat(
-      () => Array.from(Array(3)),
-      html`
+        (x) => x.isLoading,
+        html` ${repeat(
+          () => Array.from(Array(3)),
+          html`
             <fast-button appearance="outline">
               <fast-skeleton
                 style="border-radius: 4px;height: 100%;margin-bottom: 10px;"
@@ -85,16 +85,16 @@ const template = html<TESRuns>`
                 slot="heading"
               ></fast-skeleton>
             </fast-button>
-          `,
-    )}`,
-  )}
+          `
+        )}`
+      )}
       ${when(
-    x => !x.isLoading,
-    html`
+        (x) => !x.isLoading,
+        html`
           <fast-button
             appearance="neutral"
-            ?disabled=${x => x.pageNumber === 1}
-            @click=${x => x.handlePrev()}
+            ?disabled=${(x) => x.pageNumber === 1}
+            @click=${(x) => x.handlePrev()}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -108,12 +108,12 @@ const template = html<TESRuns>`
             </svg>
           </fast-button>
           <fast-button appearance="outline" style="color:black"
-            >${x => x.pageNumber}</fast-button
+            >${(x) => x.pageNumber}</fast-button
           >
           <fast-button
             appearance="neutral"
-            ?disabled=${x => x.tokens[x.pageNumber + 1] === undefined}
-            @click=${x => x.handleNext()}
+            ?disabled=${(x) => x.tokens[x.pageNumber + 1] === undefined}
+            @click=${(x) => x.handleNext()}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -126,8 +126,8 @@ const template = html<TESRuns>`
               />
             </svg>
           </fast-button>
-        `,
-  )}
+        `
+      )}
     </div>
   </div>
 `;
