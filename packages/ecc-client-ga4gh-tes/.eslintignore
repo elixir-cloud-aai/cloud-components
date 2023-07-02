@@ -7,7 +7,7 @@ dist
 # Never lint coverage output
 coverage
 
-# Never lint 
+# Never lint
 **/.git
 **/.svn
 **/.hg
