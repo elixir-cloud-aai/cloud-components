@@ -7,11 +7,7 @@ import {
 } from '@microsoft/fast-element';
 import template from './tesCreateRun.template.js';
 import styles from './tesCreateRun.styles.js';
-import CreateTaskData, {
-  Executor,
-  Input,
-  Output,
-} from './createTask.js';
+import CreateTaskData, { Executor, Input, Output } from './createTask.js';
 import { postTask } from '../../../data/Task/tesGet.js';
 
 @customElement({
@@ -98,6 +94,6 @@ export default class TESCreateRun extends FASTElement {
 
   handleClick = async () => {
     const resp = await postTask(this.baseURL, this.testData);
-    console.log(resp);
+    return resp;
   };
 }
