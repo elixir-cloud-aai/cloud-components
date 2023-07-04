@@ -8,7 +8,7 @@ This package provides a collection of Web Components for interacting with TES (T
 | Component              | Issue  | Status             |
 |------------------------|--------|--------------------|
 |    ecc-tes-get-run     |   #48  |       Done         |
-|    ecc-tes-get-runs    |   #48  |     In Progress    |
+|    ecc-tes-get-runs    |   #48  |       Done         |
 
 ## Getting Started
 
@@ -19,6 +19,7 @@ To get started with this project, follow these steps:
 - `build` builds your app and outputs it in your `dist` directory
 - `test` runs your test suite with Web Test Runner
 - `lint` runs the linter for your project
+> Note: For test script, chrome browser is required.
 
 
 
