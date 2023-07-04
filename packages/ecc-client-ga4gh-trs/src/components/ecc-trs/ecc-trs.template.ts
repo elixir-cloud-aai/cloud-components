@@ -134,19 +134,26 @@ export const template = html<TRS>`
                     Filter tools by the name of the subclass.
                   </custom-tooltip>
                 </div>
+                <!-- 
+                  there is no issue with fast select, this utilises the attr of class TRS  
                 <fast-select
                   value="${(x) => x.filterParams.toolClass}"
                   @input="${(x, c) => x.handleSelectToolClass(c.event)}"
                 >
+                Everything's fine till here
                   ${repeat(
-                    (x) => x.toolClasses,
-                    html<IToolClass>`
-                      <fast-option value="${(x) => x.name}"
-                        >${(x) => x.name}</fast-option
-                      >
-                    `
-                  )}
+                  // This is the problematic part
+                  // FAST thinks this x is from class TRS, hence throws error
+                  // But select is populated and works despite error because the class IToolCLass is imported
+                  (x) => x.toolClasses,
+                  html<IToolClass>`
+                    <fast-option value="${(x) => x.name}"
+                      >${(x) => x.name}</fast-option
+                    >
+                  `
+                )}
                 </fast-select>
+               -->
               </label>
               <label class="filterContainer--label">
                 <div>
