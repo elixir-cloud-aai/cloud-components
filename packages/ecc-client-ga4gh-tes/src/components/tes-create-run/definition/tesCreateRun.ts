@@ -1,14 +1,27 @@
 import {
   FASTElement,
   attr,
-  // attr,
+  observable,
   customElement,
   // observable,
 } from '@microsoft/fast-element';
-import template from './tesCreateRun.template.js';
+import template, { executorFields } from './tesCreateRun.template.js';
 import styles from './tesCreateRun.styles.js';
 import CreateTaskData, { Executor, Input, Output } from './createTask.js';
 import { postTask } from '../../../data/Task/tesGet.js';
+
+const executorTemplate: Executor = {
+  data: {
+    command: [],
+    env: {},
+    image: '',
+    stderr: '',
+    stdin: '',
+    stdout: '',
+    workdir: '',
+  },
+  index: 0,
+};
 
 @customElement({
   name: 'ecc-client-ga4gh-tes-create-run',
@@ -25,7 +38,9 @@ export default class TESCreateRun extends FASTElement {
 
   @attr description = '';
 
-  @attr executors: Executor[] = [];
+  @attr executors: Executor[] = [JSON.parse(JSON.stringify(executorTemplate))];
+
+  @observable executorsLength = 1;
 
   @attr input: Input[] = [];
 
@@ -51,16 +66,19 @@ export default class TESCreateRun extends FASTElement {
     description: 'string',
     executors: [
       {
-        command: ['/bin/md5', '/data/file1'],
-        env: {
-          BLASTDB: '/data/GRC38',
-          HMMERDB: '/data/hmmer',
+        data: {
+          command: ['/bin/md5', '/data/file1'],
+          env: {
+            BLASTDB: '/data/GRC38',
+            HMMERDB: '/data/hmmer',
+          },
+          image: 'ubuntu:20.04',
+          stderr: '/tmp/stderr.log',
+          stdin: '/data/file1',
+          stdout: '/tmp/stdout.log',
+          workdir: '/data/',
         },
-        image: 'ubuntu:20.04',
-        stderr: '/tmp/stderr.log',
-        stdin: '/data/file1',
-        stdout: '/tmp/stdout.log',
-        workdir: '/data/',
+        index: 1,
       },
     ],
     inputs: [
@@ -96,4 +114,53 @@ export default class TESCreateRun extends FASTElement {
     const resp = await postTask(this.baseURL, this.testData);
     return resp;
   };
+
+  handleExecutorChange = (value: string, index: number, label: string) => {
+    switch (label) {
+      case executorFields[0].label:
+        // handle command situation
+        break;
+
+      case executorFields[1].label:
+      case executorFields[2].label:
+        this.executors[index].data.env[label] = value;
+        break;
+
+      default:
+        // @ts-expect-error: should not be using type string to index data
+        this.executors[index].data[label] = value;
+        break;
+    }
+
+    console.log(this.executors);
+  };
+
+  addExecutor = () => {
+    const newTemplate: Executor = {
+      ...JSON.parse(JSON.stringify(executorTemplate)),
+      index: this.executorsLength,
+    };
+
+    this.executorsLength += 1;
+    this.executors.push(newTemplate);
+  };
+
+  deleteExecutor = () => {
+    if (this.executors.length > 1) this.executors.pop();
+    this.executorsLength -= 1;
+  };
 }
+
+// export class Executors extends FASTElement {
+//   @attr executors: Executor[] = [
+//     {
+//       command: [],
+//       env: {},
+//       image: "",
+//       stderr: "",
+//       stdin: "",
+//       stdout: "",
+//       workdir: "",
+//     },
+//   ];
+// }

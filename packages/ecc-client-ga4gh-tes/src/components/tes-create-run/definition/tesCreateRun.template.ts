@@ -1,4 +1,4 @@
-import { html } from '@microsoft/fast-element';
+import { html, repeat, when } from '@microsoft/fast-element';
 import {
   provideFASTDesignSystem,
   fastTextField,
@@ -12,6 +12,62 @@ provideFASTDesignSystem().register(
   fastCheckbox(),
   fastButton()
 );
+
+interface Input {
+  name: string;
+  label: string;
+  required?: boolean;
+}
+
+export const executorFields: Input[] = [
+  {
+    name: 'Command',
+    label: 'command',
+    required: true,
+  },
+  {
+    name: 'BLASTDB',
+    label: 'blastdb',
+    required: true,
+  },
+  { name: 'HMMERDB', label: 'hmmerdb', required: true },
+  { name: 'Image', label: 'image', required: true },
+  { name: 'Stderr', label: 'stderr', required: true },
+  { name: 'Stdin', label: 'stdin', required: true },
+  { name: 'Workdir', label: 'workdir', required: true },
+];
+
+const executorsTemplate = html<TESCreateRun>`
+  ${repeat(
+    x => x.executors,
+    html`
+      <div class="executors">
+        ${repeat(
+    () => executorFields,
+    html<Input>`
+            <div class="label-input ${x => x.label}">
+              <label for="${x => x.label}">${x => x.name}</label>
+              <fast-text-field
+                type="text"
+                id="${x => x.label}"
+                name="${x => x.label}"
+                required="${x => x.required}"
+                class="input"
+                @input=${(x, c) => c.parentContext.parent.handleExecutorChange(
+    // @ts-expect-error: value does not exist on the event target for some reason
+    c.event.target.value,
+    c.parent.index,
+    x.label,
+  )}
+              >
+              </fast-text-field>
+            </div>
+          `,
+  )}
+      </div>
+    `,
+  )}
+`;
 
 const template = html<TESCreateRun>`
 <form class="container">
@@ -35,45 +91,26 @@ const template = html<TESCreateRun>`
          ) => x.state} required>
       </div>
    </div>
-   <div class="executors">
-      <div class="label-input">
-         <label for="command">Command:</label>
-         <fast-text-field type="text" id="command" name="command" class="input" required>
-      </div>
-      <label>Env:</label>
-      <div class="sec df">
-         <div class="label-input">
-            <label for="blastdb">BLASTDB:</label>
-            <fast-text-field type="text" id="blastdb" name="blastdb" class="input" required>
-         </div>
-         <div class="label-input">
-            <label for="hmmerdb">HMMERDB:</label>
-            <fast-text-field type="text" id="hmmerdb" name="hmmerdb" class="input" required>
-         </div>
-      </div>
-      <div class="sec">
-        <div class="label-input">
-          <label for="image">Image:</label>
-          <fast-text-field type="text" id="image" name="image" class="input" required>
-        </div>
-        <div class="label-input">
-          <label for="stderr">Stderr:</label>
-          <fast-text-field type="text" id="stderr" name="stderr" class="input" required>
-        </div>
-        <div class="label-input">
-          <label for="stdin">Stdin:</label>
-          <fast-text-field type="text" id="stdin" name="stdin" class="input" required>
-        </div>
-        <div class="label-input">
-          <label for="stdout">Stdout:</label>
-          <fast-text-field type="text" id="stdout" name="stdout" class="input" required>
-        </div>
-        <div class="label-input">
-          <label for="workdir">Workdir:</label>
-          <fast-text-field type="text" id="workdir" name="workdir" class="input" required>
-        </div>
-      </div>
+   <div class="executor-container" >
+    <span class="heading">
+      <h2 class="header">Executors</h2> 
+      <fast-button class="add" @click=${x => x.addExecutor()} > Add </fast-button>
+    </span>
+    
+    ${executorsTemplate} 
+    ${when(
+    x => x.executorsLength > 1,
+    html`
+        <span class="delete">
+          <fast-button @click=${x => x.deleteExecutor()}>
+            Delete
+          </fast-button>
+        </span>
+      `,
+  )}
+    
    </div>
+   
    <div class="input">
       <div class="label-input">
          <label for="url">URL:</label>

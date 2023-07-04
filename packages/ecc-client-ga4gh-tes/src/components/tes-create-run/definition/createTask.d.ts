@@ -10,14 +10,19 @@ export default interface CreateTaskData {
   volumes: string[];
 }
 
-interface Executor {
+interface ExecutorData {
   command: string[];
-  env: { [key: string]: string };
+  env: Record<string, string>;
   image: string;
   stderr: string;
   stdin: string;
   stdout: string;
   workdir: string;
+}
+
+interface Executor {
+  data: ExecutorData;
+  index: number;
 }
 
 export interface Input {
