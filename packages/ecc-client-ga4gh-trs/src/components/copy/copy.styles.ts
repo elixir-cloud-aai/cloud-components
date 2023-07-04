@@ -1,19 +1,19 @@
-import { css, ElementStyles } from "@microsoft/fast-element";
+import { css, ElementStyles } from '@microsoft/fast-element';
 
 export const styles: ElementStyles = css`
   .input {
-    background-color: #32353D;
+    background-color: #32353d;
   }
 
-.button {
-    background-color: #4F4F4F;
-}
+  .button {
+    background-color: #4f4f4f;
+  }
 
   .doneicon {
-    fill: #42DC0C;
+    fill: #42dc0c;
   }
 
-  .clipboard{
+  .clipboard {
     padding: 5px 10px;
     display: flex;
     justify-content: space-between;

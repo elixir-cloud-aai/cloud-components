@@ -1,4 +1,4 @@
-import { html, repeat, when } from "@microsoft/fast-element";
+import { html, repeat, when } from '@microsoft/fast-element';
 import {
   provideFASTDesignSystem,
   fastTextField,
@@ -11,9 +11,9 @@ import {
   fastTab,
   fastTabPanel,
   fastTooltip,
-} from "@microsoft/fast-components";
-import { TRS } from "./ecc-trs.js";
-import { IToolClass, Tool, Version } from "./ecc-trs.interface.js";
+} from '@microsoft/fast-components';
+import { TRS } from './ecc-trs.js';
+import { IToolClass, Tool, Version } from './ecc-trs.interface.js';
 
 provideFASTDesignSystem().register(
   fastTextField(),
@@ -35,22 +35,23 @@ export const template = html<TRS>`
         <fast-text-field
           class="searchInput"
           placeholder="Search"
-          value="${(x) => x.searchQuery}"
-          @change="${(x, c) => x.handleSearchChange(c.event)}"
+          value=${(x) => x.searchQuery}
+          @change=${(x, c) => x.handleSearchChange(c.event)}
         >
         </fast-text-field>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          width="16"
-          height="16"
-          class="filterIcon"
-          @click="${(x) => x.handleOpenFilter()}"
-        >
-          <path
-            d="M15 2.75a.75.75 0 0 1-.75.75h-4a.75.75 0 0 1 0-1.5h4a.75.75 0 0 1 .75.75Zm-8.5.75v1.25a.75.75 0 0 0 1.5 0v-4a.75.75 0 0 0-1.5 0V2H1.75a.75.75 0 0 0 0 1.5H6.5Zm1.25 5.25a.75.75 0 0 0 0-1.5h-6a.75.75 0 0 0 0 1.5h6ZM15 8a.75.75 0 0 1-.75.75H11.5V10a.75.75 0 1 1-1.5 0V6a.75.75 0 0 1 1.5 0v1.25h2.75A.75.75 0 0 1 15 8Zm-9 5.25v-2a.75.75 0 0 0-1.5 0v1.25H1.75a.75.75 0 0 0 0 1.5H4.5v1.25a.75.75 0 0 0 1.5 0v-2Zm9 0a.75.75 0 0 1-.75.75h-6a.75.75 0 0 1 0-1.5h6a.75.75 0 0 1 .75.75Z"
-          ></path>
-        </svg>
+        <fast-button @click=${(x) => x.handleOpenFilter()}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            width="16"
+            height="16"
+            class="filterIcon"
+          >
+            <path
+              d="M15 2.75a.75.75 0 0 1-.75.75h-4a.75.75 0 0 1 0-1.5h4a.75.75 0 0 1 .75.75Zm-8.5.75v1.25a.75.75 0 0 0 1.5 0v-4a.75.75 0 0 0-1.5 0V2H1.75a.75.75 0 0 0 0 1.5H6.5Zm1.25 5.25a.75.75 0 0 0 0-1.5h-6a.75.75 0 0 0 0 1.5h6ZM15 8a.75.75 0 0 1-.75.75H11.5V10a.75.75 0 1 1-1.5 0V6a.75.75 0 0 1 1.5 0v1.25h2.75A.75.75 0 0 1 15 8Zm-9 5.25v-2a.75.75 0 0 0-1.5 0v1.25H1.75a.75.75 0 0 0 0 1.5H4.5v1.25a.75.75 0 0 0 1.5 0v-2Zm9 0a.75.75 0 0 1-.75.75h-6a.75.75 0 0 1 0-1.5h6a.75.75 0 0 1 .75.75Z"
+            ></path>
+          </svg>
+        </fast-button>
       </div>
       ${when((x) => !x.ready, html<TRS>` Loading... `)}
       ${when(
@@ -107,7 +108,6 @@ export const template = html<TRS>`
                     with the given alias.
                   </custom-tooltip>
                 </div>
-
                 <fast-text-field
                   type="text"
                   name="alias"
@@ -134,7 +134,6 @@ export const template = html<TRS>`
                     Filter tools by the name of the subclass.
                   </custom-tooltip>
                 </div>
-
                 <fast-select
                   value="${(x) => x.filterParams.toolClass}"
                   @input="${(x, c) => x.handleSelectToolClass(c.event)}"
@@ -272,7 +271,6 @@ export const template = html<TRS>`
                     The author of the tool.
                   </custom-tooltip>
                 </div>
-
                 <fast-text-field
                   type="text"
                   name="author"
@@ -281,13 +279,11 @@ export const template = html<TRS>`
                 ></fast-text-field>
               </label>
             </div>
-
             <fast-button
               class="filterContainer--button"
               @click="${(x) => x.handleApplyFilter()}"
               >Apply</fast-button
             >
-
             <fast-button
               class="filterContainer--clear"
               @click="${(x) => x.handleClearFilter()}"
@@ -300,143 +296,142 @@ export const template = html<TRS>`
     <fast-accordion expand-mode="multi">
       ${repeat(
         (x) => x.tools,
-        html<Tool>`
-          <fast-accordion-item class="accordionItem">
-            <table class="styled-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Meta Version</th>
-                  <th>Tool Class</th>
-                  <th>Description</th>
-                  <th>Organization</th>
-                  <th>URL</th>
-                  <th>Checker</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="active-row">
-                  <td>${(x) => x.id}</td>
-                  <td>${(x) => x.name}</td>
-                  <td>${(x) => x.meta_version}</td>
-                  <td>${(x) => x.toolclass.name}</td>
-                  <td>${(x) => x.description}</td>
-                  <td>${(x) => x.organization}</td>
-                  <td><a href=${(x) => x.url}>${(x) => x.url}</a></td>
-                  <td>
-                    ${(x) => (x.has_checker ? x.checker_url : "No checker")}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <div>
-              ${when(
-                (x) => x && x.aliases && x.aliases.length !== 0,
-                html` <h3>Aliases:</h3>`
-              )}
-              ${repeat(
-                (x) => x.aliases,
-                html<string>`
-                  <custom-copy value="${(alias) => alias}"></custom-copy>
-                  <div class="space"></div>
-                `
-              )}
-            </div>
-            <div class="space"></div>
-            <h3>Versions:</h3>
-            <fast-tabs orientation="vertical">
-              ${repeat(
-                (x) => x.versions,
-                html<Version>`
-                  <fast-tab slot="tab">Version ${(x) => x.name}</fast-tab>
-                  <fast-tab-panel slot="tabpanel" class="tabContent">
-                    <table class="styled-table">
-                      <thead>
-                        <tr>
-                          <th>ID</th>
-                          <th>Name</th>
-                          <th>Author</th>
-                          <th>Meta Version</th>
-                          <th>Descriptor Type</th>
-                          <th>Is Production</th>
-                          <th>Is Signed</th>
-                          <th>Is Verified</th>
-                          <th>URL</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr class="active-row">
-                          <td>${(x) => x.id}</td>
-                          <td>${(x) => x.name}</td>
-                          <td>${(x) => x.author.join(", ")}</td>
-                          <td>${(x) => x.meta_version}</td>
-                          <td>${(x) => x.descriptor_type}</td>
-                          <td>${(x) => x.is_production}</td>
-                          <td>${(x) => x.signed}</td>
-                          <td>
-                            ${(x) =>
-                              x.verified ? x.verified_source : "Not verified"}
-                          </td>
-                          <td><a href=${(x) => x.url}>${(x) => x.url}</a></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </fast-tab-panel>
-                `
-              )}
-            </fast-tabs>
-
-            <div slot="heading" class="accordionItem">
-              <h3 class="toolName">
-                Tool #${(x) => x.id}${(x) => (x.name ? ` (${x.name})` : "")}
-              </h3>
-            </div>
-            <svg
-              style="stroke: #e62f63;"
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              slot="collapsed-icon"
-            >
-              <path
-                d="M15.2222 1H2.77778C1.79594 1 1 1.79594 1 2.77778V15.2222C1 16.2041 1.79594 17 2.77778 17H15.2222C16.2041 17 17 16.2041 17 15.2222V2.77778C17 1.79594 16.2041 1 15.2222 1Z"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path>
-              <path
-                d="M9 5.44446V12.5556"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path>
-              <path
-                d="M5.44446 9H12.5556"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path></svg
-            ><svg
-              style="stroke: #e62f63;"
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              slot="expanded-icon"
-            >
-              <path
-                d="M15.2222 1H2.77778C1.79594 1 1 1.79594 1 2.77778V15.2222C1 16.2041 1.79594 17 2.77778 17H15.2222C16.2041 17 17 16.2041 17 15.2222V2.77778C17 1.79594 16.2041 1 15.2222 1Z"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path>
-              <path
-                d="M5.44446 9H12.5556"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path></svg
-          ></fast-accordion-item>
-        `
+        html<Tool>` <fast-accordion-item class="accordionItem">
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Meta Version</th>
+                <th>Tool Class</th>
+                <th>Description</th>
+                <th>Organization</th>
+                <th>URL</th>
+                <th>Checker</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="active-row">
+                <td>${(x) => x.id}</td>
+                <td>${(x) => x.name}</td>
+                <td>${(x) => x.meta_version}</td>
+                <td>${(x) => x.toolclass.name}</td>
+                <td>${(x) => x.description}</td>
+                <td>${(x) => x.organization}</td>
+                <td><a href=${(x) => x.url}>${(x) => x.url}</a></td>
+                <td>
+                  ${(x) => (x.has_checker ? x.checker_url : 'No checker')}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div>
+            ${when(
+              (x) => x && x.aliases && x.aliases.length !== 0,
+              html` <h3>Aliases:</h3> `
+            )}
+            ${repeat(
+              (x) => x.aliases,
+              html<string>` <custom-copy
+                  value="${(alias) => alias}"
+                ></custom-copy>
+                <div class="space"></div>`
+            )}
+          </div>
+          <div class="space"></div>
+          <h3>Versions:</h3>
+          <fast-tabs orientation="vertical">
+            ${repeat(
+              (x) => x.versions,
+              html<Version>` <fast-tab slot="tab"
+                  >Version ${(x) => x.name}</fast-tab
+                >
+                <fast-tab-panel slot="tabpanel" class="tabContent">
+                  <table class="styled-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Author</th>
+                        <th>Meta Version</th>
+                        <th>Descriptor Type</th>
+                        <th>Is Production</th>
+                        <th>Is Signed</th>
+                        <th>Is Verified</th>
+                        <th>URL</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="active-row">
+                        <td>${(x) => x.id}</td>
+                        <td>${(x) => x.name}</td>
+                        <td>${(x) => x.author.join(', ')}</td>
+                        <td>${(x) => x.meta_version}</td>
+                        <td>${(x) => x.descriptor_type}</td>
+                        <td>${(x) => x.is_production}</td>
+                        <td>${(x) => x.signed}</td>
+                        <td>
+                          ${(x) =>
+                            x.verified ? x.verified_source : 'Not verified'}
+                        </td>
+                        <td><a href=${(x) => x.url}>${(x) => x.url}</a></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </fast-tab-panel>`
+            )}
+          </fast-tabs>
+          <div slot="heading" class="accordionItem">
+            <h3 class="toolName">
+              Tool #${(x) => x.id}${(x) => (x.name ? ` (${x.name})` : '')}
+            </h3>
+          </div>
+          <svg
+            style="stroke: #e62f63;"
+            width="18"
+            height="18"
+            viewBox="0 0 18 18"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            slot="collapsed-icon"
+          >
+            <path
+              d="M15.2222 1H2.77778C1.79594 1 1 1.79594 1 2.77778V15.2222C1 16.2041 1.79594 17 2.77778 17H15.2222C16.2041 17 17 16.2041 17 15.2222V2.77778C17 1.79594 16.2041 1 15.2222 1Z"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+            <path
+              d="M9 5.44446V12.5556"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+            <path
+              d="M5.44446 9H12.5556"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+          </svg>
+          <svg
+            style="stroke: #e62f63;"
+            width="18"
+            height="18"
+            viewBox="0 0 18 18"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            slot="expanded-icon"
+          >
+            <path
+              d="M15.2222 1H2.77778C1.79594 1 1 1.79594 1 2.77778V15.2222C1 16.2041 1.79594 17 2.77778 17H15.2222C16.2041 17 17 16.2041 17 15.2222V2.77778C17 1.79594 16.2041 1 15.2222 1Z"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+            <path
+              d="M5.44446 9H12.5556"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+          </svg>
+        </fast-accordion-item>`
       )}
     </fast-accordion>
   </div>

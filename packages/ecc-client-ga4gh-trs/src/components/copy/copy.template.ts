@@ -1,9 +1,9 @@
-import { html } from "@microsoft/fast-element";
-import type { CopyClipboard } from "./copy.js";
+import { html } from '@microsoft/fast-element';
 import {
   allComponents,
   provideFASTDesignSystem,
-} from "@microsoft/fast-components";
+} from '@microsoft/fast-components';
+import type { CopyClipboard } from './copy.js';
 
 provideFASTDesignSystem().register(allComponents);
 

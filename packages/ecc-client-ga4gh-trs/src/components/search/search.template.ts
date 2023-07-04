@@ -1,10 +1,10 @@
-import { html, repeat, when } from "@microsoft/fast-element";
-import { CustomSearch } from "./search.js";
+import { html, repeat, when } from '@microsoft/fast-element';
 import {
   allComponents,
   provideFASTDesignSystem,
-} from "@microsoft/fast-components";
-import { Tool } from "../ecc-trs/ecc-trs.interface.js";
+} from '@microsoft/fast-components';
+import { CustomSearch } from './search.js';
+import { Tool } from '../ecc-trs/ecc-trs.interface.js';
 
 provideFASTDesignSystem().register(allComponents);
 
@@ -17,18 +17,19 @@ export const template = html<CustomSearch>`
         @input="${(x, c) => x.onChange(c.event)}"
       >
       </fast-text-field>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 16 16"
-        width="16"
-        height="16"
-        class="filterIcon"
-        @click="${(x) => x.handleOpenFilter()}"
-      >
-        <path
-          d="M15 2.75a.75.75 0 0 1-.75.75h-4a.75.75 0 0 1 0-1.5h4a.75.75 0 0 1 .75.75Zm-8.5.75v1.25a.75.75 0 0 0 1.5 0v-4a.75.75 0 0 0-1.5 0V2H1.75a.75.75 0 0 0 0 1.5H6.5Zm1.25 5.25a.75.75 0 0 0 0-1.5h-6a.75.75 0 0 0 0 1.5h6ZM15 8a.75.75 0 0 1-.75.75H11.5V10a.75.75 0 1 1-1.5 0V6a.75.75 0 0 1 1.5 0v1.25h2.75A.75.75 0 0 1 15 8Zm-9 5.25v-2a.75.75 0 0 0-1.5 0v1.25H1.75a.75.75 0 0 0 0 1.5H4.5v1.25a.75.75 0 0 0 1.5 0v-2Zm9 0a.75.75 0 0 1-.75.75h-6a.75.75 0 0 1 0-1.5h6a.75.75 0 0 1 .75.75Z"
-        ></path>
-      </svg>
+      <fast-button @click=${(x) => x.handleOpenFilter()}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          width="16"
+          height="16"
+          class="filterIcon"
+        >
+          <path
+            d="M15 2.75a.75.75 0 0 1-.75.75h-4a.75.75 0 0 1 0-1.5h4a.75.75 0 0 1 .75.75Zm-8.5.75v1.25a.75.75 0 0 0 1.5 0v-4a.75.75 0 0 0-1.5 0V2H1.75a.75.75 0 0 0 0 1.5H6.5Zm1.25 5.25a.75.75 0 0 0 0-1.5h-6a.75.75 0 0 0 0 1.5h6ZM15 8a.75.75 0 0 1-.75.75H11.5V10a.75.75 0 1 1-1.5 0V6a.75.75 0 0 1 1.5 0v1.25h2.75A.75.75 0 0 1 15 8Zm-9 5.25v-2a.75.75 0 0 0-1.5 0v1.25H1.75a.75.75 0 0 0 0 1.5H4.5v1.25a.75.75 0 0 0 1.5 0v-2Zm9 0a.75.75 0 0 1-.75.75h-6a.75.75 0 0 1 0-1.5h6a.75.75 0 0 1 .75.75Z"
+          ></path>
+        </svg>
+      </fast-button>
     </div>
 
     ${when(
@@ -60,8 +61,8 @@ export const template = html<CustomSearch>`
               <fast-text-field
                 type="text"
                 name="id"
-                value="${(x) => x.filterParams.id}"
-                @input="${(x, c) => x.handleFilterParamChange(c.event)}"
+                value=${(x) => x.filterParams.id}
+                @input=${(x, c) => x.handleFilterParamChange(c.event)}
               ></fast-text-field>
             </label>
             <label class="filterContainer--label">

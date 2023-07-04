@@ -3,23 +3,25 @@ import {
   attr,
   customElement,
   observable,
-} from "@microsoft/fast-element";
-import { template } from "./copy.template.js";
-import { styles } from "./copy.styles.js";
+} from '@microsoft/fast-element';
+import { template } from './copy.template.js';
+import { styles } from './copy.styles.js';
 
 @customElement({
-  name: "custom-copy",
+  name: 'custom-copy',
   template,
   styles,
 })
 export class CopyClipboard extends FASTElement {
   @attr value: string;
+
   @observable text: string;
-  @observable copied: boolean = false;
+
+  @observable copied = false;
 
   connectedCallback() {
     super.connectedCallback();
-    this.text = this.value || "";
+    this.text = this.value || '';
   }
 
   async handleCopy() {
@@ -30,7 +32,7 @@ export class CopyClipboard extends FASTElement {
         this.copied = false;
       }, 2000);
     } catch (err) {
-      console.error("Failed to copy text: ", err);
+      console.error('Failed to copy text: ', err);
     }
   }
 }

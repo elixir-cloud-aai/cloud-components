@@ -1,4 +1,4 @@
-import { css, ElementStyles } from "@microsoft/fast-element";
+import { css, ElementStyles } from '@microsoft/fast-element';
 
 export const styles: ElementStyles = css`
   .trs-container {
@@ -84,7 +84,7 @@ export const styles: ElementStyles = css`
     padding: 8px;
     box-shadow: 0px 11px 20px 0px rgba(5, 16, 55, 0.1);
     background-color: #ffffff;
-    font: 400 14px/20px "Roboto", sans-serif;
+    font: 400 14px/20px 'Roboto', sans-serif;
   }
 
   .filterContainer--grid {
@@ -107,9 +107,8 @@ export const styles: ElementStyles = css`
     margin-top: 20px;
   }
 
-.tooltipIcon {
-  cursor: pointer;
-  fill: #009879;
-}
-
+  .tooltipIcon {
+    cursor: pointer;
+    fill: #009879;
+  }
 `;

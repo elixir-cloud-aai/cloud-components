@@ -1,20 +1,20 @@
-import { css, ElementStyles } from "@microsoft/fast-element";
+import { css, ElementStyles } from '@microsoft/fast-element';
 
 export const styles: ElementStyles = css`
-@keyframes tooltipFadeIn {
+  @keyframes tooltipFadeIn {
     from {
       opacity: 0;
     }
-  
+
     to {
       opacity: 1;
     }
   }
-  
+
   body {
     padding: 16px;
   }
-  
+
   .tooltip {
     display: inline-flex;
     flex-direction: column;
@@ -25,7 +25,6 @@ export const styles: ElementStyles = css`
     position: relative;
   }
 
-  
   .tooltip-dropdown {
     display: none;
     position: absolute;
@@ -35,7 +34,7 @@ export const styles: ElementStyles = css`
     z-index: 2;
     padding-top: 32px;
   }
-  
+
   .tooltip-dropdown__content {
     color: white;
     background-color: black;
@@ -44,14 +43,14 @@ export const styles: ElementStyles = css`
     width: 300px;
     text-align: left;
   }
-  
+
   .tooltip--open {
     .tooltip-dropdown {
       animation: tooltipFadeIn 0.15s;
       display: block;
     }
   }
-  
+
   @media (hover: hover) {
     .tooltip:hover {
       .tooltip-dropdown {
@@ -60,8 +59,4 @@ export const styles: ElementStyles = css`
       }
     }
   }
-  
-
-
-
 `;

@@ -1,1 +1,1 @@
-declare module "*.html";
+declare module '*.html';

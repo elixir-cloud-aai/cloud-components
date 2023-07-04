@@ -1,48 +1,49 @@
 import {
   FASTElement,
-  attr,
   customElement,
   observable,
-  volatile,
-} from "@microsoft/fast-element";
-import { template } from "./ecc-trs.template.js";
-import { styles } from "./ecc-trs.styles.js";
-import { IToolClass } from "./ecc-trs.interface.js";
+} from '@microsoft/fast-element';
+import { template } from './ecc-trs.template.js';
+import { styles } from './ecc-trs.styles.js';
+import { IToolClass } from './ecc-trs.interface.js';
 
 @customElement({
-  name: "ecc-client-ga4gh-trs",
+  name: 'ecc-client-ga4gh-trs',
   template,
   styles,
 })
 export class TRS extends FASTElement {
-  @observable ready: boolean = false;
+  @observable ready = false;
+
   @observable tools: any[] = [];
-  @observable limit: number = 5;
-  @observable currentPage: number = 1;
+
+  @observable limit = 5;
+
+  @observable currentPage = 1;
+
   @observable pageCount: number;
-  @observable searchQuery = "";
-  @observable isOpenFilter: boolean = false;
+
+  @observable searchQuery = '';
+
+  @observable isOpenFilter = false;
+
   @observable toolClasses: IToolClass[] = [];
 
   @observable filterParams: { [key: string]: string | undefined | boolean } = {
-    id: "",
-    alias: "",
-    toolClass: "",
-    descriptorType: "",
-    registry: "",
-    organization: "",
-    name: "",
-    description: "",
-    author: "",
+    id: '',
+    alias: '',
+    toolClass: '',
+    descriptorType: '',
+    registry: '',
+    organization: '',
+    name: '',
+    description: '',
+    author: '',
     checker: undefined,
-    offset: "",
+    offset: '',
   };
 
-  public baseUrl = "https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2";
-
-  constructor() {
-    super();
-  }
+  public baseUrl = 'https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2';
 
   async connectedCallback() {
     super.connectedCallback();
@@ -51,7 +52,7 @@ export class TRS extends FASTElement {
   }
 
   disconnectedCallback() {
-    console.log("disconnected");
+    console.log('disconnected');
     super.disconnectedCallback();
   }
 
@@ -60,14 +61,11 @@ export class TRS extends FASTElement {
     if (this.searchQuery.length > 0) {
       url += `&toolname=${this.searchQuery}`;
     }
-    for (const key in this.filterParams) {
-      if (
-        this.filterParams[key] !== "" &&
-        this.filterParams[key] !== undefined
-      ) {
-        url += `&${key}=${this.filterParams[key]}`;
+    Object.entries(this.filterParams).forEach(([key, value]) => {
+      if (value !== '' && value !== undefined) {
+        url += `&${key}=${value}`;
       }
-    }
+    });
     const response = await fetch(url);
     const data = await response.json();
 
@@ -77,7 +75,7 @@ export class TRS extends FASTElement {
   }
 
   async loadTools(): Promise<void> {
-    let url = `${this.baseUrl}/toolClasses`;
+    const url = `${this.baseUrl}/toolClasses`;
     const response = await fetch(url);
     const data = await response.json();
     this.toolClasses = data;
@@ -112,17 +110,17 @@ export class TRS extends FASTElement {
 
   handleClearFilter = () => {
     this.filterParams = {
-      id: "",
-      alias: "",
-      toolClass: "",
-      descriptorType: "",
-      registry: "",
-      organization: "",
-      name: "",
-      description: "",
-      author: "",
+      id: '',
+      alias: '',
+      toolClass: '',
+      descriptorType: '',
+      registry: '',
+      organization: '',
+      name: '',
+      description: '',
+      author: '',
       checker: undefined,
-      offset: "",
+      offset: '',
     };
   };
 
