@@ -25,15 +25,25 @@ interface Executor {
   index: number;
 }
 
-export interface Input {
+export interface InputData {
   url: string;
   path: string;
 }
 
-export interface Output {
+interface Input {
+  data: InputData;
+  index: number;
+}
+
+export interface OutputData {
   path: string;
   url: string;
   type: string;
+}
+
+interface Output {
+  data: OutputData;
+  index: number;
 }
 
 interface Resources {

@@ -31,6 +31,7 @@ const styles = css`
     background-color: #45a049;
   }
 
+  /* Executor */
   .executor-container {
     margin: 30px 0;
     padding: 20px;
@@ -67,6 +68,45 @@ const styles = css`
 
   .executors fast-text-field {
     width: calc(100% - 120px);
+  }
+
+  /* Inputs */
+
+  .input-container {
+    margin: 30px 0;
+    padding: 20px;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .input-container .delete {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .input-container .heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Output */
+  .output-container {
+    margin: 30px 0;
+    padding: 20px;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .output-container .delete {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .output-container .heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .df {
