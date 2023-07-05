@@ -136,19 +136,15 @@ const filtersTemplate = html<TRS>` ${when(
             </custom-tooltip>
           </div>
           <fast-select
-            value="${(x) => x.filterParams.toolClass}"
-            @input="${(x, c) => x.handleSelectToolClass(c.event)}"
+            value="${(trs) => trs.filterParams.toolClass}"
+            @input="${(trs, c) => trs.handleSelectToolClass(c.event)}"
           >
-            Everything's fine till here
             ${repeat(
-              // This is the problematic part
-              // FAST thinks this x is from class TRS, hence throws error
-              // But select is populated and works despite error because the class IToolCLass is imported
-              (x) => x.toolClasses,
+              (trs) => trs.toolClasses,
               html<IToolClass>`
-                <fast-option value="${(x) => x.name}"
-                  >${(x) => x.name}</fast-option
-                >
+                <fast-option value="${(tool) => tool.name}">
+                  ${(tool) => tool.name}
+                </fast-option>
               `
             )}
           </fast-select>
