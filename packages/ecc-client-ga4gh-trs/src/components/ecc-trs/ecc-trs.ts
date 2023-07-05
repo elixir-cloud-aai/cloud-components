@@ -2,13 +2,13 @@ import {
   FASTElement,
   customElement,
   observable,
-} from '@microsoft/fast-element';
-import { template } from './ecc-trs.template.js';
-import { styles } from './ecc-trs.styles.js';
-import { IToolClass } from './ecc-trs.interface.js';
+} from "@microsoft/fast-element";
+import { template } from "./ecc-trs.template.js";
+import { styles } from "./ecc-trs.styles.js";
+import { IToolClass } from "./ecc-trs.interface.js";
 
 @customElement({
-  name: 'ecc-client-ga4gh-trs',
+  name: "ecc-client-ga4gh-trs",
   template,
   styles,
 })
@@ -23,27 +23,27 @@ export class TRS extends FASTElement {
 
   @observable pageCount: number;
 
-  @observable searchQuery = '';
+  @observable searchQuery = "";
 
   @observable isOpenFilter = false;
 
   @observable toolClasses: IToolClass[] = [];
 
   @observable filterParams: { [key: string]: string | undefined | boolean } = {
-    id: '',
-    alias: '',
-    toolClass: '',
-    descriptorType: '',
-    registry: '',
-    organization: '',
-    name: '',
-    description: '',
-    author: '',
+    id: "",
+    alias: "",
+    toolClass: "",
+    descriptorType: "",
+    registry: "",
+    organization: "",
+    name: "",
+    description: "",
+    author: "",
     checker: undefined,
-    offset: '',
+    offset: "",
   };
 
-  public baseUrl = 'https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2';
+  public baseUrl = "https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2";
 
   async connectedCallback() {
     super.connectedCallback();
@@ -52,7 +52,7 @@ export class TRS extends FASTElement {
   }
 
   disconnectedCallback() {
-    console.log('disconnected');
+    console.log("disconnected");
     super.disconnectedCallback();
   }
 
@@ -62,7 +62,7 @@ export class TRS extends FASTElement {
       url += `&toolname=${this.searchQuery}`;
     }
     Object.entries(this.filterParams).forEach(([key, value]) => {
-      if (value !== '' && value !== undefined) {
+      if (value !== "" && value !== undefined) {
         url += `&${key}=${value}`;
       }
     });
@@ -84,6 +84,7 @@ export class TRS extends FASTElement {
   handleSearchChange = (e: Event) => {
     this.searchQuery = (e.target as HTMLInputElement).value;
     // debounce search
+
     setTimeout(() => {
       this.loadData();
     }, 1000);
@@ -104,23 +105,23 @@ export class TRS extends FASTElement {
 
   handleApplyFilter = () => {
     console.log(this.filterParams);
-    // this.loadData();
-    // this.isOpenFilter = false;
+    this.loadData();
+    this.isOpenFilter = false;
   };
 
   handleClearFilter = () => {
     this.filterParams = {
-      id: '',
-      alias: '',
-      toolClass: '',
-      descriptorType: '',
-      registry: '',
-      organization: '',
-      name: '',
-      description: '',
-      author: '',
+      id: "",
+      alias: "",
+      toolClass: "",
+      descriptorType: "",
+      registry: "",
+      organization: "",
+      name: "",
+      description: "",
+      author: "",
       checker: undefined,
-      offset: '',
+      offset: "",
     };
   };
 
