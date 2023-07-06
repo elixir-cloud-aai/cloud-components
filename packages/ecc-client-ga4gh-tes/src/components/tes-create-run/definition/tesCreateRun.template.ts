@@ -25,13 +25,13 @@ export const executorFields: Input[] = [
     label: 'command',
     required: true,
   },
+  { name: 'Image', label: 'image', required: true },
   {
     name: 'BLASTDB',
     label: 'blastdb',
     required: true,
   },
   { name: 'HMMERDB', label: 'hmmerdb', required: true },
-  { name: 'Image', label: 'image', required: true },
   { name: 'Stderr', label: 'stderr', required: true },
   { name: 'Stdin', label: 'stdin', required: true },
   { name: 'Stdout', label: 'stdout', required: true },
@@ -254,32 +254,37 @@ const template = html<TESCreateRun>`
          )}
       </fieldset>
    </div>
-   <div class="container resources">
+   <div class="container resources-container">
       <fieldset>
          <legend>Resources</legend>
-         <div class="label-input">
-            <label for="cpu-cores">CPU Cores:</label>
-            <fast-text-field type="number" id="cpu-cores" name="cpu-cores" class="input" :value=${(
-              x
-            ) => x.cpu_cores} required>
+         <div class="resources">
+           <div class="label-input">
+              <label for="cpu-cores">CPU Cores:</label>
+              <fast-text-field type="number" id="cpu-cores" name="cpu-cores" class="input" :value=${(
+                x
+              ) => x.cpu_cores} required>
+           </div>
+           <div class="label-input">
+              <label for="disk-gb">Disk GB:</label>
+              <fast-text-field type="number" id="disk-gb" name="disk-gb" class="input" :value=${(
+                x
+              ) => x.disk_gb} required>
+           </div>
+           <div class="label-input">
+              <label for="ram-gb">RAM GB:</label>
+              <fast-text-field type="number" id="ram-gb" name="ram-gb" class="input" :value=${(
+                x
+              ) => x.ram_gb} required>
+           </div>
+           <div class="label-input">
+              <label for="zones">Zones:</label>
+              <fast-text-field type="text" id="zones" name="zones" class="input" required>
+           </div>
+           <div class="label-input">
+              <label for="zones">Preemtible</label>
+              <fast-checkbox id="preemptible" name="preemptible" class="checkbox-field"></fast-checkbox>
+           </div>
          </div>
-         <div class="label-input">
-            <label for="disk-gb">Disk GB:</label>
-            <fast-text-field type="number" id="disk-gb" name="disk-gb" class="input" :value=${(
-              x
-            ) => x.disk_gb} required>
-         </div>
-         <div class="label-input">
-            <label for="ram-gb">RAM GB:</label>
-            <fast-text-field type="number" id="ram-gb" name="ram-gb" class="input" :value=${(
-              x
-            ) => x.ram_gb} required>
-         </div>
-         <div class="label-input">
-            <label for="zones">Zones:</label>
-            <fast-text-field type="text" id="zones" name="zones" class="input" required>
-         </div>
-         <fast-checkbox style="background-color:grey" id="preemptible" name="preemptible" class="checkbox-field">Preemptible</fast-checkbox>
       </fieldset>
    </div>
    <div class="container tags">
