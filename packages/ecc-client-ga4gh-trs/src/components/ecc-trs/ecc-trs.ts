@@ -1,5 +1,6 @@
 import {
   FASTElement,
+  attr,
   customElement,
   observable,
 } from "@microsoft/fast-element";
@@ -13,6 +14,8 @@ import { IToolClass } from "./ecc-trs.interface.js";
   styles,
 })
 export class TRS extends FASTElement {
+  @attr public baseUrl = '';
+
   @observable ready = false;
 
   @observable tools: any[] = [];
@@ -43,7 +46,7 @@ export class TRS extends FASTElement {
     offset: "",
   };
 
-  public baseUrl = "https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2";
+  // public baseUrl = "https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2";
 
   async connectedCallback() {
     super.connectedCallback();
