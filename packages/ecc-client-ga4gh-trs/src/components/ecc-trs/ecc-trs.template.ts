@@ -13,7 +13,7 @@ import {
   fastTooltip,
 } from "@microsoft/fast-components";
 import { TRS } from "./ecc-trs.js";
-import { IToolClass, Tool, Version } from "./ecc-trs.interface.js";
+import { IToolClass, ITool, IVersion } from "./ecc-trs.interface.js";
 
 provideFASTDesignSystem().register(
   fastTextField(),
@@ -299,7 +299,7 @@ const accordionTemplate = html<TRS>`
   <fast-accordion expand-mode="multi">
     ${repeat(
       (x) => x.tools,
-      html<Tool>` <fast-accordion-item class="accordionItem">
+      html<ITool>` <fast-accordion-item class="accordionItem">
         <table class="styled-table">
           <thead>
             <tr>
@@ -344,7 +344,7 @@ const accordionTemplate = html<TRS>`
         <fast-tabs orientation="vertical">
           ${repeat(
             (x) => x.versions,
-            html<Version>` <fast-tab slot="tab"
+            html<IVersion>` <fast-tab slot="tab"
                 >Version ${(x) => x.name}</fast-tab
               >
               <fast-tab-panel slot="tabpanel" class="tabContent">

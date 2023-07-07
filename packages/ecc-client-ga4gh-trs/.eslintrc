@@ -4,8 +4,8 @@
     "plugin:import/typescript",
     "prettier",
     "turbo",
-    "standard",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/typescript"
   ],
   "plugins": ["import", "prettier"],
   "rules": {

@@ -4,7 +4,7 @@ import {
   provideFASTDesignSystem,
 } from "@microsoft/fast-components";
 import { CustomSearch } from "./search.js";
-import { Tool } from "../../../ecc-trs/ecc-trs.interface.js";
+import { ITool } from "../../../ecc-trs/ecc-trs.interface.js";
 
 provideFASTDesignSystem().register(allComponents);
 
@@ -119,7 +119,7 @@ export const template = html<CustomSearch>`
               >
                 ${repeat(
                   (x) => x.toolClasses,
-                  html<Tool>`
+                  html<ITool>`
                     <fast-option value="${(x) => x.name}"
                       >${(x) => x.name}</fast-option
                     >

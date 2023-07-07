@@ -1,4 +1,34 @@
-interface Tool {
+interface IChecksum {
+  checksum: string;
+  type: string;
+}
+
+interface IImage {
+  checksum: IChecksum[];
+  image_name: string;
+  image_type: string;
+  registry_host: string;
+  size: number;
+  updated: string;
+}
+
+interface IVersion {
+  author: string[];
+  containerfile: boolean;
+  descriptor_type: string[];
+  id: string;
+  images: IImage[];
+  included_apps: string[];
+  is_production: boolean;
+  meta_version: string;
+  name: string;
+  signed: boolean;
+  url: string;
+  verified: boolean;
+  verified_source: string[];
+}
+
+interface ITool {
   aliases: string[];
   checker_url: string;
   description: string;
@@ -13,37 +43,7 @@ interface Tool {
     name: string;
   };
   url: string;
-  versions: Version[];
-}
-
-interface Version {
-  author: string[];
-  containerfile: boolean;
-  descriptor_type: string[];
-  id: string;
-  images: Image[];
-  included_apps: string[];
-  is_production: boolean;
-  meta_version: string;
-  name: string;
-  signed: boolean;
-  url: string;
-  verified: boolean;
-  verified_source: string[];
-}
-
-interface Image {
-  checksum: Checksum[];
-  image_name: string;
-  image_type: string;
-  registry_host: string;
-  size: number;
-  updated: string;
-}
-
-interface Checksum {
-  checksum: string;
-  type: string;
+  versions: IVersion[];
 }
 
 interface IToolClass {
@@ -52,4 +52,4 @@ interface IToolClass {
   name: string;
 }
 
-export type { Tool, Version, Image, Checksum, IToolClass };
+export type { ITool, IVersion, IImage, IChecksum, IToolClass };

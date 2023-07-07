@@ -1,6 +1,7 @@
 import { FASTElement, attr, customElement } from "@microsoft/fast-element";
 import { template } from "./search.template.js";
 import { styles } from "./search.styles.js";
+import { IFilterParams } from "./search.interface.js";
 
 @customElement({
   name: "custom-search",
@@ -12,10 +13,10 @@ export class CustomSearch extends FASTElement {
   public searchQuery: string;
 
   @attr
-  public filterParams: any;
+  public filterParams: IFilterParams;
 
   @attr
-  public toolClasses: any[];
+  public toolClasses: unknown[];
 
   @attr
   public isOpenFilter: boolean;

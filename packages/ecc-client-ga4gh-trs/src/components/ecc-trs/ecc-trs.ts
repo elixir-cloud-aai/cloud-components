@@ -14,11 +14,11 @@ import { IToolClass } from "./ecc-trs.interface.js";
   styles,
 })
 export class TRS extends FASTElement {
-  @attr public baseUrl = '';
+  @attr public baseUrl = "";
 
   @observable ready = false;
 
-  @observable tools: any[] = [];
+  @observable tools: unknown[] = [];
 
   @observable limit = 5;
 
