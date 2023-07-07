@@ -2,16 +2,26 @@ import { FASTElement, customElement } from "@microsoft/fast-element";
 import { template } from "./tooltip.template.js";
 import { styles } from "./tooltip.styles.js";
 
+/**
+ * Represents the CustomTooltip class.
+ * @extends FASTElement
+ */
 @customElement({
   name: "custom-tooltip",
   template,
   styles,
 })
 export class CustomTooltip extends FASTElement {
+  /** Represents the placeholder for the tooltip. */
   placeholder: HTMLElement;
 
+  /** Represents the dropdown for the tooltip. */
   dropdown: HTMLElement;
 
+  /**
+   * Executes when the element is first connected to the DOM.
+   * @override
+   */
   connectedCallback() {
     super.connectedCallback();
     // this.setup();
@@ -28,6 +38,9 @@ export class CustomTooltip extends FASTElement {
     this.placeholder.addEventListener("touchstart", () => this.toggle());
   }
 
+  /**
+   * Handles the position of the dropdown.
+   */
   handleDropdownPosition() {
     const screenPadding = 16;
 
@@ -52,6 +65,9 @@ export class CustomTooltip extends FASTElement {
     }
   }
 
+  /**
+   * Toggles the tooltip.
+   */
   toggle() {
     if (this.classList.contains("tooltip--open")) {
       this.close();
@@ -60,11 +76,17 @@ export class CustomTooltip extends FASTElement {
     }
   }
 
+  /**
+   * Opens the tooltip.
+   */
   open() {
     this.classList.add("tooltip--open");
     this.handleDropdownPosition();
   }
 
+  /**
+   * Closes the tooltip.
+   */
   close() {
     this.classList.remove("tooltip--open");
   }

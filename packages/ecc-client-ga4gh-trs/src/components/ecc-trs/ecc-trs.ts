@@ -8,6 +8,11 @@ import { template } from "./ecc-trs.template.js";
 import { styles } from "./ecc-trs.styles.js";
 import { IToolClass } from "./ecc-trs.interface.js";
 
+/**
+ * @class
+ * @classdesc TRS Custom Element Class.
+ * @extends FASTElement
+ */
 @customElement({
   name: "ecc-client-ga4gh-trs",
   template,
@@ -46,17 +51,31 @@ export class TRS extends FASTElement {
     offset: "",
   };
 
+  /**
+   * @method
+   * @description Load data on element connected.
+   * @async
+   */
   async connectedCallback() {
     super.connectedCallback();
     await this.loadData();
     await this.loadTools();
   }
 
+  /**
+   * @method
+   * @description Log on element disconnected.
+   */
   disconnectedCallback() {
     console.log("disconnected");
     super.disconnectedCallback();
   }
 
+  /**
+   * @method
+   * @description Load data from the backend.
+   * @async
+   */
   async loadData() {
     let url = `${this.baseUrl}/tools?limit=${this.limit}`;
     if (this.searchQuery.length > 0) {
@@ -75,6 +94,12 @@ export class TRS extends FASTElement {
     this.ready = true;
   }
 
+  /**
+   * @method
+   * @description Load tools from the backend.
+   * @async
+   * @returns {Promise<void>}
+   */
   async loadTools(): Promise<void> {
     const url = `${this.baseUrl}/toolClasses`;
     const response = await fetch(url);
@@ -82,6 +107,11 @@ export class TRS extends FASTElement {
     this.toolClasses = data;
   }
 
+  /**
+   * @method
+   * @description Handle search input change.
+   * @param {Event} e - The triggering event.
+   */
   handleSearchChange = (e: Event) => {
     this.searchQuery = (e.target as HTMLInputElement).value;
     // debounce search
@@ -91,25 +121,47 @@ export class TRS extends FASTElement {
     }, 1000);
   };
 
+  /**
+   * @method
+   * @description Handle filter open state.
+   */
   handleOpenFilter = () => {
     this.isOpenFilter = !this.isOpenFilter;
   };
 
+  /**
+   * @method
+   * @description Handle selection of tool class.
+   * @param {Event} e - The triggering event.
+   */
   handleSelectToolClass = (e: Event) => {
     this.filterParams.toolClass = (e.target as HTMLInputElement).value;
   };
 
+  /**
+   * @method
+   * @description Handle filter parameters change.
+   * @param {Event} e - The triggering event.
+   */
   handleFilterParamChange = (e: Event) => {
     const { name, value } = e.target as HTMLInputElement;
     this.filterParams[name] = value;
   };
 
+  /**
+   * @method
+   * @description Apply the current filter parameters.
+   */
   handleApplyFilter = () => {
     console.log(this.filterParams);
     this.loadData();
     this.isOpenFilter = false;
   };
 
+  /**
+   * @method
+   * @description Clear all filter parameters.
+   */
   handleClearFilter = () => {
     this.filterParams = {
       id: "",
@@ -126,11 +178,19 @@ export class TRS extends FASTElement {
     };
   };
 
+  /**
+   * @method
+   * @description Handle previous page.
+   */
   handlePrevPage = () => {
     if (this.currentPage === 1) return;
     this.currentPage -= 1;
   };
 
+  /**
+   * @method
+   * @description Handle next page.
+   */
   handleNextPage = () => {
     if (this.currentPage === this.pageCount) return;
     this.currentPage += 1;
