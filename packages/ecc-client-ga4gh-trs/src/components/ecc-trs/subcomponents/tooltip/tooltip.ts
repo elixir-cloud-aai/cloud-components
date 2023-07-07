@@ -1,9 +1,9 @@
-import { FASTElement, customElement } from '@microsoft/fast-element';
-import { template } from './tooltip.template.js';
-import { styles } from './tooltip.styles.js';
+import { FASTElement, customElement } from "@microsoft/fast-element";
+import { template } from "./tooltip.template.js";
+import { styles } from "./tooltip.styles.js";
 
 @customElement({
-  name: 'custom-tooltip',
+  name: "custom-tooltip",
   template,
   styles,
 })
@@ -16,16 +16,16 @@ export class CustomTooltip extends FASTElement {
     super.connectedCallback();
     // this.setup();
     this.placeholder = this.shadowRoot?.querySelector(
-      '[data-tooltip-placeholder]'
+      "[data-tooltip-placeholder]"
     ) as HTMLElement;
     this.dropdown = this.shadowRoot?.querySelector(
-      '[data-tooltip-dropdown]'
+      "[data-tooltip-dropdown]"
     ) as HTMLElement;
 
-    this.placeholder.addEventListener('mouseover', () =>
+    this.placeholder.addEventListener("mouseover", () =>
       this.handleDropdownPosition()
     );
-    this.placeholder.addEventListener('touchstart', () => this.toggle());
+    this.placeholder.addEventListener("touchstart", () => this.toggle());
   }
 
   handleDropdownPosition() {
@@ -38,14 +38,14 @@ export class CustomTooltip extends FASTElement {
     const placeholderRightX = placeholderRect.x + placeholderRect.width;
 
     if (dropdownRect.x < 0) {
-      this.dropdown.style.left = '0';
-      this.dropdown.style.right = 'auto';
+      this.dropdown.style.left = "0";
+      this.dropdown.style.right = "auto";
       this.dropdown.style.transform = `translateX(${
         -placeholderRect.x + screenPadding
       }px)`;
     } else if (dropdownRightX > window.outerWidth) {
-      this.dropdown.style.left = 'auto';
-      this.dropdown.style.right = '0';
+      this.dropdown.style.left = "auto";
+      this.dropdown.style.right = "0";
       this.dropdown.style.transform = `translateX(${
         window.outerWidth - placeholderRightX - screenPadding
       }px)`;
@@ -53,7 +53,7 @@ export class CustomTooltip extends FASTElement {
   }
 
   toggle() {
-    if (this.classList.contains('tooltip--open')) {
+    if (this.classList.contains("tooltip--open")) {
       this.close();
     } else {
       this.open();
@@ -61,11 +61,11 @@ export class CustomTooltip extends FASTElement {
   }
 
   open() {
-    this.classList.add('tooltip--open');
+    this.classList.add("tooltip--open");
     this.handleDropdownPosition();
   }
 
   close() {
-    this.classList.remove('tooltip--open');
+    this.classList.remove("tooltip--open");
   }
 }

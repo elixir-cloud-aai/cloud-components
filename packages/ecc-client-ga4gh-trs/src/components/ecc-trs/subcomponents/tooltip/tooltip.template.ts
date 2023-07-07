@@ -1,5 +1,5 @@
-import { html } from '@microsoft/fast-element';
-import { CustomTooltip } from './tooltip.js';
+import { html } from "@microsoft/fast-element";
+import { CustomTooltip } from "./tooltip.js";
 
 export const template = html<CustomTooltip>`
   <div class="tooltip">

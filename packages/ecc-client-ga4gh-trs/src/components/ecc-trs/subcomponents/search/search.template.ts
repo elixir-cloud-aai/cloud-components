@@ -1,10 +1,10 @@
-import { html, repeat, when } from '@microsoft/fast-element';
+import { html, repeat, when } from "@microsoft/fast-element";
 import {
   allComponents,
   provideFASTDesignSystem,
-} from '@microsoft/fast-components';
-import { CustomSearch } from './search.js';
-import { Tool } from '../ecc-trs/ecc-trs.interface.js';
+} from "@microsoft/fast-components";
+import { CustomSearch } from "./search.js";
+import { Tool } from "../../../ecc-trs/ecc-trs.interface.js";
 
 provideFASTDesignSystem().register(allComponents);
 

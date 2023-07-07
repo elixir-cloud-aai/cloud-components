@@ -1,9 +1,9 @@
-import { FASTElement, attr, customElement } from '@microsoft/fast-element';
-import { template } from './search.template.js';
-import { styles } from './search.styles.js';
+import { FASTElement, attr, customElement } from "@microsoft/fast-element";
+import { template } from "./search.template.js";
+import { styles } from "./search.styles.js";
 
 @customElement({
-  name: 'custom-search',
+  name: "custom-search",
   template,
   styles,
 })
@@ -26,10 +26,6 @@ export class CustomSearch extends FASTElement {
   @attr
   public onChange: (event: Event) => void;
 
-  // handleSearchChange(event: Event) {
-  //   this.searchQuery = (event.target as HTMLInputElement).value;
-  // }
-
   handleOpenFilter() {
     this.isOpenFilter = !this.isOpenFilter;
   }
@@ -45,17 +41,17 @@ export class CustomSearch extends FASTElement {
 
   handleClearFilter = () => {
     this.filterParams = {
-      id: '',
-      alias: '',
-      toolClass: '',
-      descriptorType: '',
-      registry: '',
-      organization: '',
-      name: '',
-      description: '',
-      author: '',
+      id: "",
+      alias: "",
+      toolClass: "",
+      descriptorType: "",
+      registry: "",
+      organization: "",
+      name: "",
+      description: "",
+      author: "",
       checker: undefined,
-      offset: '',
+      offset: "",
     };
   };
 }
