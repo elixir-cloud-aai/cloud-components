@@ -139,6 +139,7 @@ const filtersTemplate = html<TRS>` ${when(
             value="${(trs) => trs.filterParams.toolClass}"
             @input="${(trs, c) => trs.handleSelectToolClass(c.event)}"
           >
+            <fast-option value="">--None--</fast-option>
             ${repeat(
               (trs) => trs.toolClasses,
               html<IToolClass>`
@@ -229,7 +230,7 @@ const filtersTemplate = html<TRS>` ${when(
         </label>
         <label class="filterContainer--label">
           <div>
-            <span>Name </span>
+            <span>Image Name </span>
             <custom-tooltip>
               <svg
                 slot="label"

@@ -46,8 +46,6 @@ export class TRS extends FASTElement {
     offset: "",
   };
 
-  // public baseUrl = "https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2";
-
   async connectedCallback() {
     super.connectedCallback();
     await this.loadData();
