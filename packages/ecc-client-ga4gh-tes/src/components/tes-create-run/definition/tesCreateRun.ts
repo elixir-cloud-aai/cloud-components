@@ -6,7 +6,14 @@ import {
 } from '@microsoft/fast-element';
 import template, { executorFields } from './tesCreateRun.template.js';
 import styles from './tesCreateRun.styles.js';
-import { Executor, Input, Output } from './createTask.js';
+import CreateTaskData, {
+  Executor,
+  ExecutorData,
+  Input,
+  InputData,
+  Output,
+  OutputData,
+} from './createTask.js';
 
 const executorTemplate: Executor = {
   data: {
@@ -52,15 +59,23 @@ export default class TESCreateRun extends FASTElement {
 
   @attr description = '';
 
-  @attr executors: Executor[] = [JSON.parse(JSON.stringify(executorTemplate))];
+  @observable executors: Executor[] = [
+    JSON.parse(JSON.stringify(executorTemplate)),
+  ];
+
+  @attr taskExecutors: ExecutorData[] = [];
 
   @observable executorsLength = 1;
 
-  @attr input: Input[] = [JSON.parse(JSON.stringify(inputTemplate))];
+  @observable input: Input[] = [JSON.parse(JSON.stringify(inputTemplate))];
+
+  @attr taskInput: InputData[] = [];
 
   @observable inputLength = 1;
 
-  @attr output: Output[] = [JSON.parse(JSON.stringify(outputTemplate))];
+  @observable output: Output[] = [JSON.parse(JSON.stringify(outputTemplate))];
+
+  @attr taskOutput: OutputData[] = [];
 
   @observable outputLength = 1;
 
@@ -80,9 +95,43 @@ export default class TESCreateRun extends FASTElement {
 
   @attr volumes: string[] = [];
 
+  @observable taskData: CreateTaskData = {
+    name: this.name,
+    state: this.state,
+    description: this.description,
+    executors: this.taskExecutors,
+    inputs: this.taskInput,
+    outputs: this.taskOutput,
+    resources: {
+      cpu_cores: parseInt(this.cpu_cores, 10),
+      disk_gb: parseInt(this.disk_gb, 10),
+      preemptible: this.preemptible,
+      ram_gb: parseInt(this.ram_gb, 10),
+      zones: this.zones,
+    },
+    tags: {
+      WORKFLOW_ID: this.WORKFLOW_ID,
+      PROJECT_GROUP: this.PROJECT_GROUP,
+    },
+    volumes: this.volumes,
+  };
+
   handleClick = async () => {
-    // handle Submit
-    console.log(this.name);
+    this.taskData.name = this.name;
+    this.taskData.state = this.state;
+    this.taskData.description = this.description;
+    this.taskData.executors = this.taskExecutors;
+    this.taskData.inputs = this.taskInput;
+    this.taskData.outputs = this.taskOutput;
+    this.taskData.resources.cpu_cores = parseInt(this.cpu_cores, 10);
+    this.taskData.resources.disk_gb = parseInt(this.disk_gb, 10);
+    this.taskData.resources.preemptible = this.preemptible;
+    this.taskData.resources.ram_gb = parseInt(this.ram_gb, 10);
+    this.taskData.resources.zones = this.zones;
+    this.taskData.tags.WORKFLOW_ID = this.WORKFLOW_ID;
+    this.taskData.tags.PROJECT_GROUP = this.PROJECT_GROUP;
+    this.taskData.volumes = this.volumes;
+    // Call API here to create task
   };
 
   handleNameInput = (event: Event) => {

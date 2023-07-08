@@ -1,9 +1,9 @@
 export default interface CreateTaskData {
   description: string;
-  executors: Executor[];
-  inputs: Input[];
+  executors: ExecutorData[];
+  inputs: InputData[];
   name: string;
-  outputs: Output[];
+  outputs: OutputData[];
   resources: Resources;
   state: string;
   tags: Tags;
