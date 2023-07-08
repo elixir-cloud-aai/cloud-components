@@ -14,6 +14,7 @@ import CreateTaskData, {
   Output,
   OutputData,
 } from './createTask.js';
+import { postTask } from '../../../data/Task/tesGet.js';
 
 const executorTemplate: Executor = {
   data: {
@@ -120,8 +121,17 @@ export default class TESCreateRun extends FASTElement {
     this.taskData.name = this.name;
     this.taskData.state = this.state;
     this.taskData.description = this.description;
+    for (const exec of this.executors) {
+      this.taskExecutors.push(exec.data);
+    }
     this.taskData.executors = this.taskExecutors;
+    for (const inp of this.input) {
+      this.taskInput.push(inp.data);
+    }
     this.taskData.inputs = this.taskInput;
+    for (const out of this.output) {
+      this.taskOutput.push(out.data);
+    }
     this.taskData.outputs = this.taskOutput;
     this.taskData.resources.cpu_cores = parseInt(this.cpu_cores, 10);
     this.taskData.resources.disk_gb = parseInt(this.disk_gb, 10);
@@ -131,6 +141,9 @@ export default class TESCreateRun extends FASTElement {
     this.taskData.tags.WORKFLOW_ID = this.WORKFLOW_ID;
     this.taskData.tags.PROJECT_GROUP = this.PROJECT_GROUP;
     this.taskData.volumes = this.volumes;
+    console.log(this.taskData);
+    const createTask = await postTask(this.baseURL, this.taskData);
+    console.log(createTask);
     // Call API here to create task
   };
 

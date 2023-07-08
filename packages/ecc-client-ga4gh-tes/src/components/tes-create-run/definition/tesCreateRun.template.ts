@@ -167,7 +167,7 @@ const outputTemplate = html<TESCreateRun>`
 `;
 
 const template = html<TESCreateRun>`
-<form class="form-container">
+<form class="form-container" onsubmit="return false">
    <div class="container meta">
       <div class="label-input">
          <label for="name">Name:</label>
@@ -321,7 +321,7 @@ const template = html<TESCreateRun>`
          ) => x.handleVolumesInput(c.event)} required>
       </div>
    </div>
-   <fast-button class="submit-button" @click=${(x) =>
+   <fast-button type="submit" class="submit-button" @click=${(x) =>
      x.handleClick()}>Create Task
    </fast-button>
 </form>
