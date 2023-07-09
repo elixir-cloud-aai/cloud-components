@@ -202,7 +202,7 @@ const template = html<TESCreateRun>`
            (x) => x.executorsLength > 1,
            html`
              <span class="data-button">
-               <fast-button @click=${(x) => x.deleteExecutor()}>
+               <fast-button class="delete" @click=${(x) => x.deleteExecutor()}>
                  Delete
                </fast-button>
              </span>
@@ -222,7 +222,7 @@ const template = html<TESCreateRun>`
            (x) => x.inputLength > 1,
            html`
              <span class="data-button">
-               <fast-button @click=${(x) => x.deleteInput()}>
+               <fast-button class="delete" @click=${(x) => x.deleteInput()}>
                  Delete
                </fast-button>
              </span>
@@ -243,7 +243,7 @@ const template = html<TESCreateRun>`
            (x) => x.outputLength > 1,
            html`
              <span class="data-button">
-               <fast-button @click=${(x) => x.deleteOutput()}>
+               <fast-button class="delete" @click=${(x) => x.deleteOutput()}>
                  Delete
                </fast-button>
              </span>
@@ -318,12 +318,14 @@ const template = html<TESCreateRun>`
          <fast-text-field type="text" id="volumes" name="volumes" class="input" @input=${(
            x,
            c
-         ) => x.handleVolumesInput(c.event)} required>
+         ) => x.handleVolumesInput(c.event)} required >
       </div>
    </div>
-   <fast-button type="submit" class="submit-button" @click=${(x) =>
-     x.handleClick()}>Create Task
+   <div class="submit-button-container">
+   <fast-button class="submit-button" @click=${(x) =>
+     x.handleClick()} >Create Task
    </fast-button>
+   </div>
 </form>
 `;
 export default template;

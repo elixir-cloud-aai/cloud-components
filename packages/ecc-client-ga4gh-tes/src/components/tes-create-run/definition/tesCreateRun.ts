@@ -4,7 +4,7 @@ import {
   observable,
   customElement,
 } from '@microsoft/fast-element';
-import template, { executorFields } from './tesCreateRun.template.js';
+import template from './tesCreateRun.template.js';
 import styles from './tesCreateRun.styles.js';
 import CreateTaskData, {
   Executor,
@@ -54,11 +54,11 @@ const outputTemplate: Output = {
 export default class TESCreateRun extends FASTElement {
   @attr baseURL = '';
 
-  @attr name = '';
+  @attr name = 'myTask';
 
   @attr state = 'UNKNOWN';
 
-  @attr description = '';
+  @attr description = 'myTask';
 
   @observable executors: Executor[] = [
     JSON.parse(JSON.stringify(executorTemplate)),
@@ -80,21 +80,66 @@ export default class TESCreateRun extends FASTElement {
 
   @observable outputLength = 1;
 
-  @attr cpu_cores = '0';
+  @attr cpu_cores = '4';
 
-  @attr disk_gb = '0';
+  @attr disk_gb = '40';
 
   @attr preemptible = false;
 
-  @attr ram_gb = '0';
+  @attr ram_gb = '8';
 
-  @attr zones: string[] = [];
+  @attr zones: string[] = ['us-west-1'];
 
-  @attr WORKFLOW_ID = '';
+  @attr WORKFLOW_ID = 'cwl-01234';
 
-  @attr PROJECT_GROUP = '';
+  @attr PROJECT_GROUP = 'alice-lab';
 
-  @attr volumes: string[] = [];
+  @attr volumes: string[] = ['/vol/A/'];
+
+  @observable testData: CreateTaskData = {
+    description: 'string',
+    executors: [
+      {
+        command: ['/bin/md5', '/data/file1'],
+        env: {
+          BLASTDB: '/data/GRC38',
+          HMMERDB: '/data/hmmer',
+        },
+        image: 'ubuntu:20.04',
+        stderr: '/tmp/stderr.log',
+        stdin: '/data/file1',
+        stdout: '/tmp/stdout.log',
+        workdir: '/data/',
+      },
+    ],
+    inputs: [
+      {
+        url: 's3://my-object-store/file1',
+        path: '/data/file1',
+      },
+    ],
+    name: 'string',
+    outputs: [
+      {
+        path: '/data/outfile',
+        url: 's3://my-object-store/outfile-1',
+        type: 'FILE',
+      },
+    ],
+    resources: {
+      cpu_cores: 4,
+      disk_gb: 40,
+      preemptible: false,
+      ram_gb: 8,
+      zones: ['us-west-1'],
+    },
+    state: 'UNKNOWN',
+    tags: {
+      WORKFLOW_ID: 'cwl-01234',
+      PROJECT_GROUP: 'alice-lab',
+    },
+    volumes: ['/vol/A/'],
+  };
 
   @observable taskData: CreateTaskData = {
     name: this.name,
@@ -141,10 +186,9 @@ export default class TESCreateRun extends FASTElement {
     this.taskData.tags.WORKFLOW_ID = this.WORKFLOW_ID;
     this.taskData.tags.PROJECT_GROUP = this.PROJECT_GROUP;
     this.taskData.volumes = this.volumes;
-    console.log(this.taskData);
+    // Call API to create task
     const createTask = await postTask(this.baseURL, this.taskData);
     console.log(createTask);
-    // Call API here to create task
   };
 
   handleNameInput = (event: Event) => {
@@ -199,20 +243,13 @@ export default class TESCreateRun extends FASTElement {
   };
 
   handleExecutorChange = (value: string, index: number, label: string) => {
-    switch (label) {
-      case executorFields[0].label:
-        // handle command situation
-        break;
-
-      case executorFields[1].label:
-      case executorFields[2].label:
-        this.executors[index].data.env[label] = value;
-        break;
-
-      default:
-        // @ts-expect-error: should not be using type string to index data
-        this.executors[index].data[label] = value;
-        break;
+    if (label === 'command') {
+      this.executors[index].data.command = value.split(',');
+    } else if (label === 'hmmerdb' || label === 'blastdb') {
+      this.executors[index].data.env[label] = value;
+    } else {
+      // @ts-expect-error: should not be using type string to index data
+      this.executors[index].data[label] = value;
     }
   };
 

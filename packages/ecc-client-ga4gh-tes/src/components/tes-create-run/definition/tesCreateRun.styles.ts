@@ -37,11 +37,33 @@ const styles = css`
   }
 
   fast-button {
-    height: 2rem;
+    height: 1.8rem;
   }
 
-  fast-checkbox {
-    color: red !important;
+  .add:hover {
+    background-color: #4caf50;
+  }
+
+  .delete:hover {
+    background-color: #d32f2f;
+  }
+
+  .submit-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.6em;
+  }
+
+  .submit-button {
+    height: 2.5rem;
+  }
+
+  .submit-button:hover {
+    background-color: #4caf50;
+  }
+
+  .submit-button:active {
+    background-color: #4ccf50;
   }
 `;
 
