@@ -20,11 +20,10 @@ const styles = css`
   }
 
   fast-text-field {
-    width: 70%;
+    width: 50%;
   }
 
   .executors,
-  .input,
   .output,
   .resources,
   .tags {
@@ -65,6 +64,36 @@ const styles = css`
 
   .submit-button:active {
     background-color: #4ccf50;
+  }
+
+  /* Media query for screens with a maximum width of 1024px */
+  @media (max-width: 1024px) {
+    fast-text-field {
+      width: 65%;
+    }
+  }
+
+  /* Media query for screens with a maximum width of 768px */
+  @media (max-width: 768px) {
+    .form-container {
+      padding: 0.2rem;
+    }
+
+    fast-text-field {
+      width: 90%;
+    }
+
+    .executors,
+    .input,
+    .output,
+    .resources,
+    .tags {
+      grid-template-columns: 1fr;
+    }
+
+    .submit-button {
+      height: 2rem;
+    }
   }
 `;
 
