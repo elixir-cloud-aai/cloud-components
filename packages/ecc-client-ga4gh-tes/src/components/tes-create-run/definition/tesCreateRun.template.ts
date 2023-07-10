@@ -177,7 +177,7 @@ const template = html<TESCreateRun>`
       </div>
       <div class="label-input">
          <label for="">State:</label>
-         <fast-text-field type="text" id="" name="" class="input" :value=${(
+         <fast-text-field type="text" id="state" name="state" class="input" :value=${(
            x
          ) => x.state} @input=${(x, c) => x.handleStateInput(c.event)} required>
       </div>
@@ -193,7 +193,7 @@ const template = html<TESCreateRun>`
       <fieldset>
          <legend>Executors</legend>
          <span class="data-button">
-            <fast-button class="add" @click=${(x) =>
+            <fast-button class="add" id="add-executors" @click=${(x) =>
               x.addExecutor()} > Add Executors
             </fast-button>
          </span>
@@ -202,7 +202,11 @@ const template = html<TESCreateRun>`
            (x) => x.executorsLength > 1,
            html`
              <span class="data-button">
-               <fast-button class="delete" @click=${(x) => x.deleteExecutor()}>
+               <fast-button
+                 class="delete"
+                 id="delete-executor"
+                 @click=${(x) => x.deleteExecutor()}
+               >
                  Delete
                </fast-button>
              </span>
@@ -214,7 +218,8 @@ const template = html<TESCreateRun>`
       <fieldset>
          <legend>Input</legend>
          <span class="data-button">
-            <fast-button class="add" @click=${(x) => x.addInput()} > Add Inputs
+            <fast-button class="add" id="add-input" @click=${(x) =>
+              x.addInput()} > Add Inputs
             </fast-button>
          </span>
          ${inputTemplate}
@@ -222,7 +227,11 @@ const template = html<TESCreateRun>`
            (x) => x.inputLength > 1,
            html`
              <span class="data-button">
-               <fast-button class="delete" @click=${(x) => x.deleteInput()}>
+               <fast-button
+                 class="delete"
+                 id="delete-input"
+                 @click=${(x) => x.deleteInput()}
+               >
                  Delete
                </fast-button>
              </span>
@@ -234,7 +243,7 @@ const template = html<TESCreateRun>`
       <fieldset>
          <legend>Output</legend>
          <span class="data-button">
-            <fast-button class="add" @click=${(x) =>
+            <fast-button class="add" id="add-output" @click=${(x) =>
               x.addOutput()} > Add Outputs
             </fast-button>
          </span>
@@ -243,7 +252,11 @@ const template = html<TESCreateRun>`
            (x) => x.outputLength > 1,
            html`
              <span class="data-button">
-               <fast-button class="delete" @click=${(x) => x.deleteOutput()}>
+               <fast-button
+                 class="delete"
+                 id="delete-output"
+                 @click=${(x) => x.deleteOutput()}
+               >
                  Delete
                </fast-button>
              </span>
@@ -293,9 +306,10 @@ const template = html<TESCreateRun>`
          </div>
       </fieldset>
    </div>
-   <div class="container tags">
+   <div class="container tags-container">
       <fieldset>
          <legend>Tag</legend>
+         <div class="tags">
          <div class="label-input">
             <label for="workflow-id">Workflow ID:</label>
             <fast-text-field type="text" id="workflow-id" name="workflow-id" class="input" :value=${(
@@ -310,6 +324,7 @@ const template = html<TESCreateRun>`
             ) => x.PROJECT_GROUP} @input=${(x, c) =>
   x.handleProjectGroupInput(c.event)} required>
          </div>
+            </div>
       </fieldset>
    </div>
    <div class="container volumes">

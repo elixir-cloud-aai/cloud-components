@@ -26,7 +26,8 @@ const styles = css`
   .executors,
   .input,
   .output,
-  .resources {
+  .resources,
+  .tags {
     display: grid;
     grid-template-columns: 1fr 1fr;
   }

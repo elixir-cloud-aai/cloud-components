@@ -54,11 +54,11 @@ const outputTemplate: Output = {
 export default class TESCreateRun extends FASTElement {
   @attr baseURL = '';
 
-  @attr name = 'myTask';
+  @attr name = '';
 
   @attr state = 'UNKNOWN';
 
-  @attr description = 'myTask';
+  @attr description = '';
 
   @observable executors: Executor[] = [
     JSON.parse(JSON.stringify(executorTemplate)),
@@ -88,13 +88,13 @@ export default class TESCreateRun extends FASTElement {
 
   @attr ram_gb = '8';
 
-  @attr zones: string[] = ['us-west-1'];
+  @attr zones: string[] = [];
 
-  @attr WORKFLOW_ID = 'cwl-01234';
+  @attr WORKFLOW_ID = '';
 
-  @attr PROJECT_GROUP = 'alice-lab';
+  @attr PROJECT_GROUP = '';
 
-  @attr volumes: string[] = ['/vol/A/'];
+  @attr volumes: string[] = [];
 
   @observable taskData: CreateTaskData = {
     name: this.name,
@@ -225,7 +225,9 @@ export default class TESCreateRun extends FASTElement {
    * @param event The input event triggered when the zones input changes
    */
   handleZonesInput = (event: Event) => {
-    this.zones = (event.target! as HTMLInputElement).value.split(',');
+    const inputElement = event.target as HTMLInputElement;
+    // Separate the input by ',' and remove the white spaces
+    this.zones = inputElement.value.split(',').map((volume) => volume.trim());
   };
 
   /**
@@ -269,7 +271,9 @@ export default class TESCreateRun extends FASTElement {
    * @param event The input event triggered when the volumes input changes
    */
   handleVolumesInput = (event: Event) => {
-    this.volumes = (event.target! as HTMLInputElement).value.split(',');
+    const inputElement = event.target as HTMLInputElement;
+    // Separate the input by ',' and remove the white spaces
+    this.volumes = inputElement.value.split(',').map((volume) => volume.trim());
   };
 
   /**
@@ -284,8 +288,9 @@ export default class TESCreateRun extends FASTElement {
   handleExecutorChange = (value: string, index: number, label: string) => {
     // Since command is an array it needs to be handled separately
     if (label === 'command') {
-      // split the string input to create an array
-      this.executors[index].data.command = value.split(',');
+      // split the string input by ',' and remove white spaces
+      const inputData = value.split(',').map((volume) => volume.trim());
+      this.executors[index].data.command = inputData;
     }
     // Since env is an object it needs to be handled separately
     else if (label === 'hmmerdb' || label === 'blastdb') {
@@ -345,8 +350,10 @@ export default class TESCreateRun extends FASTElement {
    */
   deleteExecutor = () => {
     // only remove if more than one present
-    if (this.executors.length > 1) this.executors.pop();
-    this.executorsLength -= 1;
+    if (this.executors.length > 1) {
+      this.executors.pop();
+      this.executorsLength -= 1;
+    }
   };
 
   /**
@@ -368,8 +375,10 @@ export default class TESCreateRun extends FASTElement {
    */
   deleteInput = () => {
     // Only if more than one exist
-    if (this.input.length > 1) this.input.pop();
-    this.inputLength -= 1;
+    if (this.input.length > 1) {
+      this.input.pop();
+      this.inputLength -= 1;
+    }
   };
 
   /**
@@ -391,7 +400,9 @@ export default class TESCreateRun extends FASTElement {
    */
   deleteOutput = () => {
     // Only if more than one exist
-    if (this.output.length > 1) this.output.pop();
-    this.outputLength -= 1;
+    if (this.output.length > 1) {
+      this.output.pop();
+      this.outputLength -= 1;
+    }
   };
 }
