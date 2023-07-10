@@ -186,7 +186,7 @@ const template = html<TESCreateRun>`
          <fast-text-field type="text" id="description" name="description" class="input" :value=${(
            x
          ) => x.description}
-         @input=${(x, c) => x.handleDiscriptionInput(c.event)} required>
+         @input=${(x, c) => x.handleDescriptionInput(c.event)} required>
       </div>
    </div>
    <div class="container executors-container">
@@ -323,7 +323,7 @@ const template = html<TESCreateRun>`
    </div>
    <div class="submit-button-container">
    <fast-button class="submit-button" @click=${(x) =>
-     x.handleClick()} >Create Task
+     x.handleSubmit()} >Create Task
    </fast-button>
    </div>
 </form>
