@@ -64,19 +64,19 @@ export default class TESCreateRun extends FASTElement {
     JSON.parse(JSON.stringify(executorTemplate)),
   ];
 
-  @attr taskExecutors: ExecutorData[] = [];
+  @observable taskExecutors: ExecutorData[] = [];
 
   @observable executorsLength = 1;
 
   @observable input: Input[] = [JSON.parse(JSON.stringify(inputTemplate))];
 
-  @attr taskInput: InputData[] = [];
+  @observable taskInput: InputData[] = [];
 
   @observable inputLength = 1;
 
   @observable output: Output[] = [JSON.parse(JSON.stringify(outputTemplate))];
 
-  @attr taskOutput: OutputData[] = [];
+  @observable taskOutput: OutputData[] = [];
 
   @observable outputLength = 1;
 
@@ -88,13 +88,13 @@ export default class TESCreateRun extends FASTElement {
 
   @attr ram_gb = '8';
 
-  @attr zones: string[] = [];
+  @observable zones: string[] = [];
 
   @attr WORKFLOW_ID = '';
 
   @attr PROJECT_GROUP = '';
 
-  @attr volumes: string[] = [];
+  @observable volumes: string[] = [];
 
   @observable taskData: CreateTaskData = {
     name: this.name,
