@@ -256,6 +256,11 @@ export default class TESCreateRun extends FASTElement {
     this.volumes = inputElement.value.split(',').map((volume) => volume.trim());
   };
 
+  /**
+   * Handles the change of the command input in the executor fields
+   * @param event The input event triggered when the command input changes
+   * @param executor The specific executor in the taskExecutors that is being changed
+   */
   handleExecutorsCommandChange = (event: Event, executor: ExecutorData) => {
     const newCommands = (event.target as HTMLInputElement).value;
     // this.taskExecutors[index].command = newCommands.split(",");
@@ -263,11 +268,22 @@ export default class TESCreateRun extends FASTElement {
     console.log(this.taskExecutors);
   };
 
+  /**
+   * Handles the change of the image input of the executor fields
+   * @param event The input event triggered when the image input changes
+   * @param executor The specific executor in the taskExecutors that is being changed
+   */
   handleExecutorsImageChange = (event: Event, executor: ExecutorData) => {
     const newImage = (event.target as HTMLInputElement).value;
     executor.image = newImage;
   };
 
+  /**
+   * Handles the change of the name field of env of the executor field
+   * @param event The event triggered when the name field of env from any executor changes
+   * @param executor The specific executor in the taskExecutors that is being changed
+   * @param index The index of the env being changes if considered as an array
+   */
   handleEnvNameChange = (
     event: Event,
     executor: ExecutorData,
@@ -280,6 +296,12 @@ export default class TESCreateRun extends FASTElement {
     console.log(this.taskExecutors);
   };
 
+  /**
+   * Handles the change of the value field of env of the executor field
+   * @param event The event triggered when the value field of env from any executor changes
+   * @param executor The specific executor in the taskExecutors that is being changed
+   * @param index The index of the env being changes if considered as an array
+   */
   handleEnvValueChange = (
     event: Event,
     executor: ExecutorData,
@@ -292,56 +314,48 @@ export default class TESCreateRun extends FASTElement {
     console.log(this.taskExecutors);
   };
 
+  /**
+   * Handles the stderr input for the executor
+   * @param event The event triggered when the stderr field of the executor field changes
+   * @param executor The specific executor in the taskExecutors that is being changed
+   */
   handleExecutorsStderrChange = (event: Event, executor: ExecutorData) => {
     const stderrInput = (event.target as HTMLInputElement).value;
     executor.stderr = stderrInput;
   };
 
+  /**
+   * Handles the stdout input for the executor
+   * @param event The event triggered when the stdout field of the executor field changes
+   * @param executor The specific executor in the taskExecutors that is being changed
+   */
   handleExecutorsStdoutChange = (event: Event, executor: ExecutorData) => {
     const stdoutInput = (event.target as HTMLInputElement).value;
     executor.stdout = stdoutInput;
   };
 
+  /**
+   * Handles the stdin input for the executor
+   * @param event The event triggered when the stdin field of the executor field changes
+   * @param executor The specific executor in the taskExecutors that is being changed
+   */
   handleExecutorsStdinChange = (event: Event, executor: ExecutorData) => {
     const stdinInput = (event.target as HTMLInputElement).value;
     executor.stdin = stdinInput;
   };
 
+  /**
+   * Handles the workdir input for the executor
+   * @param event The event triggered when the workdir field of the executor field changes
+   * @param executor The specific executor in the taskExecutors that is being changed
+   */
   handleExecutorsWorkdirChange = (event: Event, executor: ExecutorData) => {
     const workdirInput = (event.target as HTMLInputElement).value;
     executor.workdir = workdirInput;
   };
 
   /**
-   * Handles change in value of all the input input values and creates input array
-   * This array is further transformed into appropriate data type (`InputData[]`) to
-   * further create `taskData` to send request to the API
-   * @param value Value of the input field being changed
-   * @param index index of the input in the input array, Since there can be
-   *  multiple inputs, this stores which input's value is being changed
-   * @param label The label of the input being changed
-   */
-  handleInputChange = (value: string, index: number, label: string) => {
-    // @ts-expect-error: should not be using type string to index data
-    this.input[index].data[label] = value;
-  };
-
-  /**
-   * Handles change in value of all the output values and creates outpu array
-   * This array is further transformed into appropriate data type (`OutputData[]`) to
-   * further create `taskData` to send request to the API
-   * @param value Value of the input field being changed
-   * @param index index of the input in the input array, Since there can be
-   *  multiple inputs, this stores which input's value is being changed
-   * @param label The label of the input being changed
-   */
-  handleOutputChange = (value: string, index: number, label: string) => {
-    // @ts-expect-error: should not be using type string to index data
-    this.output[index].data[label] = value;
-  };
-
-  /**
-   * Populate more executors field
+   * Populate more executor fields
    */
   addExecutor = () => {
     this.taskExecutors.push(executorTemplate);
@@ -351,11 +365,15 @@ export default class TESCreateRun extends FASTElement {
   addEnv = (executor: ExecutorData) => {
     const updatedExecutors = this.taskExecutors.map((ex) => {
       if (ex === executor) {
-        const updatedEnv = { ...ex.env, '': '' }; // Create a new object with the updated env field
+        // Create a new object with the updated env field
+        const updatedEnv = { ...ex.env, '': '' };
         this.taskExecutorsLength += 1;
-        return { ...ex, env: updatedEnv }; // Return a new executor object with the updated env field
+
+        // Return a new executor object with the updated env field
+        return { ...ex, env: updatedEnv };
       }
-      return ex; // Return the original executor object if it doesn't match the provided executor
+      // Return the original executor object if it doesn't match the provided executor
+      return ex;
     });
     this.taskExecutors = updatedExecutors;
   };
@@ -363,10 +381,13 @@ export default class TESCreateRun extends FASTElement {
   deleteEnv = (executor: ExecutorData) => {
     const updatedExecutors = this.taskExecutors.map((ex) => {
       if (ex === executor) {
+        // Create a new object with the updated env field
         const entries = Object.entries(ex.env);
         entries.pop();
         const updatedEnv = Object.fromEntries(entries);
-        return { ...ex, env: updatedEnv }; // Return a new executor object with the updated env field
+
+        // Return a new executor object with the updated env field
+        return { ...ex, env: updatedEnv };
       }
       return ex; // Return the original executor object if it doesn't match the provided executor
     });
@@ -392,11 +413,21 @@ export default class TESCreateRun extends FASTElement {
     this.taskInputLength += 1;
   };
 
+  /**
+   * Handles the path input for the Input fields
+   * @param event The event triggered when the path field of the Input section changes
+   * @param input The specific input of the taskInput that is being changed
+   */
   handleInputPathChange = (event: Event, input: InputData) => {
     const inputPathInput = (event.target as HTMLInputElement).value;
     input.path = inputPathInput;
   };
 
+  /**
+   * Handles the url input for the Input fields
+   * @param event The event triggered when the url field of the Input section changes
+   * @param input The specific input of the taskInput that is being changed
+   */
   handleInputUrlChange = (event: Event, input: InputData) => {
     const inputUrlInput = (event.target as HTMLInputElement).value;
     input.url = inputUrlInput;
@@ -421,19 +452,34 @@ export default class TESCreateRun extends FASTElement {
     this.taskOutputLength += 1;
   };
 
+  /**
+   * Handles the path input for the Output fields
+   * @param event The event triggered when the path field of the output section changes
+   * @param output The specific output of the taskInput that is being changed
+   */
   handleOutputPathChange = (event: Event, output: OutputData) => {
     const outputPathInput = (event.target as HTMLInputElement).value;
     output.path = outputPathInput;
   };
 
+  /**
+   * Handles the url input for the Output fields
+   * @param event The event triggered when the url field of the output section changes
+   * @param output The specific output of the taskInput that is being changed
+   */
   handleOutputUrlChange = (event: Event, output: OutputData) => {
     const outputUrlInput = (event.target as HTMLInputElement).value;
     output.url = outputUrlInput;
   };
 
+  /**
+   * Handles the type input for the Output fields
+   * @param event The event triggered when the type field of the output section changes
+   * @param output The specific output of the taskInput that is being changed
+   */
   handleOutputTypeChange = (event: Event, output: OutputData) => {
     const outputTypeInput = (event.target as HTMLInputElement).value;
-    output.path = outputTypeInput;
+    output.type = outputTypeInput;
   };
 
   /**
