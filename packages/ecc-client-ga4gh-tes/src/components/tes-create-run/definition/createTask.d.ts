@@ -20,30 +20,15 @@ interface ExecutorData {
   workdir: string;
 }
 
-interface Executor {
-  data: ExecutorData;
-  index: number;
-}
-
 export interface InputData {
   url: string;
   path: string;
-}
-
-interface Input {
-  data: InputData;
-  index: number;
 }
 
 export interface OutputData {
   path: string;
   url: string;
   type: string;
-}
-
-interface Output {
-  data: OutputData;
-  index: number;
 }
 
 interface Resources {

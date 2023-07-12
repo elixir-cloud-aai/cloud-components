@@ -38,7 +38,6 @@ import styles from './tesCreateRun.styles.js';
 import CreateTaskData, {
   ExecutorData,
   InputData,
-  Output,
   OutputData,
 } from './createTask.js';
 import { postTask } from '../../../data/Task/tesGet.js';
@@ -58,13 +57,10 @@ const inputTemplate: InputData = {
   url: '',
 };
 
-const outputTemplate: Output = {
-  data: {
-    path: '',
-    url: '',
-    type: '',
-  },
-  index: 0,
+const outputTemplate: OutputData = {
+  path: '',
+  url: '',
+  type: '',
 };
 @customElement({
   name: 'ecc-client-ga4gh-tes-create-run',
@@ -89,13 +85,9 @@ export default class TESCreateRun extends FASTElement {
 
   @observable taskInputLength = this.taskInput.length;
 
-  @observable inputLength = 1;
+  @observable taskOutput: OutputData[] = [outputTemplate];
 
-  @observable output: Output[] = [JSON.parse(JSON.stringify(outputTemplate))];
-
-  @observable taskOutput: OutputData[] = [];
-
-  @observable outputLength = 1;
+  @observable taskOutputLength = 1;
 
   @attr cpu_cores = '4';
 
@@ -134,46 +126,12 @@ export default class TESCreateRun extends FASTElement {
     volumes: this.volumes,
   };
 
-  // connectedCallback(): void {
-  //   this.taskExecutorsLength = this.taskExecutors.length;
-  //   this.taskInputLength = this.taskInput.length;
-  // }
-
   /**
    * Handles submit button click
    */
   handleSubmit = async () => {
     // Compute all the task information and create the task schema
     // <----------------------------------------------------------------->
-    this.taskData.name = this.name;
-    this.taskData.state = this.state;
-    this.taskData.description = this.description;
-
-    // Create a taskExecutors from all the input in the executors array
-    // for (const exec of this.executors) {
-    //   this.taskExecutors.push(exec.data);
-    // }
-
-    // Create a taskInput from all the input in the input array
-    this.taskData.executors = this.taskExecutors;
-    // for (const inp of this.input) {
-    //   this.taskInput.push(inp.data);
-    // }
-
-    // Create a taskInput from all the input in the input array
-    this.taskData.inputs = this.taskInput;
-    for (const out of this.output) {
-      this.taskOutput.push(out.data);
-    }
-    this.taskData.outputs = this.taskOutput;
-    this.taskData.resources.cpu_cores = parseInt(this.cpu_cores, 10);
-    this.taskData.resources.disk_gb = parseInt(this.disk_gb, 10);
-    this.taskData.resources.preemptible = this.preemptible;
-    this.taskData.resources.ram_gb = parseInt(this.ram_gb, 10);
-    this.taskData.resources.zones = this.zones;
-    this.taskData.tags.WORKFLOW_ID = this.WORKFLOW_ID;
-    this.taskData.tags.PROJECT_GROUP = this.PROJECT_GROUP;
-    this.taskData.volumes = this.volumes;
 
     // All the fields input by user are compiled according to task schema
     // <----------------------------------------------------------------->
@@ -426,6 +384,14 @@ export default class TESCreateRun extends FASTElement {
     }
   };
 
+  /**
+   * Popuate more Input fields
+   */
+  addInput = () => {
+    this.taskInput.push(inputTemplate);
+    this.taskInputLength += 1;
+  };
+
   handleInputPathChange = (event: Event, input: InputData) => {
     const inputPathInput = (event.target as HTMLInputElement).value;
     input.path = inputPathInput;
@@ -434,14 +400,6 @@ export default class TESCreateRun extends FASTElement {
   handleInputUrlChange = (event: Event, input: InputData) => {
     const inputUrlInput = (event.target as HTMLInputElement).value;
     input.url = inputUrlInput;
-  };
-
-  /**
-   * Popuate more Input fields
-   */
-  addInput = () => {
-    this.taskInput.push(inputTemplate);
-    this.taskInputLength += 1;
   };
 
   /**
@@ -459,14 +417,23 @@ export default class TESCreateRun extends FASTElement {
    * Populate more Output fields
    */
   addOutput = () => {
-    const newTemplate: Output = {
-      ...JSON.parse(JSON.stringify(outputTemplate)),
-      index: this.outputLength,
-    };
+    this.taskOutput.push(outputTemplate);
+    this.taskOutputLength += 1;
+  };
 
-    // Increase the length of the output array and extend the template
-    this.outputLength += 1;
-    this.output.push(newTemplate);
+  handleOutputPathChange = (event: Event, output: OutputData) => {
+    const outputPathInput = (event.target as HTMLInputElement).value;
+    output.path = outputPathInput;
+  };
+
+  handleOutputUrlChange = (event: Event, output: OutputData) => {
+    const outputUrlInput = (event.target as HTMLInputElement).value;
+    output.url = outputUrlInput;
+  };
+
+  handleOutputTypeChange = (event: Event, output: OutputData) => {
+    const outputTypeInput = (event.target as HTMLInputElement).value;
+    output.path = outputTypeInput;
   };
 
   /**
@@ -474,9 +441,9 @@ export default class TESCreateRun extends FASTElement {
    */
   deleteOutput = () => {
     // Only if more than one exist
-    if (this.output.length > 1) {
-      this.output.pop();
-      this.outputLength -= 1;
+    if (this.taskOutput.length > 1) {
+      this.taskOutput.pop();
+      this.taskOutputLength -= 1;
     }
   };
 }

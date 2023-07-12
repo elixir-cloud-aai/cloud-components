@@ -14,11 +14,6 @@ provideFASTDesignSystem().register(
   fastButton(),
   fastDivider()
 );
-interface Input {
-  name: string;
-  label: string;
-  required?: boolean;
-}
 
 const ExecutorsTemplate = html<TESCreateRun>`
   ${repeat(
@@ -192,53 +187,44 @@ const InputTemplate = html<TESCreateRun>`
   )}
 `;
 
-// Output
-export const outputFields: Input[] = [
-  {
-    name: 'Path',
-    label: 'path',
-    required: true,
-  },
-  {
-    name: 'URL',
-    label: 'url',
-    required: true,
-  },
-  {
-    name: 'Type',
-    label: 'type',
-    required: true,
-  },
-];
-
-const outputTemplate = html<TESCreateRun>`
+const OutputTemplate = html<TESCreateRun>`
   ${repeat(
-    (x) => x.output,
+    (x) => x.taskOutput,
     html`
       <div class="outputs">
-        ${repeat(
-          () => outputFields,
-          html<Input>`
-            <div class="label-input ${(x) => x.label}">
-              <label for="${(x) => x.label}">${(x) => x.name}</label>
-              <fast-text-field
-                type="text"
-                id="${(x) => x.label}"
-                name="${(x) => x.label}"
-                required="${(x) => x.required}"
-                class="input"
-                @input=${(x, c) =>
-                  c.parentContext.parent.handleOutputChange(
-                    // @ts-expect-error: value does not exist on the event target for some reason
-                    c.event.target.value,
-                    c.parent.index,
-                    x.label
-                  )}
-              >
-              </fast-text-field>
-            </div>
-          `
-        )}
+        <div class="label-input path">
+          <label for="name">Path:</label>
+          <fast-text-field
+            type="text"
+            id="path"
+            name="path"
+            class="input"
+            :value=${(x) => x.path}
+            @input=${(x, c) => c.parent.handleOutputPathChange(c.event, x)}
+          ></fast-text-field>
+        </div>
+        <div class="label-input url">
+          <label for="name">URL:</label>
+          <fast-text-field
+            type="text"
+            id="url"
+            name="url"
+            class="input"
+            :value=${(x) => x.url}
+            @input=${(x, c) => c.parent.handleOutputUrlChange(c.event, x)}
+          ></fast-text-field>
+        </div>
+        <div class="label-input type">
+          <label for="name">Type:</label>
+          <fast-text-field
+            type="text"
+            id="type"
+            name="type"
+            class="input"
+            :value=${(x) => x.type}
+            @input=${(x, c) => c.parent.handleOutputTypeChange(c.event, x)}
+          ></fast-text-field>
+        </div>
       </div>
     `
   )}
@@ -323,9 +309,9 @@ const template = html<TESCreateRun>`
               x.addOutput()} > Add Outputs
             </fast-button>
          </span>
-         ${outputTemplate}
+         ${OutputTemplate}
          ${when(
-           (x) => x.outputLength > 1,
+           (x) => x.taskOutputLength > 1,
            html`
              <span class="data-button">
                <fast-button
