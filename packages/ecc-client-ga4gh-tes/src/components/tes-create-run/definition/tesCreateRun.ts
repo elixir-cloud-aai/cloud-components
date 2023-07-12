@@ -1,3 +1,32 @@
+/* eslint no-param-reassign: 0 */
+/* eslint class-methods-use-this: 0 */
+/*
+To effectively handle the executors, inputs, and outputs sections of the taskData, the mentioned
+rules are disabled specifically in this module. The underlying directive utilizes "repeat"
+to handle the mentioned data. The approach to address these rules would be to pass the
+index value to the respective handler and update the state accordingly.
+
+eg
+  ``` html
+  ${repeat(x=>x.data,
+  html`
+  <input @input=${(x,c)=>c.parent.handleDataFieldChange(c.event, c.index)}></input>
+  `,
+  {positioning : true}
+  )}
+  ````
+  ``` Ts
+  handleDataFieldChange = (event: Event, index: number) => {
+    this.data[index] = (event.target! as HTMLInputElement).value;
+  };
+  ```
+  This would be the ideal way to handle the above mentioned rules, note this way uses
+  `this` in the class method and no params are being reassigned.
+
+But as mentioned in the above, the code uses { positioning: true } to get the index value, this as mentioned
+in the [FAST documentation](https://www.fast.design/docs/fast-element/using-directives/#the-repeat-directive:~:text=Some%20context%20properties,template%20from%20above%3A)
+can have performance issues, hence these rules are opted out.
+*/
 import {
   FASTElement,
   attr,
@@ -7,7 +36,6 @@ import {
 import template from './tesCreateRun.template.js';
 import styles from './tesCreateRun.styles.js';
 import CreateTaskData, {
-  Executor,
   ExecutorData,
   Input,
   InputData,
@@ -16,17 +44,14 @@ import CreateTaskData, {
 } from './createTask.js';
 import { postTask } from '../../../data/Task/tesGet.js';
 
-const executorTemplate: Executor = {
-  data: {
-    command: [],
-    env: {},
-    image: '',
-    stderr: '',
-    stdin: '',
-    stdout: '',
-    workdir: '',
-  },
-  index: 0,
+const executorTemplate: ExecutorData = {
+  command: [],
+  env: {},
+  image: '',
+  stderr: '',
+  stdin: '',
+  stdout: '',
+  workdir: '',
 };
 
 const inputTemplate: Input = {
@@ -60,13 +85,7 @@ export default class TESCreateRun extends FASTElement {
 
   @attr description = '';
 
-  @observable executors: Executor[] = [
-    JSON.parse(JSON.stringify(executorTemplate)),
-  ];
-
-  @observable taskExecutors: ExecutorData[] = [];
-
-  @observable executorsLength = 1;
+  @attr taskExecutors: ExecutorData[] = [executorTemplate];
 
   @observable input: Input[] = [JSON.parse(JSON.stringify(inputTemplate))];
 
@@ -128,9 +147,9 @@ export default class TESCreateRun extends FASTElement {
     this.taskData.description = this.description;
 
     // Create a taskExecutors from all the input in the executors array
-    for (const exec of this.executors) {
-      this.taskExecutors.push(exec.data);
-    }
+    // for (const exec of this.executors) {
+    //   this.taskExecutors.push(exec.data);
+    // }
 
     // Create a taskInput from all the input in the input array
     this.taskData.executors = this.taskExecutors;
@@ -276,31 +295,60 @@ export default class TESCreateRun extends FASTElement {
     this.volumes = inputElement.value.split(',').map((volume) => volume.trim());
   };
 
-  /**
-   * Handles change in values of all the executors values and creates executors array
-   * This array is further transformed into appropriate data type (`ExecutorData[]`)
-   * to further create `taskData` to send request to the API
-   * @param value The value of the executors field, like command, env etc being changed
-   * @param index The index of the exector, since there can be multiple executors, this
-   * stores which executor's value is being changed
-   * @param label The label of input being changed
-   */
-  handleExecutorChange = (value: string, index: number, label: string) => {
-    // Since command is an array it needs to be handled separately
-    if (label === 'command') {
-      // split the string input by ',' and remove white spaces
-      const inputData = value.split(',').map((volume) => volume.trim());
-      this.executors[index].data.command = inputData;
-    }
-    // Since env is an object it needs to be handled separately
-    else if (label === 'hmmerdb' || label === 'blastdb') {
-      this.executors[index].data.env[label] = value;
-    }
-    // All the rest of the component of the executors are string
-    else {
-      // @ts-expect-error: should not be using type string to index data
-      this.executors[index].data[label] = value;
-    }
+  handleExecutorsCommandChange = (event: Event, executor: ExecutorData) => {
+    const newCommands = (event.target as HTMLInputElement).value;
+    // this.taskExecutors[index].command = newCommands.split(",");
+    executor.command = newCommands.split(',');
+    console.log(this.taskExecutors);
+  };
+
+  handleExecutorsImageChange = (event: Event, executor: ExecutorData) => {
+    const newImage = (event.target as HTMLInputElement).value;
+    executor.image = newImage;
+  };
+
+  handleEnvNameChange = (
+    event: Event,
+    executor: ExecutorData,
+    index: number
+  ) => {
+    const newEnvName = (event.target as HTMLInputElement).value;
+    const entries = Object.entries(executor.env);
+    entries[index][0] = newEnvName;
+    executor.env = Object.fromEntries(entries);
+    console.log(this.taskExecutors);
+  };
+
+  handleEnvValueChange = (
+    event: Event,
+    executor: ExecutorData,
+    index: number
+  ) => {
+    const newEnvValue = (event.target as HTMLInputElement).value;
+    const entries = Object.entries(executor.env);
+    entries[index][1] = newEnvValue;
+    executor.env = Object.fromEntries(entries);
+    console.log(this.taskExecutors);
+  };
+
+  handleExecutorsStderrChange = (event: Event, executor: ExecutorData) => {
+    const stderrInput = (event.target as HTMLInputElement).value;
+    executor.stderr = stderrInput;
+  };
+
+  handleExecutorsStdoutChange = (event: Event, executor: ExecutorData) => {
+    const stdoutInput = (event.target as HTMLInputElement).value;
+    executor.stdout = stdoutInput;
+  };
+
+  handleExecutorsStdinChange = (event: Event, executor: ExecutorData) => {
+    const stdinInput = (event.target as HTMLInputElement).value;
+    executor.stdin = stdinInput;
+  };
+
+  handleExecutorsWorkdirChange = (event: Event, executor: ExecutorData) => {
+    const workdirInput = (event.target as HTMLInputElement).value;
+    executor.workdir = workdirInput;
   };
 
   /**
@@ -335,14 +383,31 @@ export default class TESCreateRun extends FASTElement {
    * Populate more executors field
    */
   addExecutor = () => {
-    const newTemplate: Executor = {
-      ...JSON.parse(JSON.stringify(executorTemplate)),
-      index: this.executorsLength,
-    };
+    this.taskExecutors.push(executorTemplate);
+  };
 
-    // Increase the length of the executors array and extend the template
-    this.executorsLength += 1;
-    this.executors.push(newTemplate);
+  addEnv = (executor: ExecutorData) => {
+    const updatedExecutors = this.taskExecutors.map((ex) => {
+      if (ex === executor) {
+        const updatedEnv = { ...ex.env, '': '' }; // Create a new object with the updated env field
+        return { ...ex, env: updatedEnv }; // Return a new executor object with the updated env field
+      }
+      return ex; // Return the original executor object if it doesn't match the provided executor
+    });
+    this.taskExecutors = updatedExecutors;
+  };
+
+  deleteEnv = (executor: ExecutorData) => {
+    const updatedExecutors = this.taskExecutors.map((ex) => {
+      if (ex === executor) {
+        const entries = Object.entries(ex.env);
+        entries.pop();
+        const updatedEnv = Object.fromEntries(entries);
+        return { ...ex, env: updatedEnv }; // Return a new executor object with the updated env field
+      }
+      return ex; // Return the original executor object if it doesn't match the provided executor
+    });
+    this.taskExecutors = updatedExecutors;
   };
 
   /**
@@ -350,9 +415,8 @@ export default class TESCreateRun extends FASTElement {
    */
   deleteExecutor = () => {
     // only remove if more than one present
-    if (this.executors.length > 1) {
-      this.executors.pop();
-      this.executorsLength -= 1;
+    if (this.taskExecutors.length > 1) {
+      this.taskExecutors.pop();
     }
   };
 

@@ -24,11 +24,17 @@ const styles = css`
   }
 
   .executors,
-  .output,
+  .env,
+  .inputs,
+  .outputs,
   .resources,
   .tags {
     display: grid;
     grid-template-columns: 1fr 1fr;
+  }
+
+  .env-container {
+    grid-column: 1 / span 2;
   }
 
   .data-button {

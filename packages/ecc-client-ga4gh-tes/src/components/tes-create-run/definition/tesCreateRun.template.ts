@@ -4,66 +4,159 @@ import {
   fastTextField,
   fastSwitch,
   fastButton,
+  fastDivider,
 } from '@microsoft/fast-components';
 import TESCreateRun from './tesCreateRun.js';
 
-provideFASTDesignSystem().register(fastTextField(), fastSwitch(), fastButton());
+provideFASTDesignSystem().register(
+  fastTextField(),
+  fastSwitch(),
+  fastButton(),
+  fastDivider()
+);
 interface Input {
   name: string;
   label: string;
   required?: boolean;
 }
 
-// Executors
-export const executorFields: Input[] = [
-  {
-    name: 'Command',
-    label: 'command',
-    required: true,
-  },
-  { name: 'Image', label: 'image', required: true },
-  {
-    name: 'BLASTDB',
-    label: 'blastdb',
-    required: true,
-  },
-  { name: 'HMMERDB', label: 'hmmerdb', required: true },
-  { name: 'Stderr', label: 'stderr', required: true },
-  { name: 'Stdin', label: 'stdin', required: true },
-  { name: 'Stdout', label: 'stdout', required: true },
-  { name: 'Workdir', label: 'workdir', required: true },
-];
-
-const executorsTemplate = html<TESCreateRun>`
+const ExecutorsTemplate = html<TESCreateRun>`
   ${repeat(
-    (x) => x.executors,
+    (x) => x.taskExecutors,
     html`
       <div class="executors">
-        ${repeat(
-          () => executorFields,
-          html<Input>`
-            <div class="label-input ${(x) => x.label}">
-              <label for="${(x) => x.label}">${(x) => x.name}</label>
-              <fast-text-field
-                type="text"
-                id="${(x) => x.label}"
-                name="${(x) => x.label}"
-                required="${(x) => x.required}"
-                class="input"
-                @input=${(x, c) =>
-                  c.parentContext.parent.handleExecutorChange(
-                    // @ts-expect-error: value does not exist on the event target for some reason
-                    c.event.target.value,
-                    c.parent.index,
-                    x.label
-                  )}
+        <div class="label-input commands">
+          <label for="command">Command:</label>
+          <fast-text-field
+            type="text"
+            id="command"
+            name="command"
+            class="input"
+            :value=${(x) => x.command.join(',')}
+            @input=${(x, c) =>
+              c.parent.handleExecutorsCommandChange(c.event, x)}
+          ></fast-text-field>
+        </div>
+        <div class="label-input image">
+          <label for="command">Image:</label>
+          <fast-text-field
+            type="text"
+            id="image"
+            name="image"
+            class="input"
+            :value=${(x) => x.image}
+            @input=${(x, c) => c.parent.handleExecutorsImageChange(c.event, x)}
+          ></fast-text-field>
+        </div>
+        <div class="container env-container">
+          <span class="data-button">
+            <fast-button
+              class="add"
+              id="add-env"
+              @click=${(x, c) => c.parent.addEnv(x)}
+            >
+              Add Env
+            </fast-button>
+          </span>
+          <div class="env">
+            ${repeat(
+              (x) => Array.from(Array(Object.keys(x.env).length).keys()),
+              html` <div class="label-input env-name">
+                  <label for="env-name">Env${(x) => x + 1} Name:</label>
+                  <fast-text-field
+                    type="text"
+                    id="env-name"
+                    name="env-name"
+                    class="input"
+                    :value=${(x, c) => Object.keys(c.parent.env)[x]}
+                    @input=${(x, c) =>
+                      c.parentContext.parent.handleEnvNameChange(
+                        c.event,
+                        c.parent,
+                        x
+                      )}
+                  ></fast-text-field>
+                </div>
+                <div class="label-input env-value">
+                  <label for="env-value">Env${(x) => x + 1} Value:</label>
+                  <fast-text-field
+                    type="text"
+                    id="env-value"
+                    name="env-value"
+                    :value=${(x, c) => Object.values(c.parent.env)[x]}
+                    class="input"
+                    @input=${(x, c) =>
+                      c.parentContext.parent.handleEnvValueChange(
+                        c.event,
+                        c.parent,
+                        x
+                      )}
+                  ></fast-text-field>
+                </div>`
+            )}
+          </div>
+          ${when(
+            (x) => Object.keys(x.env).length,
+            html`<span class="data-button">
+              <fast-button
+                class="delete"
+                id="delete-env"
+                @click=${(x, c) => c.parent.deleteEnv(x)}
               >
-              </fast-text-field>
-            </div>
-          `
-        )}
+                Add Env
+              </fast-button>
+            </span>`
+          )}
+        </div>
+        <div class="label-input stderr">
+          <label for="command">Stderr:</label>
+          <fast-text-field
+            type="text"
+            id="stderr"
+            name="stderr"
+            class="input"
+            :value=${(x) => x.stderr}
+            @input=${(x, c) => c.parent.handleExecutorsStderrChange(c.event, x)}
+          ></fast-text-field>
+        </div>
+        <div class="label-input stdin">
+          <label for="command">Stdin:</label>
+          <fast-text-field
+            type="text"
+            id="stdin"
+            name="stdin"
+            class="input"
+            :value=${(x) => x.stdin}
+            @input=${(x, c) => c.parent.handleExecutorsStdinChange(c.event, x)}
+          ></fast-text-field>
+        </div>
+        <div class="label-input stdout">
+          <label for="command">Stdout:</label>
+          <fast-text-field
+            type="text"
+            id="stdout"
+            name="stdout"
+            class="input"
+            :value=${(x) => x.stdout}
+            @input=${(x, c) => c.parent.handleExecutorsStdoutChange(c.event, x)}
+          ></fast-text-field>
+        </div>
+        <div class="label-input workdir">
+          <label for="command">Workdir:</label>
+          <fast-text-field
+            type="text"
+            id="workdir"
+            name="workdir"
+            class="input"
+            :value=${(x) => x.workdir}
+            @input=${(x, c) =>
+              c.parent.handleExecutorsWorkdirChange(c.event, x)}
+          ></fast-text-field>
+        </div>
       </div>
-    `
+      <fast-divider></fast-divider>
+    `,
+    { positioning: true }
   )}
 `;
 
@@ -85,7 +178,7 @@ const inputTemplate = html<TESCreateRun>`
   ${repeat(
     (x) => x.input,
     html`
-      <div class="input">
+      <div class="inputs">
         ${repeat(
           () => inputFields,
           html<Input>`
@@ -137,7 +230,7 @@ const outputTemplate = html<TESCreateRun>`
   ${repeat(
     (x) => x.output,
     html`
-      <div class="output">
+      <div class="outputs">
         ${repeat(
           () => outputFields,
           html<Input>`
@@ -193,24 +286,22 @@ const template = html<TESCreateRun>`
       <fieldset>
          <legend>Executors</legend>
          <span class="data-button">
-            <fast-button class="add" id="add-executors" @click=${(x) =>
+            <fast-button class="add" id="add-input" @click=${(x) =>
               x.addExecutor()} > Add Executors
             </fast-button>
          </span>
-         ${executorsTemplate}
+         ${ExecutorsTemplate}
          ${when(
-           (x) => x.executorsLength > 1,
-           html`
-             <span class="data-button">
-               <fast-button
-                 class="delete"
-                 id="delete-executor"
-                 @click=${(x) => x.deleteExecutor()}
-               >
-                 Delete
-               </fast-button>
-             </span>
-           `
+           (x) => Object.keys(x.taskExecutors).length > 1,
+           html` <span class="data-button">
+             <fast-button
+               class="delete"
+               id="delete-input"
+               @click=${(x) => x.deleteExecutor()}
+             >
+               delete Executors
+             </fast-button>
+           </span>`
          )}
       </fieldset>
    </div>
