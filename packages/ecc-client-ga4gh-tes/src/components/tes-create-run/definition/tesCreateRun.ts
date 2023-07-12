@@ -40,7 +40,7 @@ import CreateTaskData, {
   InputData,
   OutputData,
 } from './createTask.js';
-import { postTask } from '../../../data/Task/tesGet.js';
+// import { postTask } from '../../../data/Task/tesGet.js';
 
 const executorTemplate: ExecutorData = {
   command: [],
@@ -126,21 +126,25 @@ export default class TESCreateRun extends FASTElement {
     volumes: this.volumes,
   };
 
+  connectedCallback(): void {
+    super.connectedCallback();
+    this.taskExecutorsLength = this.taskExecutors.length;
+    this.taskInputLength = this.taskInput.length;
+    this.taskOutputLength = this.taskOutput.length;
+  }
+
   /**
    * Handles submit button click
    */
   handleSubmit = async () => {
     // Compute all the task information and create the task schema
     // <----------------------------------------------------------------->
-
     // All the fields input by user are compiled according to task schema
     // <----------------------------------------------------------------->
-
     // Call API to create task
-    const createTask = await postTask(this.baseURL, this.taskData);
-
+    // const createTask = await postTask(this.baseURL, this.taskData);
     // Handle with response
-    console.log(createTask);
+    // console.log(createTask);
   };
 
   /**
@@ -263,8 +267,9 @@ export default class TESCreateRun extends FASTElement {
    */
   handleExecutorsCommandChange = (event: Event, executor: ExecutorData) => {
     const newCommands = (event.target as HTMLInputElement).value;
-    // this.taskExecutors[index].command = newCommands.split(",");
-    executor.command = newCommands.split(',');
+
+    // Split the string with the separator "," and remove white space
+    executor.command = newCommands.split(',').map((c) => c.trim());
     console.log(this.taskExecutors);
   };
 
