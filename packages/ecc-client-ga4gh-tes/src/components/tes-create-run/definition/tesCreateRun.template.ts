@@ -160,48 +160,33 @@ const ExecutorsTemplate = html<TESCreateRun>`
   )}
 `;
 
-// Input
-export const inputFields: Input[] = [
-  {
-    name: 'URL',
-    label: 'url',
-    required: true,
-  },
-  {
-    name: 'Path',
-    label: 'path',
-    required: true,
-  },
-];
-
-const inputTemplate = html<TESCreateRun>`
+const InputTemplate = html<TESCreateRun>`
   ${repeat(
-    (x) => x.input,
+    (x) => x.taskInput,
     html`
       <div class="inputs">
-        ${repeat(
-          () => inputFields,
-          html<Input>`
-            <div class="label-input ${(x) => x.label}">
-              <label for="${(x) => x.label}">${(x) => x.name}</label>
-              <fast-text-field
-                type="text"
-                id="${(x) => x.label}"
-                name="${(x) => x.label}"
-                required="${(x) => x.required}"
-                class="input"
-                @input=${(x, c) =>
-                  c.parentContext.parent.handleInputChange(
-                    // @ts-expect-error: value does not exist on the event target for some reason
-                    c.event.target.value,
-                    c.parent.index,
-                    x.label
-                  )}
-              >
-              </fast-text-field>
-            </div>
-          `
-        )}
+        <div class="label-input path">
+          <label for="name">Path:</label>
+          <fast-text-field
+            type="text"
+            id="path"
+            name="path"
+            class="input"
+            :value=${(x) => x.path}
+            @input=${(x, c) => c.parent.handleInputPathChange(c.event, x)}
+          ></fast-text-field>
+        </div>
+        <div class="label-input url">
+          <label for="name">URL:</label>
+          <fast-text-field
+            type="text"
+            id="url"
+            name="url"
+            class="input"
+            :value=${(x) => x.url}
+            @input=${(x, c) => c.parent.handleInputUrlChange(c.event, x)}
+          ></fast-text-field>
+        </div>
       </div>
     `
   )}
@@ -292,7 +277,7 @@ const template = html<TESCreateRun>`
          </span>
          ${ExecutorsTemplate}
          ${when(
-           (x) => Object.keys(x.taskExecutors).length > 1,
+           (x) => x.taskExecutorsLength > 1,
            html` <span class="data-button">
              <fast-button
                class="delete"
@@ -310,12 +295,12 @@ const template = html<TESCreateRun>`
          <legend>Input</legend>
          <span class="data-button">
             <fast-button class="add" id="add-input" @click=${(x) =>
-              x.addInput()} > Add Inputs
+              x.addInput()}> Add Inputs
             </fast-button>
          </span>
-         ${inputTemplate}
+         ${InputTemplate}
          ${when(
-           (x) => x.inputLength > 1,
+           (x) => x.taskInputLength > 1,
            html`
              <span class="data-button">
                <fast-button

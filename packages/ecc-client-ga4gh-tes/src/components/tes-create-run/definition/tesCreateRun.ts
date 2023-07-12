@@ -37,7 +37,6 @@ import template from './tesCreateRun.template.js';
 import styles from './tesCreateRun.styles.js';
 import CreateTaskData, {
   ExecutorData,
-  Input,
   InputData,
   Output,
   OutputData,
@@ -54,12 +53,9 @@ const executorTemplate: ExecutorData = {
   workdir: '',
 };
 
-const inputTemplate: Input = {
-  data: {
-    path: '',
-    url: '',
-  },
-  index: 0,
+const inputTemplate: InputData = {
+  path: '',
+  url: '',
 };
 
 const outputTemplate: Output = {
@@ -87,9 +83,11 @@ export default class TESCreateRun extends FASTElement {
 
   @attr taskExecutors: ExecutorData[] = [executorTemplate];
 
-  @observable input: Input[] = [JSON.parse(JSON.stringify(inputTemplate))];
+  @observable taskExecutorsLength = this.taskExecutors.length;
 
-  @observable taskInput: InputData[] = [];
+  @attr taskInput: InputData[] = [inputTemplate];
+
+  @observable taskInputLength = this.taskInput.length;
 
   @observable inputLength = 1;
 
@@ -136,6 +134,11 @@ export default class TESCreateRun extends FASTElement {
     volumes: this.volumes,
   };
 
+  // connectedCallback(): void {
+  //   this.taskExecutorsLength = this.taskExecutors.length;
+  //   this.taskInputLength = this.taskInput.length;
+  // }
+
   /**
    * Handles submit button click
    */
@@ -153,9 +156,9 @@ export default class TESCreateRun extends FASTElement {
 
     // Create a taskInput from all the input in the input array
     this.taskData.executors = this.taskExecutors;
-    for (const inp of this.input) {
-      this.taskInput.push(inp.data);
-    }
+    // for (const inp of this.input) {
+    //   this.taskInput.push(inp.data);
+    // }
 
     // Create a taskInput from all the input in the input array
     this.taskData.inputs = this.taskInput;
@@ -384,12 +387,14 @@ export default class TESCreateRun extends FASTElement {
    */
   addExecutor = () => {
     this.taskExecutors.push(executorTemplate);
+    this.taskExecutorsLength += 1;
   };
 
   addEnv = (executor: ExecutorData) => {
     const updatedExecutors = this.taskExecutors.map((ex) => {
       if (ex === executor) {
         const updatedEnv = { ...ex.env, '': '' }; // Create a new object with the updated env field
+        this.taskExecutorsLength += 1;
         return { ...ex, env: updatedEnv }; // Return a new executor object with the updated env field
       }
       return ex; // Return the original executor object if it doesn't match the provided executor
@@ -417,21 +422,26 @@ export default class TESCreateRun extends FASTElement {
     // only remove if more than one present
     if (this.taskExecutors.length > 1) {
       this.taskExecutors.pop();
+      this.taskExecutorsLength -= 1;
     }
+  };
+
+  handleInputPathChange = (event: Event, input: InputData) => {
+    const inputPathInput = (event.target as HTMLInputElement).value;
+    input.path = inputPathInput;
+  };
+
+  handleInputUrlChange = (event: Event, input: InputData) => {
+    const inputUrlInput = (event.target as HTMLInputElement).value;
+    input.url = inputUrlInput;
   };
 
   /**
    * Popuate more Input fields
    */
   addInput = () => {
-    const newTemplate: Input = {
-      ...JSON.parse(JSON.stringify(inputTemplate)),
-      index: this.inputLength,
-    };
-
-    // Increase the length of the input array and extend the template
-    this.inputLength += 1;
-    this.input.push(newTemplate);
+    this.taskInput.push(inputTemplate);
+    this.taskInputLength += 1;
   };
 
   /**
@@ -439,9 +449,9 @@ export default class TESCreateRun extends FASTElement {
    */
   deleteInput = () => {
     // Only if more than one exist
-    if (this.input.length > 1) {
-      this.input.pop();
-      this.inputLength -= 1;
+    if (this.taskInput.length > 1) {
+      this.taskInput.pop();
+      this.taskInputLength -= 1;
     }
   };
 
