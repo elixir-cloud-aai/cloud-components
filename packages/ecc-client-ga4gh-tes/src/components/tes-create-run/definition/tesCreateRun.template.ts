@@ -353,10 +353,10 @@ const template = html<TESCreateRun>`
            </div>
            <div class="label-input">
               <label for="zones">Zones:</label>
-              <fast-text-field type="text" id="zones" name="zones" class="input" @input=${(
-                x,
-                c
-              ) => x.handleZonesInput(c.event)} required>
+              <fast-text-field type="text" id="zones" name="zones" class="input" :value=${(
+                x
+              ) => x.zones.join(',')} @input=${(x, c) =>
+  x.handleZonesInput(c.event)} required>
            </div>
            <div class="label-input">
               <label for="preemptible">Preemtible</label>
@@ -392,10 +392,10 @@ const template = html<TESCreateRun>`
    <div class="container volumes">
       <div class="label-input">
          <label for="volumes">Volumes:</label>
-         <fast-text-field type="text" id="volumes" name="volumes" class="input" @input=${(
-           x,
-           c
-         ) => x.handleVolumesInput(c.event)} required >
+         <fast-text-field type="text" id="volumes" name="volumes" class="input" :value=${(
+           x
+         ) => x.volumes.join(',')} @input=${(x, c) =>
+  x.handleVolumesInput(c.event)} required >
       </div>
    </div>
    <div class="submit-button-container">

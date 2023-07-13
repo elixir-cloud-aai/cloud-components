@@ -85,7 +85,7 @@ export default class TESCreateRun extends FASTElement {
 
   @observable taskInputLength = this.taskInput.length;
 
-  @observable taskOutput: OutputData[] = [outputTemplate];
+  @attr taskOutput: OutputData[] = [outputTemplate];
 
   @observable taskOutputLength = 1;
 
@@ -97,13 +97,13 @@ export default class TESCreateRun extends FASTElement {
 
   @attr ram_gb = '8';
 
-  @observable zones: string[] = [];
+  @attr zones: string[] = [];
 
   @attr WORKFLOW_ID = '';
 
   @attr PROJECT_GROUP = '';
 
-  @observable volumes: string[] = [];
+  @attr volumes: string[] = [];
 
   @observable response = {};
 
