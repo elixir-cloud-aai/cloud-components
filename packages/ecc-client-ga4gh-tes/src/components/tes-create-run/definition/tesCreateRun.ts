@@ -40,7 +40,7 @@ import CreateTaskData, {
   InputData,
   OutputData,
 } from './createTask.js';
-// import { postTask } from '../../../data/Task/tesGet.js';
+import { postTask } from '../../../data/Task/tesGet.js';
 
 const executorTemplate: ExecutorData = {
   command: [],
@@ -105,6 +105,8 @@ export default class TESCreateRun extends FASTElement {
 
   @observable volumes: string[] = [];
 
+  @observable response = {};
+
   @observable taskData: CreateTaskData = {
     name: this.name,
     state: this.state,
@@ -140,11 +142,27 @@ export default class TESCreateRun extends FASTElement {
     // Compute all the task information and create the task schema
     // <----------------------------------------------------------------->
     // All the fields input by user are compiled according to task schema
+    this.taskData.name = this.name;
+    this.taskData.state = this.state;
+    this.taskData.description = this.description;
+    this.taskData.executors = this.taskExecutors;
+    this.taskData.inputs = this.taskInput;
+    this.taskData.outputs = this.taskOutput;
+    this.taskData.resources.cpu_cores = parseInt(this.cpu_cores, 10);
+    this.taskData.resources.disk_gb = parseInt(this.disk_gb, 10);
+    this.taskData.resources.preemptible = this.preemptible;
+    this.taskData.resources.ram_gb = parseInt(this.ram_gb, 10);
+    this.taskData.resources.zones = this.zones;
+    this.taskData.tags.WORKFLOW_ID = this.WORKFLOW_ID;
+    this.taskData.tags.PROJECT_GROUP = this.PROJECT_GROUP;
+    this.taskData.volumes = this.volumes;
     // <----------------------------------------------------------------->
+
     // Call API to create task
-    // const createTask = await postTask(this.baseURL, this.taskData);
+    this.response = await postTask(this.baseURL, this.taskData);
+
     // Handle with response
-    // console.log(createTask);
+    console.log(this.response);
   };
 
   /**
@@ -270,7 +288,6 @@ export default class TESCreateRun extends FASTElement {
 
     // Split the string with the separator "," and remove white space
     executor.command = newCommands.split(',').map((c) => c.trim());
-    console.log(this.taskExecutors);
   };
 
   /**
@@ -298,7 +315,6 @@ export default class TESCreateRun extends FASTElement {
     const entries = Object.entries(executor.env);
     entries[index][0] = newEnvName;
     executor.env = Object.fromEntries(entries);
-    console.log(this.taskExecutors);
   };
 
   /**
@@ -316,7 +332,6 @@ export default class TESCreateRun extends FASTElement {
     const entries = Object.entries(executor.env);
     entries[index][1] = newEnvValue;
     executor.env = Object.fromEntries(entries);
-    console.log(this.taskExecutors);
   };
 
   /**
