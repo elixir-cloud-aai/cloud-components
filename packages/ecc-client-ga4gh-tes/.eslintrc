@@ -14,7 +14,6 @@
     "@typescript-eslint/no-unused-vars": ["error"],
     "import/no-unresolved": "off",
     "import/no-extraneous-dependencies": "off",
-    "@typescript-eslint/no-non-null-assertion": "off",
     "import/extensions": [
       "error",
       "always",

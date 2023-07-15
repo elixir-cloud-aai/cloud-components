@@ -17,7 +17,7 @@ eg
   ````
   ``` Ts
   handleDataFieldChange = (event: Event, index: number) => {
-    this.data[index] = (event.target! as HTMLInputElement).value;
+    this.data[index] = (event.target as HTMLInputElement).value;
   };
   ```
   This would be the ideal way to handle the above mentioned rules, note this way uses
@@ -171,7 +171,7 @@ export default class TESCreateRun extends FASTElement {
    * @param event - The input event triggered when the name input changes
    */
   handleNameInput = (event: Event) => {
-    this.name = (event.target! as HTMLInputElement).value;
+    this.name = (event.target as HTMLInputElement).value;
   };
 
   /**
@@ -182,7 +182,7 @@ export default class TESCreateRun extends FASTElement {
    * @param event - The input event triggered when the state input changes
    */
   handleStateInput = (event: Event) => {
-    this.state = (event.target! as HTMLInputElement).value;
+    this.state = (event.target as HTMLInputElement).value;
   };
 
   /**
@@ -191,7 +191,7 @@ export default class TESCreateRun extends FASTElement {
    * @param event The input event triggered when the description input change
    */
   handleDescriptionInput = (event: Event) => {
-    this.description = (event.target! as HTMLInputElement).value;
+    this.description = (event.target as HTMLInputElement).value;
   };
 
   /**
@@ -200,7 +200,7 @@ export default class TESCreateRun extends FASTElement {
    * @param event The input event triggered when the cpu-core input changes
    */
   handleCPUCoresInput = (event: Event) => {
-    this.cpu_cores = (event.target! as HTMLInputElement).value;
+    this.cpu_cores = (event.target as HTMLInputElement).value;
   };
 
   /**
@@ -209,7 +209,7 @@ export default class TESCreateRun extends FASTElement {
    * @param event The input event triggered when the disk-gb input changes
    */
   handleDiskGBInput = (event: Event) => {
-    this.disk_gb = (event.target! as HTMLInputElement).value;
+    this.disk_gb = (event.target as HTMLInputElement).value;
   };
 
   /**
@@ -218,7 +218,7 @@ export default class TESCreateRun extends FASTElement {
    * @param event The input event triggered when the ram-gb input changes
    */
   handleRAMGBInput = (event: Event) => {
-    this.ram_gb = (event.target! as HTMLInputElement).value;
+    this.ram_gb = (event.target as HTMLInputElement).value;
   };
 
   /**
@@ -255,7 +255,7 @@ export default class TESCreateRun extends FASTElement {
    * @param event The input event triggered when the workflow-id input changes
    */
   handleWorkflowIDInput = (event: Event) => {
-    this.WORKFLOW_ID = (event.target! as HTMLInputElement).value;
+    this.WORKFLOW_ID = (event.target as HTMLInputElement).value;
   };
 
   /**
@@ -264,7 +264,7 @@ export default class TESCreateRun extends FASTElement {
    * @param event The input event triggered when the project-group input changes
    */
   handleProjectGroupInput = (event: Event) => {
-    this.PROJECT_GROUP = (event.target! as HTMLInputElement).value;
+    this.PROJECT_GROUP = (event.target as HTMLInputElement).value;
   };
 
   /**
