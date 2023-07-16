@@ -3,11 +3,6 @@ import { FoundationElement } from "@microsoft/fast-foundation";
 import { registerDesignTokens, setToken } from "../../design-system/index.js";
 import { backgroundColor, textColor } from "../../design-system/tokens.js";
 
-/**
- * A Custom HTML Element.
- *
- * @public
- */
 export class Wrapper extends FoundationElement {
   // config: handle passing the design system config
   @attr config = "";
