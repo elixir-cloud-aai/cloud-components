@@ -9,13 +9,15 @@ import { backgroundColor, textColor } from "../../design-system/tokens.js";
  * @public
  */
 export class Wrapper extends FoundationElement {
+  // config: handle passing the design system config
   @attr config = "";
 
   connectedCallback() {
     super.connectedCallback();
     registerDesignTokens(this);
     const configJSON = JSON.parse(this.config);
-    setToken(this, configJSON.backgroundColor, backgroundColor);
-    setToken(this, configJSON.textColor, textColor);
+    if (configJSON.backgroundColor)
+      setToken(this, configJSON.backgroundColor, backgroundColor);
+    if (configJSON.textColor) setToken(this, configJSON.textColor, textColor);
   }
 }
