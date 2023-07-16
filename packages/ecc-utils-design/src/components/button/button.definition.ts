@@ -5,4 +5,7 @@ export const definition = {
   baseName: "button",
   template,
   styles,
+  shadowOptions: {
+    delegatesFocus: true,
+  },
 };

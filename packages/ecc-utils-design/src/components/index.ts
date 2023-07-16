@@ -1,3 +1,2 @@
-import { button } from "./button/index.js";
-
-export default [button()];
+export { button } from "./button/index.js";
+export { wrapper } from "./wrapper/index.js";

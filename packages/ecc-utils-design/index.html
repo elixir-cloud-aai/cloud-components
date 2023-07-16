@@ -7,16 +7,15 @@
         background: #fff;
       }
     </style>
+    <title>ecc-utils-design</title>
   </head>
   <body>
     <div id="demo"></div>
-    <ecc-utils-design-button>
-      <div>Hello world</div>
-    </ecc-utils-design-button>
-
-    <ecc-utils-design-button-temp red>
-      <div>Hello world</div>
-    </ecc-utils-design-button-temp>
+    <ecc-utils-design-wrapper debug config='{"color": "blue"}'>
+      <ecc-utils-design-button>
+        Button
+      </ecc-utils-design-button>
+    </ecc-utils-design-wrapper>
     <script src="../dist/src/index.js" type="module"></script>
   </body>
 </html>
