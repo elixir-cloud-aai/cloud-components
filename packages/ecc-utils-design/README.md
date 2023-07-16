@@ -6,9 +6,10 @@ This package serves as an abstraction layer for other packages, providing a stre
 ...
 
 ### Components
-| Component              | Issue  | Status             |
-|------------------------|--------|--------------------|
-|                        |        |                    |
+| Component                    | Issue  | Status             |
+|------------------------------|--------|--------------------|
+| ecc-utils-design-wrapper     |        | In Progress        |
+| ecc-utils-design-button      |        | In Progress        |
 
 ## Getting Started
 
