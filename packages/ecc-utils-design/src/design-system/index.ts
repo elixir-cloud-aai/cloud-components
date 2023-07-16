@@ -1,9 +1,9 @@
 import { DesignToken } from "@microsoft/fast-foundation";
 
-export const createTokenColor = (name: string, value: string) =>
+export const createToken = (name: string, value: string) =>
   DesignToken.create<string>(name).withDefault(value);
 
-export const setColor = (
+export const setToken = (
   element: HTMLElement,
   value: string,
   token: DesignToken<string>
@@ -11,7 +11,7 @@ export const setColor = (
   token.setValueFor(element, value);
 };
 
-export const getColor = (element: HTMLElement, token: DesignToken<string>) =>
+export const getToken = (element: HTMLElement, token: DesignToken<string>) =>
   token.getValueFor(element);
 
 export const registerDesignTokens = (element: HTMLElement) => {

@@ -1,11 +1,13 @@
 import { css, ElementStyles } from "@microsoft/fast-element";
-import { color } from "../../design-system/tokens.js";
+import { backgroundColor, textColor } from "../../design-system/tokens.js";
 
 export const styles: ElementStyles = css`
   :host[hidden] {
     display: none;
   }
   .button {
-    background-color: ${color};
+    background-color: ${backgroundColor};
+    color: ${textColor};
+    cursor: pointer;
   }
 `;

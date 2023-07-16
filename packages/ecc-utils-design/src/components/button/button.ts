@@ -1,13 +1,9 @@
 import { attr } from "@microsoft/fast-element";
 import { FoundationElement } from "@microsoft/fast-foundation";
 
-/**
- * A Custom HTML Element.
- *
- * @public
- */
 export class Button extends FoundationElement {
-  @attr type = "primary";
+  // name: used as the identifier for the wrapper styles
+  @attr public name = "default";
 
   connectedCallback() {
     super.connectedCallback();

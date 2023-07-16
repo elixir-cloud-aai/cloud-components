@@ -1,7 +1,7 @@
 import { attr } from "@microsoft/fast-element";
 import { FoundationElement } from "@microsoft/fast-foundation";
-import { registerDesignTokens, setColor } from "../../design-system/index.js";
-import { color } from "../../design-system/tokens.js";
+import { registerDesignTokens, setToken } from "../../design-system/index.js";
+import { backgroundColor, textColor } from "../../design-system/tokens.js";
 
 /**
  * A Custom HTML Element.
@@ -15,6 +15,7 @@ export class Wrapper extends FoundationElement {
     super.connectedCallback();
     registerDesignTokens(this);
     const configJSON = JSON.parse(this.config);
-    setColor(this, configJSON.color, color);
+    setToken(this, configJSON.backgroundColor, backgroundColor);
+    setToken(this, configJSON.textColor, textColor);
   }
 }
