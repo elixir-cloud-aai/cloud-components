@@ -77,15 +77,15 @@ export default class TESCreateRun extends FASTElement {
 
   @attr description = '';
 
-  @attr taskExecutors: ExecutorData[] = [executorTemplate];
+  @attr taskExecutors: ExecutorData[] = [{ ...executorTemplate }];
 
   @observable taskExecutorsLength = this.taskExecutors.length;
 
-  @attr taskInput: InputData[] = [inputTemplate];
+  @attr taskInput: InputData[] = [{ ...inputTemplate }];
 
   @observable taskInputLength = this.taskInput.length;
 
-  @attr taskOutput: OutputData[] = [outputTemplate];
+  @attr taskOutput: OutputData[] = [{ ...outputTemplate }];
 
   @observable taskOutputLength = 1;
 
@@ -142,6 +142,42 @@ export default class TESCreateRun extends FASTElement {
     // Compute all the task information and create the task schema
     // <----------------------------------------------------------------->
     // All the fields input by user are compiled according to task schema
+
+    // Check if all the fields are filled
+    if (
+      this.baseURL === undefined ||
+      this.baseURL === '' ||
+      this.name === undefined ||
+      this.name === '' ||
+      this.state === undefined ||
+      this.state === '' ||
+      this.description === undefined ||
+      this.description === '' ||
+      this.taskExecutors === undefined ||
+      this.taskExecutors.length === 0 ||
+      this.taskInput === undefined ||
+      this.taskInput.length === 0 ||
+      this.taskOutput === undefined ||
+      this.taskOutput.length === 0 ||
+      this.cpu_cores === undefined ||
+      this.cpu_cores === '' ||
+      this.disk_gb === undefined ||
+      this.disk_gb === '' ||
+      this.preemptible === undefined ||
+      this.ram_gb === undefined ||
+      this.ram_gb === '' ||
+      this.zones === undefined ||
+      this.WORKFLOW_ID === undefined ||
+      this.WORKFLOW_ID === '' ||
+      this.PROJECT_GROUP === undefined ||
+      this.PROJECT_GROUP === '' ||
+      this.volumes === undefined ||
+      this.volumes.length === 0
+    ) {
+      this.response = { error: 'All the fields are not filled.' };
+      return;
+    }
+
     this.taskData.name = this.name;
     this.taskData.state = this.state;
     this.taskData.description = this.description;
@@ -378,16 +414,44 @@ export default class TESCreateRun extends FASTElement {
    * Populate more executor fields
    */
   addExecutor = () => {
-    this.taskExecutors.push(executorTemplate);
+    this.taskExecutors.push({ ...executorTemplate });
     this.taskExecutorsLength += 1;
+  };
+
+  // Custom comparison function for executors
+  areExecutorsEqual = (executor1: ExecutorData, executor2: ExecutorData) => {
+    // Define the criteria for equality based on specific properties
+    const check =
+      executor1.image === executor2.image &&
+      executor1.stderr === executor2.stderr &&
+      executor1.stdin === executor2.stdin &&
+      executor1.stdout === executor2.stdout &&
+      executor1.workdir === executor2.workdir &&
+      JSON.stringify(executor1.command) === JSON.stringify(executor2.command);
+
+    const keys1 = Object.keys(executor1.env);
+    const keys2 = Object.keys(executor2.env);
+
+    // Check if the number of keys is the same
+    if (keys1.length !== keys2.length) {
+      return false;
+    }
+
+    // Check if each key-value pair in executor1 exists in executor2
+    for (const key of keys1) {
+      if (executor1.env[key] !== executor2.env[key]) {
+        return false;
+      }
+    }
+
+    return check;
   };
 
   addEnv = (executor: ExecutorData) => {
     const updatedExecutors = this.taskExecutors.map((ex) => {
-      if (ex === executor) {
+      if (this.areExecutorsEqual(ex, executor)) {
         // Create a new object with the updated env field
         const updatedEnv = { ...ex.env, '': '' };
-        this.taskExecutorsLength += 1;
 
         // Return a new executor object with the updated env field
         return { ...ex, env: updatedEnv };
@@ -400,7 +464,7 @@ export default class TESCreateRun extends FASTElement {
 
   deleteEnv = (executor: ExecutorData) => {
     const updatedExecutors = this.taskExecutors.map((ex) => {
-      if (ex === executor) {
+      if (this.areExecutorsEqual(ex, executor)) {
         // Create a new object with the updated env field
         const entries = Object.entries(ex.env);
         entries.pop();
@@ -429,7 +493,7 @@ export default class TESCreateRun extends FASTElement {
    * Popuate more Input fields
    */
   addInput = () => {
-    this.taskInput.push(inputTemplate);
+    this.taskInput.push({ ...inputTemplate });
     this.taskInputLength += 1;
   };
 
@@ -468,7 +532,7 @@ export default class TESCreateRun extends FASTElement {
    * Populate more Output fields
    */
   addOutput = () => {
-    this.taskOutput.push(outputTemplate);
+    this.taskOutput.push({ ...outputTemplate });
     this.taskOutputLength += 1;
   };
 

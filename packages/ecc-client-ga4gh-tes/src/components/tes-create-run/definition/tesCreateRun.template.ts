@@ -98,7 +98,7 @@ const ExecutorsTemplate = html<TESCreateRun>`
                 id="delete-env"
                 @click=${(x, c) => c.parent.deleteEnv(x)}
               >
-                Add Env
+                Delete Env
               </fast-button>
             </span>`
           )}
