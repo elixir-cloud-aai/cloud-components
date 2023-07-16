@@ -15,12 +15,18 @@ This package serves as an abstraction layer for other packages, providing a stre
 
 To get started with this project, follow these steps:
 
-1. Add your steps here
+1. Install dependencies:
 
    ```
-   Add your commands here
+   npm ci
    ```
+2. Run dev server: 
 
+   ```
+   cd packages/ecc-utils-design
+   npm run dev
+   ```
+   
 ## Contributing
 
 This project is a community effort and lives off _your_ contributions, be it in
