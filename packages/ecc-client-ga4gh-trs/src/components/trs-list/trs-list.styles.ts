@@ -1,6 +1,15 @@
 import { css, ElementStyles } from "@microsoft/fast-element";
 
 export const styles: ElementStyles = css`
+  :host {
+    display: block;
+    contain: content;
+  }
+
+  :host([hidden]) {
+    display: none;
+  }
+
   .trs-container {
     max-width: 1200px;
     margin-inline: auto;

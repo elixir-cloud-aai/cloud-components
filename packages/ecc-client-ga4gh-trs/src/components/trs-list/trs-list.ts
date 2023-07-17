@@ -4,9 +4,9 @@ import {
   customElement,
   observable,
 } from "@microsoft/fast-element";
-import { template } from "./ecc-trs.template.js";
-import { styles } from "./ecc-trs.styles.js";
-import { IToolClass } from "./ecc-trs.interface.js";
+import { template } from "./trs-list.template.js";
+import { styles } from "./trs-list.styles.js";
+import { IToolClass } from "./trs-list.interface.js";
 
 /**
  * @class

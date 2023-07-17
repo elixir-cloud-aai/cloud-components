@@ -11,8 +11,8 @@
   "scripts": {
     "dev": "webpack-dev-server --config=./webpack.dev.cjs --history-api-fallback --progress",
     "build": "webpack --config=./webpack.prod.cjs",
-    "eslint": "eslint . --ext .ts",
-    "eslint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
     "start": "webpack-dev-server --config=./webpack.dev.cjs --history-api-fallback --progress --port 3500",
     "start:storybook": "start-storybook -p 3000 -h localhost",
     "test:serve": "node ./test-server.cjs"
@@ -20,7 +20,8 @@
   "dependencies": {
     "@microsoft/fast-components": "^2.30.6",
     "@microsoft/fast-element": "^1.12.0",
-    "@microsoft/fast-foundation": "^2.49.0"
+    "@microsoft/fast-foundation": "^2.49.0",
+    "turbo": "^1.9.8"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.22.5",
