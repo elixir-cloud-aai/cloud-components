@@ -4,7 +4,7 @@ import {
   provideFASTDesignSystem,
 } from "@microsoft/fast-components";
 import { CustomSearch } from "./search.js";
-import { ITool } from "../../trs-list.interface.js";
+import { ITool } from "../../definition/trs-list.interface.js";
 
 provideFASTDesignSystem().register(allComponents);
 

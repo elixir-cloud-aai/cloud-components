@@ -9,11 +9,10 @@
   "license": "ISC",
   "repository": "",
   "scripts": {
-    "dev": "webpack-dev-server --config=./webpack.dev.cjs --history-api-fallback --progress",
     "build": "webpack --config=./webpack.prod.cjs",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "start": "webpack-dev-server --config=./webpack.dev.cjs --history-api-fallback --progress --port 3500",
+    "dev": "webpack-dev-server --config=./webpack.dev.cjs --history-api-fallback --progress --port 3500",
     "start:storybook": "start-storybook -p 3000 -h localhost",
     "test:serve": "node ./test-server.cjs"
   },

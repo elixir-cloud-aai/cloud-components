@@ -3,17 +3,15 @@
  */
 import { DesignSystem } from "@microsoft/fast-foundation";
 import components from "./components/trs-list/index.js";
+import { componentConfig } from "./components/config.js";
 
 // Register all the components
 
-const prefix = "ecc-trs-";
-
 components.forEach((component) => {
-  const componentNameWithPrefix = `${prefix}${component.name}`;
   DesignSystem.getOrCreate()
     .withShadowRootMode("open")
+    .withPrefix(componentConfig.prefix)
     .register({
       ...component,
-      name: componentNameWithPrefix,
     });
 });

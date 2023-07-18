@@ -1,4 +1,4 @@
-import { TRS } from "./trs-list.js";
+import { TRS } from "./definition/trs-list.js";
 import { CopyClipboard } from "./custom/copy/copy.js";
 import { CustomTooltip } from "./custom/tooltip/tooltip.js";
 import { CustomSearch } from "./custom/search/search.js";
