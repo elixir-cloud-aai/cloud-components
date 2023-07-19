@@ -1,0 +1,5 @@
+{
+  "extends": ["@open-wc",  "elixir"],
+  "rules": {}
+}
+
