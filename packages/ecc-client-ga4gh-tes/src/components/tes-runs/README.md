@@ -10,6 +10,7 @@ With `ecc-client-ga4gh-tes-runs`, users can conveniently browse through tasks, a
 To use the "ecc-client-ga4gh-tes-runs" Web Component, you need to provide two important parameters: 
 - `pageNumber`
 - `baseURL`
+- `admin`
 ### Fixture
 
 ```html
@@ -31,6 +32,14 @@ This attribute specifies the base URL of the API endpoint used for interacting w
 | Parameter | Type     | Description                       | Default |
 | :-------- | :------- | :-------------------------------- | :-------|
 |`baseURL`|`string`|**Required**. Base end point to fetch tasks|null|
+
+#### baseURL 
+
+This attribute is used to allow user to be able to be able interact with the task at admin level, ie delete (as of now). 
+
+| Parameter | Type     | Description                       | Default |
+| :-------- | :------- | :-------------------------------- | :-------|
+|`baseURL`|`boolean`|Defines admin permissions|false|
 
 
 ![Logo]('./../../../../images/logo-elixir.svg)
