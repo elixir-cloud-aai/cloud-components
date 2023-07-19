@@ -33,6 +33,7 @@ const template = html<TESRuns>`
         :value=${(x) => x.stateInput}
         @input=${(x, c) => x.handleStateInput(c.event)}
       >
+        <fast-option value="ALL">ALL</fast-option>
         ${repeat(
           () => stateOption,
           html`<fast-option value=${(x) => x}>${(x) => x}</fast-option>`
