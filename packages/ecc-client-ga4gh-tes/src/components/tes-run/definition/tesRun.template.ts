@@ -57,12 +57,19 @@ const template = html<TESRun>`
             <div class="status-badge">
               <div>
                 <style>
-                  /* For example purposes only. App authors needs to define */
+                  /* For example purposes only. App authors need to define */
                   fast-badge {
                     --badge-fill-error: #d32f2f;
                     --badge-fill-processing: #ffc107;
                     --badge-fill-cancelled: #cccccc;
                     --badge-fill-complete: #4caf50;
+                    --badge-fill-queued: #2196f3;
+                    --badge-fill-initializing: #9c27b0;
+                    --badge-fill-running: #ff5722;
+                    --badge-fill-paused: #607d8b;
+                    --badge-fill-system-error: #f44336;
+                    --badge-fill-canceling: #795548;
+                    --badge-fill-preempted: #00bcd4;
                     --badge-fill-transparent: transparent;
                     --badge-color-black: #000000;
                     --badge-color-white: #ffffff;
@@ -79,7 +86,7 @@ const template = html<TESRun>`
                 ${when(
                   () => x?.state === 'SYSTEM_ERROR',
                   html`
-                    <fast-badge fill="error" color="white"
+                    <fast-badge fill="system-error" color="white"
                       >${x.state}</fast-badge
                     >
                   `
@@ -96,6 +103,62 @@ const template = html<TESRun>`
                   () => x?.state === 'CANCELED',
                   html`
                     <fast-badge fill="cancelled" color="white"
+                      >${x.state}</fast-badge
+                    >
+                  `
+                )}
+                ${when(
+                  () => x?.state === 'QUEUED',
+                  html`
+                    <fast-badge fill="queued" color="white"
+                      >${x.state}</fast-badge
+                    >
+                  `
+                )}
+                ${when(
+                  () => x?.state === 'INITIALIZING',
+                  html`
+                    <fast-badge fill="initializing" color="white"
+                      >${x.state}</fast-badge
+                    >
+                  `
+                )}
+                ${when(
+                  () => x?.state === 'RUNNING',
+                  html`
+                    <fast-badge fill="running" color="white"
+                      >${x.state}</fast-badge
+                    >
+                  `
+                )}
+                ${when(
+                  () => x?.state === 'PAUSED',
+                  html`
+                    <fast-badge fill="paused" color="white"
+                      >${x.state}</fast-badge
+                    >
+                  `
+                )}
+                ${when(
+                  () => x?.state === 'EXECUTOR_ERROR',
+                  html`
+                    <fast-badge fill="error" color="white"
+                      >${x.state}</fast-badge
+                    >
+                  `
+                )}
+                ${when(
+                  () => x?.state === 'CANCELING',
+                  html`
+                    <fast-badge fill="canceling" color="white"
+                      >${x.state}</fast-badge
+                    >
+                  `
+                )}
+                ${when(
+                  () => x?.state === 'PREEMPTED',
+                  html`
+                    <fast-badge fill="preempted" color="white"
                       >${x.state}</fast-badge
                     >
                   `
