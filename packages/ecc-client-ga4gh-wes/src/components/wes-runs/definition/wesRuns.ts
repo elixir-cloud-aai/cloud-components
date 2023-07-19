@@ -1,12 +1,6 @@
-import { FASTElement, customElement, html, css } from '@microsoft/fast-element';
-
-const template = html`<div class="container">Hello</div>`;
-
-const styles = css`
-  .container {
-    background-color: red;
-  }
-`;
+import { FASTElement, customElement } from '@microsoft/fast-element';
+import template from './wesRuns.template.js';
+import styles from './wesRuns.styles.js';
 
 @customElement({
   name: 'ecc-client-ga4gh-wes-runs',
