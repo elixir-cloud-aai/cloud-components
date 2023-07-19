@@ -33,7 +33,7 @@ This attribute specifies the base URL of the API endpoint used for interacting w
 | :-------- | :------- | :-------------------------------- | :-------|
 |`baseURL`|`string`|**Required**. Base end point to fetch tasks|null|
 
-#### baseURL 
+#### admin 
 
 This attribute is used to allow user to be able to be able interact with the task at admin level, ie delete (as of now). 
 

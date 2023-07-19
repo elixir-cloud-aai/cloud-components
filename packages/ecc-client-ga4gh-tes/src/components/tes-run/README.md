@@ -46,6 +46,15 @@ This attribute indicates the current `state` or `status` of the `task`. In the g
 | :-------- | :------- | :-------------------------------- | :-------|
 |`state`|`string`|**Required**. State of the task|null|
 
+#### admin 
+
+This attribute is used to allow user to be able to be able interact with the task at admin level, ie delete (as of now). 
+
+| Parameter | Type     | Description                       | Default |
+| :-------- | :------- | :-------------------------------- | :-------|
+|`baseURL`|`boolean`|Defines admin permissions|false|
+
+
 
 ![Logo]('./../../../../images/logo-elixir.svg)
 ![Logo]('./../../../../images/logo-elixir-cloud-aai.svg)
