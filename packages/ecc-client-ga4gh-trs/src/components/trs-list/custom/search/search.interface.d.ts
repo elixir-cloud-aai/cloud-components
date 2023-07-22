@@ -1,4 +1,4 @@
-interface IFilterParams {
+interface FilterParams {
   id: string;
   alias: string;
   toolClass: string;
