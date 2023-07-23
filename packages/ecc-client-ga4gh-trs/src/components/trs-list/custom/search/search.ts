@@ -1,7 +1,7 @@
 import { FASTElement, attr, customElement } from "@microsoft/fast-element";
 import { template } from "./search.template.js";
 import { styles } from "./search.styles.js";
-import { IFilterParams } from "./search.interface.js";
+import { FilterParams } from "./search.types.js";
 
 /**
  * A custom search component.
@@ -19,7 +19,7 @@ export class CustomSearch extends FASTElement {
 
   /** The parameters used to filter the search. */
   @attr
-  public filterParams: IFilterParams;
+  public filterParams: FilterParams;
 
   /** The classes of tools used in the search. */
   @attr

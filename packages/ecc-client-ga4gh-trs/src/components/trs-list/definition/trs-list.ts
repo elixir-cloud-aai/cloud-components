@@ -6,7 +6,7 @@ import {
 } from "@microsoft/fast-element";
 import { template } from "./trs-list.template.js";
 import { styles } from "./trs-list.styles.js";
-import { IToolClass } from "./trs-list.interface.js";
+import { ToolClass } from "./trs-list.types.js";
 
 /**
  * @class
@@ -35,7 +35,7 @@ export class TRS extends FASTElement {
 
   @observable isOpenFilter = false;
 
-  @observable toolClasses: IToolClass[] = [];
+  @observable toolClasses: ToolClass[] = [];
 
   @observable filterParams: { [key: string]: string | undefined | boolean } = {
     id: "",

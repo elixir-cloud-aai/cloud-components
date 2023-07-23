@@ -7,7 +7,7 @@ import {
   provideFASTDesignSystem,
 } from "@microsoft/fast-components";
 import { CustomSearch } from "./search.js";
-import { ITool } from "../../definition/trs-list.interface.js";
+import { Tool } from "../../definition/trs-list.types.js";
 
 provideFASTDesignSystem().register(
   fastButton(),
@@ -127,7 +127,7 @@ export const template = html<CustomSearch>`
               >
                 ${repeat(
                   (x) => x.toolClasses,
-                  html<ITool>`
+                  html<Tool>`
                     <fast-option value="${(x) => x.name}"
                       >${(x) => x.name}</fast-option
                     >

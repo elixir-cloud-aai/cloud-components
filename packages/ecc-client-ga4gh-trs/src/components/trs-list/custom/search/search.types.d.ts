@@ -12,4 +12,4 @@ interface FilterParams {
   offset: string;
 }
 
-export type { IFilterParams };
+export type { FilterParams };
