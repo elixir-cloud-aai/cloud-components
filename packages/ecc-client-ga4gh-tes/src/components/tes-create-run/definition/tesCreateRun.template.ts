@@ -40,7 +40,7 @@ const ExecutorsTemplate = html<TESCreateRun>`
             name="image"
             class="input"
             :value=${(x) => x.image}
-            @input=${(x, c) => c.parent.handleExecutorsImageChange(c.event, x)}
+            @input=${(x, c) => c.parent.handleExecutorsDataChange(c.event, x)}
           ></fast-text-field>
         </div>
         <div class="container env-container">
@@ -117,7 +117,8 @@ const ExecutorsTemplate = html<TESCreateRun>`
             name="stderr"
             class="input"
             :value=${(x) => x.stderr}
-            @input=${(x, c) => c.parent.handleExecutorsStderrChange(c.event, x)}
+            @input=${(x, c) =>
+              c.parent.handleExecutorsDataChange(c.event, x, c)}
           ></fast-text-field>
         </div>
         <div class="label-input stdin">
@@ -128,7 +129,7 @@ const ExecutorsTemplate = html<TESCreateRun>`
             name="stdin"
             class="input"
             :value=${(x) => x.stdin}
-            @input=${(x, c) => c.parent.handleExecutorsStdinChange(c.event, x)}
+            @input=${(x, c) => c.parent.handleExecutorsDataChange(c.event, x)}
           ></fast-text-field>
         </div>
         <div class="label-input stdout">
@@ -139,7 +140,7 @@ const ExecutorsTemplate = html<TESCreateRun>`
             name="stdout"
             class="input"
             :value=${(x) => x.stdout}
-            @input=${(x, c) => c.parent.handleExecutorsStdoutChange(c.event, x)}
+            @input=${(x, c) => c.parent.handleExecutorsDataChange(c.event, x)}
           ></fast-text-field>
         </div>
         <div class="label-input workdir">
@@ -150,8 +151,7 @@ const ExecutorsTemplate = html<TESCreateRun>`
             name="workdir"
             class="input"
             :value=${(x) => x.workdir}
-            @input=${(x, c) =>
-              c.parent.handleExecutorsWorkdirChange(c.event, x)}
+            @input=${(x, c) => c.parent.handleExecutorsDataChange(c.event, x)}
           ></fast-text-field>
         </div>
       </div>

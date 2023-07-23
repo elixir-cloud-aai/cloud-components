@@ -327,16 +327,6 @@ export default class TESCreateRun extends FASTElement {
   };
 
   /**
-   * Handles the change of the image input of the executor fields
-   * @param event The input event triggered when the image input changes
-   * @param executor The specific executor in the taskExecutors that is being changed
-   */
-  handleExecutorsImageChange = (event: Event, executor: ExecutorData) => {
-    const newImage = (event.target as HTMLInputElement).value;
-    executor.image = newImage;
-  };
-
-  /**
    * Handles the change of the name field of env of the executor field
    * @param event The event triggered when the name field of env from any executor changes
    * @param executor The specific executor in the taskExecutors that is being changed
@@ -371,43 +361,14 @@ export default class TESCreateRun extends FASTElement {
   };
 
   /**
-   * Handles the stderr input for the executor
-   * @param event The event triggered when the stderr field of the executor field changes
+   * This function handles input changes of stderr, stdout, stdin, workdir, image
+   * @param event The event triggered when the value field changes
    * @param executor The specific executor in the taskExecutors that is being changed
    */
-  handleExecutorsStderrChange = (event: Event, executor: ExecutorData) => {
-    const stderrInput = (event.target as HTMLInputElement).value;
-    executor.stderr = stderrInput;
-  };
-
-  /**
-   * Handles the stdout input for the executor
-   * @param event The event triggered when the stdout field of the executor field changes
-   * @param executor The specific executor in the taskExecutors that is being changed
-   */
-  handleExecutorsStdoutChange = (event: Event, executor: ExecutorData) => {
-    const stdoutInput = (event.target as HTMLInputElement).value;
-    executor.stdout = stdoutInput;
-  };
-
-  /**
-   * Handles the stdin input for the executor
-   * @param event The event triggered when the stdin field of the executor field changes
-   * @param executor The specific executor in the taskExecutors that is being changed
-   */
-  handleExecutorsStdinChange = (event: Event, executor: ExecutorData) => {
-    const stdinInput = (event.target as HTMLInputElement).value;
-    executor.stdin = stdinInput;
-  };
-
-  /**
-   * Handles the workdir input for the executor
-   * @param event The event triggered when the workdir field of the executor field changes
-   * @param executor The specific executor in the taskExecutors that is being changed
-   */
-  handleExecutorsWorkdirChange = (event: Event, executor: ExecutorData) => {
-    const workdirInput = (event.target as HTMLInputElement).value;
-    executor.workdir = workdirInput;
+  handleExecutorsDataChange = (event: Event, executor: ExecutorData) => {
+    const key: string = (event.target as HTMLInputElement).name;
+    const data: any = (event.target as HTMLInputElement).value;
+    executor[key as keyof ExecutorData] = data;
   };
 
   /**
