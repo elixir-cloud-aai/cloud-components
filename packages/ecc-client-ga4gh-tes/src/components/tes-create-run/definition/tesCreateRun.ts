@@ -211,17 +211,6 @@ export default class TESCreateRun extends FASTElement {
   };
 
   /**
-   * Handles the state input for the task
-   * - state - State of the task, Allowed states according to TES schema are :
-   * UNKNOWN, QUEUED, INITIALIZING, RUNNING, PAUSED, COMPLETE, EXECUTOR_ERROR,
-   * SYSTEM_ERROR, CANCELED
-   * @param event - The input event triggered when the state input changes
-   */
-  handleStateInput = (event: Event) => {
-    this.state = (event.target as HTMLInputElement).value;
-  };
-
-  /**
    * Handles the description input for the task
    * - description - The user given information about the task
    * @param event The input event triggered when the description input change

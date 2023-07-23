@@ -1,10 +1,20 @@
 import { css } from '@microsoft/fast-element';
 
 const styles = css`
+  fast-accordion {
+    color: black;
+  }
+  fast-accordion-item {
+    color: black;
+  }
+
   /* CSS styles for the form */
   .form-container {
     margin: 0 auto;
     padding: 0.4rem;
+    // display:flex;
+    // flex-direction:column;
+    // gap:0.3rem;
   }
 
   /* All the CSS that deals with labe and input field */
@@ -85,16 +95,13 @@ const styles = css`
       padding: 0.2rem;
     }
 
-    fast-text-field {
-      width: 90%;
-    }
-
     .executors,
-    .input,
-    .output,
+    .inputs,
+    .outputs,
     .resources,
     .tags {
-      grid-template-columns: 1fr;
+      display: flex;
+      flex-direction: column;
     }
 
     .submit-button {

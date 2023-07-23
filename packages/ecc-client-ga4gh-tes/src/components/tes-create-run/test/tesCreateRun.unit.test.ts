@@ -19,13 +19,6 @@ describe('TESCreateRun', () => {
     expect(ele.name).equal('');
   });
 
-  it('should have a default state of "UNKNOWN"', async () => {
-    const ele = await fixture<TESCreateRun>(
-      html`<ecc-client-ga4gh-tes-create-run></ecc-client-ga4gh-tes-create-run>`
-    );
-    expect(ele.state).equal('UNKNOWN');
-  });
-
   it('should have a default description of "myTask"', async () => {
     const ele = await fixture<TESCreateRun>(
       html`<ecc-client-ga4gh-tes-create-run></ecc-client-ga4gh-tes-create-run>`
@@ -369,24 +362,6 @@ describe('TESCreateRun', () => {
     inputField.dispatchEvent(new Event('input'));
 
     expect(ele.ram_gb).to.equal('16');
-  });
-
-  it('should update the state property on input', async () => {
-    const ele = await fixture<TESCreateRun>(
-      html`<ecc-client-ga4gh-tes-create-run></ecc-client-ga4gh-tes-create-run>`
-    );
-
-    const inputField = ele.shadowRoot?.querySelector(
-      'fast-text-field[id="state"]'
-    ) as HTMLInputElement;
-
-    expect(ele.state).to.equal('UNKNOWN');
-
-    // Simulate input field value change
-    inputField.value = 'RUNNING';
-    inputField.dispatchEvent(new Event('input'));
-
-    expect(ele.state).to.equal('RUNNING');
   });
 
   it('should update the executors commands on input', async () => {

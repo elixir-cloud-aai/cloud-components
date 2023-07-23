@@ -5,6 +5,8 @@ import {
   fastSwitch,
   fastButton,
   fastDivider,
+  fastAccordion,
+  fastAccordionItem,
 } from '@microsoft/fast-components';
 import TESCreateRun from './tesCreateRun.js';
 
@@ -12,7 +14,9 @@ provideFASTDesignSystem().register(
   fastTextField(),
   fastSwitch(),
   fastButton(),
-  fastDivider()
+  fastDivider(),
+  fastAccordion(),
+  fastAccordionItem()
 );
 
 const ExecutorsTemplate = html<TESCreateRun>`
@@ -149,7 +153,6 @@ const ExecutorsTemplate = html<TESCreateRun>`
           ></fast-text-field>
         </div>
       </div>
-      <fast-divider></fast-divider>
     `,
     { positioning: true }
   )}
@@ -232,146 +235,156 @@ const OutputTemplate = html<TESCreateRun>`
 
 const template = html<TESCreateRun>`
 <form class="form-container" onsubmit="return false">
-   <div class="container meta">
-      <div class="label-input">
-         <label for="name">Name:</label>
-         <fast-text-field type="text" id="name" name="name" class="input" :value=${(
-           x
-         ) => x.name} @input=${(x, c) => x.handleNameInput(c.event)} required>
+  <!-- Meta data  -->
+  <div class="container meta">
+    <div class="label-input">
+      <label for="name">Name:</label>
+      <fast-text-field type="text" id="name" name="name" class="input" :value=${(
+        x
+      ) => x.name} @input=${(x, c) => x.handleNameInput(c.event)} required>
       </div>
-      <div class="label-input">
-         <label for="">State:</label>
-         <fast-text-field type="text" id="state" name="state" class="input" :value=${(
-           x
-         ) => x.state} @input=${(x, c) => x.handleStateInput(c.event)} required>
-      </div>
-      <div class="label-input">
-         <label for="description">Description:</label>
-         <fast-text-field type="text" id="description" name="description" class="input" :value=${(
-           x
-         ) => x.description}
+        <div class="label-input">
+          <label for="description">Description:</label>
+          <fast-text-field type="text" id="description" name="description" class="input" :value=${(
+            x
+          ) => x.description}
          @input=${(x, c) => x.handleDescriptionInput(c.event)} required>
+        </div>
       </div>
-   </div>
+
+      <!-- Executors Fields -->
+      <fast-accordion>
    <div class="container executors-container">
-      <fieldset>
-         <legend>Executors</legend>
-         <span class="data-button">
-            <fast-button class="add" id="add-executors" @click=${(x) =>
-              x.addExecutor()} > Add Executors
-            </fast-button>
-         </span>
-         ${ExecutorsTemplate}
-         ${when(
-           (x) => x.taskExecutorsLength > 1,
-           html` <span class="data-button">
-             <fast-button
-               class="delete"
-               id="delete-executor"
-               @click=${(x) => x.deleteExecutor()}
-             >
-               delete Executors
-             </fast-button>
-           </span>`
-         )}
-      </fieldset>
+         <fast-accordion-item expanded>
+            <h3 slot="start">Executors</h3>
+            <div class="data-button">
+               <fast-button class="add" id="add-executors" @click=${(x) =>
+                 x.addExecutor()} > Add Executors
+               </fast-button>
+            </div>
+            ${ExecutorsTemplate}
+            ${when(
+              (x) => x.taskExecutorsLength > 1,
+              html`
+                <div class="data-button">
+                  <fast-button
+                    class="delete"
+                    id="delete-executor"
+                    @click=${(x) => x.deleteExecutor()}
+                  >
+                    delete Executors
+                  </fast-button>
+                </div>
+              `
+            )}
+         </fast-accordion-item>
    </div>
+
+   <!-- Input Fields -->
    <div class="container input-container">
-      <fieldset>
-         <legend>Input</legend>
-         <span class="data-button">
-            <fast-button class="add" id="add-input" @click=${(x) =>
-              x.addInput()}> Add Inputs
-            </fast-button>
-         </span>
-         ${InputTemplate}
-         ${when(
-           (x) => x.taskInputLength > 1,
-           html`
-             <span class="data-button">
-               <fast-button
-                 class="delete"
-                 id="delete-input"
-                 @click=${(x) => x.deleteInput()}
-               >
-                 Delete
+         <fast-accordion-item>
+            <h3 slot="start">Inputs</h3>
+            <span class="data-button">
+               <fast-button class="add" id="add-input" @click=${(x) =>
+                 x.addInput()}> Add Inputs
                </fast-button>
-             </span>
-           `
-         )}
-      </fieldset>
+            </span>
+            ${InputTemplate}
+            ${when(
+              (x) => x.taskInputLength > 1,
+              html`
+                <span class="data-button">
+                  <fast-button
+                    class="delete"
+                    id="delete-input"
+                    @click=${(x) => x.deleteInput()}
+                  >
+                    Delete
+                  </fast-button>
+                </span>
+              `
+            )}
+            </fieldset>
+         </fast-accordion-item>
    </div>
+
+   <!-- Output Fields -->
    <div class="container output-container">
-      <fieldset>
-         <legend>Output</legend>
-         <span class="data-button">
-            <fast-button class="add" id="add-output" @click=${(x) =>
-              x.addOutput()} > Add Outputs
-            </fast-button>
-         </span>
-         ${OutputTemplate}
-         ${when(
-           (x) => x.taskOutputLength > 1,
-           html`
-             <span class="data-button">
-               <fast-button
-                 class="delete"
-                 id="delete-output"
-                 @click=${(x) => x.deleteOutput()}
-               >
-                 Delete
+         <fast-accordion-item>
+            <h3 slot="start">Outputs</h3>
+            <span class="data-button">
+               <fast-button class="add" id="add-output" @click=${(x) =>
+                 x.addOutput()} > Add Outputs
                </fast-button>
-             </span>
-           `
-         )}
-      </fieldset>
+            </span>
+            ${OutputTemplate}
+            ${when(
+              (x) => x.taskOutputLength > 1,
+              html`
+                <span class="data-button">
+                  <fast-button
+                    class="delete"
+                    id="delete-output"
+                    @click=${(x) => x.deleteOutput()}
+                  >
+                    Delete
+                  </fast-button>
+                </span>
+              `
+            )}
+            </fieldset>
+         </fast-accordion-item>
    </div>
+
+   <!-- Resources Fields -->
    <div class="container resources-container">
-      <fieldset>
-         <legend>Resources</legend>
-         <div class="resources">
-           <div class="label-input">
-              <label for="cpu-cores">CPU Cores:</label>
-              <fast-text-field type="number" id="cpu-cores" name="cpu-cores" class="input" :value=${(
-                x
-              ) => x.cpu_cores} @input=${(x, c) =>
+         <fast-accordion-item>
+            <h3 slot="start">Resources</h3>
+            <div class="resources">
+               <div class="label-input">
+                  <label for="cpu-cores">CPU Cores:</label>
+                  <fast-text-field type="number" id="cpu-cores" name="cpu-cores" class="input" :value=${(
+                    x
+                  ) => x.cpu_cores} @input=${(x, c) =>
   x.handleCPUCoresInput(c.event)} required>
-           </div>
-           <div class="label-input">
-              <label for="disk-gb">Disk GB:</label>
-              <fast-text-field type="number" id="disk-gb" name="disk-gb" class="input" :value=${(
-                x
-              ) => x.disk_gb} @input=${(x, c) =>
+               </div>
+               <div class="label-input">
+                  <label for="disk-gb">Disk GB:</label>
+                  <fast-text-field type="number" id="disk-gb" name="disk-gb" class="input" :value=${(
+                    x
+                  ) => x.disk_gb} @input=${(x, c) =>
   x.handleDiskGBInput(c.event)} required>
-           </div>
-           <div class="label-input">
-              <label for="ram-gb">RAM GB:</label>
-              <fast-text-field type="number" id="ram-gb" name="ram-gb" class="input" :value=${(
-                x
-              ) => x.ram_gb} @input=${(x, c) =>
+               </div>
+               <div class="label-input">
+                  <label for="ram-gb">RAM GB:</label>
+                  <fast-text-field type="number" id="ram-gb" name="ram-gb" class="input" :value=${(
+                    x
+                  ) => x.ram_gb} @input=${(x, c) =>
   x.handleRAMGBInput(c.event)} required>
-           </div>
-           <div class="label-input">
-              <label for="zones">Zones:</label>
-              <fast-text-field type="text" id="zones" name="zones" class="input" :value=${(
-                x
-              ) => x.zones.join(',')} @input=${(x, c) =>
+               </div>
+               <div class="label-input">
+                  <label for="zones">Zones:</label>
+                  <fast-text-field type="text" id="zones" name="zones" class="input" :value=${(
+                    x
+                  ) => x.zones.join(',')} @input=${(x, c) =>
   x.handleZonesInput(c.event)} required>
-           </div>
-           <div class="label-input">
-              <label for="preemptible">Preemtible</label>
-              <fast-switch id="preemptible" name="preemptible" class="checkbox-field" @change=${(
-                x,
-                c
-              ) => x.handlePreemptibleInput(c.event)}></fast-switch>
-           </div>
-         </div>
-      </fieldset>
+               </div>
+               <div class="label-input">
+                  <label for="preemptible">Preemtible</label>
+                  <fast-switch id="preemptible" name="preemptible" class="checkbox-field" @change=${(
+                    x,
+                    c
+                  ) => x.handlePreemptibleInput(c.event)}></fast-switch>
+               </div>
+            </div>
+         </fast-accordion-item>
    </div>
+
+   <!-- Tags Fields -->
    <div class="container tags-container">
-      <fieldset>
-         <legend>Tag</legend>
-         <div class="tags">
+      <fast-accordion-item>
+      <h3 slot="start">Tags</h3>
+      <div class="tags">
          <div class="label-input">
             <label for="workflow-id">Workflow ID:</label>
             <fast-text-field type="text" id="workflow-id" name="workflow-id" class="input" :value=${(
@@ -386,22 +399,30 @@ const template = html<TESCreateRun>`
             ) => x.PROJECT_GROUP} @input=${(x, c) =>
   x.handleProjectGroupInput(c.event)} required>
          </div>
-            </div>
-      </fieldset>
+      </div>
+      </fast-accordion-item>
    </div>
+
+   <!-- Volumes Fields -->
    <div class="container volumes">
-      <div class="label-input">
-         <label for="volumes">Volumes:</label>
-         <fast-text-field type="text" id="volumes" name="volumes" class="input" :value=${(
-           x
-         ) => x.volumes.join(',')} @input=${(x, c) =>
+         <fast-accordion-item>
+            <h3 slot="start">Volumes</h3>
+            <div class="label-input">
+               <label for="volumes">Volumes:</label>
+               <fast-text-field type="text" id="volumes" name="volumes" class="input" :value=${(
+                 x
+               ) => x.volumes.join(',')} @input=${(x, c) =>
   x.handleVolumesInput(c.event)} required >
+         </fast-accordion-item>
       </div>
    </div>
+   </fast-accordion>
+
+   <!-- Submit Button -->
    <div class="submit-button-container">
-   <fast-button class="submit-button" @click=${(x) =>
-     x.handleSubmit()} >Create Task
-   </fast-button>
+      <fast-button class="submit-button" @click=${(x) =>
+        x.handleSubmit()} >Create Task
+      </fast-button>
    </div>
 </form>
 `;
