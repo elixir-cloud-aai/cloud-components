@@ -55,13 +55,7 @@ const ExecutorsTemplate = html<TESCreateRun>`
           </span>
           <div class="env">
             ${repeat(
-              (x) => {
-                const envKeys = Object.keys(x.env);
-                const { length } = envKeys;
-                const envArr = Array.from(Array(length).keys());
-
-                return envArr;
-              },
+              (x) => Array.from(Array(Object.keys(x.env).length).keys()),
               html` <div class="label-input env-name">
                   <label for="env-name">Env${(x) => x + 1} Name:</label>
                   <fast-text-field
