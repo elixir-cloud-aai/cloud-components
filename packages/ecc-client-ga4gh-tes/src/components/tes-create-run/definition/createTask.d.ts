@@ -32,10 +32,10 @@ export interface OutputData {
 }
 
 interface Resources {
-  cpu_cores: number;
-  disk_gb: number;
+  cpu_cores: string;
+  disk_gb: string;
   preemptible: boolean;
-  ram_gb: number;
+  ram_gb: string;
   zones: string[];
 }
 

@@ -34,6 +34,7 @@ const ExecutorsTemplate = html<TESCreateRun>`
             :value=${(x) => x.command.join(',')}
             @input=${(x, c) =>
               c.parent.handleExecutorsCommandChange(c.event, x)}
+            required
           ></fast-text-field>
         </div>
         <div class="label-input image">
@@ -45,6 +46,7 @@ const ExecutorsTemplate = html<TESCreateRun>`
             class="input"
             :value=${(x) => x.image}
             @input=${(x, c) => c.parent.handleExecutorsDataChange(c.event, x)}
+            required
           ></fast-text-field>
         </div>
         <div class="container env-container">
@@ -234,21 +236,21 @@ const OutputTemplate = html<TESCreateRun>`
 `;
 
 const template = html<TESCreateRun>`
-<form class="form-container" onsubmit="return false">
+<form class="form-container" >
   <!-- Meta data  -->
   <div class="container meta">
     <div class="label-input">
       <label for="name">Name:</label>
       <fast-text-field type="text" id="name" name="name" class="input" :value=${(
         x
-      ) => x.name} @input=${(x, c) => x.handleNameInput(c.event)} required>
+      ) => x.name} @input=${(x, c) => x.handleDataChange(c.event)} >
       </div>
         <div class="label-input">
           <label for="description">Description:</label>
           <fast-text-field type="text" id="description" name="description" class="input" :value=${(
             x
           ) => x.description}
-         @input=${(x, c) => x.handleDescriptionInput(c.event)} required>
+         @input=${(x, c) => x.handleDataChange(c.event)} >
         </div>
       </div>
 
@@ -342,32 +344,32 @@ const template = html<TESCreateRun>`
             <h3 slot="start">Resources</h3>
             <div class="resources">
                <div class="label-input">
-                  <label for="cpu-cores">CPU Cores:</label>
-                  <fast-text-field type="number" id="cpu-cores" name="cpu-cores" class="input" :value=${(
+                  <label for="cpu_cores">CPU Cores:</label>
+                  <fast-text-field type="text" id="cpu_cores" name="cpu_cores" class="input" :value=${(
                     x
                   ) => x.cpu_cores} @input=${(x, c) =>
-  x.handleCPUCoresInput(c.event)} required>
+  x.handleDataChange(c.event)} >
                </div>
                <div class="label-input">
-                  <label for="disk-gb">Disk GB:</label>
-                  <fast-text-field type="number" id="disk-gb" name="disk-gb" class="input" :value=${(
+                  <label for="disk_gb">Disk GB:</label>
+                  <fast-text-field type="text" id="disk_gb" name="disk_gb" class="input" :value=${(
                     x
                   ) => x.disk_gb} @input=${(x, c) =>
-  x.handleDiskGBInput(c.event)} required>
+  x.handleDataChange(c.event)} >
                </div>
                <div class="label-input">
-                  <label for="ram-gb">RAM GB:</label>
-                  <fast-text-field type="number" id="ram-gb" name="ram-gb" class="input" :value=${(
+                  <label for="ram_gb">RAM GB:</label>
+                  <fast-text-field type="text" id="ram_gb" name="ram_gb" class="input" :value=${(
                     x
                   ) => x.ram_gb} @input=${(x, c) =>
-  x.handleRAMGBInput(c.event)} required>
+  x.handleDataChange(c.event)} >
                </div>
                <div class="label-input">
                   <label for="zones">Zones:</label>
                   <fast-text-field type="text" id="zones" name="zones" class="input" :value=${(
                     x
                   ) => x.zones.join(',')} @input=${(x, c) =>
-  x.handleZonesInput(c.event)} required>
+  x.handleZonesInput(c.event)} >
                </div>
                <div class="label-input">
                   <label for="preemptible">Preemtible</label>
@@ -386,18 +388,18 @@ const template = html<TESCreateRun>`
       <h3 slot="start">Tags</h3>
       <div class="tags">
          <div class="label-input">
-            <label for="workflow-id">Workflow ID:</label>
-            <fast-text-field type="text" id="workflow-id" name="workflow-id" class="input" :value=${(
+            <label for="workflow_id">Workflow ID:</label>
+            <fast-text-field type="text" id="workflow_id" name="workflow_id" class="input" :value=${(
               x
             ) => x.WORKFLOW_ID} @input=${(x, c) =>
-  x.handleWorkflowIDInput(c.event)} required>
+  x.handleDataChange(c.event)} >
          </div>
          <div class="label-input">
-            <label for="project-group">Project Group:</label>
-            <fast-text-field type="text" id="project-group" name="project-group" class="input" :value=${(
+            <label for="project_group">Project Group:</label>
+            <fast-text-field type="text" id="project_group" name="project_group" class="input" :value=${(
               x
             ) => x.PROJECT_GROUP} @input=${(x, c) =>
-  x.handleProjectGroupInput(c.event)} required>
+  x.handleDataChange(c.event)} >
          </div>
       </div>
       </fast-accordion-item>

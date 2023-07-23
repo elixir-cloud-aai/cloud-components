@@ -35,11 +35,7 @@ import {
 } from '@microsoft/fast-element';
 import template from './tesCreateRun.template.js';
 import styles from './tesCreateRun.styles.js';
-import CreateTaskData, {
-  ExecutorData,
-  InputData,
-  OutputData,
-} from './createTask.js';
+import { ExecutorData, InputData, OutputData } from './createTask.js';
 import { postTask } from '../../../data/Task/tesGet.js';
 
 const executorTemplate: ExecutorData = {
@@ -73,8 +69,6 @@ export default class TESCreateRun extends FASTElement {
 
   @attr name = '';
 
-  @attr state = 'UNKNOWN';
-
   @attr description = '';
 
   @attr taskExecutors: ExecutorData[] = [{ ...executorTemplate }];
@@ -89,13 +83,13 @@ export default class TESCreateRun extends FASTElement {
 
   @observable taskOutputLength = 1;
 
-  @attr cpu_cores = '4';
+  @attr cpu_cores = '';
 
-  @attr disk_gb = '40';
+  @attr disk_gb = '';
 
   @attr preemptible = false;
 
-  @attr ram_gb = '8';
+  @attr ram_gb = '';
 
   @attr zones: string[] = [];
 
@@ -107,18 +101,17 @@ export default class TESCreateRun extends FASTElement {
 
   @observable response = {};
 
-  @observable taskData: CreateTaskData = {
+  @observable taskData: any = {
     name: this.name,
-    state: this.state,
     description: this.description,
     executors: this.taskExecutors,
     inputs: this.taskInput,
     outputs: this.taskOutput,
     resources: {
-      cpu_cores: parseInt(this.cpu_cores, 10),
-      disk_gb: parseInt(this.disk_gb, 10),
+      cpu_cores: this.cpu_cores,
+      disk_gb: this.disk_gb,
       preemptible: this.preemptible,
-      ram_gb: parseInt(this.ram_gb, 10),
+      ram_gb: this.ram_gb,
       zones: this.zones,
     },
     tags: {
@@ -135,6 +128,28 @@ export default class TESCreateRun extends FASTElement {
     this.taskOutputLength = this.taskOutput.length;
   }
 
+  removeEmptyFields = (obj: any) => {
+    Object.entries(obj).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        if (value.length < 1) {
+          delete obj[key];
+        } else {
+          value.forEach((element) => {
+            this.removeEmptyFields(element);
+          });
+        }
+      } else if (value && typeof value === 'object') {
+        if (Object.entries(value).length === 0) {
+          delete obj[key];
+        } else {
+          this.removeEmptyFields(value);
+        }
+      } else if (value === null || value === undefined || value === '') {
+        delete obj[key];
+      }
+    });
+  };
+
   /**
    * Handles submit button click
    */
@@ -143,107 +158,80 @@ export default class TESCreateRun extends FASTElement {
     // <----------------------------------------------------------------->
     // All the fields input by user are compiled according to task schema
 
-    // Check if all the fields are filled
-    if (
-      this.baseURL === undefined ||
-      this.baseURL === '' ||
-      this.name === undefined ||
-      this.name === '' ||
-      this.state === undefined ||
-      this.state === '' ||
-      this.description === undefined ||
-      this.description === '' ||
-      this.taskExecutors === undefined ||
-      this.taskExecutors.length === 0 ||
-      this.taskInput === undefined ||
-      this.taskInput.length === 0 ||
-      this.taskOutput === undefined ||
-      this.taskOutput.length === 0 ||
-      this.cpu_cores === undefined ||
-      this.cpu_cores === '' ||
-      this.disk_gb === undefined ||
-      this.disk_gb === '' ||
-      this.preemptible === undefined ||
-      this.ram_gb === undefined ||
-      this.ram_gb === '' ||
-      this.zones === undefined ||
-      this.WORKFLOW_ID === undefined ||
-      this.WORKFLOW_ID === '' ||
-      this.PROJECT_GROUP === undefined ||
-      this.PROJECT_GROUP === '' ||
-      this.volumes === undefined ||
-      this.volumes.length === 0
-    ) {
-      this.response = { error: 'All the fields are not filled.' };
-      return;
-    }
-
     this.taskData.name = this.name;
-    this.taskData.state = this.state;
     this.taskData.description = this.description;
     this.taskData.executors = this.taskExecutors;
     this.taskData.inputs = this.taskInput;
     this.taskData.outputs = this.taskOutput;
-    this.taskData.resources.cpu_cores = parseInt(this.cpu_cores, 10);
-    this.taskData.resources.disk_gb = parseInt(this.disk_gb, 10);
+    this.taskData.resources.cpu_cores = this.cpu_cores;
+    this.taskData.resources.disk_gb = this.disk_gb;
     this.taskData.resources.preemptible = this.preemptible;
-    this.taskData.resources.ram_gb = parseInt(this.ram_gb, 10);
+    this.taskData.resources.ram_gb = this.ram_gb;
     this.taskData.resources.zones = this.zones;
     this.taskData.tags.WORKFLOW_ID = this.WORKFLOW_ID;
     this.taskData.tags.PROJECT_GROUP = this.PROJECT_GROUP;
     this.taskData.volumes = this.volumes;
     // <----------------------------------------------------------------->
 
+    // Perform checks for required fields
+    const requiredFields = ['command', 'image', 'workdir'];
+    for (const executor of this.taskData.executors) {
+      for (const field of requiredFields) {
+        if (
+          !executor[field] ||
+          (Array.isArray(executor[field]) && executor[field].length === 0)
+        ) {
+          this.response = {
+            error: `${field} cannot be left empty`,
+            breakpoint: 'handleSubmit',
+          };
+          return;
+        }
+      }
+    }
+
+    // Remove empty fields
+    this.removeEmptyFields(this.taskData);
+
     // Call API to create task
     this.response = await postTask(this.baseURL, this.taskData);
 
     // Handle with response
-    console.log(this.response);
+    console.log(this.taskData);
   };
 
   /**
-   * Handles the name input for the task
-   * - name - The user given identifier of the task
-   * @param event - The input event triggered when the name input changes
-   */
-  handleNameInput = (event: Event) => {
-    this.name = (event.target as HTMLInputElement).value;
-  };
-
-  /**
-   * Handles the description input for the task
-   * - description - The user given information about the task
-   * @param event The input event triggered when the description input change
-   */
-  handleDescriptionInput = (event: Event) => {
-    this.description = (event.target as HTMLInputElement).value;
-  };
-
-  /**
-   * Handles the cpu_cores input for the task
-   * - cpu_cores - Requested number of CPUs
-   * @param event The input event triggered when the cpu-core input changes
-   */
-  handleCPUCoresInput = (event: Event) => {
-    this.cpu_cores = (event.target as HTMLInputElement).value;
-  };
-
-  /**
-   * Handles the disk_gb input for the task
-   * - disk_gb - Requested disk size in gigabytes (GB)
+   * Handles the input for the data thats non-dynamic, ie only of is present.
    * @param event The input event triggered when the disk-gb input changes
    */
-  handleDiskGBInput = (event: Event) => {
-    this.disk_gb = (event.target as HTMLInputElement).value;
-  };
-
-  /**
-   * Handles the ram_gb input for the task
-   * - ram_gb - Requested RAM required in gigabytes (GB)
-   * @param event The input event triggered when the ram-gb input changes
-   */
-  handleRAMGBInput = (event: Event) => {
-    this.ram_gb = (event.target as HTMLInputElement).value;
+  handleDataChange = (event: Event) => {
+    const { name } = event.target as HTMLInputElement;
+    const { value } = event.target as HTMLInputElement;
+    switch (name) {
+      case 'name':
+        this.name = value;
+        break;
+      case 'description':
+        this.description = value;
+        break;
+      case 'cpu_cores':
+        this.cpu_cores = value;
+        break;
+      case 'disk_gb':
+        this.disk_gb = value;
+        break;
+      case 'ram_gb':
+        this.ram_gb = value;
+        break;
+      case 'workflow_id':
+        this.WORKFLOW_ID = value;
+        break;
+      case 'project_group':
+        this.PROJECT_GROUP = value;
+        break;
+      default:
+        break;
+    }
   };
 
   /**
@@ -272,24 +260,6 @@ export default class TESCreateRun extends FASTElement {
       (event.target as HTMLInputElement).setAttribute('aria-checked', 'true');
       this.preemptible = false;
     }
-  };
-
-  /**
-   * Handles the WORKFLOW_ID input for the task
-   * - WORKFLOW_ID - Used to store meta-data and annotations about a task
-   * @param event The input event triggered when the workflow-id input changes
-   */
-  handleWorkflowIDInput = (event: Event) => {
-    this.WORKFLOW_ID = (event.target as HTMLInputElement).value;
-  };
-
-  /**
-   * Handles the PROJECT_GROUP input for the task
-   * - PROJECT_GROUP - Used to store meta-data and annotations about a task
-   * @param event The input event triggered when the project-group input changes
-   */
-  handleProjectGroupInput = (event: Event) => {
-    this.PROJECT_GROUP = (event.target as HTMLInputElement).value;
   };
 
   /**
