@@ -259,7 +259,7 @@ const template = html<TESCreateRun>`
             <h3 slot="start">Executors</h3>
             <div class="data-button">
                <fast-button class="add" id="add-executors" @click=${(x) =>
-                 x.addExecutor()} > Add Executors
+                 x.addExecutor()} > Add Executor
                </fast-button>
             </div>
             ${ExecutorsTemplate}
@@ -272,7 +272,7 @@ const template = html<TESCreateRun>`
                     id="delete-executor"
                     @click=${(x) => x.deleteExecutor()}
                   >
-                    delete Executors
+                    Delete Executor
                   </fast-button>
                 </div>
               `
@@ -286,7 +286,7 @@ const template = html<TESCreateRun>`
             <h3 slot="start">Inputs</h3>
             <span class="data-button">
                <fast-button class="add" id="add-input" @click=${(x) =>
-                 x.addInput()}> Add Inputs
+                 x.addInput()}> Add Input
                </fast-button>
             </span>
             ${InputTemplate}
@@ -299,7 +299,7 @@ const template = html<TESCreateRun>`
                     id="delete-input"
                     @click=${(x) => x.deleteInput()}
                   >
-                    Delete
+                    Delete Input
                   </fast-button>
                 </span>
               `
@@ -314,7 +314,7 @@ const template = html<TESCreateRun>`
             <h3 slot="start">Outputs</h3>
             <span class="data-button">
                <fast-button class="add" id="add-output" @click=${(x) =>
-                 x.addOutput()} > Add Outputs
+                 x.addOutput()} > Add Output
                </fast-button>
             </span>
             ${OutputTemplate}
@@ -327,7 +327,7 @@ const template = html<TESCreateRun>`
                     id="delete-output"
                     @click=${(x) => x.deleteOutput()}
                   >
-                    Delete
+                    Delete Output
                   </fast-button>
                 </span>
               `

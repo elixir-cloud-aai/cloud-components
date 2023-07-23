@@ -12,9 +12,6 @@ const styles = css`
   .form-container {
     margin: 0 auto;
     padding: 0.4rem;
-    // display:flex;
-    // flex-direction:column;
-    // gap:0.3rem;
   }
 
   /* All the CSS that deals with labe and input field */
@@ -104,6 +101,15 @@ const styles = css`
       flex-direction: column;
     }
 
+    .env-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .env {
+      display: flex;
+      flex-direction: column;
+    }
     .submit-button {
       height: 2rem;
     }
