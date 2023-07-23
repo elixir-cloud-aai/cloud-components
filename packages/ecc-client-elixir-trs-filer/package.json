@@ -11,7 +11,7 @@
         "build": "webpack --config=./webpack.prod.cjs",
         "lint": "eslint . --ext .ts",
         "lint:fix": "eslint . --ext .ts --fix",
-        "start": "webpack-dev-server --config=./webpack.dev.cjs --history-api-fallback --progress",
+        "dev": "webpack-dev-server --config=./webpack.dev.cjs --history-api-fallback --progress",
         "start:storybook": "start-storybook -p 3000 -h localhost",
         "test:serve": "node ./test-server.cjs",
         "fast:postinstall": "==========================================\n\n Your project has been initialized!\n You have access to the following commands:\n\n Start: npm start\n Test: npm run test\n Build: npm run build\n\n=========================================="
