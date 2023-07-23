@@ -1,11 +1,11 @@
 import { html } from "@microsoft/fast-element";
 import {
-  allComponents,
+  fastButton,
   provideFASTDesignSystem,
 } from "@microsoft/fast-components";
 import type { CopyClipboard } from "./copy.js";
 
-provideFASTDesignSystem().register(allComponents);
+provideFASTDesignSystem().register(fastButton());
 
 export const template = html<CopyClipboard>`
   <head>

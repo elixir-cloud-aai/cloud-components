@@ -1,12 +1,20 @@
 import { html, repeat, when } from "@microsoft/fast-element";
 import {
-  allComponents,
+  fastSelect,
+  fastTextField,
+  fastOption,
+  fastButton,
   provideFASTDesignSystem,
 } from "@microsoft/fast-components";
 import { CustomSearch } from "./search.js";
 import { ITool } from "../../definition/trs-list.interface.js";
 
-provideFASTDesignSystem().register(allComponents);
+provideFASTDesignSystem().register(
+  fastButton(),
+  fastSelect(),
+  fastTextField(),
+  fastOption()
+);
 
 export const template = html<CustomSearch>`
   <div class="search">
