@@ -35,7 +35,7 @@ import {
 } from '@microsoft/fast-element';
 import template from './tesCreateRun.template.js';
 import styles from './tesCreateRun.styles.js';
-import { ExecutorData, InputData, OutputData } from './createTask.js';
+import { ExecutorData, InputData, OutputData } from './types.js';
 import { postTask } from '../../../data/Task/tesGet.js';
 
 const executorTemplate: ExecutorData = {
