@@ -39,7 +39,7 @@ import { ExecutorData, InputData, OutputData } from './createTask.js';
 import { postTask } from '../../../data/Task/tesGet.js';
 
 const executorTemplate: ExecutorData = {
-  command: [],
+  command: [''],
   env: {},
   image: '',
   stderr: '',
@@ -130,24 +130,52 @@ export default class TESCreateRun extends FASTElement {
 
   removeEmptyFields = (obj: any) => {
     Object.entries(obj).forEach(([key, value]) => {
+      // If the key is array
       if (Array.isArray(value)) {
-        if (value.length < 1) {
+        // If the array is empty remove this key value pair
+        if (value.length === 0) {
           delete obj[key];
         } else {
+          // Clean out all the objects to remove empty fields
           value.forEach((element) => {
-            this.removeEmptyFields(element);
+            if (typeof element === 'object' && element !== null) {
+              this.removeEmptyFields(element);
+            }
           });
+
+          // Check if this object became empty, if so remove this too.
+          value.forEach((element, index) => {
+            if (
+              typeof element === 'object' &&
+              Object.entries(element).length === 0
+            ) {
+              value.splice(index, 1);
+            }
+          });
+          if (value.length === 0) {
+            delete obj[key];
+          }
         }
       } else if (value && typeof value === 'object') {
+        // if this object is empty remove it
         if (Object.entries(value).length === 0) {
           delete obj[key];
         } else {
+          // Else remove all the empty fields from the objects
           this.removeEmptyFields(value);
+
+          // Check if this made current objects empty, if so remove it
+          if (Object.entries(value).length === 0) {
+            delete obj[key];
+          }
         }
-      } else if (value === null || value === undefined || value === '') {
+      }
+      // remove all the empty empty values
+      else if (value === null || value === undefined || value === '') {
         delete obj[key];
       }
     });
+    return obj;
   };
 
   /**
@@ -157,7 +185,6 @@ export default class TESCreateRun extends FASTElement {
     // Compute all the task information and create the task schema
     // <----------------------------------------------------------------->
     // All the fields input by user are compiled according to task schema
-
     this.taskData.name = this.name;
     this.taskData.description = this.description;
     this.taskData.executors = this.taskExecutors;
@@ -197,7 +224,25 @@ export default class TESCreateRun extends FASTElement {
     this.response = await postTask(this.baseURL, this.taskData);
 
     // Handle with response
-    console.log(this.taskData);
+    console.log(this.response);
+
+    // Clear the form
+    this.baseURL = '';
+    this.name = '';
+    this.description = '';
+    this.taskExecutors = [{ ...executorTemplate }];
+    this.taskInput = [{ ...inputTemplate }];
+    this.taskOutput = [{ ...outputTemplate }];
+    this.cpu_cores = '';
+    this.disk_gb = '';
+    this.preemptible = false;
+    this.ram_gb = '';
+    this.zones = [];
+    this.WORKFLOW_ID = '';
+    this.PROJECT_GROUP = '';
+    this.volumes = [];
+
+    this.taskData = {};
   };
 
   /**
