@@ -99,7 +99,7 @@ export default class TESCreateRun extends FASTElement {
 
   @attr volumes: string[] = [];
 
-  @observable response = {};
+  @observable response: any = { id: 'id' };
 
   @observable taskData: any = {
     name: this.name,
@@ -120,6 +120,10 @@ export default class TESCreateRun extends FASTElement {
     },
     volumes: this.volumes,
   };
+
+  @observable responseGot = false;
+
+  @observable isLoading = false;
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -179,52 +183,84 @@ export default class TESCreateRun extends FASTElement {
   };
 
   /**
+   * Checks is the reponse of the sumbmission has a specified key
+   * @param key The key to be checked in response
+   * @returns true is the response has the said key
+   */
+  reponseHas = (key: string) => {
+    if (Object.prototype.hasOwnProperty.call(this.response, key)) {
+      return true;
+    }
+    return false;
+  };
+
+  /**
    * Handles submit button click
    */
   handleSubmit = async () => {
-    // Compute all the task information and create the task schema
-    // <----------------------------------------------------------------->
-    // All the fields input by user are compiled according to task schema
-    this.taskData.name = this.name;
-    this.taskData.description = this.description;
-    this.taskData.executors = this.taskExecutors;
-    this.taskData.inputs = this.taskInput;
-    this.taskData.outputs = this.taskOutput;
-    this.taskData.resources.cpu_cores = this.cpu_cores;
-    this.taskData.resources.disk_gb = this.disk_gb;
-    this.taskData.resources.preemptible = this.preemptible;
-    this.taskData.resources.ram_gb = this.ram_gb;
-    this.taskData.resources.zones = this.zones;
-    this.taskData.tags.WORKFLOW_ID = this.WORKFLOW_ID;
-    this.taskData.tags.PROJECT_GROUP = this.PROJECT_GROUP;
-    this.taskData.volumes = this.volumes;
-    // <----------------------------------------------------------------->
+    this.responseGot = false;
+    this.isLoading = true;
 
-    // Perform checks for required fields
-    const requiredFields = ['command', 'image', 'workdir'];
-    for (const executor of this.taskData.executors) {
-      for (const field of requiredFields) {
-        if (
-          !executor[field] ||
-          (Array.isArray(executor[field]) && executor[field].length === 0)
-        ) {
-          this.response = {
-            error: `${field} cannot be left empty`,
-            breakpoint: 'handleSubmit',
-          };
-          return;
-        }
-      }
+    // Set the form to the value filled but user in respective attr
+    this.setFormDataToDefault();
+
+    this.checkRequiredFields();
+    if (Object.prototype.hasOwnProperty.call(this.response, 'error')) {
+      this.isLoading = false;
+      this.responseGot = true;
+      this.clearForm();
+      return;
     }
 
     // Remove empty fields
     this.removeEmptyFields(this.taskData);
 
+    const isValid = this.isJSONValid(this.taskData);
+    if (!isValid) {
+      this.response = {
+        error: 'Invalid JSON form the form data.',
+      };
+      this.responseGot = true;
+      this.isLoading = false;
+    }
+
     // Call API to create task
     this.response = await postTask(this.baseURL, this.taskData);
+    this.isLoading = false;
+    this.responseGot = true;
 
     // Handle with response
     console.log(this.response);
+
+    // Clear form
+    this.clearForm();
+  };
+
+  /**
+   * Clears all the fields and sets the value to empty
+   */
+  clearForm = () => {
+    /* Reconstruct the taskData because it might have been emptied due
+    to removeEmptyField fucn. */
+    this.taskData = {
+      name: this.name,
+      description: this.description,
+      executors: this.taskExecutors,
+      inputs: this.taskInput,
+      outputs: this.taskOutput,
+      resources: {
+        cpu_cores: this.cpu_cores,
+        disk_gb: this.disk_gb,
+        preemptible: this.preemptible,
+        ram_gb: this.ram_gb,
+        zones: this.zones,
+      },
+      tags: {
+        WORKFLOW_ID: this.WORKFLOW_ID,
+        PROJECT_GROUP: this.PROJECT_GROUP,
+      },
+      volumes: this.volumes,
+    };
 
     // Clear the form
     this.baseURL = '';
@@ -242,8 +278,65 @@ export default class TESCreateRun extends FASTElement {
     this.PROJECT_GROUP = '';
     this.volumes = [];
 
-    this.taskData = {};
+    this.setFormDataToDefault();
   };
+
+  /**
+   * Set all the form fields to the value of the attr in current state
+   */
+  setFormDataToDefault = () => {
+    this.taskData.name = this.name;
+    this.taskData.description = this.description;
+    this.taskData.executors = this.taskExecutors;
+    this.taskData.inputs = this.taskInput;
+    this.taskData.outputs = this.taskOutput;
+    this.taskData.resources.cpu_cores = this.cpu_cores;
+    this.taskData.resources.disk_gb = this.disk_gb;
+    this.taskData.resources.preemptible = this.preemptible;
+    this.taskData.resources.ram_gb = this.ram_gb;
+    this.taskData.resources.zones = this.zones;
+    this.taskData.tags.WORKFLOW_ID = this.WORKFLOW_ID;
+    this.taskData.tags.PROJECT_GROUP = this.PROJECT_GROUP;
+    this.taskData.volumes = this.volumes;
+  };
+
+  /**
+   * Checks if all the required fields ie command, image, and workdir is filled
+   * @returns break and sets response to error message is required fields aren't filled
+   */
+  checkRequiredFields = () => {
+    // Perform checks for required fields
+    const requiredFields = ['image', 'workdir'];
+    for (const executor of this.taskData.executors) {
+      for (const field of requiredFields) {
+        if (
+          !executor[field] ||
+          (Array.isArray(executor[field]) && executor[field].length === 0)
+        ) {
+          this.response = {
+            error: `${field} cannot be left empty`,
+            breakpoint: 'handleSubmit',
+          };
+          return;
+        }
+      }
+    }
+  };
+
+  /**
+   * Checks if an obj is a valid JSON
+   * @param obj Takes in an object to be checked
+   * @returns boolean, true if obj is valid JSON and vice versa
+   */
+  isJSONValid(obj: any): boolean {
+    try {
+      const jsonString = JSON.stringify(obj); // Serialize to JSON
+      JSON.parse(jsonString); // Deserialize JSON back to an object
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 
   /**
    * Handles the input for the data thats non-dynamic, ie only of is present.
@@ -277,6 +370,16 @@ export default class TESCreateRun extends FASTElement {
       default:
         break;
     }
+  };
+
+  fillFormAgain = () => {
+    this.responseGot = false;
+
+    // Clear the prev form data
+    this.clearForm();
+
+    // Clear prev response
+    this.response = {};
   };
 
   /**

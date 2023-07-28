@@ -236,6 +236,40 @@ const OutputTemplate = html<TESCreateRun>`
 `;
 
 const template = html<TESCreateRun>`
+  ${when(
+    (x) => x.responseGot && x.reponseHas('id'),
+    html`
+      <ecc-client-ga4gh-tes-run
+        baseUrl=${(x) => x.baseURL}
+        id=${(x) => x.response.id}
+      >
+      </ecc-client-ga4gh-tes-run>
+      <!-- Submit Button -->
+      <div class="submit-button-container">
+        <fast-button class="submit-button" @click=${(x) => x.fillFormAgain()}
+          >Fill Form Again
+        </fast-button>
+      </div>
+    `
+  )}
+  ${when(
+    (x) => x.responseGot && x.reponseHas('error'),
+    html`
+      <fast-accordion-item>
+        <span slot="start">error: ${(x) => x.response.error} </span>
+        <p>${(x) => JSON.stringify(x.response)}</p>
+      </fast-accordion-item>
+      <!-- Submit Button -->
+      <div class="submit-button-container">
+        <fast-button class="submit-button" @click=${(x) => x.fillFormAgain()}
+          >Fill Form Again
+        </fast-button>
+      </div>
+    `
+  )}
+  ${when(
+    (x) => !x.responseGot,
+    html`
 <form class="form-container" >
   <!-- Meta data  -->
   <div class="container meta">
@@ -348,28 +382,28 @@ const template = html<TESCreateRun>`
                   <fast-text-field type="text" id="cpu_cores" name="cpu_cores" class="input" :value=${(
                     x
                   ) => x.cpu_cores} @input=${(x, c) =>
-  x.handleDataChange(c.event)} >
+      x.handleDataChange(c.event)} >
                </div>
                <div class="label-input">
                   <label for="disk_gb">Disk GB:</label>
                   <fast-text-field type="text" id="disk_gb" name="disk_gb" class="input" :value=${(
                     x
                   ) => x.disk_gb} @input=${(x, c) =>
-  x.handleDataChange(c.event)} >
+      x.handleDataChange(c.event)} >
                </div>
                <div class="label-input">
                   <label for="ram_gb">RAM GB:</label>
                   <fast-text-field type="text" id="ram_gb" name="ram_gb" class="input" :value=${(
                     x
                   ) => x.ram_gb} @input=${(x, c) =>
-  x.handleDataChange(c.event)} >
+      x.handleDataChange(c.event)} >
                </div>
                <div class="label-input">
                   <label for="zones">Zones:</label>
                   <fast-text-field type="text" id="zones" name="zones" class="input" :value=${(
                     x
                   ) => x.zones.join(',')} @input=${(x, c) =>
-  x.handleZonesInput(c.event)} >
+      x.handleZonesInput(c.event)} >
                </div>
                <div class="label-input">
                   <label for="preemptible">Preemtible</label>
@@ -392,14 +426,14 @@ const template = html<TESCreateRun>`
             <fast-text-field type="text" id="workflow_id" name="workflow_id" class="input" :value=${(
               x
             ) => x.WORKFLOW_ID} @input=${(x, c) =>
-  x.handleDataChange(c.event)} >
+      x.handleDataChange(c.event)} >
          </div>
          <div class="label-input">
             <label for="project_group">Project Group:</label>
             <fast-text-field type="text" id="project_group" name="project_group" class="input" :value=${(
               x
             ) => x.PROJECT_GROUP} @input=${(x, c) =>
-  x.handleDataChange(c.event)} >
+      x.handleDataChange(c.event)} >
          </div>
       </div>
       </fast-accordion-item>
@@ -414,7 +448,7 @@ const template = html<TESCreateRun>`
                <fast-text-field type="text" id="volumes" name="volumes" class="input" :value=${(
                  x
                ) => x.volumes.join(',')} @input=${(x, c) =>
-  x.handleVolumesInput(c.event)} required >
+      x.handleVolumesInput(c.event)} required >
          </fast-accordion-item>
       </div>
    </div>
@@ -422,10 +456,31 @@ const template = html<TESCreateRun>`
 
    <!-- Submit Button -->
    <div class="submit-button-container">
-      <fast-button class="submit-button" @click=${(x) =>
-        x.handleSubmit()} >Create Task
-      </fast-button>
+     ${when(
+       (x) => x.isLoading,
+       html`
+         <fast-button
+           class="submit-button"
+           @click=${(x) => x.handleSubmit()}
+           disabled=${(x) => x.isLoading}
+         >
+           ${when((x) => x.isLoading, html<string>`Creating task`)}
+         </fast-button>
+       `
+     )}
+      ${when(
+        (x) => !x.isLoading,
+        html` <fast-button
+          class="submit-button"
+          @click=${(x) => x.handleSubmit()}
+          }
+        >
+          ${when((x) => !x.isLoading, html<string>`Create Task`)}
+        </fast-button>`
+      )}
    </div>
-</form>
+  </form>
+  `
+  )}
 `;
 export default template;
