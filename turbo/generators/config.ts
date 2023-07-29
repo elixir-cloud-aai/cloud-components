@@ -72,6 +72,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         validate: validateNotEmpty,
       },
     ],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     actions: (data: any) => {
       // Take the prompt value and convert it into kebab-case
       const library = data.library || "";
