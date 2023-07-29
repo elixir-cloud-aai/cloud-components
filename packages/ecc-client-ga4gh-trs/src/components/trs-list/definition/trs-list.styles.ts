@@ -127,4 +127,12 @@ export const styles: ElementStyles = css`
     cursor: pointer;
     fill: #009879;
   }
+
+  .tab--version:hover {
+    color: #000;
+  }
+
+  .tab--version[aria-selected="true"]:hover {
+    color: #fff;
+  }
 `;

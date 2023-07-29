@@ -62,7 +62,9 @@ const filtersTemplate = html<TRS>` ${when(
           <div class="filterContainer--label">
             <div class="filterContainer--label">
               <div className="filterContainer--tooptip">
-                <span>${(field) => field.name}</span>
+                <label for="${(field) => field.key}"
+                  >${(field) => field.name}</label
+                >
                 <custom-tooltip>
                   ${tooltipIcon} ${(x) => x.tooltipText}
                 </custom-tooltip>
@@ -70,6 +72,7 @@ const filtersTemplate = html<TRS>` ${when(
               ${(x) =>
                 x.textFieldName === "toolclass"
                   ? html` <fast-select
+                      id="${(x) => x.key}"
                       name="${(x) => x.key}"
                       value="${(x, c) => c.parent.filterParams[x.key]}"
                       @change="${(x, c) =>
@@ -85,6 +88,7 @@ const filtersTemplate = html<TRS>` ${when(
                       )}
                     </fast-select>`
                   : html`<fast-text-field
+                      id="${(x) => x.key}"
                       type="text"
                       name="${(x) => x.key}"
                       value="${(x, c) => c.parent.filterParams[x.key]}"
@@ -158,7 +162,7 @@ const accordionTemplate = html<TRS>`
         <fast-tabs orientation="vertical">
           ${repeat(
             (x) => x.versions,
-            html<Version>` <fast-tab slot="tab"
+            html<Version>` <fast-tab slot="tab" class="tab--version"
                 >Version ${(x) => x.name}</fast-tab
               >
               <fast-tab-panel slot="tabpanel" class="tabContent">
