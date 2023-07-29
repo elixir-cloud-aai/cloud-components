@@ -19,7 +19,7 @@ import {
   minusIcon,
   plusIcon,
   tooltipIcon,
-} from "../../../assets/icons.template.js";
+} from "../../../assets/icons.js";
 
 provideFASTDesignSystem().register(
   fastTextField(),
