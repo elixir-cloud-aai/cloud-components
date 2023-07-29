@@ -108,6 +108,13 @@ export const styles: ElementStyles = css`
     gap: 10px;
   }
 
+  .filterContainer--tooltip {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+  }
+
   .pagination {
     display: flex;
     justify-content: center;

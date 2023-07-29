@@ -6,7 +6,7 @@ import {
 } from "@microsoft/fast-element";
 import { template } from "./trs-list.template.js";
 import { styles } from "./trs-list.styles.js";
-import { ToolClass } from "./trs-list.types.js";
+import { FilterFields, ToolClass } from "./trs-list.types.js";
 
 /**
  * @class
@@ -50,6 +50,58 @@ export class TRS extends FASTElement {
     checker: undefined,
     offset: "",
   };
+
+  @observable filterFields: FilterFields[] = [
+    {
+      key: "id",
+      name: "Tool Id",
+      textFieldName: "id",
+      tooltipText:
+        "A unique identifier of the tool, scoped to this registry, for example 123456.",
+    },
+    {
+      key: "alias",
+      name: "Alias",
+      textFieldName: "alias",
+      tooltipText:
+        "Support for this parameter is optional for tool registries that support aliases. If provided will only return entries with the given alias.",
+    },
+    {
+      key: "toolClass",
+      name: "Registry",
+      textFieldName: "registry",
+      tooltipText:
+        "If provided will only return entries from the specific registry.",
+    },
+    {
+      key: "organization",
+      name: "Organization",
+      textFieldName: "organization",
+      tooltipText:
+        "If provided will only return entries from the specific organization.",
+    },
+    {
+      key: "name",
+      name: "Name",
+      textFieldName: "name",
+      tooltipText:
+        "The name of the tool, without reference to any particular version. If provided will only return entries with the given name.",
+    },
+    {
+      key: "toolClass",
+      name: "Toolclass",
+      textFieldName: "toolclass",
+      tooltipText:
+        "If provided will only return entries of the specific tool class.",
+    },
+    {
+      key: "author",
+      name: "Checker",
+      textFieldName: "checker",
+      tooltipText:
+        "If true only checker workflows will be returned, if false only non-checker workflows will be returned. If not present both checker and non-checker workflows will be returned.",
+    },
+  ];
 
   /**
    * @method
@@ -153,7 +205,6 @@ export class TRS extends FASTElement {
    * @description Apply the current filter parameters.
    */
   handleApplyFilter = () => {
-    console.log(this.filterParams);
     this.loadData();
     this.isOpenFilter = false;
   };

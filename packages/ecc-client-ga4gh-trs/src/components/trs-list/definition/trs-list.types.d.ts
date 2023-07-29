@@ -52,4 +52,11 @@ interface ToolClass {
   name: string;
 }
 
-export type { Tool, Version, Image, Checksum, ToolClass };
+interface FilterFields {
+  key: string;
+  name: string;
+  textFieldName: string;
+  tooltipText: string;
+}
+
+export type { Tool, Version, Image, Checksum, ToolClass, FilterFields };
