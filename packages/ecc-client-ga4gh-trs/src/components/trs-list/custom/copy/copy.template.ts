@@ -9,23 +9,15 @@ import { copyIcon, doneIcon } from "../../../../assets/icons.js";
 provideFASTDesignSystem().register(fastButton());
 
 export const template = html<CopyClipboard>`
-  <head>
-    <script
-      type="module"
-      src="https://cdn.jsdelivr.net/npm/@microsoft/fast-components/dist/fast-components.min.js"
-    ></script>
-  </head>
-  <body>
-    <div class="clipboard input">
-      <p>${(x) => x.value}dwdwe</p>
-      <fast-button
-        class="button"
-        href="#"
-        appearance="stealth"
-        @click="${(x) => x.handleCopy()}"
-      >
-        ${(x) => (x.copied ? html`${doneIcon}` : html`${copyIcon}`)}
-      </fast-button>
-    </div>
-  </body>
+  <div class="clipboard input">
+    <p>${(x) => x.value}dwdwe</p>
+    <fast-button
+      class="button"
+      href="#"
+      appearance="stealth"
+      @click="${(x) => x.handleCopy()}"
+    >
+      ${(x) => (x.copied ? html`${doneIcon}` : html`${copyIcon}`)}
+    </fast-button>
+  </div>
 `;
