@@ -36,7 +36,7 @@
     "husky": "^8.0.0",
     "prettier": "^2.8.8",
     "standard-version": "^9.5.0",
-    "turbo": "^1.9.8"
+    "turbo": "^1.10.7"
   },
   "name": "elixir-cloud-components",
   "packageManager": "npm@9.2.0",
