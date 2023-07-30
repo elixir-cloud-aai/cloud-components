@@ -39,7 +39,7 @@ To get started with this project, follow these steps:
 4. Start the development server
 
    ```
-   npm start
+   npm run dev
    ```
 
 5. Include the `ecc-client-ga4gh-trs` component in your HTML file
