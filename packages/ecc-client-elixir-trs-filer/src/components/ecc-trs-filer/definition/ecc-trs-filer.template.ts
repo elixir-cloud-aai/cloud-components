@@ -3,11 +3,11 @@ import {
   allComponents,
   provideFASTDesignSystem,
 } from "@microsoft/fast-components";
-import type { TRS } from "./ecc-trs-filer.js";
+import type { TRSFiler } from "./ecc-trs-filer.js";
 
 provideFASTDesignSystem().register(allComponents);
 
-export const template = html<TRS>`
+export const template = html<TRSFiler>`
   <div class="trs-container">
     <h1>TRS Filer</h1>
     <fast-tabs>
@@ -15,14 +15,12 @@ export const template = html<TRS>`
       <fast-tab slot="tab">List of tool classes</fast-tab>
       <fast-tab-panel slot="tabpanel" class="custom-tabpanel">
         <div class="u-mt-md"></div>
-        <trs-list
-          baseUrl="https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2"
-        ></trs-list
+        <trs-list baseUrl="${(x) => x.baseUrl}"></trs-list
       ></fast-tab-panel>
       <fast-tab-panel slot="tabpanel" class="custom-tabpanel">
         <div class="u-mt-md"></div>
 
-        <trs-classes></trs-classes>
+        <trs-classes baseUrl="${(x) => x.baseUrl}"></trs-classes>
       </fast-tab-panel>
     </fast-tabs>
   </div>

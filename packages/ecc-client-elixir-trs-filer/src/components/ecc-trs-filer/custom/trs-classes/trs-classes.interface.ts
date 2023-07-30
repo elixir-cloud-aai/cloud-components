@@ -2,8 +2,7 @@ type IToolClass = {
   id: string;
   name: string;
   description: string;
-   isEditing: boolean;
+  isEditing?: boolean;
 };
-
 
 export type { IToolClass };

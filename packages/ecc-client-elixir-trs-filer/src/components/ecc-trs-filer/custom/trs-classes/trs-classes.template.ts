@@ -6,31 +6,26 @@ import type { IToolClass } from "./trs-classes.interface.js";
 const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
   <tr class="active-row">
     ${(x) =>
-        x.isEditing
-            ? html`
+      x.isEditing
+        ? html`
+            <td>${x.id}</td>
+            </td>
             <td>
               <input
                 type="text"
-                value="${x.id}"
-                @input="${(e, ctx) => ctx.parent.handleInput(e, x, "id")}"
+                name="name"
+                value="${(x) => x.name}"
+                @input="${(x, c) => c.parent.handleInputChange(x, c.event)}"
               />
             </td>
             <td>
               <input
                 type="text"
-                value="${x.name}"
-                @input="${(e, ctx) => ctx.parent.handleInput(e, x, "name")}"
+                name="description"
+                value="${(x) => x.description}"
+                @input="${(x, c) => c.parent.handleInputChange(x, c.event)}"
               />
             </td>
-            <td>
-              <input
-                type="text"
-                value="${x.description}"
-                @input="${(e, ctx) =>
-                    ctx.parent.handleInput(e, x, "description")}"
-              />
-            </td>
-            <td>
               <div>
                 <p
                   class="clickable"
@@ -41,7 +36,7 @@ const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
               </div>
             </td>
           `
-            : html`
+        : html`
             <td>${x.id}</td>
             <td>${x.name}</td>
             <td>${x.description}</td>

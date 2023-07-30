@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/typedef */
 import {
+  attr,
   customElement,
   FASTElement,
   observable,
@@ -22,6 +21,7 @@ type DataItem = {
   styles,
 })
 export class TRSClasses extends FASTElement {
+  @attr public baseUrl = "";
   @observable public data: IToolClass[] = [];
 
   public connectedCallback(): void {
@@ -31,42 +31,38 @@ export class TRSClasses extends FASTElement {
 
   private async fetchData(): Promise<void> {
     try {
-      const response = await fetch(
-        "https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2/toolClasses",
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${this.baseUrl}/toolClasses`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      });
       const data: IToolClass[] = await response.json();
       this.data = data;
+      console.log(this.data);
     } catch (error) {
       console.error("Failed to fetch data", error);
     }
   }
 
   public edit(id: string): void {
-    const item = this.data.find((item) => item.id === id);
-    if (item) {
-      item.isEditing = true;
+    const itemIndex = this.data.findIndex((item) => item.id === id);
+    if (itemIndex !== -1) {
+      const updatedItem = { ...this.data[itemIndex], isEditing: true };
+      const updatedData = [...this.data];
+      updatedData[itemIndex] = updatedItem;
+      this.data = updatedData;
     }
-    console.log("edit", id);
-    console.log("editing mode", item?.isEditing);
   }
 
   public async delete(id: string): Promise<void> {
     try {
-      const response = await fetch(
-        `https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2/toolClasses/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Accept: "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${this.baseUrl}/toolClasses/${id}`, {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+        },
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -81,33 +77,38 @@ export class TRSClasses extends FASTElement {
     const item = this.data.find((item) => item.id === id);
     if (!item) return;
 
+    // without isEditing object;
+    const updatedItem = {
+      name: item.name,
+      description: item.description,
+    };
+
     try {
-      const response = await fetch(
-        `https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2/toolClasses/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(item),
-        }
-      );
+      const response = await fetch(`${this.baseUrl}/toolClasses/${id}`, {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedItem),
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      item.isEditing = false;
+      const updatedData = this.data.map((item) => {
+        if (item.id === id) {
+          return { ...item, isEditing: false };
+        }
+        return item;
+      });
+      this.data = updatedData;
     } catch (error) {
       console.error(`Failed to save item with id: ${id}`, error);
     }
   }
-  public handleInput(
-    event: Event,
-    item: DataItem,
-    field: keyof DataItem
-  ): void {
-    if (field === "id" || field === "name" || field === "description") {
-      item[field] = (event.target as HTMLInputElement).value;
-    }
+
+  public handleInputChange(item: DataItem, e: Event) {
+    const { name, value } = e.target as HTMLInputElement;
+    item[name] = value;
   }
 }

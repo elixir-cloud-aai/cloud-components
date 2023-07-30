@@ -1,4 +1,4 @@
-import { customElement, FASTElement } from "@microsoft/fast-element";
+import { attr, customElement, FASTElement } from "@microsoft/fast-element";
 import { template } from "./ecc-trs-filer.template.js";
 import { styles } from "./ecc-trs-filer.styles.js";
 
@@ -7,4 +7,6 @@ import { styles } from "./ecc-trs-filer.styles.js";
   template,
   styles,
 })
-export class TRS extends FASTElement {}
+export class TRSFiler extends FASTElement {
+  @attr public baseUrl = "";
+}
