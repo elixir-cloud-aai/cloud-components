@@ -10,10 +10,10 @@ const outDir = path.resolve(__dirname, "./www");
 module.exports = {
     name: "root",
     entry: {
-        main: path.resolve(appDir, "index.tsx"),
+        main: path.resolve(appDir, "index.ts"),
     },
     resolve: {
-        extensions: [".ts", ".tsx", ".js", ".jsx"],
+        extensions: [".ts", ".js"],
         plugins: [
             new ResolveTypeScriptPlugin()
         ]
@@ -25,14 +25,12 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.(ts|tsx|js|jsx)$/, // Add .jsx and .tsx
-                exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['@babel/preset-env', '@babel/preset-react'],
+                test: /.ts$/,
+                use: [
+                    {
+                        loader: "ts-loader",
                     },
-                },
+                ],
             },
         ],
     },

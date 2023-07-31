@@ -3,21 +3,48 @@
 TRS component
 
 ## Introduction
-...
+
+This project introduces the `ecc-client-ga4gh-trs` component, an easily embeddable component that works with the GA4GH's Tool Registry Service (TRS). The component can be included in an application by adding an HTML tag with a `baseUrl` attribute that corresponds to the backend URL for the TRS service.
+
+The project's directory structure contains `src/components/ecc-trs` folders, where you can find three subcomponents of the TRS component.
 
 ### Components
-| Component              | Issue  | Status             |
-|------------------------|--------|--------------------|
-|                        |        |                    |
+
+| Component            | Issue                                                                       | Status |
+| -------------------- | --------------------------------------------------------------------------- | ------ |
+| ecc-client-ga4gh-trs | [Issue #78](https://github.com/elixir-cloud-aai/cloud-components/issues/78) | Done   |
 
 ## Getting Started
 
 To get started with this project, follow these steps:
 
-1. Add your steps here
+1. Clone the project
 
    ```
-   Add your commands here
+   git clone https://github.com/elixir-cloud-aai/cloud-components.git
+   ```
+
+2. Navigate to the project directory
+
+   ```
+   cd packages/ecc-client-ga4gh-trs
+   ```
+
+3. Install the dependencies
+
+   ```
+   npm install
+   ```
+
+4. Start the development server
+
+   ```
+   npm run dev
+   ```
+
+5. Include the `ecc-client-ga4gh-trs` component in your HTML file
+   ```
+   <ecc-client-ga4gh-trs baseUrl="https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2"></ecc-client-ga4gh-trs>
    ```
 
 ## Contributing
