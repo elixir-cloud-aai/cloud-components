@@ -19,7 +19,10 @@ export const styles: ElementStyles = css`
     text-align: left;
   }
 
-  .styled-table th,
+  .styled-table th {
+    padding: 12px 15px;
+    color: white;
+  }
   .styled-table td {
     padding: 12px 15px;
   }
@@ -30,10 +33,6 @@ export const styles: ElementStyles = css`
 
   .styled-table tbody tr:nth-of-type(even) {
     background-color: #f3f3f3;
-  }
-
-  .styled-table tbody tr:last-of-type {
-    border-bottom: 2px solid #009879;
   }
 
   .styled-table tbody tr.active-row {
@@ -48,6 +47,16 @@ export const styles: ElementStyles = css`
   }
 
   .clickable:hover {
+    color: white;
+  }
+
+  .buttonToolClass {
+    display: flex;
+    flex-direction: column;
+    color: white;
+  }
+
+  .button {
     color: white;
   }
 `;

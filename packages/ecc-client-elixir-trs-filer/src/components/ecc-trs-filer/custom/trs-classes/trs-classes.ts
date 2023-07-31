@@ -23,6 +23,9 @@ type DataItem = {
 export class TRSClasses extends FASTElement {
   @attr public baseUrl = "";
   @observable public data: IToolClass[] = [];
+  @observable public isModalOpen = false;
+  @observable public modalDescription = "";
+  @observable public modalName = "";
 
   public connectedCallback(): void {
     super.connectedCallback();
@@ -45,6 +48,64 @@ export class TRSClasses extends FASTElement {
     }
   }
 
+  public handleDescriptionChange(e: Event): void {
+    const target = e.target as HTMLInputElement;
+    if (target) {
+      this.modalDescription = target.value;
+    }
+  }
+
+  public handleNameChange(e: Event): void {
+    const target = e.target as HTMLInputElement;
+    if (target) {
+      this.modalName = target.value;
+    }
+  }
+
+  public clearModal(): void {
+    this.modalDescription = "";
+    this.modalName = "";
+  }
+
+  public async createToolClass(
+    description: string,
+    name: string
+  ): Promise<void> {
+    console.log(description, name);
+    try {
+      const response = await fetch(`${this.baseUrl}/toolClasses`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ description, name }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      console.log("Tool class created successfully!");
+      this.clearModal();
+      this.fetchData();
+    } catch (error) {
+      console.error("Failed to create tool class", error);
+    }
+  }
+
+  public openModal(): void {
+    this.isModalOpen = true;
+  }
+
+  public closeModal(): void {
+    this.isModalOpen = false;
+  }
+
+  public async createToolClassFromModal(): Promise<void> {
+    await this.createToolClass(this.modalDescription, this.modalName);
+    this.closeModal();
+  }
+
+  // for editing and deleting a tool class
   public edit(id: string): void {
     const itemIndex = this.data.findIndex((item) => item.id === id);
     if (itemIndex !== -1) {

@@ -1,7 +1,12 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { html, repeat, ViewTemplate } from "@microsoft/fast-element";
+import { html, repeat, ViewTemplate, when } from "@microsoft/fast-element";
 import type { TRSClasses } from "./trs-classes.js";
 import type { IToolClass } from "./trs-classes.interface.js";
+import {
+  allComponents,
+  provideFASTDesignSystem,
+} from "@microsoft/fast-components";
+
+provideFASTDesignSystem().register(allComponents);
 
 const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
   <tr class="active-row">
@@ -62,6 +67,36 @@ const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
 
 export const template = html<TRSClasses>`
   <div>
+    <div class="buttonToolClass">
+      <fast-button class="button" @click="${(x) => x.openModal()}"
+        >Create Tool Class</fast-button
+      >
+    </div>
+    ${when(
+      (x) => x.isModalOpen,
+      html`
+        <div class="modal">
+          <label>Description:</label>
+          <input
+            type="text"
+            value=${(x) => x.modalDescription}
+            @input=${(x, c) => x.handleDescriptionChange(c.event)}
+          />
+
+          <label>Name:</label>
+          <input
+            type="text"
+            value=${(x) => x.modalName}
+            @input="${(x, c) => x.handleNameChange(c.event)}"
+          />
+
+          <fast-button @click="${(x) => x.createToolClassFromModal()}"
+            >Submit</fast-button
+          >
+          <fast-button @click="${(x) => x.closeModal()}">Cancel</fast-button>
+        </div>
+      `
+    )}
     <table class="styled-table">
       <thead>
         <tr>

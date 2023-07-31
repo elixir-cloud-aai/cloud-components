@@ -32,10 +32,6 @@ export const styles: ElementStyles = css`
     background-color: #f3f3f3;
   }
 
-  .styled-table tbody tr:last-of-type {
-    border-bottom: 2px solid #009879;
-  }
-
   .styled-table tbody tr.active-row {
     font-weight: bold;
     color: #009879;
