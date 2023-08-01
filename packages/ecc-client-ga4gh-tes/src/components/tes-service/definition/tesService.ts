@@ -22,5 +22,6 @@ export default class TESService extends FASTElement {
   async connectedCallback() {
     super.connectedCallback();
     this.data = await fetchService(this.baseURL);
+    console.log(this.data);
   }
 }

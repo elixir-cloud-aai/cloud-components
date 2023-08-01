@@ -1,54 +1,98 @@
 import { html, repeat, when } from '@microsoft/fast-element';
 
+const OtherTemplate: any = (x: any) => html`
+  <div class="container key-value">
+    <div class="key">${x[0]}</div>
+    <div class="value">${x[1]}</div>
+  </div>
+`;
+
+const ArrayTemplate: any = (x: any) => html`
+  <div class="container array-container">
+    <div class="key">${x[0]}</div>
+    <div class="value array-value">
+      ${repeat(
+        (arr) => arr[1],
+        html`
+          ${when(
+            (val) => Array.isArray(val[1]),
+            html`${(val) => ArrayTemplate(val)} `
+          )}
+          ${when(
+            (val) =>
+              typeof val[1] === 'object' &&
+              val[1] !== null &&
+              !Array.isArray(val[1]),
+            html` ${(val) => ObjectTemplate(val)} `
+          )}
+          ${when((val) => typeof val[1] !== 'object', html` ${(val) => val} `)}
+        `
+      )}
+    </div>
+  </div>
+`;
+
+const ObjectTemplate: any = (x: any) => html`
+  <div class="obj-name">${x[0]}:</div>
+  <div class="object-container">
+    <div class="value object-value">
+      ${when(
+        (obj) => Object.entries(obj[1]).length > 0,
+        html`
+          ${repeat(
+            (val) => Object.entries(val[1]),
+            html`
+              ${when(
+                (val) => Array.isArray(val[1]),
+                html` ${(val) => ArrayTemplate(val)} `
+              )}
+              ${when(
+                (val) =>
+                  typeof val[1] === 'object' &&
+                  val[1] !== null &&
+                  !Array.isArray(x[1]),
+                html` ${(val) => ObjectTemplate(val)} `
+              )}
+              ${when(
+                (val) => typeof val[1] !== 'object',
+                html` ${(val) => OtherTemplate(val)} `
+              )}
+            `
+          )}
+        `
+      )}
+    </div>
+  </div>
+`;
+
 const template = html`
-  ${when(
-    (x) => Object.entries(x.data).length > 1,
-    html`
-      <div class="service-container">
-        <div class="name">
-          <div class="key">Name</div>
-          <div class="value">${(x) => x.data.name}</div>
-        </div>
-        <div class="description">
-          <div class="key">Description</div>
-          <div class="value">${(x) => x.data.description}</div>
-        </div>
-        <div class="id">
-          <div class="key">ID</div>
-          <div class="value">${(x) => x.data.id}</div>
-        </div>
-        <div class="version">
-          <div class="key">Version</div>
-          <div class="value">${(x) => x.data.version}</div>
-        </div>
-        <div class="organization">
-          <div class="key">Organization</div>
-          <div class="value">${(x) => x.data.organization.name}</div>
-        </div>
-        <div class="type">
-          <div class="key">Type</div>
-          <div class="value subcontainer">
-            ${repeat(
-              (x) => Object.entries(x.data.type),
-              html`
-                <div class="key">${(x) => x[0]}</div>
-                <div class="value">${(x) => x[1]}</div>
-              `
+  <div class="Outer-container">
+    ${when(
+      (x) => Object.entries(x.data).length > 0,
+      html`
+        ${repeat(
+          (x) => Object.entries(x.data),
+          html`
+            ${when(
+              (val) => Array.isArray(val[1]),
+              html` ${(val) => ArrayTemplate(val)} `
             )}
-          </div>
-        </div>
-        <div class="storage">
-          <div class="key">Storage</div>
-          <div class="value subcontainer">
-            ${repeat(
-              (x) => x.data.storage,
-              html` <div class="array-value">${(x) => x}</div> `
+            ${when(
+              (val) =>
+                typeof val[1] === 'object' &&
+                val[1] !== null &&
+                !Array.isArray(val[1]),
+              html` ${(x) => ObjectTemplate(x)} `
             )}
-          </div>
-        </div>
-      </div>
-    `
-  )}
+            ${when(
+              (val) => typeof val[1] !== 'object',
+              html` ${(val) => OtherTemplate(val)} `
+            )}
+          `
+        )}
+      `
+    )}
+  </div>
 `;
 
 export default template;
