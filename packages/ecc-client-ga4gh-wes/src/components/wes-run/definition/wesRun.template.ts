@@ -5,7 +5,7 @@ import {
   fastButton,
   fastBadge,
 } from '@microsoft/fast-components';
-import { html, when } from '@microsoft/fast-element';
+import { html, repeat, when } from '@microsoft/fast-element';
 import WESRun from './wesRun.js';
 
 provideFASTDesignSystem().register(
@@ -42,15 +42,122 @@ provideFASTDesignSystem().register(
   })
 );
 
+const OtherTemplate: any = (x: any) => html`
+  <div class="container key-value">
+    <div class="key">${x[0]}</div>
+    <div class="value">${x[1]}</div>
+  </div>
+`;
+
+const ArrayTemplate: any = (x: any) => html`
+  <div class="container array-container">
+    <div class="key">${x[0]}</div>
+    <div class="value array-value">
+      ${repeat(
+        (arr: any) => arr[1],
+        html`
+          ${when(
+            (val) => Array.isArray(val[1]),
+            html`${(val) => ArrayTemplate(val)} `
+          )}
+          ${when(
+            (val) =>
+              typeof val[1] === 'object' &&
+              val[1] !== null &&
+              !Array.isArray(val[1]),
+            html` ${(val) => ObjectTemplate(val)} `
+          )}
+          ${when((val) => typeof val[1] !== 'object', html` ${(val) => val} `)}
+        `
+      )}
+    </div>
+  </div>
+`;
+
+const ObjectTemplate: any = (x: any) => html`
+  <div class="obj-name">${x[0]}:</div>
+  <div class="object-container">
+    <div class="value object-value">
+      ${when(
+        (obj) => Object.entries(obj[1]).length > 0,
+        html`
+          ${repeat(
+            (val) => Object.entries(val[1]),
+            html`
+              ${when(
+                (val) => Array.isArray(val[1]),
+                html` ${(val) => ArrayTemplate(val)} `
+              )}
+              ${when(
+                (val) =>
+                  typeof val[1] === 'object' &&
+                  val[1] !== null &&
+                  !Array.isArray(x[1]),
+                html` ${(val) => ObjectTemplate(val)} `
+              )}
+              ${when(
+                (val) => typeof val[1] !== 'object',
+                html` ${(val) => OtherTemplate(val)} `
+              )}
+            `
+          )}
+        `
+      )}
+    </div>
+  </div>
+`;
+
+const innerTemplate = html`
+  <div class="Outer-container">
+    ${when(
+      (x) => Object.entries(x.data).length > 0,
+      html`
+        ${repeat(
+          (x) => Object.entries(x.data),
+          html`
+            ${when(
+              (val) => Array.isArray(val[1]),
+              html` ${(val) => ArrayTemplate(val)} `
+            )}
+            ${when(
+              (val) =>
+                typeof val[1] === 'object' &&
+                val[1] !== null &&
+                !Array.isArray(val[1]),
+              html` ${(x) => ObjectTemplate(x)} `
+            )}
+            ${when(
+              (val) => typeof val[1] !== 'object',
+              html` ${(val) => OtherTemplate(val)} `
+            )}
+          `
+        )}
+      `
+    )}
+  </div>
+`;
+const state: string[] = [
+  'UNKNOWN',
+  'QUEUED',
+  'INITIALIZING',
+  'RUNNING',
+  'PAUSED',
+  'COMPLETE',
+  'EXECUTOR_ERROR',
+  'SYSTEM_ERROR',
+  'CANCELED',
+  'CANCELING',
+  'PREEMPTED',
+];
 const template = html<WESRun>` <fast-accordion-item>
   <span slot="heading" class="slot-heading">
     ${(x) => html`
       <div class="collapsed-container">
         <div class="right">
-          <span class="id">
-            <span class="title">RUN ID:</span>
-            <span>${x.id}</span>
-          </span>
+          <div class="id">
+            <sxpan class="title">RUN ID</sxpan>
+            <span>${(w) => w.id}</span>
+          </div>
         </div>
         <div class="left">
           <div class="status-badge">
@@ -66,7 +173,7 @@ const template = html<WESRun>` <fast-accordion-item>
                   --badge-fill-initializing: #9c27b0;
                   --badge-fill-running: #ff5722;
                   --badge-fill-paused: #607d8b;
-                  --badge-fill-system-error: #f44336;
+                  --badge-fill-system_error: #f44336;
                   --badge-fill-canceling: #795548;
                   --badge-fill-preempted: #00bcd4;
                   --badge-fill-transparent: transparent;
@@ -74,90 +181,17 @@ const template = html<WESRun>` <fast-accordion-item>
                   --badge-color-white: #ffffff;
                 }
               </style>
-              ${when(
-                () => x?.state === 'COMPLETE',
+              ${repeat(
+                () => state,
                 html`
-                  <fast-badge fill="complete" color="white"
-                    >${x.state}</fast-badge
-                  >
-                `
-              )}
-              ${when(
-                () => x?.state === 'SYSTEM_ERROR',
-                html`
-                  <fast-badge fill="system-error" color="white"
-                    >${x.state}</fast-badge
-                  >
-                `
-              )}
-              ${when(
-                () => x?.state === 'PROCESSING',
-                html`
-                  <fast-badge fill="processing" color="white"
-                    >${x.state}</fast-badge
-                  >
-                `
-              )}
-              ${when(
-                () => x?.state === 'CANCELED',
-                html`
-                  <fast-badge fill="cancelled" color="white"
-                    >${x.state}</fast-badge
-                  >
-                `
-              )}
-              ${when(
-                () => x?.state === 'QUEUED',
-                html`
-                  <fast-badge fill="queued" color="white"
-                    >${x.state}</fast-badge
-                  >
-                `
-              )}
-              ${when(
-                () => x?.state === 'INITIALIZING',
-                html`
-                  <fast-badge fill="initializing" color="white"
-                    >${x.state}</fast-badge
-                  >
-                `
-              )}
-              ${when(
-                () => x?.state === 'RUNNING',
-                html`
-                  <fast-badge fill="running" color="white"
-                    >${x.state}</fast-badge
-                  >
-                `
-              )}
-              ${when(
-                () => x?.state === 'PAUSED',
-                html`
-                  <fast-badge fill="paused" color="white"
-                    >${x.state}</fast-badge
-                  >
-                `
-              )}
-              ${when(
-                () => x?.state === 'EXECUTOR_ERROR',
-                html`
-                  <fast-badge fill="error" color="white">${x.state}</fast-badge>
-                `
-              )}
-              ${when(
-                () => x?.state === 'CANCELING',
-                html`
-                  <fast-badge fill="canceling" color="white"
-                    >${x.state}</fast-badge
-                  >
-                `
-              )}
-              ${when(
-                () => x?.state === 'PREEMPTED',
-                html`
-                  <fast-badge fill="preempted" color="white"
-                    >${x.state}</fast-badge
-                  >
+                  ${when(
+                    (curr_state, c) => c.parent?.state === curr_state,
+                    html`
+                      <fast-badge fill=${(s) => s.toLowerCase()} color="white"
+                        >${x.state}</fast-badge
+                      >
+                    `
+                  )}
                 `
               )}
             </div>
@@ -191,7 +225,7 @@ const template = html<WESRun>` <fast-accordion-item>
   )}
   ${when(
     (x) => !x.isLoading,
-    html<WESRun>` ${when((x) => x.data.request, html``)} `
+    html<WESRun>` ${when((x) => x.data, html` ${innerTemplate} `)} `
   )}
 </fast-accordion-item>`;
 
