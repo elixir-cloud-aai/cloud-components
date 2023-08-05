@@ -91,8 +91,13 @@ const styles = css`
   }
 
   .value {
+    color: black;
     flex-basis: 70%;
     overflow-x: scroll;
+  }
+
+  .value::-webkit-scrollbar {
+    display: none;
   }
 
   /* Responsive styles for mobile devices */

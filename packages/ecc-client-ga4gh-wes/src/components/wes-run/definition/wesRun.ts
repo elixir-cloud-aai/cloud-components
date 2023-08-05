@@ -6,7 +6,6 @@ import {
 } from '@microsoft/fast-element';
 import template from './wesRun.template.js';
 import styles from './wesRun.styles.js';
-import WorkflowData from './workflowData.js';
 import { cancelWorkflow, fetchWorkflow } from '../../../data/index.js';
 
 @customElement({
@@ -23,51 +22,11 @@ export default class WESRun extends FASTElement {
 
   @observable isLoading = true;
 
-  @observable data: WorkflowData = {
-    run_id: this.id,
-    state: this.state,
-    request: {
-      workflow_params: {},
-      workflow_type: '',
-      workflow_type_version: '',
-      tags: {
-        additionalProp1: '',
-        additionalProp2: '',
-        additionalProp3: '',
-      },
-      workflow_engine_parameters: {
-        additionalProp1: '',
-        additionalProp2: '',
-        additionalProp3: '',
-      },
-      workflow_url: '',
-    },
-    run_log: {
-      name: '',
-      cmd: [],
-      start_time: '',
-      end_time: '',
-      stdout: '',
-      stderr: '',
-      exit_code: 0,
-    },
-    task_logs: [
-      {
-        name: '',
-        cmd: [],
-        start_time: '',
-        end_time: '',
-        stdout: '',
-        stderr: '',
-        exit_code: 0,
-      },
-    ],
-    outputs: {},
-  };
+  @observable data: any = {};
 
   connectedCallback() {
     super.connectedCallback();
-    this.handleFetch();
+    // this.handleFetch();
   }
 
   disconnectedCallback() {
@@ -84,7 +43,9 @@ export default class WESRun extends FASTElement {
   handleFetch = async () => {
     // Only fetch the data if not already fetched and base URL is provided
     if (this.isLoading && this.baseURL.length !== 0) {
+      console.log('clicked');
       this.data = await fetchWorkflow(this.baseURL, this.id);
+      console.log(this.data);
       this.isLoading = false;
     }
   };

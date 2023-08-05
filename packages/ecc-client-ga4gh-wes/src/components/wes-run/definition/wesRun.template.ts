@@ -158,7 +158,9 @@ const state: string[] = [
   'PREEMPTED',
 ];
 
-const template = html<WESRun>` <fast-accordion-item>
+const template = html<WESRun>` <fast-accordion-item
+  @change=${(x) => x.handleFetch()}
+>
   <span slot="heading" class="slot-heading">
     ${(x) => html`
       <div class="collapsed-container">
@@ -182,6 +184,7 @@ const template = html<WESRun>` <fast-accordion-item>
                   --badge-fill-initializing: #9c27b0;
                   --badge-fill-running: #ff5722;
                   --badge-fill-paused: #607d8b;
+                  --badge-fill-executor_error: #b22222;
                   --badge-fill-system_error: #f44336;
                   --badge-fill-canceling: #795548;
                   --badge-fill-preempted: #00bcd4;
