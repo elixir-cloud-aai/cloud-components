@@ -14,6 +14,13 @@ const styles = css`
     align-items: center;
   }
 
+  .template-container {
+    margin: 0.3rem;
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    border-radius: 10px;
+  }
+
   .right {
     margin-right: 10px;
   }
@@ -27,10 +34,10 @@ const styles = css`
   .id {
     display: flex;
     align-items: center;
+    gap: 1rem;
   }
 
   .title {
-    margin-right: 5px;
     font-weight: bold;
     font-size: 0.8rem;
   }
@@ -57,25 +64,20 @@ const styles = css`
 
   /* Styling for objects */
   .object-container {
-    border-bottom: 1px solid #ccc;
-    // margin: 0.4rem 0rem;
   }
 
   .object-value {
   }
 
   .obj-name {
-    margin-bottom: 1rem;
     font-weight: bold;
     color: #333;
     flex-basis: 30%;
     text-transform: uppercase;
-    border-top: 1px solid #ccc;
   }
 
   /* Styling for key-value pairs */
   .key-value {
-    margin-bottom: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -90,12 +92,11 @@ const styles = css`
 
   .value {
     flex-basis: 70%;
+    overflow-x: scroll;
   }
 
   /* Responsive styles for mobile devices */
-  @media (max-width: 550px) {
-    /* 48rem equals 768px (768px / 16px = 48rem) */
-    /* Reduce padding for the main container */
+  @media (max-width: 770px) {
     .outer-container {
       padding: 0.5rem;
     }

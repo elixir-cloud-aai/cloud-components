@@ -43,66 +43,73 @@ provideFASTDesignSystem().register(
 );
 
 const OtherTemplate: any = (x: any) => html`
-  <div class="container key-value">
+  <div class="template-container container key-value">
     <div class="key">${x[0]}</div>
     <div class="value">${x[1]}</div>
   </div>
 `;
 
 const ArrayTemplate: any = (x: any) => html`
-  <div class="container array-container">
-    <div class="key">${x[0]}</div>
-    <div class="value array-value">
-      ${repeat(
-        (arr: any) => arr[1],
-        html`
-          ${when(
-            (val) => Array.isArray(val[1]),
-            html`${(val) => ArrayTemplate(val)} `
-          )}
-          ${when(
-            (val) =>
-              typeof val[1] === 'object' &&
-              val[1] !== null &&
-              !Array.isArray(val[1]),
-            html` ${(val) => ObjectTemplate(val)} `
-          )}
-          ${when((val) => typeof val[1] !== 'object', html` ${(val) => val} `)}
-        `
-      )}
+  <div class="template-container">
+    <div class="container array-container">
+      <div class="key">${x[0]}</div>
+      <div class="value array-value">
+        ${repeat(
+          (arr: any) => arr[1],
+          html`
+            ${when(
+              (val) => Array.isArray(val[1]),
+              html`${(val) => ArrayTemplate(val)} `
+            )}
+            ${when(
+              (val) =>
+                typeof val[1] === 'object' &&
+                val[1] !== null &&
+                !Array.isArray(val[1]),
+              html` ${(val) => ObjectTemplate(val)} `
+            )}
+            ${when(
+              (val) => typeof val[1] !== 'object',
+              html` ${(val) => val} `
+            )}
+          `
+        )}
+      </div>
     </div>
   </div>
 `;
 
 const ObjectTemplate: any = (x: any) => html`
-  <div class="obj-name">${x[0]}:</div>
-  <div class="object-container">
-    <div class="value object-value">
-      ${when(
-        (obj) => Object.entries(obj[1]).length > 0,
-        html`
-          ${repeat(
-            (val) => Object.entries(val[1]),
-            html`
-              ${when(
-                (val) => Array.isArray(val[1]),
-                html` ${(val) => ArrayTemplate(val)} `
-              )}
-              ${when(
-                (val) =>
-                  typeof val[1] === 'object' &&
-                  val[1] !== null &&
-                  !Array.isArray(x[1]),
-                html` ${(val) => ObjectTemplate(val)} `
-              )}
-              ${when(
-                (val) => typeof val[1] !== 'object',
-                html` ${(val) => OtherTemplate(val)} `
-              )}
-            `
-          )}
-        `
-      )}
+  <div class="template-container">
+    <div class="obj-name">${x[0]}:</div>
+    <div class="object-container">
+      <div class="value object-value">
+        ${when(
+          (obj) => Object.entries(obj[1]).length > 0,
+          html`
+            ${repeat(
+              (val) => Object.entries(val[1]),
+              html`
+                ${when(
+                  (val) => Array.isArray(val[1]),
+                  html` ${(val) => ArrayTemplate(val)} `
+                )}
+                ${when(
+                  (val) =>
+                    typeof val[1] === 'object' &&
+                    val[1] !== null &&
+                    !Array.isArray(x[1]),
+                  html` ${(val) => ObjectTemplate(val)} `
+                )}
+                ${when(
+                  (val) => typeof val[1] !== 'object',
+                  html` ${(val) => OtherTemplate(val)} `
+                )}
+              `
+            )}
+          `
+        )}
+      </div>
     </div>
   </div>
 `;
@@ -136,6 +143,7 @@ const innerTemplate = html`
     )}
   </div>
 `;
+
 const state: string[] = [
   'UNKNOWN',
   'QUEUED',
@@ -149,13 +157,14 @@ const state: string[] = [
   'CANCELING',
   'PREEMPTED',
 ];
+
 const template = html<WESRun>` <fast-accordion-item>
   <span slot="heading" class="slot-heading">
     ${(x) => html`
       <div class="collapsed-container">
         <div class="right">
           <div class="id">
-            <sxpan class="title">RUN ID</sxpan>
+            <span class="title">RUN ID</span>
             <span>${(w) => w.id}</span>
           </div>
         </div>
