@@ -52,7 +52,7 @@ This attribute is used to allow user to be able to be able interact with the tas
 
 | Parameter | Type     | Description                       | Default |
 | :-------- | :------- | :-------------------------------- | :-------|
-|`baseURL`|`boolean`|Defines admin permissions|false|
+|`admin`|`boolean`|Defines admin permissions|false|
 
 
 
