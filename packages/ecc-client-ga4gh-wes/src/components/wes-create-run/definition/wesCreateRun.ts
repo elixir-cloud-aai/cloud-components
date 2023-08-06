@@ -6,7 +6,7 @@ import {
 } from '@microsoft/fast-element';
 import template from './wesCreateRun.template.js';
 import styles from './wesCreateRun.styles.js';
-import { postWork } from '../../../data/Workflow/wesGet.js';
+import { postWorkflow } from '../../../data/Workflow/wesGet.js';
 
 @customElement({
   name: 'ecc-client-ga4gh-wes-create-run',
@@ -44,7 +44,7 @@ export default class WESCreateRun extends FASTElement {
   };
 
   handleSubmit = async () => {
-    const response = await postWork(this.baseURL, this.data);
+    const response = await postWorkflow(this.baseURL, this.data);
     this.response = response;
   };
 }

@@ -94,7 +94,7 @@ const cancelWorkflow = async (baseURL: string, id: string) => {
  * @param {object} data - The data of the run to be posted.
  *                        This should be an object containing the necessary fields for the task.
  */
-const postWork = async (baseURL: string, data: object) => {
+const postWorkflow = async (baseURL: string, data: object) => {
   const url = `${baseURL}/runs`;
 
   try {
@@ -124,4 +124,4 @@ const postWork = async (baseURL: string, data: object) => {
   }
 };
 
-export { fetchWorkflows, fetchWorkflow, cancelWorkflow, postWork };
+export { fetchWorkflows, fetchWorkflow, cancelWorkflow, postWorkflow };
