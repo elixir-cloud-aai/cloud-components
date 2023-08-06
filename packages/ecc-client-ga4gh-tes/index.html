@@ -23,8 +23,26 @@
       .container {
         padding: 0.4rem;
       }
+      .comp-container {
+        border: 1px solid black;
+        margin: 0.3em auto;
+      }
+      .description {
+        text-align: center;
+        background-color: #f3f3f3;
+        width: inherit;
+        padding: 0px;
+        margin: 0px;
+        margin-bottom: 1rem;
+        padding: 1rem;
+      }
+      strong {
+        color: rgb(70, 155, 177);
+      }
       .comp-name {
         text-decoration: underline;
+        font-size: larger;
+        font-weight: bolder;
       }
     </style>
     <title>ecc-client-ga4gh-tes</title>
@@ -32,29 +50,62 @@
   <body>
     <h1 class="title">WEB COMPONENTS - TES</h1>
     <div class="container">
-<<<<<<< HEAD
-      <h2 class="comp-name">ecc-client-ga4gh-tes-service</h2>
-      <ecc-client-ga4gh-tes-service
-        baseURL="https://csc-tesk-noauth.rahtiapp.fi/v1"
-      ></ecc-client-ga4gh-tes-service>
-      <h2 class="comp-name">ecc-client-ga4gh-tes-run</h2>
-=======
-      <h2 class="comp-name">ecc-client-ga4gh-tes-create-run</h2>
-      <ecc-client-ga4gh-tes-create-run
-        baseURL="https://csc-tesk-noauth.rahtiapp.fi/v1"
-      ></ecc-client-ga4gh-tes-create-run>
-      <!-- <h2 class="comp-name">ecc-client-ga4gh-tes-run</h2>
->>>>>>> 6d78bb3033ca7ab9eb150c9dff59511852443957
-      <ecc-client-ga4gh-tes-run
-        baseURL="https://csc-tesk-noauth.rahtiapp.fi/v1"
-        id="task-05b4ec40"
-        state="SYSTEM_ERROR"
-      ></ecc-client-ga4gh-tes-run>
-      <h2 class="comp-name">ecc-client-ga4gh-tes-runs</h2>
-      <ecc-client-ga4gh-tes-runs
-        pageSize="5"
-        baseURL="https://csc-tesk-noauth.rahtiapp.fi/v1"
-      ></ecc-client-ga4gh-tes-runs> -->
+      <fieldset class="comp-container">
+        <legend class="comp-name">1: ecc-client-ga4gh-tes-service</legend>
+        <div class="description">
+          The <strong>ecc-client-ga4gh-tes-runs</strong> is Web Component
+          designed to facilitate the listing of Task Execution Service service
+          information.
+        </div>
+        <ecc-client-ga4gh-tes-service
+          baseURL="https://csc-tesk-noauth.rahtiapp.fi/v1"
+        ></ecc-client-ga4gh-tes-service>
+      </fieldset>
+      <fieldset class="comp-container">
+        <legend class="comp-name">2: ecc-client-ga4gh-tes-run</legend>
+        <div class="description">
+          The <strong>ecc-client-ga4gh-tes-run</strong> component is an integral
+          part of the <strong>ecc-client-ga4gh-tes-runs</strong> component,
+          which is used for listing TES tasks in a paged or infinite scrolling
+          fashion. This allows users to paginated manner. The
+          <strong>ecc-client-ga4gh-tes-run</strong> component serves as an
+          individual item within the task list, providing additional
+          functionality for displaying and managing detailed information about a
+          specific task.
+        </div>
+        <ecc-client-ga4gh-tes-run
+          baseURL="https://csc-tesk-noauth.rahtiapp.fi/v1"
+          id="task-05b4ec40"
+          state="SYSTEM_ERROR"
+        ></ecc-client-ga4gh-tes-run>
+      </fieldset>
+      <fieldset class="comp-container">
+        <div class="description">
+          The <strong>ecc-client-ga4gh-tes-runs</strong> is Web Component
+          designed to facilitate the listing of Task Execution Service tasks in
+          a paginated manner. It provides an intuitive interface for retrieving
+          and displaying a collection of tasks, allowing users to efficiently
+          navigate through a potentially large number of tasks.
+        </div>
+        <legend class="comp-name">3: ecc-client-ga4gh-tes-runs</legend>
+        <ecc-client-ga4gh-tes-runs
+          pageSize="5"
+          baseURL="https://csc-tesk-noauth.rahtiapp.fi/v1"
+        ></ecc-client-ga4gh-tes-runs>
+      </fieldset>
+      <fieldset class="comp-container">
+        <legend class="comp-name">4: ecc-client-ga4gh-tes-create-run</legend>
+        <div class="description">
+          The web component <strong>ecc-client-ga4gh-tes-create-run</strong> is
+          designed to facilitate the creation of tasks using the Task Execution
+          Schema API provided by the Global Alliance for Genomics and Health
+          (GA4GH). This component allows users to define various parameters and
+          inputs required for executing tasks through TES.
+        </div>
+        <ecc-client-ga4gh-tes-create-run
+          baseURL="https://csc-tesk-noauth.rahtiapp.fi/v1"
+        ></ecc-client-ga4gh-tes-create-run>
+      </fieldset>
     </div>
     <script type="module" src="./out-tsc/src/index.js"></script>
   </body>
