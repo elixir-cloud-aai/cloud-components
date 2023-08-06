@@ -130,7 +130,8 @@ const template = html<WESRuns>`
           <fast-button
             appearance="neutral"
             ?disabled=${(x) =>
-              x.tokens[x.pageNumber + 1] === undefined && x.data.size === 0}
+              x.tokens[x.pageNumber + 1] === undefined ||
+              Object.entries(x.data).length === 0}
             @click=${(x) => x.handleNext()}
           >
             <svg

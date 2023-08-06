@@ -43,9 +43,7 @@ export default class WESRun extends FASTElement {
   handleFetch = async () => {
     // Only fetch the data if not already fetched and base URL is provided
     if (this.isLoading && this.baseURL.length !== 0) {
-      console.log('clicked');
       this.data = await fetchWorkflow(this.baseURL, this.id);
-      console.log(this.data);
       this.isLoading = false;
     }
   };
