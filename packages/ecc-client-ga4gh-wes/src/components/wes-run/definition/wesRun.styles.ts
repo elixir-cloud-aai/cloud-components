@@ -5,15 +5,6 @@ const styles = css`
     color: black;
   }
 
-  .collapsed-container {
-    display: flex;
-    border: none;
-    width: 100%;
-    height: 100%;
-    justify-content: space-between;
-    align-items: center;
-  }
-
   .template-container {
     margin: 0.3rem;
     border: 1px solid #ccc;
@@ -29,6 +20,7 @@ const styles = css`
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 0.3rem;
   }
 
   .id {

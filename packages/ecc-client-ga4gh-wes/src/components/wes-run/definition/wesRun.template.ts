@@ -161,56 +161,74 @@ const state: string[] = [
 const template = html<WESRun>` <fast-accordion-item
   @change=${(x) => x.handleFetch()}
 >
-  <span slot="heading" class="slot-heading">
-    ${(x) => html`
-      <div class="collapsed-container">
-        <div class="right">
-          <div class="id">
-            <span class="title">RUN ID</span>
-            <span>${(w) => w.id}</span>
-          </div>
-        </div>
-        <div class="left">
-          <div class="status-badge">
-            <div>
-              <style>
-                /* For example purposes only. App authors need to define */
-                fast-badge {
-                  --badge-fill-error: #d32f2f;
-                  --badge-fill-processing: #ffc107;
-                  --badge-fill-cancelled: #cccccc;
-                  --badge-fill-complete: #4caf50;
-                  --badge-fill-queued: #2196f3;
-                  --badge-fill-initializing: #9c27b0;
-                  --badge-fill-running: #ff5722;
-                  --badge-fill-paused: #607d8b;
-                  --badge-fill-executor_error: #b22222;
-                  --badge-fill-system_error: #f44336;
-                  --badge-fill-canceling: #795548;
-                  --badge-fill-preempted: #00bcd4;
-                  --badge-fill-transparent: transparent;
-                  --badge-color-black: #000000;
-                  --badge-color-white: #ffffff;
-                }
-              </style>
-              ${repeat(
-                () => state,
+  <span slot="start" class="slot-heading">
+    <div class="right">
+      <div class="id">
+        <span class="title">RUN ID</span>
+        <span>${(x) => x.id}</span>
+      </div>
+    </div>
+  </span>
+  <span slot="end">
+    <div class="left">
+      <div class="status-badge">
+        <div>
+          <style>
+            /* For example purposes only. App authors need to define */
+            fast-badge {
+              --badge-fill-error: #d32f2f;
+              --badge-fill-processing: #ffc107;
+              --badge-fill-cancelled: #cccccc;
+              --badge-fill-complete: #4caf50;
+              --badge-fill-queued: #2196f3;
+              --badge-fill-initializing: #9c27b0;
+              --badge-fill-running: #ff5722;
+              --badge-fill-paused: #607d8b;
+              --badge-fill-executor_error: #b22222;
+              --badge-fill-system_error: #f44336;
+              --badge-fill-canceling: #795548;
+              --badge-fill-preempted: #00bcd4;
+              --badge-fill-transparent: transparent;
+              --badge-color-black: #000000;
+              --badge-color-white: #ffffff;
+            }
+          </style>
+          ${repeat(
+            () => state,
+            html`
+              ${when(
+                (x, c) => c.parent?.state === x,
                 html`
-                  ${when(
-                    (curr_state, c) => c.parent?.state === curr_state,
-                    html`
-                      <fast-badge fill=${(s) => s.toLowerCase()} color="white"
-                        >${x.state}</fast-badge
-                      >
-                    `
-                  )}
+                  <fast-badge fill=${(s) => s.toLowerCase()} color="white"
+                    >${(_, c) => c.parent.state}</fast-badge
+                  >
                 `
               )}
-            </div>
-          </div>
+            `
+          )}
         </div>
       </div>
-    `}
+      ${when(
+        (x) => x.admin && x.state === 'RUNNING',
+        html` <fast-button class="delete" @click=${(x) => x.handleDelete()}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-trash"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"
+            />
+            <path
+              d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"
+            />
+          </svg>
+        </fast-button>`
+      )}
+    </div>
   </span>
   ${when(
     (x) => x.isLoading,
