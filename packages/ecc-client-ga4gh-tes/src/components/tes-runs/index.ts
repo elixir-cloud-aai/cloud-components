@@ -1,3 +1,3 @@
-import TESRuns from './defintion/tesRuns.js';
+import TESRuns from './definition/tesRuns.js';
 
 export default TESRuns;
