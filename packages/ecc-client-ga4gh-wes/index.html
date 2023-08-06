@@ -23,8 +23,26 @@
       .container {
         padding: 0.4rem;
       }
+      .comp-container {
+        border: 1px solid black;
+        margin: 0.3em auto;
+      }
+      .description {
+        text-align: center;
+        background-color: #f3f3f3;
+        width: inherit;
+        padding: 0px;
+        margin: 0px;
+        margin-bottom: 1rem;
+        padding: 1rem;
+      }
+      strong {
+        color: rgb(70, 155, 177);
+      }
       .comp-name {
         text-decoration: underline;
+        font-size: larger;
+        font-weight: bolder;
       }
     </style>
     <title>ecc-client-ga4gh-wes</title>
@@ -32,19 +50,37 @@
   <body>
     <h1 class="title">WEB COMPONENTS - WES</h1>
     <div class="container">
-      <h2>ecc-client-ga4gh-wes-run</h2>
-      <ecc-client-ga4gh-wes-run
-        baseURL="https://wes-prod.cloud.e-infra.cz/ga4gh/wes/v1"
-        id="5OZ3ZG"
-        state="RUNNING"
-        admin="true"
-      ></ecc-client-ga4gh-wes-run>
-    </div>
-    <div class="container">
-      <h2>ecc-client-ga4gh-wes-runs</h2>
-      <ecc-client-ga4gh-wes-runS
-        baseURL="https://wes-prod.cloud.e-infra.cz/ga4gh/wes/v1"
-      ></ecc-client-ga4gh-wes-runS>
+      <fieldset class="comp-container">
+        <legend class="comp-name">ecc-client-ga4gh-wes-run</legend>
+        <div class="description">
+          The <strong>ecc-client-ga4gh-wes-run</strong> component is an integral
+          part of the <strong>ecc-client-ga4gh-wes-runs</strong> component,
+          which is used for listing WES workflow runs in a paginated manner. The
+          <strong>ecc-client-ga4gh-wes-run</strong> component serves as an
+          individual item within the runs list, providing additional
+          functionality for displaying and managing detailed information about a
+          specific run.
+        </div>
+        <ecc-client-ga4gh-wes-run
+          baseURL="https://wes-prod.cloud.e-infra.cz/ga4gh/wes/v1"
+          id="5OZ3ZG"
+          state="RUNNING"
+          admin="true"
+        ></ecc-client-ga4gh-wes-run>
+      </fieldset>
+      <fieldset class="comp-container">
+        <legend class="comp-name">ecc-client-ga4gh-wes-runs</legend>
+        <div class="description">
+          The <strong>ecc-client-ga4gh-wes-runs</strong> is Web Component
+          designed to facilitate the listing of WES workflows in a paginated
+          manner. It provides an intuitive interface for retrieving and
+          displaying a collection of runs, allowing users to efficiently
+          navigate through a potentially large number of runs.
+        </div>
+        <ecc-client-ga4gh-wes-runs
+          baseURL="https://wes-prod.cloud.e-infra.cz/ga4gh/wes/v1"
+        ></ecc-client-ga4gh-wes-runs>
+      </fieldset>
     </div>
     <script type="module" src="./out-tsc/src/index.js"></script>
   </body>
