@@ -1,4 +1,3 @@
-
 # ecc-client-ga4gh-tes-run
 
 The `ecc-client-ga4gh-tes-run` component is an integral part of the `ecc-client-ga4gh-tes-runs` component, which is used for listing [TES](https://github.com/ga4gh/task-execution-schemas) tasks in a paginated manner. The `ecc-client-ga4gh-tes-run` component serves as an individual item within the task list, providing additional functionality for displaying and managing detailed information about a specific task.
