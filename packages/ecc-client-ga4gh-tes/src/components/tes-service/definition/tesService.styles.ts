@@ -6,10 +6,15 @@ const styles = css`
     display: flex;
   }
 
+  .template-container {
+    border: 1px solid #ccc;
+    margin: 0.4rem;
+    padding: 0.3rem;
+    border-radius: 0.4rem;
+  }
+
   /* Styling for the main container */
   .outer-container {
-    padding: 1rem;
-    background-color: #f9f9f9;
   }
 
   /* Styling for arrays */
@@ -19,30 +24,23 @@ const styles = css`
   .array-value {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
   }
 
   /* Styling for objects */
   .object-container {
-    border-bottom: 1px solid #ccc;
-    // margin: 0.4rem 0rem;
   }
 
   .object-value {
   }
 
   .obj-name {
-    margin-bottom: 1rem;
     font-weight: bold;
-    color: #333;
     flex-basis: 30%;
     text-transform: uppercase;
-    border-top: 1px solid #ccc;
   }
 
   /* Styling for key-value pairs */
   .key-value {
-    margin-bottom: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -50,21 +48,19 @@ const styles = css`
 
   .key {
     font-weight: bold;
-    color: #333;
+    font-size: small;
     flex-basis: 30%;
     text-transform: uppercase;
   }
 
   .value {
+    font-size: small;
     flex-basis: 70%;
   }
 
   /* Responsive styles for mobile devices */
   @media (max-width: 550px) {
-    /* 48rem equals 768px (768px / 16px = 48rem) */
-    /* Reduce padding for the main container */
     .outer-container {
-      padding: 0.5rem;
     }
 
     .container {
@@ -73,6 +69,10 @@ const styles = css`
 
     .key-value {
       display: block;
+    }
+
+    .key {
+      font-size: smaller;
     }
 
     .value {
