@@ -6,6 +6,7 @@ import {
 } from '@microsoft/fast-element';
 import template from './wesCreateRun.template.js';
 import styles from './wesCreateRun.styles.js';
+import { postWork } from '../../../data/Workflow/wesGet.js';
 
 @customElement({
   name: 'ecc-client-ga4gh-wes-create-run',
@@ -17,6 +18,8 @@ export default class WESCreateRun extends FASTElement {
   @attr baseURL = '';
 
   @observable data: FormData = new FormData();
+
+  @observable response: any = {};
 
   handleInput = (event: Event) => {
     const input = event.target as HTMLInputElement;
@@ -40,7 +43,8 @@ export default class WESCreateRun extends FASTElement {
     }
   };
 
-  handleSubmit = () => {
-    console.log(...this.data);
+  handleSubmit = async () => {
+    const response = await postWork(this.baseURL, this.data);
+    this.response = response;
   };
 }

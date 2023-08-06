@@ -88,4 +88,40 @@ const cancelWorkflow = async (baseURL: string, id: string) => {
   }
 };
 
-export { fetchWorkflows, fetchWorkflow, cancelWorkflow };
+/**
+ * Create a workflow run
+ * @param {string} baseURL - Base URL for fetching workflows
+ * @param {object} data - The data of the run to be posted.
+ *                        This should be an object containing the necessary fields for the task.
+ */
+const postWork = async (baseURL: string, data: object) => {
+  const url = `${baseURL}/runs`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response) {
+      return {
+        isError: true,
+        breakpoint: 'postTask',
+        error: 'No response from server',
+      };
+    }
+
+    return await response.json();
+  } catch (error) {
+    return {
+      isError: true,
+      breakpoint: 'postTask',
+      error,
+    };
+  }
+};
+
+export { fetchWorkflows, fetchWorkflow, cancelWorkflow, postWork };
