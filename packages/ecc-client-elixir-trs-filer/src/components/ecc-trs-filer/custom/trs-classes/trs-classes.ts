@@ -127,7 +127,6 @@ export class TRSClasses extends FASTElement {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      // After deleting, you might want to remove the item from this.data.
       this.data = this.data.filter((item) => item.id !== id);
     } catch (error) {
       console.error(`Failed to delete item with id: ${id}`, error);

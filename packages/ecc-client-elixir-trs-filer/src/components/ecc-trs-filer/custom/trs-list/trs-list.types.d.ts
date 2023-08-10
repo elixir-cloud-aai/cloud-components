@@ -1,10 +1,10 @@
-interface IChecksum {
+interface Checksum {
   checksum: string;
   type: string;
 }
 
-interface IImage {
-  checksum: IChecksum[];
+interface Image {
+  checksum: Checksum[];
   image_name: string;
   image_type: string;
   registry_host: string;
@@ -12,12 +12,12 @@ interface IImage {
   updated: string;
 }
 
-interface IVersion {
+interface Version {
   author: string[];
   containerfile: boolean;
   descriptor_type: string[];
   id: string;
-  images: IImage[];
+  images: Image[];
   included_apps: string[];
   is_production: boolean;
   meta_version: string;
@@ -26,9 +26,10 @@ interface IVersion {
   url: string;
   verified: boolean;
   verified_source: string[];
+  isEditing: boolean;
 }
 
-interface ITool {
+interface Tool {
   aliases: string[];
   checker_url: string;
   description: string;
@@ -43,13 +44,35 @@ interface ITool {
     name: string;
   };
   url: string;
-  versions: IVersion[];
+  versions: Version[];
 }
 
-interface IToolClass {
+interface IEnhancedTool extends Tool {
+  isEditing: boolean;
+  delete(): () => void;
+}
+
+interface ToolClass {
   description: string;
   id: string;
   name: string;
 }
 
-export type { ITool, IVersion, IImage, IChecksum, IToolClass };
+interface FilterFields {
+  key: string;
+  name: string;
+  textFieldName: string;
+  tooltipText: string;
+}
+
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
+export type {
+  Tool,
+  Version,
+  Image,
+  Checksum,
+  ToolClass,
+  FilterFields,
+  IEnhancedTool,
+};

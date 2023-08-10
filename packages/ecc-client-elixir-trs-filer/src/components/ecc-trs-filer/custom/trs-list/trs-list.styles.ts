@@ -1,6 +1,22 @@
 import { css, ElementStyles } from "@microsoft/fast-element";
 
 export const styles: ElementStyles = css`
+  :host {
+    display: block;
+    contain: content;
+  }
+
+  :host([hidden]) {
+    display: none;
+  }
+
+  .trs-container {
+    max-width: 1200px;
+    margin-inline: auto;
+    padding: 10px 20px;
+    box-shadow: 0px 11px 20px 0px rgba(5, 16, 55, 0.1);
+    border-radius: 10px;
+  }
   .accordionItem {
     color: black;
   }
@@ -9,8 +25,9 @@ export const styles: ElementStyles = css`
     border-collapse: collapse;
     margin: 25px 0;
     font-size: 0.9em;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    min-width: 400px;
     width: 100%;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
   }
 
   .styled-table thead tr {
@@ -22,6 +39,11 @@ export const styles: ElementStyles = css`
   .styled-table th,
   .styled-table td {
     padding: 12px 15px;
+    // height: max-content;
+  }
+
+  .styled-table td {
+    height: 50px;
   }
 
   .styled-table tbody tr {
@@ -32,41 +54,13 @@ export const styles: ElementStyles = css`
     background-color: #f3f3f3;
   }
 
+  .styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid #009879;
+  }
+
   .styled-table tbody tr.active-row {
     font-weight: bold;
     color: #009879;
-  }
-
-  .table-responsive {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  @media screen and (max-width: 768px) {
-    .styled-table thead {
-      display: none;
-    }
-
-    .styled-table tr {
-      margin-bottom: 10px;
-      display: block;
-      border-bottom: 2px solid #009879;
-    }
-
-    .styled-table td {
-      display: block;
-      text-align: right;
-      font-size: 13px;
-      border-bottom: 1px dotted #ccc;
-    }
-
-    .styled-table td::before {
-      content: attr(data-label);
-      float: left;
-      text-transform: uppercase;
-      font-weight: bold;
-    }
   }
 
   .space {
@@ -120,6 +114,13 @@ export const styles: ElementStyles = css`
     gap: 10px;
   }
 
+  .filterContainer--tooltip {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+  }
+
   .pagination {
     display: flex;
     justify-content: center;
@@ -133,13 +134,41 @@ export const styles: ElementStyles = css`
     fill: #009879;
   }
 
-  .tabs {
-    justify-content: flex-start;
+  .tab--version:hover {
+    color: #000;
   }
 
-  .createVersionTabContent {
+  .tab--version[aria-selected="true"]:hover {
+    color: #fff;
+  }
+
+  .edit {
+    fill: #ffc107;
+    cursor: pointer;
+  }
+
+  .delete {
+    fill: #e62f63;
+    cursor: pointer;
+  }
+
+  .styled-table .actions {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .save {
+    fill: #009879;
+    cursor: pointer;
+    align-self: center;
+    justify-self: center;
+  }
+
+  .horizontal {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
   }
 `;
