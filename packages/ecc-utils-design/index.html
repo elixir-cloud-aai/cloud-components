@@ -10,17 +10,54 @@
     <title>ecc-utils-design</title>
   </head>
   <body>
-    <div id="demo"></div>
-    <ecc-utils-design-wrapper debug config='{"textColor": "white", "backgroundColor": "black"}'>
-      <ecc-utils-design-button>
-        Button 1
-      </ecc-utils-design-button>
-      <ecc-utils-design-wrapper debug config='{"textColor": "blue", "backgroundColor": "red"}'>
-        <ecc-utils-design-button>
-          Button 2
+    <body>
+      <div id="demo"></div>
+      <ecc-utils-design-wrapper
+        debug
+        config='{
+          "primary": {
+          "text-color": "red", 
+          "background-color": "pink"
+        },
+        "text-color": "blue",
+        "background-color": "pink",
+        "secondary": {
+          "text-color": "white", 
+          "background-color": "red"
+        }, 
+        "default": {
+          "text-color": "blue"
+        }
+        
+      }'
+      >
+        <ecc-utils-design-button name="primary">
+          Button 1
         </ecc-utils-design-button>
+        <ecc-utils-design-button name="secondary">
+          Button 1.5
+        </ecc-utils-design-button>
+        <ecc-utils-design-button> Button 1.8 </ecc-utils-design-button>
+
+        <ecc-utils-design-wrapper
+          debug
+          config='{
+          "text-color": "pink",
+          "background-color": "blue",
+
+          "primary": {
+            "text-color": "pink",
+            "background-color": "black"
+          }
+          }'
+        >
+          <ecc-utils-design-button> Button 2 </ecc-utils-design-button>
+          <ecc-utils-design-button name="primary">
+            Button 2.5
+          </ecc-utils-design-button>
+        </ecc-utils-design-wrapper>
       </ecc-utils-design-wrapper>
-    </ecc-utils-design-wrapper>
-    <script src="../dist/src/index.js" type="module"></script>
+      <script src="../dist/src/index.js" type="module"></script>
+    </body>
   </body>
 </html>
