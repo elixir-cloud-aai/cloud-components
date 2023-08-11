@@ -105,6 +105,37 @@ export class TRSToolsList extends FASTElement {
     },
   ];
 
+  @attr public isOpenVersionModal = false;
+
+  public modalButtonClick = () => {
+    this.isOpenVersionModal = true;
+    if (this.isOpenVersionModal) {
+      const trsFiler = document.querySelector("ecc-client-elixir-trs-filer");
+      const trsContainer =
+        trsFiler?.shadowRoot?.querySelector(".trs-container");
+      const tabPanel = trsContainer?.querySelector("fast-tab-panel");
+      const trsList = tabPanel?.querySelector("trs-list");
+      const fastAccordionContainer =
+        trsList?.shadowRoot?.querySelector("fast-accordion");
+      const fastAccordionItem = fastAccordionContainer?.querySelectorAll(
+        "fast-accordion-item"
+      );
+      setTimeout(() => {
+        fastAccordionItem?.forEach((item) => {
+          const modalContainer = item?.querySelector("fast-dialog");
+          const modalDiv = modalContainer?.shadowRoot?.querySelector("div");
+          modalDiv?.setAttribute("style", "z-index: 80");
+          const modalControl = modalDiv?.querySelector(".control");
+          modalControl?.setAttribute("style", "background-color: #fff");
+        });
+      }, 1);
+    }
+  };
+
+  public closeModal = () => {
+    this.isOpenVersionModal = false;
+  };
+
   /**
    * @method
    * @description Load data on element connected.

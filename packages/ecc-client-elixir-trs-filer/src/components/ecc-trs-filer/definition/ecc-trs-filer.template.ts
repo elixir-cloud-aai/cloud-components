@@ -25,8 +25,9 @@ export const template = html<TRSFiler>`
               modal
               :hidden="${(x) => !x.isOpenModal}"
             >
-              <h2>Create a Tool</h2>
-              <slot></slot>
+              <div>
+                <h2>Create a Tool</h2>
+              </div>
               <fast-button @click="${(x) => x.closeModal()}">Close</fast-button>
             </fast-dialog>
           `

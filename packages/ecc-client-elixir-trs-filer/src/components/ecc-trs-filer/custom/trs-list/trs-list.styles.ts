@@ -100,6 +100,7 @@ export const styles: ElementStyles = css`
     box-shadow: 0px 11px 20px 0px rgba(5, 16, 55, 0.1);
     background-color: #ffffff;
     font: 400 14px/20px "Roboto", sans-serif;
+    color: #000000;
   }
 
   .filterContainer--grid {
@@ -170,5 +171,27 @@ export const styles: ElementStyles = css`
     flex-direction: row;
     gap: 1rem;
     align-items: center;
+  }
+
+  svg {
+    cursor: pointer;
+  }
+
+  .modalVersion {
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .modalVersion__upper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modalVersion__close {
+    transform: rotate(45deg);
+    cursor: pointer;
   }
 `;
