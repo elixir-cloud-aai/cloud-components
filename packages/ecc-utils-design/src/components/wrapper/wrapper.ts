@@ -1,7 +1,7 @@
 import { attr, observable } from "@microsoft/fast-element";
 import { FoundationElement, CSSDesignToken } from "@microsoft/fast-foundation";
 import {
-  createToken,
+  defaultComponentName,
   registerDesignTokens,
   setToken,
 } from "../../design-system/index.js";
@@ -27,29 +27,47 @@ export class Wrapper extends FoundationElement {
   connectedCallback() {
     super.connectedCallback();
     registerDesignTokens(this);
+  }
+
+  handleSlotChange() {
+    const childComponents: any[] = Array.from(this.children);
+    console.log(childComponents);
 
     if (!this.config) return;
     let configJSON = this.config;
 
     if (!isObject(configJSON)) configJSON = JSON.parse(this.config);
+    const componentsNotNamedDefault = childComponents.filter(
+      (el) => el._name && el._name !== defaultComponentName
+    );
+
+    const componentsNamedDefault = childComponents.filter(
+      (el) => el.name === defaultComponentName
+    );
 
     Object.keys(configJSON).forEach((i) => {
-      // add case to not register when object name is "default"
-      if (isObject(configJSON[i])) {
+      if (isObject(configJSON[i]) && i !== defaultComponentName) {
         Object.keys(configJSON[i]).forEach((j) => {
-          const newToken = createToken(`${i}-${j}`);
-          setToken(this, configJSON[i][j], newToken);
+          componentsNotNamedDefault.forEach((el) => {
+            const tokenName = camelize(j);
 
-          this.storeTokensLocallyForTesting(newToken.name, configJSON[i][j]);
+            setToken(el, configJSON[el._name][j], allTokens[tokenName]);
+          });
+        });
+      } else if (i === defaultComponentName) {
+        Object.keys(configJSON[i]).forEach((j) => {
+          componentsNamedDefault.forEach((el) => {
+            const tokenName = camelize(j);
+
+            setToken(el, configJSON.default[j], allTokens[tokenName]);
+          });
         });
       } else {
-        const tokenName = camelize(i);
-        setToken(this, configJSON[i], allTokens[tokenName]);
+        componentsNamedDefault.forEach((el) => {
+          const tokenName = camelize(i);
 
-        this.storeTokensLocallyForTesting(
-          allTokens[tokenName].name,
-          configJSON[i]
-        );
+          setToken(el, configJSON[i], allTokens[tokenName]);
+        });
       }
     });
   }
