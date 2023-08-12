@@ -1,11 +1,11 @@
-import { attr, observable } from '@microsoft/fast-element';
-import { FoundationElement, CSSDesignToken } from '@microsoft/fast-foundation';
+import { attr, observable } from "@microsoft/fast-element";
+import { FoundationElement, CSSDesignToken } from "@microsoft/fast-foundation";
 import {
   createToken,
   registerDesignTokens,
   setToken,
-} from '../../design-system/index.js';
-import allTokens from '../../design-system/tokens.js';
+} from "../../design-system/index.js";
+import allTokens from "../../design-system/tokens.js";
 
 const isObject = (o: unknown) =>
   o instanceof Object && o.constructor === Object;
@@ -14,7 +14,7 @@ const camelize = (s: string) => s.replace(/-./g, (x) => x[1].toUpperCase());
 
 export class Wrapper extends FoundationElement {
   // config: handle passing the design system config
-  @attr config: any = '';
+  @attr config: any = "";
   @observable locallyStoredTokens: Record<string, CSSDesignToken<string>> = {};
 
   private storeTokensLocallyForTesting(
