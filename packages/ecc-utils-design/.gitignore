@@ -20,5 +20,8 @@
 /dist/
 /out-tsc/
 
+# rollup
+.rollup.cache
+
 storybook-static
 custom-elements.json
