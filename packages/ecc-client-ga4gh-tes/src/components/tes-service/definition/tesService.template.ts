@@ -71,17 +71,7 @@ const template = html`
           ${repeat(
             (x) => Object.entries(x.data),
             html`
-              ${when(
-                (val) => Array.isArray(val[1]),
-                html` ${(val) => ArrayTemplate(val)} `
-              )}
-              ${when(
-                (val) =>
-                  typeof val[1] === 'object' &&
-                  val[1] !== null &&
-                  !Array.isArray(val[1]),
-                html` ${(x) => ObjectTemplate(x)} `
-              )}
+              ${conditionalRender()}
               ${when(
                 (val) => typeof val[1] !== 'object',
                 html` ${(val) => OtherTemplate(val)} `
