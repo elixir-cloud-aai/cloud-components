@@ -6,6 +6,7 @@ import {
   fastBadge,
 } from '@microsoft/fast-components';
 import { html, when, repeat } from '@microsoft/fast-element';
+import { stateOption } from '../../tes-runs/definition/tesRuns.js';
 import TESRun from './tesRun.js';
 
 provideFASTDesignSystem().register(
@@ -42,20 +43,6 @@ provideFASTDesignSystem().register(
   })
 );
 
-const state = [
-  'UNKNOWN',
-  'QUEUED',
-  'INITIALIZING',
-  'RUNNING',
-  'PAUSED',
-  'COMPLETE',
-  'EXECUTOR_ERROR',
-  'SYSTEM_ERROR',
-  'CANCELED',
-  'PREEMPTED',
-  'CANCELING',
-];
-
 const template = html<TESRun>`
   <fast-accordion-item @change=${(x) => x.handleFetch()}>
     <span slot="heading" class="slot-heading">
@@ -87,7 +74,7 @@ const template = html<TESRun>`
                   }
                 </style>
                 ${repeat(
-                  () => state,
+                  () => stateOption,
                   html`
                     ${when(
                       (thisState, c) => c.parent.state === thisState,
