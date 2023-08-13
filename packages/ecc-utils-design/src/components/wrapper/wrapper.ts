@@ -1,6 +1,6 @@
 import { attr } from "@microsoft/fast-element";
 import { FoundationElement } from "@microsoft/fast-foundation";
-import { registerDesignTokens, setToken } from "../../design-system/index.js";
+import { setToken } from "../../design-system/index.js";
 import allTokens from "../../design-system/tokens.js";
 
 const isObject = (o: unknown) =>
@@ -11,19 +11,15 @@ const camelize = (s: string) => s.replace(/-./g, (x) => x[1].toUpperCase());
 export class Wrapper extends FoundationElement {
   // config: handle passing the design system config
   @attr config: any = "";
-
-  connectedCallback() {
-    super.connectedCallback();
-    registerDesignTokens(this);
-  }
+  @attr name = "";
 
   handleSlotChange() {
-    const childComponents: any[] = Array.from(this.children);
-
     if (!this.config) return;
-    let configJSON = this.config;
-    if (!isObject(configJSON)) configJSON = JSON.parse(this.config);
 
+    const configJSON = isObject(this.config)
+      ? this.config
+      : JSON.parse(this.config);
+    const childComponents: any[] = Array.from(this.querySelectorAll("*"));
     const componentsNotNamedDefault = childComponents.filter(
       (el) => el._name && el._name !== ""
     );
