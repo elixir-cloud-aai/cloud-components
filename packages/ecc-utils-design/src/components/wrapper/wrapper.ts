@@ -30,11 +30,11 @@ export class Wrapper extends FoundationElement {
 
     Object.keys(configJSON).forEach((i) => {
       if (isObject(configJSON[i])) {
-        const elementName = camelize(i);
-        const componentsWithTokenName = componentsNotNamedDefault.filter(
-          (el) => el._name === elementName
+        const customName = camelize(i);
+        const componentsWithCustomName = componentsNotNamedDefault.filter(
+          (el) => el._name === customName
         );
-        componentsWithTokenName.forEach((el) => {
+        componentsWithCustomName.forEach((el) => {
           Object.keys(configJSON[i]).forEach((j) => {
             const tokenName = camelize(j);
             setToken(el, configJSON[i][j], allTokens[tokenName]);
