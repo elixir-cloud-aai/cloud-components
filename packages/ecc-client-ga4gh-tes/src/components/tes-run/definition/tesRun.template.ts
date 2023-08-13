@@ -149,10 +149,11 @@ const template = html<TESRun>`
                 ${(x) => x.data.creation_time}
               </div>
             </div>
-            ${when(
-              (x) => x.state === 'RUNNING',
-              html`<div class="meta-data-right">
-                <fast-button
+            <div class="meta-data-right">
+              <!-- All the buttons rendered here will need admin permission -->
+              ${when(
+                (x) => x.state === 'RUNNING' && x.admin === true,
+                html` <fast-button
                   class="delete-button"
                   @click=${(x) => x.handleDelete()}
                 >
@@ -171,9 +172,10 @@ const template = html<TESRun>`
                       d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"
                     />
                   </svg>
-                </fast-button>
-              </div>`
-            )}
+                </fast-button>`
+              )}
+              <!-- If more cta are to be added that need admin permission, use admin === true with other respective checks -->
+            </div>
           </div>
           <div class="executors">
             <div class="section-heading">

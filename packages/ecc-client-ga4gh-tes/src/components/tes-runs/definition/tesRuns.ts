@@ -40,6 +40,8 @@ export default class TESRuns extends FASTElement {
   // Base URL, provided by app author
   @attr baseURL = '';
 
+  @attr admin = false;
+
   // Number of Task to be listed at once
   @attr pageSize = 5;
 

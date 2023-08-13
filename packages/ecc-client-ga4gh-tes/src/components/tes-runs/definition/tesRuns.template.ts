@@ -66,6 +66,7 @@ const template = html<TESRuns>`
               baseURL=${(_, c) => c.parent.baseURL}
               id=${(x) => x.id}
               state=${(x) => x.state}
+              admin=${(x) => x.admin}
             >
             </ecc-client-ga4gh-tes-run>
           `
