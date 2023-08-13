@@ -141,7 +141,7 @@ Example:
     "type": "image/png"
   }
 ]
-
+```
 #### cpu_cores
 
 The `cpu_cores` attribute specifies the requested number of CPUs (Central Processing Units) for the task. It represents the desired CPU resource allocation for executing the task. In the provided code snippet, the `cpu_cores` attribute is set to "8".
