@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 interface Checksum {
   checksum: string;
   type: string;

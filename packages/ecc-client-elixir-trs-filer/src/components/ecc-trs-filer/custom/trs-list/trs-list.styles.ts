@@ -191,7 +191,24 @@ export const styles: ElementStyles = css`
   }
 
   .modalVersion__close {
-    transform: rotate(45deg);
     cursor: pointer;
+  }
+
+  .label-input {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .checker-input {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .container.meta {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
 `;

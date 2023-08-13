@@ -8,6 +8,30 @@ import { template } from "./trs-list.template.js";
 import { styles } from "./trs-list.styles.js";
 import { FilterFields, Tool, ToolClass } from "./trs-list.types.js";
 
+export interface AuthorsData {
+  authors: string;
+}
+
+const authorsTemplate: AuthorsData = {
+  authors: "",
+};
+
+export interface AppsData {
+  apps: string;
+}
+
+const appsTemplate: AppsData = {
+  apps: "",
+};
+
+export interface SourcesData {
+  sources: string;
+}
+
+const sourcesTemplate: SourcesData = {
+  sources: "",
+};
+
 /**
  * @class
  * @classdesc TRS Custom Element Class.
@@ -107,6 +131,12 @@ export class TRSToolsList extends FASTElement {
 
   @attr public isOpenVersionModal = false;
 
+  @attr authorsInput: AuthorsData[] = [{ ...authorsTemplate }];
+  @attr appsInput: AppsData[] = [{ ...appsTemplate }];
+  @attr sourcesInput: SourcesData[] = [{ ...sourcesTemplate }];
+
+  @observable authorsInputLength = 1;
+
   public modalButtonClick = () => {
     this.isOpenVersionModal = true;
     if (this.isOpenVersionModal) {
@@ -128,7 +158,7 @@ export class TRSToolsList extends FASTElement {
           const modalControl = modalDiv?.querySelector(".control");
           modalControl?.setAttribute("style", "background-color: #fff");
         });
-      }, 1);
+      }, 10);
     }
   };
 
@@ -349,4 +379,32 @@ export class TRSToolsList extends FASTElement {
     const { name, value } = e.target as HTMLInputElement;
     item[name] = value;
   }
+
+  // for version control -- multiple strings in authors, apps, sources
+  public handleInputAuthorChange = (event: Event, input: AuthorsData) => {
+    const authorsInput = (event.target as HTMLInputElement).value;
+    input.authors = authorsInput;
+  };
+
+  public handleInputAppsChange = (event: Event, input: AppsData) => {
+    const appsInput = (event.target as HTMLInputElement).value;
+    input.apps = appsInput;
+  };
+
+  public handleInputSourceChange = (event: Event, input: SourcesData) => {
+    const sourceInput = (event.target as HTMLInputElement).value;
+    input.sources = sourceInput;
+  };
+
+  public addAuthor = () => {
+    this.authorsInput.push({ ...authorsTemplate });
+    this.authorsInputLength += 1;
+  };
+
+  public deleteAuthor = () => {
+    if (this.authorsInput.length > 1) {
+      this.authorsInput.pop();
+      this.authorsInputLength -= 1;
+    }
+  };
 }
