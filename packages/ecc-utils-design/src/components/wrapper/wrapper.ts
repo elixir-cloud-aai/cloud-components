@@ -17,13 +17,6 @@ export class Wrapper extends FoundationElement {
   @attr config: any = "";
   @observable locallyStoredTokens: Record<string, CSSDesignToken<string>> = {};
 
-  private storeTokensLocallyForTesting(
-    registeredTokenName: string,
-    registeredTokenValue: CSSDesignToken<string>
-  ) {
-    this.locallyStoredTokens[registeredTokenName] = registeredTokenValue;
-  }
-
   connectedCallback() {
     super.connectedCallback();
     registerDesignTokens(this);
@@ -31,7 +24,6 @@ export class Wrapper extends FoundationElement {
 
   handleSlotChange() {
     const childComponents: any[] = Array.from(this.children);
-    console.log(childComponents);
 
     if (!this.config) return;
     let configJSON = this.config;
