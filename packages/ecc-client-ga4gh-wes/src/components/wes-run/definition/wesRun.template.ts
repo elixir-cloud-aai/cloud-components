@@ -43,6 +43,15 @@ provideFASTDesignSystem().register(
   })
 );
 
+const conditionalRender = () => html`
+  ${when((val) => Array.isArray(val[1]), html`${(val) => ArrayTemplate(val)} `)}
+  ${when(
+    (val) =>
+      typeof val[1] === 'object' && val[1] !== null && !Array.isArray(val[1]),
+    html` ${(val) => ObjectTemplate(val)} `
+  )}
+`;
+
 const OtherTemplate: any = (x: any) => html`
   <div class="template-container container key-value">
     <div class="key">${x[0]}</div>
@@ -58,17 +67,7 @@ const ArrayTemplate: any = (x: any) => html`
         ${repeat(
           (arr: any) => arr[1],
           html`
-            ${when(
-              (val) => Array.isArray(val[1]),
-              html`${(val) => ArrayTemplate(val)} `
-            )}
-            ${when(
-              (val) =>
-                typeof val[1] === 'object' &&
-                val[1] !== null &&
-                !Array.isArray(val[1]),
-              html` ${(val) => ObjectTemplate(val)} `
-            )}
+            ${conditionalRender()}
             ${when(
               (val) => typeof val[1] !== 'object',
               html` ${(val) => val} `
@@ -91,17 +90,7 @@ const ObjectTemplate: any = (x: any) => html`
             ${repeat(
               (val) => Object.entries(val[1]),
               html`
-                ${when(
-                  (val) => Array.isArray(val[1]),
-                  html` ${(val) => ArrayTemplate(val)} `
-                )}
-                ${when(
-                  (val) =>
-                    typeof val[1] === 'object' &&
-                    val[1] !== null &&
-                    !Array.isArray(x[1]),
-                  html` ${(val) => ObjectTemplate(val)} `
-                )}
+                ${conditionalRender()}
                 ${when(
                   (val) => typeof val[1] !== 'object',
                   html` ${(val) => OtherTemplate(val)} `
@@ -123,17 +112,7 @@ const innerTemplate = html`
         ${repeat(
           (x) => Object.entries(x.data),
           html`
-            ${when(
-              (val) => Array.isArray(val[1]),
-              html` ${(val) => ArrayTemplate(val)} `
-            )}
-            ${when(
-              (val) =>
-                typeof val[1] === 'object' &&
-                val[1] !== null &&
-                !Array.isArray(val[1]),
-              html` ${(x) => ObjectTemplate(x)} `
-            )}
+            ${conditionalRender()}
             ${when(
               (val) => typeof val[1] !== 'object',
               html` ${(val) => OtherTemplate(val)} `
