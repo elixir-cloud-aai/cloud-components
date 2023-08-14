@@ -1,7 +1,5 @@
 import { DesignToken } from "@microsoft/fast-foundation";
 
-export const defaultComponentName = "default";
-
 export const createToken = (name: string) => DesignToken.create<string>(name);
 
 export const setToken = (

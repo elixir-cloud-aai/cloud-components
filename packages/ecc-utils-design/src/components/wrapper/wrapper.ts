@@ -1,10 +1,6 @@
-import { attr, observable } from "@microsoft/fast-element";
-import { FoundationElement, CSSDesignToken } from "@microsoft/fast-foundation";
-import {
-  defaultComponentName,
-  registerDesignTokens,
-  setToken,
-} from "../../design-system/index.js";
+import { attr } from "@microsoft/fast-element";
+import { FoundationElement } from "@microsoft/fast-foundation";
+import { setToken } from "../../design-system/index.js";
 import allTokens from "../../design-system/tokens.js";
 
 const isObject = (o: unknown) =>
@@ -15,51 +11,34 @@ const camelize = (s: string) => s.replace(/-./g, (x) => x[1].toUpperCase());
 export class Wrapper extends FoundationElement {
   // config: handle passing the design system config
   @attr config: any = "";
-  @observable locallyStoredTokens: Record<string, CSSDesignToken<string>> = {};
-
-  connectedCallback() {
-    super.connectedCallback();
-    registerDesignTokens(this);
-  }
+  @attr name = "";
 
   handleSlotChange() {
-    const childComponents: any[] = Array.from(this.children);
-
     if (!this.config) return;
-    let configJSON = this.config;
 
-    if (!isObject(configJSON)) configJSON = JSON.parse(this.config);
+    const configJSON = isObject(this.config)
+      ? this.config
+      : JSON.parse(this.config);
+    const childComponents: any[] = Array.from(this.querySelectorAll("*"));
     const componentsNotNamedDefault = childComponents.filter(
-      (el) => el._name && el._name !== defaultComponentName
-    );
-
-    const componentsNamedDefault = childComponents.filter(
-      (el) => el.name === defaultComponentName
+      (el) => el._name && el._name !== ""
     );
 
     Object.keys(configJSON).forEach((i) => {
-      if (isObject(configJSON[i]) && i !== defaultComponentName) {
-        Object.keys(configJSON[i]).forEach((j) => {
-          componentsNotNamedDefault.forEach((el) => {
+      if (isObject(configJSON[i])) {
+        const customName = camelize(i);
+        const componentsWithCustomName = componentsNotNamedDefault.filter(
+          (el) => el._name === customName
+        );
+        componentsWithCustomName.forEach((el) => {
+          Object.keys(configJSON[i]).forEach((j) => {
             const tokenName = camelize(j);
-
-            setToken(el, configJSON[el._name][j], allTokens[tokenName]);
-          });
-        });
-      } else if (i === defaultComponentName) {
-        Object.keys(configJSON[i]).forEach((j) => {
-          componentsNamedDefault.forEach((el) => {
-            const tokenName = camelize(j);
-
-            setToken(el, configJSON.default[j], allTokens[tokenName]);
+            setToken(el, configJSON[i][j], allTokens[tokenName]);
           });
         });
       } else {
-        componentsNamedDefault.forEach((el) => {
-          const tokenName = camelize(i);
-
-          setToken(el, configJSON[i], allTokens[tokenName]);
-        });
+        const tokenName = camelize(i);
+        setToken(this, configJSON[i], allTokens[tokenName]);
       }
     });
   }
