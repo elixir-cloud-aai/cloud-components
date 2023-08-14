@@ -7,6 +7,7 @@ import {
 } from '@microsoft/fast-components';
 import { html, repeat, when } from '@microsoft/fast-element';
 import WESRun from './wesRun.js';
+import { state } from '../../wes-runs/definition/wesRuns.template.js';
 
 provideFASTDesignSystem().register(
   fastSkeleton(),
@@ -143,20 +144,6 @@ const innerTemplate = html`
     )}
   </div>
 `;
-
-const state: string[] = [
-  'UNKNOWN',
-  'QUEUED',
-  'INITIALIZING',
-  'RUNNING',
-  'PAUSED',
-  'COMPLETE',
-  'EXECUTOR_ERROR',
-  'SYSTEM_ERROR',
-  'CANCELED',
-  'CANCELING',
-  'PREEMPTED',
-];
 
 const template = html<WESRun>` <fast-accordion-item
   @change=${(x) => x.handleFetch()}
