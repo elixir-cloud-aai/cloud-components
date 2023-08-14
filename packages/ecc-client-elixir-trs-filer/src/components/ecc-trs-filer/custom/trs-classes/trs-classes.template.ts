@@ -5,6 +5,7 @@ import {
   allComponents,
   provideFASTDesignSystem,
 } from "@microsoft/fast-components";
+import { deleteIcon, editIcon, okIcon } from "../../../../assets/icons.js";
 
 provideFASTDesignSystem().register(allComponents);
 
@@ -32,12 +33,16 @@ const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
               />
             </td>
               <div>
-                <p
-                  class="clickable"
-                  @click="${(x, ctx) => ctx.parent.save(x.id)}"
-                >
-                  Save
-                </p>
+              <a
+              class="save"
+              title="Save"
+              data-toggle="tooltip"
+              @click="${(x, ctx) => ctx.parent.save(x.id)}"
+            >
+              <custom-tooltip>
+                ${okIcon} Save the class
+              </custom-tooltip>
+            </a>
               </div>
             </td>
           `
@@ -46,19 +51,25 @@ const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
             <td>${x.name}</td>
             <td>${x.description}</td>
             <td>
-              <div>
-                <p
-                  class="clickable"
+              <div class="actions">
+                <a
+                  class="edit"
+                  title="Edit"
+                  data-toggle="tooltip"
                   @click="${(x, ctx) => ctx.parent.edit(x.id)}"
                 >
-                  Edit
-                </p>
-                <p
-                  class="clickable"
+                  <custom-tooltip> ${editIcon} Edit the tool </custom-tooltip>
+                </a>
+                <a
+                  class="delete"
+                  title="Delete"
+                  data-toggle="tooltip"
                   @click="${(x, ctx) => ctx.parent.delete(x.id)}"
                 >
-                  Delete
-                </p>
+                  <custom-tooltip>
+                    ${deleteIcon} Delete the tool
+                  </custom-tooltip>
+                </a>
               </div>
             </td>
           `}
@@ -68,8 +79,8 @@ const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
 export const template = html<TRSClasses>`
   <div>
     <div class="buttonToolClass">
-      <fast-button class="button" @click="${(x) => x.openModal()}"
-        >Create Tool Class</fast-button
+      <fast-button class="button-toolclass" @click="${(x) => x.openModal()}"
+        >Create a Tool Class</fast-button
       >
     </div>
     ${when(

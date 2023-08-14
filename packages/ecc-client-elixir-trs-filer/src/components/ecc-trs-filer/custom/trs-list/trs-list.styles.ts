@@ -25,9 +25,8 @@ export const styles: ElementStyles = css`
     border-collapse: collapse;
     margin: 25px 0;
     font-size: 0.9em;
-    min-width: 400px;
-    width: 100%;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    width: 100%;
   }
 
   .styled-table thead tr {
@@ -36,14 +35,13 @@ export const styles: ElementStyles = css`
     text-align: left;
   }
 
-  .styled-table th,
+  .styled-table th {
+    padding: 12px 15px;
+    color: white;
+  }
   .styled-table td {
     padding: 12px 15px;
-    // height: max-content;
-  }
-
-  .styled-table td {
-    height: 50px;
+    color: black;
   }
 
   .styled-table tbody tr {
@@ -54,12 +52,8 @@ export const styles: ElementStyles = css`
     background-color: #f3f3f3;
   }
 
-  .styled-table tbody tr:last-of-type {
-    border-bottom: 2px solid #009879;
-  }
-
   .styled-table tbody tr.active-row {
-    font-weight: bold;
+    // font-weight: bold;
     color: #009879;
   }
 
@@ -72,7 +66,7 @@ export const styles: ElementStyles = css`
   }
 
   .toolName {
-    color: #009879;
+    color: #414141;
   }
 
   .input-container {
@@ -180,7 +174,6 @@ export const styles: ElementStyles = css`
   .modalVersion {
     padding: 20px;
     height: 100%;
-    overflow-y: auto;
   }
 
   .modalVersion__upper {
@@ -210,5 +203,23 @@ export const styles: ElementStyles = css`
     display: flex;
     flex-direction: column;
     gap: 20px;
+  }
+
+  .button {
+    display: flex;
+    justify-content: center;
+  }
+
+  .accordion {
+    margin: 20px 0;
+  }
+
+  .data-button {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 10px;
+  }
+  .inputs {
+    padding-bottom: 10px;
   }
 `;

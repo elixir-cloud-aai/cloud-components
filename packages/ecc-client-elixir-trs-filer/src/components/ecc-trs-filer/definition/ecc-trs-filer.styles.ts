@@ -17,4 +17,27 @@ export const styles: ElementStyles = css`
   .custom-tabpanel {
     padding: 0;
   }
+
+  fast-tabs::part(tablist) {
+    padding: 0;
+  }
+
+  .button-create-tool {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .create-tool {
+    height: 25px;
+    border-radius: 11px;
+    background: var(--outlines-secondary, #b02d55);
+  }
+
+  .custom-tab:hover {
+    color: black;
+  }
+
+  .custom-tab[aria-selected="true"]:hover {
+    color: white;
+  }
 `;

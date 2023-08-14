@@ -11,27 +11,33 @@ export const template = html<TRSFiler>`
   <div class="trs-container">
     <h1>TRS Filer</h1>
     <fast-tabs>
-      <fast-tab slot="tab">List of tools</fast-tab>
-      <fast-tab slot="tab">List of tool classes</fast-tab>
+      <fast-tab slot="tab" class="custom-tab">List of tools</fast-tab>
+      <fast-tab slot="tab" class="custom-tab">List of tool classes</fast-tab>
       <fast-tab-panel slot="tabpanel" class="custom-tabpanel">
-        <fast-button @click="${(x) => x.modalButtonClick()}"
-          >Create a Tool</fast-button
-        >
-        ${when(
-          (x) => x.isOpenModal,
-          html`
-            <fast-dialog
-              id="modal-container"
-              modal
-              :hidden="${(x) => !x.isOpenModal}"
-            >
-              <div>
-                <h2>Create a Tool</h2>
-              </div>
-              <fast-button @click="${(x) => x.closeModal()}">Close</fast-button>
-            </fast-dialog>
-          `
-        )}
+        <div class="button-create-tool">
+          <fast-button
+            @click="${(x) => x.modalButtonClick()}"
+            class="create-tool"
+            >Create a Tool</fast-button
+          >
+          ${when(
+            (x) => x.isOpenModal,
+            html`
+              <fast-dialog
+                id="modal-container"
+                modal
+                :hidden="${(x) => !x.isOpenModal}"
+              >
+                <div>
+                  <h2>Create a Tool</h2>
+                </div>
+                <fast-button @click="${(x) => x.closeModal()}"
+                  >Close</fast-button
+                >
+              </fast-dialog>
+            `
+          )}
+        </div>
         <div class="u-mt-md"></div>
         <trs-list baseUrl="${(x) => x.baseUrl}"></trs-list
       ></fast-tab-panel>

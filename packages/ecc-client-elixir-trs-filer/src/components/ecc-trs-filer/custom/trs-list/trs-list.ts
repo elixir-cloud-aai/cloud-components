@@ -41,6 +41,9 @@ const sourcesTemplate: SourcesData = {
   name: "trs-list",
   template,
   styles,
+  shadowOptions: {
+    mode: "open",
+  },
 })
 export class TRSToolsList extends FASTElement {
   @attr public baseUrl = "";
@@ -131,8 +134,10 @@ export class TRSToolsList extends FASTElement {
 
   @attr public isOpenVersionModal = false;
 
-  @attr authorsInput: AuthorsData[] = [{ ...authorsTemplate }];
+  @attr authorsInput: string[] = [""];
+
   @attr appsInput: AppsData[] = [{ ...appsTemplate }];
+
   @attr sourcesInput: SourcesData[] = [{ ...sourcesTemplate }];
 
   @observable authorsInputLength = 1;
@@ -156,9 +161,12 @@ export class TRSToolsList extends FASTElement {
           const modalDiv = modalContainer?.shadowRoot?.querySelector("div");
           modalDiv?.setAttribute("style", "z-index: 80");
           const modalControl = modalDiv?.querySelector(".control");
-          modalControl?.setAttribute("style", "background-color: #fff");
+          modalControl?.setAttribute(
+            "style",
+            "background-color: #fff; overflow-y: auto;"
+          );
         });
-      }, 10);
+      }, 50);
     }
   };
 
@@ -173,6 +181,7 @@ export class TRSToolsList extends FASTElement {
    */
   async connectedCallback() {
     super.connectedCallback();
+    this.authorsInputLength = this.authorsInput.length;
     await this.loadData();
     await this.loadTools();
   }
@@ -381,9 +390,16 @@ export class TRSToolsList extends FASTElement {
   }
 
   // for version control -- multiple strings in authors, apps, sources
-  public handleInputAuthorChange = (event: Event, input: AuthorsData) => {
+  // public handleInputAuthorChange = (event: Event, input: AuthorsData) => {
+  //   const authorsInput = (event.target as HTMLInputElement).value;
+  //   console.log(authorsInput);
+  //   console.log(input.authors);
+  //   input.authors = authorsInput;
+  // };
+  public handleInputAuthorsChange = (event: Event) => {
+    console.log("handleInputAuthorsChange called with event:", event);
     const authorsInput = (event.target as HTMLInputElement).value;
-    input.authors = authorsInput;
+    console.log("authorsInput:", authorsInput);
   };
 
   public handleInputAppsChange = (event: Event, input: AppsData) => {
@@ -391,13 +407,13 @@ export class TRSToolsList extends FASTElement {
     input.apps = appsInput;
   };
 
-  public handleInputSourceChange = (event: Event, input: SourcesData) => {
+  public handleInputSourceChange = (input: SourcesData, event: Event) => {
     const sourceInput = (event.target as HTMLInputElement).value;
     input.sources = sourceInput;
   };
 
   public addAuthor = () => {
-    this.authorsInput.push({ ...authorsTemplate });
+    this.authorsInput.push("");
     this.authorsInputLength += 1;
   };
 

@@ -53,10 +53,36 @@ export const styles: ElementStyles = css`
   .buttonToolClass {
     display: flex;
     flex-direction: column;
-    color: white;
+    align-items: flex-end;
   }
 
-  .button {
+  .button-toolclass {
     color: white;
+    height: 25px;
+    border-radius: 11px;
+    background: var(--outlines-secondary, #b02d55);
+  }
+
+  .edit {
+    fill: #ffc107;
+    cursor: pointer;
+  }
+
+  .delete {
+    fill: #e62f63;
+    cursor: pointer;
+  }
+
+  .save {
+    fill: #009879;
+    cursor: pointer;
+    margin: 10px;
+    align-self: center;
+    justify-self: center;
+  }
+
+  .actions {
+    display: flex;
+    gap: 30px;
   }
 `;

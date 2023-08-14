@@ -34,27 +34,26 @@ provideFASTDesignSystem().register(
   fastTabPanel(),
   fastTooltip()
 );
+
 const AuthorsTemplate = html<TRSToolsList>`
   ${repeat(
-    (x) => x.authorsInput,
-    html`
-      <div class="inputs">
-        <div class="label-input input-path">
-          <label for="name">Authors:</label>
-          <fast-text-field
-            type="text"
-            id="authors"
-            name="authors"
-            class="input"
-            :value=${(x) => x.authors}
-            @input=${(x, c) => c.parent.handleInputAuthorChange(c.event, x)}
-          >
-          </fast-text-field>
-        </div>
+    (x, c) => c.parent.authorsInput,
+    html` <div class="inputs">
+      <div class="label-input input-path">
+        <label for="name">Author:</label>
+        <fast-text-field
+          type="text"
+          id="authors"
+          name="authors"
+          class="input"
+          :value=${(x) => x}
+          @input=${(x, c) => c.parent.handleInputAuthorsChange(c.event)}
+        ></fast-text-field>
       </div>
-    `
+    </div>`
   )}
 `;
+
 const IncludedAppsTemplate = html<TRSToolsList>`
   ${repeat(
     (x) => x.appsInput,
@@ -98,7 +97,7 @@ const VerifiedSourceTemplate = html<TRSToolsList>`
   )}
 `;
 export const accordionTemplate = html<TRSToolsList>`
-  <fast-accordion expand-mode="multi">
+  <fast-accordion expand-mode="multi" class="accordion">
     ${repeat(
       (x) => x.tools,
       html<IEnhancedTool>`
@@ -275,136 +274,57 @@ export const accordionTemplate = html<TRSToolsList>`
           ${when(
             (x, c) => c.parent.isOpenVersionModal,
             html`
-      <fast-dialog
-         id="modal-container"
-         modal
-         :hidden="${(x, c) => !c.parent.isOpenVersionModal}"
-         >
-         <div class="modalVersion">
-            <div class="modalVersion__upper">
-               <h2>Create a Tool</h2>
-               <div
-                  class="modalVersion__close"
-                  @click="${(x, c) => c.parent.closeModal()}"
-                  >
-                  ${xIcon}
-               </div>
-            </div>
-            <div class="modalVersion__body">
-               <form class="form-container" >
-                  <div class="container meta">
-                     <div class="label-input">
-                        <label for="name">Name:</label>
-                        <fast-text-field type="text" id="name" name="name" class="input" :value=${(
-                          x
-                        ) => x.name} @input=${(x, c) =>
-              x.handleDataChange(c.event)} >
-                     </div>
-                     <div class="checker-input">
-                        <label for="is_production">Is production</label>
-                        <fast-checkbox checked required type="text" id="description" name="description" class="input" :value=${(
-                          x
-                        ) => x.description}
-                           @input=${(x, c) =>
-                             x.handleDataChange(c.event)} >is_production
-                        </fast-checkbox>
-                     </div>
-                     <div class="checker-input">
-                        <label for="is_production">Is verified</label>
-                        <fast-checkbox checked required type="text" id="description" name="description" class="input" :value=${(
-                          x
-                        ) => x.description}
-                           @input=${(x, c) =>
-                             x.handleDataChange(c.event)} >is_verified
-                        </fast-checkbox>
-                     </div>
-                     <div class="checker-input">
-                        <label for="is_signed">Is signed</label>
-                        <fast-checkbox checked required type="text" id="description" name="description" class="input" :value=${(
-                          x
-                        ) => x.description}
-                           @input=${(x, c) =>
-                             x.handleDataChange(c.event)} >is_signed
-                        </fast-checkbox>
-                     </div>
+              <fast-dialog
+                id="modal-container"
+                modal
+                :hidden="${(x, c) => !c.parent.isOpenVersionModal}"
+              >
+                <div class="modalVersion">
+                  <div class="modalVersion__upper">
+                    <h2>Create a Version</h2>
+                    <div
+                      class="modalVersion__close"
+                      @click="${(x, c) => c.parent.closeModal()}"
+                    >
+                      ${xIcon}
+                    </div>
                   </div>
-                  <div class="container authors-container">
-                     <h3 slot="start">Authors</h3>
-                     <div class="data-button">
-                        <fast-button class="add" id="add-executors" @click=${(
-                          x
-                        ) => x.addAuthor()} > Add Author
-                        </fast-button>
-                     </div>
-                     ${AuthorsTemplate}
-                     ${when(
-                       (x) => x.authorsInputLength > 1,
-                       html`
-                         <div class="data-button">
-                           <fast-button
-                             class="delete"
-                             id="delete-executor"
-                             @click=${(x) => x.deleteAuthor()}
-                           >
-                             Delete Author
-                           </fast-button>
-                         </div>
-                       `
-                     )}
+                  <div class="modalVersion__body">
+                    <form class="form-container">
+                      <div class="container meta">
+                        <div class="container authors-container">
+                          <h3 slot="start">Authors</h3>
+                          <div class="data-button">
+                            <fast-button
+                              class="add"
+                              id="add-executors"
+                              @click=${(x, c) => c.parent.addAuthor()}
+                            >
+                              Add Author
+                            </fast-button>
+                          </div>
+                          ${AuthorsTemplate}
+                          ${when(
+                            (x, c) => c.parent.authorsInputLength > 1,
+                            html`
+                              <div class="data-button">
+                                <fast-button
+                                  class="delete"
+                                  id="delete-executor"
+                                  @click=${(x, c) => c.parent.deleteAuthor()}
+                                >
+                                  Delete Author
+                                </fast-button>
+                              </div>
+                            `
+                          )}
+                        </div>
+                      </div>
+                    </form>
                   </div>
-                  <div class="container apps-container">
-                     <h3 slot="start">Included Apps</h3>
-                     <div class="data-button">
-                        <fast-button class="add" id="add-executors" @click=${(
-                          x
-                        ) => x.addApp()} > Add App
-                        </fast-button>
-                     </div>
-                     ${IncludedAppsTemplate}
-                     ${when(
-                       (x) => x.appsLength > 1,
-                       html`
-                         <div class="data-button">
-                           <fast-button
-                             class="delete"
-                             id="delete-executor"
-                             @click=${(x) => x.deleteApp()}
-                           >
-                             Delete App
-                           </fast-button>
-                         </div>
-                       `
-                     )}
-                  </div>
-                  <div class="container sources-container">
-                     <h3 slot="start">Verified Sources</h3>
-                     <div class="data-button">
-                        <fast-button class="add" id="add-executors" @click=${(
-                          x
-                        ) => x.addSource()} > Add Verified Source
-                        </fast-button>
-                     </div>
-                     ${VerifiedSourceTemplate}
-                     ${when(
-                       (x) => x.sourcesLength > 1,
-                       html`
-                         <div class="data-button">
-                           <fast-button
-                             class="delete"
-                             id="delete-executor"
-                             @click=${(x) => x.deleteSource()}
-                           >
-                             Delete Verified Source
-                           </fast-button>
-                         </div>
-                       `
-                     )}
-                  </div>
-               </form>
-            </div>
-         </div>
-      </fast-dialog>
-      `
+                </div>
+              </fast-dialog>
+            `
           )}
           <fast-tabs orientation="vertical">
             ${repeat(
