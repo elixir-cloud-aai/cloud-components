@@ -390,16 +390,11 @@ export class TRSToolsList extends FASTElement {
   }
 
   // for version control -- multiple strings in authors, apps, sources
-  // public handleInputAuthorChange = (event: Event, input: AuthorsData) => {
-  //   const authorsInput = (event.target as HTMLInputElement).value;
-  //   console.log(authorsInput);
-  //   console.log(input.authors);
-  //   input.authors = authorsInput;
-  // };
   public handleInputAuthorsChange = (event: Event) => {
-    console.log("handleInputAuthorsChange called with event:", event);
-    const authorsInput = (event.target as HTMLInputElement).value;
-    console.log("authorsInput:", authorsInput);
+    const inputElement = event.target as HTMLInputElement;
+    this.authorsInput = inputElement.value
+      .split(",")
+      .map((author) => author.trim());
   };
 
   public handleInputAppsChange = (event: Event, input: AppsData) => {
@@ -415,6 +410,7 @@ export class TRSToolsList extends FASTElement {
   public addAuthor = () => {
     this.authorsInput.push("");
     this.authorsInputLength += 1;
+    console.log(this.authorsInput);
   };
 
   public deleteAuthor = () => {

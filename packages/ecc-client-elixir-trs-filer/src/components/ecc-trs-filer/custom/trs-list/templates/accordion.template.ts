@@ -44,10 +44,10 @@ const AuthorsTemplate = html<TRSToolsList>`
         <fast-text-field
           type="text"
           id="authors"
-          name="authors"
           class="input"
           :value=${(x) => x}
-          @input=${(x, c) => c.parent.handleInputAuthorsChange(c.event)}
+          @input=${(x, c) =>
+            c.parentContext.parent.handleInputAuthorsChange(c.event)}"
         ></fast-text-field>
       </div>
     </div>`
