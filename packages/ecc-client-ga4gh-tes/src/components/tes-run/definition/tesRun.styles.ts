@@ -59,6 +59,11 @@ const styles = css`
     justify-content: space-between;
   }
 
+  .meta-data-right {
+    display: flex;
+    gap: 0.2rem;
+  }
+
   .name,
   .description,
   .creation-time {
@@ -108,6 +113,18 @@ const styles = css`
   .user-id {
     margin-bottom: 0.5rem;
     font-size: 0.9rem;
+  }
+
+  @media only screen and (max-width: 600px) {
+    .meta-data {
+      display: flex;
+      flex-direction: column-reverse;
+
+      .meta-data-right {
+        justify-content: end;
+        margin-bottom: 0.4rem;
+      }
+    }
   }
 `;
 

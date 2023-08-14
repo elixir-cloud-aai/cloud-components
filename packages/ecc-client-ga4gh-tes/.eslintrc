@@ -12,6 +12,7 @@
     "no-unused-vars": "off",
     "wc/guard-super-call": "off",
     "@typescript-eslint/no-unused-vars": ["error"],
+    "@typescript-eslint/no-use-before-define": ["warn"],
     "import/no-unresolved": "off",
     "import/no-extraneous-dependencies": "off",
     "import/extensions": [
