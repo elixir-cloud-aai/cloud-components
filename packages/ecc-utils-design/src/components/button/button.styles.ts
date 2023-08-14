@@ -6,8 +6,10 @@ export const styles: ElementStyles = css`
   :host[hidden] {
     display: none;
   }
+
   sl-button::part(base) {
     background-color: ${backgroundColor};
     color: ${textColor};
+    cursor: pointer;
   }
 `;
