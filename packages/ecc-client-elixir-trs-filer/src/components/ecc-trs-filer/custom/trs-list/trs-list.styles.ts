@@ -202,7 +202,7 @@ export const styles: ElementStyles = css`
   .container.meta {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
   }
 
   .button {
@@ -221,5 +221,21 @@ export const styles: ElementStyles = css`
   }
   .inputs {
     padding-bottom: 10px;
+  }
+
+  .checkbox-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  fast-checkbox::part(label) {
+    color: #000;
+  }
+
+  .checkbox-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
   }
 `;

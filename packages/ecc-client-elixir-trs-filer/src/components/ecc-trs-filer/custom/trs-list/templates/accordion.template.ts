@@ -35,67 +35,6 @@ provideFASTDesignSystem().register(
   fastTooltip()
 );
 
-const AuthorsTemplate = html<TRSToolsList>`
-  ${repeat(
-    (x, c) => c.parent.authorsInput,
-    html` <div class="inputs">
-      <div class="label-input input-path">
-        <label for="name">Author:</label>
-        <fast-text-field
-          type="text"
-          id="authors"
-          class="input"
-          :value=${(x) => x}
-          @input=${(x, c) =>
-            c.parentContext.parent.handleInputAuthorsChange(c.event)}"
-        ></fast-text-field>
-      </div>
-    </div>`
-  )}
-`;
-
-const IncludedAppsTemplate = html<TRSToolsList>`
-  ${repeat(
-    (x) => x.appsInput,
-    html`
-      <div class="inputs">
-        <div class="label-input input-path">
-          <label for="name">Authors:</label>
-          <fast-text-field
-            type="text"
-            id="included_apps"
-            name="included_apps"
-            class="input"
-            :value=${(x) => x.included_apps}
-            @input=${(x, c) => c.parent.handleInputAppsChange(c.event, x)}
-          >
-          </fast-text-field>
-        </div>
-      </div>
-    `
-  )}
-`;
-const VerifiedSourceTemplate = html<TRSToolsList>`
-  ${repeat(
-    (x) => x.sourcesInput,
-    html`
-      <div class="inputs">
-        <div class="label-input input-path">
-          <label for="name">Authors:</label>
-          <fast-text-field
-            type="text"
-            id="verified_sources"
-            name="verified_source"
-            class="input"
-            :value=${(x) => x.verified_source}
-            @input=${(x, c) => c.parent.handleInputSourceChange(c.event, x)}
-          >
-          </fast-text-field>
-        </div>
-      </div>
-    `
-  )}
-`;
 export const accordionTemplate = html<TRSToolsList>`
   <fast-accordion expand-mode="multi" class="accordion">
     ${repeat(
@@ -293,32 +232,91 @@ export const accordionTemplate = html<TRSToolsList>`
                     <form class="form-container">
                       <div class="container meta">
                         <div class="container authors-container">
-                          <h3 slot="start">Authors</h3>
-                          <div class="data-button">
-                            <fast-button
-                              class="add"
-                              id="add-executors"
-                              @click=${(x, c) => c.parent.addAuthor()}
-                            >
-                              Add Author
-                            </fast-button>
+                          <div class="inputs">
+                            <div class="label-input input-path">
+                              <label for="authors">Authors:</label>
+                              <fast-text-field
+                                type="text"
+                                id="authors"
+                                required
+                                name="authors"
+                                class="input"
+                                :value=${(x, c) => c.parent.authors.join(",")}
+                                @input=${(x, c) =>
+                                  c.parent.handleInputAuthorsChange(c.event)}
+                              ></fast-text-field>
+                            </div>
                           </div>
-                          ${AuthorsTemplate}
-                          ${when(
-                            (x, c) => c.parent.authorsInputLength > 1,
-                            html`
-                              <div class="data-button">
-                                <fast-button
-                                  class="delete"
-                                  id="delete-executor"
-                                  @click=${(x, c) => c.parent.deleteAuthor()}
-                                >
-                                  Delete Author
-                                </fast-button>
-                              </div>
-                            `
-                          )}
                         </div>
+
+                        <div class="container apps-container">
+                          <div class="inputs">
+                            <div class="label-input input-path">
+                              <label for="included_apps">Included Apps:</label>
+                              <fast-text-field
+                                type="url"
+                                required
+                                id="included_apps"
+                                name="included_apps"
+                                class="input"
+                                :value=${(x, c) =>
+                                  c.parent.includedApps.join(",")}
+                                @input=${(x, c) =>
+                                  c.parent.handleIncludedAppsChange(c.event)}
+                              ></fast-text-field>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="container apps-container">
+                          <div class="inputs">
+                            <div class="label-input input-path">
+                              <label for="verified_source"
+                                >Verified Sources:</label
+                              >
+                              <fast-text-field
+                                type="text"
+                                required
+                                id="verified_source"
+                                name="verified_source"
+                                class="input"
+                                :value=${(x, c) =>
+                                  c.parent.verifiedSource.join(",")}
+                                @input=${(x, c) =>
+                                  c.parent.handleVerifiedSourceChange(c.event)}
+                              ></fast-text-field>
+                            </div>
+                          </div>
+                        </div>
+
+                        <fieldset class="checkbox-container">
+                          <legend>Tool Properties</legend>
+                          <fast-checkbox
+                            checked
+                            name="is_production"
+                            @change=${(x, c) =>
+                              c.parent.handleCheckboxChange(c.event)}
+                            >Is Production</fast-checkbox
+                          >
+                          <fast-checkbox
+                            checked
+                            name="signed"
+                            @change=${(x, c) =>
+                              c.parent.handleCheckboxChange(c.event)}
+                            >Is Signed</fast-checkbox
+                          >
+                          <fast-checkbox
+                            checked
+                            name="verified"
+                            @change=${(x, c) =>
+                              c.parent.handleCheckboxChange(c.event)}
+                            >Is Verified</fast-checkbox
+                          >
+                        </fieldset>
+
+                        <fast-button @click="${(x, c) => c.parent.addAuthor()}"
+                          >Submit</fast-button
+                        >
                       </div>
                     </form>
                   </div>

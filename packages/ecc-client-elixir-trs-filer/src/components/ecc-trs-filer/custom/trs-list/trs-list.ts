@@ -80,6 +80,55 @@ export class TRSToolsList extends FASTElement {
     offset: "",
   };
 
+  @observable createVersionForm = {
+    author: [""],
+    descriptor_type: ["CWL"],
+    files: [
+      {
+        file_wrapper: {
+          checksum: [
+            {
+              checksum: "ea2a5db69bd20a42976838790bc29294df3af02b",
+              type: "sha1",
+            },
+          ],
+          content: "string",
+          url: "string",
+        },
+        tool_file: {
+          file_type: "OTHER",
+          path: "string",
+        },
+        type: "CWL",
+      },
+    ],
+    images: [
+      {
+        checksum: [
+          {
+            checksum:
+              "77af4d6b9913e693e8d0b4b294fa62ade6054e6b2f1ffb617ac955dd63fb0182",
+            type: "sha256",
+          },
+        ],
+        image_name: "string",
+        image_type: "Docker",
+        registry_host: "string",
+        size: 0,
+        updated: "string",
+      },
+    ],
+    included_apps: [
+      "https://bio.tools/tool/mytum.de/SNAP2/1",
+      "https://bio.tools/bioexcel_seqqc",
+    ],
+    is_production: true,
+    name: "string",
+    signed: true,
+    verified: true,
+    verified_source: ["string"],
+  };
+
   @observable filterFields: FilterFields[] = [
     {
       key: "id",
@@ -134,13 +183,11 @@ export class TRSToolsList extends FASTElement {
 
   @attr public isOpenVersionModal = false;
 
-  @attr authorsInput: string[] = [""];
+  @attr authors: string[] = [""];
 
-  @attr appsInput: AppsData[] = [{ ...appsTemplate }];
+  @attr includedApps: string[] = [""];
 
-  @attr sourcesInput: SourcesData[] = [{ ...sourcesTemplate }];
-
-  @observable authorsInputLength = 1;
+  @attr verifiedSource: string[] = [""];
 
   public modalButtonClick = () => {
     this.isOpenVersionModal = true;
@@ -181,7 +228,6 @@ export class TRSToolsList extends FASTElement {
    */
   async connectedCallback() {
     super.connectedCallback();
-    this.authorsInputLength = this.authorsInput.length;
     await this.loadData();
     await this.loadTools();
   }
@@ -392,31 +438,35 @@ export class TRSToolsList extends FASTElement {
   // for version control -- multiple strings in authors, apps, sources
   public handleInputAuthorsChange = (event: Event) => {
     const inputElement = event.target as HTMLInputElement;
-    this.authorsInput = inputElement.value
+    this.authors = inputElement.value.split(",").map((author) => author.trim());
+  };
+
+  public handleIncludedAppsChange = (event: Event) => {
+    const inputElement = event.target as HTMLInputElement;
+    this.includedApps = inputElement.value.split(",").map((app) => app.trim());
+  };
+
+  public handleVerifiedSourceChange = (event: Event) => {
+    const inputElement = event.target as HTMLInputElement;
+    this.verifiedSource = inputElement.value
       .split(",")
-      .map((author) => author.trim());
+      .map((source) => source.trim());
   };
 
-  public handleInputAppsChange = (event: Event, input: AppsData) => {
-    const appsInput = (event.target as HTMLInputElement).value;
-    input.apps = appsInput;
-  };
-
-  public handleInputSourceChange = (input: SourcesData, event: Event) => {
-    const sourceInput = (event.target as HTMLInputElement).value;
-    input.sources = sourceInput;
+  public handleCheckboxChange = (event: Event) => {
+    const inputElement = event.target as HTMLInputElement;
+    this.createVersionForm = {
+      ...this.createVersionForm,
+      [inputElement.name]: inputElement.checked,
+    };
   };
 
   public addAuthor = () => {
-    this.authorsInput.push("");
-    this.authorsInputLength += 1;
-    console.log(this.authorsInput);
-  };
-
-  public deleteAuthor = () => {
-    if (this.authorsInput.length > 1) {
-      this.authorsInput.pop();
-      this.authorsInputLength -= 1;
-    }
+    this.createVersionForm = {
+      ...this.createVersionForm,
+      author: this.authors,
+      included_apps: this.includedApps,
+    };
+    console.log(this.createVersionForm);
   };
 }
