@@ -1,6 +1,6 @@
 # ELIXIR Cloud Components
 
-Elixir Cloud Components (ecc) is lightweight, fast, and reusable web-components developed by Elixir Cloud and AAI Community for managing and accessing various services.
+ELIXIR Cloud Components (ECC) are lightweight, fast and reusable Web Components for operationalizing various [ELIXIR Cloud & AAI](https://elixir-cloud.dcc.sib.swiss/) and [GA4GH](https://ga4gh.org/) [Cloud](https://www.ga4gh.org/work_stream/cloud/) services.
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 
