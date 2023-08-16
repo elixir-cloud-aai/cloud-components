@@ -27,7 +27,7 @@ interface Version {
   url: string;
   verified: boolean;
   verified_source: string[];
-  isEditing: boolean;
+  isVersionEditing: boolean;
 }
 
 interface Tool {

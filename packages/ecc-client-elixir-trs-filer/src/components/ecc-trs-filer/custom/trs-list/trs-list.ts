@@ -66,6 +66,8 @@ export class TRSToolsList extends FASTElement {
 
   @observable toolClasses: ToolClass[] = [];
 
+  @observable isVersionEditing = false;
+
   @observable filterParams: { [key: string]: string | undefined | boolean } = {
     id: "",
     alias: "",
@@ -80,7 +82,18 @@ export class TRSToolsList extends FASTElement {
     offset: "",
   };
 
-  @observable createVersionForm = {
+  @observable descriptorType = [
+    "CWL",
+    "WDL",
+    "NFL",
+    "GALAXY",
+    "PLAIN_CWL",
+    "PLAIN_WDL",
+    "PLAIN_NFL",
+    "PLAIN_GALAXY",
+  ];
+
+  @observable initialCreateVersionForm = {
     author: [""],
     descriptor_type: ["CWL"],
     files: [
@@ -123,11 +136,13 @@ export class TRSToolsList extends FASTElement {
       "https://bio.tools/bioexcel_seqqc",
     ],
     is_production: true,
-    name: "string",
+    name: "",
     signed: true,
     verified: true,
     verified_source: ["string"],
   };
+
+  @observable createVersionForm = this.initialCreateVersionForm;
 
   @observable filterFields: FilterFields[] = [
     {
@@ -387,6 +402,7 @@ export class TRSToolsList extends FASTElement {
       throw new Error(`HTTP error! status: ${response.status}`);
     } else {
       console.log("Tool deleted");
+      this.loadData();
     }
   }
 
@@ -438,7 +454,7 @@ export class TRSToolsList extends FASTElement {
   // for version control -- multiple strings in authors, apps, sources
   public handleInputAuthorsChange = (event: Event) => {
     const inputElement = event.target as HTMLInputElement;
-    this.authors = inputElement.value.split(",").map((author) => author.trim());
+    this.authors = inputElement.value.split(",").map((author) => author);
   };
 
   public handleIncludedAppsChange = (event: Event) => {
@@ -461,12 +477,61 @@ export class TRSToolsList extends FASTElement {
     };
   };
 
-  public addAuthor = () => {
+  public handleVersionNameChange = (event: Event) => {
+    const inputElement = event.target as HTMLInputElement;
+    this.createVersionForm = {
+      ...this.createVersionForm,
+      name: inputElement.value,
+    };
+  };
+
+  public handleSelectDescriptorType = (event: Event) => {
+    const inputElement = event.target as HTMLInputElement;
+    this.createVersionForm = {
+      ...this.createVersionForm,
+      descriptor_type: [inputElement.value],
+    };
+  };
+
+  public async handleSubmitVersion(toolId: string) {
     this.createVersionForm = {
       ...this.createVersionForm,
       author: this.authors,
       included_apps: this.includedApps,
+      verified_source: this.verifiedSource,
     };
+    const url = `${this.baseUrl}/tools/${toolId}/versions`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(this.createVersionForm),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    this.isOpenVersionModal = false;
+    this.loadData();
     console.log(this.createVersionForm);
-  };
+  }
+
+  /**
+   * Deletes a tool version.
+   * @param toolId The ID of the tool.
+   * @param versionId The ID of the version to delete.
+   * @returns A promise resolving when the version is deleted.
+   */
+  public async deleteVersion(toolId: string, versionId: string): Promise<void> {
+    console.log(toolId, versionId);
+    const url = `${this.baseUrl}/tools/${toolId}/versions/${versionId}`;
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        accept: "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to delete version. Status: ${response.status}`);
+    }
+    this.loadData();
+  }
 }

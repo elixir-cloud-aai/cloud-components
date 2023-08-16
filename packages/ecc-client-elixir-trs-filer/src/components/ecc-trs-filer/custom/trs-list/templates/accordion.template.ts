@@ -230,6 +230,25 @@ export const accordionTemplate = html<TRSToolsList>`
                   </div>
                   <div class="modalVersion__body">
                     <form class="form-container">
+                      <div class="container">
+                        <div class="inputs">
+                          <div class="label-input input-path">
+                            <label for="name">Name:</label>
+                            <fast-text-field
+                              type="text"
+                              required
+                              id="name"
+                              name="name"
+                              class="input"
+                              :value=${(x, c) =>
+                                c.parent.createVersionForm.name}
+                              @input=${(x, c) =>
+                                c.parent.handleVersionNameChange(c.event)}
+                            ></fast-text-field>
+                          </div>
+                        </div>
+                      </div>
+
                       <div class="container meta">
                         <div class="container authors-container">
                           <div class="inputs">
@@ -264,6 +283,34 @@ export const accordionTemplate = html<TRSToolsList>`
                                 @input=${(x, c) =>
                                   c.parent.handleIncludedAppsChange(c.event)}
                               ></fast-text-field>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="container">
+                          <div class="inputs">
+                            <div class="label-input input-path">
+                              <label for="descriptor_type"
+                                >Descriptor Type:</label
+                              >
+                              <fast-select
+                                id="descriptor_type"
+                                name="descriptor_type"
+                                :value="${(x, c) =>
+                                  c.parent.createVersionForm
+                                    .descriptor_type[0]}"
+                                @change="${(x, c) =>
+                                  c.parent.handleSelectDescriptorType(c.event)}"
+                              >
+                                ${repeat(
+                                  (x, c) => c.parent.descriptorType,
+                                  html`
+                                    <fast-option
+                                      value="${(x) => x}"
+                                      >${(x) => x}</fast-option
+                                  `
+                                )}
+                              </fast-select>
                             </div>
                           </div>
                         </div>
@@ -314,7 +361,9 @@ export const accordionTemplate = html<TRSToolsList>`
                           >
                         </fieldset>
 
-                        <fast-button @click="${(x, c) => c.parent.addAuthor()}"
+                        <fast-button
+                          @click="${(x, c) =>
+                            c.parent.handleSubmitVersion(x.id)}"
                           >Submit</fast-button
                         >
                       </div>
@@ -338,32 +387,36 @@ export const accordionTemplate = html<TRSToolsList>`
                         Version ${(x) => x.name}
                       </h1>
                       ${when(
-                        (x) => !x.isEditing,
+                        (x) => !x.isVersionEditing,
                         html`
                           <a
                             class="edit"
                             title="Edit"
                             data-toggle="tooltip"
-                            @click="${(x) => x.editTool(x.id)}"
+                            @click="${(x) => x.editVersion(x.id)}"
                           >
                             <custom-tooltip>
-                              ${editIcon} Edit the tool
+                              ${editIcon} Edit the version
                             </custom-tooltip>
                           </a>
                           <a
                             class="delete"
                             title="Delete"
                             data-toggle="tooltip"
-                            @click="${(x) => x.delete()}"
+                            @click="${(x, c) =>
+                              c.parentContext.parent.deleteVersion(
+                                c.parent.id,
+                                x.id
+                              )}"
                           >
                             <custom-tooltip>
-                              ${deleteIcon} Delete the tool
+                              ${deleteIcon} Delete the version
                             </custom-tooltip>
                           </a>
                         `
                       )}
                       ${when(
-                        (x) => x.isEditing,
+                        (x) => x.isVersionEditing,
                         html`
                           <a
                             class="save"
@@ -379,9 +432,16 @@ export const accordionTemplate = html<TRSToolsList>`
                       )}
                     </div>
                     <! -- DISPLAY OF VERSION DATA -->
-                    <p data-key="ID" data-value="${(x) => x.id}">
-                      ID: ${(x) => x.id}
-                    </p>
+                    ${(x) =>
+                      x.isVersionEditing
+                        ? html` <fast-text-field
+                            data-key="ID"
+                            value="${(x) => x.id}"
+                          ></fast-text-field>`
+                        : html` <p data-key="ID" data-value="${(x) => x.id}">
+                            ID: ${(x) => x.id}
+                          </p>`}
+
                     <p data-key="Name" data-value="${(x) => x.name}">
                       Name: ${(x) => x.name}
                     </p>
@@ -404,6 +464,12 @@ export const accordionTemplate = html<TRSToolsList>`
                       Descriptor Type: ${(x) => x.descriptor_type}
                     </p>
                     <p
+                      data-key="Included Apps"
+                      data-value="${(x) => x.included_apps}"
+                    >
+                      Included Apps: ${(x) => x.included_apps}
+                    </p>
+                    <p
                       data-key="Is Production"
                       data-value="${(x) => x.is_production}"
                     >
@@ -413,11 +479,11 @@ export const accordionTemplate = html<TRSToolsList>`
                       Is Signed: ${(x) => x.signed}
                     </p>
                     <p
-                      data-key="Is Verified"
+                      data-key="Verified Source"
                       data-value="${(x) =>
                         x.verified ? x.verified_source : "Not verified"}"
                     >
-                      Is Verified:
+                      Verified Source:
                       ${(x) =>
                         x.verified ? x.verified_source : "Not verified"}
                     </p>
