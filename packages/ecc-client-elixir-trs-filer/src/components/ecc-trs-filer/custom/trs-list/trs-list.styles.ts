@@ -238,4 +238,16 @@ export const styles: ElementStyles = css`
     flex-direction: row;
     align-items: center;
   }
+
+  .create-version {
+    height: 30px;
+    border-radius: 11px;
+    background: var(--outlines-secondary, #b02d55);
+    margin: 10px 0 20px 0;
+    width: 100%;
+  }
+
+  fast-dialog::part(positioning-region)::part(dialog) {
+    background-color: #fff;
+  }
 `;

@@ -360,14 +360,13 @@ export const accordionTemplate = html<TRSToolsList>`
                             >Is Verified</fast-checkbox
                           >
                         </fieldset>
-
-                        <fast-button
-                          @click="${(x, c) =>
-                            c.parent.handleSubmitVersion(x.id)}"
-                          >Submit</fast-button
-                        >
                       </div>
                     </form>
+                    <fast-button
+                      class="create-tool"
+                      @click="${(x, c) => c.parent.handleSubmitVersion(x.id)}"
+                      >Submit</fast-button
+                    >
                   </div>
                 </div>
               </fast-dialog>

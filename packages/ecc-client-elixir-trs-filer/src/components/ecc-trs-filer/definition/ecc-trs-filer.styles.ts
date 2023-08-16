@@ -40,4 +40,51 @@ export const styles: ElementStyles = css`
   .custom-tab[aria-selected="true"]:hover {
     color: white;
   }
+
+  .modalTool {
+    padding: 20px;
+    height: 100%;
+  }
+
+  .modalTool__upper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    color: black;
+  }
+
+  .modalTool__close {
+    cursor: pointer;
+  }
+
+  .modalTool__form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: black;
+  }
+
+  .modalTool__form-item {
+    display: flex;
+    flex-direction: column;
+    color: black;
+  }
+
+  .modalTool__fieldset {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    color: black;
+  }
+
+  .modalTool__checkbox {
+    color: black;
+  }
+
+  .u-tool {
+    width: 100%;
+    margin: 10px 0 20px 0;
+  }
 `;
