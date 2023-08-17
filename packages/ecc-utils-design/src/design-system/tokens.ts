@@ -1,4 +1,4 @@
-import { DesignToken } from "@microsoft/fast-foundation";
+import { CSSDesignToken, DesignToken } from "@microsoft/fast-foundation";
 
 export const backgroundColor =
   DesignToken.create<string>("background-color").withDefault("#fff");
@@ -12,3 +12,10 @@ export const textColor =
     },
   });
 });
+
+const allTokens: Record<string, CSSDesignToken<string>> = {
+  backgroundColor,
+  textColor,
+};
+
+export default allTokens;

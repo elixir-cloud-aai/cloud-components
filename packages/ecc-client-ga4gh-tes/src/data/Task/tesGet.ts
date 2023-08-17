@@ -1,4 +1,30 @@
 /**
+ * Fetches service-info endpoint
+ * @param baseURL The base URL for fetching tasks
+ * @returns response from service-info endpoint
+ */
+const fetchService = async (baseURL: string) => {
+  const url = `${baseURL}/service-info?`;
+  try {
+    const response = await fetch(url);
+    if (!response) {
+      return {
+        isError: true,
+        breakpoint: 'fetchTasks',
+        error: 'No response from server',
+      };
+    }
+    return await response.json();
+  } catch (error) {
+    return {
+      isError: true,
+      breakpoint: 'fetchTasks',
+      error,
+    };
+  }
+};
+
+/**
  * Fetches tasks based on the specified parameters.
  * @param {string} [baseURL] - The base URL for fetching tasks
  * @param {number} [pageSize] - OPTIONAL. Number of tasks to return in one page.
@@ -151,4 +177,4 @@ const postTask = async (baseURL: string, taskData: object) => {
   }
 };
 
-export { fetchTasks, fetchTask, deleteTask, postTask };
+export { fetchService, fetchTasks, fetchTask, deleteTask, postTask };

@@ -20,6 +20,8 @@ export default class TESRun extends FASTElement {
 
   @attr id = '';
 
+  @attr admin = false;
+
   @attr state = '';
 
   @observable isLoading = true;
