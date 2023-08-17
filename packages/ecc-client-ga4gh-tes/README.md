@@ -5,10 +5,12 @@ Web components for TES
 ## Introduction
 This package provides a collection of Web Components for interacting with TES (Task Execution Service). It offers functionalities for listing, creating, and deleting task runs. These components facilitate seamless integration and enhanced user experience when working with TES tasks.
 ### Components
-| Component              | Issue  | Status             |
-|------------------------|--------|--------------------|
-|    ecc-tes-get-run     |   #48  |       Done         |
-|    ecc-tes-get-runs    |   #48  |       Done         |
+| Component                          | Issue | Status |
+|------------------------------------|-------|--------|
+| ecc-client-ga4gh-tes-get-run       | #48   | Done   |
+| ecc-client-ga4gh-tes-get-runs      | #48   | Done   |
+| ecc-client-ga4gh-tes-create-run    | #79   | Done   |
+| ecc-client-ga4gh-tes-service       | #93   | Done   |
 
 ## Getting Started
 
