@@ -204,7 +204,7 @@ export const accordionTemplate = html<TRSToolsList>`
           </div>
           <div class="space"></div>
           <div class="horizontal">
-            <h1>Versions:</h1>
+            <h3>Versions:</h3>
             <div @click="${(x, c) => c.parent.modalButtonClick()}">
               ${plusIcon}
             </div>
