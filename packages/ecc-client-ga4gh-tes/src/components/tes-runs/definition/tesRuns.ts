@@ -8,6 +8,19 @@ import { fetchTasks } from '../../../data/index.js';
 import template from './tesRuns.template.js';
 import styles from './tesRuns.styles.js';
 
+export const stateOption = [
+  'UNKNOWN',
+  'QUEUED',
+  'INITIALIZING',
+  'RUNNING',
+  'PAUSED',
+  'COMPLETE',
+  'EXECUTOR_ERROR',
+  'SYSTEM_ERROR',
+  'CANCELED',
+  'PREEMPTED',
+  'CANCELING',
+];
 interface Task {
   id: string;
   state: string;
