@@ -88,7 +88,6 @@ const cancelWorkflow = async (baseURL: string, id: string) => {
   }
 };
 
-
 /**
  * Create a workflow run
  * @param {string} baseURL - Base URL for fetching workflows
@@ -126,4 +125,3 @@ const postWorkflow = async (baseURL: string, data: object) => {
 };
 
 export { fetchWorkflows, fetchWorkflow, cancelWorkflow, postWorkflow };
-
