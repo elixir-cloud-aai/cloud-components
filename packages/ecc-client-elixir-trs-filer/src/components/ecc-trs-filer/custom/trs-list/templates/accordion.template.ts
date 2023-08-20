@@ -363,7 +363,7 @@ export const accordionTemplate = html<TRSToolsList>`
                       </div>
                     </form>
                     <fast-button
-                      class="create-tool"
+                      class="create-version"
                       @click="${(x, c) => c.parent.handleSubmitVersion(x.id)}"
                       >Submit</fast-button
                     >
@@ -386,13 +386,14 @@ export const accordionTemplate = html<TRSToolsList>`
                         Version ${(x) => x.name}
                       </h1>
                       ${when(
-                        (x) => !x.isVersionEditing,
+                        (x, c) => !c.parentContext.parent.isVersionEditing,
                         html`
                           <a
                             class="edit"
                             title="Edit"
                             data-toggle="tooltip"
-                            @click="${(x) => x.editVersion(x.id)}"
+                            @click="${(x, c) =>
+                              c.parentContext.parent.editVersionButton(x)}"
                           >
                             <custom-tooltip>
                               ${editIcon} Edit the version
@@ -415,86 +416,249 @@ export const accordionTemplate = html<TRSToolsList>`
                         `
                       )}
                       ${when(
-                        (x) => x.isVersionEditing,
+                        (x, c) => c.parentContext.parent.isVersionEditing,
                         html`
                           <a
                             class="save"
                             title="Save"
                             data-toggle="tooltip"
-                            @click="${(x) => x.saveTool(x.id)}"
+                            @click="${(x, c) =>
+                              c.parentContext.parent.saveVersionButton(
+                                c.parent.id,
+                                x.id
+                              )}"
                           >
                             <custom-tooltip>
-                              ${okIcon} Save the tool
+                              ${okIcon} Save the version
                             </custom-tooltip>
                           </a>
                         `
                       )}
                     </div>
-                    <! -- DISPLAY OF VERSION DATA -->
-                    ${(x) =>
-                      x.isVersionEditing
-                        ? html` <fast-text-field
-                            data-key="ID"
-                            value="${(x) => x.id}"
-                          ></fast-text-field>`
-                        : html` <p data-key="ID" data-value="${(x) => x.id}">
-                            ID: ${(x) => x.id}
-                          </p>`}
+                    <div class="version-edit-inputs">
+                      <! -- DISPLAY OF VERSION DATA -->
 
-                    <p data-key="Name" data-value="${(x) => x.name}">
-                      Name: ${(x) => x.name}
-                    </p>
-                    <p
-                      data-key="Author"
-                      data-value="${(x) => x.author.join(", ")}"
-                    >
-                      Author: ${(x) => x.author.join(", ")}
-                    </p>
-                    <p
-                      data-key="Meta Version"
-                      data-value="${(x) => x.meta_version}"
-                    >
-                      Meta Version: ${(x) => x.meta_version}
-                    </p>
-                    <p
-                      data-key="Descriptor Type"
-                      data-value="${(x) => x.descriptor_type}"
-                    >
-                      Descriptor Type: ${(x) => x.descriptor_type}
-                    </p>
-                    <p
-                      data-key="Included Apps"
-                      data-value="${(x) => x.included_apps}"
-                    >
-                      Included Apps: ${(x) => x.included_apps}
-                    </p>
-                    <p
-                      data-key="Is Production"
-                      data-value="${(x) => x.is_production}"
-                    >
-                      Is Production: ${(x) => x.is_production}
-                    </p>
-                    <p data-key="Is Signed" data-value="${(x) => x.signed}">
-                      Is Signed: ${(x) => x.signed}
-                    </p>
-                    <p
-                      data-key="Verified Source"
-                      data-value="${(x) =>
-                        x.verified ? x.verified_source : "Not verified"}"
-                    >
-                      Verified Source:
-                      ${(x) =>
-                        x.verified ? x.verified_source : "Not verified"}
-                    </p>
-                    <p data-key="URL" data-value="${(x) => x.url}">
-                      URL:
-                      <a
-                        href="${(x) => x.url}"
-                        data-key="URL"
-                        data-value="${(x) => x.url}"
-                        >${(x) => x.url}</a
-                      >
-                    </p>
+                      <div class="row">
+                        <span class="key">Version ID:</span>
+                        <span class="value">${(x) => x.id}</span>
+                      </div>
+
+                      ${(x, c) =>
+                        c.parentContext.parent.isVersionEditing
+                          ? html` <div class="version-edit-container">
+                              <label for="name">Name:</label>
+                              <fast-text-field
+                                class="u-w-full"
+                                id="name"
+                                data-key="Name"
+                                name="name"
+                                @change=${(x, c) =>
+                                  c.parentContext.parent.handleEditVersionChange(
+                                    c.event
+                                  )}
+                                value="${(x) => x.name}"
+                              ></fast-text-field>
+                            </div>`
+                          : html`<div class="row">
+                              <span class="key">Version Name:</span>
+                              <span class="value">${(x) => x.name}</span>
+                            </div>`}
+                      ${(x, c) =>
+                        c.parentContext.parent.isVersionEditing
+                          ? html` <div class="version-edit-container">
+                              <label for="name">Author:</label>
+                              <fast-text-field
+                                class="u-w-full"
+                                data-key="Author"
+                                name="author"
+                                @change=${(x, c) =>
+                                  c.parentContext.parent.handleEditVersionChange(
+                                    c.event
+                                  )}
+                                value="${(x) => x.author.join(", ")}"
+                              ></fast-text-field>
+                            </div>`
+                          : html`<div class="row">
+                              <span class="key">Authors:</span>
+                              <span class="value"
+                                >${(x) => x.author.join(", ")}</span
+                              >
+                            </div>`}
+
+                      <div class="row">
+                        <span class="key">Meta Version:</span>
+                        <span class="value">${(x) => x.meta_version}</span>
+                      </div>
+
+                      ${(x, c) =>
+                        c.parentContext.parent.isVersionEditing
+                          ? html` <div class="version-edit-container">
+                              <label for="descriptor_type"
+                                >Descriptor Type:</label
+                              >
+                              <fast-select
+                                id="descriptor_type"
+                                name="descriptor_type"
+                                class="u-w-full"
+                                :value="${(x, c) =>
+                                  c.parentContext.parent.createVersionForm
+                                    .descriptor_type[0]}"
+                                @change="${(x, c) =>
+                                  c.parentContext.parent.handleSelectDescriptorType(
+                                    c.event
+                                  )}"
+                              >
+                                ${repeat(
+                                  (x, c) =>
+                                    c.parentContext.parent.descriptorType,
+                                  html`
+                                    <fast-option
+                                      value="${(x) => x}"
+                                      >${(x) => x}</fast-option
+                                  `
+                                )}
+                              </fast-select>
+                            </div>`
+                          : html` <div class="row">
+                              <span class="key">Descriptor Type:</span>
+                              <span class="value"
+                                >${(x) => x.descriptor_type}</span
+                              >
+                            </div>`}
+                      ${(x, c) =>
+                        c.parentContext.parent.isVersionEditing
+                          ? html` <div class="version-edit-container">
+                              <label for="included_apps">Included Apps:</label>
+                              <fast-text-area
+                                type="url"
+                                required
+                                id="included_apps"
+                                name="included_apps"
+                                class="u-w-full"
+                                :value=${(x, c) =>
+                                  c.parentContext.parent.createVersionForm.included_apps.join(
+                                    ", "
+                                  )}
+                                @input=${(x, c) =>
+                                  c.parentContext.parent.handleEditVersionChange(
+                                    c.event
+                                  )}
+                              ></fast-text-area>
+                            </div>`
+                          : html`
+                              <div class="row">
+                                <span class="key"> Included Apps:</span>
+                                <span class="value"
+                                  >${(x) => x.included_apps.join(", ")}</span
+                                >
+                              </div>
+                            `}
+                      ${(x, c) =>
+                        c.parentContext.parent.isVersionEditing
+                          ? html` <div class="version-edit-container">
+                              <label for="is_production">Is Production:</label>
+                              <fast-checkbox
+                                id="is_production"
+                                name="is_production"
+                                @change=${(x, c) =>
+                                  c.parentContext.parent.handleEditVersionChange(
+                                    c.event
+                                  )}
+                                :checked="${(x, c) =>
+                                  c.parentContext.parent.createVersionForm
+                                    .is_production}"
+                              ></fast-checkbox>
+                            </div>`
+                          : html`<div class="row">
+                              <span class="key">Is production:</span>
+                              <span class="value"
+                                >${(x) => x.is_production}</span
+                              >
+                            </div>`}
+                      ${(x, c) =>
+                        c.parentContext.parent.isVersionEditing
+                          ? html` <div class="version-edit-container">
+                              <label for="signed">Is Signed:</label>
+                              <fast-checkbox
+                                id="signed"
+                                name="signed"
+                                @change=${(x, c) =>
+                                  c.parentContext.parent.handleEditVersionChange(
+                                    c.event
+                                  )}
+                                :checked="${(x, c) =>
+                                  c.parentContext.parent.createVersionForm
+                                    .signed}"
+                              ></fast-checkbox>
+                            </div>`
+                          : html`<div class="row">
+                              <span class="key">Is signed:</span>
+                              <span class="value">${(x) => x.signed}</span>
+                            </div>`}
+                      ${(x, c) =>
+                        c.parentContext.parent.isVersionEditing
+                          ? html` <div class="version-edit-container">
+                              <label for="verified">Is Verified:</label>
+                              <fast-checkbox
+                                id="verified"
+                                name="verified"
+                                @change=${(x, c) =>
+                                  c.parentContext.parent.handleEditVersionChange(
+                                    c.event
+                                  )}
+                                :checked="${(x, c) =>
+                                  c.parentContext.parent.createVersionForm
+                                    .verified}"
+                              ></fast-checkbox>
+                            </div>`
+                          : html`<div class="row">
+                              <span class="key">Is verified:</span>
+                              <span class="value">${(x) => x.verified}</span>
+                            </div>`}
+                      ${when(
+                        (x, c) =>
+                          c.parentContext.parent.createVersionForm.verified,
+                        html`
+                          ${(x, c) =>
+                            c.parentContext.parent.isVersionEditing
+                              ? html` <div class="version-edit-container">
+                                  <label for="verified_source"
+                                    >Verified Sources:</label
+                                  >
+                                  <fast-text-field
+                                    type="text"
+                                    required
+                                    id="verified_source"
+                                    name="verified_source"
+                                    class="u-w-full"
+                                    :value=${(x, c) =>
+                                      c.parentContext.parent.createVersionForm.verified_source.join(
+                                        ", "
+                                      )}
+                                    @input=${(x, c) =>
+                                      c.parentContext.parent.handleEditVersionChange(
+                                        c.event
+                                      )}
+                                  ></fast-text-field>
+                                </div>`
+                              : html` <div class="row">
+                                  <span class="key">Verified Sources:</span>
+                                  <span class="value">
+                                    ${(x) => x.verified_source.join(", ")}</span
+                                  >
+                                </div>`}
+                        `
+                      )}
+
+                      <div class="row">
+                        <span class="key">Verified Sources:</span>
+                        <span class="value">
+                          <a href="${(x) => x.url}" value="${(x) => x.url}"
+                            >${(x) => x.url}</a
+                          ></span
+                        >
+                      </div>
+                    </div>
                   </div>
                 </fast-tab-panel>
               `

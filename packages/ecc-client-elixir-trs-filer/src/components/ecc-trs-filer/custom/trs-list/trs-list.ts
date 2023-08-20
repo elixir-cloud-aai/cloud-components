@@ -280,6 +280,7 @@ export class TRSToolsList extends FASTElement {
       editTool: () => this.editTool(tool.id),
       saveTool: (updatedTool: Partial<Tool>) => this.saveTool(tool.id),
       isEditing: false,
+      // editVersion: () => this.editVersion(tool.id.version),
     })) as Tool[];
 
     this.pageCount = Math.ceil(this.tools.length / this.limit);
@@ -531,6 +532,55 @@ export class TRSToolsList extends FASTElement {
     });
     if (!response.ok) {
       throw new Error(`Failed to delete version. Status: ${response.status}`);
+    }
+    this.loadData();
+  }
+
+  public editVersionButton(obj: typeof this.createVersionForm) {
+    this.isVersionEditing = true;
+    this.createVersionForm = obj;
+    console.log(this.createVersionForm);
+    console.log(this.isVersionEditing);
+  }
+
+  async editVersionSave(versionId: string): Promise<void> {
+    console.log(versionId);
+  }
+
+  public handleEditVersionChange = (event: Event) => {
+    const inputElement = event.target as HTMLInputElement;
+    if (Array.isArray(this.createVersionForm[inputElement.name])) {
+      this.createVersionForm = {
+        ...this.createVersionForm,
+        [inputElement.name]: inputElement.value
+          .split(",")
+          .map((item) => item.trim()),
+      };
+    } else if (typeof this.createVersionForm[inputElement.name] === "boolean") {
+      this.createVersionForm = {
+        ...this.createVersionForm,
+        [inputElement.name]: inputElement.checked,
+      };
+    } else {
+      this.createVersionForm = {
+        ...this.createVersionForm,
+        [inputElement.name]: inputElement.value,
+      };
+    }
+  };
+
+  public async saveVersionButton(toolId: string, versionId: string) {
+    console.log(toolId, versionId);
+    this.isVersionEditing = false;
+    const url = `${this.baseUrl}/tools/${toolId}/versions/${versionId}`;
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(this.createVersionForm),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
     this.loadData();
   }

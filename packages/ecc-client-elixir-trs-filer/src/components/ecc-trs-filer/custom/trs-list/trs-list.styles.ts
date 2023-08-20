@@ -250,4 +250,42 @@ export const styles: ElementStyles = css`
   fast-dialog::part(positioning-region)::part(dialog) {
     background-color: #fff;
   }
+
+  .version-edit-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .version-edit-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+  }
+
+  label {
+    white-space: nowrap;
+  }
+
+  .u-w-full {
+    width: 100%;
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .key {
+    flex: 0.25;
+    text-align: left;
+    padding-right: 20px;
+    font-style: italic;
+  }
+
+  .value {
+    flex: 1;
+  }
 `;
