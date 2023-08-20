@@ -6,6 +6,23 @@
       body {
         background: #fff;
       }
+      ecc-utils-design-wrapper[name="wrapper-1"]
+        ecc-utils-design-button::part(button-base) {
+        background-color: red;
+        color: green;
+        --ecc-button-height: 30px;
+      }
+      ecc-utils-design-wrapper[name="wrapper-1"]
+        ecc-utils-design-button[name="primary"]::part(button-base) {
+        background-color: pink;
+        color: blueviolet;
+        /* --sl-input-height-medium: 20px; */
+      }
+      ecc-utils-design-wrapper[name="wrapper-2"]
+        ecc-utils-design-button[name="primary"]::part(button-base) {
+        background-color: pink;
+        color: red;
+      }
     </style>
     <link rel="stylesheet" href="../dist/style.css" />
     <title>ecc-utils-design</title>
@@ -13,43 +30,16 @@
   <body>
     <body>
       <div id="demo"></div>
-      <ecc-utils-design-wrapper
-        debug
-        config='{
-          "text-color": "blue",
-          "background-color": "pink",
-          "primary": {
-            "text-color": "red", 
-            "background-color": "pink"
-          },
-          "secondary": {
-            "text-color": "yellow", 
-            "background-color": "red"
-          }
-        }'
-      >
-        <div>
-          <ecc-utils-design-button name="primary">
-            Button 1.1
-          </ecc-utils-design-button>
-        </div>
+      <ecc-utils-design-wrapper name="wrapper-1">
+        <ecc-utils-design-button name="primary">
+          Button 1.1
+        </ecc-utils-design-button>
         <ecc-utils-design-button name="secondary">
           Button 1.2
         </ecc-utils-design-button>
         <ecc-utils-design-button> Button 1.3 </ecc-utils-design-button>
 
-        <ecc-utils-design-wrapper
-          name="primary"
-          debug
-          config='{
-            "text-color": "pink",
-            "background-color": "blue",
-            "primary": {
-              "text-color": "purple",
-              "background-color": "yellow"
-            }
-          }'
-        >
+        <ecc-utils-design-wrapper name="wrapper-2">
           <ecc-utils-design-button> Button 2.1 </ecc-utils-design-button>
           <ecc-utils-design-button name="primary">
             Button 2.2
