@@ -3,11 +3,16 @@
 Web components for WES
 
 ## Introduction
+
 This package provides a collection of Web Components for interacting with TES (Task Execution Service). It offers functionalities for listing, creating, and deleting task runs. These components facilitate seamless integration and enhanced user experience when working with TES tasks.
+
 ### Components
-| Component              | Issue  | Status             |
-|------------------------|--------|--------------------|
-|    ecc-client-wes-runs |        |                    |
+
+| Component | Issue | Status |
+| --------- | ----- | ------ |  
+| ecc-client-wes-run | #94 | Done |  
+| ecc-client-wes-runs | #94 | Done |  
+| ecc-client-wes-create-run | #106 | Done |
 
 ## Getting Started
 

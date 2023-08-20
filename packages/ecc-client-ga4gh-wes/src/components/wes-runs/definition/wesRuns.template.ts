@@ -19,7 +19,7 @@ provideFASTDesignSystem().register(
   fastTextField()
 );
 
-const state: string[] = [
+export const state: string[] = [
   'UNKNOWN',
   'QUEUED',
   'INITIALIZING',
