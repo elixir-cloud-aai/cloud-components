@@ -139,6 +139,7 @@ export const okIcon = html` <svg
 </svg>`;
 
 export const xIcon = html` <svg
+  slot="label"
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 16 16"
   width="16"

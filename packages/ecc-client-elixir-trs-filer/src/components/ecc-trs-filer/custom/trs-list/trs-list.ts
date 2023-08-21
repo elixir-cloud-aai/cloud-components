@@ -58,39 +58,32 @@ export class TRSToolsList extends FASTElement {
     offset: "",
   };
 
-  @observable descriptorType = [
-    "CWL",
-    "WDL",
-    "NFL",
-    "GALAXY",
-    "PLAIN_CWL",
-    "PLAIN_WDL",
-    "PLAIN_NFL",
-    "PLAIN_GALAXY",
+  @observable descriptorType = ["CWL", "WDL", "NFL", "GALAXY"];
+
+  @observable defaultFiles = [
+    {
+      file_wrapper: {
+        checksum: [
+          {
+            checksum: "ea2a5db69bd20a42976838790bc29294df3af02b",
+            type: "sha1",
+          },
+        ],
+        content: "string",
+        url: "string",
+      },
+      tool_file: {
+        file_type: "OTHER",
+        path: "string",
+      },
+      type: "CWL",
+    },
   ];
 
   @observable initialCreateVersionForm = {
     author: [""],
     descriptor_type: ["CWL"],
-    files: [
-      {
-        file_wrapper: {
-          checksum: [
-            {
-              checksum: "ea2a5db69bd20a42976838790bc29294df3af02b",
-              type: "sha1",
-            },
-          ],
-          content: "string",
-          url: "string",
-        },
-        tool_file: {
-          file_type: "OTHER",
-          path: "string",
-        },
-        type: "CWL",
-      },
-    ],
+    files: this.defaultFiles,
     images: [
       {
         checksum: [
@@ -174,13 +167,8 @@ export class TRSToolsList extends FASTElement {
 
   @attr public isOpenVersionModal = false;
 
-  @attr authors: string[] = [""];
-
-  @attr includedApps: string[] = [""];
-
-  @attr verifiedSource: string[] = [""];
-
   public modalButtonClick = () => {
+    this.createVersionForm = this.initialCreateVersionForm;
     this.isOpenVersionModal = true;
     if (this.isOpenVersionModal) {
       const trsFiler = document.querySelector("ecc-client-elixir-trs-filer");
@@ -254,6 +242,7 @@ export class TRSToolsList extends FASTElement {
       ...tool,
       delete: () => this.deleteTool(tool.id),
       editTool: () => this.editTool(tool.id),
+      saveTool: (x: any) => this.saveTool(x),
       isEditing: false,
     })) as Tool[];
 
@@ -382,64 +371,88 @@ export class TRSToolsList extends FASTElement {
   }
 
   async editTool(toolId: string): Promise<void> {
+    console.log(this.tools[0]);
     this.tools = this.tools.map((tool) =>
       tool.id === toolId ? { ...tool, isEditing: true } : tool
     );
   }
 
-  async saveTool(toolId: string): Promise<void> {
-    const url = `${this.baseUrl}/tools/${toolId}`;
-    const oneTool = this.tools.find((tool) => tool.id === toolId);
+  async saveTool(tool: any): Promise<void> {
+    const toolId = tool.id;
     const updatedTool = {
-      aliases: oneTool?.aliases ?? [],
-      checker_url: oneTool?.checker_url ?? "",
-      description: oneTool?.description ?? "",
-      has_checker: oneTool?.has_checker ?? false,
-      name: oneTool?.name ?? "",
-      organization: oneTool?.organization ?? "",
-      toolclass: oneTool?.toolclass ?? { description: "", id: "", name: "" },
-      versions: oneTool?.versions ?? [],
+      aliases: tool.aliases,
+      checker_url: tool.checker_url,
+      description: tool.description,
+      has_checker: tool.has_checker,
+      name: tool.name,
+      organization: tool.organization,
+      toolclass: tool.toolclass,
+      versions: tool.versions.map((v) => ({
+        author: v.author,
+        descriptor_type: v.descriptor_type,
+        files: this.defaultFiles,
+        id: v.id,
+        images: v.images,
+        included_apps: v.included_apps,
+        is_production: v.is_production,
+        name: v.name,
+        signed: v.signed,
+        verified: v.verified,
+        verified_source: v.verified_source,
+      })),
     };
+    const url = `${this.baseUrl}/tools/${toolId}`;
     const response = await fetch(url, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedTool),
     });
-
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
-    // update the tool in the list with the updated tool data
+    // // update the tool in the list with the updated tool data
     const updatedTools = this.tools.map((tool) =>
       tool.id === toolId ? { ...tool, ...updatedTool, isEditing: false } : tool
     );
-
     this.tools = updatedTools;
-
     // can refresh the entire list
     this.loadData();
   }
 
   public handleInputChangeToolEdit(item: Tool, e: Event) {
     const { name, value } = e.target as HTMLInputElement;
-    item[name] = value;
+    if (name === "toolclass") {
+      const selectedToolClass = this.toolClasses.find(
+        (toolClass) => toolClass.id === value
+      );
+      item.toolclass = selectedToolClass || {
+        description: "",
+        id: "",
+        name: "",
+      };
+    } else {
+      item[name] = value;
+    }
   }
 
   // for version control -- multiple strings in authors, apps, sources
   public handleInputAuthorsChange = (event: Event) => {
     const inputElement = event.target as HTMLInputElement;
-    this.authors = inputElement.value.split(",").map((author) => author);
+    this.createVersionForm.author = inputElement.value
+      .split(",")
+      .map((author) => author);
   };
 
   public handleIncludedAppsChange = (event: Event) => {
     const inputElement = event.target as HTMLInputElement;
-    this.includedApps = inputElement.value.split(",").map((app) => app.trim());
+    this.createVersionForm.included_apps = inputElement.value
+      .split(",")
+      .map((app) => app.trim());
   };
 
   public handleVerifiedSourceChange = (event: Event) => {
     const inputElement = event.target as HTMLInputElement;
-    this.verifiedSource = inputElement.value
+    this.createVersionForm.verified_source = inputElement.value
       .split(",")
       .map((source) => source.trim());
   };
@@ -469,12 +482,6 @@ export class TRSToolsList extends FASTElement {
   };
 
   public async handleSubmitVersion(toolId: string) {
-    this.createVersionForm = {
-      ...this.createVersionForm,
-      author: this.authors,
-      included_apps: this.includedApps,
-      verified_source: this.verifiedSource,
-    };
     const url = `${this.baseUrl}/tools/${toolId}/versions`;
     const response = await fetch(url, {
       method: "POST",
@@ -485,6 +492,7 @@ export class TRSToolsList extends FASTElement {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     this.isOpenVersionModal = false;
+    this.createVersionForm = this.initialCreateVersionForm;
     this.loadData();
   }
 
@@ -538,30 +546,12 @@ export class TRSToolsList extends FASTElement {
 
   public async saveVersionButton(toolId: string, versionId: string) {
     this.isVersionEditing = false;
-    const defaultFiles = [
-      {
-        file_wrapper: {
-          checksum: [
-            {
-              checksum: "ea2a5db69bd20a42976838790bc29294df3af02b",
-              type: "sha1",
-            },
-          ],
-          content: "string",
-          url: "string",
-        },
-        tool_file: {
-          file_type: "OTHER",
-          path: "string",
-        },
-        type: "CWL",
-      },
-    ];
+
     const url = `${this.baseUrl}/tools/${toolId}/versions/${versionId}`;
     const responseBody = {
       author: this.createVersionForm.author,
       descriptor_type: this.createVersionForm.descriptor_type,
-      files: defaultFiles,
+      files: this.defaultFiles,
       images: this.createVersionForm.images,
       included_apps: this.createVersionForm.included_apps,
       is_production: this.createVersionForm.is_production,
@@ -580,5 +570,9 @@ export class TRSToolsList extends FASTElement {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     this.loadData();
+  }
+
+  public cancelVersionButton() {
+    this.isVersionEditing = false;
   }
 }

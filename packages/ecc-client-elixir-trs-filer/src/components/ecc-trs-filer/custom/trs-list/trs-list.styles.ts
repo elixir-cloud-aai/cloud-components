@@ -160,6 +160,11 @@ export const styles: ElementStyles = css`
     justify-self: center;
   }
 
+  .cancel {
+    fill: #e62f63;
+    cursor: pointer;
+  }
+
   .horizontal {
     display: flex;
     flex-direction: row;

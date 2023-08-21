@@ -50,7 +50,7 @@ export const accordionTemplate = html<TRSToolsList>`
                 <th>Tool Class</th>
                 <th>Description</th>
                 <th>Organization</th>
-                <th>Checker</th>
+                <th>Checker Url</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -91,12 +91,21 @@ export const accordionTemplate = html<TRSToolsList>`
                   ${(x) =>
                     x.isEditing
                       ? html`
-                          <fast-text-field
+                          <fast-select
                             value="${(x) => x.toolclass.name}"
                             name="toolclass"
                             @input="${(x, c) =>
                               c.parent.handleInputChangeToolEdit(x, c.event)}"
-                          ></fast-text-field>
+                          >
+                            ${repeat(
+                              (x, c) => c.parent.toolClasses,
+                              html`
+                                <fast-option value="${(x) => x.id}"
+                                  >${(x) => x.name}</fast-option
+                                >
+                              `
+                            )}
+                          </fast-select>
                         `
                       : x.toolclass.name}
                 </td>
@@ -131,17 +140,17 @@ export const accordionTemplate = html<TRSToolsList>`
                 <! -- checker -->
                 <td>
                   ${(x) =>
-                    x.has_checker
-                      ? x.isEditing
-                        ? html`
-                            <fast-text-field
-                              value="${(x) => x.checker_url}"
-                              @input="${(e) =>
-                                (x.checker_url = e.target.value)}"
-                            ></fast-text-field>
-                          `
-                        : x.checker_url
-                      : "No checker"}
+                    x.isEditing
+                      ? html`
+                          <fast-text-field
+                            type="url"
+                            value="${(x) => x.checker_url}"
+                            name="checker_url"
+                            @input="${(x, c) =>
+                              c.parent.handleInputChangeToolEdit(x, c.event)}"
+                          ></fast-text-field>
+                        `
+                      : x.checker_url}
                 </td>
                 <! -- actions -->
                 <td class="actions">
@@ -177,7 +186,7 @@ export const accordionTemplate = html<TRSToolsList>`
                         class="save"
                         title="Save"
                         data-toggle="tooltip"
-                        @click="${(x) => x.saveTool(x.id)}"
+                        @click="${(x) => x.saveTool(x)}"
                       >
                         <custom-tooltip>
                           ${okIcon} Save the tool
@@ -260,7 +269,8 @@ export const accordionTemplate = html<TRSToolsList>`
                                 required
                                 name="authors"
                                 class="input"
-                                :value=${(x, c) => c.parent.authors.join(",")}
+                                :value=${(x, c) =>
+                                  c.parent.createVersionForm.author.join(",")}
                                 @input=${(x, c) =>
                                   c.parent.handleInputAuthorsChange(c.event)}
                               ></fast-text-field>
@@ -279,7 +289,9 @@ export const accordionTemplate = html<TRSToolsList>`
                                 name="included_apps"
                                 class="input"
                                 :value=${(x, c) =>
-                                  c.parent.includedApps.join(",")}
+                                  c.parent.createVersionForm.included_apps.join(
+                                    ","
+                                  )}
                                 @input=${(x, c) =>
                                   c.parent.handleIncludedAppsChange(c.event)}
                               ></fast-text-field>
@@ -315,27 +327,6 @@ export const accordionTemplate = html<TRSToolsList>`
                           </div>
                         </div>
 
-                        <div class="container apps-container">
-                          <div class="inputs">
-                            <div class="label-input input-path">
-                              <label for="verified_source"
-                                >Verified Sources:</label
-                              >
-                              <fast-text-field
-                                type="text"
-                                required
-                                id="verified_source"
-                                name="verified_source"
-                                class="input"
-                                :value=${(x, c) =>
-                                  c.parent.verifiedSource.join(",")}
-                                @input=${(x, c) =>
-                                  c.parent.handleVerifiedSourceChange(c.event)}
-                              ></fast-text-field>
-                            </div>
-                          </div>
-                        </div>
-
                         <fieldset class="checkbox-container">
                           <legend>Tool Properties</legend>
                           <fast-checkbox
@@ -360,6 +351,36 @@ export const accordionTemplate = html<TRSToolsList>`
                             >Is Verified</fast-checkbox
                           >
                         </fieldset>
+
+                        ${when(
+                          (x, c) => c.parent.createVersionForm.verified,
+                          html`
+                            <div class="container apps-container">
+                              <div class="inputs">
+                                <div class="label-input input-path">
+                                  <label for="verified_source"
+                                    >Verified Sources:</label
+                                  >
+                                  <fast-text-field
+                                    type="text"
+                                    required
+                                    id="verified_source"
+                                    name="verified_source"
+                                    class="input"
+                                    :value=${(x, c) =>
+                                      c.parent.createVersionForm.verified_source.join(
+                                        ","
+                                      )}
+                                    @input=${(x, c) =>
+                                      c.parent.handleVerifiedSourceChange(
+                                        c.event
+                                      )}
+                                  ></fast-text-field>
+                                </div>
+                              </div>
+                            </div>
+                          `
+                        )}
                       </div>
                     </form>
                     <fast-button
@@ -417,7 +438,7 @@ export const accordionTemplate = html<TRSToolsList>`
                       )}
                       ${when(
                         (x, c) => c.parentContext.parent.isVersionEditing,
-                        html<PutVersion>`
+                        html`
                           <a
                             class="save"
                             title="Save"
@@ -430,6 +451,17 @@ export const accordionTemplate = html<TRSToolsList>`
                           >
                             <custom-tooltip>
                               ${okIcon} Save the version
+                            </custom-tooltip>
+                          </a>
+                          <a
+                            class="cancel"
+                            title="Cancel"
+                            data-toggle="tooltip"
+                            @click="${(x, c) =>
+                              c.parentContext.parent.cancelVersionButton()}"
+                          >
+                            <custom-tooltip>
+                              ${xIcon} Cancel the version
                             </custom-tooltip>
                           </a>
                         `
