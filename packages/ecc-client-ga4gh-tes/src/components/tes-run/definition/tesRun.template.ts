@@ -6,6 +6,7 @@ import {
   fastBadge,
 } from '@microsoft/fast-components';
 import { html, when, repeat } from '@microsoft/fast-element';
+import { stateOption } from '../../tes-runs/definition/tesRuns.js';
 import TESRun from './tesRun.js';
 
 provideFASTDesignSystem().register(
@@ -57,47 +58,34 @@ const template = html<TESRun>`
             <div class="status-badge">
               <div>
                 <style>
-                  /* For example purposes only. App authors needs to define */
+                  /* For example purposes only. App authors need to define */
                   fast-badge {
-                    --badge-fill-error: #d32f2f;
-                    --badge-fill-processing: #ffc107;
-                    --badge-fill-cancelled: #cccccc;
+                    --badge-fill-unknown: #aad3d3;
                     --badge-fill-complete: #4caf50;
-                    --badge-fill-transparent: transparent;
-                    --badge-color-black: #000000;
+                    --badge-fill-queued: #2196f3;
+                    --badge-fill-initializing: #9c27b0;
+                    --badge-fill-running: #ff5722;
+                    --badge-fill-paused: #607d8b;
+                    --badge-fill-system_error: #f44336;
+                    --badge-fill-executor_error: #d32f2f;
+                    --badge-fill-canceled: #795548;
+                    --badge-fill-preempted: #00bcd4;
                     --badge-color-white: #ffffff;
                   }
                 </style>
-                ${when(
-                  () => x?.state === 'COMPLETE',
+                ${repeat(
+                  () => stateOption,
                   html`
-                    <fast-badge fill="complete" color="white"
-                      >${x.state}</fast-badge
-                    >
-                  `
-                )}
-                ${when(
-                  () => x?.state === 'SYSTEM_ERROR',
-                  html`
-                    <fast-badge fill="error" color="white"
-                      >${x.state}</fast-badge
-                    >
-                  `
-                )}
-                ${when(
-                  () => x?.state === 'PROCESSING',
-                  html`
-                    <fast-badge fill="processing" color="white"
-                      >${x.state}</fast-badge
-                    >
-                  `
-                )}
-                ${when(
-                  () => x?.state === 'CANCELED',
-                  html`
-                    <fast-badge fill="cancelled" color="white"
-                      >${x.state}</fast-badge
-                    >
+                    ${when(
+                      (thisState, c) => c.parent.state === thisState,
+                      html`
+                        <fast-badge
+                          fill=${(value) => value.toLowerCase()}
+                          color="white"
+                          >${x.state}</fast-badge
+                        >
+                      `
+                    )}
                   `
                 )}
               </div>
@@ -148,10 +136,11 @@ const template = html<TESRun>`
                 ${(x) => x.data.creation_time}
               </div>
             </div>
-            ${when(
-              (x) => x.state === 'RUNNING',
-              html`<div class="meta-data-right">
-                <fast-button
+            <div class="meta-data-right">
+              <!-- All the buttons rendered here will need admin permission -->
+              ${when(
+                (x) => x.state === 'RUNNING' && x.admin === true,
+                html` <fast-button
                   class="delete-button"
                   @click=${(x) => x.handleDelete()}
                 >
@@ -170,9 +159,10 @@ const template = html<TESRun>`
                       d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"
                     />
                   </svg>
-                </fast-button>
-              </div>`
-            )}
+                </fast-button>`
+              )}
+              <!-- If more cta are to be added that need admin permission, use admin === true with other respective checks -->
+            </div>
           </div>
           <div class="executors">
             <div class="section-heading">

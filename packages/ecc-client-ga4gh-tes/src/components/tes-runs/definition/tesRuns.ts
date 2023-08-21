@@ -8,6 +8,19 @@ import { fetchTasks } from '../../../data/index.js';
 import template from './tesRuns.template.js';
 import styles from './tesRuns.styles.js';
 
+export const stateOption = [
+  'UNKNOWN',
+  'QUEUED',
+  'INITIALIZING',
+  'RUNNING',
+  'PAUSED',
+  'COMPLETE',
+  'EXECUTOR_ERROR',
+  'SYSTEM_ERROR',
+  'CANCELED',
+  'PREEMPTED',
+  'CANCELING',
+];
 interface Task {
   id: string;
   state: string;
@@ -26,6 +39,8 @@ interface Data {
 export default class TESRuns extends FASTElement {
   // Base URL, provided by app author
   @attr baseURL = '';
+
+  @attr admin = false;
 
   // Number of Task to be listed at once
   @attr pageSize = 5;

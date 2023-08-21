@@ -1,4 +1,30 @@
 /**
+ * Fetches service-info endpoint
+ * @param baseURL The base URL for fetching tasks
+ * @returns response from service-info endpoint
+ */
+const fetchService = async (baseURL: string) => {
+  const url = `${baseURL}/service-info?`;
+  try {
+    const response = await fetch(url);
+    if (!response) {
+      return {
+        isError: true,
+        breakpoint: 'fetchTasks',
+        error: 'No response from server',
+      };
+    }
+    return await response.json();
+  } catch (error) {
+    return {
+      isError: true,
+      breakpoint: 'fetchTasks',
+      error,
+    };
+  }
+};
+
+/**
  * Fetches tasks based on the specified parameters.
  * @param {string} [baseURL] - The base URL for fetching tasks
  * @param {number} [pageSize] - OPTIONAL. Number of tasks to return in one page.
@@ -112,4 +138,43 @@ const deleteTask = async (baseURL: string, id: string) => {
   }
 };
 
-export { fetchTasks, fetchTask, deleteTask };
+/**
+ * Posts a new task.
+ * @param {string} baseURL - The base URL for posting the task.
+ * @param {object} taskData - The data of the task to be posted.
+ *                           This should be an object containing the necessary fields for the task.
+ *                           Modify the structure according to your task requirements.
+ * @returns {Promise<object>} - A promise that resolves to the parsed JSON response from the server,
+ *                              or an error object if an error occurs.
+ */
+const postTask = async (baseURL: string, taskData: object) => {
+  const url = `${baseURL}/tasks`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(taskData),
+    });
+
+    if (!response) {
+      return {
+        isError: true,
+        breakpoint: 'postTask',
+        error: 'No response from server',
+      };
+    }
+
+    return await response.json();
+  } catch (error) {
+    return {
+      isError: true,
+      breakpoint: 'postTask',
+      error,
+    };
+  }
+};
+
+export { fetchService, fetchTasks, fetchTask, deleteTask, postTask };

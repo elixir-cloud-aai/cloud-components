@@ -1,7 +1,7 @@
 import { provideFASTDesignSystem, fastSkeleton, fastAccordion, fastAccordionItem, fastSelect, fastOption, fastTextField, } from '@microsoft/fast-components';
 import { html, when, repeat } from '@microsoft/fast-element';
 provideFASTDesignSystem().register(fastAccordion(), fastAccordionItem(), fastSkeleton(), fastSelect(), fastOption(), fastTextField());
-const state = [
+export const state = [
     'UNKNOWN',
     'QUEUED',
     'INITIALIZING',

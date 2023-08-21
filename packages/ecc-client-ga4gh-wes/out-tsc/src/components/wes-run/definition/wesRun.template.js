@@ -1,5 +1,6 @@
 import { provideFASTDesignSystem, fastAccordionItem, fastSkeleton, fastButton, fastBadge, } from '@microsoft/fast-components';
 import { html, repeat, when } from '@microsoft/fast-element';
+import { state } from '../../wes-runs/definition/wesRuns.template.js';
 provideFASTDesignSystem().register(fastSkeleton(), fastButton(), fastBadge(), fastAccordionItem({
     collapsedIcon: `<svg
       xmlns="http://www.w3.org/2000/svg"
@@ -28,6 +29,10 @@ provideFASTDesignSystem().register(fastSkeleton(), fastButton(), fastBadge(), fa
       />
     </svg>`,
 }));
+const conditionalRender = () => html `
+  ${when((val) => Array.isArray(val[1]), html `${(val) => ArrayTemplate(val)} `)}
+  ${when((val) => typeof val[1] === 'object' && val[1] !== null && !Array.isArray(val[1]), html ` ${(val) => ObjectTemplate(val)} `)}
+`;
 const OtherTemplate = (x) => html `
   <div class="template-container container key-value">
     <div class="key">${x[0]}</div>
@@ -40,10 +45,7 @@ const ArrayTemplate = (x) => html `
       <div class="key">${x[0]}</div>
       <div class="value array-value">
         ${repeat((arr) => arr[1], html `
-            ${when((val) => Array.isArray(val[1]), html `${(val) => ArrayTemplate(val)} `)}
-            ${when((val) => typeof val[1] === 'object' &&
-    val[1] !== null &&
-    !Array.isArray(val[1]), html ` ${(val) => ObjectTemplate(val)} `)}
+            ${conditionalRender()}
             ${when((val) => typeof val[1] !== 'object', html ` ${(val) => val} `)}
           `)}
       </div>
@@ -57,10 +59,7 @@ const ObjectTemplate = (x) => html `
       <div class="value object-value">
         ${when((obj) => Object.entries(obj[1]).length > 0, html `
             ${repeat((val) => Object.entries(val[1]), html `
-                ${when((val) => Array.isArray(val[1]), html ` ${(val) => ArrayTemplate(val)} `)}
-                ${when((val) => typeof val[1] === 'object' &&
-    val[1] !== null &&
-    !Array.isArray(x[1]), html ` ${(val) => ObjectTemplate(val)} `)}
+                ${conditionalRender()}
                 ${when((val) => typeof val[1] !== 'object', html ` ${(val) => OtherTemplate(val)} `)}
               `)}
           `)}
@@ -72,28 +71,12 @@ const innerTemplate = html `
   <div class="Outer-container">
     ${when((x) => Object.entries(x.data).length > 0, html `
         ${repeat((x) => Object.entries(x.data), html `
-            ${when((val) => Array.isArray(val[1]), html ` ${(val) => ArrayTemplate(val)} `)}
-            ${when((val) => typeof val[1] === 'object' &&
-    val[1] !== null &&
-    !Array.isArray(val[1]), html ` ${(x) => ObjectTemplate(x)} `)}
+            ${conditionalRender()}
             ${when((val) => typeof val[1] !== 'object', html ` ${(val) => OtherTemplate(val)} `)}
           `)}
       `)}
   </div>
 `;
-const state = [
-    'UNKNOWN',
-    'QUEUED',
-    'INITIALIZING',
-    'RUNNING',
-    'PAUSED',
-    'COMPLETE',
-    'EXECUTOR_ERROR',
-    'SYSTEM_ERROR',
-    'CANCELED',
-    'CANCELING',
-    'PREEMPTED',
-];
 const template = html ` <fast-accordion-item
   @change=${(x) => x.handleFetch()}
 >
