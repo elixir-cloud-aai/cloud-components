@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+
 interface Checksum {
   checksum: string;
   type: string;
@@ -13,6 +14,7 @@ interface Image {
   updated: string;
 }
 
+// Corresponds to the GetResponse
 interface Version {
   author: string[];
   containerfile: boolean;
@@ -28,6 +30,19 @@ interface Version {
   verified: boolean;
   verified_source: string[];
   isVersionEditing: boolean;
+}
+
+interface File {
+  file_wrapper: {
+    checksum: Checksum[];
+    content: string;
+    url: string;
+  };
+  tool_file: {
+    file_type: string;
+    path: string;
+  };
+  type: string;
 }
 
 interface Tool {
@@ -50,7 +65,7 @@ interface Tool {
 
 interface IEnhancedTool extends Tool {
   isEditing: boolean;
-  delete(): () => void;
+  delete(): void;
 }
 
 interface ToolClass {
@@ -68,6 +83,12 @@ interface FilterFields {
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
+// Corresponds to the PutRequest
+interface PutVersion
+  extends Omit<Version, "containerfile" | "meta_version" | "url"> {
+  files: File[];
+}
+
 export type {
   Tool,
   Version,
@@ -76,4 +97,6 @@ export type {
   ToolClass,
   FilterFields,
   IEnhancedTool,
+  PutVersion, // Newly added export for the PutRequest type
+  File,
 };

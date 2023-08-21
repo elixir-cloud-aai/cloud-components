@@ -6,31 +6,7 @@ import {
 } from "@microsoft/fast-element";
 import { template } from "./trs-list.template.js";
 import { styles } from "./trs-list.styles.js";
-import { FilterFields, Tool, ToolClass } from "./trs-list.types.js";
-
-export interface AuthorsData {
-  authors: string;
-}
-
-const authorsTemplate: AuthorsData = {
-  authors: "",
-};
-
-export interface AppsData {
-  apps: string;
-}
-
-const appsTemplate: AppsData = {
-  apps: "",
-};
-
-export interface SourcesData {
-  sources: string;
-}
-
-const sourcesTemplate: SourcesData = {
-  sources: "",
-};
+import { FilterFields, PutVersion, Tool, ToolClass } from "./trs-list.types.js";
 
 /**
  * @class
@@ -512,7 +488,6 @@ export class TRSToolsList extends FASTElement {
     }
     this.isOpenVersionModal = false;
     this.loadData();
-    console.log(this.createVersionForm);
   }
 
   /**
@@ -539,12 +514,6 @@ export class TRSToolsList extends FASTElement {
   public editVersionButton(obj: typeof this.createVersionForm) {
     this.isVersionEditing = true;
     this.createVersionForm = obj;
-    console.log(this.createVersionForm);
-    console.log(this.isVersionEditing);
-  }
-
-  async editVersionSave(versionId: string): Promise<void> {
-    console.log(versionId);
   }
 
   public handleEditVersionChange = (event: Event) => {
@@ -570,13 +539,43 @@ export class TRSToolsList extends FASTElement {
   };
 
   public async saveVersionButton(toolId: string, versionId: string) {
-    console.log(toolId, versionId);
     this.isVersionEditing = false;
+    const defaultFiles = [
+      {
+        file_wrapper: {
+          checksum: [
+            {
+              checksum: "ea2a5db69bd20a42976838790bc29294df3af02b",
+              type: "sha1",
+            },
+          ],
+          content: "string",
+          url: "string",
+        },
+        tool_file: {
+          file_type: "OTHER",
+          path: "string",
+        },
+        type: "CWL",
+      },
+    ];
     const url = `${this.baseUrl}/tools/${toolId}/versions/${versionId}`;
+    const responseBody = {
+      author: this.createVersionForm.author,
+      descriptor_type: this.createVersionForm.descriptor_type,
+      files: defaultFiles,
+      images: this.createVersionForm.images,
+      included_apps: this.createVersionForm.included_apps,
+      is_production: this.createVersionForm.is_production,
+      name: this.createVersionForm.name,
+      signed: this.createVersionForm.signed,
+      verified: this.createVersionForm.verified,
+      verified_source: this.createVersionForm.verified_source,
+    };
     const response = await fetch(url, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(this.createVersionForm),
+      body: JSON.stringify(responseBody),
     });
 
     if (!response.ok) {

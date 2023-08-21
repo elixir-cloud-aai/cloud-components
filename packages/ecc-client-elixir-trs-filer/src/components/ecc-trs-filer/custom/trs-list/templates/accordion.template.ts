@@ -13,7 +13,7 @@ import {
   provideFASTDesignSystem,
 } from "@microsoft/fast-components";
 import type { TRSToolsList } from "../trs-list.js";
-import type { Version, IEnhancedTool } from "../trs-list.types.js";
+import type { Version, IEnhancedTool, PutVersion } from "../trs-list.types.js";
 import {
   plusIcon,
   minusIcon,
@@ -417,7 +417,7 @@ export const accordionTemplate = html<TRSToolsList>`
                       )}
                       ${when(
                         (x, c) => c.parentContext.parent.isVersionEditing,
-                        html`
+                        html<PutVersion>`
                           <a
                             class="save"
                             title="Save"
@@ -445,7 +445,9 @@ export const accordionTemplate = html<TRSToolsList>`
 
                       ${(x, c) =>
                         c.parentContext.parent.isVersionEditing
-                          ? html` <div class="version-edit-container">
+                          ? html<PutVersion>` <div
+                              class="version-edit-container"
+                            >
                               <label for="name">Name:</label>
                               <fast-text-field
                                 class="u-w-full"
@@ -465,7 +467,9 @@ export const accordionTemplate = html<TRSToolsList>`
                             </div>`}
                       ${(x, c) =>
                         c.parentContext.parent.isVersionEditing
-                          ? html` <div class="version-edit-container">
+                          ? html<PutVersion>` <div
+                              class="version-edit-container"
+                            >
                               <label for="name">Author:</label>
                               <fast-text-field
                                 class="u-w-full"
@@ -492,7 +496,9 @@ export const accordionTemplate = html<TRSToolsList>`
 
                       ${(x, c) =>
                         c.parentContext.parent.isVersionEditing
-                          ? html` <div class="version-edit-container">
+                          ? html<PutVersion>` <div
+                              class="version-edit-container"
+                            >
                               <label for="descriptor_type"
                                 >Descriptor Type:</label
                               >
@@ -527,7 +533,9 @@ export const accordionTemplate = html<TRSToolsList>`
                             </div>`}
                       ${(x, c) =>
                         c.parentContext.parent.isVersionEditing
-                          ? html` <div class="version-edit-container">
+                          ? html<PutVersion>` <div
+                              class="version-edit-container"
+                            >
                               <label for="included_apps">Included Apps:</label>
                               <fast-text-area
                                 type="url"
@@ -555,7 +563,9 @@ export const accordionTemplate = html<TRSToolsList>`
                             `}
                       ${(x, c) =>
                         c.parentContext.parent.isVersionEditing
-                          ? html` <div class="version-edit-container">
+                          ? html<PutVersion>` <div
+                              class="version-edit-container"
+                            >
                               <label for="is_production">Is Production:</label>
                               <fast-checkbox
                                 id="is_production"
@@ -577,7 +587,9 @@ export const accordionTemplate = html<TRSToolsList>`
                             </div>`}
                       ${(x, c) =>
                         c.parentContext.parent.isVersionEditing
-                          ? html` <div class="version-edit-container">
+                          ? html<PutVersion>` <div
+                              class="version-edit-container"
+                            >
                               <label for="signed">Is Signed:</label>
                               <fast-checkbox
                                 id="signed"
@@ -597,7 +609,9 @@ export const accordionTemplate = html<TRSToolsList>`
                             </div>`}
                       ${(x, c) =>
                         c.parentContext.parent.isVersionEditing
-                          ? html` <div class="version-edit-container">
+                          ? html<PutVersion>` <div
+                              class="version-edit-container"
+                            >
                               <label for="verified">Is Verified:</label>
                               <fast-checkbox
                                 id="verified"
@@ -621,7 +635,9 @@ export const accordionTemplate = html<TRSToolsList>`
                         html`
                           ${(x, c) =>
                             c.parentContext.parent.isVersionEditing
-                              ? html` <div class="version-edit-container">
+                              ? html<PutVersion>` <div
+                                  class="version-edit-container"
+                                >
                                   <label for="verified_source"
                                     >Verified Sources:</label
                                   >
@@ -651,7 +667,7 @@ export const accordionTemplate = html<TRSToolsList>`
                       )}
 
                       <div class="row">
-                        <span class="key">Verified Sources:</span>
+                        <span class="key">Version url:</span>
                         <span class="value">
                           <a href="${(x) => x.url}" value="${(x) => x.url}"
                             >${(x) => x.url}</a

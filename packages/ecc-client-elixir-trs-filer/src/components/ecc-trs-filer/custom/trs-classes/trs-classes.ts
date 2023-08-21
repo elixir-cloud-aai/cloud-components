@@ -42,7 +42,6 @@ export class TRSClasses extends FASTElement {
       });
       const data: IToolClass[] = await response.json();
       this.data = data;
-      console.log(this.data);
     } catch (error) {
       console.error("Failed to fetch data", error);
     }
@@ -71,7 +70,6 @@ export class TRSClasses extends FASTElement {
     description: string,
     name: string
   ): Promise<void> {
-    console.log(description, name);
     try {
       const response = await fetch(`${this.baseUrl}/toolClasses`, {
         method: "POST",
