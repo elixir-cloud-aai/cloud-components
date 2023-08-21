@@ -6,7 +6,7 @@ import {
 } from "@microsoft/fast-element";
 import { template } from "./trs-list.template.js";
 import { styles } from "./trs-list.styles.js";
-import { FilterFields, PutVersion, Tool, ToolClass } from "./trs-list.types.js";
+import { FilterFields, Tool, ToolClass } from "./trs-list.types.js";
 
 /**
  * @class
@@ -254,9 +254,7 @@ export class TRSToolsList extends FASTElement {
       ...tool,
       delete: () => this.deleteTool(tool.id),
       editTool: () => this.editTool(tool.id),
-      saveTool: (updatedTool: Partial<Tool>) => this.saveTool(tool.id),
       isEditing: false,
-      // editVersion: () => this.editVersion(tool.id.version),
     })) as Tool[];
 
     this.pageCount = Math.ceil(this.tools.length / this.limit);
