@@ -56,7 +56,7 @@ export const filtersTemplate = html<TRSToolsList>` ${when(
                         id="${x.key}"
                         name="${x.key}"
                         value="${(x, c) => c.parent.filterParams[x.key]}"
-                        @change="${(c) =>
+                        @change="${(x, c) =>
                           c.parent.handleSelectToolClass(c.event)}"
                       >
                         ${repeat(
