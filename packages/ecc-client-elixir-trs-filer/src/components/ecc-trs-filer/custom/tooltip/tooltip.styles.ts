@@ -21,7 +21,6 @@ export const styles: ElementStyles = css`
     justify-content: center;
     color: blue;
     cursor: pointer;
-    border-bottom: 1px dotted;
     position: relative;
   }
 

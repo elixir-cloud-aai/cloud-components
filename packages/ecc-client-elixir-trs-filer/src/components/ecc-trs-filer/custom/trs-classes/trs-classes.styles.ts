@@ -40,6 +40,13 @@ export const styles: ElementStyles = css`
     color: #009879;
   }
 
+  .styled-table .actions {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-top: 10px;
+  }
+
   .clickable {
     font-weight: bold;
     color: blue;
@@ -63,6 +70,13 @@ export const styles: ElementStyles = css`
     background: var(--outlines-secondary, #b02d55);
   }
 
+  .cancel-toolclass {
+    color: white;
+    height: 25px;
+    border-radius: 11px;
+    background: var(--outlines-secondary, #bfbfbf);
+  }
+
   .edit {
     fill: #ffc107;
     cursor: pointer;
@@ -76,13 +90,58 @@ export const styles: ElementStyles = css`
   .save {
     fill: #009879;
     cursor: pointer;
-    margin: 10px;
     align-self: center;
     justify-self: center;
+  }
+
+  .save-container {
+    margin-top: 30px;
+    margin-left: 20px;
   }
 
   .actions {
     display: flex;
     gap: 30px;
+  }
+
+  .modalClass {
+    padding: 20px;
+    height: 100%;
+  }
+
+  .modalClass__upper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modalClass__close {
+    cursor: pointer;
+  }
+
+  fast-dialog::part(control) {
+    background: white;
+  }
+
+  .modalClass__form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: black;
+  }
+
+  .modalClass__form-item {
+    display: flex;
+    flex-direction: column;
+    color: black;
+  }
+
+  .button-row-modal {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 20px;
   }
 `;

@@ -5,7 +5,12 @@ import {
   allComponents,
   provideFASTDesignSystem,
 } from "@microsoft/fast-components";
-import { deleteIcon, editIcon, okIcon } from "../../../../assets/icons.js";
+import {
+  deleteIcon,
+  editIcon,
+  okIcon,
+  xIcon,
+} from "../../../../assets/icons.js";
 
 provideFASTDesignSystem().register(allComponents);
 
@@ -17,7 +22,7 @@ const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
             <td>${x.id}</td>
             </td>
             <td>
-              <input
+            <fast-text-field
                 type="text"
                 name="name"
                 value="${(x) => x.name}"
@@ -25,14 +30,14 @@ const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
               />
             </td>
             <td>
-              <input
+            <fast-text-field
                 type="text"
                 name="description"
                 value="${(x) => x.description}"
                 @input="${(x, c) => c.parent.handleInputChange(x, c.event)}"
               />
             </td>
-              <div>
+              <div class="save-container">
               <a
               class="save"
               title="Save"
@@ -86,26 +91,58 @@ export const template = html<TRSClasses>`
     ${when(
       (x) => x.isModalOpen,
       html`
-        <div class="modal">
-          <label>Description:</label>
-          <input
-            type="text"
-            value=${(x) => x.modalDescription}
-            @input=${(x, c) => x.handleDescriptionChange(c.event)}
-          />
-
-          <label>Name:</label>
-          <input
-            type="text"
-            value=${(x) => x.modalName}
-            @input="${(x, c) => x.handleNameChange(c.event)}"
-          />
-
-          <fast-button @click="${(x) => x.createToolClassFromModal()}"
-            >Submit</fast-button
-          >
-          <fast-button @click="${(x) => x.closeModal()}">Cancel</fast-button>
-        </div>
+      <fast-dialog
+      id="modal-container"
+      modal
+      :hidden="${(x) => x.openModal()}"
+      >
+      <div class="modalClass">
+      <div class="modalClass__upper">
+         <h2>Create a Version</h2>
+         <div
+            class="modalClass__close"
+            @click="${(x) => x.closeModal()}"
+            >
+            ${xIcon}
+         </div>
+      </div>
+      <div class="modalClass__body">
+         <form class="modalClass__form">
+            <div class="modalClass__form-item">
+               <label>Name:</label>
+               <fast-text-field
+                  type="text"
+                  required
+                  id="name"
+                  name="name"
+                  class="input"
+                  value=${(x) => x.modalName}
+               @input="${(x, c) => x.handleNameChange(c.event)}"
+               />
+            </div>
+            <div class="modalClass__form-item">
+               <label>Description:</label>
+               <fast-text-area
+                  type="text"
+                  required
+                  id="description"
+                  name="description"
+                  class="input"
+                  value=${(x) => x.modalDescription}
+               @input=${(x, c) => x.handleDescriptionChange(c.event)}
+               />
+            </div>
+            <div class="button-row-modal">
+               <fast-button class="button-toolclass" @click="${(x) =>
+                 x.createToolClassFromModal()}"
+                  >Submit</fast-button
+                  >
+               <fast-button class="cancel-toolclass" @click="${(x) =>
+                 x.closeModal()}">Cancel</fast-button>
+            </div>
+         </form>
+      </div>
+   </fast-dialog>
       `
     )}
     <table class="styled-table">

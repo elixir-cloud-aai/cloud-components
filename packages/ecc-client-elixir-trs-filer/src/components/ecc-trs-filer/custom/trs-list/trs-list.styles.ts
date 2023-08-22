@@ -151,6 +151,7 @@ export const styles: ElementStyles = css`
     display: flex;
     gap: 20px;
     align-items: center;
+    margin-top: 10px;
   }
 
   .save {
@@ -165,11 +166,12 @@ export const styles: ElementStyles = css`
     cursor: pointer;
   }
 
-  .horizontal {
+  .version-title {
     display: flex;
     flex-direction: row;
     gap: 1rem;
     align-items: center;
+    padding-bottom: 15px;
   }
 
   svg {

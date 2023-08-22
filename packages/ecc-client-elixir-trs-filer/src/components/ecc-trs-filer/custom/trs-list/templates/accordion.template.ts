@@ -212,7 +212,7 @@ export const accordionTemplate = html<TRSToolsList>`
             )}
           </div>
           <div class="space"></div>
-          <div class="horizontal">
+          <div class="version-title">
             <h3>Versions:</h3>
             <div @click="${(x, c) => c.parent.modalButtonClick()}">
               ${plusIcon}
@@ -402,7 +402,7 @@ export const accordionTemplate = html<TRSToolsList>`
                 >
                 <fast-tab-panel slot="tabpanel" class="tabContent">
                   <div class="version-section">
-                    <div class="horizontal">
+                    <div class="version-title">
                       <h1 data-key="Version" data-value="${(x) => x.name}">
                         Version ${(x) => x.name}
                       </h1>
@@ -461,7 +461,7 @@ export const accordionTemplate = html<TRSToolsList>`
                               c.parentContext.parent.cancelVersionButton()}"
                           >
                             <custom-tooltip>
-                              ${xIcon} Cancel the version
+                              ${xIcon} Cancel the editing of the version
                             </custom-tooltip>
                           </a>
                         `
