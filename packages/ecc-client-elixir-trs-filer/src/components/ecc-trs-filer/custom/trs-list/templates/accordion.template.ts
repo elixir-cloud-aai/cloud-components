@@ -21,6 +21,8 @@ import {
   editIcon,
   okIcon,
   xIcon,
+  alertIcon,
+  tooltipIcon,
 } from "../../../../../assets/icons.js";
 provideFASTDesignSystem().register(
   fastTextField(),
@@ -198,6 +200,7 @@ export const accordionTemplate = html<TRSToolsList>`
               </tr>
             </tbody>
           </table>
+
           <div>
             ${when(
               (x) => x && x.aliases && x.aliases.length !== 0,
@@ -238,6 +241,12 @@ export const accordionTemplate = html<TRSToolsList>`
                     </div>
                   </div>
                   <div class="modalVersion__body">
+                    <div class="alert alert-primary" role="alert">
+                      <div class="alert-icon">${alertIcon}</div>
+                      If you wish to add more than one author, included app, or
+                      verified source, please enter them in the text field and
+                      separate each entry using a comma (,).
+                    </div>
                     <form class="form-container">
                       <div class="container">
                         <div class="inputs">
@@ -402,10 +411,18 @@ export const accordionTemplate = html<TRSToolsList>`
                 >
                 <fast-tab-panel slot="tabpanel" class="tabContent">
                   <div class="version-section">
+                    <div class="alert alert-primary" role="alert">
+                      <div class="alert-icon">${alertIcon}</div>
+                      Keep in mind that you cannot delete a version if it's the
+                      only existing version of the tool. If you wish to delete a
+                      specific version that's left alone, please create a new
+                      one first.
+                    </div>
                     <div class="version-title">
                       <h1 data-key="Version" data-value="${(x) => x.name}">
                         Version ${(x) => x.name}
                       </h1>
+
                       ${when(
                         (x, c) => !c.parentContext.parent.isVersionEditing,
                         html`
@@ -569,6 +586,7 @@ export const accordionTemplate = html<TRSToolsList>`
                               class="version-edit-container"
                             >
                               <label for="included_apps">Included Apps:</label>
+
                               <fast-text-area
                                 type="url"
                                 required

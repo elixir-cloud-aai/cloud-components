@@ -48,6 +48,16 @@ const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
                 ${okIcon} Save the class
               </custom-tooltip>
             </a>
+            <a
+            class="cancel"
+            title="Cancel"
+            data-toggle="tooltip"
+            @click="${(x, ctx) => ctx.parent.cancel(x.id)}"
+          >
+            <custom-tooltip>
+              ${xIcon} Cancel the editing of the class
+            </custom-tooltip>
+          </a>
               </div>
             </td>
           `

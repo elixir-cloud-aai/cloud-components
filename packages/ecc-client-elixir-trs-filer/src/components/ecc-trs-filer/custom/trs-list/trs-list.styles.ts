@@ -151,7 +151,7 @@ export const styles: ElementStyles = css`
     display: flex;
     gap: 20px;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 15px;
   }
 
   .save {
@@ -294,5 +294,34 @@ export const styles: ElementStyles = css`
 
   .value {
     flex: 1;
+  }
+
+  .alert {
+    position: relative;
+    top: 10px;
+    left: 0;
+    width: auto;
+    height: auto;
+    padding: 10px;
+    margin-bottom: 20px;
+    // line-height: 1.8;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: sans-serif;
+    font-weight: 200;
+    fill: #999;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .alert-primary {
+    background-color: #eee;
+    border: 1px solid #ddd;
+    color: #999;
+  }
+
+  .alert-icon {
+    opacity: 0.6;
   }
 `;

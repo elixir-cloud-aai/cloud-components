@@ -87,4 +87,33 @@ export const styles: ElementStyles = css`
     width: 100%;
     margin: 10px 0 20px 0;
   }
+
+  .alert {
+    position: relative;
+    top: 10px;
+    left: 0;
+    width: auto;
+    height: auto;
+    padding: 10px;
+    margin-bottom: 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: sans-serif;
+    font-weight: 200;
+    font-size: 14px;
+    fill: #999;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .alert-primary {
+    background-color: #eee;
+    border: 1px solid #ddd;
+    color: #999;
+  }
+
+  .alert-icon {
+    opacity: 0.6;
+  }
 `;

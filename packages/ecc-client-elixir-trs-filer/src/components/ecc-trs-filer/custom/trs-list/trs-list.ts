@@ -167,6 +167,10 @@ export class TRSToolsList extends FASTElement {
 
   @attr public isOpenVersionModal = false;
 
+  public cancelToolButton() {
+    this.isEditing = false;
+  }
+
   public modalButtonClick = () => {
     this.createVersionForm = this.initialCreateVersionForm;
     this.isOpenVersionModal = true;

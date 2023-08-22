@@ -114,6 +114,16 @@ export class TRSClasses extends FASTElement {
     }
   }
 
+  public cancel(id: string): void {
+    const itemIndex = this.data.findIndex((item) => item.id === id);
+    if (itemIndex !== -1) {
+      const updatedItem = { ...this.data[itemIndex], isEditing: false };
+      const updatedData = [...this.data];
+      updatedData[itemIndex] = updatedItem;
+      this.data = updatedData;
+    }
+  }
+
   public async delete(id: string): Promise<void> {
     try {
       const response = await fetch(`${this.baseUrl}/toolClasses/${id}`, {

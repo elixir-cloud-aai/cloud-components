@@ -4,13 +4,22 @@ import {
   provideFASTDesignSystem,
 } from "@microsoft/fast-components";
 import type { TRSFiler } from "./ecc-trs-filer.js";
-import { xIcon } from "../../../assets/icons.js";
+import { alertIcon, tooltipIcon, xIcon } from "../../../assets/icons.js";
 
 provideFASTDesignSystem().register(allComponents);
 
 export const template = html<TRSFiler>`
   <div class="trs-container">
     <h1>TRS Filer</h1>
+    <div class="alert alert-primary" role="alert">
+      <div class="alert-icon">${tooltipIcon}</div>
+      TRS-filer is an interface for the GA4GH Tool Registry API, streamlining
+      tool and workflow management in genomics. It supports standardized
+      descriptions for Docker-based tools and workflows like CWL, WDL, and
+      Nextflow. Crucially, TRS-filer offers management features: users can
+      register service info, and efficiently create, update, or delete tool
+      classes, tools, and their versions.
+    </div>
     <fast-tabs>
       <fast-tab slot="tab" class="custom-tab">List of tools</fast-tab>
       <fast-tab slot="tab" class="custom-tab">List of tool classes</fast-tab>

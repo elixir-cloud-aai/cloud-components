@@ -87,6 +87,11 @@ export const styles: ElementStyles = css`
     cursor: pointer;
   }
 
+  .cancel {
+    fill: #e62f63;
+    cursor: pointer;
+  }
+
   .save {
     fill: #009879;
     cursor: pointer;
@@ -96,7 +101,9 @@ export const styles: ElementStyles = css`
 
   .save-container {
     margin-top: 30px;
-    margin-left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
   }
 
   .actions {

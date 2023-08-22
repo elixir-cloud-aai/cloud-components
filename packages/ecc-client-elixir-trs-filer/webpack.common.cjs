@@ -36,7 +36,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            title: "Welcome to FAST!",
+            title: "ecc-client-elixir-trs-filer",
             template: path.resolve(appDir, "index.html"),
         }),
     ],
