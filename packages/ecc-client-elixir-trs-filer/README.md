@@ -11,7 +11,7 @@ The project's directory structure contains `src/components/ecc-trs-filer` folder
 
 | Component            | Issue                                                                       | Status |
 | -------------------- | --------------------------------------------------------------------------- | ------ |
-| ecc-client-elixir-trs-filer | [Issue #97](https://github.com/elixir-cloud-aai/cloud-components/issues/97) | In Progress   |
+| ecc-client-elixir-trs-filer | [Issue #97](https://github.com/elixir-cloud-aai/cloud-components/issues/97) | Done   |
 | ecc-client-ga4gh-trs | [Issue #78](https://github.com/elixir-cloud-aai/cloud-components/issues/78) | Done  |
 
 ## Getting Started
@@ -42,9 +42,9 @@ To get started with this project, follow these steps:
    npm run dev
    ```
 
-5. Include the `ecc-client-ga4gh-trs` component in your HTML file
+5. Include the `ecc-client-elixir-trs-filer` component in your HTML file
    ```
-   <ecc-client-elixir-trs-filer baseUrl="https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2"></ecc-client-elixir-trs-filer>
+    <ecc-client-elixir-trs-filer baseUrl="https://trs-filer-test.rahtiapp.fi/ga4gh/trs/v2"></ecc-client-elixir-trs-filer>
    ```
 
 ## Contributing
