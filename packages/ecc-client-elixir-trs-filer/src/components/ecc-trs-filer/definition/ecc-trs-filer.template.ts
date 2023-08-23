@@ -4,7 +4,7 @@ import {
   provideFASTDesignSystem,
 } from "@microsoft/fast-components";
 import type { TRSFiler } from "./ecc-trs-filer.js";
-import { alertIcon, tooltipIcon, xIcon } from "../../../assets/icons.js";
+import { tooltipIcon, xIcon } from "../../../assets/icons.js";
 
 provideFASTDesignSystem().register(allComponents);
 

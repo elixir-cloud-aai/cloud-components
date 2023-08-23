@@ -226,7 +226,7 @@ export class TRSToolsList extends FASTElement {
 
   /**
    * @method
-   * @description Load data from the backend.
+   * @description Load tools from the backend.
    * @async
    */
   async loadData() {
@@ -246,7 +246,7 @@ export class TRSToolsList extends FASTElement {
       ...tool,
       delete: () => this.deleteTool(tool.id),
       editTool: () => this.editTool(tool.id),
-      saveTool: (x: any) => this.saveTool(x),
+      saveTool: (x: Tool) => this.saveTool(x),
       isEditing: false,
     })) as Tool[];
 
@@ -395,6 +395,7 @@ export class TRSToolsList extends FASTElement {
    * @param {Tool} tool - The tool to save.
    * @returns {Promise<void>}
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async saveTool(tool: any): Promise<void> {
     const toolId = tool.id;
     const updatedTool = {

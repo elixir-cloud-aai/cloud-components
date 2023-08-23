@@ -22,7 +22,6 @@ import {
   okIcon,
   xIcon,
   alertIcon,
-  tooltipIcon,
 } from "../../../../../assets/icons.js";
 provideFASTDesignSystem().register(
   fastTextField(),
