@@ -47,16 +47,6 @@ export const styles: ElementStyles = css`
     margin-top: 10px;
   }
 
-  .clickable {
-    font-weight: bold;
-    color: blue;
-    cursor: pointer;
-  }
-
-  .clickable:hover {
-    color: white;
-  }
-
   .buttonToolClass {
     display: flex;
     flex-direction: column;

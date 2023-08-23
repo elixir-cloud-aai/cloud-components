@@ -374,6 +374,13 @@ export class TRSToolsList extends FASTElement {
     }
   }
 
+  /**
+   * @method
+   * @description Edit a tool by its ID.
+   * @async
+   * @param {string} toolId - The ID of the tool to edit.
+   * @returns {Promise<void>}
+   */
   async editTool(toolId: string): Promise<void> {
     console.log(this.tools[0]);
     this.tools = this.tools.map((tool) =>
@@ -381,6 +388,13 @@ export class TRSToolsList extends FASTElement {
     );
   }
 
+  /**
+   * @method
+   * @description Save a tool after editing.
+   * @async
+   * @param {Tool} tool - The tool to save.
+   * @returns {Promise<void>}
+   */
   async saveTool(tool: any): Promise<void> {
     const toolId = tool.id;
     const updatedTool = {
@@ -414,7 +428,7 @@ export class TRSToolsList extends FASTElement {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    // // update the tool in the list with the updated tool data
+    // update the tool in the list with the updated tool data
     const updatedTools = this.tools.map((tool) =>
       tool.id === toolId ? { ...tool, ...updatedTool, isEditing: false } : tool
     );
@@ -423,6 +437,13 @@ export class TRSToolsList extends FASTElement {
     this.loadData();
   }
 
+  /**
+   * @method
+   * @description Handle input change for tool edit.
+   * @param {Tool} item - The tool to edit.
+   * @param {Event} e - The triggering event.
+   * @returns {void}
+   */
   public handleInputChangeToolEdit(item: Tool, e: Event) {
     const { name, value } = e.target as HTMLInputElement;
     if (name === "toolclass") {
@@ -439,7 +460,13 @@ export class TRSToolsList extends FASTElement {
     }
   }
 
-  // for version control -- multiple strings in authors, apps, sources
+  /**
+   * @method
+   * @description Handle input change for authors while creating a version.
+   * @param {Event} event - The triggering event.
+   * @returns {void}
+   */
+
   public handleInputAuthorsChange = (event: Event) => {
     const inputElement = event.target as HTMLInputElement;
     this.createVersionForm.author = inputElement.value
@@ -447,6 +474,12 @@ export class TRSToolsList extends FASTElement {
       .map((author) => author);
   };
 
+  /**
+   * @method
+   * @description Handle input change for included apps while creating a version.
+   * @param {Event} event - The triggering event.
+   * @returns {void}
+   */
   public handleIncludedAppsChange = (event: Event) => {
     const inputElement = event.target as HTMLInputElement;
     this.createVersionForm.included_apps = inputElement.value
@@ -454,6 +487,12 @@ export class TRSToolsList extends FASTElement {
       .map((app) => app.trim());
   };
 
+  /**
+   * @method
+   * @description Handle input change for verified sources while creating a version.
+   * @param {Event} event - The triggering event.
+   * @returns {void}
+   */
   public handleVerifiedSourceChange = (event: Event) => {
     const inputElement = event.target as HTMLInputElement;
     this.createVersionForm.verified_source = inputElement.value
@@ -461,6 +500,12 @@ export class TRSToolsList extends FASTElement {
       .map((source) => source.trim());
   };
 
+  /**
+   * @method
+   * @description Handle input change for checkbox while creating a version.
+   * @param {Event} event - The triggering event.
+   * @returns {void}
+   */
   public handleCheckboxChange = (event: Event) => {
     const inputElement = event.target as HTMLInputElement;
     this.createVersionForm = {
@@ -469,6 +514,12 @@ export class TRSToolsList extends FASTElement {
     };
   };
 
+  /**
+   * @method
+   * @description Handle input change for version name while creating a version.
+   * @param {Event} event - The triggering event.
+   * @returns {void}
+   */
   public handleVersionNameChange = (event: Event) => {
     const inputElement = event.target as HTMLInputElement;
     this.createVersionForm = {
@@ -477,6 +528,12 @@ export class TRSToolsList extends FASTElement {
     };
   };
 
+  /**
+   * @method
+   * @description Handle input change for descriptor type while creating a version.
+   * @param {Event} event - The triggering event.
+   * @returns {void}
+   */
   public handleSelectDescriptorType = (event: Event) => {
     const inputElement = event.target as HTMLInputElement;
     this.createVersionForm = {
@@ -485,6 +542,12 @@ export class TRSToolsList extends FASTElement {
     };
   };
 
+  /**
+   * @method
+   * @description Handle submit button while creating a version.
+   * @param {Event} event - The triggering event.
+   * @returns {void}
+   */
   public async handleSubmitVersion(toolId: string) {
     const url = `${this.baseUrl}/tools/${toolId}/versions`;
     const response = await fetch(url, {
@@ -521,11 +584,25 @@ export class TRSToolsList extends FASTElement {
     this.loadData();
   }
 
+  /**
+   * Edits a tool version.
+   * @param toolId The ID of the tool.
+   * @param versionId The ID of the version to edit.
+   * @returns A promise resolving when the version is edited.
+   * @async
+   */
   public editVersionButton(obj: typeof this.createVersionForm) {
     this.isVersionEditing = true;
     this.createVersionForm = obj;
   }
 
+  /**
+   * @method
+   * @description Handle input change while editing a version.
+   * @param {Event} event - The triggering event.
+   * @returns {void}
+   * @async
+   */
   public handleEditVersionChange = (event: Event) => {
     const inputElement = event.target as HTMLInputElement;
     if (Array.isArray(this.createVersionForm[inputElement.name])) {
@@ -548,6 +625,14 @@ export class TRSToolsList extends FASTElement {
     }
   };
 
+  /**
+   * @method
+   * @description Save a tool version after editing.
+   * @async
+   * @param {string} toolId - The ID of the tool.
+   * @param {string} versionId - The ID of the version to save.
+   * @returns {Promise<void>}
+   */
   public async saveVersionButton(toolId: string, versionId: string) {
     this.isVersionEditing = false;
 

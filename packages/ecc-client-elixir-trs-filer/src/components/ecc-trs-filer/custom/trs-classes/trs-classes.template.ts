@@ -1,6 +1,6 @@
 import { html, repeat, ViewTemplate, when } from "@microsoft/fast-element";
 import type { TRSClasses } from "./trs-classes.js";
-import type { IToolClass } from "./trs-classes.interface.js";
+import type { IToolClass } from "./trs-classes.types.js";
 import {
   allComponents,
   provideFASTDesignSystem,

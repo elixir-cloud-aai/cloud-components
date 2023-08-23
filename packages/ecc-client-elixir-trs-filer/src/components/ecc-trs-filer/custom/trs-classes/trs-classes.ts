@@ -6,7 +6,7 @@ import {
 } from "@microsoft/fast-element";
 import { template } from "./trs-classes.template.js";
 import { styles } from "./trs-classes.styles.js";
-import type { IToolClass } from "./trs-classes.interface.js";
+import type { IToolClass } from "./trs-classes.types.js";
 
 type DataItem = {
   id: string;
@@ -27,11 +27,23 @@ export class TRSClasses extends FASTElement {
   @observable public modalDescription = "";
   @observable public modalName = "";
 
+  /**
+   * @method
+   * @description Load data on element connected.
+   * @async
+   */
   public connectedCallback(): void {
     super.connectedCallback();
     this.fetchData();
   }
 
+  /**
+   * @method
+   * @description Fetch tool classes from the server.
+   * @async
+   * @returns {Promise<void>}
+   * @private
+   */
   private async fetchData(): Promise<void> {
     try {
       const response = await fetch(`${this.baseUrl}/toolClasses`, {
@@ -47,6 +59,11 @@ export class TRSClasses extends FASTElement {
     }
   }
 
+  /**
+   * @param e
+   * @description Handle description change while creating a new tool class.
+   * @returns {void}
+   */
   public handleDescriptionChange(e: Event): void {
     const target = e.target as HTMLInputElement;
     if (target) {
@@ -54,6 +71,11 @@ export class TRSClasses extends FASTElement {
     }
   }
 
+  /**
+   * @param e
+   * @description Handle name change while creating a new tool class.
+   * @returns {void}
+   */
   public handleNameChange(e: Event): void {
     const target = e.target as HTMLInputElement;
     if (target) {
@@ -61,11 +83,22 @@ export class TRSClasses extends FASTElement {
     }
   }
 
+  /**
+   * @description Clear modal inputs.
+   * @returns {void}
+   */
   public clearModal(): void {
     this.modalDescription = "";
     this.modalName = "";
   }
 
+  /**
+   * @param description
+   * @param name
+   * @description Create a new tool class. This function is then called from the modal.
+   * @returns {Promise<void>}
+   * @async
+   */
   public async createToolClass(
     description: string,
     name: string
@@ -90,20 +123,37 @@ export class TRSClasses extends FASTElement {
     }
   }
 
+  /**
+   * @description Open modal for creating a new tool class.
+   * @returns {void}
+   */
   public openModal(): void {
     this.isModalOpen = true;
   }
 
+  /**
+   * @description Close modal for creating a new tool class.
+   * @returns {void}
+   */
   public closeModal(): void {
     this.isModalOpen = false;
   }
 
+  /**
+   * @description Create a new tool class from the modal.
+   * @returns {Promise<void>}
+   * @async
+   */
   public async createToolClassFromModal(): Promise<void> {
     await this.createToolClass(this.modalDescription, this.modalName);
     this.closeModal();
   }
 
-  // for editing and deleting a tool class
+  /**
+   * @param id
+   * @description Edit a tool class.
+   * @returns {void}
+   */
   public edit(id: string): void {
     const itemIndex = this.data.findIndex((item) => item.id === id);
     if (itemIndex !== -1) {
@@ -114,6 +164,11 @@ export class TRSClasses extends FASTElement {
     }
   }
 
+  /**
+   * @param id
+   * @description Cancel editing a tool class.
+   * @returns {void}
+   */
   public cancel(id: string): void {
     const itemIndex = this.data.findIndex((item) => item.id === id);
     if (itemIndex !== -1) {
@@ -124,6 +179,12 @@ export class TRSClasses extends FASTElement {
     }
   }
 
+  /**
+   * @param id
+   * @description Delete a tool class.
+   * @returns {Promise<void>}
+   * @async
+   */
   public async delete(id: string): Promise<void> {
     try {
       const response = await fetch(`${this.baseUrl}/toolClasses/${id}`, {
@@ -141,6 +202,13 @@ export class TRSClasses extends FASTElement {
     }
   }
 
+  /**
+   *
+   * @param id
+   * @returns {Promise<void>}
+   * @async
+   * @description Save a tool class afetr editing.
+   */
   public async save(id: string): Promise<void> {
     const item = this.data.find((item) => item.id === id);
     if (!item) return;
@@ -175,6 +243,12 @@ export class TRSClasses extends FASTElement {
     }
   }
 
+  /**
+   * @param item
+   * @param e
+   * @description Handle input change while editing a tool class.
+   * @returns {void}
+   */
   public handleInputChange(item: DataItem, e: Event) {
     const { name, value } = e.target as HTMLInputElement;
     item[name] = value;

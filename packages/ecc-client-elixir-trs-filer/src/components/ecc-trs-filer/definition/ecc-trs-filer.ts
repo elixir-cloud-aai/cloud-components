@@ -37,6 +37,11 @@ export class TRSFiler extends FASTElement {
     versions: [],
   };
 
+  /**
+   * Load tool classes from the server
+   * @returns {Promise<void>}
+   * @async
+   */
   async loadTools() {
     const url = `${this.baseUrl}/toolClasses`;
     const response = await fetch(url, {
@@ -52,11 +57,20 @@ export class TRSFiler extends FASTElement {
     this.toolClasses = data;
   }
 
+  /**
+   * Connected callback
+   * @returns {Promise<void>}
+   * @async
+   */
   async connectedCallback() {
     super.connectedCallback();
     await this.loadTools();
   }
 
+  /**
+   * Handle modal button click to create a new tool
+   * @returns {void}
+   */
   public modalButtonClick = () => {
     this.isOpenModal = true;
     if (this.isOpenModal) {
@@ -77,6 +91,11 @@ export class TRSFiler extends FASTElement {
     }
   };
 
+  /**
+   * Handle input change for the create tool form
+   * @param e
+   * @returns {void}
+   */
   public handleCreateToolInputChange = (e: Event) => {
     const { name, value } = e.target as HTMLInputElement;
     this.createToolForm = {
@@ -85,6 +104,11 @@ export class TRSFiler extends FASTElement {
     };
   };
 
+  /**
+   * Handle checkbox change for the create tool form
+   * @param e
+   * @returns {void}
+   */
   public handleCreateToolChexboxChange = (e: Event) => {
     const { name, checked } = e.target as HTMLInputElement;
     this.createToolForm = {
@@ -93,12 +117,22 @@ export class TRSFiler extends FASTElement {
     };
   };
 
+  /**
+   * Handle alias change for the create tool form
+   * @param e
+   * @returns {void}
+   */
   public handleAliasChange = (e: Event) => {
     const { value } = e.target as HTMLInputElement;
     const aliases = value.split("\n").map((alias) => alias.trim());
     this.createToolForm.aliases = aliases;
   };
 
+  /**
+   * Handle the work of the selector in the create tool class form
+   * @param e
+   * @returns {void}
+   */
   public handleToolClassSelect = (e: Event) => {
     const inputElement = e.target as HTMLInputElement;
     const toolClass = this.toolClasses.find(
@@ -111,10 +145,19 @@ export class TRSFiler extends FASTElement {
     };
   };
 
+  /**
+   * Close modal for creating a tool.
+   * @returns {void}
+   */
   public closeModal = () => {
     this.isOpenModal = false;
   };
 
+  /**
+   * Handle create tool submit. Send a POST request to the server.
+   * @returns {Promise<void>}
+   * @async
+   */
   public async handleCreateToolSubmit() {
     const url = `${this.baseUrl}/tools`;
     const response = await fetch(url, {

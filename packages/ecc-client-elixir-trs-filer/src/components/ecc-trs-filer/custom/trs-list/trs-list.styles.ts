@@ -53,7 +53,6 @@ export const styles: ElementStyles = css`
   }
 
   .styled-table tbody tr.active-row {
-    // font-weight: bold;
     color: #009879;
   }
 
@@ -114,14 +113,6 @@ export const styles: ElementStyles = css`
     flex-direction: row;
     gap: 10px;
     align-items: center;
-  }
-
-  .pagination {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    align-items: center;
-    margin-top: 20px;
   }
 
   .tooltipIcon {
@@ -199,13 +190,6 @@ export const styles: ElementStyles = css`
     flex-direction: column;
   }
 
-  .checker-input {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 20px;
-  }
-
   .container.meta {
     display: flex;
     flex-direction: column;
@@ -221,11 +205,6 @@ export const styles: ElementStyles = css`
     margin: 20px 0;
   }
 
-  .data-button {
-    display: flex;
-    justify-content: flex-end;
-    padding-top: 10px;
-  }
   .inputs {
     padding-bottom: 10px;
   }
@@ -238,12 +217,6 @@ export const styles: ElementStyles = css`
 
   fast-checkbox::part(label) {
     color: #000;
-  }
-
-  .checkbox-item {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
   }
 
   .create-version {
@@ -304,7 +277,6 @@ export const styles: ElementStyles = css`
     height: auto;
     padding: 10px;
     margin-bottom: 20px;
-    // line-height: 1.8;
     border-radius: 5px;
     cursor: pointer;
     font-family: sans-serif;
