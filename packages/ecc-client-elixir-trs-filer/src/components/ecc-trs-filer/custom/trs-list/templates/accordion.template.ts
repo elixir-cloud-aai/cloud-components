@@ -13,7 +13,7 @@ import {
   provideFASTDesignSystem,
 } from "@microsoft/fast-components";
 import type { TRSToolsList } from "../trs-list.js";
-import type { Version, IEnhancedTool, PutVersion } from "../trs-list.types.js";
+import type { Version, EnhancedTool, PutVersion } from "../trs-list.types.js";
 import {
   plusIcon,
   minusIcon,
@@ -40,7 +40,7 @@ export const accordionTemplate = html<TRSToolsList>`
   <fast-accordion expand-mode="multi" class="accordion">
     ${repeat(
       (x) => x.tools,
-      html<IEnhancedTool>`
+      html<EnhancedTool>`
         <fast-accordion-item class="accordionItem">
           <table class="styled-table">
             <thead>
@@ -158,7 +158,7 @@ export const accordionTemplate = html<TRSToolsList>`
                   ${when(
                     (x) => !x.isEditing,
                     html`
-                      <a
+                      <i
                         class="edit"
                         title="Edit"
                         data-toggle="tooltip"
@@ -167,8 +167,8 @@ export const accordionTemplate = html<TRSToolsList>`
                         <custom-tooltip>
                           ${editIcon} Edit the tool
                         </custom-tooltip>
-                      </a>
-                      <a
+                      </i>
+                      <i
                         class="delete"
                         title="Delete"
                         data-toggle="tooltip"
@@ -177,13 +177,13 @@ export const accordionTemplate = html<TRSToolsList>`
                         <custom-tooltip>
                           ${deleteIcon} Delete the tool
                         </custom-tooltip>
-                      </a>
+                      </i>
                     `
                   )}
                   ${when(
                     (x) => x.isEditing,
                     html`
-                      <a
+                      <i
                         class="save"
                         title="Save"
                         data-toggle="tooltip"
@@ -192,7 +192,7 @@ export const accordionTemplate = html<TRSToolsList>`
                         <custom-tooltip>
                           ${okIcon} Save the tool
                         </custom-tooltip>
-                      </a>
+                      </i>
                     `
                   )}
                 </td>
@@ -425,7 +425,7 @@ export const accordionTemplate = html<TRSToolsList>`
                       ${when(
                         (x, c) => !c.parentContext.parent.isVersionEditing,
                         html`
-                          <a
+                          <i
                             class="edit"
                             title="Edit"
                             data-toggle="tooltip"
@@ -435,8 +435,8 @@ export const accordionTemplate = html<TRSToolsList>`
                             <custom-tooltip>
                               ${editIcon} Edit the version
                             </custom-tooltip>
-                          </a>
-                          <a
+                          </i>
+                          <i
                             class="delete"
                             title="Delete"
                             data-toggle="tooltip"
@@ -449,13 +449,13 @@ export const accordionTemplate = html<TRSToolsList>`
                             <custom-tooltip>
                               ${deleteIcon} Delete the version
                             </custom-tooltip>
-                          </a>
+                          </i>
                         `
                       )}
                       ${when(
                         (x, c) => c.parentContext.parent.isVersionEditing,
                         html`
-                          <a
+                          <i
                             class="save"
                             title="Save"
                             data-toggle="tooltip"
@@ -468,8 +468,8 @@ export const accordionTemplate = html<TRSToolsList>`
                             <custom-tooltip>
                               ${okIcon} Save the version
                             </custom-tooltip>
-                          </a>
-                          <a
+                          </i>
+                          <i
                             class="cancel"
                             title="Cancel"
                             data-toggle="tooltip"
@@ -479,7 +479,7 @@ export const accordionTemplate = html<TRSToolsList>`
                             <custom-tooltip>
                               ${xIcon} Cancel the editing of the version
                             </custom-tooltip>
-                          </a>
+                          </i>
                         `
                       )}
                     </div>
@@ -718,8 +718,8 @@ export const accordionTemplate = html<TRSToolsList>`
                       <div class="row">
                         <span class="key">Version url:</span>
                         <span class="value">
-                          <a href="${(x) => x.url}" value="${(x) => x.url}"
-                            >${(x) => x.url}</a
+                          <i href="${(x) => x.url}" value="${(x) => x.url}"
+                            >${(x) => x.url}</i
                           ></span
                         >
                       </div>

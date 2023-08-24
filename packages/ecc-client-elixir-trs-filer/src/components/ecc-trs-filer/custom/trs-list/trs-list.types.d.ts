@@ -63,7 +63,7 @@ interface Tool {
   versions: Version[];
 }
 
-interface IEnhancedTool extends Tool {
+interface EnhancedTool extends Tool {
   isEditing: boolean;
   delete(): void;
 }
@@ -96,7 +96,7 @@ export type {
   Checksum,
   ToolClass,
   FilterFields,
-  IEnhancedTool,
-  PutVersion, // Newly added export for the PutRequest type
+  EnhancedTool,
+  PutVersion,
   File,
 };

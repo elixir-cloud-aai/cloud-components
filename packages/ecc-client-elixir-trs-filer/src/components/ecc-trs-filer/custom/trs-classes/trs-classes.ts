@@ -6,7 +6,7 @@ import {
 } from "@microsoft/fast-element";
 import { template } from "./trs-classes.template.js";
 import { styles } from "./trs-classes.styles.js";
-import type { IToolClass } from "./trs-classes.types.js";
+import type { ToolClass } from "./trs-classes.types.js";
 
 type DataItem = {
   id: string;
@@ -22,7 +22,7 @@ type DataItem = {
 })
 export class TRSClasses extends FASTElement {
   @attr public baseUrl = "";
-  @observable public data: IToolClass[] = [];
+  @observable public data: ToolClass[] = [];
   @observable public isModalOpen = false;
   @observable public modalDescription = "";
   @observable public modalName = "";
@@ -52,7 +52,7 @@ export class TRSClasses extends FASTElement {
           Accept: "application/json",
         },
       });
-      const data: IToolClass[] = await response.json();
+      const data: ToolClass[] = await response.json();
       this.data = data;
     } catch (error) {
       console.error("Failed to fetch data", error);

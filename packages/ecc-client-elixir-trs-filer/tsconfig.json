@@ -15,5 +15,6 @@
     "types": ["node"],
     "lib": ["DOM", "ES2015", "ES2016.Array.Include"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }

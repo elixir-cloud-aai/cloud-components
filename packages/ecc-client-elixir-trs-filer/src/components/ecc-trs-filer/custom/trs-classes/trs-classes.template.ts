@@ -1,6 +1,6 @@
 import { html, repeat, ViewTemplate, when } from "@microsoft/fast-element";
 import type { TRSClasses } from "./trs-classes.js";
-import type { IToolClass } from "./trs-classes.types.js";
+import type { ToolClass } from "./trs-classes.types.js";
 import {
   allComponents,
   provideFASTDesignSystem,
@@ -14,7 +14,7 @@ import {
 
 provideFASTDesignSystem().register(allComponents);
 
-const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
+const classesDataTemplate: ViewTemplate<ToolClass> = html<ToolClass>`
   <tr class="active-row">
     ${(x) =>
       x.isEditing
@@ -38,7 +38,7 @@ const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
               />
             </td>
               <div class="save-container">
-              <a
+              <i
               class="save"
               title="Save"
               data-toggle="tooltip"
@@ -47,8 +47,8 @@ const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
               <custom-tooltip>
                 ${okIcon} Save the class
               </custom-tooltip>
-            </a>
-            <a
+            </i>
+            <i
             class="cancel"
             title="Cancel"
             data-toggle="tooltip"
@@ -57,7 +57,7 @@ const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
             <custom-tooltip>
               ${xIcon} Cancel the editing of the class
             </custom-tooltip>
-          </a>
+          </i>
               </div>
             </td>
           `
@@ -67,15 +67,15 @@ const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
             <td>${x.description}</td>
             <td>
               <div class="actions">
-                <a
+                <i
                   class="edit"
                   title="Edit"
                   data-toggle="tooltip"
                   @click="${(x, ctx) => ctx.parent.edit(x.id)}"
                 >
                   <custom-tooltip> ${editIcon} Edit the tool </custom-tooltip>
-                </a>
-                <a
+                </i>
+                <i
                   class="delete"
                   title="Delete"
                   data-toggle="tooltip"
@@ -84,7 +84,7 @@ const classesDataTemplate: ViewTemplate<IToolClass> = html<IToolClass>`
                   <custom-tooltip>
                     ${deleteIcon} Delete the tool
                   </custom-tooltip>
-                </a>
+                </i>
               </div>
             </td>
           `}
