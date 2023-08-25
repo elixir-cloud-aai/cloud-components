@@ -1,1 +1,0 @@
-{"version":3,"file":"index.js","sourceRoot":"","sources":["../../../../src/components/wes-run/index.ts"],"names":[],"mappings":"AAAA,OAAO,MAAM,MAAM,wBAAwB,CAAC;AAE5C,eAAe,MAAM,CAAC","sourcesContent":["import WESRun from './definition/wesRun.js';\n\nexport default WESRun;\n"]}
