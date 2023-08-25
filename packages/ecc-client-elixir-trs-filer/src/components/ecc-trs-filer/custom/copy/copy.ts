@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/typedef */
 import {
   attr,
   customElement,
@@ -20,19 +19,8 @@ export class CopyClipboard extends FASTElement {
   /** The text value to be copied */
   @attr value: string;
 
-  /** The text displayed to the user */
-  @observable text: string;
-
   /** Flag indicating whether text has been successfully copied */
   @observable copied = false;
-
-  /**
-   * Lifecycle hook called when component is fully connected to the DOM.
-   * Overriding connectedCallback to update the text based on input value.
-   */
-  connectedCallback(): void {
-    super.connectedCallback();
-  }
 
   /**
    * Copies text value to clipboard and sets copied flag to true temporarily.
