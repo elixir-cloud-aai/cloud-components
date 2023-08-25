@@ -28,10 +28,11 @@ export const styles: ElementStyles = css`
     display: none;
     position: absolute;
     top: 0;
-    left: 50%;
-    transform: translateX(-50%);
     z-index: 2;
     padding-top: 32px;
+    left: 65px;
+    right: auto;
+    transform: translateX(-127.633px);
   }
 
   .tooltip-dropdown__content {
@@ -42,20 +43,15 @@ export const styles: ElementStyles = css`
     width: 300px;
     text-align: left;
   }
-
-  .tooltip--open {
-    .tooltip-dropdown {
-      animation: tooltipFadeIn 0.15s;
-      display: block;
-    }
+  div.tooltip:hover div.tooltip-dropdown {
+    animation: tooltipFadeIn 0.15s;
+    display: block;
   }
 
   @media (hover: hover) {
-    .tooltip:hover {
-      .tooltip-dropdown {
-        animation: tooltipFadeIn 0.15s;
-        display: block;
-      }
+    div.tooltip:hover div.tooltip-dropdown {
+      animation: tooltipFadeIn 0.15s, -moz-tooltipFadeIn 0.15s; /* Added -moz- prefix for older Firefox versions */
+      display: block;
     }
   }
 `;

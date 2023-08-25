@@ -11,6 +11,9 @@ import { styles } from "./ecc-trs-filer.styles.js";
   name: "ecc-client-elixir-trs-filer",
   template,
   styles,
+  shadowOptions: {
+    mode: "open",
+  },
 })
 export class TRSFiler extends FASTElement {
   @attr public baseUrl = "";
@@ -42,7 +45,7 @@ export class TRSFiler extends FASTElement {
    * @returns {Promise<void>}
    * @async
    */
-  async loadTools() {
+  async loadToolClasses() {
     const url = `${this.baseUrl}/toolClasses`;
     const response = await fetch(url, {
       method: "GET",
@@ -64,7 +67,7 @@ export class TRSFiler extends FASTElement {
    */
   async connectedCallback() {
     super.connectedCallback();
-    await this.loadTools();
+    await this.loadToolClasses();
   }
 
   /**
