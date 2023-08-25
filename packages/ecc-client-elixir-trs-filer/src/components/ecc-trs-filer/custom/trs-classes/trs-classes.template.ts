@@ -40,7 +40,6 @@ const classesDataTemplate: ViewTemplate<ToolClass> = html<ToolClass>`
               <div class="save-container">
               <i
               class="save"
-              title="Save"
               data-toggle="tooltip"
               @click="${(x, ctx) => ctx.parent.save(x.id)}"
             >
@@ -50,7 +49,6 @@ const classesDataTemplate: ViewTemplate<ToolClass> = html<ToolClass>`
             </i>
             <i
             class="cancel"
-            title="Cancel"
             data-toggle="tooltip"
             @click="${(x, ctx) => ctx.parent.cancel(x.id)}"
           >
@@ -69,7 +67,6 @@ const classesDataTemplate: ViewTemplate<ToolClass> = html<ToolClass>`
               <div class="actions">
                 <i
                   class="edit"
-                  title="Edit"
                   data-toggle="tooltip"
                   @click="${(x, ctx) => ctx.parent.edit(x.id)}"
                 >
@@ -77,7 +74,6 @@ const classesDataTemplate: ViewTemplate<ToolClass> = html<ToolClass>`
                 </i>
                 <i
                   class="delete"
-                  title="Delete"
                   data-toggle="tooltip"
                   @click="${(x, ctx) => ctx.parent.delete(x.id)}"
                 >

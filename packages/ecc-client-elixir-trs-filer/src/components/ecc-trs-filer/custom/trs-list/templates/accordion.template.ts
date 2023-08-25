@@ -160,7 +160,6 @@ export const accordionTemplate = html<TRSToolsList>`
                     html`
                       <i
                         class="edit"
-                        title="Edit"
                         data-toggle="tooltip"
                         @click="${(x) => x.editTool(x.id)}"
                       >
@@ -170,7 +169,6 @@ export const accordionTemplate = html<TRSToolsList>`
                       </i>
                       <i
                         class="delete"
-                        title="Delete"
                         data-toggle="tooltip"
                         @click="${(x) => x.delete()}"
                       >
@@ -185,7 +183,6 @@ export const accordionTemplate = html<TRSToolsList>`
                     html`
                       <i
                         class="save"
-                        title="Save"
                         data-toggle="tooltip"
                         @click="${(x) => x.saveTool(x)}"
                       >
@@ -427,7 +424,6 @@ export const accordionTemplate = html<TRSToolsList>`
                         html`
                           <i
                             class="edit"
-                            title="Edit"
                             data-toggle="tooltip"
                             @click="${(x, c) =>
                               c.parentContext.parent.editVersionButton(x)}"
@@ -438,7 +434,6 @@ export const accordionTemplate = html<TRSToolsList>`
                           </i>
                           <i
                             class="delete"
-                            title="Delete"
                             data-toggle="tooltip"
                             @click="${(x, c) =>
                               c.parentContext.parent.deleteVersion(
@@ -457,7 +452,6 @@ export const accordionTemplate = html<TRSToolsList>`
                         html`
                           <i
                             class="save"
-                            title="Save"
                             data-toggle="tooltip"
                             @click="${(x, c) =>
                               c.parentContext.parent.saveVersionButton(
@@ -471,7 +465,6 @@ export const accordionTemplate = html<TRSToolsList>`
                           </i>
                           <i
                             class="cancel"
-                            title="Cancel"
                             data-toggle="tooltip"
                             @click="${(x, c) =>
                               c.parentContext.parent.cancelVersionButton()}"

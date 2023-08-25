@@ -9,7 +9,7 @@ export const styles: ElementStyles = css`
     background-color: #4f4f4f;
   }
 
-  .doneicon {
+  .doneIcon {
     fill: #42dc0c;
   }
 

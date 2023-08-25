@@ -32,7 +32,6 @@ export class CopyClipboard extends FASTElement {
    */
   connectedCallback(): void {
     super.connectedCallback();
-    this.text = this.value || "";
   }
 
   /**
@@ -40,8 +39,12 @@ export class CopyClipboard extends FASTElement {
    * @async
    */
   async handleCopy(): Promise<void> {
+    if (!this.value) {
+      console.warn("No text to copy");
+      return;
+    }
     try {
-      await navigator.clipboard.writeText(this.value || this.text);
+      await navigator.clipboard.writeText(this.value);
       this.copied = true;
       setTimeout(() => {
         this.copied = false;

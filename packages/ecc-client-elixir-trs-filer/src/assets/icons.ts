@@ -77,10 +77,11 @@ export const minusIcon = html` <svg
 </svg>`;
 
 export const doneIcon = html` <svg
+  slot="label"
   xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 30 30"
-  width="30px"
-  height="30px"
+  viewBox="0 0 24 24"
+  width="18px"
+  height="18px"
   class="doneicon"
 >
   <path
@@ -89,10 +90,11 @@ export const doneIcon = html` <svg
 </svg>`;
 
 export const copyIcon = html` <svg
+  slot="label"
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 24 24"
-  width="24"
-  height="24"
+  width="18"
+  height="18"
 >
   <path
     d="M7.024 3.75c0-.966.784-1.75 1.75-1.75H20.25c.966 0 1.75.784 1.75 1.75v11.498a1.75 1.75 0 0 1-1.75 1.75H8.774a1.75 1.75 0 0 1-1.75-1.75Zm1.75-.25a.25.25 0 0 0-.25.25v11.498c0 .139.112.25.25.25H20.25a.25.25 0 0 0 .25-.25V3.75a.25.25 0 0 0-.25-.25Z"
