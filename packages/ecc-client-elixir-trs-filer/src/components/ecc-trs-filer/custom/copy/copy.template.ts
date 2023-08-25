@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { html } from "@microsoft/fast-element";
 import {
   allComponents,

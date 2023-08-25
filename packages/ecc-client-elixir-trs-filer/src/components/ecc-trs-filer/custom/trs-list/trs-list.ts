@@ -395,7 +395,6 @@ export class TRSToolsList extends FASTElement {
    * @param {Tool} tool - The tool to save.
    * @returns {Promise<void>}
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async saveTool(tool: any): Promise<void> {
     const toolId = tool.id;
     const updatedTool = {

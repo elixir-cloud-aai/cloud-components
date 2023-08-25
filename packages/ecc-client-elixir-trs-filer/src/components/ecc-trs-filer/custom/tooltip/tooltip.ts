@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { customElement, FASTElement } from "@microsoft/fast-element";
 import { template } from "./tooltip.template.js";
 import { styles } from "./tooltip.styles.js";
