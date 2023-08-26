@@ -17,6 +17,8 @@
     "fast:postinstall": "==========================================\n\n Your project has been initialized!\n You have access to the following commands:\n\n Start: npm start\n Test: npm run test\n Build: npm run build\n\n=========================================="
   },
   "dependencies": {
+    "@eslint/js": "^8.48.0",
+    "@humanwhocodes/module-importer": "^1.0.1",
     "@microsoft/fast-components": "^2.30.6",
     "@microsoft/fast-element": "^1.12.0",
     "@microsoft/fast-foundation": "^2.49.0"
@@ -30,12 +32,12 @@
     "@typescript-eslint/eslint-plugin": "^5.17.0",
     "@typescript-eslint/parser": "^5.17.0",
     "eslint": "^8.12.0",
+    "eslint-config-elixir": "*",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-node": "^0.3.6",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-n": "^16.0.2",
     "eslint-plugin-promise": "^6.1.1",
-    "eslint-config-elixir": "*",
     "express": "^4.17.3",
     "html-loader": "^3.1.2",
     "html-webpack-plugin": "5.5.0",

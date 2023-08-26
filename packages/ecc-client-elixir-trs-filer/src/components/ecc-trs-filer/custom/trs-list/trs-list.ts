@@ -395,7 +395,7 @@ export class TRSToolsList extends FASTElement {
    * @param {Tool} tool - The tool to save.
    * @returns {Promise<void>}
    */
-  async saveTool(tool: any): Promise<void> {
+  async saveTool(tool: Tool): Promise<void> {
     const toolId = tool.id;
     const updatedTool = {
       aliases: tool.aliases,
@@ -429,8 +429,17 @@ export class TRSToolsList extends FASTElement {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     // update the tool in the list with the updated tool data
+    // const updatedTools = this.tools.map((tool) =>
+    //   tool.id === toolId ? { ...tool, ...updatedTool, isEditing: false } : tool
+    // );
+    // this.tools = updatedTools;
     const updatedTools = this.tools.map((tool) =>
-      tool.id === toolId ? { ...tool, ...updatedTool, isEditing: false } : tool
+      tool.id === toolId
+        ? ({ ...tool, ...updatedTool, isEditing: false } as unknown as Tool & {
+            isEditing?: boolean;
+            id: string;
+          })
+        : tool
     );
     this.tools = updatedTools;
     // can refresh the entire list
