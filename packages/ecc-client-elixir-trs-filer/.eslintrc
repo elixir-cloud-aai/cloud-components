@@ -1,0 +1,17 @@
+{
+  "extends": [
+    "elixir",
+    "plugin:import/typescript",
+    "prettier",
+    "turbo",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/typescript"
+  ],
+  "plugins": ["import", "prettier"],
+  "rules": {
+    "no-unused-vars": "off"
+  },
+  "parserOptions": {
+    "project": ["./tsconfig.json"]
+  }
+}
