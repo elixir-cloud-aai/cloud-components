@@ -1,1 +1,1 @@
-export * from "./components/index.js";
+import "./components/index.js";

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        background: #fafafa;
+      }
+      ecc-utils-design-button::part(button-base) {
+        background-color: palevioletred;
+        color: black;
+        --ecc-button-height: 30px;
+      }
+    </style>
+    <title>ecc-utils-design</title>
+  </head>
+  <body>
+    <div id="demo"></div>
+
+    <script type="module">
+      import { html, render } from "lit";
+      import "../dist/src/index.js";
+
+      render(
+        html` <ecc-utils-design-button> Button </ecc-utils-design-button> `,
+        document.querySelector("#demo")
+      );
+    </script>
+  </body>
+</html>

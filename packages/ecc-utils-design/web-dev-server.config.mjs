@@ -4,7 +4,7 @@
 const hmr = process.argv.includes("--hmr");
 
 export default /** @type {import('@web/dev-server').DevServerConfig} */ ({
-  open: "/",
+  open: "/demo/",
   /** Use regular watch mode if HMR is not enabled. */
   watch: !hmr,
   /** Resolve bare module imports */
@@ -20,7 +20,7 @@ export default /** @type {import('@web/dev-server').DevServerConfig} */ ({
 
   plugins: [
     /** Use Hot Module Replacement by uncommenting. Requires @open-wc/dev-server-hmr plugin */
-    // hmr && hmrPlugin({ exclude: ['**/*/node_modules/**/*'] }),
+    // hmr && hmrPlugin({ exclude: ['**/*/node_modules/**/*'], presets: [presets.litElement] }),
   ],
 
   // See documentation for all available options
