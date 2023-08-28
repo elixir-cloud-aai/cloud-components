@@ -1,6 +1,6 @@
 # ecc-utils-design Components
 
-This package serves as an abstraction layer & provides utility components to manage the headless yet constitent design accross ecc component
+This package serves as an abstraction layer & provides utility components to manage the headless yet constitent design across ecc component
 
 ## Introduction
 ...

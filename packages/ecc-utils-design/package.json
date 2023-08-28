@@ -1,6 +1,6 @@
 {
   "name": "ecc-utils-design",
-  "description": "Encapsulation &amp; Utility components to manage the headless yet constitent design accross ecc component",
+  "description": "Abstraction layer that provides utility components to manage the headless yet constitent design across ecc component",
   "main": "dist/src/index.js",
   "module": "dist/src/index.js",
   "exports": {
