@@ -1,15 +1,14 @@
 # ecc-utils-design Components
 
-This package serves as an abstraction layer for other packages, providing a streamlined approach for extracting common design token logic.
+This package serves as an abstraction layer & provides utility components to manage the headless yet constitent design across ecc component
 
 ## Introduction
 ...
 
 ### Components
-| Component                    | Issue  | Status             |
-|------------------------------|--------|--------------------|
-| ecc-utils-design-wrapper     |        | In Progress        |
-| ecc-utils-design-button      |        | In Progress        |
+| Component              | Issue  | Status             |
+|------------------------|--------|--------------------|
+|                        |        |                    |
 
 ## Getting Started
 

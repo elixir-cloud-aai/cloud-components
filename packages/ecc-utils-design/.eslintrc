@@ -1,5 +1,4 @@
 {
-  "extends": ["@open-wc",  "elixir"],
+  "extends": ["@open-wc", "elixir"],
   "rules": {}
 }
-
