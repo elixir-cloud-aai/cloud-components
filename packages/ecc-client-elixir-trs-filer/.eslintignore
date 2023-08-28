@@ -12,5 +12,3 @@ dist
 
 # Never lint coverage output
 coverage
-
-custom-elements.d.ts
