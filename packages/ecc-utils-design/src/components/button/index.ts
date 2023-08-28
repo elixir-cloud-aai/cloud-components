@@ -1,3 +1,3 @@
-import { Button } from "./Button.js";
+import { Button } from "./button.js";
 
 window.customElements.define("ecc-utils-design-button", Button);
