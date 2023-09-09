@@ -1,13 +1,13 @@
 {
   "name": "ecc-client-ga4gh-tes",
   "description": "Web components for TES",
-  "main": "./dist/index.js",
+  "main": "./dist/src/index.js",
   "type": "module",
-  "version": "0.1.6",
+  "version": "0.1.8",
   "license": "MIT",
   "repository": "https://github.com/elixir-cloud-aai/cloud-components",
   "exports": {
-    ".": "./dist/index.js",
+    ".": "./dist/src/index.js",
     "./package.json": "./package.json"
   },
   "files": [

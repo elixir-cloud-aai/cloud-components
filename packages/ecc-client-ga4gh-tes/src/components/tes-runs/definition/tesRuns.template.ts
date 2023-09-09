@@ -9,7 +9,7 @@ import {
 } from '@microsoft/fast-components';
 import { html, repeat, when } from '@microsoft/fast-element';
 import TESRuns, { stateOption } from './tesRuns.js';
-import TESRun from '../../tes-run/index.js';
+import { TESRun } from '../../tes-run/index.js';
 
 provideFASTDesignSystem().register(
   fastAccordion(),
