@@ -1,13 +1,26 @@
 {
   "name": "ecc-client-ga4gh-tes",
   "description": "Web components for TES",
-  "main": "./out-tsc/src/index.js",
-  "private": true,
+  "main": "./dist/src/index.js",
   "type": "module",
   "version": "0.1.0",
-  "author": "",
-  "license": "ISC",
-  "repository": "",
+  "license": "MIT",
+  "repository": "https://github.com/elixir-cloud-aai/cloud-components",
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "images",
+    "dist"
+  ],
+  "keywords": [
+    "TES",
+    "Task Execution Service",
+    "Elixir",
+    "Cloud Component",
+    "Web Component"
+  ],
   "scripts": {
     "dev": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds\"",
     "lint:fix": "npm run lint -- --fix",
@@ -15,9 +28,10 @@
     "test:watch": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wtr --watch\"",
     "storybook": "tsc && npm run analyze -- --exclude dist && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds -c .storybook/server.mjs\"",
     "storybook:build": "tsc && npm run analyze -- --exclude dist && build-storybook",
+    "build": "tsc",
     "start:build": "web-dev-server --root-dir dist --app-index index.html --open",
     "analyze": "cem analyze --fast",
-    "start": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds\""
+    "release": "npm run build && npm publish"
   },
   "dependencies": {
     "@microsoft/fast-components": "^2.30.6",
