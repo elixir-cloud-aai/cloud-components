@@ -4,7 +4,7 @@ const filteredLogs = ["Running in dev mode"];
 
 export default /** @type {import("@web/test-runner").TestRunnerConfig} */ ({
   /** Test files to run */
-  files: "out-tsc/src/**/*.test.js",
+  files: "dist/src/**/*.test.js",
 
   /** Resolve bare module imports */
   nodeResolve: {

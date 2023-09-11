@@ -1,10 +1,3 @@
-/**
- * Import DesingSystem and envoke/register all the components here
- */
-import { DesignSystem } from '@microsoft/fast-foundation';
-import components from './components/index.js';
-
-// Register all the components
-components.forEach((component) => {
-  DesignSystem.getOrCreate().withShadowRootMode('open').register(component);
-});
+export { WESRuns } from './components/wes-runs/index.js';
+export { WESRun } from './components/wes-run/index.js';
+export { WESCreateRun } from './components/wes-create-run/index.js';
