@@ -15,8 +15,9 @@
     "inlineSources": true,
     "rootDir": "./",
     "incremental": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "declaration": true
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }

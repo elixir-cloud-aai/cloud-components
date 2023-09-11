@@ -4,8 +4,13 @@
   "main": "./dist/src/index.js",
   "type": "module",
   "version": "0.1.0",
+  "author": "elixir-cloud-aai",
   "license": "MIT",
+  "types": "dist/src/index.d.ts",
   "repository": "https://github.com/elixir-cloud-aai/cloud-components",
+  "bugs": {
+    "url": "https://github.com/elixir-cloud-aai/cloud-components/issues"
+  },
   "exports": {
     ".": "./dist/src/index.js",
     "./package.json": "./package.json"
