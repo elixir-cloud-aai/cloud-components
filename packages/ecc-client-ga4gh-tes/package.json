@@ -27,17 +27,17 @@
     "Web Component"
   ],
   "scripts": {
-    "dev": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds\"",
-    "lint:fix": "npm run lint -- --fix",
+    "dev": "concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds\"",
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore",
+    "lint:fix": "npm run lint --fix",
     "test": "tsc && wtr --coverage",
-    "test:watch": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wtr --watch\"",
-    "storybook": "tsc && npm run analyze -- --exclude dist && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds -c .storybook/server.mjs\"",
-    "storybook:build": "tsc && npm run analyze -- --exclude dist && build-storybook",
+    "test:watch": "concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wtr --watch\"",
+    "storybook": "tsc && npm run analyze && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds -c .storybook/server.mjs\"",
+    "storybook:build": "tsc && npm run analyze && build-storybook",
     "build": "tsc",
     "start:build": "web-dev-server --root-dir dist --app-index index.html --open",
-    "analyze": "cem analyze --fast",
-    "release": "npm run build && npm publish"
+    "analyze": "cem analyze --fast --exclude dist",
+    "release": "npm version && npm run build && build publish"
   },
   "dependencies": {
     "@microsoft/fast-components": "^2.30.6",
