@@ -1,14 +1,13 @@
 {
-  "name": "ecc-utils-design",
+  "name": "@elixir-cloud/design",
   "description": "Abstraction layer that provides utility components to manage the headless yet constitent design across ecc component",
   "main": "dist/src/index.js",
   "module": "dist/src/index.js",
   "exports": {
     ".": "./dist/src/index.js"
   },
-  "private": true,
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "",
   "license": "ISC",
   "repository": "",

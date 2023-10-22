@@ -1,9 +1,11 @@
 {
-  "name": "ecc-client-ga4gh-tes",
+  "name": "@elixir-cloud/tes",
   "description": "Web components for TES",
-  "main": "./dist/src/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "type": "module",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "license": "MIT",
   "repository": "https://github.com/elixir-cloud-aai/cloud-components",
   "exports": {
@@ -22,14 +24,14 @@
     "Web Component"
   ],
   "scripts": {
-    "dev": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds\"",
+    "dev": "npm run build && concurrently -k -r \"npm run build -- --watch\" \"wds\"",
     "lint:fix": "npm run lint -- --fix",
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore",
-    "test": "tsc && wtr --coverage",
-    "test:watch": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wtr --watch\"",
-    "storybook": "tsc && npm run analyze -- --exclude dist && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds -c .storybook/server.mjs\"",
-    "storybook:build": "tsc && npm run analyze -- --exclude dist && build-storybook",
-    "build": "tsc",
+    "test": "npm run build && wtr --coverage",
+    "test:watch": "npm run build && concurrently -k -r \"npm run build -- --watch\" \"wtr --watch\"",
+    "storybook": "npm run build && npm run analyze -- --exclude dist && concurrently -k -r \"npm run build -- --watch\" \"wds -c .storybook/server.mjs\"",
+    "storybook:build": "npm run build && npm run analyze -- --exclude dist && build-storybook",
+    "build": "tsup src/index.ts --format cjs,esm --dts",
     "start:build": "web-dev-server --root-dir dist --app-index index.html --open",
     "analyze": "cem analyze --fast",
     "release": "npm run build && npm publish"
@@ -56,6 +58,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "rimraf": "^3.0.2",
     "tslib": "^2.3.1",
+    "tsup": "^7.2.0",
     "typescript": "^4.9.5"
   },
   "customElements": "custom-elements.json"
