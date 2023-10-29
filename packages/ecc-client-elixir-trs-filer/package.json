@@ -1,9 +1,8 @@
 {
-  "name": "ecc-client-elixir-trs-filer",
+  "name": "@elixir-cloud/trs-filer",
   "description": "TRS Filer component",
-  "private": true,
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "author": "",
   "license": "ISC",
   "repository": "",
