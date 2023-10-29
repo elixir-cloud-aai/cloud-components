@@ -21,7 +21,10 @@ jobs:
           node-version: 16
 
       - name: Install Dependencies
-        run: yarn
+        run: npm i
+
+      - name: Unset Git Hooks
+        run: git config --unset core.hooksPath
 
       - name: Create Release Pull Request
         uses: changesets/action@v1
