@@ -95,6 +95,22 @@ export class Form extends LitElement {
         flex-direction: row;
         justify-content: space-between;
       }
+      input[type="file"]::file-selector-button {
+        height: 100%;
+        background-color: #fff;
+        border: 0px;
+        border-right: 1px solid #e5e5e5;
+        padding-right: 20px;
+        padding-left: 20px;
+        margin-right: 10px;
+      }
+      input[type="file"] {
+        background-color: #fff;
+        border: 1px solid #e5e5e5;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        height: 2.5rem;
+      }
     `,
   ];
 
@@ -157,17 +173,49 @@ export class Form extends LitElement {
     `;
   }
 
+  toBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+    });
+
   renderInputTemplate(
     field: Field,
     options: { index?: number; parentkey?: string } = {}
   ): TemplateResult {
     if (field.type === "array" || field.type === "switch") return html``;
-    console.log(field);
     const { index, parentkey } = options;
     const value =
       parentkey !== undefined && index !== undefined
         ? (this.form as any)[parentkey][index][field.key]
         : (this.form as any)[field.key];
+    if (field.type === "file") {
+      return html`
+        <label>${field.label} ${field.fieldOptions?.required ? "*" : ""}</label>
+        <input
+          class=${parentkey !== undefined && index !== undefined
+            ? "child-input"
+            : "input"}
+          type="file"
+          ?required=${field.fieldOptions?.required}
+          .value=${value}
+          @change=${async (e: any) => {
+            const { files } = e.target;
+            const base64 = await this.toBase64(files[0]);
+            const newForm = { ...this.form };
+            if (parentkey !== undefined && index !== undefined) {
+              (newForm as any)[parentkey][index][field.key] = base64;
+            } else {
+              (newForm as any)[field.key] = base64;
+            }
+            this.form = newForm;
+            this.requestUpdate();
+          }}
+        />
+      `;
+    }
     return html`
       <sl-input
         class=${parentkey !== undefined && index !== undefined
@@ -177,6 +225,7 @@ export class Form extends LitElement {
         type=${field.type ? field.type : "text"}
         ?required=${field.fieldOptions?.required}
         value=${value}
+        ?password-toggle=${field.type === "password"}
         @sl-change=${(e: any) => {
           const newForm = { ...this.form };
           if (parentkey !== undefined && index !== undefined) {
