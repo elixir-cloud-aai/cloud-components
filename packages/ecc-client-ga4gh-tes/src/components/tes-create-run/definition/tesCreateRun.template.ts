@@ -9,6 +9,7 @@ import {
   fastAccordionItem,
 } from '@microsoft/fast-components';
 import TESCreateRun from './tesCreateRun.js';
+import '@elixir-cloud/design';
 
 provideFASTDesignSystem().register(
   fastTextField(),
@@ -234,8 +235,75 @@ const OutputTemplate = html<TESCreateRun>`
     `
   )}
 `;
+const fields = [
+  {
+    key: 'name',
+    label: 'Name',
+    type: 'text',
+    fieldOptions: {
+      // required: true,
+    },
+  },
+  {
+    key: 'email',
+    label: 'Email',
+    type: 'email',
+    fieldOptions: {
+      // required: false,
+    },
+  },
+  {
+    key: 'address',
+    label: 'Address',
+    type: 'array',
+    children: [
+      {
+        key: 'street',
+        label: 'Street',
+        type: 'text',
+        fieldOptions: {
+          // required: false,
+        },
+      },
+      {
+        key: 'city',
+        label: 'City',
+        type: 'text',
+        fieldOptions: {
+          // required: true,
+        },
+      },
+      {
+        key: 'isPrimary',
+        label: 'Primary',
+        type: 'switch',
+      },
+    ],
+  },
+  {
+    key: '18+',
+    label: '18+',
+    type: 'switch',
+    switchOptions: {
+      default: true,
+    },
+  },
+  {
+    key: 'id',
+    label: 'ID',
+    type: 'file',
+    fieldOptions: {
+      // required: true,
+    },
+  },
+];
 
 const template = html<TESCreateRun>`
+  <ecc-utils-design-form
+    fields=${JSON.stringify(fields)}
+    @form-submit=${(x, c) => console.log(c.event.detail)}
+  >
+  </ecc-utils-design-form>
   ${when(
     (x) => x.responseGot && x.reponseHas('id'),
     html`

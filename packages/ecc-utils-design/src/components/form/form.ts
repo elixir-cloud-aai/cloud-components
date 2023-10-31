@@ -330,6 +330,7 @@ export class Form extends LitElement {
   }
 
   render() {
+    console.log(this.fields);
     return html`
       <form
         @submit=${(e: any) => {

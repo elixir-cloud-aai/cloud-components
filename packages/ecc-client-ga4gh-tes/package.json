@@ -37,6 +37,7 @@
     "release": "npm run build && npm publish"
   },
   "dependencies": {
+    "@elixir-cloud/design": "*",
     "@microsoft/fast-components": "^2.30.6",
     "@microsoft/fast-element": "^1.12.0",
     "@microsoft/fast-foundation": "^2.49.0"
