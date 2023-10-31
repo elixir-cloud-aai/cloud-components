@@ -10,7 +10,7 @@ export default interface CreateTaskData {
   volumes: string[];
 }
 
-interface ExecutorData {
+export interface ExecutorData {
   command: string[];
   env: Record<string, string>;
   image: string;

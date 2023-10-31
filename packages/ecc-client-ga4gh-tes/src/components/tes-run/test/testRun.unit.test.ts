@@ -20,21 +20,21 @@ describe('TESRun', () => {
         baseURL="https://csc-tesk-noauth.rahtiapp.fi/v1"
       ></ecc-client-ga4gh-tes-run>`
     );
-    expect(ele.baseURL).to.equal(baseURL);
+    expect(ele.getAttribute('baseURL')).to.equal(baseURL);
   });
 
   it('should set the task id correctly', async () => {
     const ele = await fixture<TESRun>(
       html`<ecc-client-ga4gh-tes-run id="1234"></ecc-client-ga4gh-tes-run>`
     );
-    expect(ele.id).to.equal('1234');
+    expect(ele.getAttribute('id')).to.equal('1234');
   });
 
   it('should set the task state correctly', async () => {
     const ele = await fixture<TESRun>(
       html`<ecc-client-ga4gh-tes-run id="DELETE"></ecc-client-ga4gh-tes-run>`
     );
-    expect(ele.id).to.equal('DELETE');
+    expect(ele.getAttribute('id')).to.equal('DELETE');
   });
 
   it('should have isLoading set to true by default', async () => {
