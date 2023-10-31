@@ -1,10 +1,9 @@
 {
-  "name": "ecc-client-ga4gh-wes",
+  "name": "@elixir-cloud/wes",
   "description": "Web components for WES",
   "main": "./out-tsc/src/index.js",
-  "private": true,
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "author": "",
   "license": "ISC",
   "repository": "",

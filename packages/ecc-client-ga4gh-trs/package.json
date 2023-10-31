@@ -1,10 +1,9 @@
 {
-  "name": "ecc-client-ga4gh-trs",
+  "name": "@elixir-cloud/trs",
   "main": "index.js",
   "description": "A TRS component",
-  "private": true,
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "author": "",
   "license": "ISC",
   "repository": "",
