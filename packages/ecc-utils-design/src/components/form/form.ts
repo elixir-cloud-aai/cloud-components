@@ -4,7 +4,8 @@ import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/switch/switch.js";
 import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
-import { sholelaceLightStyles } from "../../styles/shoelace-styles.js";
+import { sholelaceLightStyles } from "../../styles/shoelace.styles.js";
+import { hostStyles } from "../../styles/host.styles.js";
 
 interface Field {
   key: string;
@@ -32,9 +33,60 @@ interface Field {
 export class Form extends LitElement {
   static styles = [
     sholelaceLightStyles,
+    hostStyles,
     css`
       :host {
         display: block;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+      form sl-input {
+        margin-bottom: 1rem;
+      }
+      form sl-switch {
+        margin-bottom: 1rem;
+      }
+      .array {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1rem;
+        border-style: solid;
+        border-width: 0px 0px 1px 0px;
+        border-color: var(--sl-color-gray-300);
+      }
+      .array sl-button {
+        align-self: flex-end;
+      }
+      .array sl-input {
+        margin-bottom: 1rem;
+      }
+      .array-container {
+      }
+      .array-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      .array-label {
+        margin-bottom: 0.5rem;
+      }
+      .add-button {
+        display: flex;
+        width: fit-content;
+        items-align: center;
+      }
+      .delete-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+        margin-bottom: -0.4rem;
+      }
+      .add-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+        margin-bottom: -0.4rem;
       }
     `,
   ];
@@ -74,21 +126,24 @@ export class Form extends LitElement {
         ? (this.form as any)[parentkey][index][field.key]
         : (this.form as any)[field.key];
     return html`
-      <sl-switch
-        label=${field.label}
-        ?required=${field.fieldOptions?.required}
-        ?checked=${value}
-        @sl-change=${(e: any) => {
-          const newForm = { ...this.form };
-          if (parentkey !== undefined && index !== undefined) {
-            (newForm as any)[parentkey][index][field.key] = e.target.checked;
-          } else {
-            (newForm as any)[field.key] = e.target.checked;
-          }
-          this.form = newForm;
-          this.requestUpdate();
-        }}
-      ></sl-switch>
+      <div>
+        <label>${field.label}</label>
+        <sl-switch
+          label=${field.label}
+          ?required=${field.fieldOptions?.required}
+          ?checked=${value}
+          @sl-change=${(e: any) => {
+            const newForm = { ...this.form };
+            if (parentkey !== undefined && index !== undefined) {
+              (newForm as any)[parentkey][index][field.key] = e.target.checked;
+            } else {
+              (newForm as any)[field.key] = e.target.checked;
+            }
+            this.form = newForm;
+            this.requestUpdate();
+          }}
+        ></sl-switch>
+      </div>
     `;
   }
 
@@ -104,6 +159,9 @@ export class Form extends LitElement {
         : (this.form as any)[field.key];
     return html`
       <sl-input
+        class=${parentkey !== undefined && index !== undefined
+          ? "child-input"
+          : "input"}
         label=${field.label}
         type=${field.type ? field.type : "text"}
         ?required=${field.fieldOptions?.required}
@@ -125,38 +183,42 @@ export class Form extends LitElement {
   renderTemplate(field: Field): TemplateResult {
     if (field.type === "array") {
       return html`
-        <div>
-          <sl-button
-            @click=${() => {
-              const newChild = {};
-              field.children?.forEach((child) => {
-                (newChild as any)[child.key] = "";
-              });
-              const newForm = { ...this.form };
-              const currentForm = newForm;
-              (currentForm as any)[field.key].push(newChild);
-              this.requestUpdate();
-            }}
-          >
-            Add
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="{1.5}"
-              stroke="currentColor"
-              style="width: auto; height: 1.5rem;"
+        <div class="array-container">
+          <div class="array-header">
+            <label class="array-label">${field.label}</label>
+            <sl-button
+              class="add-button"
+              @click=${() => {
+                const newChild = {};
+                field.children?.forEach((child) => {
+                  (newChild as any)[child.key] = "";
+                });
+                const newForm = { ...this.form };
+                const currentForm = newForm;
+                (currentForm as any)[field.key].push(newChild);
+                this.requestUpdate();
+              }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-          </sl-button>
+              <svg
+                class="add-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="{1.5}"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4.5v15m7.5-7.5h-15"
+                />
+              </svg>
+              Add
+            </sl-button>
+          </div>
           ${(this.form as any)[field.key].map(
             (_item: any, index: number) => html`
-              <div>
+              <div class="array">
                 <sl-button
                   variant="text"
                   @click=${() => {
@@ -167,12 +229,12 @@ export class Form extends LitElement {
                   }}
                 >
                   <svg
+                    class="delete-icon"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
-                    style="width: auto; height: 1.5rem;"
                   >
                     <path
                       stroke-linecap="round"
