@@ -1,11 +1,11 @@
 {
   "name": "@elixir-cloud/design",
   "description": "Abstraction layer that provides utility components to manage the headless yet constitent design across ecc component",
-  "main": "dist/src/index.js",
-  "module": "dist/src/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/src/index.js",
-    "./form": "./dist/src/components/form/index.js"
+    ".": "./dist/index.js"
   },
   "type": "module",
   "version": "0.0.0",
@@ -14,21 +14,22 @@
   "repository": "",
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "tsc && npm run analyze -- --exclude dist",
-    "dev": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds\"",
-    "test": "tsc && wtr --coverage",
-    "test:watch": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wtr --watch\"",
-    "storybook": "tsc && npm run analyze -- --exclude dist && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds -c .storybook/server.mjs\"",
-    "storybook:build": "tsc && npm run analyze -- --exclude dist && build-storybook",
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "npm run build && concurrently -k -r \"npm run build -- --watch\" \"wds\"",
+    "test": "wtr --coverage",
+    "test:watch": "wtr --watch",
+    "storybook": "npm run build && npm run analyze -- --exclude dist && concurrently -k -r \"npm run build -- --watch\" \"wds -c .storybook/server.mjs\"",
+    "storybook:build": "npm run build && npm run analyze -- --exclude dist && build-storybook",
     "lint": "npx eslint .",
     "lint:fix": "npm run lint -- --fix",
-    "prepublish": "tsc && npm run analyze -- --exclude dist"
+    "prepublish": "npm run build"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.8.4",
     "@open-wc/eslint-config": "^12.0.0",
     "@open-wc/testing": "^3.2.0",
     "@web/dev-server": "^0.3.0",
+    "@web/dev-server-esbuild": "^0.4.3",
     "@web/dev-server-storybook": "^1.0.2",
     "@web/test-runner": "^0.17.0",
     "concurrently": "^8.2.1",
@@ -36,6 +37,7 @@
     "eslint-config-elixir": "*",
     "eslint-plugin-prettier": "^4.2.1",
     "tslib": "^2.6.2",
+    "tsup": "^7.2.0",
     "typescript": "^5.0.4"
   },
   "dependencies": {
