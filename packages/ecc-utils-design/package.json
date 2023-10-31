@@ -4,7 +4,8 @@
   "main": "dist/src/index.js",
   "module": "dist/src/index.js",
   "exports": {
-    ".": "./dist/src/index.js"
+    ".": "./dist/src/index.js",
+    "./form": "./dist/src/components/form/index.js"
   },
   "type": "module",
   "version": "0.0.0",
