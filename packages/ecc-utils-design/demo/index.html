@@ -31,13 +31,13 @@
           label: "Name",
           type: "text",
           fieldOptions: {
-            // required: true,
+            required: true,
           },
         },
         {
           key: "email",
           label: "Email",
-          type: "text",
+          type: "email",
           fieldOptions: {
             // required: false,
           },
@@ -56,17 +56,17 @@
               },
             },
             {
-              key: "isPrimary",
-              label: "Gender",
-              type: "switch",
-            },
-            {
               key: "city",
               label: "City",
               type: "text",
               fieldOptions: {
-                // required: false,
+                required: true,
               },
+            },
+            {
+              key: "isPrimary",
+              label: "Primary",
+              type: "switch",
             },
           ],
         },
@@ -74,6 +74,9 @@
           key: "18+",
           label: "18+",
           type: "switch",
+          switchOptions: {
+            default: true,
+          },
         },
       ];
 

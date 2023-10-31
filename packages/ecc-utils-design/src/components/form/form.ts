@@ -26,6 +26,9 @@ interface Field {
   fieldOptions?: {
     required?: boolean;
   };
+  switchOptions?: {
+    default?: boolean;
+  };
   error?: string;
   children?: Array<Field>;
 }
@@ -81,12 +84,16 @@ export class Form extends LitElement {
       .delete-icon {
         width: 1.5rem;
         height: 1.5rem;
-        margin-bottom: -0.4rem;
+        margin-bottom: -0.5rem;
       }
       .add-icon {
         width: 1.5rem;
         height: 1.5rem;
-        margin-bottom: -0.4rem;
+      }
+      .switch-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
       }
     `,
   ];
@@ -101,14 +108,14 @@ export class Form extends LitElement {
         const array = [{}];
         field.children?.forEach((child) => {
           if (child.type === "switch") {
-            (array[0] as any)[child.key] = false;
+            (array[0] as any)[child.key] = child.switchOptions?.default;
           } else {
             (array[0] as any)[child.key] = "";
           }
         });
         (this.form as any)[field.key] = array;
       } else if (field.type === "switch") {
-        (this.form as any)[field.key] = false;
+        (this.form as any)[field.key] = field.switchOptions?.default;
       } else {
         (this.form as any)[field.key] = "";
       }
@@ -126,9 +133,12 @@ export class Form extends LitElement {
         ? (this.form as any)[parentkey][index][field.key]
         : (this.form as any)[field.key];
     return html`
-      <div>
-        <label>${field.label}</label>
+      <div class="switch-container">
+        <label class="switch-label">${field.label}</label>
         <sl-switch
+          class=${parentkey !== undefined && index !== undefined
+            ? "child-switch"
+            : "switch"}
           label=${field.label}
           ?required=${field.fieldOptions?.required}
           ?checked=${value}
@@ -152,6 +162,7 @@ export class Form extends LitElement {
     options: { index?: number; parentkey?: string } = {}
   ): TemplateResult {
     if (field.type === "array" || field.type === "switch") return html``;
+    console.log(field);
     const { index, parentkey } = options;
     const value =
       parentkey !== undefined && index !== undefined
@@ -201,6 +212,7 @@ export class Form extends LitElement {
             >
               <svg
                 class="add-icon"
+                slot="prefix"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
