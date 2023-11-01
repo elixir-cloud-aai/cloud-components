@@ -1,3 +1,1 @@
-import TESService from './definition/tesService.js';
-
-export { TESService };
+import './definition/tesService.js';
