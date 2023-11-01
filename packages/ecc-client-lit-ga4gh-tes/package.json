@@ -1,0 +1,47 @@
+{
+  "name": "@elixir-cloud/lit-tes",
+  "description": "Web components for TES",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "type": "module",
+  "version": "0.0.0",
+  "author": "",
+  "license": "ISC",
+  "repository": "",
+  "scripts": {
+    "analyze": "cem analyze --litelement",
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "npm run build && concurrently -k -r \"npm run build -- --watch\" \"wds\"",
+    "test": "wtr --coverage",
+    "test:watch": "wtr --watch",
+    "storybook": "npm run build && npm run analyze -- --exclude dist && concurrently -k -r \"npm run build -- --watch\" \"wds -c .storybook/server.mjs\"",
+    "storybook:build": "npm run build && npm run analyze -- --exclude dist && build-storybook",
+    "lint": "npx eslint .",
+    "lint:fix": "npm run lint -- --fix",
+    "prepublish": "npm run build"
+  },
+  "devDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.8.4",
+    "@open-wc/eslint-config": "^12.0.0",
+    "@open-wc/testing": "^3.2.0",
+    "@web/dev-server": "^0.3.0",
+    "@web/dev-server-esbuild": "^0.4.3",
+    "@web/dev-server-storybook": "^1.0.2",
+    "@web/test-runner": "^0.17.0",
+    "concurrently": "^8.2.1",
+    "eslint": "^8.41.0",
+    "eslint-config-elixir": "*",
+    "eslint-plugin-prettier": "^4.2.1",
+    "tslib": "^2.6.2",
+    "tsup": "^7.2.0",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "@elixir-cloud/design": "^0.0.0",
+    "lit": "^3.0.1"
+  }
+}
