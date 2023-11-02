@@ -1,0 +1,14 @@
+{
+  "name": "ecc-docs",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs",
+    "start": "vitepress preview docs"
+  },
+  "dependencies": {
+    "vitepress": "^1.0.0-rc.24",
+    "vue": "3.3.6"
+  }
+}
