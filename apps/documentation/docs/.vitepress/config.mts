@@ -1,13 +1,15 @@
+import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vitepress";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "Elixir Cloud Components",
-  head: [["link", { rel: "icon", href: "/public/logo-elixir-cloud-aai.svg" }]],
-  description: "",
+  head: [["link", { rel: "icon", href: "/elixir-cloud/logo.svg" }]],
+  description:
+    "A suite of highly reusable Web Components for operationalising ELIXIR and GA4GH Cloud Services.",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
-    logo: "/logo-elixir-cloud-aai.svg",
+    logo: "/elixir-cloud/logo.svg",
     siteTitle: "Elixir Cloud Components",
     nav: [
       { text: "Home", link: "/" },
@@ -73,8 +75,20 @@ export default defineConfig({
     ],
 
     footer: {
-      message: "Released under the MIT License.",
+      message: "Released under the MIT License",
       copyright: "Copyright © 2023-present Elixir",
+    },
+  },
+  vite: {
+    resolve: {
+      alias: [
+        {
+          find: /^.*\/VPFooter\.vue$/,
+          replacement: fileURLToPath(
+            new URL("./theme/components/Footer.vue", import.meta.url)
+          ),
+        },
+      ],
     },
   },
 });
