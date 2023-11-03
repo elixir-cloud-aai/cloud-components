@@ -43,7 +43,7 @@ export default defineConfig({
           {
             text: "Components",
             items: [
-              { text: "Task Run", link: "/tes/components/task-runs" },
+              { text: "Task Run", link: "/tes/components/task-run" },
               { text: "Create Run", link: "/tes/components/create-run" }
             ],
           },
