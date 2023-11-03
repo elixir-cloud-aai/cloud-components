@@ -1,1 +1,21 @@
-{}
+{
+  "trailingComma": "all",
+  "singleQuote": true,
+  "printWidth": 100,
+  "overrides": [
+    {
+      "files": "*.md",
+      "options": {
+        "parser": "markdown",
+        "singleQuote": false
+      }
+    },
+    {
+      "files": "*.vue",
+      "options": {
+        "parser": "vue",
+        "singleQuote": false
+      }
+    }
+  ]
+}

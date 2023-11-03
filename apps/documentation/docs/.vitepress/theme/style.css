@@ -92,11 +92,7 @@
 
 :root {
   --vp-home-hero-name-color: transparent;
-  --vp-home-hero-name-background: -webkit-linear-gradient(
-    120deg,
-    #66bce9 30%,
-    #58b760
-  );
+  --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #66bce9 30%, #58b760);
 }
 
 @media (min-width: 640px) {
