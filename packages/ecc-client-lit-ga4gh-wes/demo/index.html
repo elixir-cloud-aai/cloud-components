@@ -13,15 +13,10 @@
 
   <script type="module">
     import { html, render } from "lit";
-    import "../dist/src/ecc-client-lit-ga4gh-wes.js";
+    import "../dist/index.js";
 
-    const header = "Hello owc World!";
     render(
-      html`
-        <ecc-client-lit-ga4gh-wes .header=${header}>
-          some light-dom
-        </ecc-client-lit-ga4gh-wes>
-      `,
+      html` <ecc-client-lit-ga4gh-wes-create-run /> `,
       document.querySelector("#demo")
     );
   </script>

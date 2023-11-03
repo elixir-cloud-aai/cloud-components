@@ -1,1 +1,1 @@
-export { EccClientLitGa4ghWes } from "./EccClientLitGa4ghWes.js";
+import "./components/index.js";
