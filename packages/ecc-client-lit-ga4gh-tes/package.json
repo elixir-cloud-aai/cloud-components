@@ -1,6 +1,6 @@
 {
-  "name": "@elixir-cloud/design",
-  "description": "Abstraction layer that provides utility components to manage the headless yet constitent design across ecc component",
+  "name": "@elixir-cloud/lit-tes",
+  "description": "Web components for TES",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -41,7 +41,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@shoelace-style/shoelace": "^2.8.0",
-    "lit": "^2.8.0"
+    "@elixir-cloud/design": "^0.0.0",
+    "lit": "^3.0.1"
   }
 }
