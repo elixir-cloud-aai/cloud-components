@@ -1,7 +1,12 @@
 import { html, LitElement } from "lit";
+import { property } from "lit/decorators.js";
+// import { postWorkflow } from "../../API/Workflow/wesGet";
 import "@elixir-cloud/design";
 
 export class WESCreateRun extends LitElement {
+  @property({ type: Object }) form: any = {};
+  @property({ type: String }) baseURL = "";
+
   fields = [
     {
       key: "workflow_params",
@@ -52,12 +57,17 @@ export class WESCreateRun extends LitElement {
     },
   ];
 
+  submitForm(form: any) {
+    this.form = form;
+    console.log(form);
+  }
+
   render() {
     return html`
       <ecc-utils-design-form
         .fields=${this.fields}
-        @form-submit=${(e: { detail: any }) => {
-          console.log("form - submitted", e.detail);
+        @form-submit=${(e: CustomEvent) => {
+          this.submitForm(e.detail);
         }}
       ></ecc-utils-design-form>
     `;
