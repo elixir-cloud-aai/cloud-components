@@ -16,13 +16,16 @@ export class WESCreateRun extends LitElement {
       label: "Workflow Type",
       type: "text",
       fieldOptions: {
-        required: false,
+        required: true,
       },
     },
     {
       key: "workflow_type_version",
       label: "Workflow Type Version",
       type: "text",
+      fieldOptions: {
+        required: true,
+      },
     },
     {
       key: "workflow_engine",
@@ -38,6 +41,9 @@ export class WESCreateRun extends LitElement {
       key: "workflow_url",
       label: "Workflow URL",
       type: "text",
+      fieldOptions: {
+        required: true,
+      },
     },
     {
       key: "workflow_attachment",
