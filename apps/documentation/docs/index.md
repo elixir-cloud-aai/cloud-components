@@ -3,18 +3,18 @@
 layout: home
 
 hero:
-  name: "Elixir Cloud Components"
+  name: "ELIXIR Cloud Components"
   # text: "Web Components for Elixir Cloud Services"
-  tagline: "A collection of Elixir cloud components (ECC's) for integrating Elixir Cloud Services faster and easier."
+  tagline: "A suite of highly reusable Web Components for operationalising ELIXIR and GA4GH Cloud Services."
   actions:
     - theme: brand
       text: Get Started
       link: /getting-started
-    # - theme: alt
-    #   text: API Examples
-    #   link: /api-examples
+    - theme: alt
+      text: View on Github
+      link: https://github.com/elixir-cloud-aai/cloud-components
   # image:
-  #   src: /logo-elixir-cloud-aai.svg
+  #   src: /elixir-cloud/logo.svg
   #   alt: Elixir Cloud Components Logo
 
 features:

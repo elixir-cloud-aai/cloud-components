@@ -37,4 +37,6 @@ yarn-error.log*
 
 # prettier
 .prettierrc
-```
+
+# Don't ignore prettier in apps/documentation
+!apps/documentation/.prettierrc
