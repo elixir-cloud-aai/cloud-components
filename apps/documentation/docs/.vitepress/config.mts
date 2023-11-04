@@ -12,51 +12,51 @@ export default defineConfig({
     logo: "/elixir-cloud/logo.svg",
     siteTitle: "Elixir Cloud Components",
     nav: [
-      { text: "Home", link: "/" },
-      { text: "Docs", link: "/getting-started" },
+      { text: 'Home', link: '/' },
+      { text: 'Docs', link: '/getting-started' },
     ],
 
     search: {
-      provider: "local",
+      provider: 'local',
     },
 
     sidebar: [
       {
-        text: "Introduction",
+        text: 'Introduction',
         collapsed: false,
         items: [
-          { text: "Getting Started", link: "/getting-started" },
-          { text: "Installation", link: "/installation" },
-          { text: "Usage", link: "/usage" },
+          { text: 'Getting Started', link: '/getting-started' },
+          { text: 'Installation', link: '/installation' },
+          { text: 'Usage', link: '/usage' },
         ],
       },
       {
-        text: "Customize",
+        text: 'Customize',
         collapsed: true,
-        items: [{ text: "Introduction", link: "/customize/introduction" }],
+        items: [{ text: 'Introduction', link: '/customize/introduction' }],
       },
       {
-        text: "TES",
+        text: 'TES',
         collapsed: true,
         items: [
-          { text: "Introduction", link: "/tes/introduction" },
-          { text: "Installation", link: "/tes/installation" },
-          { text: "Usage", link: "/tes/usage" },
+          { text: 'Introduction', link: '/tes/introduction' },
+          { text: 'Installation', link: '/tes/installation' },
+          { text: 'Usage', link: '/tes/usage' },
           {
-            text: "Components",
-            items: [{ text: "Create Run", link: "/tes/components/create-run" }],
+            text: 'Components',
+            items: [{ text: 'Create Run', link: '/tes/components/create-run' }],
           },
         ],
       },
       {
-        text: "WES",
+        text: 'WES',
         collapsed: true,
         items: [
-          { text: "Introduction", link: "/wes/introduction" },
-          { text: "Installation", link: "/wes/installation" },
-          { text: "Usage", link: "/wes/usage" },
+          { text: 'Introduction', link: '/wes/introduction' },
+          { text: 'Installation', link: '/wes/installation' },
+          { text: 'Usage', link: '/wes/usage' },
           {
-            text: "Components",
+            text: 'Components',
             items: [],
           },
         ],
@@ -65,18 +65,18 @@ export default defineConfig({
 
     socialLinks: [
       {
-        icon: "github",
-        link: "https://github.com/elixir-cloud-aai/cloud-components",
+        icon: 'github',
+        link: 'https://github.com/elixir-cloud-aai/cloud-components',
       },
       {
-        icon: "slack",
-        link: "https://elixir-cloud.slack.com",
+        icon: 'slack',
+        link: 'https://elixir-cloud.slack.com',
       },
     ],
 
     footer: {
-      message: "Released under the MIT License",
-      copyright: "Copyright © 2023-present Elixir",
+      message: 'Released under the MIT License.',
+      copyright: 'Copyright © 2023-present Elixir',
     },
   },
   vite: {

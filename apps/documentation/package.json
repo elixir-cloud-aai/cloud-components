@@ -5,10 +5,14 @@
   "scripts": {
     "dev": "vitepress dev docs",
     "build": "vitepress build docs",
-    "start": "vitepress preview docs"
+    "start": "vitepress preview docs",
+    "lint:fix": "prettier --write ."
   },
   "dependencies": {
     "vitepress": "^1.0.0-rc.24",
-    "vue": "3.3.5"
+    "vue": "3.3.6"
+  },
+  "devDependencies": {
+    "prettier": "3.0.3"
   }
 }
