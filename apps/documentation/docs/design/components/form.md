@@ -111,6 +111,9 @@ const fields = [
     key: "email",
     label: "Email",
     type: "email",
+    fieldOptions: {
+      // required: false,
+    },
   },
   {
     key: "address",
@@ -118,17 +121,35 @@ const fields = [
     type: "array",
     children: [
       {
-        key: "street",
-        label: "Street",
-        type: "text",
-      },
-      {
-        key: "city",
-        label: "City",
-        type: "text",
-        fieldOptions: {
-          required: true,
-        },
+        key: "Details",
+        label: "Details",
+        type: "array",
+        children: [
+          {
+            key: "houseNumber",
+            label: "House Number",
+            type: "text",
+            fieldOptions: {
+              required: true,
+            },
+          },
+          {
+            key: "street",
+            label: "Street",
+            type: "text",
+            fieldOptions: {
+              // required: false,
+            },
+          },
+          {
+            key: "city",
+            label: "City",
+            type: "text",
+            fieldOptions: {
+              required: true,
+            },
+          },
+        ],
       },
       {
         key: "isPrimary",
@@ -179,7 +200,7 @@ const fields = [
 <ClientOnly>
   <div :class="isDark ? 'component-dark component' : 'component-light component'">
   <!-- Render ecc-utils-design-form component only after the component is loaded -->
-    <ecc-utils-design-form class="styled-form-example" :v-if="renderComponent" :fields="complexExampleFields"></ecc-utils-design-form>
+    <ecc-utils-design-form class="styled-form-example" :v-if="renderComponent" :fields="styledExampleFields"></ecc-utils-design-form>
 
 ::: details Code Blocks
 ::: code-group
@@ -348,6 +369,7 @@ console.log(isDark);
 const renderComponent = ref(false);
 const primaryFields = ref([]);
 const complexExampleFields = ref([]);
+const styledExampleFields = ref([]);
 onMounted(() => {
   import("@elixir-cloud/design").then((module) => {
     renderComponent.value = false;
@@ -361,7 +383,85 @@ onMounted(() => {
           },
         },
       ];
-    complexExampleFields.value = [
+
+    complexExampleFields.value =  [
+        {
+          key: "name",
+          label: "Name",
+          type: "text",
+          fieldOptions: {
+            required: true,
+          },
+        },
+        {
+          key: "email",
+          label: "Email",
+          type: "email",
+          fieldOptions: {
+            // required: false,
+          },
+        },
+        {
+          key: "address",
+          label: "Address",
+          type: "array",
+          children: [
+            {
+              key: "Details",
+              label: "Details",
+              type: "array",
+              children: [
+                {
+                  key: "houseNumber",
+                  label: "House Number",
+                  type: "text",
+                  fieldOptions: {
+                    required: true,
+                  },
+                },
+                {
+                  key: "street",
+                  label: "Street",
+                  type: "text",
+                  fieldOptions: {
+                    // required: false,
+                  },
+                },
+                {
+                  key: "city",
+                  label: "City",
+                  type: "text",
+                  fieldOptions: {
+                    required: true,
+                  },
+                },
+              ],
+            },
+            {
+              key: "isPrimary",
+              label: "Primary",
+              type: "switch",
+            },
+          ],
+        },
+        {
+          key: "18+",
+          label: "18+",
+          type: "switch",
+          switchOptions: {
+            default: true,
+          },
+        },
+        {
+          key: "id",
+          label: "ID",
+          type: "file",
+          fieldOptions: {
+            required: true,
+          },
+        },
+      ];
+    styledExampleFields.value = [
         {
           key: "name",
           label: "Name",
