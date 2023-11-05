@@ -46,6 +46,11 @@
           key: "address",
           label: "Address",
           type: "array",
+          fieldOptions: {
+            defaultCount: 1,
+            max: 2,
+            min: 1,
+          },
           children: [
             {
               key: "street",
@@ -68,15 +73,38 @@
               label: "Primary",
               type: "switch",
             },
+            {
+              key: "inner-add",
+              label: "Inner Add",
+              type: "array",
+              children: [
+                {
+                  key: "town",
+                  label: "Town",
+                  type: "text",
+                  fieldOptions: {
+                    // required: false,
+                  },
+                },
+                {
+                  key: "state",
+                  label: "State",
+                  type: "text",
+                  fieldOptions: {
+                    required: true,
+                  },
+                },
+              ],
+            },
           ],
         },
         {
           key: "18+",
           label: "18+",
           type: "switch",
-          switchOptions: {
-            default: true,
-          },
+          // fieldOptions: {
+          //   value: true,
+          // },
         },
         {
           key: "id",
@@ -84,6 +112,8 @@
           type: "file",
           fieldOptions: {
             required: true,
+            multiple: true,
+            accept: "image/*,.pdf",
           },
         },
       ];
