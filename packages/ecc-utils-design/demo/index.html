@@ -116,20 +116,35 @@
           type: "array",
           children: [
             {
-              key: "street",
-              label: "Street",
-              type: "text",
-              fieldOptions: {
-                // required: false,
-              },
-            },
-            {
-              key: "city",
-              label: "City",
-              type: "text",
-              fieldOptions: {
-                required: true,
-              },
+              key: "Details",
+              label: "Details",
+              type: "array",
+              children: [
+                {
+                  key: "houseNumber",
+                  label: "House Number",
+                  type: "text",
+                  fieldOptions: {
+                    required: true,
+                  },
+                },
+                {
+                  key: "street",
+                  label: "Street",
+                  type: "text",
+                  fieldOptions: {
+                    // required: false,
+                  },
+                },
+                {
+                  key: "city",
+                  label: "City",
+                  type: "text",
+                  fieldOptions: {
+                    required: true,
+                  },
+                },
+              ],
             },
             {
               key: "isPrimary",
@@ -155,11 +170,6 @@
           },
         },
       ];
-
-      // const button = document.querySelector("#button");
-      // button.addEventListener("click", () => {
-      //   console.log("clicked", fields);
-      // });
 
       render(
         html`<ecc-utils-design-form

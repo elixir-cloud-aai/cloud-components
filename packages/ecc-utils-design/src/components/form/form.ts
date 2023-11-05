@@ -4,6 +4,7 @@ import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/switch/switch.js";
 import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
+import _ from "lodash-es";
 import { sholelaceLightStyles } from "../../styles/shoelace.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
 
@@ -121,53 +122,22 @@ export class Form extends LitElement {
     if (!this.fields) {
       throw new Error("Fields is required");
     }
-    this.fields.forEach((field) => {
-      if (field.type === "array") {
-        const array = [{}];
-        field.children?.forEach((child) => {
-          if (child.type === "switch") {
-            (array[0] as any)[child.key] = child.switchOptions?.default;
-          } else {
-            (array[0] as any)[child.key] = "";
-          }
-        });
-        (this.form as any)[field.key] = array;
-      } else if (field.type === "switch") {
-        (this.form as any)[field.key] = field.switchOptions?.default;
-      } else {
-        (this.form as any)[field.key] = "";
-      }
-    });
   }
 
-  renderSwitchTemplate(
-    field: Field,
-    options: { index?: number; parentkey?: string } = {}
-  ): TemplateResult {
+  renderSwitchTemplate(field: Field, path: string): TemplateResult {
     if (field.type !== "switch") return html``;
-    const { index, parentkey } = options;
-    const value =
-      parentkey !== undefined && index !== undefined
-        ? (this.form as any)[parentkey][index][field.key]
-        : (this.form as any)[field.key];
     return html`
       <div part="field" class="switch-container">
         <label part="label" class="switch-label">${field.label}</label>
         <sl-switch
           exportparts="control: switch, thumb: switch-thumb"
-          class=${parentkey !== undefined && index !== undefined
-            ? "child-switch"
-            : "switch"}
+          class="switch"
           label=${field.label}
           ?required=${field.fieldOptions?.required}
-          ?checked=${value}
+          ?checked=${_.get(this.form, path, false)}
           @sl-change=${(e: any) => {
             const newForm = { ...this.form };
-            if (parentkey !== undefined && index !== undefined) {
-              (newForm as any)[parentkey][index][field.key] = e.target.checked;
-            } else {
-              (newForm as any)[field.key] = e.target.checked;
-            }
+            _.set(newForm, path, e.target.checked);
             this.form = newForm;
             this.requestUpdate();
           }}
@@ -184,16 +154,8 @@ export class Form extends LitElement {
       reader.onerror = reject;
     });
 
-  renderInputTemplate(
-    field: Field,
-    options: { index?: number; parentkey?: string } = {}
-  ): TemplateResult {
+  renderInputTemplate(field: Field, path: string): TemplateResult {
     if (field.type === "array" || field.type === "switch") return html``;
-    const { index, parentkey } = options;
-    const value =
-      parentkey !== undefined && index !== undefined
-        ? (this.form as any)[parentkey][index][field.key]
-        : (this.form as any)[field.key];
     if (field.type === "file") {
       return html`
         <div part="field" class="row">
@@ -201,9 +163,7 @@ export class Form extends LitElement {
             ${field.label} ${field.fieldOptions?.required ? "*" : ""}
           </label>
           <input
-            class=${parentkey !== undefined && index !== undefined
-              ? "child-input"
-              : "input"}
+            class="input"
             part="input-base input"
             type="file"
             ?required=${field.fieldOptions?.required}
@@ -211,11 +171,7 @@ export class Form extends LitElement {
               const { files } = e.target;
               const base64 = await this.toBase64(files[0]);
               const newForm = { ...this.form };
-              if (parentkey !== undefined && index !== undefined) {
-                (newForm as any)[parentkey][index][field.key] = base64;
-              } else {
-                (newForm as any)[field.key] = base64;
-              }
+              _.set(newForm, path, base64);
               this.form = newForm;
               this.requestUpdate();
             }}
@@ -226,21 +182,15 @@ export class Form extends LitElement {
     return html`
       <sl-input
         exportparts="form-control: field, form-control-label: label, input: input, base: input-base"
-        class=${parentkey !== undefined && index !== undefined
-          ? "child-input"
-          : "input"}
+        class="input"
         label=${field.label}
         type=${field.type ? field.type : "text"}
         ?required=${field.fieldOptions?.required}
-        value=${value}
+        value=${_.get(this.form, path, "")}
         ?password-toggle=${field.type === "password"}
         @sl-change=${(e: any) => {
           const newForm = { ...this.form };
-          if (parentkey !== undefined && index !== undefined) {
-            (newForm as any)[parentkey][index][field.key] = e.target.value;
-          } else {
-            (newForm as any)[field.key] = e.target.value;
-          }
+          _.set(newForm, path, e.target.value);
           this.form = newForm;
           this.requestUpdate();
         }}
@@ -248,7 +198,13 @@ export class Form extends LitElement {
     `;
   }
 
-  renderArrayTemplate(field: Field): TemplateResult {
+  renderArrayTemplate(field: Field, path: string): TemplateResult {
+    const doesExit = _.get(this.form, path, false);
+    if (!doesExit) {
+      const newForm = { ...this.form };
+      _.set(newForm, path, [{}]);
+      this.form = newForm;
+    }
     return html`
       <div class="array-container">
         <div part="array-header" class="array-header">
@@ -260,13 +216,9 @@ export class Form extends LitElement {
             exportparts="base: button, base: add-button"
             class="add-button"
             @click=${() => {
-              const newChild = {};
-              field.children?.forEach((child) => {
-                (newChild as any)[child.key] = "";
-              });
               const newForm = { ...this.form };
-              const currentForm = newForm;
-              (currentForm as any)[field.key].push(newChild);
+              _.get(newForm, path).push({});
+              this.form = newForm;
               this.requestUpdate();
             }}
           >
@@ -288,7 +240,7 @@ export class Form extends LitElement {
             Add
           </sl-button>
         </div>
-        ${(this.form as any)[field.key].map(
+        ${_.get(this.form, path).map(
           (_item: any, index: number) => html`
             <div part="array-item" class="array-item">
               <sl-button
@@ -296,8 +248,8 @@ export class Form extends LitElement {
                 exportparts="base: button, base: remove-button"
                 @click=${() => {
                   const newForm = { ...this.form };
-                  const currentForm = newForm;
-                  (currentForm as any)[field.key].splice(index, 1);
+                  _.get(newForm, path).splice(index, 1);
+                  this.form = newForm;
                   this.requestUpdate();
                 }}
               >
@@ -317,18 +269,9 @@ export class Form extends LitElement {
                 </svg>
               </sl-button>
               <div class="array-item-container">
-                ${field.children?.map((child) => {
-                  if (child.type === "switch") {
-                    return this.renderSwitchTemplate(child, {
-                      index,
-                      parentkey: field.key,
-                    });
-                  }
-                  return this.renderInputTemplate(child, {
-                    index,
-                    parentkey: field.key,
-                  });
-                })}
+                ${field.children?.map((child) =>
+                  this.renderTemplate(child, `${path}[${index}]`)
+                )}
               </div>
             </div>
           `
@@ -337,38 +280,19 @@ export class Form extends LitElement {
     `;
   }
 
-  renderTemplate(field: Field): TemplateResult {
+  renderTemplate(field: Field, path: string): TemplateResult {
     if (field.type === "array") {
-      return this.renderArrayTemplate(field);
+      return this.renderArrayTemplate(field, `${path}.${field.key}`);
     }
     if (field.type === "switch") {
-      return this.renderSwitchTemplate(field);
+      return this.renderSwitchTemplate(field, `${path}.${field.key}`);
     }
-    return this.renderInputTemplate(field);
+    return this.renderInputTemplate(field, `${path}.${field.key}`);
   }
 
   render() {
     if (!this.fields || this.fields.length === 0) {
       throw new Error("Fields is required & should not be empty array");
-    }
-    if (!this.form || Object.keys(this.form).length === 0) {
-      this.fields.forEach((field) => {
-        if (field.type === "array") {
-          const array = [{}];
-          field.children?.forEach((child) => {
-            if (child.type === "switch") {
-              (array[0] as any)[child.key] = child.switchOptions?.default;
-            } else {
-              (array[0] as any)[child.key] = "";
-            }
-          });
-          (this.form as any)[field.key] = array;
-        } else if (field.type === "switch") {
-          (this.form as any)[field.key] = field.switchOptions?.default;
-        } else {
-          (this.form as any)[field.key] = "";
-        }
-      });
     }
     return html`
       <form
@@ -390,7 +314,7 @@ export class Form extends LitElement {
           this.dispatchEvent(event);
         }}
       >
-        ${this.fields.map((field) => this.renderTemplate(field))}
+        ${this.fields.map((field) => this.renderTemplate(field, "data"))}
         <sl-button
           type="submit"
           exportparts="base: button, base: submit-button"
