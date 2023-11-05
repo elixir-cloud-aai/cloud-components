@@ -2,9 +2,9 @@
 
 <div class="component-name">&lt;ecc-utils-design-form&gt;</div>
 This component is used to render a form with the given fields.
-
-<div :class="isDark ? 'component-dark component' : 'component-light component'">
-  <ecc-utils-design-form :v-if="renderComponent" :fields="primaryFields"></ecc-utils-design-form>
+<ClientOnly>
+  <div :class="isDark ? 'component-dark component' : 'component-light component'">
+    <ecc-utils-design-form :v-if="renderComponent" :fields="primaryFields"></ecc-utils-design-form>
 
 ::: details Code Blocks
 ::: code-group
@@ -22,13 +22,14 @@ const fields = [...];
 />
 ```
 
-<!-- ```jsx [React]
+  <!-- ```jsx [React]
 
-``` -->
+  ``` -->
 
 :::
 
-</div>
+  </div>
+</ClientOnly>
 
 ## Importing
 
@@ -85,9 +86,10 @@ This property is used to render the fields in the form. Fields can be passed as 
 
 ### Complex Form
 
-<div :class="isDark ? 'component-dark component' : 'component-light component'">
-<!-- Render ecc-utils-design-form component only after the component is loaded -->
-  <ecc-utils-design-form class="complex-form-example" :v-if="renderComponent" :fields="complexExampleFields"></ecc-utils-design-form>
+<ClientOnly>
+  <div :class="isDark ? 'component-dark component' : 'component-light component'">
+  <!-- Render ecc-utils-design-form component only after the component is loaded -->
+    <ecc-utils-design-form class="complex-form-example" :v-if="renderComponent" :fields="complexExampleFields"></ecc-utils-design-form>
 
 ::: details Code Blocks
 ::: code-group
@@ -163,19 +165,21 @@ const fields = [
 />
 ```
 
-<!-- ```jsx [React]
+  <!-- ```jsx [React]
 
-``` -->
+  ``` -->
 
 :::
 
-</div>
+  </div>
+</ClientOnly>
 
 ### Styled Form
 
-<div :class="isDark ? 'component-dark component' : 'component-light component'">
-<!-- Render ecc-utils-design-form component only after the component is loaded -->
-  <ecc-utils-design-form class="styled-form-example" :v-if="renderComponent" :fields="complexExampleFields"></ecc-utils-design-form>
+<ClientOnly>
+  <div :class="isDark ? 'component-dark component' : 'component-light component'">
+  <!-- Render ecc-utils-design-form component only after the component is loaded -->
+    <ecc-utils-design-form class="styled-form-example" :v-if="renderComponent" :fields="complexExampleFields"></ecc-utils-design-form>
 
 ::: details Code Blocks
 ::: code-group
@@ -327,20 +331,21 @@ const fields = [
 }
 ```
 
-<!-- ```jsx [React]
+  <!-- ```jsx [React]
 
-``` -->
+  ``` -->
 
 :::
 
-</div>
+  </div>
+</ClientOnly>
 
 <script setup>
 import { onMounted, ref } from "vue";
 import { useData } from "vitepress";
-const {isDark} = useData();
+const { isDark } = useData();
+console.log(isDark);
 const renderComponent = ref(false);
-console.log(renderComponent.value);
 const primaryFields = ref([]);
 const complexExampleFields = ref([]);
 onMounted(() => {
