@@ -10,11 +10,7 @@ const { isDark } = useData();
   <footer class="footer" v-if="!hasSidebar">
     <div class="container">
       <div class="footer-icons">
-        <a
-          href="https://elixir-cloud.dcc.sib.swiss/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href="https://elixir-cloud.dcc.sib.swiss/" target="_blank" rel="noopener noreferrer">
           <img
             :src="isDark ? '/elixir-cloud/logo.svg' : '/elixir-cloud/logo.svg'"
             alt="Elixir Cloud & AAI"
@@ -26,11 +22,7 @@ const { isDark } = useData();
           alt="Cloud SDK"
           class="footer-logo"
         />
-        <a
-          href="https://elixir-europe.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href="https://elixir-europe.org/" target="_blank" rel="noopener noreferrer">
           <img
             :src="isDark ? '/elixir/dark.png' : '/elixir/light.svg'"
             alt="Elixir"
@@ -97,9 +89,3 @@ const { isDark } = useData();
   height: 72px;
 }
 </style>
-
-<!-- <script>
-export default {
-  name: "Footer",
-};
-</script> -->

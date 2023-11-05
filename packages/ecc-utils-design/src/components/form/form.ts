@@ -104,6 +104,7 @@ export class Form extends LitElement {
         margin-bottom: 0.5rem;
         height: 2.5rem;
         font-size: 1rem;
+        color: #000;
       }
       .row {
         display: flex;
@@ -117,6 +118,9 @@ export class Form extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    if (!this.fields) {
+      throw new Error("Fields is required");
+    }
     this.fields.forEach((field) => {
       if (field.type === "array") {
         const array = [{}];
@@ -203,7 +207,6 @@ export class Form extends LitElement {
             part="input-base input"
             type="file"
             ?required=${field.fieldOptions?.required}
-            .value=${value}
             @change=${async (e: any) => {
               const { files } = e.target;
               const base64 = await this.toBase64(files[0]);
@@ -345,6 +348,28 @@ export class Form extends LitElement {
   }
 
   render() {
+    if (!this.fields || this.fields.length === 0) {
+      throw new Error("Fields is required & should not be empty array");
+    }
+    if (!this.form || Object.keys(this.form).length === 0) {
+      this.fields.forEach((field) => {
+        if (field.type === "array") {
+          const array = [{}];
+          field.children?.forEach((child) => {
+            if (child.type === "switch") {
+              (array[0] as any)[child.key] = child.switchOptions?.default;
+            } else {
+              (array[0] as any)[child.key] = "";
+            }
+          });
+          (this.form as any)[field.key] = array;
+        } else if (field.type === "switch") {
+          (this.form as any)[field.key] = field.switchOptions?.default;
+        } else {
+          (this.form as any)[field.key] = "";
+        }
+      });
+    }
     return html`
       <form
         part="form"

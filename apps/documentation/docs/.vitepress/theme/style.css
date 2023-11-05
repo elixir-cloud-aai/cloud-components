@@ -52,7 +52,7 @@
   --vp-c-brand-1: #23a9f6;
   --vp-c-brand-2: #1b92e1;
   --vp-c-brand-3: #1b92e1;
-  --vp-c-brand-soft: rgba(49, 46, 46, 0.1);
+  --vp-c-brand-soft: rgba(27, 146, 225, 0.1);
 
   --vp-c-tip-1: var(--vp-c-brand-1);
   --vp-c-tip-2: var(--vp-c-brand-2);
@@ -92,11 +92,7 @@
 
 :root {
   --vp-home-hero-name-color: transparent;
-  --vp-home-hero-name-background: -webkit-linear-gradient(
-    120deg,
-    #23a9f6 30%,
-    #1b92e1
-  );
+  --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #23a9f6 30%, #1b92e1);
 }
 
 @media (min-width: 640px) {
@@ -128,4 +124,26 @@
 
 .DocSearch {
   --docsearch-primary-color: var(--vp-c-brand-1) !important;
+}
+
+.component-name {
+  color: var(--vp-c-brand-1);
+  font-family: var(--vp-font-family-mono);
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.component-light {
+  background-color: #f6f6f7;
+}
+
+.component-dark {
+  background-color: #161618;
+}
+
+.component {
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
