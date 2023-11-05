@@ -5,12 +5,14 @@ import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/switch/switch.js";
 import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
 import _ from "lodash-es";
+import { resolveClass } from "../../utils/componentHelpers.js";
 import { sholelaceLightStyles } from "../../styles/shoelace.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
 
 interface Field {
   key: string;
   label: string;
+  className?: string;
   type?:
     | "text"
     | "date"
@@ -27,9 +29,14 @@ interface Field {
     | "file";
   fieldOptions?: {
     required?: boolean;
+    value?: string | boolean;
+    multiple?: boolean;
+    accept?: string;
   };
-  switchOptions?: {
-    default?: boolean;
+  arrayOptions?: {
+    defaultCount?: number;
+    max?: number;
+    min?: number;
   };
   error?: string;
   children?: Array<Field>;
@@ -124,21 +131,22 @@ export class Form extends LitElement {
     }
   }
 
-  renderSwitchTemplate(field: Field, path: string): TemplateResult {
+  renderSwitchTemplate(field: Field, path: string, depth = 0): TemplateResult {
     if (field.type !== "switch") return html``;
     return html`
-      <div part="field" class="switch-container">
+      <div
+        part="field"
+        class="switch-container ${resolveClass(field.className, depth)}"
+      >
         <label part="label" class="switch-label">${field.label}</label>
         <sl-switch
           exportparts="control: switch, thumb: switch-thumb"
           class="switch"
           label=${field.label}
           ?required=${field.fieldOptions?.required}
-          ?checked=${_.get(this.form, path, false)}
-          @sl-change=${(e: any) => {
-            const newForm = { ...this.form };
-            _.set(newForm, path, e.target.checked);
-            this.form = newForm;
+          ?checked=${field.fieldOptions?.value || false}
+          @sl-change=${(e: Event) => {
+            _.set(this.form, path, (e.target as HTMLInputElement).checked);
             this.requestUpdate();
           }}
         ></sl-switch>
@@ -146,19 +154,11 @@ export class Form extends LitElement {
     `;
   }
 
-  toBase64 = (file: Blob) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-    });
-
-  renderInputTemplate(field: Field, path: string): TemplateResult {
+  renderInputTemplate(field: Field, path: string, depth = 0): TemplateResult {
     if (field.type === "array" || field.type === "switch") return html``;
     if (field.type === "file") {
       return html`
-        <div part="field" class="row">
+        <div part="field" class="row ${resolveClass(field.className, depth)}">
           <label part="label">
             ${field.label} ${field.fieldOptions?.required ? "*" : ""}
           </label>
@@ -166,13 +166,12 @@ export class Form extends LitElement {
             class="input"
             part="input-base input"
             type="file"
+            accept=${field.fieldOptions?.accept}
+            ?multiple=${field.fieldOptions?.multiple}
             ?required=${field.fieldOptions?.required}
-            @change=${async (e: any) => {
-              const { files } = e.target;
-              const base64 = await this.toBase64(files[0]);
-              const newForm = { ...this.form };
-              _.set(newForm, path, base64);
-              this.form = newForm;
+            @change=${async (e: Event) => {
+              const { files } = e.target as HTMLInputElement;
+              _.set(this.form, path, files);
               this.requestUpdate();
             }}
           />
@@ -182,31 +181,47 @@ export class Form extends LitElement {
     return html`
       <sl-input
         exportparts="form-control: field, form-control-label: label, input: input, base: input-base"
-        class="input"
+        class="input ${resolveClass(field.className, depth)}"
         label=${field.label}
-        type=${field.type ? field.type : "text"}
+        type=${field.type || "text"}
         ?required=${field.fieldOptions?.required}
-        value=${_.get(this.form, path, "")}
+        value=${field.fieldOptions?.value || ""}
         ?password-toggle=${field.type === "password"}
-        @sl-change=${(e: any) => {
-          const newForm = { ...this.form };
-          _.set(newForm, path, e.target.value);
-          this.form = newForm;
+        @sl-change=${(e: Event) => {
+          _.set(this.form, path, (e.target as HTMLInputElement).value);
           this.requestUpdate();
         }}
       ></sl-input>
     `;
   }
 
-  renderArrayTemplate(field: Field, path: string): TemplateResult {
-    const doesExit = _.get(this.form, path, false);
-    if (!doesExit) {
-      const newForm = { ...this.form };
-      _.set(newForm, path, [{}]);
-      this.form = newForm;
+  renderArrayTemplate(field: Field, path: string, depth = 0): TemplateResult {
+    const doesExist = _.get(this.form, path, false);
+    const { arrayOptions } = field;
+
+    if (!doesExist) {
+      const defaultCount = field.arrayOptions?.defaultCount;
+      if (defaultCount) {
+        _.set(this.form, path, Array(defaultCount).fill({}));
+      } else {
+        _.set(this.form, path, [{}]);
+      }
     }
+
+    const resolveAddButtonIsActive = () => {
+      if (!arrayOptions?.max) return true;
+      if (arrayOptions.max > _.get(this.form, path).length) return true;
+      return false;
+    };
+
+    const resolveDeleteButtonIsActive = () => {
+      if (!arrayOptions?.defaultCount || !arrayOptions?.min) return true;
+      if (_.get(this.form, path).length > arrayOptions.min) return true;
+      return false;
+    };
+
     return html`
-      <div class="array-container">
+      <div class="array-container ${resolveClass(field.className, depth)}">
         <div part="array-header" class="array-header">
           <label part="label array-label" class="array-label">
             ${field.label}
@@ -214,12 +229,12 @@ export class Form extends LitElement {
           <sl-button
             variant="text"
             exportparts="base: button, base: add-button"
+            ?disabled=${!resolveAddButtonIsActive()}
             class="add-button"
             @click=${() => {
-              const newForm = { ...this.form };
-              _.get(newForm, path).push({});
-              this.form = newForm;
-              this.requestUpdate();
+              resolveAddButtonIsActive() &&
+                _.get(this.form, path).push({}) &&
+                this.requestUpdate();
             }}
           >
             <svg
@@ -246,11 +261,11 @@ export class Form extends LitElement {
               <sl-button
                 variant="text"
                 exportparts="base: button, base: remove-button"
+                ?disabled=${!resolveDeleteButtonIsActive()}
                 @click=${() => {
-                  const newForm = { ...this.form };
-                  _.get(newForm, path).splice(index, 1);
-                  this.form = newForm;
-                  this.requestUpdate();
+                  resolveDeleteButtonIsActive() &&
+                    _.get(this.form, path).splice(index, 1) &&
+                    this.requestUpdate();
                 }}
               >
                 <svg
@@ -270,7 +285,7 @@ export class Form extends LitElement {
               </sl-button>
               <div class="array-item-container">
                 ${field.children?.map((child) =>
-                  this.renderTemplate(child, `${path}[${index}]`)
+                  this.renderTemplate(child, `${path}[${index}]`, depth + 1)
                 )}
               </div>
             </div>
@@ -280,14 +295,14 @@ export class Form extends LitElement {
     `;
   }
 
-  renderTemplate(field: Field, path: string): TemplateResult {
+  renderTemplate(field: Field, path: string, depth = 0): TemplateResult {
     if (field.type === "array") {
-      return this.renderArrayTemplate(field, `${path}.${field.key}`);
+      return this.renderArrayTemplate(field, `${path}.${field.key}`, depth);
     }
     if (field.type === "switch") {
-      return this.renderSwitchTemplate(field, `${path}.${field.key}`);
+      return this.renderSwitchTemplate(field, `${path}.${field.key}`, depth);
     }
-    return this.renderInputTemplate(field, `${path}.${field.key}`);
+    return this.renderInputTemplate(field, `${path}.${field.key}`, depth);
   }
 
   render() {
@@ -297,7 +312,7 @@ export class Form extends LitElement {
     return html`
       <form
         part="form"
-        @submit=${(e: any) => {
+        @submit=${(e: Event) => {
           e.preventDefault();
           const form = this.shadowRoot?.querySelector("form");
           const isValid = form?.reportValidity();

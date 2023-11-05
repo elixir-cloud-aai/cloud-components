@@ -12,9 +12,15 @@
   "author": "",
   "license": "ISC",
   "repository": "",
+  "tsup": {
+    "entry": [
+      "src/index.ts"
+    ],
+    "sourcemap": true
+  },
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "tsup  --format cjs,esm --dts",
     "dev": "npm run build && concurrently -k -r \"npm run build -- --watch\" \"wds\"",
     "test": "wtr --coverage",
     "test:watch": "wtr --watch",
