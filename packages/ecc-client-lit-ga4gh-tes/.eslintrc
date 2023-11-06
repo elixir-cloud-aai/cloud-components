@@ -2,6 +2,7 @@
   "extends": ["@open-wc", "elixir", "prettier"],
   "plugins": ["prettier"],
   "rules": {
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "no-param-reassign": [2, { "props": false }]
   }
 }

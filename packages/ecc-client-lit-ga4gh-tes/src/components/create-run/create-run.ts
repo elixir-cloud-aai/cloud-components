@@ -1,7 +1,14 @@
 import { html, LitElement } from "lit";
+// import { property, state } from 'lit/decorators.js';
+// import { postTask } from '../../API/Task/tesGet.js';
 import "@elixir-cloud/design";
 
 export class CreateRun extends LitElement {
+  // Define properties and fields
+  baseURL = "https://protes.rahtiapp.fi/ga4gh/wes/v1";
+
+  form: any = {};
+
   fields = [
     {
       key: "name",
@@ -30,8 +37,8 @@ export class CreateRun extends LitElement {
           },
           children: [
             {
-              key: "name",
-              label: "Name",
+              key: "command",
+              label: "Command",
               type: "text",
               fieldOptions: {
                 required: true,
@@ -163,7 +170,7 @@ export class CreateRun extends LitElement {
       type: "array",
       children: [
         {
-          key: "volumes",
+          key: "volume",
           label: "Volume",
           type: "text",
         },
@@ -171,12 +178,119 @@ export class CreateRun extends LitElement {
     },
   ];
 
+  resourcesTemp = ["cpu_cores", "disk_gb", "preemptible", "ram_gb", "zones"];
+  tagsTemp = ["PROJECT_GROUP", "WORKFLOW_ID"];
+
+  // Submit form function
+  async submitForm(form: any) {
+    console.log("form", form);
+    const data: any = {};
+
+    // Process the form data
+    for (const [key, value] of Object.entries(form)) {
+      // Handle form data based on keys
+      if (key === "name" || key === "description") {
+        data[key] = value;
+      } else if (key === "executors") {
+        data.executors = this.processExecutors(value);
+      } else if (key === "inputs" || key === "outputs") {
+        data[key] = this.processInputsOutputs(value);
+      } else if (key === "volumes") {
+        data.volumes = this.processVolumes(value);
+      } else if (this.resourcesTemp.includes(key)) {
+        data.resources = this.processResources(data.resources, key, value);
+      } else if (this.tagsTemp.includes(key)) {
+        data.tags = this.processTags(data.tags, key, value);
+      }
+    }
+
+    console.log(data);
+  }
+
+  // Process executors data
+  processExecutors = (value: any): any[] => {
+    if (!Array.isArray(value)) return [];
+
+    return value
+      .filter(
+        (executorElement: any) =>
+          typeof executorElement === "object" && executorElement !== null
+      )
+      .map((executorElement: any) => {
+        const executor: any = {};
+
+        if (executorElement.command && Array.isArray(executorElement.command)) {
+          executor.command = executorElement.command.map(
+            (execObject: any) => execObject.command
+          );
+        }
+
+        if (executorElement.env && Array.isArray(executorElement.env)) {
+          executor.env = this.processEnv(executorElement.env);
+        }
+
+        if (executorElement.image) executor.image = executorElement.image;
+        if (executorElement.stderr) executor.stderr = executorElement.stderr;
+        if (executorElement.stdin) executor.stdin = executorElement.stdin;
+        if (executorElement.stdout) executor.stdout = executorElement.stdout;
+        if (executorElement.workdir) executor.workdir = executorElement.workdir;
+
+        return executor;
+      });
+  };
+
+  // Process env data
+  processEnv = (envArray: any[]): any =>
+    envArray.reduce((envObject: any, item: any) => {
+      envObject[item.name] = item.value;
+      return envObject;
+    }, {});
+
+  // Process inputs and outputs data
+  processInputsOutputs = (value: any): any[] => {
+    if (!Array.isArray(value)) return [];
+
+    return value
+      .filter(
+        (itemElement: any) =>
+          typeof itemElement === "object" && itemElement !== null
+      )
+      .map((itemElement: any) => ({
+        path:
+          typeof itemElement.path === "string" ? itemElement.path : undefined,
+        url: typeof itemElement.url === "string" ? itemElement.url : undefined,
+      }));
+  };
+
+  // Process volume data
+  processVolumes = (value: any): string[] =>
+    (value as any)
+      .filter((vol: any) => typeof vol.volume === "string")
+      .map((vol: any) => vol.volume);
+
+  // Process resources data
+  processResources = (resources: any, key: string, value: any): any => {
+    let updatedResources = { ...resources };
+    if (!updatedResources) updatedResources = {};
+    updatedResources[key] = value;
+    return updatedResources;
+  };
+
+  // Process tags data
+  processTags = (tags: any, key: string, value: any): any => {
+    let updatedTags = { ...tags };
+    if (!tags) updatedTags = {};
+    updatedTags[key] = value;
+    return updatedTags;
+  };
+
+  // Render component
   render() {
     return html`
       <ecc-utils-design-form
         .fields=${this.fields}
         @form-submit=${(e: any) => {
-          console.log("form - submitted", e.detail);
+          this.submitForm(e.detail.form.data);
         }}
       >
       </ecc-utils-design-form>
