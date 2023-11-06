@@ -1,16 +1,16 @@
-import { fileURLToPath, URL } from "node:url";
-import { defineConfig } from "vitepress";
+import { fileURLToPath, URL } from 'node:url';
+import { defineConfig } from 'vitepress';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "Elixir Cloud Components",
-  head: [["link", { rel: "icon", href: "/elixir-cloud/logo.svg" }]],
+  title: 'Elixir Cloud Components',
+  head: [['link', { rel: 'icon', href: '/elixir-cloud/logo.svg' }]],
   description:
-    "A suite of highly reusable Web Components for operationalising ELIXIR and GA4GH Cloud Services.",
+    'A suite of highly reusable Web Components for operationalising ELIXIR and GA4GH Cloud Services.',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
-    logo: "/elixir-cloud/logo.svg",
-    siteTitle: "Elixir Cloud Components",
+    logo: '/elixir-cloud/logo.svg',
+    siteTitle: 'Elixir Cloud Components',
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Docs', link: '/getting-started' },
@@ -61,6 +61,23 @@ export default defineConfig({
           },
         ],
       },
+      {
+        text: 'Design',
+        collapsed: true,
+        items: [
+          { text: 'Introduction', link: '/design/introduction' },
+          { text: 'Installation', link: '/design/installation' },
+          {
+            text: 'Components',
+            items: [
+              {
+                text: 'Form',
+                link: '/design/components/form',
+              },
+            ],
+          },
+        ],
+      },
     ],
 
     socialLinks: [
@@ -84,9 +101,7 @@ export default defineConfig({
       alias: [
         {
           find: /^.*\/VPFooter\.vue$/,
-          replacement: fileURLToPath(
-            new URL("./theme/components/Footer.vue", import.meta.url)
-          ),
+          replacement: fileURLToPath(new URL('./theme/components/Footer.vue', import.meta.url)),
         },
       ],
     },
