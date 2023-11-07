@@ -5,14 +5,12 @@ import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/switch/switch.js";
 import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
 import _ from "lodash-es";
-import { resolveClass } from "../../utils/componentHelpers.js";
 import { sholelaceLightStyles } from "../../styles/shoelace.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
 
 interface Field {
   key: string;
   label: string;
-  className?: string;
   type?:
     | "text"
     | "date"
@@ -34,7 +32,7 @@ interface Field {
     accept?: string;
   };
   arrayOptions?: {
-    defaultCount?: number;
+    defaultInstances?: number;
     max?: number;
     min?: number;
   };
@@ -131,13 +129,10 @@ export class Form extends LitElement {
     }
   }
 
-  renderSwitchTemplate(field: Field, path: string, depth = 0): TemplateResult {
+  renderSwitchTemplate(field: Field, path: string): TemplateResult {
     if (field.type !== "switch") return html``;
     return html`
-      <div
-        part="field"
-        class="switch-container ${resolveClass(field.className, depth)}"
-      >
+      <div part="field" class="switch-container">
         <label part="label" class="switch-label">${field.label}</label>
         <sl-switch
           exportparts="control: switch, thumb: switch-thumb"
@@ -154,11 +149,11 @@ export class Form extends LitElement {
     `;
   }
 
-  renderInputTemplate(field: Field, path: string, depth = 0): TemplateResult {
+  renderInputTemplate(field: Field, path: string): TemplateResult {
     if (field.type === "array" || field.type === "switch") return html``;
     if (field.type === "file") {
       return html`
-        <div part="field" class="row ${resolveClass(field.className, depth)}">
+        <div part="field" class="row">
           <label part="label">
             ${field.label} ${field.fieldOptions?.required ? "*" : ""}
           </label>
@@ -181,7 +176,7 @@ export class Form extends LitElement {
     return html`
       <sl-input
         exportparts="form-control: field, form-control-label: label, input: input, base: input-base"
-        class="input ${resolveClass(field.className, depth)}"
+        class="input"
         label=${field.label}
         type=${field.type || "text"}
         ?required=${field.fieldOptions?.required}
@@ -195,33 +190,32 @@ export class Form extends LitElement {
     `;
   }
 
-  renderArrayTemplate(field: Field, path: string, depth = 0): TemplateResult {
-    const doesExist = _.get(this.form, path, false);
+  renderArrayTemplate(field: Field, path: string): TemplateResult {
+    let doesExist = _.get(this.form, path, false);
     const { arrayOptions } = field;
 
     if (!doesExist) {
-      const defaultCount = field.arrayOptions?.defaultCount;
+      const defaultCount = field.arrayOptions?.defaultInstances;
       if (defaultCount) {
         _.set(this.form, path, Array(defaultCount).fill({}));
-      } else {
-        _.set(this.form, path, [{}]);
+        doesExist = true;
       }
     }
 
     const resolveAddButtonIsActive = () => {
       if (!arrayOptions?.max) return true;
-      if (arrayOptions.max > _.get(this.form, path).length) return true;
+      if (arrayOptions.max > (_.get(this.form, path)?.length || 0)) return true;
       return false;
     };
 
     const resolveDeleteButtonIsActive = () => {
-      if (!arrayOptions?.defaultCount || !arrayOptions?.min) return true;
+      if (!arrayOptions?.defaultInstances || !arrayOptions?.min) return true;
       if (_.get(this.form, path).length > arrayOptions.min) return true;
       return false;
     };
 
     return html`
-      <div class="array-container ${resolveClass(field.className, depth)}">
+      <div class="array-container">
         <div part="array-header" class="array-header">
           <label part="label array-label" class="array-label">
             ${field.label}
@@ -232,9 +226,11 @@ export class Form extends LitElement {
             ?disabled=${!resolveAddButtonIsActive()}
             class="add-button"
             @click=${() => {
-              resolveAddButtonIsActive() &&
-                _.get(this.form, path).push({}) &&
+              if (resolveAddButtonIsActive()) {
+                const instances: [] = _.get(this.form, path) || [];
+                _.set(this.form, path, [...instances, {}]);
                 this.requestUpdate();
+              }
             }}
           >
             <svg
@@ -255,7 +251,8 @@ export class Form extends LitElement {
             Add
           </sl-button>
         </div>
-        ${_.get(this.form, path).map(
+        ${doesExist &&
+        _.get(this.form, path).map(
           (_item: any, index: number) => html`
             <div part="array-item" class="array-item">
               <sl-button
@@ -285,7 +282,7 @@ export class Form extends LitElement {
               </sl-button>
               <div class="array-item-container">
                 ${field.children?.map((child) =>
-                  this.renderTemplate(child, `${path}[${index}]`, depth + 1)
+                  this.renderTemplate(child, `${path}[${index}]`)
                 )}
               </div>
             </div>
@@ -295,14 +292,14 @@ export class Form extends LitElement {
     `;
   }
 
-  renderTemplate(field: Field, path: string, depth = 0): TemplateResult {
+  renderTemplate(field: Field, path: string): TemplateResult {
     if (field.type === "array") {
-      return this.renderArrayTemplate(field, `${path}.${field.key}`, depth);
+      return this.renderArrayTemplate(field, `${path}.${field.key}`);
     }
     if (field.type === "switch") {
-      return this.renderSwitchTemplate(field, `${path}.${field.key}`, depth);
+      return this.renderSwitchTemplate(field, `${path}.${field.key}`);
     }
-    return this.renderInputTemplate(field, `${path}.${field.key}`, depth);
+    return this.renderInputTemplate(field, `${path}.${field.key}`);
   }
 
   render() {

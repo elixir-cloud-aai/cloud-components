@@ -28,6 +28,10 @@
         flex-direction: row;
         justify-content: space-between;
       }
+      ecc-utils-design-form::part(depth-1) {
+        background-color: #f44336;
+        color: blue;
+      }
       ecc-utils-design-form::part(array-label) {
         font-weight: bold;
       }
@@ -114,6 +118,11 @@
           key: "address",
           label: "Address",
           type: "array",
+          arrayOptions: {
+            defaultInstances: 2,
+            max: 4,
+            min: 1,
+          },
           children: [
             {
               key: "Details",
@@ -121,7 +130,7 @@
               type: "array",
               className: "details",
               arrayOptions: {
-                defaultCount: 1,
+                defaultInstances: 2,
                 max: 4,
                 min: 1,
               },
@@ -130,6 +139,7 @@
                   key: "houseNumber",
                   label: "House Number",
                   type: "text",
+                  className: "house",
                   fieldOptions: {
                     required: true,
                     value: "My House",
@@ -188,7 +198,7 @@
             console.log("form - submitted", e.detail);
           }}
         >
-        </ecc-utils-design-form>`,
+        </ecc-utils-design-form> `,
         document.querySelector("#demo")
       );
     </script>
