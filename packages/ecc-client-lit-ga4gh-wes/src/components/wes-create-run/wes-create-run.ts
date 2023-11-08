@@ -77,7 +77,7 @@ export class WESCreateRun extends LitElement {
       <ecc-utils-design-form
         .fields=${this.fields}
         @form-submit=${(e: CustomEvent) => {
-          this.submitForm(e.detail.form);
+          this.submitForm(e.detail.form.data);
         }}
       ></ecc-utils-design-form>
     `;

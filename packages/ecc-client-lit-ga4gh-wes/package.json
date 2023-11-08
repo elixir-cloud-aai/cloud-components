@@ -27,7 +27,7 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "@elixir-cloud/design": "^0.0.0",
+    "@elixir-cloud/design": "*",
     "lit": "^2.0.2"
   },
   "devDependencies": {
