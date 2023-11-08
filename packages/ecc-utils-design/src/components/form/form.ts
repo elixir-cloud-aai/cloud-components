@@ -318,7 +318,6 @@ export class Form extends LitElement {
           d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
         />
       </svg>
-
       <strong>${this.errorMessage}</strong>
     </sl-alert> `;
   }
@@ -352,12 +351,12 @@ export class Form extends LitElement {
     this.formState = "loading";
   }
 
-  public success(message?: string) {
+  public success({ message }: { message?: string }) {
     this.formState = "success";
     this.successMessage = message || "Form submitted successfully";
   }
 
-  public error(message?: string) {
+  public error({ message }: { message?: string }) {
     this.formState = "error";
     this.errorMessage = message || "Something went wrong";
   }

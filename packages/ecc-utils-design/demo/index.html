@@ -181,11 +181,11 @@
               await fetch("https://jsonplaceholder.typicode.com/posts");
               document
                 .querySelector("ecc-utils-design-form")
-                .success("Data fetched successfully");
+                .success({ message: "Data fetched successfully" });
             } catch (error) {
               document
                 .querySelector("ecc-utils-design-form")
-                .error("Error fetching data");
+                .error({ message: "Error fetching data" });
             }
           }}
         >
