@@ -67,6 +67,15 @@ This property is used to render the fields in the form. Fields can be passed as 
 | ------------- | ---------------------------------------------------------------------------------------- |
 | `form-submit` | This event is fired when the form is submitted. The event detail contains the form data. |
 
+## Methods
+
+| Method Name               | Arguments             | Description                                                   |
+| ------------------------- | --------------------- | ------------------------------------------------------------- |
+| `idle()`                  | `none`                | Reset the form state to idle. Doesn't affect the form values. |
+| `loading()`               | `none`                | Set the form state to loading. Disables the submit button.    |
+| [`success()`](#methods-1) | {`message`: `string`} | Set the form state to success. Show the success message.      |
+| [`error()`](#methods-1)   | {`message`: `string`} | Set the form state to error. Show the error message at end.   |
+
 ## Parts
 
 | Part Name       | Description                                                                       |
@@ -197,6 +206,60 @@ const fields = [
     .fields=${fields}
     @form-submit=${(e) => {
         console.log("form-submitted", e.detail);
+    }}
+/>
+```
+
+  <!-- ```jsx [React]
+
+  ``` -->
+
+:::
+
+  </div>
+</ClientOnly>
+
+### Methods
+
+<ClientOnly>
+  <div :class="isDark ? 'component-dark component' : 'component-light component'">
+  <!-- Render ecc-utils-design-form component only after the component is loaded -->
+    <ecc-utils-design-form class="methods-example" :v-if="renderComponent" :fields="methodsExampleFields"></ecc-utils-design-form>
+
+::: details Code Blocks
+::: code-group
+
+```js [HTML]
+import "@elixir-cloud/design";
+
+const fields = [
+  {
+    key: "custom-message",
+    label: "Custom Message",
+    type: "text",
+  },
+  {
+    key: "throw-error",
+    label: "Throw Error",
+    type: "switch",
+  },
+]
+
+<ecc-utils-design-form
+    class="methods-example"
+    .fields=${fields}
+    @form-submit=${(e) => {
+      document.querySelector(".methods-example").loading();
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      if (e.detail.form.data["throw-error"]) {
+        document.querySelector(".methods-example").error({
+          message: e.detail.form.data["custom-message"],
+        });
+      } else {
+        document.querySelector(".methods-example").success({
+          message: e.detail.form.data["custom-message"],
+        });
+      }
     }}
 />
 ```
@@ -390,6 +453,7 @@ const renderComponent = ref(false);
 const primaryFields = ref([]);
 const complexExampleFields = ref([]);
 const styledExampleFields = ref([]);
+const methodsExampleFields = ref([]);
 onMounted(() => {
   import("@elixir-cloud/design").then((module) => {
     renderComponent.value = false;
@@ -552,10 +616,38 @@ onMounted(() => {
           },
         },
       ];
+    methodsExampleFields.value = [
+      {
+        key: "custom-message",
+        label: "Custom Message",
+        type: "text",
+      },
+      {
+        key: "throw-error",
+        label: "Throw Error",
+        type: "switch",
+      },
+    ]
+
     renderComponent.value = true;
     document.querySelectorAll("ecc-utils-design-form").forEach((element) => {
       element.addEventListener("form-submit", (e) => {
         console.log("form-submitted", e.detail);
+      });
+    });
+    document.querySelectorAll(".methods-example").forEach((element) => {
+      element.addEventListener("form-submit", async (e) => {
+        document.querySelector(".methods-example").loading();
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        if (e.detail.form.data["throw-error"]) {
+          document.querySelector(".methods-example").error({
+            message: e.detail.form.data["custom-message"],
+          });
+        } else {
+          document.querySelector(".methods-example").success({
+            message: e.detail.form.data["custom-message"],
+          });
+        }
       });
     });
   });

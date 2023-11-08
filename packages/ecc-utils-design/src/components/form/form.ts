@@ -4,6 +4,7 @@ import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/switch/switch.js";
 import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
+import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import _ from "lodash-es";
 import { sholelaceLightStyles } from "../../styles/shoelace.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
@@ -116,11 +117,20 @@ export class Form extends LitElement {
         display: flex;
         flex-direction: column;
       }
+      .success-icon {
+        height: 1.25rem;
+      }
+      .error-icon {
+        height: 1.25rem;
+      }
     `,
   ];
 
-  @property({ type: Array }) fields: Array<Field> = [];
-  @state() form: object = {};
+  @property({ type: Array }) private fields: Array<Field> = [];
+  @state() private form: object = {};
+  @state() private formState: "idle" | "loading" | "error" | "success" = "idle";
+  @state() private errorMessage = "Form submitted successfully";
+  @state() private successMessage = "Something went wrong";
 
   connectedCallback() {
     super.connectedCallback();
@@ -129,7 +139,7 @@ export class Form extends LitElement {
     }
   }
 
-  renderSwitchTemplate(field: Field, path: string): TemplateResult {
+  private renderSwitchTemplate(field: Field, path: string): TemplateResult {
     if (field.type !== "switch") return html``;
     return html`
       <div part="field" class="switch-container">
@@ -190,7 +200,7 @@ export class Form extends LitElement {
     `;
   }
 
-  renderArrayTemplate(field: Field, path: string): TemplateResult {
+  private renderArrayTemplate(field: Field, path: string): TemplateResult {
     let doesExist = _.get(this.form, path, false);
     const { arrayOptions } = field;
 
@@ -292,7 +302,7 @@ export class Form extends LitElement {
     `;
   }
 
-  renderTemplate(field: Field, path: string): TemplateResult {
+  private renderTemplate(field: Field, path: string): TemplateResult {
     if (field.type === "array") {
       return this.renderArrayTemplate(field, `${path}.${field.key}`);
     }
@@ -302,9 +312,77 @@ export class Form extends LitElement {
     return this.renderInputTemplate(field, `${path}.${field.key}`);
   }
 
+  private renderErrorTemplate(): TemplateResult {
+    if (this.formState !== "error") return html``;
+    return html`<sl-alert variant="danger" open>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        slot="icon"
+        class="error-icon"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+        />
+      </svg>
+      <strong>${this.errorMessage}</strong>
+    </sl-alert> `;
+  }
+
+  private renderSuccessTemplate(): TemplateResult {
+    if (this.formState !== "success") return html``;
+    return html`
+      <sl-alert variant="success" open>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          slot="icon"
+          class="success-icon"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+
+        <strong>${this.successMessage}</strong>
+      </sl-alert>
+    `;
+  }
+
+  public loading() {
+    this.formState = "loading";
+  }
+
+  public success({ message }: { message?: string }) {
+    this.formState = "success";
+    this.successMessage = message || "Form submitted successfully";
+  }
+
+  public error({ message }: { message?: string }) {
+    this.formState = "error";
+    this.errorMessage = message || "Something went wrong";
+  }
+
+  public idle() {
+    this.formState = "idle";
+  }
+
   render() {
     if (!this.fields || this.fields.length === 0) {
       throw new Error("Fields is required & should not be empty array");
+    }
+    if (this.formState === "success") {
+      return html` ${this.renderSuccessTemplate()} `;
     }
     return html`
       <form
@@ -327,9 +405,12 @@ export class Form extends LitElement {
         }}
       >
         ${this.fields.map((field) => this.renderTemplate(field, "data"))}
+        ${this.renderErrorTemplate()}
         <sl-button
           type="submit"
           exportparts="base: button, base: submit-button"
+          ?loading=${this.formState === "loading"}
+          ?disabled=${this.formState === "loading"}
         >
           Submit
         </sl-button>
