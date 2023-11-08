@@ -7,7 +7,6 @@ import "@elixir-cloud/design";
 export class CreateRun extends LitElement {
   // Define properties and fields
   baseURL = "https://protes.rahtiapp.fi/ga4gh/wes/v1";
-
   form: any = {};
 
   fields = [
@@ -254,7 +253,9 @@ export class CreateRun extends LitElement {
     return value
       .filter(
         (itemElement: any) =>
-          typeof itemElement === "object" && itemElement !== null
+          typeof itemElement === "object" &&
+          Object.entries(itemElement).length !== 0 &&
+          itemElement !== null
       )
       .map((itemElement: any) => ({
         path:
@@ -300,7 +301,7 @@ export class CreateRun extends LitElement {
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
+  interface HTMLElementCreateRunMap {
     "ecc-client-lit-ga4gh-tes-create-run": CreateRun;
   }
 }
