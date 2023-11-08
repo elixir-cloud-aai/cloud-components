@@ -234,6 +234,8 @@ const fields = [
     class="methods-example"
     .fields=${fields}
     @form-submit=${(e) => {
+      document.querySelector(".methods-example").loading();
+      await new Promise((resolve) => setTimeout(resolve, 3000));
       if (e.detail.form.data["throw-error"]) {
         document.querySelector(".methods-example").error({
           message: e.detail.form.data["custom-message"],
@@ -605,7 +607,9 @@ onMounted(() => {
       });
     });
     document.querySelectorAll(".methods-example").forEach((element) => {
-      element.addEventListener("form-submit", (e) => {
+      element.addEventListener("form-submit", async (e) => {
+        document.querySelector(".methods-example").loading();
+        await new Promise((resolve) => setTimeout(resolve, 3000));
         if (e.detail.form.data["throw-error"]) {
           document.querySelector(".methods-example").error({
             message: e.detail.form.data["custom-message"],
