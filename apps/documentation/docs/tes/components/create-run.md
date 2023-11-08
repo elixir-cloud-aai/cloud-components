@@ -11,7 +11,7 @@ This component is used to create task runs using TES API.
 ::: code-group
 
 ```js [HTML]
-import "@elixir-cloud/design";
+import "@elixir-cloud/lit-tes";
 
 
 <ecc-client-lit-ga4gh-tes-create-run />
