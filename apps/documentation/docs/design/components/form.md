@@ -64,12 +64,12 @@ This property is used to render the fields in the form. Fields can be passed as 
 
 ## Methods
 
-| Method Name     | Arguments             | Description                                                   |
-| --------------- | --------------------- | ------------------------------------------------------------- |
-| `idle()`        | `none`                | Reset the form state to idle. Doesn't affect the form values. |
-| `loading()`     | `none`                | Set the form state to loading. Disables the submit button.    |
-| [`success()`]() | {`message`: `string`} | Set the form state to success. Show the success message.      |
-| [`error()`]()   | {`message`: `string`} | Set the form state to error. Show the error message at end.   |
+| Method Name               | Arguments             | Description                                                   |
+| ------------------------- | --------------------- | ------------------------------------------------------------- |
+| `idle()`                  | `none`                | Reset the form state to idle. Doesn't affect the form values. |
+| `loading()`               | `none`                | Set the form state to loading. Disables the submit button.    |
+| [`success()`](#methods-1) | {`message`: `string`} | Set the form state to success. Show the success message.      |
+| [`error()`](#methods-1)   | {`message`: `string`} | Set the form state to error. Show the error message at end.   |
 
 ## Parts
 
