@@ -3,7 +3,7 @@ import { customElement } from "lit/decorators.js";
 // import { postTask } from '../../API/Task/tesGet.js';
 import "@elixir-cloud/design";
 
-@customElement("ecc-client-ga4gh-tes-create-run")
+@customElement("ecc-client-lit-ga4gh-tes-create-run")
 export class CreateRun extends LitElement {
   // Define properties and fields
   baseURL = "https://protes.rahtiapp.fi/ga4gh/wes/v1";
@@ -301,6 +301,6 @@ export class CreateRun extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "ecc-client-ga4gh-tes-create-run": CreateRun;
+    "ecc-client-lit-ga4gh-tes-create-run": CreateRun;
   }
 }
