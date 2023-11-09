@@ -1,5 +1,5 @@
 import { html, css, LitElement, TemplateResult } from "lit";
-import { property, state } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/switch/switch.js";
@@ -36,6 +36,7 @@ interface Field {
   children?: Array<Field>;
 }
 
+@customElement("ecc-utils-design-form")
 export class Form extends LitElement {
   static styles = [
     sholelaceLightStyles,
@@ -128,7 +129,6 @@ export class Form extends LitElement {
   @state() private successMessage = "Something went wrong";
 
   connectedCallback() {
-    super.connectedCallback();
     if (!this.fields) {
       throw new Error("Fields is required");
     }
@@ -404,5 +404,10 @@ export class Form extends LitElement {
         </sl-button>
       </form>
     `;
+  }
+}
+declare global {
+  interface HTMLElementTagNameMap {
+    "ecc-utils-design-form": Form;
   }
 }

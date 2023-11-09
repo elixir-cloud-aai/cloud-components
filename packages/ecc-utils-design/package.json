@@ -14,7 +14,7 @@
   "repository": "",
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "tsup src/index.ts --treeshake --format cjs,esm --dts",
     "dev": "npm run build && concurrently -k -r \"npm run build -- --watch\" \"wds\"",
     "test": "wtr --coverage",
     "test:watch": "wtr --watch",

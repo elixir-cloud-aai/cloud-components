@@ -1,1 +1,1 @@
-import "./form/index.js";
+import "./form/form.js";
