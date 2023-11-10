@@ -1,1 +1,1 @@
-import "./wes-create-run/index.js";
+import './wes-create-run/wes-create-run.js';
