@@ -64,13 +64,41 @@ export class WESCreateRun extends LitElement {
     },
   ];
 
-  private async submitForm(form: any) {
+  async submitForm(form: any) {
     Object.keys(form).forEach((key) => {
       this.form.append(key, form[key]);
     });
 
-    const response = await postWorkflow(this.baseURL, this.form);
-    console.log(response);
+    const eccUtilsDesignForm = this.shadowRoot?.querySelector(
+      "ecc-utils-design-form"
+    ) as any;
+
+    if (eccUtilsDesignForm) {
+      eccUtilsDesignForm.loading();
+
+      try {
+        const response = await postWorkflow(this.baseURL, this.form);
+
+        if (response.run_id) {
+          eccUtilsDesignForm.success({
+            message: response.run_id,
+          });
+        } else {
+          eccUtilsDesignForm.error({
+            message: response.message,
+          });
+        }
+      } catch (error) {
+        eccUtilsDesignForm.error({
+          message: "Internal Server Error",
+        });
+      }
+    } else {
+      console.error({
+        message: "ecc-utils-design-form not found",
+        breakPoint: "WESCreateRun.submitForm",
+      });
+    }
   }
 
   render() {
