@@ -90,30 +90,30 @@
     <!-- <button id="button">HTML Button</button> -->
 
     <script type="module">
-      import { html, render } from 'lit';
-      import '../dist/index.js';
+      import { html, render } from "lit";
+      import "../dist/index.js";
 
       const fields = [
         {
-          key: 'name',
-          label: 'Name',
-          type: 'text',
+          key: "name",
+          label: "Name",
+          type: "text",
           fieldOptions: {
             required: true,
           },
         },
         {
-          key: 'email',
-          label: 'Email',
-          type: 'email',
+          key: "email",
+          label: "Email",
+          type: "email",
           fieldOptions: {
             // required: false,
           },
         },
         {
-          key: 'address',
-          label: 'Address',
-          type: 'array',
+          key: "address",
+          label: "Address",
+          type: "array",
           arrayOptions: {
             defaultInstances: 1,
             max: 4,
@@ -121,9 +121,9 @@
           },
           children: [
             {
-              key: 'Details',
-              label: 'Details',
-              type: 'array',
+              key: "Details",
+              label: "Details",
+              type: "array",
               arrayOptions: {
                 defaultInstances: 1,
                 max: 4,
@@ -131,26 +131,26 @@
               },
               children: [
                 {
-                  key: 'houseNumber',
-                  label: 'House Number',
-                  type: 'text',
+                  key: "houseNumber",
+                  label: "House Number",
+                  type: "text",
                   fieldOptions: {
                     required: true,
                   },
                 },
                 {
-                  key: 'street',
-                  label: 'Street',
-                  type: 'text',
+                  key: "street",
+                  label: "Street",
+                  type: "text",
                   fieldOptions: {
-                    default: '1601 Harrier Ln',
+                    default: "1601 Harrier Ln",
                     // required: false,
                   },
                 },
                 {
-                  key: 'city',
-                  label: 'City',
-                  type: 'text',
+                  key: "city",
+                  label: "City",
+                  type: "text",
                   fieldOptions: {
                     required: true,
                   },
@@ -158,9 +158,9 @@
               ],
             },
             {
-              key: 'isPrimary',
-              label: 'Primary',
-              type: 'switch',
+              key: "isPrimary",
+              label: "Primary",
+              type: "switch",
               fieldOptions: {
                 value: true,
               },
@@ -168,14 +168,14 @@
           ],
         },
         {
-          key: '18+',
-          label: '18+',
-          type: 'switch',
+          key: "18+",
+          label: "18+",
+          type: "switch",
         },
         {
-          key: 'id',
-          label: 'ID',
-          type: 'file',
+          key: "id",
+          label: "ID",
+          type: "file",
           fieldOptions: {
             required: true,
           },
@@ -187,21 +187,21 @@
           .fields=${fields}
           @form-submit=${async (e) => {
             try {
-              console.log('form - submitted', e.detail);
-              document.querySelector('ecc-utils-design-form').loading();
-              await fetch('https://jsonplaceholder.typicode.com/posts');
+              console.log("form - submitted", e.detail);
+              document.querySelector("ecc-utils-design-form").loading();
+              await fetch("https://jsonplaceholder.typicode.com/posts");
               document
-                .querySelector('ecc-utils-design-form')
-                .success({ message: 'Data fetched successfully' });
+                .querySelector("ecc-utils-design-form")
+                .success({ message: "Data fetched successfully" });
             } catch (error) {
               document
-                .querySelector('ecc-utils-design-form')
-                .error({ message: 'Error fetching data' });
+                .querySelector("ecc-utils-design-form")
+                .error({ message: "Error fetching data" });
             }
           }}
         >
         </ecc-utils-design-form> `,
-        document.querySelector('#demo')
+        document.querySelector("#demo")
       );
     </script>
   </body>
