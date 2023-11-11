@@ -455,7 +455,7 @@ const complexExampleFields = ref([]);
 const styledExampleFields = ref([]);
 const methodsExampleFields = ref([]);
 onMounted(() => {
-  import("@elixir-cloud/design").then((module) => {
+  import("@elixir-cloud/design/dist/form/index.js").then((module) => {
     renderComponent.value = false;
     primaryFields.value =  [
         {
