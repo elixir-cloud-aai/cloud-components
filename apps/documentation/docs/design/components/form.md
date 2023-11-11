@@ -10,7 +10,7 @@ This component is used to render a form with the given fields.
 ::: code-group
 
 ```js [HTML]
-import "@elixir-cloud/design";
+import "@elixir-cloud/design/dist/form/index.js";
 
 const fields = [...];
 
@@ -34,7 +34,7 @@ const fields = [...];
 ## Importing
 
 ```js [HTML]
-import "@elixir-cloud/design";
+import "@elixir-cloud/design/dist/form/index.js";
 ```
 
 ## Properties
@@ -104,7 +104,7 @@ This property is used to render the fields in the form. Fields can be passed as 
 ::: code-group
 
 ```js [HTML]
-import "@elixir-cloud/design";
+import "@elixir-cloud/design/dist/form/index.js";
 
 
 const fields = [
@@ -215,7 +215,7 @@ const fields = [
 ::: code-group
 
 ```js [HTML]
-import "@elixir-cloud/design";
+import "@elixir-cloud/design/dist/form/index.js";
 
 const fields = [
   {
@@ -269,7 +269,7 @@ const fields = [
 ::: code-group
 
 ```js [HTML]
-import "@elixir-cloud/design";
+import "@elixir-cloud/design/dist/form/index.js";
 
 
 const fields = [
