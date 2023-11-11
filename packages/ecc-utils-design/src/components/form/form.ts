@@ -141,6 +141,8 @@ export class Form extends LitElement {
 
   private renderSwitchTemplate(field: Field, path: string): TemplateResult {
     if (field.type !== "switch") return html``;
+    _.set<string>(this.form, path, field.fieldOptions?.default || false);
+
     return html`
       <div part="field" class="switch-container">
         <label part="label" class="switch-label">${field.label}</label>
@@ -149,7 +151,7 @@ export class Form extends LitElement {
           class="switch"
           label=${field.label}
           ?required=${field.fieldOptions?.required}
-          ?checked=${field.fieldOptions?.default || false}
+          ?checked=${_.get(this.form, path)}
           @sl-change=${(e: Event) => {
             _.set(this.form, path, (e.target as HTMLInputElement).checked);
             this.requestUpdate();
