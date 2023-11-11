@@ -1,1 +1,1 @@
-import "./form/index.js";
+export { default as Form } from "./form/index.js";

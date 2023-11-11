@@ -36,7 +36,7 @@ interface Field {
   children?: Array<Field>;
 }
 
-export class Form extends LitElement {
+export default class Form extends LitElement {
   static styles = [
     sholelaceLightStyles,
     hostStyles,
