@@ -1,12 +1,12 @@
 {
   "name": "@elixir-cloud/lit-wes",
-  "description": "Webcomponent ecc-client-lit-ga4gh-wes following open-wc recommendations",
+  "description": "Web Component for interactive with WES API",
   "license": "MIT",
-  "author": "ecc-client-lit-ga4gh-wes",
   "version": "0.0.0",
   "type": "module",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js"
   },
@@ -20,8 +20,6 @@
     "dev": "npm run build && concurrently -k -r \"npm run build -- --watch\" \"wds\"",
     "test": "wtr --coverage",
     "test:watch": "wtr --watch",
-    "storybook": "npm run build && npm run analyze -- --exclude dist && concurrently -k -r \"npm run build -- --watch\" \"wds -c .storybook/server.mjs\"",
-    "storybook:build": "npm run build && npm run analyze -- --exclude dist && build-storybook",
     "lint": "npx eslint .",
     "lint:fix": "npm run lint -- --fix",
     "prepublish": "npm run build"

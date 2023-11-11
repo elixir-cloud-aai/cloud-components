@@ -79,14 +79,21 @@ import "@elixir-cloud/lit-wes";
   </div>
 </ClientOnly>
 
+> The baseURL provided is localhost:8090, for this to work, have a WES implementation running on PORT 8090 or locally deploy [proWES](https://github.com/elixir-cloud-aai/proWES).
+
 <script setup>
-import { onMounted, ref } from "vue";
+  import { onMounted } from "vue";
 import { useData } from "vitepress";
-import '@elixir-cloud/lit-wes'
 const { isDark } = useData();
+onMounted(() => {
+  import("@elixir-cloud/lit-wes").then((module) => {
+    renderComponent.value = false;
+    renderComponent.value = true;
     document.querySelectorAll("ecc-client-lit-ga4gh-wes-create-run").forEach((element) => {
       element.addEventListener("form-submit", (e) => {
         console.log("form-submitted", e.detail);
       });
     });
+  });
+});
 </script>
