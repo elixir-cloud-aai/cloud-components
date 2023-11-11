@@ -141,7 +141,10 @@ export class Form extends LitElement {
 
   private renderSwitchTemplate(field: Field, path: string): TemplateResult {
     if (field.type !== "switch") return html``;
-    _.set<string>(this.form, path, field.fieldOptions?.default || false);
+
+    if (!_.get(this.form, path)) {
+      _.set(this.form, path, field.fieldOptions?.default || false);
+    }
 
     return html`
       <div part="field" class="switch-container">
