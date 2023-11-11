@@ -13,8 +13,7 @@ This component is used to create task runs using TES API.
 ```js [HTML]
 import "@elixir-cloud/lit-tes";
 
-
-<ecc-client-lit-ga4gh-tes-create-run />
+<ecc-client-lit-ga4gh-tes-create-run />;
 ```
 
   <!-- ```jsx [React]
@@ -32,7 +31,6 @@ import "@elixir-cloud/lit-tes";
 import "@elixir-cloud/lit-tes";
 ```
 
-
 <script setup>
 import { onMounted } from "vue";
 onMounted(() => {
@@ -45,4 +43,3 @@ onMounted(() => {
   });
 });
 </script>
-
