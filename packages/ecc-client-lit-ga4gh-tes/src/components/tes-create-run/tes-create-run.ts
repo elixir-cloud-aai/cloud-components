@@ -1,13 +1,15 @@
 import { html, LitElement } from "lit";
-import { customElement } from "lit/decorators.js";
-// import { postTask } from '../../API/Task/tesGet.js';
+import { customElement, property, state } from "lit/decorators.js";
+import { postTask } from "../../API/Task/tesGet.js";
 import "@elixir-cloud/design";
 
 @customElement("ecc-client-lit-ga4gh-tes-create-run")
-export class CreateRun extends LitElement {
-  // Define properties and fields
-  baseURL = "https://protes.rahtiapp.fi/ga4gh/wes/v1";
-  form: any = {};
+export class TESCreateRun extends LitElement {
+  @property({ type: String }) baseURL =
+    "https://protes.rahtiapp.fi/ga4gh/tes/v1";
+
+  @state() form: any = {};
+  @state() response: any = {};
 
   fields = [
     {
@@ -183,7 +185,6 @@ export class CreateRun extends LitElement {
 
   // Submit form function
   async submitForm(form: any) {
-    console.log("form", form);
     const data: any = {};
 
     // Process the form data
@@ -204,7 +205,9 @@ export class CreateRun extends LitElement {
       }
     }
 
-    console.log(data);
+    this.form = data;
+    this.response = await postTask(this.baseURL, data);
+    console.log(this.response);
   }
 
   // Process executors data
@@ -240,11 +243,15 @@ export class CreateRun extends LitElement {
   };
 
   // Process env data
-  processEnv = (envArray: any[]): any =>
-    envArray.reduce((envObject: any, item: any) => {
-      envObject[item.name] = item.value;
-      return envObject;
-    }, {});
+  processEnv = (envArray: any[]): any => {
+    envArray.reduce(
+      (envObject: any, item: any) => ({
+        ...envObject,
+        [item.name]: item.value,
+      }),
+      {}
+    );
+  };
 
   // Process inputs and outputs data
   processInputsOutputs = (value: any): any[] => {
@@ -301,7 +308,7 @@ export class CreateRun extends LitElement {
 }
 
 declare global {
-  interface HTMLElementCreateRunMap {
-    "ecc-client-lit-ga4gh-tes-create-run": CreateRun;
+  interface HTMLElementTagNameMap {
+    "ecc-client-lit-ga4gh-tes-create-run": TESCreateRun;
   }
 }
