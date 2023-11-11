@@ -28,9 +28,14 @@ interface Field {
     | "file";
   fieldOptions?: {
     required?: boolean;
+    default?: string | boolean;
+    multiple?: boolean;
+    accept?: string;
   };
-  switchOptions?: {
-    default?: boolean;
+  arrayOptions?: {
+    defaultInstances?: number;
+    max?: number;
+    min?: number;
   };
   error?: string;
   children?: Array<Field>;
@@ -136,6 +141,11 @@ export default class Form extends LitElement {
 
   private renderSwitchTemplate(field: Field, path: string): TemplateResult {
     if (field.type !== "switch") return html``;
+
+    if (!_.get(this.form, path)) {
+      _.set(this.form, path, field.fieldOptions?.default || false);
+    }
+
     return html`
       <div part="field" class="switch-container">
         <label part="label" class="switch-label">${field.label}</label>
@@ -144,11 +154,9 @@ export default class Form extends LitElement {
           class="switch"
           label=${field.label}
           ?required=${field.fieldOptions?.required}
-          ?checked=${_.get(this.form, path, false)}
-          @sl-change=${(e: any) => {
-            const newForm = { ...this.form };
-            _.set(newForm, path, e.target.checked);
-            this.form = newForm;
+          ?checked=${_.get(this.form, path)}
+          @sl-change=${(e: Event) => {
+            _.set(this.form, path, (e.target as HTMLInputElement).checked);
             this.requestUpdate();
           }}
         ></sl-switch>
@@ -156,15 +164,7 @@ export default class Form extends LitElement {
     `;
   }
 
-  private toBase64 = (file: Blob) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-    });
-
-  private renderInputTemplate(field: Field, path: string): TemplateResult {
+  renderInputTemplate(field: Field, path: string): TemplateResult {
     if (field.type === "array" || field.type === "switch") return html``;
     if (field.type === "file") {
       return html`
@@ -176,32 +176,33 @@ export default class Form extends LitElement {
             class="input"
             part="input-base input"
             type="file"
+            accept=${field.fieldOptions?.accept}
+            ?multiple=${field.fieldOptions?.multiple}
             ?required=${field.fieldOptions?.required}
-            @change=${async (e: any) => {
-              const { files } = e.target;
-              const base64 = await this.toBase64(files[0]);
-              const newForm = { ...this.form };
-              _.set(newForm, path, base64);
-              this.form = newForm;
+            @change=${async (e: Event) => {
+              const { files } = e.target as HTMLInputElement;
+              _.set(this.form, path, files);
               this.requestUpdate();
             }}
           />
         </div>
       `;
     }
+
+    if (!_.get(this.form, path)) {
+      _.set(this.form, path, field.fieldOptions?.default || "");
+    }
     return html`
       <sl-input
         exportparts="form-control: field, form-control-label: label, input: input, base: input-base"
         class="input"
         label=${field.label}
-        type=${field.type ? field.type : "text"}
+        type=${field.type || "text"}
         ?required=${field.fieldOptions?.required}
-        value=${_.get(this.form, path, "")}
+        value=${_.get(this.form, path)}
         ?password-toggle=${field.type === "password"}
-        @sl-change=${(e: any) => {
-          const newForm = { ...this.form };
-          _.set(newForm, path, e.target.value);
-          this.form = newForm;
+        @sl-change=${(e: Event) => {
+          _.set(this.form, path, (e.target as HTMLInputElement).value);
           this.requestUpdate();
         }}
       ></sl-input>
@@ -209,12 +210,33 @@ export default class Form extends LitElement {
   }
 
   private renderArrayTemplate(field: Field, path: string): TemplateResult {
-    const doesExit = _.get(this.form, path, false);
-    if (!doesExit) {
-      const newForm = { ...this.form };
-      _.set(newForm, path, [{}]);
-      this.form = newForm;
+    let doesExist = _.get(this.form, path, false);
+    const { arrayOptions } = field;
+
+    if (!doesExist) {
+      const defaultCount = field.arrayOptions?.defaultInstances;
+      if (defaultCount) {
+        _.set(
+          this.form,
+          path,
+          Array.from({ length: defaultCount }, () => ({}))
+        );
+        doesExist = true;
+      }
     }
+
+    const resolveAddButtonIsActive = () => {
+      if (!arrayOptions?.max) return true;
+      if (arrayOptions.max > (_.get(this.form, path)?.length || 0)) return true;
+      return false;
+    };
+
+    const resolveDeleteButtonIsActive = () => {
+      if (!arrayOptions?.defaultInstances || !arrayOptions?.min) return true;
+      if (_.get(this.form, path).length > arrayOptions.min) return true;
+      return false;
+    };
+
     return html`
       <div class="array-container">
         <div part="array-header" class="array-header">
@@ -224,12 +246,14 @@ export default class Form extends LitElement {
           <sl-button
             variant="text"
             exportparts="base: button, base: add-button"
+            ?disabled=${!resolveAddButtonIsActive()}
             class="add-button"
             @click=${() => {
-              const newForm = { ...this.form };
-              _.get(newForm, path).push({});
-              this.form = newForm;
-              this.requestUpdate();
+              if (resolveAddButtonIsActive()) {
+                const instances: [] = _.get(this.form, path) || [];
+                _.set(this.form, path, [...instances, {}]);
+                this.requestUpdate();
+              }
             }}
           >
             <svg
@@ -250,17 +274,18 @@ export default class Form extends LitElement {
             Add
           </sl-button>
         </div>
-        ${_.get(this.form, path).map(
+        ${doesExist &&
+        _.get(this.form, path).map(
           (_item: any, index: number) => html`
             <div part="array-item" class="array-item">
               <sl-button
                 variant="text"
                 exportparts="base: button, base: remove-button"
+                ?disabled=${!resolveDeleteButtonIsActive()}
                 @click=${() => {
-                  const newForm = { ...this.form };
-                  _.get(newForm, path).splice(index, 1);
-                  this.form = newForm;
-                  this.requestUpdate();
+                  resolveDeleteButtonIsActive() &&
+                    _.get(this.form, path).splice(index, 1) &&
+                    this.requestUpdate();
                 }}
               >
                 <svg
@@ -375,7 +400,7 @@ export default class Form extends LitElement {
     return html`
       <form
         part="form"
-        @submit=${(e: any) => {
+        @submit=${(e: Event) => {
           e.preventDefault();
           const form = this.shadowRoot?.querySelector("form");
           const isValid = form?.reportValidity();
