@@ -5,7 +5,8 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.js",
+    "./dist/*": "./dist/*"
   },
   "type": "module",
   "version": "0.0.1",
@@ -20,8 +21,8 @@
   },
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "tsup  --format cjs,esm --dts",
-    "dev": "npm run build && concurrently -k -r \"npm run build -- --watch\" \"wds\"",
+    "build": "node ./scripts/build.js",
+    "dev": "concurrently -r \"npm run build --watch\" \"wds\"",
     "test": "wtr --coverage",
     "test:watch": "wtr --watch",
     "storybook": "npm run build && npm run analyze -- --exclude dist && concurrently -k -r \"npm run build -- --watch\" \"wds -c .storybook/server.mjs\"",
@@ -39,10 +40,13 @@
     "@web/dev-server-esbuild": "^0.4.3",
     "@web/dev-server-storybook": "^1.0.2",
     "@web/test-runner": "^0.17.0",
+    "commander": "^11.1.0",
     "concurrently": "^8.2.1",
+    "esbuild": "0.18.20",
     "eslint": "^8.41.0",
     "eslint-config-elixir": "*",
     "eslint-plugin-prettier": "^4.2.1",
+    "globby": "^14.0.0",
     "tslib": "^2.6.2",
     "tsup": "^7.2.0",
     "typescript": "^5.0.4"
