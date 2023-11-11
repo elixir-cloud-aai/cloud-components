@@ -186,7 +186,7 @@ const fields = [
     key: "18+",
     label: "18+",
     type: "switch",
-    switchOptions: {
+    fieldOptions: {
       default: true,
     },
   },
@@ -335,7 +335,7 @@ const fields = [
     key: "18+",
     label: "18+",
     type: "switch",
-    switchOptions: {
+    fieldOptions: {
       default: true,
     },
   },
@@ -542,7 +542,7 @@ onMounted(() => {
           key: "18+",
           label: "18+",
           type: "switch",
-          switchOptions: {
+          fieldOptions: {
             default: true,
           },
         },
@@ -603,7 +603,7 @@ onMounted(() => {
           key: "18+",
           label: "18+",
           type: "switch",
-          switchOptions: {
+          fieldOptions: {
             default: true,
           },
         },
