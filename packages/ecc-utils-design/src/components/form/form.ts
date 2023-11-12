@@ -176,7 +176,7 @@ export default class Form extends LitElement {
             class="input"
             part="input-base input"
             type="file"
-            accept=${field.fieldOptions?.accept}
+            accept=${field.fieldOptions?.accept || false}
             ?multiple=${field.fieldOptions?.multiple}
             ?required=${field.fieldOptions?.required}
             @change=${async (e: Event) => {

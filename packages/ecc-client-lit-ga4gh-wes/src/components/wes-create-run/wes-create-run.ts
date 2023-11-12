@@ -61,6 +61,9 @@ export class WESCreateRun extends LitElement {
       key: "workflow_attachment",
       label: "Workflow Attachment",
       type: "file",
+      fieldOptions: {
+        multiple: true,
+      },
     },
   ];
 
