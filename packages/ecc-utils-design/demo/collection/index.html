@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        background: #f5f5f5;
+      }
+    </style>
+    <title>ecc-utils-design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div class="p-10">
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import { html, render } from "lit";
+      import "../dist/index.js";
+
+      const items = [
+        {
+          index: 1,
+          name: "Item 1",
+          key: "item-1",
+          lazy: true,
+          tag: {
+            name: "SUCCESS",
+            type: "success",
+          },
+        },
+        {
+          index: 2,
+          name: "Item 2",
+          key: "item-2",
+          lazy: true,
+          tag: {
+            name: "WARNING",
+            type: "warning",
+          },
+        },
+        {
+          index: 3,
+          name: "Item 3",
+          key: "item-3",
+          lazy: true,
+          tag: {
+            name: "ERROR",
+            type: "danger",
+          },
+        },
+        {
+          index: 4,
+          name: "Item 4",
+          key: "item-4",
+          lazy: true,
+        },
+        {
+          index: 5,
+          name: "Item 5",
+          key: "item-5",
+          tag: {
+            name: "DEFAULT",
+          },
+        },
+      ];
+
+      const filters = [
+        {
+          key: "title",
+          type: "search",
+          placeholder: "Search",
+        },
+        {
+          key: "tag",
+          type: "select",
+          options: ["SUCCESS", "WARNING", "ERROR", "DEFAULT", "PRIMARY"],
+          placeholder: "Filter by tag",
+          selectOptions: {
+            multiple: true,
+          },
+        },
+      ];
+
+      render(
+        html`<ecc-utils-design-collection
+          .items=${items}
+          .filters=${filters}
+          @expand-item=${async (e) => {
+            // Check if child already exists
+            const children = e.target.querySelectorAll(`[slot="${e.detail.key}"]`);
+            if (children.length === 0) {
+              // Add chlld to ecc-utils-design-collection
+              const res = await fetch(
+                `https://jsonplaceholder.typicode.com/todos/${
+                  e.detail.key.split("-")[1]
+                }`
+              );
+              const data = await res.json();
+              const child = document.createElement("div");
+              child.setAttribute("slot", e.detail.key);
+              child.innerHTML = `<p>Title: ${data.title}</p>`;
+              e.target.appendChild(child);
+            }
+          }}
+          @filter=${(e) => {
+            if (e.detail.key === "title") {
+              const newItems = items.filter((item) =>
+                item.name.toLowerCase().includes(e.detail.value.toLowerCase())
+              );
+              e.target.items = newItems;
+            } else if (e.detail.key === "tag") {
+              if (e.detail.value.length > 0) {
+                const newItems = items.filter((item) =>
+                  e.detail.value.includes(item.tag?.name)
+                );
+                e.target.items = newItems;
+              } else {
+                e.target.items = items;
+              }
+            }
+          }}
+          @page-change=${async (e) => {
+            const res = await fetch(
+              `https://jsonplaceholder.typicode.com/todos?_page=${e.detail.page}&_limit=5`
+            );
+            const data = await res.json();
+            e.target.items = [
+              ...e.target.items,
+              ...data.map((d) => ({
+                index: d.id,
+                name: d.title,
+                key: `item-${d.id}`,
+                lazy: true,
+                tag: {
+                  name: d.completed ? "SUCCESS" : "ERROR",
+                  type: d.completed ? "success" : "danger",
+                },
+              })),
+            ];
+          }}
+        >
+          <div slot="item-5">Child item-5 without lazy loading</div>
+        </ecc-utils-design-collection>`,
+        document.querySelector("#demo")
+      );
+    </script>
+  </body>
+</html>
