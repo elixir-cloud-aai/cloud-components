@@ -230,8 +230,36 @@ export class TESCreateRun extends LitElement {
     }
 
     this.form = data;
-    this.response = await postTask(this.baseURL, data);
-    console.log(this.response);
+
+    const eccUtilsDesignForm = this.shadowRoot?.querySelector(
+      "ecc-utils-design-form"
+    ) as any;
+
+    if (eccUtilsDesignForm) {
+      eccUtilsDesignForm.loading();
+      this.response = await postTask(this.baseURL, data);
+
+      try {
+        if (this.response.run_id) {
+          eccUtilsDesignForm.success({
+            message: this.response.run_id,
+          });
+        } else {
+          eccUtilsDesignForm.error({
+            message: this.response.message,
+          });
+        }
+      } catch (error) {
+        eccUtilsDesignForm.error({
+          message: "Internal Server Error",
+        });
+      }
+    } else {
+      console.error({
+        message: "ecc-utils-design-form not found",
+        breakPoint: "TESCreateRun.submitForm",
+      });
+    }
   }
 
   // Process executors data
