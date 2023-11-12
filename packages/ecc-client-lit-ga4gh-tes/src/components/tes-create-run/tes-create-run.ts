@@ -5,11 +5,11 @@ import "@elixir-cloud/design";
 
 @customElement("ecc-client-lit-ga4gh-tes-create-run")
 export class TESCreateRun extends LitElement {
-  @property({ type: String }) baseURL =
+  @property({ type: String }) accessor baseURL =
     "https://protes.rahtiapp.fi/ga4gh/tes/v1";
 
-  @state() form: any = {};
-  @state() response: any = {};
+  @state() accessor form: any = {};
+  @state() accessor response: any = {};
 
   fields = [
     {
@@ -29,6 +29,9 @@ export class TESCreateRun extends LitElement {
       fieldOptions: {
         required: true,
       },
+      arrayOptions: {
+        defaultInstances: 1,
+      },
       children: [
         {
           key: "command",
@@ -36,6 +39,9 @@ export class TESCreateRun extends LitElement {
           type: "array",
           fieldOptions: {
             required: true,
+          },
+          arrayOptions: {
+            defaultInstances: 1,
           },
           children: [
             {
@@ -52,6 +58,9 @@ export class TESCreateRun extends LitElement {
           key: "env",
           label: "Env",
           type: "array",
+          arrayOptions: {
+            defaultInstances: 0,
+          },
           children: [
             {
               key: "name",
@@ -69,6 +78,9 @@ export class TESCreateRun extends LitElement {
           key: "image",
           label: "Image",
           type: "text",
+          fieldOptions: {
+            required: true,
+          },
         },
         {
           key: "stderr",
@@ -89,6 +101,9 @@ export class TESCreateRun extends LitElement {
           key: "workdir",
           label: "Workdir",
           type: "text",
+          fieldOptions: {
+            required: true,
+          },
         },
       ],
     },
@@ -96,6 +111,9 @@ export class TESCreateRun extends LitElement {
       key: "inputs",
       label: "Inputs",
       type: "array",
+      arrayOptions: {
+        defaultInstances: 1,
+      },
       children: [
         {
           key: "path",
@@ -113,6 +131,9 @@ export class TESCreateRun extends LitElement {
       key: "outputs",
       label: "Outputs",
       type: "array",
+      arrayOptions: {
+        defaultInstances: 1,
+      },
       children: [
         {
           key: "path",
@@ -170,6 +191,9 @@ export class TESCreateRun extends LitElement {
       key: "volumes",
       label: "Volumes",
       type: "array",
+      arrayOptions: {
+        defaultInstances: 1,
+      },
       children: [
         {
           key: "volume",
