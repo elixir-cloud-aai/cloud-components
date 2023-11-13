@@ -8,6 +8,7 @@ import "@shoelace-style/shoelace/dist/components/select/select.js";
 import "@shoelace-style/shoelace/dist/components/option/option.js";
 import "@shoelace-style/shoelace/dist/components/button-group/button-group.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
+import "@shoelace-style/shoelace/dist/components/skeleton/skeleton.js";
 import { hostStyles } from "../../styles/host.styles.js";
 
 interface ItemProp {
@@ -57,6 +58,10 @@ export default class Collection extends LitElement {
         margin-top: 1rem;
         display: flex;
         justify-content: center;
+      }
+      sl-skeleton {
+        width: 30%;
+        height: 1.5rem;
       }
     `,
   ];
@@ -141,7 +146,7 @@ export default class Collection extends LitElement {
           }}
           ?disabled=${this._page === 1}
         >
-          Previous
+          &lt;&lt;
         </sl-button>
         <!-- Render buttons for all the pages less than this._page -->
         ${[...Array(this._page).keys()].map(
@@ -200,13 +205,13 @@ export default class Collection extends LitElement {
           ?disabled=${this.totalItems > 0 &&
           this._page === Math.ceil(this.totalItems / this._pageSize)}
         >
-          Next
+          &gt;&gt;
         </sl-button>
       </sl-button-group>
     </div>`;
   }
 
-  private _renderItem(item: ItemProp): TemplateResult {
+  private _renderItem(item: ItemProp, loading?: boolean): TemplateResult {
     return html`<sl-details
       name="${item.key}"
       @sl-show=${() => {
@@ -220,8 +225,10 @@ export default class Collection extends LitElement {
       }}
     >
       <div class="title" slot="summary">
-        <div>${item.name}</div>
-        ${item.tag
+        ${loading
+          ? html` <sl-skeleton effect="sheen"></sl-skeleton> `
+          : html` <div>${item.name}</div>`}
+        ${item.tag && !loading
           ? html`<sl-badge variant="${item.tag.type || "primary"}">
               ${item.tag.name}
             </sl-badge>`
@@ -236,7 +243,6 @@ export default class Collection extends LitElement {
   }
 
   private _renderItems(): TemplateResult {
-    console.log(this.items, this._page, this._pageSize);
     const itemsToRender = this.items.filter(
       (item) =>
         item.index > (this._page - 1) * this._pageSize &&
@@ -249,8 +255,23 @@ export default class Collection extends LitElement {
     });
     // create new array from map
     const uniqueItemsArray = Array.from(uniqueItems.values());
-    uniqueItemsArray.sort((a, b) => a.index - b.index);
-    return html` ${uniqueItemsArray.map((item) => this._renderItem(item))}`;
+    return html` ${[...Array(this._pageSize).keys()].map((index) => {
+      const item = uniqueItemsArray.find(
+        (itrItem) =>
+          itrItem.index === this._pageSize * (this._page - 1) + index + 1
+      );
+      if (item) {
+        return this._renderItem(item);
+      }
+      return this._renderItem(
+        {
+          index: this._pageSize * (this._page - 1) + index + 1,
+          key: `item-${this._pageSize * (this._page - 1) + index + 1}`,
+          name: "Loading",
+        },
+        true
+      );
+    })}`;
   }
 
   render() {

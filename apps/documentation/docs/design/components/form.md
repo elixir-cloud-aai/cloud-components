@@ -448,7 +448,6 @@ const fields = [
 import { onMounted, ref } from "vue";
 import { useData } from "vitepress";
 const { isDark } = useData();
-console.log(isDark);
 const renderComponent = ref(false);
 const primaryFields = ref([]);
 const complexExampleFields = ref([]);

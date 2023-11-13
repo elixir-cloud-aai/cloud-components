@@ -17,7 +17,7 @@
 
     <script type="module">
       import { html, render } from "lit";
-      import "../dist/index.js";
+      import "../dist/collection/index.js";
 
       const items = [
         {
@@ -60,6 +60,30 @@
           index: 5,
           name: "Item 5",
           key: "item-5",
+          tag: {
+            name: "DEFAULT",
+          },
+        },
+        {
+          index: 6,
+          name: "Item 6",
+          key: "item-6",
+          tag: {
+            name: "DEFAULT",
+          },
+        },
+        {
+          index: 7,
+          name: "Item 7",
+          key: "item-7",
+          tag: {
+            name: "DEFAULT",
+          },
+        },
+        {
+          index: 8,
+          name: "Item 8",
+          key: "item-8",
           tag: {
             name: "DEFAULT",
           },
@@ -126,19 +150,33 @@
               `https://jsonplaceholder.typicode.com/todos?_page=${e.detail.page}&_limit=5`
             );
             const data = await res.json();
-            e.target.items = [
-              ...e.target.items,
-              ...data.map((d) => ({
-                index: d.id,
-                name: d.title,
-                key: `item-${d.id}`,
-                lazy: true,
-                tag: {
-                  name: d.completed ? "SUCCESS" : "ERROR",
-                  type: d.completed ? "success" : "danger",
+            for (let i = 0; i < data.length; i += 1) {
+              const element = data[i];
+              const existingItem = e.target.items.find(
+                (item) => item.key === `item-${element.id}`
+              );
+              if (existingItem) {
+                e.target.items = e.target.items.filter(
+                  (item) => item.key !== `item-${element.id}`
+                );
+              }
+              e.target.items = [
+                ...e.target.items,
+                {
+                  index: (e.detail.page - 1) * 5 + i + 1,
+                  name: element.title,
+                  key: `item-${element.id}`,
+                  lazy: true,
+                  tag: {
+                    name: element.completed ? "SUCCESS" : "ERROR",
+                    type: element.completed ? "success" : "danger",
+                  },
                 },
-              })),
-            ];
+              ];
+            }
+            if (e.detail.page === 5) {
+              e.target.totalItems = e.detail.page * 5;
+            }
           }}
         >
           <div slot="item-5">Child item-5 without lazy loading</div>
