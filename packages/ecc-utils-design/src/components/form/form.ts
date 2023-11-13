@@ -214,10 +214,9 @@ export default class Form extends LitElement {
   }
 
   private renderArrayTemplate(field: Field, path: string): TemplateResult {
-    let doesExist = _.get(this.form, path, false);
     const { arrayOptions } = field;
 
-    if (!doesExist) {
+    if (!_.get(this.form, path)) {
       const defaultCount = field.arrayOptions?.defaultInstances;
       if (defaultCount) {
         _.set(
@@ -225,7 +224,6 @@ export default class Form extends LitElement {
           path,
           Array.from({ length: defaultCount }, () => ({}))
         );
-        doesExist = true;
       }
     }
 
@@ -278,8 +276,7 @@ export default class Form extends LitElement {
             Add
           </sl-button>
         </div>
-        ${doesExist &&
-        _.get(this.form, path).map(
+        ${_.get(this.form, path)?.map(
           (_item: any, index: number) => html`
             <div part="array-item" class="array-item">
               <sl-button

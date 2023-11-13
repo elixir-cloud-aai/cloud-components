@@ -13,12 +13,6 @@
   "author": "",
   "license": "ISC",
   "repository": "",
-  "tsup": {
-    "entry": [
-      "src/index.ts"
-    ],
-    "sourcemap": true
-  },
   "scripts": {
     "analyze": "cem analyze --litelement",
     "build": "node ./scripts/build.js",
