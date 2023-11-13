@@ -31,17 +31,19 @@ export class TESCreateRun extends LitElement {
       },
       arrayOptions: {
         defaultInstances: 1,
+        min: 1,
       },
       children: [
         {
           key: "command",
-          label: "Command",
+          label: "Commands",
           type: "array",
           fieldOptions: {
             required: true,
           },
           arrayOptions: {
             defaultInstances: 1,
+            min: 1,
           },
           children: [
             {
@@ -101,9 +103,6 @@ export class TESCreateRun extends LitElement {
           key: "workdir",
           label: "Workdir",
           type: "text",
-          fieldOptions: {
-            required: true,
-          },
         },
       ],
     },
@@ -112,7 +111,7 @@ export class TESCreateRun extends LitElement {
       label: "Inputs",
       type: "array",
       arrayOptions: {
-        defaultInstances: 1,
+        defaultInstances: 0,
       },
       children: [
         {
@@ -132,7 +131,7 @@ export class TESCreateRun extends LitElement {
       label: "Outputs",
       type: "array",
       arrayOptions: {
-        defaultInstances: 1,
+        defaultInstances: 0,
       },
       children: [
         {
@@ -154,17 +153,17 @@ export class TESCreateRun extends LitElement {
     },
     {
       key: "cpu_cores",
-      label: "CPU Cores",
+      label: "CPU cores",
       type: "number",
     },
     {
       key: "disk_gb",
-      label: "Disk Gb",
+      label: "Disk space (Gb)",
       type: "number",
     },
     {
       key: "ram_gb",
-      label: "Ram Gb",
+      label: "Ram space (Gb)",
       type: "number",
     },
     {
@@ -179,7 +178,7 @@ export class TESCreateRun extends LitElement {
     },
     {
       key: "PROJECT_GROUP",
-      label: "Project Group",
+      label: "Project group",
       type: "text",
     },
     {
@@ -192,7 +191,7 @@ export class TESCreateRun extends LitElement {
       label: "Volumes",
       type: "array",
       arrayOptions: {
-        defaultInstances: 1,
+        defaultInstances: 0,
       },
       children: [
         {
