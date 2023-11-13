@@ -1,6 +1,6 @@
 import { html, css, LitElement, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
-import { sholelaceLightStyles } from "../../styles/shoelace.styles.js";
+import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/badge/badge.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
@@ -26,7 +26,7 @@ interface FilterProp {
   key: string;
   type: "search" | "select";
   options?: string[];
-  selectOptions?: {
+  selectConfig?: {
     multiple?: boolean;
   };
   placeholder?: string;
@@ -34,7 +34,9 @@ interface FilterProp {
 
 export default class Collection extends LitElement {
   static styles = [
-    sholelaceLightStyles,
+    getShoelaceStyles(
+      document.querySelector("html")?.classList.contains("dark")
+    ),
     hostStyles,
     css`
       :host {
@@ -45,6 +47,7 @@ export default class Collection extends LitElement {
         display: flex;
         justify-content: space-between;
         margin-right: 1rem;
+        align-items: center;
       }
       .filters {
         display: flex;
@@ -59,8 +62,20 @@ export default class Collection extends LitElement {
         display: flex;
         justify-content: center;
       }
-      sl-skeleton {
+      .skeleton-title {
         width: 30%;
+        height: 1.5rem;
+      }
+      .skeleton-body {
+        width: 100%;
+        height: 1rem;
+      }
+      .lazy {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .badge {
         height: 1.5rem;
       }
     `,
@@ -73,12 +88,17 @@ export default class Collection extends LitElement {
   @state() private _page = 1;
   @state() private _pageSize = 5;
 
+  public setPage(page: number) {
+    this._page = page;
+  }
+
   private _renderSearchFilter(filter: FilterProp): TemplateResult {
     return html`<sl-input
       type="search"
       placeholder="${filter.placeholder || "Search"}"
       clearable
       @sl-input=${(e: Event) => {
+        this._page = 1;
         this.dispatchEvent(
           new CustomEvent("filter", {
             detail: {
@@ -94,9 +114,10 @@ export default class Collection extends LitElement {
   private _renderSelectFilter(filter: FilterProp): TemplateResult {
     return html`<sl-select
       placeholder="${filter.placeholder || "Select"}"
-      .multiple=${filter.selectOptions?.multiple || false}
+      .multiple=${filter.selectConfig?.multiple || false}
       clearable
       @sl-change=${(e: CustomEvent) => {
+        this._page = 1;
         this.dispatchEvent(
           new CustomEvent("filter", {
             detail: {
@@ -223,20 +244,30 @@ export default class Collection extends LitElement {
           })
         );
       }}
+      .disabled=${loading || false}
     >
       <div class="title" slot="summary">
         ${loading
-          ? html` <sl-skeleton effect="sheen"></sl-skeleton> `
+          ? html`
+              <sl-skeleton class="skeleton-title" effect="sheen"></sl-skeleton>
+            `
           : html` <div>${item.name}</div>`}
         ${item.tag && !loading
-          ? html`<sl-badge variant="${item.tag.type || "primary"}">
+          ? html`<sl-badge
+              class="badge"
+              variant="${item.tag.type || "primary"}"
+            >
               ${item.tag.name}
             </sl-badge>`
           : ""}
       </div>
       <slot name="${item.key}">
         ${item.lazy
-          ? html`<div class="lazy">Loading...</div>`
+          ? html`<div class="lazy">
+              <sl-skeleton class="skeleton-body" effect="sheen"></sl-skeleton
+              ><sl-skeleton class="skeleton-body" effect="sheen"></sl-skeleton
+              ><sl-skeleton class="skeleton-body" effect="sheen"></sl-skeleton>
+            </div>`
           : html`<div>No content</div>`}
       </slot>
     </sl-details>`;

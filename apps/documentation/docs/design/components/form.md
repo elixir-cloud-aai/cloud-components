@@ -43,7 +43,7 @@ import "@elixir-cloud/design/dist/form/index.js";
 | ------------------- | -------- | ------- | ------- | ------------------------------------------- |
 | [`fields`](#fields) | `true`   | `[]`    | `Array` | Array of fields to be rendered in the form. |
 
-### fields \*
+### fields\*
 
 This property is used to render the fields in the form. Fields can be passed as the array of objects. Each object represents a field. The object can have the following properties.
 
