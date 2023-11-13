@@ -31,7 +31,7 @@ interface FilterProp {
   placeholder?: string;
 }
 
-export class Collection extends LitElement {
+export default class Collection extends LitElement {
   static styles = [
     sholelaceLightStyles,
     hostStyles,
