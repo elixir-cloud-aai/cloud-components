@@ -11,45 +11,6 @@ export class WESCreateRun extends LitElement {
 
   fields = [
     {
-      key: "workflow_params",
-      label: "Workflow Parameters",
-      type: "text",
-      fieldOptions: {
-        required: true,
-      },
-    },
-    {
-      key: "workflow_type",
-      label: "Workflow Type",
-      type: "text",
-      fieldOptions: {
-        required: true,
-      },
-    },
-    {
-      key: "workflow_type_version",
-      label: "Workflow Type Version",
-      type: "text",
-      fieldOptions: {
-        required: true,
-      },
-    },
-    // {
-    // 	key: 'workflow_engine',
-    // 	label: 'Workflow Engine',
-    // 	type: 'text',
-    // },
-    {
-      key: "workflow_engine_parameters",
-      label: "Workflow Engine Parameters",
-      type: "text",
-    },
-    // {
-    // 	key: 'workflow_engine_version',
-    // 	label: 'Workflow Engine Version',
-    // 	type: 'text',
-    // },
-    {
       key: "workflow_url",
       label: "Workflow URL",
       type: "text",
@@ -58,8 +19,52 @@ export class WESCreateRun extends LitElement {
       },
     },
     {
+      key: "workflow_type",
+      label: "Workflow type",
+      type: "text",
+      fieldOptions: {
+        required: true,
+      },
+    },
+    {
+      key: "workflow_type_version",
+      label: "Workflow type version",
+      type: "text",
+      fieldOptions: {
+        required: true,
+      },
+    },
+    {
+      key: "workflow_params",
+      label: "Workflow parameters",
+      type: "text",
+      fieldOptions: {
+        required: true,
+      },
+    },
+    {
+      key: "tags",
+      label: "Tags",
+      type: "text",
+    },
+    {
+      key: "workflow_engine_parameters",
+      label: "Workflow engine parameters",
+      type: "text",
+    },
+    // {
+    // 	key: 'workflow_engine',
+    // 	label: 'Workflow Engine',
+    // 	type: 'text',
+    // },
+    // {
+    // 	key: 'workflow_engine_version',
+    // 	label: 'Workflow Engine Version',
+    // 	type: 'text',
+    // },
+    {
       key: "workflow_attachment",
-      label: "Workflow Attachment",
+      label: "Workflow attachment",
       type: "file",
       fieldOptions: {
         multiple: true,
