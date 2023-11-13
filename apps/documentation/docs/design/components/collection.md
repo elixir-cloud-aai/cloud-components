@@ -70,6 +70,12 @@ import "@elixir-cloud/design/dist/collection/index.js";
 | ----------- | --------- | ---------------------------------------------- |
 | `setPage()` | `page`    | Can be used to set the page of the collection. |
 
+## Slots
+
+| Slot Name      | Description                                                                                                             |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `${items.key}` | The contents of the item. This slot will be named after the key of the item provided by the [`items`](#items) property. |
+
 ## Parts
 
 | Part Name | Description |
