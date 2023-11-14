@@ -140,6 +140,7 @@ export default class Collection extends LitElement {
   }
 
   private _renderHeader(): TemplateResult {
+    if (!this.filters || this.filters.length === 0) return html``;
     return html`<div class="header">
       <div class="filters">
         ${this.filters.map((filter) => {

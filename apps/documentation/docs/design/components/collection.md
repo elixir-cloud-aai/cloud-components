@@ -100,24 +100,7 @@ const primaryTag = ref()
 onMounted(() => {
   import("@elixir-cloud/design/dist/collection/index.js").then((module) => {
     renderComponent.value = false;
-    fetch(`https://jsonplaceholder.typicode.com/posts?_page=1&_limit=5`).then((res) => {
-      res.json().then((data) => {
-        primaryItems.value = data.map((item) => {
-          const chosenTag = Math.random();
-          return {
-            index: item.id,
-            name: item.title,
-            key: `item-${item.id}`,
-            lazy: true,
-            tag: {
-              name: item.userId % 5 === 0 ? "SUCCESS" : item.userId % 4 === 0 ? "WARNING" : item.userId % 3 === 0 ? "ERROR" : item.userId % 2 === 0 ? "NEUTRAL" : "PRIMARY",
-              type: item.userId % 5 === 0 ? "success" : item.userId % 4 === 0 ? "warning" : item.userId % 3 === 0 ? "danger" : item.userId % 2 === 0 ? "neutral" : "primary",
-            },
-          };
-        });
-      })
-    });
-
+    primaryItems.value = [];
     primaryFilters.value = [
       {
         key: "title",
@@ -219,6 +202,24 @@ onMounted(() => {
       })
     });
   });
+  fetch(`https://jsonplaceholder.typicode.com/posts?_page=1&_limit=5`).then((res) => {
+    res.json().then((data) => {
+      primaryItems.value = data.map((item) => {
+        const chosenTag = Math.random();
+        return {
+          index: item.id,
+          name: item.title,
+          key: `item-${item.id}`,
+          lazy: true,
+          tag: {
+            name: item.userId % 5 === 0 ? "SUCCESS" : item.userId % 4 === 0 ? "WARNING" : item.userId % 3 === 0 ? "ERROR" : item.userId % 2 === 0 ? "NEUTRAL" : "PRIMARY",
+            type: item.userId % 5 === 0 ? "success" : item.userId % 4 === 0 ? "warning" : item.userId % 3 === 0 ? "danger" : item.userId % 2 === 0 ? "neutral" : "primary",
+          },
+        };
+      });
+    })
+  });
+
 });
 </script>
 
