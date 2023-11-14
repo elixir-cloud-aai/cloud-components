@@ -178,6 +178,79 @@
             required: true,
           },
         },
+        {
+          key: "nextOfKin",
+          label: "Next of Kin",
+          type: "group",
+          groupOptions: {
+            collapsible: true,
+          },
+          children: [
+            {
+              key: "kinName",
+              label: "Name",
+              type: "text",
+              fieldOptions: {
+                required: true,
+              },
+            },
+            {
+              key: "kinEmail",
+              label: "Email",
+              type: "email",
+            },
+            {
+              key: "kinAddress",
+              label: "Address",
+              type: "group",
+              groupOptions: {
+                collapsible: true,
+              },
+              children: [
+                {
+                  key: "Details",
+                  label: "Details",
+                  type: "array",
+                  arrayOptions: {
+                    defaultInstances: 0,
+                  },
+                  children: [
+                    {
+                      key: "houseNumber",
+                      label: "House Number",
+                      type: "text",
+                      fieldOptions: {
+                        required: true,
+                      },
+                    },
+                    {
+                      key: "street",
+                      label: "Street",
+                      type: "text",
+                      fieldOptions: {
+                        default: "1601 Harrier Ln",
+                        // required: false,
+                      },
+                    },
+                    {
+                      key: "city",
+                      label: "City",
+                      type: "text",
+                      fieldOptions: {
+                        required: true,
+                      },
+                    },
+                  ],
+                },
+                {
+                  key: "isPrimary",
+                  label: "Primary",
+                  type: "switch",
+                },
+              ],
+            },
+          ],
+        },
       ];
 
       render(
