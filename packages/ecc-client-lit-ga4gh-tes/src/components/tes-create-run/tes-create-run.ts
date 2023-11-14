@@ -239,9 +239,9 @@ export class TESCreateRun extends LitElement {
       this.response = await postTask(this.baseURL, data);
 
       try {
-        if (this.response.run_id) {
+        if (this.response.id) {
           eccUtilsDesignForm.success({
-            message: this.response.run_id,
+            message: this.response.id,
           });
         } else {
           eccUtilsDesignForm.error({
@@ -283,11 +283,10 @@ export class TESCreateRun extends LitElement {
           executor.env = this.processEnv(executorElement.env);
         }
 
-        if (executorElement.image) executor.image = executorElement.image;
-        if (executorElement.stderr) executor.stderr = executorElement.stderr;
-        if (executorElement.stdin) executor.stdin = executorElement.stdin;
-        if (executorElement.stdout) executor.stdout = executorElement.stdout;
-        if (executorElement.workdir) executor.workdir = executorElement.workdir;
+        const execOptions = ["image", "stderr", "stdin", "stdout", "workdir"];
+        for (const opt of execOptions) {
+          if (executorElement[opt]) executor[opt] = executorElement[opt];
+        }
 
         return executor;
       });
