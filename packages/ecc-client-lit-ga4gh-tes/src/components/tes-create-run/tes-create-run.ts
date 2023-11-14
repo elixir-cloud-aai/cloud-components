@@ -1,6 +1,7 @@
 import { html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { postTask } from "../../API/Task/tesGet.js";
+import { Executor, postTaskForm, Resources } from "./types.js";
 import "@elixir-cloud/design";
 
 @customElement("ecc-client-lit-ga4gh-tes-create-run")
@@ -8,10 +9,18 @@ export class TESCreateRun extends LitElement {
   @property({ type: String }) accessor baseURL =
     "https://protes.rahtiapp.fi/ga4gh/tes/v1";
 
-  @state() accessor form: any = {};
+  @state() accessor form: postTaskForm = {
+    executors: [
+      {
+        command: [],
+        image: "",
+      },
+    ],
+  };
+
   @state() accessor response: any = {};
 
-  fields = [
+  private fields = [
     {
       key: "name",
       label: "Name",
@@ -213,11 +222,16 @@ export class TESCreateRun extends LitElement {
     },
   ];
 
-  resourcesTemp = ["cpu_cores", "disk_gb", "preemptible", "ram_gb", "zones"];
-  tagsTemp = ["PROJECT_GROUP", "WORKFLOW_ID"];
+  private resourcesTemp = [
+    "cpu_cores",
+    "disk_gb",
+    "preemptible",
+    "ram_gb",
+    "zones",
+  ];
 
   // Submit form function
-  async submitForm(form: any) {
+  private async submitForm(form: any) {
     const data: any = {};
 
     // Process the form data
@@ -226,17 +240,15 @@ export class TESCreateRun extends LitElement {
       if (key === "name" || key === "description") {
         data[key] = value;
       } else if (key === "executors") {
-        data.executors = this.processExecutors(value as any);
-      } else if (key === "inputs" || key === "outputs") {
-        data[key] = this.processInputsOutputs(value as any);
+        data.executors = this.processExecutors(value);
       } else if (key === "volumes") {
         data.volumes = this.processVolumes(value as any);
       } else if (key === "tags") {
         data.tags = this.processTags(value as any);
       } else if (this.resourcesTemp.includes(key)) {
         data.resources = this.processResources(
-          data.resources,
-          key,
+          data.resources as Resources,
+          key as keyof Resources,
           value as any
         );
       }
@@ -276,7 +288,7 @@ export class TESCreateRun extends LitElement {
   }
 
   // Process executors data
-  processExecutors = (value: any): any[] => {
+  private processExecutors = (value: any): Executor[] => {
     if (!Array.isArray(value)) return [];
 
     return value
@@ -307,52 +319,39 @@ export class TESCreateRun extends LitElement {
   };
 
   // Process env data
-  processEnv = (envArray: any[]): any => {
+  private processEnv = (
+    envArray: Record<string, string>[]
+  ): Record<string, string> =>
     envArray.reduce(
-      (envObject: any, item: any) => ({
+      (envObject, item) => ({
         ...envObject,
         [item.name]: item.value,
       }),
       {}
     );
-  };
-
-  // Process inputs and outputs data
-  processInputsOutputs = (value: any): any[] => {
-    if (!Array.isArray(value)) return [];
-
-    return value
-      .filter(
-        (itemElement: any) =>
-          typeof itemElement === "object" &&
-          Object.entries(itemElement).length !== 0 &&
-          itemElement !== null
-      )
-      .map((itemElement: any) => ({
-        path:
-          typeof itemElement.path === "string" ? itemElement.path : undefined,
-        url: typeof itemElement.url === "string" ? itemElement.url : undefined,
-      }));
-  };
 
   // Process volume data
-  processVolumes = (value: any): string[] =>
-    (value as any)
-      .filter((vol: any) => typeof vol.volume === "string")
-      .map((vol: any) => vol.volume);
+  private processVolumes = (value: Array<{ volume: string }>) =>
+    value.map((vol) => vol.volume);
 
   // Process resources data
-  processResources = (resources: any, key: string, value: any): any => {
-    let updatedResources = { ...resources };
+  private processResources = (
+    resources: Resources,
+    key: keyof Resources,
+    value: any
+  ): Resources => {
+    let updatedResources: Resources = { ...resources };
     if (!updatedResources) updatedResources = {};
     updatedResources[key] = value;
     return updatedResources;
   };
 
   // Process tags data
-  processTags = (tagArray: any[]): any =>
+  private processTags = (
+    tagArray: Array<{ name: string; value: string }>
+  ): Record<string, string> =>
     tagArray.reduce(
-      (tagObject: any, item: any) => ({
+      (tagObject, item) => ({
         ...tagObject,
         [item.name]: item.value,
       }),

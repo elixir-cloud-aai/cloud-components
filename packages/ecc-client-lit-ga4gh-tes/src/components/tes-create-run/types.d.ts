@@ -33,7 +33,7 @@ export interface Tags {
   [key: string]: string;
 }
 
-export default interface postTask {
+export interface postTaskForm {
   name?: string;
   description?: string;
   executors: Executor[];
