@@ -296,7 +296,7 @@ export default class Collection extends LitElement {
     const uniqueItemsArray = Array.from(uniqueItems.values());
     return html` ${[...Array(this._pageSize).keys()].map((index) => {
       const itemIndex = this._pageSize * (this._page - 1) + index + 1;
-      if (this.totalItems < itemIndex) {
+      if (this.totalItems !== -1 && this.totalItems < itemIndex) {
         return this._renderItem(
           {
             index: itemIndex,
