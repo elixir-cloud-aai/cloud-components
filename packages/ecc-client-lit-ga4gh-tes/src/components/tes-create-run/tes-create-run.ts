@@ -66,12 +66,12 @@ export class TESCreateRun extends LitElement {
           children: [
             {
               key: "name",
-              label: "Name",
+              label: "Env name",
               type: "text",
             },
             {
               key: "value",
-              label: "Value",
+              label: "Env value",
               type: "text",
             },
           ],
@@ -177,14 +177,24 @@ export class TESCreateRun extends LitElement {
       type: "switch",
     },
     {
-      key: "PROJECT_GROUP",
-      label: "Project group",
-      type: "text",
-    },
-    {
-      key: "WORKFLOW_ID",
-      label: "Workflow ID",
-      type: "text",
+      key: "tags",
+      label: "Tags",
+      type: "array",
+      arrayOptions: {
+        defaultInstances: 0,
+      },
+      children: [
+        {
+          key: "name",
+          label: "Tag name",
+          type: "text",
+        },
+        {
+          key: "value",
+          label: "Tag value",
+          type: "text",
+        },
+      ],
     },
     {
       key: "volumes",
@@ -216,15 +226,19 @@ export class TESCreateRun extends LitElement {
       if (key === "name" || key === "description") {
         data[key] = value;
       } else if (key === "executors") {
-        data.executors = this.processExecutors(value);
+        data.executors = this.processExecutors(value as any);
       } else if (key === "inputs" || key === "outputs") {
-        data[key] = this.processInputsOutputs(value);
+        data[key] = this.processInputsOutputs(value as any);
       } else if (key === "volumes") {
-        data.volumes = this.processVolumes(value);
+        data.volumes = this.processVolumes(value as any);
+      } else if (key === "tags") {
+        data.tags = this.processTags(value as any);
       } else if (this.resourcesTemp.includes(key)) {
-        data.resources = this.processResources(data.resources, key, value);
-      } else if (this.tagsTemp.includes(key)) {
-        data.tags = this.processTags(data.tags, key, value);
+        data.resources = this.processResources(
+          data.resources,
+          key,
+          value as any
+        );
       }
     }
 
@@ -336,12 +350,14 @@ export class TESCreateRun extends LitElement {
   };
 
   // Process tags data
-  processTags = (tags: any, key: string, value: any): any => {
-    let updatedTags = { ...tags };
-    if (!tags) updatedTags = {};
-    updatedTags[key] = value;
-    return updatedTags;
-  };
+  processTags = (tagArray: any[]): any =>
+    tagArray.reduce(
+      (tagObject: any, item: any) => ({
+        ...tagObject,
+        [item.name]: item.value,
+      }),
+      {}
+    );
 
   // Render component
   render() {
