@@ -90,6 +90,7 @@ export default class Collection extends LitElement {
 
   @state() private _page = 1;
   @state() private _pageSize = 5;
+  @state() private _pagesRendered = 1; // Only used when totalItems is not provided
 
   public setPage(page: number) {
     this._page = page;
@@ -172,8 +173,11 @@ export default class Collection extends LitElement {
         >
           &lt;&lt;
         </sl-button>
-        <!-- Render buttons for all the pages less than this._page -->
-        ${[...Array(this._page).keys()].map(
+        ${[
+          ...Array(
+            Math.max(this._pagesRendered, this.totalItems / this._pageSize)
+          ).keys(),
+        ].map(
           (page) => html`<sl-button
             @click=${() => {
               this._page = page + 1;
@@ -190,33 +194,14 @@ export default class Collection extends LitElement {
             ${page + 1}
           </sl-button>`
         )}
-        <!-- Check if totalItems is povided -->
-        ${this.totalItems > 0
-          ? html`
-              ${[
-                ...Array(
-                  Math.ceil(this.totalItems / this._pageSize) - this._page
-                ).keys(),
-              ].map(
-                (page) => html`<sl-button
-                  @click=${() => {
-                    this._page = this._page + page + 1;
-                    this.dispatchEvent(
-                      new CustomEvent("page-change", {
-                        detail: {
-                          page: this._page,
-                        },
-                      })
-                    );
-                  }}
-                >
-                  ${this._page + page + 1}
-                </sl-button>`
-              )}
-            `
-          : html` <sl-button disabled> ... </sl-button> `}
+        ${this.totalItems === -1
+          ? html` <sl-button disabled> ... </sl-button> `
+          : ""}
         <sl-button
           @click=${() => {
+            if (this.totalItems === -1 && this._page === this._pagesRendered) {
+              this._pagesRendered += 1;
+            }
             this._page += 1;
             this.dispatchEvent(
               new CustomEvent("page-change", {
