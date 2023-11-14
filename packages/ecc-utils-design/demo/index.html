@@ -99,6 +99,7 @@
           label: "Name",
           type: "text",
           fieldOptions: {
+            default: "David",
             required: true,
           },
         },
@@ -107,6 +108,7 @@
           label: "Email",
           type: "email",
           fieldOptions: {
+            returnIfEmpty: true,
             // required: false,
           },
         },
@@ -125,9 +127,7 @@
               label: "Details",
               type: "array",
               arrayOptions: {
-                defaultInstances: 1,
-                max: 4,
-                min: 1,
+                defaultInstances: 0,
               },
               children: [
                 {
@@ -162,7 +162,7 @@
               label: "Primary",
               type: "switch",
               fieldOptions: {
-                default: true,
+                default: false,
               },
             },
           ],

@@ -13,16 +13,10 @@
   "author": "",
   "license": "ISC",
   "repository": "",
-  "tsup": {
-    "entry": [
-      "src/index.ts"
-    ],
-    "sourcemap": true
-  },
   "scripts": {
     "analyze": "cem analyze --litelement",
     "build": "node ./scripts/build.js",
-    "dev": "concurrently -r \"npm run build --watch\" \"wds\"",
+    "dev": "concurrently -r \"node ./scripts/build.js --watch\" \"wds\"",
     "test": "wtr --coverage",
     "test:watch": "wtr --watch",
     "storybook": "npm run build && npm run analyze -- --exclude dist && concurrently -k -r \"npm run build -- --watch\" \"wds -c .storybook/server.mjs\"",

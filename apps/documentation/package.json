@@ -12,6 +12,7 @@
   "dependencies": {
     "@elixir-cloud/design": "*",
     "@elixir-cloud/lit-tes": "*",
+    "@elixir-cloud/lit-wes": "*",
     "vitepress": "^1.0.0-rc.24",
     "vue": "3.3.5"
   },
