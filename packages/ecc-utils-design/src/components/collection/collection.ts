@@ -78,6 +78,9 @@ export default class Collection extends LitElement {
       .badge {
         height: 1.5rem;
       }
+      .hidden {
+        visibility: hidden;
+      }
     `,
   ];
 
@@ -232,9 +235,14 @@ export default class Collection extends LitElement {
     </div>`;
   }
 
-  private _renderItem(item: ItemProp, loading?: boolean): TemplateResult {
+  private _renderItem(
+    item: ItemProp,
+    loading?: boolean,
+    hidden?: boolean
+  ): TemplateResult {
     return html`<sl-details
       name="${item.key}"
+      class="${hidden ? "hidden" : ""}"
       @sl-show=${() => {
         this.dispatchEvent(
           new CustomEvent("expand-item", {
@@ -287,20 +295,32 @@ export default class Collection extends LitElement {
     // create new array from map
     const uniqueItemsArray = Array.from(uniqueItems.values());
     return html` ${[...Array(this._pageSize).keys()].map((index) => {
+      const itemIndex = this._pageSize * (this._page - 1) + index + 1;
+      if (this.totalItems < itemIndex) {
+        return this._renderItem(
+          {
+            index: itemIndex,
+            key: `item-${itemIndex}`,
+            name: "Hidden",
+          },
+          false,
+          true
+        );
+      }
       const item = uniqueItemsArray.find(
-        (itrItem) =>
-          itrItem.index === this._pageSize * (this._page - 1) + index + 1
+        (itrItem) => itrItem.index === itemIndex
       );
       if (item) {
         return this._renderItem(item);
       }
       return this._renderItem(
         {
-          index: this._pageSize * (this._page - 1) + index + 1,
-          key: `item-${this._pageSize * (this._page - 1) + index + 1}`,
+          index: itemIndex,
+          key: `item-${itemIndex}`,
           name: "Loading",
         },
-        true
+        true,
+        false
       );
     })}`;
   }

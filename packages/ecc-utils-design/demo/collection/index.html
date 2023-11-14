@@ -111,6 +111,7 @@
         html`<ecc-utils-design-collection
           .items=${items}
           .filters=${filters}
+          .totalItems=${8}
           @expand-item=${async (e) => {
             // Check if child already exists
             const children = e.target.querySelectorAll(`[slot="${e.detail.key}"]`);
