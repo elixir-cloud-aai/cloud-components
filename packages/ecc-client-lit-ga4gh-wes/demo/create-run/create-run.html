@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      background: #fafafa;
+    }
+  </style>
+  <title>ecc-client-ga4gh-wes-create-run</title>
+</head>
+<body>
+  <div id="demo"></div>
+
+  <script type="module">
+    import { html, render } from "lit";
+    import "../../dist/index.js";
+
+    render(
+      html`<ecc-client-lit-ga4gh-wes-create-run
+        baseURL="http://localhost:8090/ga4gh/wes/v1"
+      />`,
+      document.querySelector("#demo")
+    );
+  </script>
+</body>
+</html>
