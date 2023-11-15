@@ -952,3 +952,8 @@ const sholelaceDarkStyles = css`
 `;
 
 export { sholelaceLightStyles, sholelaceDarkStyles };
+
+const getShoelaceStyles = (isDark = false) =>
+  isDark ? sholelaceDarkStyles : sholelaceLightStyles;
+
+export default getShoelaceStyles;

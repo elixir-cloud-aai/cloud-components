@@ -76,6 +76,10 @@ export default defineConfig({
                 text: 'Form',
                 link: '/design/components/form',
               },
+              {
+                text: 'Collection',
+                link: '/design/components/collection',
+              },
             ],
           },
         ],
