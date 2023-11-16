@@ -35,6 +35,7 @@ import "@elixir-cloud/design/dist/collection/index.js";
 | [`items`](#items)     | `true`   |         | `Array`  | An array of items to render                                                                                                     |
 | [`filters`](#filters) | `false`  |         | `Array`  | An array of filters to render                                                                                                   |
 | `totalItems`          | `false`  |         | `Number` | The total number of items in the collection. If not provided, the collection will render pagination without fixed page numbers. |
+| `pageSize`          | `false`  |    5    | `Number` | The number of items per pagination.|
 
 ### items\*
 
