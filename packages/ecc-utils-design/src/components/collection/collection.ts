@@ -87,9 +87,9 @@ export default class Collection extends LitElement {
   @property({ type: Array }) private items: ItemProp[] = [];
   @property({ type: Array }) private filters: FilterProp[] = [];
   @property({ type: Number }) private totalItems = -1;
+  @property({ type: Number }) private pageSize = 5;
 
   @state() private _page = 1;
-  @state() private _pageSize = 5;
   @state() private _pagesRendered = 1; // Only used when totalItems is not provided
 
   public setPage(page: number) {
@@ -176,7 +176,7 @@ export default class Collection extends LitElement {
         </sl-button>
         ${[
           ...Array(
-            Math.max(this._pagesRendered, this.totalItems / this._pageSize)
+            Math.max(this._pagesRendered, this.totalItems / this.pageSize)
           ).keys(),
         ].map(
           (page) => html`<sl-button
@@ -213,7 +213,7 @@ export default class Collection extends LitElement {
             );
           }}
           ?disabled=${this.totalItems > 0 &&
-          this._page === Math.ceil(this.totalItems / this._pageSize)}
+          this._page === Math.ceil(this.totalItems / this.pageSize)}
         >
           &gt;&gt;
         </sl-button>
@@ -270,8 +270,8 @@ export default class Collection extends LitElement {
   private _renderItems(): TemplateResult {
     const itemsToRender = this.items.filter(
       (item) =>
-        item.index > (this._page - 1) * this._pageSize &&
-        item.index <= this._page * this._pageSize
+        item.index > (this._page - 1) * this.pageSize &&
+        item.index <= this._page * this.pageSize
     );
     // remove duplicates by index
     const uniqueItems = new Map();
@@ -280,8 +280,8 @@ export default class Collection extends LitElement {
     });
     // create new array from map
     const uniqueItemsArray = Array.from(uniqueItems.values());
-    return html` ${[...Array(this._pageSize).keys()].map((index) => {
-      const itemIndex = this._pageSize * (this._page - 1) + index + 1;
+    return html` ${[...Array(this.pageSize).keys()].map((index) => {
+      const itemIndex = this.pageSize * (this._page - 1) + index + 1;
       if (this.totalItems !== -1 && this.totalItems < itemIndex) {
         return this._renderItem(
           {
