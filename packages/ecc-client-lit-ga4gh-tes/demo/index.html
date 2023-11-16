@@ -1,30 +1,24 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en-GB">
-  <head>
-    <meta charset="utf-8" />
-    <style>
-      body {
-        background: #fafafa;
-      }
-    </style>
-    <title>ecc-client-lit-ga4gh-tes</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body>
-    <div class="p-10">
-      <div id="demo"></div>
-    </div>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      background: #fafafa;
+    }
+  </style>
+</head>
+<body>
+  <div id="demo"></div>
 
-    <script type="module">
-      import { html, render } from "lit";
-      import "../dist/index.js";
+  <script type="module">
+    import { html, render } from "lit";
+    import "../dist/index.js";
 
-      render(
-        html`
-          <ecc-client-lit-ga4gh-tes-create-run> </ecc-client-lit-ga4gh-tes-create-run>
-        `,
-        document.querySelector("#demo")
-      );
-    </script>
-  </body>
+    render(
+      html`<ecc-client-lit-ga4gh-tes-create-run />`,
+      document.querySelector("#demo")
+    );
+  </script>
+</body>
 </html>
