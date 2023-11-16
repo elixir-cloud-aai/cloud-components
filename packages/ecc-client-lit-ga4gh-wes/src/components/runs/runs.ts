@@ -41,12 +41,7 @@ export class WESRuns extends LitElement {
   @state() private items: any[] = [];
   @state() private nextPageToken: string | null = "";
 
-  constructor() {
-    super();
-    const eccutilsDesignCollection = this.shadowRoot?.querySelector(
-      "ecc-utils-design-collection"
-    );
-    eccutilsDesignCollection?.setPage(this.pageSize);
+  protected firstUpdated(): void | Promise<unknown> {
     this.fetchData();
   }
 
@@ -59,7 +54,6 @@ export class WESRuns extends LitElement {
         this.pageSize,
         this.nextPageToken
       );
-
       // Set nextPageToken to null if at the last page
       if (data.next_page_token === "") this.nextPageToken = null;
       else this.nextPageToken = data.next_page_token;
