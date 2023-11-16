@@ -41,8 +41,16 @@ export class WESRuns extends LitElement {
   @state() private items: any[] = [];
   @state() private nextPageToken: string | null = "";
 
-  protected firstUpdated(): void | Promise<unknown> {
+  protected firstUpdated(): void {
     this.fetchData();
+  }
+
+  protected updated(): void {
+    const eccUtilsDesignCollection = this.shadowRoot?.querySelector(
+      "ecc-utils-design-collection"
+      // Todo: Get the typeof Collections and use it instead of `any`
+    ) as any;
+    eccUtilsDesignCollection.pageSize = this.pageSize;
   }
 
   private async fetchData() {
@@ -54,9 +62,18 @@ export class WESRuns extends LitElement {
         this.pageSize,
         this.nextPageToken
       );
+
       // Set nextPageToken to null if at the last page
-      if (data.next_page_token === "") this.nextPageToken = null;
-      else this.nextPageToken = data.next_page_token;
+      if (data.next_page_token === "") {
+        this.nextPageToken = null;
+
+        const eccUtilsDesignCollection = this.shadowRoot?.querySelector(
+          "ecc-utils-design-collection"
+          // Todo: Get the typeof Collections and use it instead of `any`
+        ) as any;
+
+        eccUtilsDesignCollection.totalItems = this.items.length;
+      } else this.nextPageToken = data.next_page_token;
 
       const covertedData: any[] = [];
       data.runs.forEach((run: { run_id: string; state: string }) => {
