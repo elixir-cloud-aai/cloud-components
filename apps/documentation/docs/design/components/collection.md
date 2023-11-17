@@ -35,7 +35,7 @@ import "@elixir-cloud/design/dist/collection/index.js";
 | [`items`](#items)     | `true`   |         | `Array`  | An array of items to render                                                                                                     |
 | [`filters`](#filters) | `false`  |         | `Array`  | An array of filters to render                                                                                                   |
 | `totalItems`          | `false`  |         | `Number` | The total number of items in the collection. If not provided, the collection will render pagination without fixed page numbers. |
-| `pageSize`          | `false`  |    5    | `Number` | The number of items per pagination.|
+| `pageSize`            | `false`  | 5       | `Number` | The number of items per pagination.                                                                                             |
 
 ### items\*
 
@@ -67,9 +67,10 @@ import "@elixir-cloud/design/dist/collection/index.js";
 
 ## Methods
 
-| Method Name | Arguments | Description                                    |
-| ----------- | --------- | ---------------------------------------------- |
-| `setPage()` | `page`    | Can be used to set the page of the collection. |
+| Method Name | Arguments | Description                                     |
+| ----------- | --------- | ----------------------------------------------- |
+| `setPage()` | `page`    | Can be used to set the page of the collection.  |
+| `error()`   | `message` | Can be used to display error alert to the user. |
 
 ## Slots
 
