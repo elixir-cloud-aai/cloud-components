@@ -1,7 +1,7 @@
 import { html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import "@elixir-cloud/design";
-import { fetchWorkflows } from "../../API/Workflow/wesGet.js";
+import { fetchWorkflow, fetchWorkflows } from "../../API/Workflow/wesGet.js";
 
 @customElement("ecc-client-lit-ga4gh-wes-runs")
 export class WESRuns extends LitElement {
@@ -41,6 +41,20 @@ export class WESRuns extends LitElement {
   @state() private items: any[] = [];
   @state() private nextPageToken: string | null = "";
 
+  private tagType: Record<string, string> = {
+    UNKNOWN: "neutral",
+    QUEUED: "warning",
+    INITIALIZING: "primary",
+    RUNNING: "primary",
+    PAUSED: "warning",
+    COMPLETE: "success",
+    EXECUTOR_ERROR: "danger",
+    SYSTEM_ERROR: "danger",
+    CANCELED: "danger",
+    PREEMPTED: "danger",
+    CANCELING: "danger",
+  };
+
   protected firstUpdated(): void {
     this.fetchData();
   }
@@ -74,7 +88,7 @@ export class WESRuns extends LitElement {
 
         eccUtilsDesignCollection.totalItems = this.items.length;
       } else this.nextPageToken = data.next_page_token;
-
+      console.log(data);
       const covertedData: any[] = [];
       data.runs.forEach((run: { run_id: string; state: string }) => {
         covertedData.push({
@@ -84,6 +98,7 @@ export class WESRuns extends LitElement {
           lazy: true,
           tag: {
             name: run.state,
+            type: this.tagType[run.state],
           },
         });
       });
@@ -97,12 +112,30 @@ export class WESRuns extends LitElement {
     }
   }
 
+  async expand(e: any) {
+    // Check if child already exists within the shadow root
+    const children = this.shadowRoot?.querySelectorAll(
+      `[slot="${e.detail.key}"]`
+    );
+    const runData = await fetchWorkflow(this.baseURL, e.detail.key);
+    console.log(runData);
+    if (!children || children.length === 0) {
+      // Add child to ecc-utils-design-collection
+
+      const child = document.createElement("div");
+      child.setAttribute("slot", e.detail.key);
+      child.innerHTML = `<p>Title: heh</p>`;
+      this.shadowRoot?.appendChild(child); // Use this.shadowRoot to append the child to the shadow root
+    }
+  }
+
   render() {
     return html`
       <ecc-utils-design-collection
         .filters=${this.filters}
         .items=${this.items}
         @page-change=${this.fetchData}
+        @expand-item=${(e: any) => this.expand(e)}
       >
       </ecc-utils-design-collection>
     `;
