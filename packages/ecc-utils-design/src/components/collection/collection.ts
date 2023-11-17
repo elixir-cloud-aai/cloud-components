@@ -9,6 +9,7 @@ import "@shoelace-style/shoelace/dist/components/option/option.js";
 import "@shoelace-style/shoelace/dist/components/button-group/button-group.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/skeleton/skeleton.js";
+import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import { hostStyles } from "../../styles/host.styles.js";
 
 interface ItemProp {
@@ -81,6 +82,10 @@ export default class Collection extends LitElement {
       .hidden {
         visibility: hidden;
       }
+      sl-alert {
+        position: absolute;
+        top: 1rem;
+      }
     `,
   ];
 
@@ -91,9 +96,14 @@ export default class Collection extends LitElement {
 
   @state() private _page = 1;
   @state() private _pagesRendered = 1; // Only used when totalItems is not provided
+  @state() private _errors: string[] = [];
 
   public setPage(page: number) {
     this._page = page;
+  }
+
+  public error(message: string) {
+    this._errors = [...this._errors, message || "Something went wrong"];
   }
 
   private _renderSearchFilter(filter: FilterProp): TemplateResult {
@@ -103,6 +113,7 @@ export default class Collection extends LitElement {
       clearable
       @sl-input=${(e: Event) => {
         this._page = 1;
+        if (this.totalItems === -1) this._pagesRendered = 1;
         this.dispatchEvent(
           new CustomEvent("filter", {
             detail: {
@@ -122,6 +133,7 @@ export default class Collection extends LitElement {
       clearable
       @sl-change=${(e: CustomEvent) => {
         this._page = 1;
+        if (this.totalItems === -1) this._pagesRendered = 1;
         this.dispatchEvent(
           new CustomEvent("filter", {
             detail: {
@@ -268,11 +280,20 @@ export default class Collection extends LitElement {
   }
 
   private _renderItems(): TemplateResult {
-    const itemsToRender = this.items.filter(
+    let itemsToRender = this.items.filter(
       (item) =>
         item.index > (this._page - 1) * this.pageSize &&
         item.index <= this._page * this.pageSize
     );
+    if (this.totalItems !== -1 && itemsToRender.length === 0) {
+      this._page -= 1;
+      this._pagesRendered -= 1;
+      itemsToRender = this.items.filter(
+        (item) =>
+          item.index > (this._page - 1) * this.pageSize &&
+          item.index <= this._page * this.pageSize
+      );
+    }
     // remove duplicates by index
     const uniqueItems = new Map();
     itemsToRender.forEach((item) => {
@@ -311,9 +332,20 @@ export default class Collection extends LitElement {
     })}`;
   }
 
+  private _renderErrors(): TemplateResult {
+    return html`${this._errors.map(
+      (error) => html`
+        <sl-alert variant="danger" duration="3000" closable open>
+          <strong>${error}</strong><br />
+        </sl-alert>
+      `
+    )}`;
+  }
+
   render() {
     return html`<div class="collection">
-      ${this._renderHeader()} ${this._renderItems()} ${this._renderFooter()}
+      ${this._renderHeader()} ${this._renderErrors()} ${this._renderItems()}
+      ${this._renderFooter()}
     </div>`;
   }
 }
