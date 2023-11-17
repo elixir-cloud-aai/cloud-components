@@ -43,6 +43,9 @@ export default class Collection extends LitElement {
       :host {
         display: block;
       }
+      .collection {
+        position: relative;
+      }
       .title {
         width: 100%;
         display: flex;
@@ -82,9 +85,12 @@ export default class Collection extends LitElement {
       .hidden {
         visibility: hidden;
       }
-      sl-alert {
+      .error {
+        width: 100%;
         position: absolute;
         top: 1rem;
+        display: flex;
+        justify-content: center;
       }
     `,
   ];
@@ -335,9 +341,11 @@ export default class Collection extends LitElement {
   private _renderErrors(): TemplateResult {
     return html`${this._errors.map(
       (error) => html`
-        <sl-alert variant="danger" duration="3000" closable open>
-          <strong>${error}</strong><br />
-        </sl-alert>
+        <div class="error">
+          <sl-alert variant="danger" closable open duration="5000">
+            <strong>${error}</strong><br />
+          </sl-alert>
+        </div>
       `
     )}`;
   }

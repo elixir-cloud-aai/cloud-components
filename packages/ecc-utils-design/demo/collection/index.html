@@ -128,9 +128,11 @@
           }}
           @page-change=${async (e) => {
             if (e.detail.page === 3) {
-              document
-                .querySelector("ecc-utils-design-collection")
-                .error("This is an error message of page 3!");
+              setTimeout(() => {
+                document
+                  .querySelector("ecc-utils-design-collection")
+                  .error("This is an error message of page 3!");
+              }, 1000);
               return;
             }
             const data = await fetchDummyData(e.detail.page, 5, search, tag);
