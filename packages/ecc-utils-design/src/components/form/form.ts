@@ -226,7 +226,6 @@ export default class Form extends LitElement {
           }
 
           this.requestUpdate();
-          console.log(this.form);
         }}
       ></sl-input>
     `;
