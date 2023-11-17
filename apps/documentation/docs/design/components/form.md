@@ -43,7 +43,7 @@ import "@elixir-cloud/design/dist/form/index.js";
 | ------------------- | -------- | ------- | ------- | ------------------------------------------- |
 | [`fields`](#fields) | `true`   | `[]`    | `Array` | Array of fields to be rendered in the form. |
 
-### fields \*
+### fields\*
 
 This property is used to render the fields in the form. Fields can be passed as the array of objects. Each object represents a field. The object can have the following properties.
 
@@ -56,7 +56,7 @@ This property is used to render the fields in the form. Fields can be passed as 
 | fieldOptions.default          | `false`  | `null`  | `string \| boolean`                                                                                                            | Value of the field                                                                                                                                                                                                        |
 | fieldOptions.multiple         | `false`  | `false` | `boolean`                                                                                                                      | Whether fields of type `file` accept multiple values. Only applies to fields of type `file`                                                                                                                               |
 | fieldOptions.accept           | `false`  | `null`  | `string`                                                                                                                       | A comma seperated string that determines the types of files that fields of type `file` will accept. [Example](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept). Only applies to fields of type `file` |
-| fieldOptions.returnIfEmpty    | `false`  | `false` | `booean`                                                                                                                       | Determines if the data from an empty input field will be returned in the form data when empty.                                                                                                                            |
+| fieldOptions.returnIfEmpty    | `false`  | `false` | `boolean`                                                                                                                      | Determines if the data from an empty input field will be returned in the form data when empty.                                                                                                                            |
 | arrayOptions.defaultInstances | `false`  | `null`  | `number`                                                                                                                       | Sets a default number of instances for fields of type `array` Only applies to fields of type `array`                                                                                                                      |
 | arrayOptions.max              | `false`  | `null`  | `number`                                                                                                                       | Sets a maximum number of instances for fields of type `array` Only applies to fields of type `array`                                                                                                                      |
 | arrayOptions.min              | `false`  | `null`  | `number`                                                                                                                       | Sets a minimum number of instances for fields of type `array` Only applies to fields of type `array` arrayOptions.defaultInstances must also be set and must be a number greater than arrayOptions.min                    |
@@ -449,7 +449,6 @@ const fields = [
 import { onMounted, ref } from "vue";
 import { useData } from "vitepress";
 const { isDark } = useData();
-console.log(isDark);
 const renderComponent = ref(false);
 const primaryFields = ref([]);
 const complexExampleFields = ref([]);

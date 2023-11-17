@@ -59,7 +59,7 @@ export default defineConfig({
           { text: 'Usage', link: '/wes/usage' },
           {
             text: 'Components',
-            items: [],
+            items: [{ text: 'Create Run', link: '/wes/components/wes-create-run.md' }],
           },
         ],
       },
@@ -75,6 +75,10 @@ export default defineConfig({
               {
                 text: 'Form',
                 link: '/design/components/form',
+              },
+              {
+                text: 'Collection',
+                link: '/design/components/collection',
               },
             ],
           },

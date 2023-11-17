@@ -8,16 +8,16 @@ Web components for TES
 ### Components
 | Component              | Issue  | Status             |
 |------------------------|--------|--------------------|
-|                        |        |                    |
+|    TESCreateRun        |  #156  |      Beta          |
 
 ## Getting Started
 
 To get started with this project, follow these steps:
 
-1. Add your steps here
+1. Start the dev environment for @elixir-cloud/lit-tes
 
    ```
-   Add your commands here
+   npm run dev
    ```
 
 ## Contributing
