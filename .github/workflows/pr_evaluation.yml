@@ -75,8 +75,8 @@ jobs:
         run: npm install
 
       - name: Build
-        run: npm run build
-      
+        run: npm run build -w=@elixir-cloud/design
+
       - name: Run linters
         run: npm run lint
 
@@ -104,7 +104,7 @@ jobs:
         run: npm install
 
       - name: Build
-        run: npm run build
-      
+        run: npm run build -w=@elixir-cloud/design
+
       - name: Run tests
         run: npm run test
