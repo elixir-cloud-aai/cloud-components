@@ -7,7 +7,7 @@ import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
 import _ from "lodash-es";
-import { sholelaceLightStyles } from "../../styles/shoelace.styles.js";
+import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
 
 interface Field {
@@ -49,7 +49,9 @@ interface Field {
 
 export default class Form extends LitElement {
   static styles = [
-    sholelaceLightStyles,
+    getShoelaceStyles(
+      document.querySelector("html")?.classList.contains("dark")
+    ),
     hostStyles,
     css`
       :host {
