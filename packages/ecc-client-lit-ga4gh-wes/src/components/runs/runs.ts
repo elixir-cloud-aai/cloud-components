@@ -3,13 +3,34 @@ import { customElement, property, state } from "lit/decorators.js";
 import "@elixir-cloud/design";
 import { fetchWorkflow, fetchWorkflows } from "../../API/Workflow/wesGet.js";
 
+interface ItemProp {
+  index: number;
+  name: string;
+  key: string;
+  lazy?: boolean;
+  tag?: {
+    name: string;
+    type?: "primary" | "success" | "neutral" | "warning" | "danger";
+  };
+}
+
+interface FilterProp {
+  key: string;
+  type: "search" | "select";
+  options?: string[];
+  selectConfig?: {
+    multiple?: boolean;
+  };
+  placeholder?: string;
+}
+
 @customElement("ecc-client-lit-ga4gh-wes-runs")
 export class WESRuns extends LitElement {
   @property({ type: Number }) private pageSize = 5;
   @property({ type: String }) private baseURL =
     "https://prowes.rahtiapp.fi/ga4gh/wes/v1";
 
-  @state() private filters: any[] = [
+  @state() private filters: FilterProp[] = [
     {
       key: "title",
       type: "search",
@@ -38,7 +59,7 @@ export class WESRuns extends LitElement {
     },
   ];
 
-  @state() private items: any[] = [];
+  @state() private items: ItemProp[] = [];
   @state() private nextPageToken: string | null = "";
 
   private tagType: Record<string, string> = {
@@ -89,16 +110,21 @@ export class WESRuns extends LitElement {
         eccUtilsDesignCollection.totalItems = this.items.length;
       } else this.nextPageToken = data.next_page_token;
       console.log(data);
-      const covertedData: any[] = [];
+      const covertedData: ItemProp[] = [];
       data.runs.forEach((run: { run_id: string; state: string }) => {
         covertedData.push({
           index: this.items.length + covertedData.length + 1,
           name: run.run_id,
-          key: run.run_id,
+          key: `${run.run_id}`,
           lazy: true,
           tag: {
             name: run.state,
-            type: this.tagType[run.state],
+            type: this.tagType[run.state] as
+              | "primary"
+              | "success"
+              | "neutral"
+              | "warning"
+              | "danger",
           },
         });
       });
@@ -129,13 +155,43 @@ export class WESRuns extends LitElement {
     }
   }
 
+  async handleExpandItem(e: CustomEvent) {
+    const eccUtilsDesignCollection = this.shadowRoot?.querySelector(
+      "ecc-utils-design-collection"
+      // Todo: Get the typeof Collections and use it instead of `any`
+    ) as any;
+    const { target, detail } = e;
+    if (!target || !(target instanceof HTMLElement)) {
+      eccUtilsDesignCollection.error("Target is null or not an HTMLElement");
+      return;
+    }
+
+    const { key } = detail;
+    console.log(detail);
+    const children = target.querySelectorAll(`[slot="${key}"]`);
+
+    if (children.length === 0) {
+      const runData = await fetchWorkflow(this.baseURL, key);
+
+      if (runData !== null) {
+        const child = document.createElement("div");
+        child.setAttribute("slot", key);
+        child.innerHTML = `<p>${JSON.stringify(runData)}</p>`;
+
+        target.appendChild(child);
+      } else {
+        eccUtilsDesignCollection.error(`Failed to fetch data for run: ${key}`);
+      }
+    }
+  }
+
   render() {
     return html`
       <ecc-utils-design-collection
         .filters=${this.filters}
         .items=${this.items}
         @page-change=${this.fetchData}
-        @expand-item=${(e: any) => this.expand(e)}
+        @expand-item=${(e: any) => this.handleExpandItem(e)}
       >
       </ecc-utils-design-collection>
     `;
