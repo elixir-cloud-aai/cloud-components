@@ -19,76 +19,32 @@
       import { html, render } from "lit";
       import "../dist/collection/index.js";
 
-      const items = [
-        {
-          index: 1,
-          name: "Item 1",
-          key: "item-1",
-          lazy: true,
-          tag: {
-            name: "SUCCESS",
-            type: "success",
-          },
+      let items = [];
+      let search = "";
+      let tag = "";
+
+      const fetchDummyData = async (page, limit, searchString, tags) => {
+        const res = await fetch(
+          `https://jsonplaceholder.typicode.com/todos?_page=${page}&_limit=${limit}${
+            searchString ? `&title_like=${searchString}` : ""
+          }${tags ? `&completed=${tags === "SUCCESS"}` : ""}`
+        );
+        const data = await res.json();
+        return data;
+      };
+
+      const dataInitial = await fetchDummyData(1, 5);
+
+      items = dataInitial.map((item, index) => ({
+        index: index + 1,
+        name: item.title,
+        key: `item-${item.id}`,
+        lazy: true,
+        tag: {
+          name: item.completed ? "SUCCESS" : "ERROR",
+          type: item.completed ? "success" : "danger",
         },
-        {
-          index: 2,
-          name: "Item 2",
-          key: "item-2",
-          lazy: true,
-          tag: {
-            name: "WARNING",
-            type: "warning",
-          },
-        },
-        {
-          index: 3,
-          name: "Item 3",
-          key: "item-3",
-          lazy: true,
-          tag: {
-            name: "ERROR",
-            type: "danger",
-          },
-        },
-        {
-          index: 4,
-          name: "Item 4",
-          key: "item-4",
-          lazy: true,
-        },
-        {
-          index: 5,
-          name: "Item 5",
-          key: "item-5",
-          tag: {
-            name: "DEFAULT",
-          },
-        },
-        {
-          index: 6,
-          name: "Item 6",
-          key: "item-6",
-          tag: {
-            name: "DEFAULT",
-          },
-        },
-        {
-          index: 7,
-          name: "Item 7",
-          key: "item-7",
-          tag: {
-            name: "DEFAULT",
-          },
-        },
-        {
-          index: 8,
-          name: "Item 8",
-          key: "item-8",
-          tag: {
-            name: "DEFAULT",
-          },
-        },
-      ];
+      }));
 
       const filters = [
         {
@@ -102,7 +58,7 @@
           options: ["SUCCESS", "WARNING", "ERROR", "DEFAULT", "PRIMARY"],
           placeholder: "Filter by tag",
           selectConfig: {
-            multiple: true,
+            // multiple: true,
           },
         },
       ];
@@ -128,28 +84,58 @@
               e.target.appendChild(child);
             }
           }}
-          @filter=${(e) => {
+          @filter=${async (e) => {
             if (e.detail.key === "title") {
-              const newItems = items.filter((item) =>
-                item.name.toLowerCase().includes(e.detail.value.toLowerCase())
+              search = e.detail.value;
+              const data = await fetchDummyData(
+                1,
+                5,
+                e.detail.value.toLowerCase(),
+                tag
               );
+              const newItems = data.map((item, index) => ({
+                index: index + 1,
+                name: item.title,
+                key: `item-${item.id}`,
+                lazy: true,
+                tag: {
+                  name: item.completed ? "SUCCESS" : "ERROR",
+                  type: item.completed ? "success" : "danger",
+                },
+              }));
               e.target.items = newItems;
+              if (data.length < 5) {
+                e.target.totalItems = data.length;
+              }
             } else if (e.detail.key === "tag") {
-              if (e.detail.value.length > 0) {
-                const newItems = items.filter((item) =>
-                  e.detail.value.includes(item.tag?.name)
-                );
-                e.target.items = newItems;
-              } else {
-                e.target.items = items;
+              tag = e.detail.value;
+              const data = await fetchDummyData(1, 5, search, e.detail.value);
+              const newItems = data.map((item, index) => ({
+                index: index + 1,
+                name: item.title,
+                key: `item-${item.id}`,
+                lazy: true,
+                tag: {
+                  name: item.completed ? "SUCCESS" : "ERROR",
+                  type: item.completed ? "success" : "danger",
+                },
+              }));
+              e.target.items = newItems;
+              if (data.length < 5) {
+                e.target.totalItems = data.length;
               }
             }
           }}
           @page-change=${async (e) => {
-            const res = await fetch(
-              `https://jsonplaceholder.typicode.com/todos?_page=${e.detail.page}&_limit=5`
-            );
-            const data = await res.json();
+            if (e.detail.page === 3) {
+              setTimeout(() => {
+                document
+                  .querySelector("ecc-utils-design-collection")
+                  .error("This is an error message of page 3!");
+              }, 1000);
+              return;
+            }
+            const data = await fetchDummyData(e.detail.page, 5, search, tag);
             for (let i = 0; i < data.length; i += 1) {
               const element = data[i];
               const existingItem = e.target.items.find(
@@ -174,8 +160,8 @@
                 },
               ];
             }
-            if (e.detail.page === 5) {
-              e.target.totalItems = e.detail.page * 5;
+            if (data.length < 5) {
+              e.target.totalItems = (e.detail.page - 1) * 5 + data.length;
             }
           }}
         >
