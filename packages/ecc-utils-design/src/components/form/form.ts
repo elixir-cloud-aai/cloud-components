@@ -72,12 +72,15 @@ export default class Form extends LitElement {
       .group-container {
         margin: 1rem 0;
       }
-      .array-item,
-      .group-item {
+      .array-item {
         margin: 1rem 0;
         border-style: solid;
+        padding: 0px 0px 1rem 0px;
         border-width: 0px 0px 1px 0px;
         border-color: var(--sl-color-gray-300);
+      }
+      .group-item {
+        margin: 1rem 0;
       }
       .array-item {
         display: flex;
@@ -87,7 +90,7 @@ export default class Form extends LitElement {
       .array-header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: center
         margin-bottom: 1rem;
       }
       .array-item-container {
@@ -103,6 +106,7 @@ export default class Form extends LitElement {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
+        align-items: center;
       }
       input[type="file"]::file-selector-button {
         height: 100%;
@@ -134,6 +138,9 @@ export default class Form extends LitElement {
       .error-icon {
         height: 1.25rem;
       }
+      .sl-details::part(base) {
+        padding: 0;
+      }
     `,
   ];
 
@@ -162,6 +169,7 @@ export default class Form extends LitElement {
         <label part="label" class="switch-label">${field.label}</label>
         <sl-switch
           exportparts="control: switch, thumb: switch-thumb"
+          size="small"
           class="switch"
           label=${field.label}
           ?required=${field.fieldOptions?.required}
@@ -176,7 +184,12 @@ export default class Form extends LitElement {
   }
 
   renderInputTemplate(field: Field, path: string): TemplateResult {
-    if (field.type === "array" || field.type === "switch") return html``;
+    if (
+      field.type === "array" ||
+      field.type === "switch" ||
+      field.type === "group"
+    )
+      return html``;
     if (field.type === "file") {
       return html`
         <div part="field" class="row">
@@ -265,6 +278,7 @@ export default class Form extends LitElement {
           </label>
           <sl-button
             variant="text"
+            size="small"
             exportparts="base: button, base: add-button"
             ?disabled=${!resolveAddButtonIsActive()}
             class="add-button"
@@ -336,7 +350,6 @@ export default class Form extends LitElement {
 
   private renderGroupTemplate(field: Field, path: string): TemplateResult {
     if (!field.children) return html``;
-
     const renderChildren = () =>
       html`
         <div part="group-item" class="group-item">

@@ -47,21 +47,21 @@ import "@elixir-cloud/design/dist/form/index.js";
 
 This property is used to render the fields in the form. Fields can be passed as the array of objects. Each object represents a field. The object can have the following properties.
 
-| Property                      | Required | Default | Type                                                                                                                                   | Description                                                                                                                                                                                                               |
-| ----------------------------- | -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| key                           | `true`   | `null`  | `string`                                                                                                                               | Unique key for the field.                                                                                                                                                                                                 |
-| label                         | `true`   | `null`  | `string`                                                                                                                               | Label for the field.                                                                                                                                                                                                      |
-| type                          | `false`  | `text`  | `text    \| date \| number \| email \| password \| tel \| url \| search \| datetime-local \| time \| file  \| switch  \|array \|group` | Type of the field.                                                                                                                                                                                                        |
-| children                      | `false`  | `null`  | `array`                                                                                                                                | Children fields for the field if type is array. This allows fields to be added dynamically                                                                                                                                |
-| fieldOptions.required         | `false`  | `false` | `boolean`                                                                                                                              | Whether the field is required or not.                                                                                                                                                                                     |
-| fieldOptions.default          | `false`  | `null`  | `string \| boolean`                                                                                                                    | Value of the field                                                                                                                                                                                                        |
-| fieldOptions.multiple         | `false`  | `false` | `boolean`                                                                                                                              | Whether fields of type `file` accept multiple values. Only applies to fields of type `file`                                                                                                                               |
-| fieldOptions.accept           | `false`  | `null`  | `string`                                                                                                                               | A comma seperated string that determines the types of files that fields of type `file` will accept. [Example](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept). Only applies to fields of type `file` |
-| fieldOptions.returnIfEmpty    | `false`  | `false` | `boolean`                                                                                                                              | Determines if the data from an empty input field will be returned in the form data when empty.                                                                                                                            |
-| arrayOptions.defaultInstances | `false`  | `null`  | `number`                                                                                                                               | Sets a default number of instances for fields of type `array` Only applies to fields of type `array`                                                                                                                      |
-| arrayOptions.max              | `false`  | `null`  | `number`                                                                                                                               | Sets a maximum number of instances for fields of type `array` Only applies to fields of type `array`                                                                                                                      |
-| arrayOptions.min              | `false`  | `null`  | `number`                                                                                                                               | Sets a minimum number of instances for fields of type `array` Only applies to fields of type `array` arrayOptions.defaultInstances must also be set and must be a number greater than arrayOptions.min                    |
-| groupOptions.collapsible      | `false`  | `null`  | `number`                                                                                                                               | Determines if a field of type `group` will be collapsible                                                                                                                                                                 |
+| Property                      | Required | Default | Type                                                                                                                                  | Description                                                                                                                                                                                                               |
+| ----------------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| key                           | `true`   | `null`  | `string`                                                                                                                              | Unique key for the field.                                                                                                                                                                                                 |
+| label                         | `true`   | `null`  | `string`                                                                                                                              | Label for the field.                                                                                                                                                                                                      |
+| type                          | `false`  | `text`  | `text \| date \| number \| email \| password \| tel \| url \| search \| datetime-local \| time \| file  \| switch  \| array \| group` | Type of the field.                                                                                                                                                                                                        |
+| children                      | `false`  | `null`  | `array`                                                                                                                               | Children fields for the field if type is array. This allows fields to be added dynamically                                                                                                                                |
+| fieldOptions.required         | `false`  | `false` | `boolean`                                                                                                                             | Whether the field is required or not.                                                                                                                                                                                     |
+| fieldOptions.default          | `false`  | `null`  | `string \| boolean`                                                                                                                   | Value of the field                                                                                                                                                                                                        |
+| fieldOptions.multiple         | `false`  | `false` | `boolean`                                                                                                                             | Whether fields of type `file` accept multiple values. Only applies to fields of type `file`                                                                                                                               |
+| fieldOptions.accept           | `false`  | `null`  | `string`                                                                                                                              | A comma seperated string that determines the types of files that fields of type `file` will accept. [Example](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept). Only applies to fields of type `file` |
+| fieldOptions.returnIfEmpty    | `false`  | `false` | `boolean`                                                                                                                             | Determines if the data from an empty input field will be returned in the form data when empty.                                                                                                                            |
+| arrayOptions.defaultInstances | `false`  | `null`  | `number`                                                                                                                              | Sets a default number of instances for fields of type `array` Only applies to fields of type `array`                                                                                                                      |
+| arrayOptions.max              | `false`  | `null`  | `number`                                                                                                                              | Sets a maximum number of instances for fields of type `array` Only applies to fields of type `array`                                                                                                                      |
+| arrayOptions.min              | `false`  | `null`  | `number`                                                                                                                              | Sets a minimum number of instances for fields of type `array` Only applies to fields of type `array` arrayOptions.defaultInstances must also be set and must be a number greater than arrayOptions.min                    |
+| groupOptions.collapsible      | `false`  | `null`  | `number`                                                                                                                              | Determines if a field of type `group` will be collapsible                                                                                                                                                                 |
 
 ## Events
 
@@ -133,18 +133,13 @@ const fields = [
     key: "email",
     label: "Email",
     type: "email",
-    fieldOptions: {
-      // required: false,
-    },
   },
   {
     key: "address",
     label: "Address",
-    type: "array",
-    arrayOptions: {
-      defaultInstances: 1,
-      max: 3,
-      min: 1
+    type: "group",
+    groupOptions: {
+      collapsible: true,
     },
     children: [
       {
@@ -152,9 +147,8 @@ const fields = [
         label: "Details",
         type: "array",
         arrayOptions: {
-          defaultInstances: 1,
-          max: 1,
-          min: 1
+          defaultInstances: 0,
+          max: 2,
         },
         children: [
           {
@@ -170,7 +164,7 @@ const fields = [
             label: "Street",
             type: "text",
             fieldOptions: {
-              // required: false,
+              default: "1601 Harrier Ln",
             },
           },
           {
@@ -181,12 +175,15 @@ const fields = [
               required: true,
             },
           },
+          {
+            key: "isPrimary",
+            label: "Primary",
+            type: "switch",
+            fieldOptions: {
+              default: true,
+            },
+          },
         ],
-      },
-      {
-        key: "isPrimary",
-        label: "Primary",
-        type: "switch",
       },
     ],
   },
@@ -194,9 +191,6 @@ const fields = [
     key: "18+",
     label: "18+",
     type: "switch",
-    fieldOptions: {
-      default: true,
-    },
   },
   {
     key: "id",
@@ -488,18 +482,13 @@ onMounted(() => {
           key: "email",
           label: "Email",
           type: "email",
-          fieldOptions: {
-            // required: false,
-          },
         },
         {
           key: "address",
           label: "Address",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 1,
-            max: 3,
-            min: 1
+          type: "group",
+          groupOptions: {
+            collapsible: true,
           },
           children: [
             {
@@ -507,9 +496,8 @@ onMounted(() => {
               label: "Details",
               type: "array",
               arrayOptions: {
-                defaultInstances: 1,
-                max: 1,
-                min: 1
+                defaultInstances: 0,
+                max: 2,
               },
               children: [
                 {
@@ -525,7 +513,7 @@ onMounted(() => {
                   label: "Street",
                   type: "text",
                   fieldOptions: {
-                    // required: false,
+                    default: "1601 Harrier Ln",
                   },
                 },
                 {
@@ -536,12 +524,15 @@ onMounted(() => {
                     required: true,
                   },
                 },
+                {
+                  key: "isPrimary",
+                  label: "Primary",
+                  type: "switch",
+                  fieldOptions: {
+                    default: true,
+                  },
+                },
               ],
-            },
-            {
-              key: "isPrimary",
-              label: "Primary",
-              type: "switch",
             },
           ],
         },
@@ -549,9 +540,6 @@ onMounted(() => {
           key: "18+",
           label: "18+",
           type: "switch",
-          fieldOptions: {
-            default: true,
-          },
         },
         {
           key: "id",
