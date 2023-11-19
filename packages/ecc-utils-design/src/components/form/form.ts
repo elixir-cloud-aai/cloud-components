@@ -7,7 +7,7 @@ import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
 import _ from "lodash-es";
-import { sholelaceLightStyles } from "../../styles/shoelace.styles.js";
+import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
 
 interface Field {
@@ -33,6 +33,7 @@ interface Field {
     default?: string | boolean;
     multiple?: boolean;
     accept?: string;
+    returnIfEmpty?: string;
   };
   arrayOptions?: {
     defaultInstances?: number;
@@ -48,7 +49,9 @@ interface Field {
 
 export default class Form extends LitElement {
   static styles = [
-    sholelaceLightStyles,
+    getShoelaceStyles(
+      document.querySelector("html")?.classList.contains("dark")
+    ),
     hostStyles,
     css`
       :host {
@@ -150,7 +153,7 @@ export default class Form extends LitElement {
   private renderSwitchTemplate(field: Field, path: string): TemplateResult {
     if (field.type !== "switch") return html``;
 
-    if (!_.get(this.form, path)) {
+    if (!_.get(this.form, path) && !this.hasUpdated) {
       _.set(this.form, path, field.fieldOptions?.default || false);
     }
 
@@ -184,7 +187,7 @@ export default class Form extends LitElement {
             class="input"
             part="input-base input"
             type="file"
-            accept=${field.fieldOptions?.accept}
+            accept=${field.fieldOptions?.accept || "*"}
             ?multiple=${field.fieldOptions?.multiple}
             ?required=${field.fieldOptions?.required}
             @change=${async (e: Event) => {
@@ -198,8 +201,13 @@ export default class Form extends LitElement {
     }
 
     if (!_.get(this.form, path)) {
-      _.set(this.form, path, field.fieldOptions?.default || "");
+      if (field.fieldOptions?.default && !this.hasUpdated) {
+        _.set(this.form, path, field.fieldOptions.default);
+      } else if (field.fieldOptions?.returnIfEmpty) {
+        _.set(this.form, path, "");
+      }
     }
+
     return html`
       <sl-input
         exportparts="form-control: field, form-control-label: label, input: input, base: input-base"
@@ -210,7 +218,13 @@ export default class Form extends LitElement {
         value=${_.get(this.form, path)}
         ?password-toggle=${field.type === "password"}
         @sl-change=${(e: Event) => {
-          _.set(this.form, path, (e.target as HTMLInputElement).value);
+          const { value } = e.target as HTMLInputElement;
+          if (!value) {
+            _.unset(this.form, path);
+          } else {
+            _.set(this.form, path, value);
+          }
+
           this.requestUpdate();
           console.log(this.form);
         }}

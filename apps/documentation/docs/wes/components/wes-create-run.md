@@ -1,19 +1,18 @@
 # Form Component <Badge type="warning" text="beta" />
 
-<div class="component-name">&lt;ecc-client-lit-ga4gh-tes-create-run&gt;</div>
-This component is used to create task runs using TES API.
+<div class="component-name">&lt;ecc-client-lit-ga4gh-wes-create-run&gt;</div>
+This component is used to create workflows runs using WES API.
 <ClientOnly>
   <div :class="isDark ? 'component-dark component' : 'component-light component'">
-    <ecc-client-lit-ga4gh-tes-create-run>
-    </ecc-client-lit-ga4gh-tes-create-run>
+    <ecc-client-lit-ga4gh-wes-create-run />
 
 ::: details Code Blocks
 ::: code-group
 
 ```js [HTML]
-import "@elixir-cloud/lit-tes";
+import "@elixir-cloud/lit-wes";
 
-<ecc-client-lit-ga4gh-tes-create-run />;
+<ecc-utils-design-form />;
 ```
 
   <!-- ```jsx [React]
@@ -28,22 +27,22 @@ import "@elixir-cloud/lit-tes";
 ## Importing
 
 ```js [HTML]
-import "@elixir-cloud/lit-tes";
+import "@elixir-cloud/lit-wes";
 ```
 
 ## Properties
 
 | Property              | Required | Default                                   | Type     | Description |
 | --------------------- | -------- | ----------------------------------------- | -------- | ----------- |
-| [`baseURL`](#baseURL) | `false`  | `https://protes.rahtiapp.fi/ga4gh/tes/v1` | `String` | Base URL    |
+| [`baseURL`](#baseURL) | `false`  | `https://prowes.rahtiapp.fi/ga4gh/wes/v1` | `String` | Base URL    |
 
 ### baseURL
 
-This property is used to give `POST` endpoint to create `Task run`. The provided baseURL is concatinated with `/runs` and is used as an endpoint to create a `POST` request.
+This property is used to give `POST` endpoint to create workflow. The provided baseURL is concatinated with `/runs` and is used as an endpoint to create a `POST` request.
 
 ## Parts
 
-<!-- TODO: -->
+TODO:
 
 <!-- | Part Name       | Description                                                                       |
 | --------------- | --------------------------------------------------------------------------------- |
@@ -58,17 +57,17 @@ This property is used to give `POST` endpoint to create `Task run`. The provided
 <ClientOnly>
   <div :class="isDark ? 'component-dark component' : 'component-light component'">
   <!-- Render ecc-utils-design-form component only after the component is loaded -->
-    <ecc-client-lit-ga4gh-tes-create-run
-        baseURL="http://localhost:8080/ga4gh/tes/v1"
+    <ecc-client-lit-ga4gh-wes-create-run
+        baseURL="http://localhost:8090/ga4gh/wes/v1"
     />
 
 ::: details Code Blocks
 ::: code-group
 
 ```js [HTML]
-import "@elixir-cloud/lit-tes";
+import "@elixir-cloud/lit-wes";
 
-<ecc-client-lit-ga4gh-tes-create-run baseURL="http://localhost:8080/ga4gh/tes/v1" />;
+<ecc-client-lit-ga4gh-wes-create-run baseURL="http://localhost:8090/ga4gh/wes/v1" />;
 ```
 
   <!-- ```jsx [React]
@@ -80,15 +79,17 @@ import "@elixir-cloud/lit-tes";
   </div>
 </ClientOnly>
 
-> The baseURL provided is localhost:8080, for this to work, have a TES implementation running on PORT 8080 or locally deploy [proTES](https://github.com/elixir-cloud-aai/proTES).
+> The baseURL provided is localhost:8090, for this to work, have a WES implementation running on PORT 8090 or locally deploy [proWES](https://github.com/elixir-cloud-aai/proWES).
 
 <script setup>
-import { onMounted } from "vue";
+  import { onMounted } from "vue";
 import { useData } from "vitepress";
 const { isDark } = useData();
 onMounted(() => {
-  import("@elixir-cloud/lit-tes").then((module) => {
-    document.querySelectorAll("ecc-client-lit-ga4gh-tes-create-run").forEach((element) => {
+  import("@elixir-cloud/lit-wes").then((module) => {
+    renderComponent.value = false;
+    renderComponent.value = true;
+    document.querySelectorAll("ecc-client-lit-ga4gh-wes-create-run").forEach((element) => {
       element.addEventListener("form-submit", (e) => {
         console.log("form-submitted", e.detail);
       });
