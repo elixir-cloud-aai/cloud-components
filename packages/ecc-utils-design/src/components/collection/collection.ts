@@ -11,6 +11,7 @@ import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/skeleton/skeleton.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import { hostStyles } from "../../styles/host.styles.js";
+import collectionStyles from "./collection.styles.js";
 
 interface ItemProp {
   index: number;
@@ -33,12 +34,29 @@ interface FilterProp {
   placeholder?: string;
 }
 
-export default class Collection extends LitElement {
+/**
+ * @summary This component is used to render a collection of items. It can be used to render a filters & pagination component for a list of items.
+ * @since 1.0.0
+ *
+ * @property {array} items - An array of items to render
+ * @property {array} filters - An array of filters to render
+ * @property {number} totalItems - The total number of items in the collection. If not provided, the collection will render pagination without fixed page numbers.
+ * @property {number} pageSize - The number of items per pagination.
+ *
+ * @method setPage - Can be used to set the page of the collection.
+ * @method error - Can be used to display error alert to the user.
+ *
+ * @event ecc-utils-page-change - Fired when the page is changed.
+ * @event ecc-utils-expand - Fired when an item is expanded.
+ * @event ecc-utils-filter - Fired when a filter is applied.
+ */
+export default class EccUtilsDesignCollection extends LitElement {
   static styles = [
     getShoelaceStyles(
       document.querySelector("html")?.classList.contains("dark")
     ),
     hostStyles,
+    collectionStyles,
     css`
       :host {
         display: block;
@@ -121,7 +139,7 @@ export default class Collection extends LitElement {
         this._page = 1;
         if (this.totalItems === -1) this._pagesRendered = 1;
         this.dispatchEvent(
-          new CustomEvent("filter", {
+          new CustomEvent("ecc-utils-filter", {
             detail: {
               key: filter.key,
               value: (e.target as HTMLInputElement)?.value,
@@ -141,7 +159,7 @@ export default class Collection extends LitElement {
         this._page = 1;
         if (this.totalItems === -1) this._pagesRendered = 1;
         this.dispatchEvent(
-          new CustomEvent("filter", {
+          new CustomEvent("ecc-utils-filter", {
             detail: {
               key: filter.key,
               value: (e.target as HTMLInputElement)?.value,
@@ -181,7 +199,7 @@ export default class Collection extends LitElement {
           @click=${() => {
             this._page -= 1;
             this.dispatchEvent(
-              new CustomEvent("page-change", {
+              new CustomEvent("ecc-utils-page-change", {
                 detail: {
                   page: this._page,
                 },
@@ -201,7 +219,7 @@ export default class Collection extends LitElement {
             @click=${() => {
               this._page = page + 1;
               this.dispatchEvent(
-                new CustomEvent("page-change", {
+                new CustomEvent("ecc-utils-page-change", {
                   detail: {
                     page: this._page,
                   },
@@ -223,7 +241,7 @@ export default class Collection extends LitElement {
             }
             this._page += 1;
             this.dispatchEvent(
-              new CustomEvent("page-change", {
+              new CustomEvent("ecc-utils-page-change", {
                 detail: {
                   page: this._page,
                 },
@@ -249,7 +267,7 @@ export default class Collection extends LitElement {
       class="${hidden ? "hidden" : ""}"
       @sl-show=${() => {
         this.dispatchEvent(
-          new CustomEvent("expand-item", {
+          new CustomEvent("ecc-utils-expand", {
             detail: {
               key: item.key,
             },

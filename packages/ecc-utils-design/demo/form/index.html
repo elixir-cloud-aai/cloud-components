@@ -91,7 +91,7 @@
 
     <script type="module">
       import { html, render } from "lit";
-      import "../dist/form/index.js";
+      import "../dist/components/form/index.js";
 
       const fields = [
         {
@@ -183,7 +183,7 @@
       render(
         html`<ecc-utils-design-form
           .fields=${fields}
-          @form-submit=${async (e) => {
+          @ecc-utils-submit=${async (e) => {
             try {
               console.log("form - submitted", e.detail);
               document.querySelector("ecc-utils-design-form").loading();
@@ -198,7 +198,7 @@
             }
           }}
         >
-        </ecc-utils-design-form>`,
+        </ecc-utils-design-form> `,
         document.querySelector("#demo")
       );
     </script>

@@ -9,6 +9,7 @@ import "@shoelace-style/shoelace/dist/components/details/details.js";
 import _ from "lodash-es";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
+import formStyles from "./form.styles.js";
 
 interface Field {
   key: string;
@@ -47,12 +48,25 @@ interface Field {
   children?: Array<Field>;
 }
 
-export default class Form extends LitElement {
+/**
+ * @summary This component is used to render a form with the given fields.
+ * @since 1.0.0
+ *
+ * @property {array} fields - Array of fields to be rendered on the form
+ *
+ * @method idle - Reset the form state to idle. Doesn't affect the form values.
+ * @method loading - Set the form state to loading. Disables the submit button.
+ * @method success - Set the form state to success. Show the success message.
+ *
+ * @event ecc-utils-submit - This event is fired when the form is submitted. The event detail contains the form data.
+ */
+export default class EccUtilsDesignForm extends LitElement {
   static styles = [
     getShoelaceStyles(
       document.querySelector("html")?.classList.contains("dark")
     ),
     hostStyles,
+    formStyles,
     css`
       :host {
         display: block;
@@ -69,20 +83,14 @@ export default class Form extends LitElement {
         margin-top: 0.5rem;
         margin-bottom: 0.5rem;
       }
-      .group-container {
-        margin: 1rem 0;
-      }
-      .array-item,
-      .group-item {
-        margin: 1rem 0;
-        border-style: solid;
-        border-width: 0px 0px 1px 0px;
-        border-color: var(--sl-color-gray-300);
-      }
       .array-item {
         display: flex;
         flex-direction: row;
         align-items: center;
+        margin-bottom: 1rem;
+        border-style: solid;
+        border-width: 0px 0px 1px 0px;
+        border-color: var(--sl-color-gray-300);
       }
       .array-header {
         display: flex;
@@ -92,6 +100,9 @@ export default class Form extends LitElement {
       }
       .array-item-container {
         width: 100%;
+      }
+      .array-label {
+        margin-bottom: 0.5rem;
       }
       .delete-icon {
         height: 1.25rem;
@@ -137,13 +148,14 @@ export default class Form extends LitElement {
     `,
   ];
 
-  @property({ type: Array }) private fields: Array<Field> = [];
+  @property({ type: Array }) private fields!: Array<Field>;
   @state() private form: object = {};
   @state() private formState: "idle" | "loading" | "error" | "success" = "idle";
   @state() private errorMessage = "Form submitted successfully";
   @state() private successMessage = "Something went wrong";
 
   connectedCallback() {
+    this.fields = [];
     super.connectedCallback();
     if (!this.fields) {
       throw new Error("Fields is required");
@@ -226,7 +238,6 @@ export default class Form extends LitElement {
           }
 
           this.requestUpdate();
-          console.log(this.form);
         }}
       ></sl-input>
     `;
@@ -461,7 +472,7 @@ export default class Form extends LitElement {
           if (!isValid) {
             return;
           }
-          const event = new CustomEvent("form-submit", {
+          const event = new CustomEvent("ecc-utils-submit", {
             detail: {
               form: this.form,
             },
