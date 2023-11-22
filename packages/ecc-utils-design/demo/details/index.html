@@ -26,6 +26,15 @@
 			      { key: "name", label: "Name", value: "John Doe", type: "text" },
 			      { key: "age", label: "Age", value: 28, type: "text" },
 			      {
+			        key: "hobby",
+			        label: "Hobby",
+			        value: ["swimming", "dancing", "singing"],
+			        type: "array",
+			        arrayOptions: {
+			          pill: true,
+			        },
+			      },
+			      {
 			        key: "email",
 			        label: "Email",
 			        value: "john@example.com",
@@ -62,6 +71,20 @@
 			        value: "http://johndoe.com",
 			        type: "url",
 			      },
+			      {
+			        key: "values",
+			        label: "Values",
+			        value: [
+			          "Friendly and outgoing",
+			          "Enjoys outdoor activities",
+			          "Passionate about technology",
+			          "Loves trying new cuisines",
+			        ],
+			        type: "array",
+			        arrayOptions: {
+			          vertical: true,
+			        },
+			      },
 			    ],
 			  },
 			];
@@ -74,3 +97,4 @@
 		</script>
 	</body>
 </html>
+

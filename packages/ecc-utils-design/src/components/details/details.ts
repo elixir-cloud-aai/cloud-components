@@ -6,13 +6,18 @@ import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
 import "@shoelace-style/shoelace/dist/components/tab/tab.js";
 import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
 import "@shoelace-style/shoelace/dist/components/copy-button/copy-button.js";
+import "@shoelace-style/shoelace/dist/components/tag/tag.js";
 import { hostStyles } from "../../styles/host.styles.js";
 
 interface Children {
   key: string;
   label: string;
-  value: string | number;
-  type: "text" | "long-text" | "url";
+  value: string | number | Array<string>;
+  type: "text" | "long-text" | "url" | "array";
+  arrayOptions?: {
+    vertical?: boolean;
+    pill?: boolean;
+  };
 }
 
 interface Field {
@@ -51,6 +56,15 @@ export default class Details extends LitElement {
       .large-text::-webkit-scrollbar {
         display: none; /* Safari and Chrome */
       }
+
+      .array-value {
+        display: flex;
+        gap: 0.2rem;
+      }
+
+      .vertical {
+        flex-direction: column;
+      }
     `,
   ];
 
@@ -88,6 +102,26 @@ export default class Details extends LitElement {
     `;
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  private _renderArray(child: Children): TemplateResult {
+    return html`
+      <div class="container">
+        <div class="label">${child.label}</div>
+        <div
+          class="array-value ${child.arrayOptions?.vertical ? "vertical" : ""}"
+        >
+          ${child.arrayOptions?.pill
+            ? html`${(child.value as Array<string>).map(
+                (value) => html`<sl-tag size="medium" pill>${value}</sl-tag>`
+              )}`
+            : html`${(child.value as Array<string>).map(
+                (value) => html`<div class="value">${value}</div>`
+              )}`}
+        </div>
+      </div>
+    `;
+  }
+
   private _renderField(tabName: string, data: Array<Children>): TemplateResult {
     return html`
       <sl-tab slot="nav" panel="${toLower(tabName)}">${tabName}</sl-tab>
@@ -100,6 +134,8 @@ export default class Details extends LitElement {
               return this._renderText(child);
             case "long-text":
               return this._renderLongText(child);
+            case "array":
+              return this._renderArray(child);
             default:
               return html``;
           }
