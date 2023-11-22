@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-console */
+/* eslint-disable no-param-reassign */
 
 import { globby } from "globby";
 import * as tsup from "tsup";
@@ -9,9 +10,7 @@ import { exec } from "child_process";
 import fs from "fs";
 import { npmDir } from "./utils.js";
 
-program.option("-w --watch");
-program.parse();
-const options = program.opts();
+const options = program.option("-w --watch").parse().opts();
 
 // to do:
 // write cdn config
@@ -83,5 +82,8 @@ await nextTask("Wrapping components for React", () =>
 await nextTask("Building source", () =>
   tsup.build({
     ...config,
+    esbuildOptions(buildOptions) {
+      buildOptions.chunkNames = "chunks/[name].[hash]";
+    },
   })
 );

@@ -69,14 +69,13 @@ export default class EccUtilsDesignForm extends LitElement {
     formStyles,
   ];
 
-  @property({ type: Array }) private fields!: Array<Field>;
+  @property({ type: Array }) private fields: Array<Field> = [];
   @state() private form: object = {};
   @state() private formState: "idle" | "loading" | "error" | "success" = "idle";
   @state() private errorMessage = "Form submitted successfully";
   @state() private successMessage = "Something went wrong";
 
   connectedCallback() {
-    this.fields = [];
     super.connectedCallback();
     if (!this.fields) {
       throw new Error("Fields is required");
