@@ -10,7 +10,7 @@ import { hostStyles } from "../../styles/host.styles.js";
 
 interface Children {
   key: string;
-  label: number;
+  label: string;
   value: string | number;
   type: "text" | "long-text" | "url";
 }
