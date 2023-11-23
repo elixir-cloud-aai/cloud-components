@@ -5,6 +5,7 @@ import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/switch/switch.js";
 import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
+import "@shoelace-style/shoelace/dist/components/details/details.js";
 import _ from "lodash-es";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
@@ -25,7 +26,8 @@ interface Field {
     | "time"
     | "array"
     | "switch"
-    | "file";
+    | "file"
+    | "group";
   fieldOptions?: {
     required?: boolean;
     default?: string | boolean;
@@ -37,6 +39,9 @@ interface Field {
     defaultInstances?: number;
     max?: number;
     min?: number;
+  };
+  groupOptions?: {
+    collapsible: boolean;
   };
   error?: string;
   children?: Array<Field>;
@@ -64,14 +69,23 @@ export default class Form extends LitElement {
         margin-top: 0.5rem;
         margin-bottom: 0.5rem;
       }
+      .group-container {
+        margin: 1rem 0;
+      }
+      .array-item {
+        margin: 1rem 0;
+        border-style: solid;
+        padding: 0px 0px 1rem 0px;
+        border-width: 0px 0px 1px 0px;
+        border-color: var(--sl-color-gray-300);
+      }
+      .group-item {
+        margin: 1rem 0;
+      }
       .array-item {
         display: flex;
         flex-direction: row;
         align-items: center;
-        margin-bottom: 1rem;
-        border-style: solid;
-        border-width: 0px 0px 1px 0px;
-        border-color: var(--sl-color-gray-300);
       }
       .array-header {
         display: flex;
@@ -81,9 +95,6 @@ export default class Form extends LitElement {
       }
       .array-item-container {
         width: 100%;
-      }
-      .array-label {
-        margin-bottom: 0.5rem;
       }
       .delete-icon {
         height: 1.25rem;
@@ -95,6 +106,7 @@ export default class Form extends LitElement {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
+        align-items: center;
       }
       input[type="file"]::file-selector-button {
         height: 100%;
@@ -126,6 +138,9 @@ export default class Form extends LitElement {
       .error-icon {
         height: 1.25rem;
       }
+      .sl-details::part(base) {
+        padding: 0;
+      }
     `,
   ];
 
@@ -154,6 +169,7 @@ export default class Form extends LitElement {
         <label part="label" class="switch-label">${field.label}</label>
         <sl-switch
           exportparts="control: switch, thumb: switch-thumb"
+          size="small"
           class="switch"
           label=${field.label}
           ?required=${field.fieldOptions?.required}
@@ -168,7 +184,12 @@ export default class Form extends LitElement {
   }
 
   renderInputTemplate(field: Field, path: string): TemplateResult {
-    if (field.type === "array" || field.type === "switch") return html``;
+    if (
+      field.type === "array" ||
+      field.type === "switch" ||
+      field.type === "group"
+    )
+      return html``;
     if (field.type === "file") {
       return html`
         <div part="field" class="row">
@@ -251,12 +272,13 @@ export default class Form extends LitElement {
 
     return html`
       <div class="array-container">
-        <div part="array-header" class="array-header">
+        <div part="header array-header" class="array-header">
           <label part="label array-label" class="array-label">
             ${field.label}
           </label>
           <sl-button
             variant="text"
+            size="small"
             exportparts="base: button, base: add-button"
             ?disabled=${!resolveAddButtonIsActive()}
             class="add-button"
@@ -326,7 +348,40 @@ export default class Form extends LitElement {
     `;
   }
 
+  private renderGroupTemplate(field: Field, path: string): TemplateResult {
+    if (!field.children) return html``;
+    const renderChildren = () =>
+      html`
+        <div part="group-item" class="group-item">
+          ${field.children?.map((child) =>
+            this.renderTemplate(child, `${path}`)
+          )}
+        </div>
+      `;
+
+    return html` <div class="group-container">
+      ${field.groupOptions?.collapsible
+        ? html` <sl-details
+            summary=${field.label}
+            exportparts="base: group, header, header: group-header, summary: label, summary: group-label, summary-icon: group-toggle-icon, content: group-content"
+          >
+            ${renderChildren()}
+          </sl-details>`
+        : html`
+            <div part="header group-header" class="group-header">
+              <label part="label group-label" class="group-label">
+                ${field.groupOptions?.collapsible ? "" : field.label}
+              </label>
+            </div>
+            ${renderChildren()}
+          `}
+    </div>`;
+  }
+
   private renderTemplate(field: Field, path: string): TemplateResult {
+    if (field.type === "group") {
+      return this.renderGroupTemplate(field, `${path}.${field.key}`);
+    }
     if (field.type === "array") {
       return this.renderArrayTemplate(field, `${path}.${field.key}`);
     }

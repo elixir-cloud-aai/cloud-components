@@ -113,12 +113,15 @@
         {
           key: "address",
           label: "Address",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 1,
-            max: 4,
-            min: 1,
+          type: "group",
+          groupOptions: {
+            collapsible: true,
           },
+          // arrayOptions: {
+          //   defaultInstances: 1,
+          //   max: 4,
+          //   min: 1,
+          // },
           children: [
             {
               key: "Details",
@@ -126,6 +129,7 @@
               type: "array",
               arrayOptions: {
                 defaultInstances: 0,
+                max: 2,
               },
               children: [
                 {
@@ -153,15 +157,15 @@
                     required: true,
                   },
                 },
+                {
+                  key: "isPrimary",
+                  label: "Primary",
+                  type: "switch",
+                  fieldOptions: {
+                    default: true,
+                  },
+                },
               ],
-            },
-            {
-              key: "isPrimary",
-              label: "Primary",
-              type: "switch",
-              fieldOptions: {
-                default: true,
-              },
             },
           ],
         },
@@ -179,7 +183,6 @@
           },
         },
       ];
-
       render(
         html`<ecc-utils-design-form
           .fields=${fields}
