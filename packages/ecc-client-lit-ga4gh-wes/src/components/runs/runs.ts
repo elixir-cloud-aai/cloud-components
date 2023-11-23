@@ -1,7 +1,23 @@
-import { html, LitElement } from "lit";
+import { html, LitElement, render } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import "@elixir-cloud/design";
 import { fetchWorkflow, fetchWorkflows } from "../../API/Workflow/wesGet.js";
+
+interface Children {
+  key: string;
+  label: string;
+  value: string | number | Array<string> | Record<string, string>;
+  type: "text" | "long-text" | "url" | "array" | "object";
+  arrayOptions?: {
+    vertical?: boolean;
+    pill?: boolean;
+  };
+}
+
+interface Field {
+  tabGroup: string;
+  children: Array<Children>;
+}
 
 interface ItemProp {
   index: number;
@@ -138,27 +154,45 @@ export class WESRuns extends LitElement {
     }
   }
 
-  async expand(e: any) {
-    // Check if child already exists within the shadow root
-    const children = this.shadowRoot?.querySelectorAll(
-      `[slot="${e.detail.key}"]`
-    );
-    const runData = await fetchWorkflow(this.baseURL, e.detail.key);
-    console.log(runData);
-    if (!children || children.length === 0) {
-      // Add child to ecc-utils-design-collection
+  private _createFields(data: any): Array<Field> {
+    this.requestUpdate();
+    const groups = ["request", "runs logs", "task logs"];
 
-      const child = document.createElement("div");
-      child.setAttribute("slot", e.detail.key);
-      child.innerHTML = `<p>Title: heh</p>`;
-      this.shadowRoot?.appendChild(child); // Use this.shadowRoot to append the child to the shadow root
+    const fields: Array<Field> = [];
+
+    for (const group of groups) {
+      const groupFields = [];
+
+      const groupData = data[group.replace(/\s/g, "_")];
+
+      if (groupData && typeof groupData === "object") {
+        for (const [key, value] of Object.entries(groupData)) {
+          const child = {
+            key,
+            label:
+              key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, " "), // Convert underscores to spaces and capitalize
+            value,
+            type: typeof value === "object" ? "object" : "text", // Assume object type for nested objects
+          };
+
+          groupFields.push(child);
+        }
+
+        const field = {
+          tabGroup: group,
+          children: groupFields,
+        };
+
+        fields.push(field as Field);
+      }
     }
+
+    return fields;
   }
 
-  async handleExpandItem(e: CustomEvent) {
+  private async handleExpandItem(e: CustomEvent) {
     const eccUtilsDesignCollection = this.shadowRoot?.querySelector(
       "ecc-utils-design-collection"
-      // Todo: Get the typeof Collections and use it instead of `any`
     ) as any;
     const { target, detail } = e;
     if (!target || !(target instanceof HTMLElement)) {
@@ -167,19 +201,27 @@ export class WESRuns extends LitElement {
     }
 
     const { key } = detail;
-    console.log(detail);
     const children = target.querySelectorAll(`[slot="${key}"]`);
-
+    const runData = await fetchWorkflow(this.baseURL, detail.key);
     if (children.length === 0) {
-      const runData = await fetchWorkflow(this.baseURL, key);
-
-      if (runData !== null) {
+      try {
+        const data = this._createFields(runData);
+        console.log(data);
+        // Create a child div and set its slot attribute
         const child = document.createElement("div");
         child.setAttribute("slot", key);
-        child.innerHTML = `<p>${JSON.stringify(runData)}</p>`;
 
+        // Use LitElement's html template to create the details component
+        const detailsComponent = html`<ecc-utils-design-details
+          .fields=${data}
+        ></ecc-utils-design-details>`;
+
+        // Render the details component using Lit's render function
+        render(detailsComponent, child);
+
+        // Append the child to the target
         target.appendChild(child);
-      } else {
+      } catch (error) {
         eccUtilsDesignCollection.error(`Failed to fetch data for run: ${key}`);
       }
     }
