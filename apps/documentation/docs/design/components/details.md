@@ -84,6 +84,16 @@ import "@elixir-cloud/design/dist/details/index.js";
 								pill: true,
 							},
 						},
+									      {
+			        key: "credentials",
+			        label: "Credentials",
+			        value: {
+			          username: "john.doe",
+			          domain: "example",
+			          extension: "com",
+			        },
+			        type: "object",
+			      },
 						{
 							key: 'email',
 							label: 'Email',

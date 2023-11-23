@@ -12,8 +12,8 @@ import { hostStyles } from "../../styles/host.styles.js";
 interface Children {
   key: string;
   label: string;
-  value: string | number | Array<string>;
-  type: "text" | "long-text" | "url" | "array";
+  value: string | number | Array<string> | Record<string, string>;
+  type: "text" | "long-text" | "url" | "array" | "object";
   arrayOptions?: {
     vertical?: boolean;
     pill?: boolean;
@@ -38,6 +38,7 @@ export default class Details extends LitElement {
       }
 
       .label {
+        // width: 6rem;
         font-weight: bold;
         margin-right: 0.5rem;
       }
@@ -65,13 +66,32 @@ export default class Details extends LitElement {
       .vertical {
         flex-direction: column;
       }
+
+      .container-object {
+      }
+
+      .object-value {
+        margin-left: 1rem;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .object-item {
+        display: flex;
+        margin-bottom: 0.5rem;
+      }
+
+      .key {
+        font-weight: bold;
+        margin-right: 0.5rem;
+      }
     `,
   ];
 
   @property({ type: Array }) private fields: Array<Field> = [];
 
-  // eslint-disable-next-line class-methods-use-this
   private _renderText(child: Children): TemplateResult {
+    this.requestUpdate();
     return html`
       <div class="container">
         <div class="label">${child.label}</div>
@@ -80,19 +100,19 @@ export default class Details extends LitElement {
     `;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private _renderUrl(child: Children): TemplateResult {
+    this.requestUpdate();
     return html`
       <div class="container">
-        <span class="label">${child.label}</span>
-        <span id="${child.key}" class="value">${child.value}</span>
+        <div class="label">${child.label}</div>
+        <div id="${child.key}" class="value">${child.value}</div>
         <sl-copy-button class="copy-button" from=${child.key}></sl-copy-button>
       </div>
     `;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private _renderLongText(child: Children): TemplateResult {
+    this.requestUpdate();
     return html`
       <div class="container">
         <div class="label">${child.label}</div>
@@ -102,8 +122,27 @@ export default class Details extends LitElement {
     `;
   }
 
-  // eslint-disable-next-line class-methods-use-this
+  private _renderObject(child: Children): TemplateResult {
+    this.requestUpdate();
+    return html`
+      <div class="container-object">
+        <div class="label">${child.label}</div>
+        <div class="object-value">
+          ${Object.entries(child.value).map(
+            ([key, value]) => html`
+              <div class="object-item">
+                <div class="label">${key}:</div>
+                <div class="value">${value}</div>
+              </div>
+            `
+          )}
+        </div>
+      </div>
+    `;
+  }
+
   private _renderArray(child: Children): TemplateResult {
+    this.requestUpdate();
     return html`
       <div class="container">
         <div class="label">${child.label}</div>
@@ -136,6 +175,8 @@ export default class Details extends LitElement {
               return this._renderLongText(child);
             case "array":
               return this._renderArray(child);
+            case "object":
+              return this._renderObject(child);
             default:
               return html``;
           }

@@ -90,7 +90,7 @@ export default class Form extends LitElement {
       .array-header {
         display: flex;
         justify-content: space-between;
-        align-items: center
+        align-items: center;
         margin-bottom: 1rem;
       }
       .array-item-container {
