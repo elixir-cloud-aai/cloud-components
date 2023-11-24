@@ -6,7 +6,7 @@
       body {
         background: #f5f5f5;
       }
-      ecc-utils-design-form::part(form) {
+      /* ecc-utils-design-form::part(form) {
         display: flex;
         flex-direction: column;
       }
@@ -67,9 +67,6 @@
         border-radius: 10px;
         box-shadow: 1px 1px 1px 1px #ccc;
       }
-      ecc-utils-design-form::part(container) {
-        background-color: blue;
-      }
       ecc-utils-design-form::part(input) {
         font-size: small;
       }
@@ -81,7 +78,7 @@
         background-color: #fff;
         color: #4caf50;
         font-weight: bold;
-      }
+      } */
     </style>
     <title>ecc-utils-design</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -94,8 +91,6 @@
 
     <script type="module">
       import { html, render } from "lit";
-      import { getComponentCssParts } from "../dist/utilities/index.js";
-      import { EccUtilsDesignForm } from "../dist/components/index.js";
       import "../dist/components/form/index.js";
 
       const fields = [
@@ -188,12 +183,10 @@
           },
         },
       ];
-
       render(
         html`<ecc-utils-design-form
           .fields=${fields}
           @ecc-utils-submit=${async (e) => {
-            console.log(getComponentCssParts(EccUtilsDesignForm));
             try {
               console.log("form - submitted", e.detail);
               document.querySelector("ecc-utils-design-form").loading();
@@ -210,10 +203,6 @@
         >
         </ecc-utils-design-form> `,
         document.querySelector("#demo")
-      );
-
-      console.log(
-        getComponentCssParts(document.querySelector("ecc-utils-design-form"))
       );
     </script>
   </body>
