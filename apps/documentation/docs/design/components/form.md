@@ -98,27 +98,32 @@ This property is used to render the fields in the form. Fields can be passed as 
 
 ## Parts
 
-| Part Name           | Description                                                                       |
-| ------------------- | --------------------------------------------------------------------------------- |
-| `form`              | Component's internal form.                                                        |
-| `submit-button`     | Component's internal submit button                                                |
-| `field`             | Component's row containing a input, label & other elements.                       |
-| `label`             | Component's label for field.                                                      |
-| `input-base`        | Component's input base element.                                                   |
-| `input`             | Component's input element. :placeholder and other pseudo selectors are supported. |
-| `header`            | Component's header for array and group type fields                                |
-| `array-header`      | Component's header for array type field containing label & add button.            |
-| `array-label`       | Component's label for array type field.                                           |
-| `array-item`        | Component's item for array type field.                                            |
-| `add-button`        | Component's add button for array type field.                                      |
-| `remove-button`     | Component's remove button for array type field.                                   |
-| `switch`            | Component's switch.                                                               |
-| `switch-thumb`      | Component's switch thumb element.                                                 |
-| `group`             | Component's group field                                                           |
-| `group-header`      | Component's header for group type field, containing label                         |
-| `group-label`       | Component's label for group type field                                            |
-| `group-toggle-icon` | Component's toggle icon for group type field                                      |
-| `group-content`     | Content area for group type field, where the children are rendered                |
+| Part Name           | Description                                                                                                            |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `form`              | Component's internal form.                                                                                             |
+| `submit-button`     | Component's internal submit button                                                                                     |
+| `field`             | Component's row containing a input, label & other elements.                                                            |
+| `label`             | Component's label for field.                                                                                           |
+| `input-base`        | Component's input base element.                                                                                        |
+| `input`             | Component's input element. :placeholder and other pseudo selectors are supported.                                      |
+| `input-label`       | Component's label for email, file, text, date, number, tel, url, search, datetime-local, time and password type fields |
+| `header`            | Component's header for array and group type fields                                                                     |
+| `container`         | Component's container for array and group type fields                                                                  |
+| `item`              | Individual child fields in an array and group type field                                                               |
+| `array-header`      | Component's header for array type field containing label & add button.                                                 |
+| `array-label`       | Component's label for array type field.                                                                                |
+| `array-item`        | Individual child fields in an array type field.                                                                        |
+| `add-button`        | Component's add button for array type field.                                                                           |
+| `remove-button`     | Component's remove button for array type field.                                                                        |
+| `switch`            | Component's switch.                                                                                                    |
+| `switch-thumb`      | Component's switch thumb element.                                                                                      |
+| `switch-label`      | Component's label for switch type field                                                                                |
+| `group`             | Component's group field                                                                                                |
+| `group-item`        | Individual child fields in a group type field                                                                          |
+| `group-header`      | Component's header for group type field, containing label                                                              |
+| `group-label`       | Component's label for group type field                                                                                 |
+| `group-toggle-icon` | Component's toggle icon for group type field                                                                           |
+| `group-content`     | Content area for group type field, where the children are rendered                                                     |
 
 ## CSS Variables
 

@@ -24,6 +24,7 @@ const config = {
     "./src/index.ts",
     ...(await globby("./src/components/**/!(*.(styles|test)).ts")),
     ...(await globby("./src/react/**/*.ts")),
+    ...(await globby("./src/utilities/**/*.ts")),
   ],
   splitting: true,
   treeshake: true,
