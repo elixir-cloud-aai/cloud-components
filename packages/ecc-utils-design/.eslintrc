@@ -1,4 +1,6 @@
 {
   "extends": ["@open-wc", "elixir"],
-  "rules": {}
+  "rules": {
+    "class-methods-use-this": 1
+  }
 }

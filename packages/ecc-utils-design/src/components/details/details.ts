@@ -115,21 +115,12 @@ export default class Details extends LitElement {
   ];
 
   @property({ type: Array }) private fields: Array<Field> = [];
-
-  // Methods need to have `this` keyword, else eslint
-  // will complain, hence it removes that error
-  // and shouldn't cause any issues
-  private eslintFix() {
-    this.requestUpdate();
-  }
-
   private _renderContainer(
     child: Children,
     content: TemplateResult,
     flexDir = false,
     alignItems = false
   ): TemplateResult {
-    this.eslintFix();
     return html`
       <div
         class="details-container ${flexDir ? "column" : ""} ${alignItems
@@ -165,7 +156,6 @@ export default class Details extends LitElement {
     [key, value]: [string, string],
     child: Children
   ): TemplateResult {
-    this.eslintFix();
     return html`
       <div class="object-item">
         <div class="object-key">${key}:</div>
@@ -193,19 +183,17 @@ export default class Details extends LitElement {
   }
 
   private _renderArrayValue(value: string): TemplateResult {
-    this.eslintFix();
     return html`<div class="value">${value}</div>`;
   }
 
   private _renderArrayPill(value: string): TemplateResult {
-    this.eslintFix();
     return html`<sl-tag size="medium" pill>${value}</sl-tag>`;
   }
 
   private _renderArray(child: Children): TemplateResult {
     const arrayRenderer = child?.arrayOptions?.pill
-      ? this._renderArrayPill.bind(this)
-      : this._renderArrayValue.bind(this);
+      ? this._renderArrayPill
+      : this._renderArrayValue;
 
     const content = html`
       <div

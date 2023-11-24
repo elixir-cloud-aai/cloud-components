@@ -43,15 +43,15 @@ import "@elixir-cloud/design/dist/details/index.js";
 
 ### children\*
 
-| Property                  | Required | Default | Type                           | Description                                     |
-| ------------------------- | -------- | ------- | ------------------------------ | ----------------------------------------------- |
-| `key`                     | `true`   |         | `String`                       | The unique key of field                         |
-| `label`                   | `true`   |         | `String`                       | The label of the information to be rendered.    |
-| `value`                   | `true`   |         | `String` or `Number`           | The info to be rendered                         |
-| `type`                    | `true`   |         | `text` or `long-text` 		  | The type of information                         |
-| `textOptions.copy` 	    | `false`  |         | `boolean`                      | Text will have a copy to clip button            |
-| `arrayOptions.isVertical` | `false`  |         | `boolean`                      | Direction of rendering of array of string       |
-| `arrayOptions.pill`       | `false`  |         | `boolean`                      | Puts the string of array into a pill shaped tag |
+| Property                  | Required | Default | Type                  | Description                                     |
+| ------------------------- | -------- | ------- | --------------------- | ----------------------------------------------- |
+| `key`                     | `true`   |         | `String`              | The unique key of field                         |
+| `label`                   | `true`   |         | `String`              | The label of the information to be rendered.    |
+| `value`                   | `true`   |         | `String` or `Number`  | The info to be rendered                         |
+| `type`                    | `true`   |         | `text` or `long-text` | The type of information                         |
+| `textOptions.copy`        | `false`  |         | `boolean`             | Text will have a copy to clip button            |
+| `arrayOptions.isVertical` | `false`  |         | `boolean`             | Direction of rendering of array of string       |
+| `arrayOptions.pill`       | `false`  |         | `boolean`             | Puts the string of array into a pill shaped tag |
 
 ## CSS Variables
 
