@@ -32,7 +32,6 @@ interface Field {
 
 interface FooterButton {
   key: string;
-  isPresent: boolean;
   name: string;
   size: "small" | "medium" | "large";
   variant: "primary" | "success" | "neutral" | "warning" | "danger";
@@ -307,8 +306,8 @@ export default class Details extends LitElement {
     this.dispatchEvent(
       new CustomEvent(`button-${key}-click`, {
         detail: {
-          buttonKey: key,
-          button: event.target,
+          Key: key,
+          event,
         },
         bubbles: true,
         composed: true,
@@ -317,7 +316,6 @@ export default class Details extends LitElement {
   }
 
   private _renderFooter(): TemplateResult {
-    console.log(this.buttons);
     return html`
       <div name="footer-container">
         <div class="footer-button">
