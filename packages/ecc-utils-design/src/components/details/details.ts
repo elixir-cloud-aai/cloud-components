@@ -6,7 +6,9 @@ import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
 import "@shoelace-style/shoelace/dist/components/tab/tab.js";
 import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
 import "@shoelace-style/shoelace/dist/components/copy-button/copy-button.js";
+import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/tag/tag.js";
+import "@shoelace-style/shoelace/dist/components/icon/icon.js";
 import { hostStyles } from "../../styles/host.styles.js";
 
 interface Children {
@@ -28,6 +30,21 @@ interface Field {
   children: Array<Children>;
 }
 
+interface FooterButton {
+  key: string;
+  isPresent: boolean;
+  name: string;
+  size: "small" | "medium" | "large";
+  variant: "primary" | "success" | "neutral" | "warning" | "danger";
+  outline: boolean;
+  pill: boolean;
+  icon?: {
+    name: string;
+    viewBox: string;
+    path: string;
+  };
+}
+
 export default class Details extends LitElement {
   static styles = [
     getShoelaceStyles(
@@ -35,6 +52,17 @@ export default class Details extends LitElement {
     ),
     hostStyles,
     css`
+      .panel-container {
+        height: 400px;
+        overflow: scroll;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      .panel-container::-webkit-scrollbar {
+        display: none;
+      }
+
       .details-container {
         display: flex;
         margin-bottom: 1rem;
@@ -111,14 +139,18 @@ export default class Details extends LitElement {
         flex-direction: column;
         align-items: flex-start;
       }
+
+      [name="footer-container"] {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.2rem;
+      }
     `,
   ];
 
   @property({ type: Array }) private fields: Array<Field> = [];
+  @property({ type: Array }) private buttons: Array<FooterButton> = [];
 
-  // Methods need to have `this` keyword, else eslint
-  // will complain, hence it removes that error
-  // and shouldn't cause any issues
   private eslintFix() {
     this.requestUpdate();
   }
@@ -224,20 +256,22 @@ export default class Details extends LitElement {
     return html`
       <sl-tab slot="nav" panel="${toLower(tabName)}">${tabName}</sl-tab>
       <sl-tab-panel name="${toLower(tabName)}">
-        ${data.map((child) => {
-          switch (child.type) {
-            case "text":
-              return this._renderText(child);
-            case "long-text":
-              return this._renderLongText(child);
-            case "array":
-              return this._renderArray(child);
-            case "object":
-              return this._renderObject(child);
-            default:
-              return html``;
-          }
-        })}
+        <div class="panel-container">
+          ${data.map((child) => {
+            switch (child.type) {
+              case "text":
+                return this._renderText(child);
+              case "long-text":
+                return this._renderLongText(child);
+              case "array":
+                return this._renderArray(child);
+              case "object":
+                return this._renderObject(child);
+              default:
+                return html``;
+            }
+          })}
+        </div>
       </sl-tab-panel>
     `;
   }
@@ -253,7 +287,61 @@ export default class Details extends LitElement {
     `;
   }
 
+  private _renderSvg(icon: FooterButton["icon"]): TemplateResult {
+    this.eslintFix();
+    return html`
+      <svg
+        slot="prefix"
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        fill="currentColor"
+        viewBox="${icon?.viewBox}"
+      >
+        <path d="${icon?.path}" />
+      </svg>
+    `;
+  }
+
+  private _handleClick(event: Event, key: string) {
+    this.dispatchEvent(
+      new CustomEvent(`button-${key}-click`, {
+        detail: {
+          buttonKey: key,
+          button: event.target,
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  private _renderFooter(): TemplateResult {
+    console.log(this.buttons);
+    return html`
+      <div name="footer-container">
+        <div class="footer-button">
+          ${this.buttons.map((button) => {
+            const { size, variant, outline, pill, name, icon, key } = button;
+            return html`
+              <sl-button
+                ?pill="${pill}"
+                variant="${variant}"
+                ?outline="${outline}"
+                size="${size}"
+                @click="${(event: Event) => this._handleClick(event, key)}"
+              >
+                ${icon ? this._renderSvg(icon) : ""} ${name}
+              </sl-button>
+            `;
+          })}
+        </div>
+        <slot name="footer"> </slot>
+      </div>
+    `;
+  }
+
   render() {
-    return html`${this._renderFields(this.fields)}`;
+    return html` ${this._renderFields(this.fields)} ${this._renderFooter()} `;
   }
 }
