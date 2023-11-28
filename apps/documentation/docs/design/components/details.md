@@ -113,6 +113,14 @@ The component emits a custom event named `button-${button.key}-click` when a but
 | `key`    | `String` | The unique identifier of the clicked button. |
 | `event`  | `Event`  | The event emitted.                           |
 
+### Methods
+
+## Methods
+
+| Method Name          | Arguments                                 | Description                                                      |
+| -------------------- | ----------------------------------------- | ---------------------------------------------------------------- |
+| `setButtonLoading()` | {`index`: `number`, `loading`: `boolean`} | Sets the state of button with given index to given loading state |
+
 ## CSS Variables
 
 ## Examples
@@ -262,8 +270,14 @@ The component emits a custom event named `button-${button.key}-click` when a but
 			    pill: false,
 			  },
 			];
-
 			renderComponent.value = true;
+			
+			document.querySelectorAll("ecc-utils-design-details")
+			.forEach((element) => {
+				element.addEventListener("button-1-click", (e) => {
+					console.log("form-submitted", e.detail);
+				});
+			});
 		});
 	});
 </script>

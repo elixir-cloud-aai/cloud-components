@@ -1,5 +1,5 @@
 import { html, css, LitElement, TemplateResult } from "lit";
-import { property } from "lit/decorators.js";
+import { property, state } from "lit/decorators.js";
 import { toLower } from "lodash-es";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
@@ -150,17 +150,20 @@ export default class Details extends LitElement {
   @property({ type: Array }) private fields: Array<Field> = [];
   @property({ type: Array }) private buttons: Array<FooterButton> = [];
 
-  private eslintFix() {
-    this.requestUpdate();
+  @state() private loading: Array<boolean> = [];
+
+  constructor() {
+    super();
+    this.loading = new Array(this.buttons.length).fill(false);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   private _renderContainer(
     child: Children,
     content: TemplateResult,
     flexDir = false,
     alignItems = false
   ): TemplateResult {
-    this.eslintFix();
     return html`
       <div
         class="details-container ${flexDir ? "column" : ""} ${alignItems
@@ -168,7 +171,7 @@ export default class Details extends LitElement {
           : ""}"
       >
         <div class="label">${child.label}</div>
-        <div class="value-container">
+        <div class="value-container" id=${child.key}>
           ${content}
           ${child.textOptions?.copy &&
           html`<sl-copy-button
@@ -178,6 +181,16 @@ export default class Details extends LitElement {
         </div>
       </div>
     `;
+  }
+
+  /**
+   * Use to set the loading state of a button
+   * @param index index of the button to set loading state
+   * @param loading loading state, `true` set the button to loading state
+   */
+  public setButtonLoading(index: number, loading: boolean) {
+    this.loading[index] = loading;
+    this.requestUpdate();
   }
 
   private _renderText(child: Children): TemplateResult {
@@ -192,11 +205,11 @@ export default class Details extends LitElement {
     return this._renderContainer(child, content, true);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   private _renderObjectItem(
     [key, value]: [string, string],
     child: Children
   ): TemplateResult {
-    this.eslintFix();
     return html`
       <div class="object-item">
         <div class="object-key">${key}:</div>
@@ -223,13 +236,13 @@ export default class Details extends LitElement {
     `;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   private _renderArrayValue(value: string): TemplateResult {
-    this.eslintFix();
     return html`<div class="value">${value}</div>`;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   private _renderArrayPill(value: string): TemplateResult {
-    this.eslintFix();
     return html`<sl-tag size="medium" pill>${value}</sl-tag>`;
   }
 
@@ -251,6 +264,7 @@ export default class Details extends LitElement {
     return this._renderContainer(child, content, false, true);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   private _renderField(tabName: string, data: Array<Children>): TemplateResult {
     return html`
       <sl-tab slot="nav" panel="${toLower(tabName)}">${tabName}</sl-tab>
@@ -275,6 +289,7 @@ export default class Details extends LitElement {
     `;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   private _renderFields(fields: Array<Field>): TemplateResult {
     if (!fields.length) return html``;
     return html`
@@ -286,8 +301,8 @@ export default class Details extends LitElement {
     `;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   private _renderSvg(icon: FooterButton["icon"]): TemplateResult {
-    this.eslintFix();
     return html`
       <svg
         slot="prefix"
@@ -302,10 +317,11 @@ export default class Details extends LitElement {
     `;
   }
 
-  private _handleClick(event: Event, key: string) {
+  private _handleClick(event: Event, key: string, index: number) {
     this.dispatchEvent(
       new CustomEvent(`button-${key}-click`, {
         detail: {
+          index,
           Key: key,
           event,
         },
@@ -319,22 +335,39 @@ export default class Details extends LitElement {
     return html`
       <div name="footer-container">
         <div class="footer-button">
-          ${this.buttons.map((button) => {
+          ${this.buttons.map((button, index) => {
             const { size, variant, outline, pill, name, icon, key } = button;
             return html`
-              <sl-button
-                ?pill="${pill}"
-                variant="${variant}"
-                ?outline="${outline}"
-                size="${size}"
-                @click="${(event: Event) => this._handleClick(event, key)}"
-              >
-                ${icon ? this._renderSvg(icon) : ""} ${name}
-              </sl-button>
+              ${this.loading[index]
+                ? html`
+                    <sl-button
+                      loading
+                      ?pill="${pill}"
+                      variant="${variant}"
+                      ?outline="${outline}"
+                      size="${size}"
+                      @click="${(event: Event) =>
+                        this._handleClick(event, key, index)}"
+                    >
+                      ${icon ? this._renderSvg(icon) : ""} ${name}
+                    </sl-button>
+                  `
+                : html`
+                    <sl-button
+                      ?pill="${pill}"
+                      variant="${variant}"
+                      ?outline="${outline}"
+                      size="${size}"
+                      @click="${(event: Event) =>
+                        this._handleClick(event, key, index)}"
+                    >
+                      ${icon ? this._renderSvg(icon) : ""} ${name}
+                    </sl-button>
+                  `}
             `;
           })}
         </div>
-        <slot name="footer"> </slot>
+        <slot name="footer"></slot>
       </div>
     `;
   }

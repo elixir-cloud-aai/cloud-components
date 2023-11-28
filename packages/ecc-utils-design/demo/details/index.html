@@ -160,10 +160,20 @@
 
 			const detailsElement = document.querySelector("ecc-utils-design-details");
 
-			detailsElement.addEventListener("button-1-click", (event) => {
-			  const { Key } = event.detail;
-			  console.log(`Button ${Key} clicked!`);
+			detailsElement.addEventListener("button-1-click", async (event) => {
+			  const { index } = event.detail;
+			  detailsElement.setButtonLoading(index, true);
+			  console.log(`Button ${index} clicked!`);
+
+			  await new Promise((resolve) => {
+			    setTimeout(() => {
+			      resolve();
+			    }, 200);
+			  });
+
+			  detailsElement.setButtonLoading(index, false);
 			});
+
 			detailsElement.addEventListener("button-2-click", (event) => {
 			  const { Key } = event.detail;
 			  console.log(`Button ${Key} clicked!`);
