@@ -248,8 +248,8 @@ export default class Details extends LitElement {
 
   private _renderArray(child: Children): TemplateResult {
     const arrayRenderer = child?.arrayOptions?.pill
-      ? this._renderArrayPill.bind(this)
-      : this._renderArrayValue.bind(this);
+      ? this._renderArrayPill
+      : this._renderArrayValue;
 
     const content = html`
       <div
