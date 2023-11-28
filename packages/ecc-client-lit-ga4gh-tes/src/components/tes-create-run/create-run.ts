@@ -33,7 +33,7 @@ export class TESCreateRun extends LitElement {
     },
     {
       key: "executors",
-      label: "Executors section",
+      label: "Executors",
       type: "group",
       groupOptions: {
         collapsible: true,
@@ -41,7 +41,7 @@ export class TESCreateRun extends LitElement {
       children: [
         {
           key: "executors",
-          label: "Executors",
+          label: "",
           type: "array",
           fieldOptions: {
             required: true,
@@ -127,7 +127,7 @@ export class TESCreateRun extends LitElement {
     },
     {
       key: "inputs",
-      label: "Input section",
+      label: "Inputs",
       type: "group",
       groupOptions: {
         collapsible: true,
@@ -135,7 +135,7 @@ export class TESCreateRun extends LitElement {
       children: [
         {
           key: "inputs",
-          label: "Inputs",
+          label: "",
           type: "array",
           arrayOptions: {
             defaultInstances: 0,
@@ -157,7 +157,7 @@ export class TESCreateRun extends LitElement {
     },
     {
       key: "outputs",
-      label: "Output section",
+      label: "Outputs",
       type: "group",
       groupOptions: {
         collapsible: true,
@@ -165,7 +165,7 @@ export class TESCreateRun extends LitElement {
       children: [
         {
           key: "outputs",
-          label: "Outputs",
+          label: "",
           type: "array",
           arrayOptions: {
             defaultInstances: 0,
