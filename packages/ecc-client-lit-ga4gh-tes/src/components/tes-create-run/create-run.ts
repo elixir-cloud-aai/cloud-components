@@ -1,7 +1,7 @@
 import { html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { postTask } from "../../API/Task/tesGet.js";
-import { Executor, postTaskForm, Resources } from "./types.js";
+import { Executor, postTaskForm } from "./types.js";
 import "@elixir-cloud/design";
 
 @customElement("ecc-client-lit-ga4gh-tes-create-run")
@@ -34,18 +34,14 @@ export class TESCreateRun extends LitElement {
     {
       key: "executors",
       label: "Executors",
-      type: "array",
-      fieldOptions: {
-        required: true,
-      },
-      arrayOptions: {
-        defaultInstances: 1,
-        min: 1,
+      type: "group",
+      groupOptions: {
+        collapsible: true,
       },
       children: [
         {
-          key: "command",
-          label: "Commands",
+          key: "executors",
+          label: "",
           type: "array",
           fieldOptions: {
             required: true,
@@ -57,133 +53,177 @@ export class TESCreateRun extends LitElement {
           children: [
             {
               key: "command",
-              label: "Command",
+              label: "Commands",
+              type: "array",
+              fieldOptions: {
+                required: true,
+              },
+              arrayOptions: {
+                defaultInstances: 1,
+                min: 1,
+              },
+              children: [
+                {
+                  key: "command",
+                  label: "Command",
+                  type: "text",
+                  fieldOptions: {
+                    required: true,
+                  },
+                },
+              ],
+            },
+            {
+              key: "env",
+              label: "Env",
+              type: "array",
+              arrayOptions: {
+                defaultInstances: 0,
+              },
+              children: [
+                {
+                  key: "name",
+                  label: "Env name",
+                  type: "text",
+                },
+                {
+                  key: "value",
+                  label: "Env value",
+                  type: "text",
+                },
+              ],
+            },
+            {
+              key: "image",
+              label: "Image",
               type: "text",
               fieldOptions: {
                 required: true,
               },
             },
-          ],
-        },
-        {
-          key: "env",
-          label: "Env",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 0,
-          },
-          children: [
             {
-              key: "name",
-              label: "Env name",
+              key: "stderr",
+              label: "Stderr",
               type: "text",
             },
             {
-              key: "value",
-              label: "Env value",
+              key: "stdin",
+              label: "Stdin",
+              type: "text",
+            },
+            {
+              key: "stdout",
+              label: "Stdout",
+              type: "text",
+            },
+            {
+              key: "workdir",
+              label: "Workdir",
               type: "text",
             },
           ],
-        },
-        {
-          key: "image",
-          label: "Image",
-          type: "text",
-          fieldOptions: {
-            required: true,
-          },
-        },
-        {
-          key: "stderr",
-          label: "Stderr",
-          type: "text",
-        },
-        {
-          key: "stdin",
-          label: "Stdin",
-          type: "text",
-        },
-        {
-          key: "stdout",
-          label: "Stdout",
-          type: "text",
-        },
-        {
-          key: "workdir",
-          label: "Workdir",
-          type: "text",
         },
       ],
     },
     {
       key: "inputs",
       label: "Inputs",
-      type: "array",
-      arrayOptions: {
-        defaultInstances: 0,
+      type: "group",
+      groupOptions: {
+        collapsible: true,
       },
       children: [
         {
-          key: "path",
-          label: "Path",
-          type: "text",
-        },
-        {
-          key: "url",
-          label: "URL",
-          type: "text",
+          key: "inputs",
+          label: "",
+          type: "array",
+          arrayOptions: {
+            defaultInstances: 0,
+          },
+          children: [
+            {
+              key: "path",
+              label: "Path",
+              type: "text",
+            },
+            {
+              key: "url",
+              label: "URL",
+              type: "text",
+            },
+          ],
         },
       ],
     },
     {
       key: "outputs",
       label: "Outputs",
-      type: "array",
-      arrayOptions: {
-        defaultInstances: 0,
+      type: "group",
+      groupOptions: {
+        collapsible: true,
       },
       children: [
         {
-          key: "path",
-          label: "Path",
-          type: "text",
-        },
-        {
-          key: "type",
-          label: "Type",
-          type: "text",
-        },
-        {
-          key: "url",
-          label: "URL",
-          type: "text",
+          key: "outputs",
+          label: "",
+          type: "array",
+          arrayOptions: {
+            defaultInstances: 0,
+          },
+          children: [
+            {
+              key: "path",
+              label: "Path",
+              type: "text",
+            },
+            {
+              key: "type",
+              label: "Type",
+              type: "text",
+            },
+            {
+              key: "url",
+              label: "URL",
+              type: "text",
+            },
+          ],
         },
       ],
     },
     {
-      key: "cpu_cores",
-      label: "CPU cores",
-      type: "number",
-    },
-    {
-      key: "disk_gb",
-      label: "Disk space (Gb)",
-      type: "number",
-    },
-    {
-      key: "ram_gb",
-      label: "Ram space (Gb)",
-      type: "number",
-    },
-    {
-      key: "zones",
-      label: "Zones",
-      type: "text",
-    },
-    {
-      key: "preemptible",
-      label: "Preemptible",
-      type: "switch",
+      key: "resources",
+      label: "Resources section",
+      type: "group",
+      groupOptions: {
+        collapsible: true,
+      },
+      children: [
+        {
+          key: "cpu_cores",
+          label: "CPU cores",
+          type: "number",
+        },
+        {
+          key: "disk_gb",
+          label: "Disk space (Gb)",
+          type: "number",
+        },
+        {
+          key: "ram_gb",
+          label: "Ram space (Gb)",
+          type: "number",
+        },
+        {
+          key: "zones",
+          label: "Zones",
+          type: "text",
+        },
+        {
+          key: "preemptible",
+          label: "Preemptible",
+          type: "switch",
+        },
+      ],
     },
     {
       key: "tags",
@@ -222,73 +262,99 @@ export class TESCreateRun extends LitElement {
     },
   ];
 
-  private resourcesTemp = [
-    "cpu_cores",
-    "disk_gb",
-    "preemptible",
-    "ram_gb",
-    "zones",
-  ];
-
-  // Submit form function
-  private async submitForm(form: any) {
-    const data: any = {};
-
-    // Process the form data
-    for (const [key, value] of Object.entries(form)) {
-      // Handle form data based on keys
-      if (key === "name" || key === "description") {
-        data[key] = value;
-      } else if (key === "executors") {
-        data.executors = this.processExecutors(value);
-      } else if (key === "volumes") {
-        data.volumes = this.processVolumes(value as any);
-      } else if (key === "tags") {
-        data.tags = this.processTags(value as any);
-      } else if (this.resourcesTemp.includes(key)) {
-        data.resources = this.processResources(
-          data.resources as Resources,
-          key as keyof Resources,
-          value as any
-        );
-      }
-    }
-
-    this.form = data;
-
+  /**
+   * Logs the error if UI breaks else uses public method of `ecc-utils-design-form` to show error on UI
+   * @param message Error message
+   * @param breakMethod The class method where the error occured
+   */
+  private _handleError(message: string, breakMethod: string) {
     const eccUtilsDesignForm = this.shadowRoot?.querySelector(
       "ecc-utils-design-form"
     ) as any;
-
     if (eccUtilsDesignForm) {
-      eccUtilsDesignForm.loading();
-      this.response = await postTask(this.baseURL, data);
+      eccUtilsDesignForm.error({
+        message,
+      });
+    } else {
+      console.error({
+        message: "ecc-utils-design-form not found",
+        breakPoint: `TESCreateRun.${breakMethod}`,
+      });
+    }
+  }
 
-      try {
+  // Extracting the API call into a separate method
+  private async _callAPI(data: any) {
+    try {
+      const eccUtilsDesignForm = this.shadowRoot?.querySelector(
+        "ecc-utils-design-form"
+      ) as any;
+      if (eccUtilsDesignForm) {
+        eccUtilsDesignForm.loading();
+        this.response = await postTask(this.baseURL, data);
+
         if (this.response.id) {
           eccUtilsDesignForm.success({
             message: this.response.id,
           });
         } else {
-          eccUtilsDesignForm.error({
-            message: this.response.message,
-          });
+          this._handleError(this.response.message, "callAPI");
         }
-      } catch (error) {
-        eccUtilsDesignForm.error({
-          message: "Internal Server Error",
+      } else {
+        console.error({
+          message: "ecc-utils-design-form not found",
+          breakPoint: "TESCreateRun.callApi",
         });
       }
-    } else {
-      console.error({
-        message: "ecc-utils-design-form not found",
-        breakPoint: "TESCreateRun.submitForm",
-      });
+    } catch (error) {
+      this._handleError("Internal Server Error", "callAPI");
+    }
+  }
+
+  // form submit method
+  private async _submitForm(form: any) {
+    const data: any = {};
+    // Process the form data
+    for (const [key, value] of Object.entries(form)) {
+      switch (key) {
+        case "name":
+        case "description":
+        case "resources":
+          data[key] = value;
+          break;
+        case "executors":
+          data.executors = this._processExecutors(
+            (value as { executors: unknown }).executors
+          );
+          break;
+        case "inputs":
+          data.inputs = (value as { inputs: unknown }).inputs;
+          break;
+        case "outputs":
+          data.output = (value as { outputs: unknown }).outputs;
+          break;
+        case "volumes":
+          data.volumes = this._processVolumes(value as any);
+          break;
+        case "tags":
+          data.tags = this._processTags(value as any);
+          break;
+        default:
+          break;
+      }
+    }
+
+    this.form = data;
+
+    try {
+      await this._callAPI(data);
+    } catch (error) {
+      this._handleError("Couldn't call the API", "submitForm");
     }
   }
 
   // Process executors data
-  private processExecutors = (value: any): Executor[] => {
+  private _processExecutors = (value: any): Executor[] => {
     if (!Array.isArray(value)) return [];
 
     return value
@@ -306,7 +372,7 @@ export class TESCreateRun extends LitElement {
         }
 
         if (executorElement.env && Array.isArray(executorElement.env)) {
-          executor.env = this.processEnv(executorElement.env);
+          executor.env = this._processEnv(executorElement.env);
         }
 
         const execOptions = ["image", "stderr", "stdin", "stdout", "workdir"];
@@ -319,7 +385,7 @@ export class TESCreateRun extends LitElement {
   };
 
   // Process env data
-  private processEnv = (
+  private _processEnv = (
     envArray: Record<string, string>[]
   ): Record<string, string> =>
     envArray.reduce(
@@ -331,23 +397,11 @@ export class TESCreateRun extends LitElement {
     );
 
   // Process volume data
-  private processVolumes = (value: Array<{ volume: string }>) =>
+  private _processVolumes = (value: Array<{ volume: string }>) =>
     value.map((vol) => vol.volume);
 
-  // Process resources data
-  private processResources = (
-    resources: Resources,
-    key: keyof Resources,
-    value: any
-  ): Resources => {
-    let updatedResources: Resources = { ...resources };
-    if (!updatedResources) updatedResources = {};
-    updatedResources[key] = value;
-    return updatedResources;
-  };
-
   // Process tags data
-  private processTags = (
+  private _processTags = (
     tagArray: Array<{ name: string; value: string }>
   ): Record<string, string> =>
     tagArray.reduce(
@@ -364,7 +418,7 @@ export class TESCreateRun extends LitElement {
       <ecc-utils-design-form
         .fields=${this.fields}
         @form-submit=${(e: any) => {
-          this.submitForm(e.detail.form.data);
+          this._submitForm(e.detail.form.data);
         }}
       >
       </ecc-utils-design-form>
