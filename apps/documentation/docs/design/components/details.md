@@ -52,9 +52,9 @@ import "@elixir-cloud/design/dist/details/index.js";
 
 | Property                  | Required | Default | Type                  | Description                                     |
 | ------------------------- | -------- | ------- | --------------------- | ----------------------------------------------- |
-| `key`                     | `true`   |         | `String`              | The unique key of field                         |
-| `label`                   | `true`   |         | `String`              | The label of the information to be rendered.    |
-| `value`                   | `true`   |         | `String` or `Number`  | The info to be rendered                         |
+| `key`                     | `true`   |         | `string`              | The unique key of field                         |
+| `label`                   | `true`   |         | `string`              | The label of the information to be rendered.    |
+| `value`                   | `true`   |         | `string` or `number`  | The info to be rendered                         |
 | `type`                    | `true`   |         | `text` or `long-text` | The type of information                         |
 | `textOptions.copy`        | `false`  |         | `boolean`             | Text will have a copy to clip button            |
 | `arrayOptions.isVertical` | `false`  |         | `boolean`             | Direction of rendering of array of string       |
@@ -64,15 +64,15 @@ import "@elixir-cloud/design/dist/details/index.js";
 
 The `buttons` property allows you to define an array of buttons along with their configuration. Buttons can be used to trigger specific actions or events within the component.
 
-| Property  | Required | Default     | Type      | Description                                                                                      |
-| --------- | -------- | ----------- | --------- | ------------------------------------------------------------------------------------------------ |
-| `key`     | `true`   |             | `String`  | A unique identifier for the button, used to distinguish between buttons in the configuration.    |
-| `name`    | `true`   |             | `String`  | The display name or label for the button.                                                        |
-| `size`    | `false`  | `'medium'`  | `String`  | The size of the button. Possible values: `'small'`, `'medium'`, `'large'`.                       |
-| `variant` | `false`  | `'primary'` | `String`  | The visual style or color variant of the button. Possible values: `'primary'`, `'warning'`, etc. |
-| `outline` | `false`  | `false`     | `Boolean` | Specifies whether the button should have an outlined style.                                      |
-| `pill`    | `false`  | `false`     | `Boolean` | Specifies whether the button should have a pill-shaped style.                                    |
-| `icon`    | `false`  |             | `Object`  | Configuration object for an optional icon associated with the button.                            |
+| Property  | Required | Default     | Type                           | Description                                                                                      |
+| --------- | -------- | ----------- | ------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `key`     | `true`   |             | `string`                       | A unique identifier for the button, used to distinguish between buttons in the configuration.    |
+| `name`    | `true`   |             | `string`                       | The display name or label for the button.                                                        |
+| `size`    | `false`  | `'medium'`  | `small` or `meduim` or `large` | The size of the button. Possible values: `'small'`, `'medium'`, `'large'`.                       |
+| `variant` | `false`  | `'primary'` | `string`                       | The visual style or color variant of the button. Possible values: `'primary'`, `'warning'`, etc. |
+| `outline` | `false`  | `false`     | `boolean`                      | Specifies whether the button should have an outlined style.                                      |
+| `pill`    | `false`  | `false`     | `boolean`                      | Specifies whether the button should have a pill-shaped style.                                    |
+| `icon`    | `false`  |             | `object`                       | Configuration object for an optional icon associated with the button.                            |
 
 #### Example
 

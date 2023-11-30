@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { html, css, LitElement, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import { toLower } from "lodash-es";
@@ -157,7 +158,6 @@ export default class Details extends LitElement {
     this.loading = new Array(this.buttons.length).fill(false);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private _renderContainer(
     child: Children,
     content: TemplateResult,
@@ -205,7 +205,6 @@ export default class Details extends LitElement {
     return this._renderContainer(child, content, true);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private _renderObjectItem(
     [key, value]: [string, string],
     child: Children
@@ -236,12 +235,10 @@ export default class Details extends LitElement {
     `;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private _renderArrayValue(value: string): TemplateResult {
     return html`<div class="value">${value}</div>`;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private _renderArrayPill(value: string): TemplateResult {
     return html`<sl-tag size="medium" pill>${value}</sl-tag>`;
   }
@@ -264,7 +261,6 @@ export default class Details extends LitElement {
     return this._renderContainer(child, content, false, true);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private _renderField(tabName: string, data: Array<Children>): TemplateResult {
     return html`
       <sl-tab slot="nav" panel="${toLower(tabName)}">${tabName}</sl-tab>
@@ -289,7 +285,6 @@ export default class Details extends LitElement {
     `;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private _renderFields(fields: Array<Field>): TemplateResult {
     if (!fields.length) return html``;
     return html`
@@ -301,7 +296,6 @@ export default class Details extends LitElement {
     `;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private _renderSvg(icon: FooterButton["icon"]): TemplateResult {
     return html`
       <svg
