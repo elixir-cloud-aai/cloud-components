@@ -45,34 +45,34 @@ import "@elixir-cloud/design/dist/details/index.js";
 
 | Property                | Required | Default | Type     | Description                                              |
 | ----------------------- | -------- | ------- | -------- | -------------------------------------------------------- |
-| `tabGroup`              | `true`   |         | `String` | Tab group in which all the its children will be rendered |
+| `tabGroup`              | `true`   |         | `string` | Tab group in which all the its children will be rendered |
 | [`Children`](#children) | `true`   |         | `Array`  | Array of the details to be rendered                      |
 
 ### children\*
 
-| Property                  | Required | Default | Type                  | Description                                     |
-| ------------------------- | -------- | ------- | --------------------- | ----------------------------------------------- |
-| `key`                     | `true`   |         | `string`              | The unique key of field                         |
-| `label`                   | `true`   |         | `string`              | The label of the information to be rendered.    |
-| `value`                   | `true`   |         | `string` or `number`  | The info to be rendered                         |
-| `type`                    | `true`   |         | `text` or `long-text` | The type of information                         |
-| `textOptions.copy`        | `false`  |         | `boolean`             | Text will have a copy to clip button            |
-| `arrayOptions.isVertical` | `false`  |         | `boolean`             | Direction of rendering of array of string       |
-| `arrayOptions.pill`       | `false`  |         | `boolean`             | Puts the string of array into a pill shaped tag |
+| Property                  | Required | Default | Type                                           | Description                                     |
+| ------------------------- | -------- | ------- | ---------------------------------------------- | ----------------------------------------------- |
+| `key`                     | `true`   |         | `string`                                       | The unique key of field                         |
+| `label`                   | `true`   |         | `string`                                       | The label of the information to be rendered.    |
+| `value`                   | `true`   |         | `string \| number \| Array \| object`          | The info to be rendered                         |
+| `type`                    | `true`   |         | `'text' \| 'long-text' \| 'array' \| 'object'` | The type of information                         |
+| `textOptions.copy`        | `false`  | `false` | `boolean`                                      | Text will have a copy to clip button            |
+| `arrayOptions.isVertical` | `false`  | `false` | `boolean`                                      | Direction of rendering of array of string       |
+| `arrayOptions.pill`       | `false`  | `false` | `boolean`                                      | Puts the string of array into a pill shaped tag |
 
 ### Buttons
 
 The `buttons` property allows you to define an array of buttons along with their configuration. Buttons can be used to trigger specific actions or events within the component.
 
-| Property  | Required | Default     | Type                           | Description                                                                                      |
-| --------- | -------- | ----------- | ------------------------------ | ------------------------------------------------------------------------------------------------ |
-| `key`     | `true`   |             | `string`                       | A unique identifier for the button, used to distinguish between buttons in the configuration.    |
-| `name`    | `true`   |             | `string`                       | The display name or label for the button.                                                        |
-| `size`    | `false`  | `'medium'`  | `small` or `meduim` or `large` | The size of the button. Possible values: `'small'`, `'medium'`, `'large'`.                       |
-| `variant` | `false`  | `'primary'` | `string`                       | The visual style or color variant of the button. Possible values: `'primary'`, `'warning'`, etc. |
-| `outline` | `false`  | `false`     | `boolean`                      | Specifies whether the button should have an outlined style.                                      |
-| `pill`    | `false`  | `false`     | `boolean`                      | Specifies whether the button should have a pill-shaped style.                                    |
-| `icon`    | `false`  |             | `object`                       | Configuration object for an optional icon associated with the button.                            |
+| Property  | Required | Default     | Type                                                           | Description                                                                                   |
+| --------- | -------- | ----------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `key`     | `true`   |             | `string`                                                       | A unique identifier for the button, used to distinguish between buttons in the configuration. |
+| `name`    | `true`   |             | `string`                                                       | The display name or label for the button.                                                     |
+| `size`    | `false`  | `'medium'`  | `'small' \| 'meduim' \| 'large'`                               | The size of the button.                                                                       |
+| `variant` | `false`  | `'primary'` | `'primary' \| 'success' \| 'neutral' \| 'warning' \| 'danger'` | The visual style or color variant of the button.                                              |
+| `outline` | `false`  | `false`     | `boolean`                                                      | Specifies whether the button should have an outlined style.                                   |
+| `pill`    | `false`  | `false`     | `boolean`                                                      | Specifies whether the button should have a pill-shaped style.                                 |
+| `icon`    | `false`  |             | `object`                                                       | Configuration object for an optional icon associated with the button.                         |
 
 #### Example
 
@@ -110,7 +110,7 @@ The component emits a custom event named `button-${button.key}-click` when a but
 
 | Property | Type     | Description                                  |
 | -------- | -------- | -------------------------------------------- |
-| `key`    | `String` | The unique identifier of the clicked button. |
+| `key`    | `string` | The unique identifier of the clicked button. |
 | `event`  | `Event`  | The event emitted.                           |
 
 ### Methods
