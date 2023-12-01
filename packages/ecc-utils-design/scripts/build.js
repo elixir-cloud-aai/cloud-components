@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-console */
+/* eslint-disable no-param-reassign */
 
 import { globby } from "globby";
 import * as tsup from "tsup";
@@ -23,6 +24,7 @@ const config = {
     "./src/index.ts",
     ...(await globby("./src/components/**/!(*.(styles|test)).ts")),
     ...(await globby("./src/react/**/*.ts")),
+    ...(await globby("./src/utilities/**/*.ts")),
   ],
   splitting: true,
   treeshake: true,
@@ -81,8 +83,8 @@ await nextTask("Wrapping components for React", () =>
 await nextTask("Building source", () =>
   tsup.build({
     ...config,
-    esbuildOptions: async (options) =>
-      // eslint-disable-next-line no-param-reassign
-      (options.chunkNames = "chunks/[name].[hash]"),
+    esbuildOptions(buildOptions) {
+      buildOptions.chunkNames = "chunks/[name].[hash]";
+    },
   })
 );

@@ -1,4 +1,4 @@
-import { html, css, LitElement, TemplateResult } from "lit";
+import { html, LitElement, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
@@ -60,6 +60,7 @@ interface Field {
  *
  * @event ecc-utils-submit - This event is fired when the form is submitted. The event detail contains the form data.
  */
+
 export default class EccUtilsDesignForm extends LitElement {
   static styles = [
     getShoelaceStyles(
@@ -67,105 +68,43 @@ export default class EccUtilsDesignForm extends LitElement {
     ),
     hostStyles,
     formStyles,
-    css`
-      :host {
-        display: block;
-      }
-      form {
-        display: flex;
-        flex-direction: column;
-      }
-      form sl-input {
-        margin-top: 0.5rem;
-        margin-bottom: 0.5rem;
-      }
-      form sl-switch {
-        margin-top: 0.5rem;
-        margin-bottom: 0.5rem;
-      }
-      .group-container {
-        margin: 1rem 0;
-      }
-      .array-item {
-        margin: 1rem 0;
-        border-style: solid;
-        padding: 0px 0px 1rem 0px;
-        border-width: 0px 0px 1px 0px;
-        border-color: var(--sl-color-gray-300);
-      }
-      .group-item {
-        margin: 1rem 0;
-      }
-      .array-item {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-      }
-      .array-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-      }
-      .array-item-container {
-        width: 100%;
-      }
-      .delete-icon {
-        height: 1.25rem;
-      }
-      .add-icon {
-        height: 1.1rem;
-      }
-      .switch-container {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-      }
-      input[type="file"]::file-selector-button {
-        height: 100%;
-        background-color: #fff;
-        border: 0px;
-        border-right: 1px solid #d4d4d8;
-        padding-right: 20px;
-        padding-left: 20px;
-        margin-right: 10px;
-        font-size: 1rem;
-      }
-      input[type="file"] {
-        background-color: #fff;
-        border: 1px solid #d4d4d8;
-        border-radius: 4px;
-        margin-top: 0.5rem;
-        margin-bottom: 0.5rem;
-        height: 2.5rem;
-        font-size: 1rem;
-        color: #000;
-      }
-      .row {
-        display: flex;
-        flex-direction: column;
-      }
-      .success-icon {
-        height: 1.25rem;
-      }
-      .error-icon {
-        height: 1.25rem;
-      }
-      .sl-details::part(base) {
-        padding: 0;
-      }
-    `,
   ];
 
-  @property({ type: Array }) private fields!: Array<Field>;
+  @property({ type: Array }) private fields: Array<Field> = [];
   @state() private form: object = {};
   @state() private formState: "idle" | "loading" | "error" | "success" = "idle";
   @state() private errorMessage = "Form submitted successfully";
   @state() private successMessage = "Something went wrong";
+  protected cssParts = {
+    switchControl: "switch",
+    switchThumb: "switch-thumb",
+    switchLabel: "switch-label",
+    formControl: "field",
+    formControlLabel: "input-label",
+    input: "input",
+    inputBase: "input-base",
+    button: "button",
+    addButton: "add-button",
+    removeButton: "remove-button",
+    submitButton: "submit-button",
+    header: "header",
+    label: "label",
+    arrayHeader: "array-header",
+    arrayContainer: "array-container",
+    arrayLabel: "array-label",
+    arrayItem: "array-item",
+    groupBase: "group",
+    groupHeader: "group-header",
+    groupItem: "group-item",
+    groupLabel: "group-label",
+    groupToggleIcon: "group-toggle-icon",
+    groupContent: "group-content",
+    container: "container",
+    item: "item",
+    form: "form",
+  };
 
   connectedCallback() {
-    this.fields = [];
     super.connectedCallback();
     if (!this.fields) {
       throw new Error("Fields is required");
@@ -179,11 +118,15 @@ export default class EccUtilsDesignForm extends LitElement {
       _.set(this.form, path, field.fieldOptions?.default || false);
     }
 
+    const { switchControl, switchThumb, label, switchLabel, formControl } =
+      this.cssParts;
     return html`
-      <div part="field" class="switch-container">
-        <label part="label" class="switch-label">${field.label}</label>
+      <div part="${formControl}" class="switch-container">
+        <label part="${label} ${switchLabel}" class="switch-label"
+          >${field.label}</label
+        >
         <sl-switch
-          exportparts="control: switch, thumb: switch-thumb"
+          exportparts="control: ${switchControl}, thumb: ${switchThumb}"
           size="small"
           class="switch"
           label=${field.label}
@@ -205,15 +148,18 @@ export default class EccUtilsDesignForm extends LitElement {
       field.type === "group"
     )
       return html``;
+
+    const { formControl, formControlLabel, input, inputBase, label } =
+      this.cssParts;
     if (field.type === "file") {
       return html`
-        <div part="field" class="row">
-          <label part="label">
+        <div part="${formControl}" class="row">
+          <label part="${label} ${formControlLabel}">
             ${field.label} ${field.fieldOptions?.required ? "*" : ""}
           </label>
           <input
             class="input"
-            part="input-base input"
+            part="${inputBase} ${input}"
             type="file"
             accept=${field.fieldOptions?.accept || "*"}
             ?multiple=${field.fieldOptions?.multiple}
@@ -238,7 +184,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
     return html`
       <sl-input
-        exportparts="form-control: field, form-control-label: label, input: input, base: input-base"
+        exportparts="form-control: ${formControl}, form-control-label: ${formControlLabel}, form-control-label: ${label}, input: ${input}, base: ${inputBase}"
         class="input"
         label=${field.label}
         type=${field.type || "text"}
@@ -285,16 +231,32 @@ export default class EccUtilsDesignForm extends LitElement {
       return false;
     };
 
+    const {
+      button,
+      addButton,
+      removeButton,
+      label,
+      header,
+      arrayHeader,
+      arrayContainer,
+      container,
+      arrayLabel,
+      arrayItem,
+      item,
+    } = this.cssParts;
     return html`
-      <div class="array-container">
-        <div part="header array-header" class="array-header">
-          <label part="label array-label" class="array-label">
+      <div class="array-container" part="${container} ${arrayContainer}">
+        <div
+          part="header: ${arrayHeader}, header: ${header}"
+          class="array-header"
+        >
+          <label part="${label} ${arrayLabel}" class="array-label">
             ${field.label}
           </label>
           <sl-button
             variant="text"
             size="small"
-            exportparts="base: button, base: add-button"
+            exportparts="base: ${button}, base: ${addButton}"
             ?disabled=${!resolveAddButtonIsActive()}
             class="add-button"
             @click=${() => {
@@ -325,10 +287,10 @@ export default class EccUtilsDesignForm extends LitElement {
         </div>
         ${_.get(this.form, path)?.map(
           (_item: any, index: number) => html`
-            <div part="array-item" class="array-item">
+            <div part="${item} ${arrayItem}" class="array-item">
               <sl-button
                 variant="text"
-                exportparts="base: button, base: remove-button"
+                exportparts="base: ${button}, base: ${removeButton}"
                 ?disabled=${!resolveDeleteButtonIsActive()}
                 @click=${() => {
                   resolveDeleteButtonIsActive() &&
@@ -365,9 +327,21 @@ export default class EccUtilsDesignForm extends LitElement {
 
   private renderGroupTemplate(field: Field, path: string): TemplateResult {
     if (!field.children) return html``;
+
+    const {
+      item,
+      header,
+      label,
+      groupItem,
+      groupBase,
+      groupContent,
+      groupHeader,
+      groupLabel,
+      groupToggleIcon,
+    } = this.cssParts;
     const renderChildren = () =>
       html`
-        <div part="group-item" class="group-item">
+        <div part="${item} ${groupItem}" class="group-item">
           ${field.children?.map((child) =>
             this.renderTemplate(child, `${path}`)
           )}
@@ -378,13 +352,13 @@ export default class EccUtilsDesignForm extends LitElement {
       ${field.groupOptions?.collapsible
         ? html` <sl-details
             summary=${field.label}
-            exportparts="base: group, header, header: group-header, summary: label, summary: group-label, summary-icon: group-toggle-icon, content: group-content"
+            exportparts="base: ${groupBase}, header: ${groupHeader}, header: ${header}, summary: ${label}, summary: ${groupLabel}, summary-icon: ${groupToggleIcon}, content: ${groupContent}"
           >
             ${renderChildren()}
           </sl-details>`
         : html`
-            <div part="header group-header" class="group-header">
-              <label part="label group-label" class="group-label">
+            <div part="${header} ${groupHeader}" class="group-header">
+              <label part="${groupLabel} ${label}" class="group-label">
                 ${field.groupOptions?.collapsible ? "" : field.label}
               </label>
             </div>
@@ -478,9 +452,11 @@ export default class EccUtilsDesignForm extends LitElement {
     if (this.formState === "success") {
       return html` ${this.renderSuccessTemplate()} `;
     }
+
+    const { button, submitButton, form: csspartForm } = this.cssParts;
     return html`
       <form
-        part="form"
+        part="${csspartForm}"
         @submit=${(e: Event) => {
           e.preventDefault();
           const form = this.shadowRoot?.querySelector("form");
@@ -502,7 +478,7 @@ export default class EccUtilsDesignForm extends LitElement {
         ${this.renderErrorTemplate()}
         <sl-button
           type="submit"
-          exportparts="base: button, base: submit-button"
+          exportparts="base: ${button}, base: ${submitButton}"
           ?loading=${this.formState === "loading"}
           ?disabled=${this.formState === "loading"}
         >

@@ -69,6 +69,7 @@ export default defineConfig({
         items: [
           { text: 'Introduction', link: '/design/introduction' },
           { text: 'Installation', link: '/design/installation' },
+          { text: 'Utilities', link: '/design/utilities' },
           {
             text: 'Components',
             items: [
