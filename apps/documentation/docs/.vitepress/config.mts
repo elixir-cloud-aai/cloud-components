@@ -81,6 +81,10 @@ export default defineConfig({
                 text: 'Collection',
                 link: '/design/components/collection',
               },
+              {
+                text: 'Details',
+                link: '/design/components/details',
+              },
             ],
           },
         ],

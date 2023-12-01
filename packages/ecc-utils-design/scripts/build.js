@@ -10,7 +10,7 @@ import { exec } from "child_process";
 import fs from "fs";
 import { npmDir } from "./utils.js";
 
-const options = program.option("-w --watch").parse().opts();
+const commanderOpts = program.option("-w --watch").parse().opts();
 
 // to do:
 // write cdn config
@@ -31,7 +31,7 @@ const config = {
   bundle: true,
   outDir: npmDir,
   dts: true,
-  watch: options.watch,
+  watch: commanderOpts.watch,
 };
 
 const bundleDirectories = [npmDir];
