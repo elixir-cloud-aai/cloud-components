@@ -9,9 +9,7 @@ import { exec } from "child_process";
 import fs from "fs";
 import { npmDir } from "./utils.js";
 
-program.option("-w --watch");
-program.parse();
-const options = program.opts();
+const commanderOpts = program.option("-w --watch").parse().opts();
 
 // to do:
 // write cdn config
@@ -31,7 +29,7 @@ const config = {
   bundle: true,
   outDir: npmDir,
   dts: true,
-  watch: options.watch,
+  watch: commanderOpts.watch,
 };
 
 const bundleDirectories = [npmDir];
@@ -83,5 +81,8 @@ await nextTask("Wrapping components for React", () =>
 await nextTask("Building source", () =>
   tsup.build({
     ...config,
+    esbuildOptions: async (options) =>
+      // eslint-disable-next-line no-param-reassign
+      (options.chunkNames = "chunks/[name].[hash]"),
   })
 );

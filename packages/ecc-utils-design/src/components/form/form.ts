@@ -83,14 +83,23 @@ export default class EccUtilsDesignForm extends LitElement {
         margin-top: 0.5rem;
         margin-bottom: 0.5rem;
       }
+      .group-container {
+        margin: 1rem 0;
+      }
+      .array-item {
+        margin: 1rem 0;
+        border-style: solid;
+        padding: 0px 0px 1rem 0px;
+        border-width: 0px 0px 1px 0px;
+        border-color: var(--sl-color-gray-300);
+      }
+      .group-item {
+        margin: 1rem 0;
+      }
       .array-item {
         display: flex;
         flex-direction: row;
         align-items: center;
-        margin-bottom: 1rem;
-        border-style: solid;
-        border-width: 0px 0px 1px 0px;
-        border-color: var(--sl-color-gray-300);
       }
       .array-header {
         display: flex;
@@ -100,9 +109,6 @@ export default class EccUtilsDesignForm extends LitElement {
       }
       .array-item-container {
         width: 100%;
-      }
-      .array-label {
-        margin-bottom: 0.5rem;
       }
       .delete-icon {
         height: 1.25rem;
@@ -114,6 +120,7 @@ export default class EccUtilsDesignForm extends LitElement {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
+        align-items: center;
       }
       input[type="file"]::file-selector-button {
         height: 100%;
@@ -145,6 +152,9 @@ export default class EccUtilsDesignForm extends LitElement {
       .error-icon {
         height: 1.25rem;
       }
+      .sl-details::part(base) {
+        padding: 0;
+      }
     `,
   ];
 
@@ -174,6 +184,7 @@ export default class EccUtilsDesignForm extends LitElement {
         <label part="label" class="switch-label">${field.label}</label>
         <sl-switch
           exportparts="control: switch, thumb: switch-thumb"
+          size="small"
           class="switch"
           label=${field.label}
           ?required=${field.fieldOptions?.required}
@@ -188,7 +199,12 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   renderInputTemplate(field: Field, path: string): TemplateResult {
-    if (field.type === "array" || field.type === "switch") return html``;
+    if (
+      field.type === "array" ||
+      field.type === "switch" ||
+      field.type === "group"
+    )
+      return html``;
     if (field.type === "file") {
       return html`
         <div part="field" class="row">
@@ -277,6 +293,7 @@ export default class EccUtilsDesignForm extends LitElement {
           </label>
           <sl-button
             variant="text"
+            size="small"
             exportparts="base: button, base: add-button"
             ?disabled=${!resolveAddButtonIsActive()}
             class="add-button"
@@ -348,7 +365,6 @@ export default class EccUtilsDesignForm extends LitElement {
 
   private renderGroupTemplate(field: Field, path: string): TemplateResult {
     if (!field.children) return html``;
-
     const renderChildren = () =>
       html`
         <div part="group-item" class="group-item">
