@@ -20,7 +20,7 @@
   "version": "0.0.1",
   "author": "",
   "license": "ISC",
-  "customElements": "dist/custom-elements.json",
+  "customElements": "./dist/custom-elements.json",
   "repository": "",
   "scripts": {
     "analyze": "cem analyze --litelement",

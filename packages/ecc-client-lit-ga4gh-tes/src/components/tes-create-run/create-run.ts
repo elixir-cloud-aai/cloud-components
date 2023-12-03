@@ -2,7 +2,7 @@ import { html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { postTask } from "../../API/Task/tesGet.js";
 import { Executor, postTaskForm } from "./types.js";
-import "@elixir-cloud/design";
+import "@elixir-cloud/design/dist/components/form/index.js";
 
 @customElement("ecc-client-lit-ga4gh-tes-create-run")
 export class TESCreateRun extends LitElement {
@@ -417,7 +417,7 @@ export class TESCreateRun extends LitElement {
     return html`
       <ecc-utils-design-form
         .fields=${this.fields}
-        @form-submit=${(e: any) => {
+        @ecc-utils-submit=${(e: any) => {
           this._submitForm(e.detail.form.data);
         }}
       >
