@@ -1,17 +1,17 @@
-import { html, LitElement, TemplateResult } from 'lit';
-import { property, state } from 'lit/decorators.js';
-import getShoelaceStyles from '../../styles/shoelace.styles.js';
-import '@shoelace-style/shoelace/dist/components/details/details.js';
-import '@shoelace-style/shoelace/dist/components/badge/badge.js';
-import '@shoelace-style/shoelace/dist/components/input/input.js';
-import '@shoelace-style/shoelace/dist/components/select/select.js';
-import '@shoelace-style/shoelace/dist/components/option/option.js';
-import '@shoelace-style/shoelace/dist/components/button-group/button-group.js';
-import '@shoelace-style/shoelace/dist/components/button/button.js';
-import '@shoelace-style/shoelace/dist/components/skeleton/skeleton.js';
-import '@shoelace-style/shoelace/dist/components/alert/alert.js';
-import { hostStyles } from '../../styles/host.styles.js';
-import collectionStyles from './collection.styles.js';
+import { html, LitElement, TemplateResult } from "lit";
+import { property, state } from "lit/decorators.js";
+import getShoelaceStyles from "../../styles/shoelace.styles.js";
+import "@shoelace-style/shoelace/dist/components/details/details.js";
+import "@shoelace-style/shoelace/dist/components/badge/badge.js";
+import "@shoelace-style/shoelace/dist/components/input/input.js";
+import "@shoelace-style/shoelace/dist/components/select/select.js";
+import "@shoelace-style/shoelace/dist/components/option/option.js";
+import "@shoelace-style/shoelace/dist/components/button-group/button-group.js";
+import "@shoelace-style/shoelace/dist/components/button/button.js";
+import "@shoelace-style/shoelace/dist/components/skeleton/skeleton.js";
+import "@shoelace-style/shoelace/dist/components/alert/alert.js";
+import { hostStyles } from "../../styles/host.styles.js";
+import collectionStyles from "./collection.styles.js";
 
 interface ItemProp {
   index: number;
@@ -20,13 +20,13 @@ interface ItemProp {
   lazy?: boolean;
   tag?: {
     name: string;
-    type?: 'primary' | 'success' | 'neutral' | 'warning' | 'danger';
+    type?: "primary" | "success" | "neutral" | "warning" | "danger";
   };
 }
 
 interface FilterProp {
   key: string;
-  type: 'search' | 'select';
+  type: "search" | "select";
   options?: string[];
   selectConfig?: {
     multiple?: boolean;
@@ -53,7 +53,7 @@ interface FilterProp {
 export default class EccUtilsDesignCollection extends LitElement {
   static styles = [
     getShoelaceStyles(
-      document.querySelector('html')?.classList.contains('dark')
+      document.querySelector("html")?.classList.contains("dark")
     ),
     hostStyles,
     collectionStyles,
@@ -73,19 +73,19 @@ export default class EccUtilsDesignCollection extends LitElement {
   }
 
   public error(message: string) {
-    this._errors = [...this._errors, message || 'Something went wrong'];
+    this._errors = [...this._errors, message || "Something went wrong"];
   }
 
   private _renderSearchFilter(filter: FilterProp): TemplateResult {
     return html`<sl-input
       type="search"
-      placeholder="${filter.placeholder || 'Search'}"
+      placeholder="${filter.placeholder || "Search"}"
       clearable
       @sl-input=${(e: Event) => {
         this._page = 1;
         if (this.totalItems === -1) this._pagesRendered = 1;
         this.dispatchEvent(
-          new CustomEvent('ecc-utils-filter', {
+          new CustomEvent("ecc-utils-filter", {
             detail: {
               key: filter.key,
               value: (e.target as HTMLInputElement)?.value,
@@ -98,14 +98,14 @@ export default class EccUtilsDesignCollection extends LitElement {
 
   private _renderSelectFilter(filter: FilterProp): TemplateResult {
     return html`<sl-select
-      placeholder="${filter.placeholder || 'Select'}"
+      placeholder="${filter.placeholder || "Select"}"
       .multiple=${filter.selectConfig?.multiple || false}
       clearable
       @sl-change=${(e: CustomEvent) => {
         this._page = 1;
         if (this.totalItems === -1) this._pagesRendered = 1;
         this.dispatchEvent(
-          new CustomEvent('ecc-utils-filter', {
+          new CustomEvent("ecc-utils-filter", {
             detail: {
               key: filter.key,
               value: (e.target as HTMLInputElement)?.value,
@@ -126,10 +126,10 @@ export default class EccUtilsDesignCollection extends LitElement {
     return html`<div class="header">
       <div class="filters">
         ${this.filters.map((filter) => {
-          if (filter.type === 'search') {
+          if (filter.type === "search") {
             return this._renderSearchFilter(filter);
           }
-          if (filter.type === 'select') {
+          if (filter.type === "select") {
             return this._renderSelectFilter(filter);
           }
           return html``;
@@ -145,7 +145,7 @@ export default class EccUtilsDesignCollection extends LitElement {
           @click=${() => {
             this._page -= 1;
             this.dispatchEvent(
-              new CustomEvent('ecc-utils-page-change', {
+              new CustomEvent("ecc-utils-page-change", {
                 detail: {
                   page: this._page,
                 },
@@ -165,21 +165,21 @@ export default class EccUtilsDesignCollection extends LitElement {
             @click=${() => {
               this._page = page + 1;
               this.dispatchEvent(
-                new CustomEvent('ecc-utils-page-change', {
+                new CustomEvent("ecc-utils-page-change", {
                   detail: {
                     page: this._page,
                   },
                 })
               );
             }}
-            variant="${this._page === page + 1 ? 'primary' : 'default'}"
+            variant="${this._page === page + 1 ? "primary" : "default"}"
           >
             ${page + 1}
           </sl-button>`
         )}
         ${this.totalItems === -1
           ? html` <sl-button disabled> ... </sl-button> `
-          : ''}
+          : ""}
         <sl-button
           @click=${() => {
             if (this.totalItems === -1 && this._page === this._pagesRendered) {
@@ -187,7 +187,7 @@ export default class EccUtilsDesignCollection extends LitElement {
             }
             this._page += 1;
             this.dispatchEvent(
-              new CustomEvent('ecc-utils-page-change', {
+              new CustomEvent("ecc-utils-page-change", {
                 detail: {
                   page: this._page,
                 },
@@ -210,10 +210,10 @@ export default class EccUtilsDesignCollection extends LitElement {
   ): TemplateResult {
     return html`<sl-details
       name="${item.key}"
-      class="${hidden ? 'hidden' : ''}"
+      class="${hidden ? "hidden" : ""}"
       @sl-show=${() => {
         this.dispatchEvent(
-          new CustomEvent('ecc-utils-expand', {
+          new CustomEvent("ecc-utils-expand", {
             detail: {
               key: item.key,
             },
@@ -231,11 +231,11 @@ export default class EccUtilsDesignCollection extends LitElement {
         ${item.tag && !loading
           ? html`<sl-badge
               class="badge"
-              variant="${item.tag.type || 'primary'}"
+              variant="${item.tag.type || "primary"}"
             >
               ${item.tag.name}
             </sl-badge>`
-          : ''}
+          : ""}
       </div>
       <slot name="${item.key}">
         ${item.lazy
@@ -278,7 +278,7 @@ export default class EccUtilsDesignCollection extends LitElement {
           {
             index: itemIndex,
             key: `item-${itemIndex}`,
-            name: 'Hidden',
+            name: "Hidden",
           },
           false,
           true
@@ -294,7 +294,7 @@ export default class EccUtilsDesignCollection extends LitElement {
         {
           index: itemIndex,
           key: `item-${itemIndex}`,
-          name: 'Loading',
+          name: "Loading",
         },
         true,
         false

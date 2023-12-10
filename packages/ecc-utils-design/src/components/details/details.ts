@@ -1,22 +1,22 @@
 /* eslint-disable class-methods-use-this */
-import { html, css, LitElement, TemplateResult } from 'lit';
-import { property, state } from 'lit/decorators.js';
-import { toLower } from 'lodash-es';
-import getShoelaceStyles from '../../styles/shoelace.styles.js';
-import '@shoelace-style/shoelace/dist/components/tab-group/tab-group.js';
-import '@shoelace-style/shoelace/dist/components/tab/tab.js';
-import '@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js';
-import '@shoelace-style/shoelace/dist/components/copy-button/copy-button.js';
-import '@shoelace-style/shoelace/dist/components/button/button.js';
-import '@shoelace-style/shoelace/dist/components/tag/tag.js';
-import '@shoelace-style/shoelace/dist/components/icon/icon.js';
-import { hostStyles } from '../../styles/host.styles.js';
+import { html, css, LitElement, TemplateResult } from "lit";
+import { property, state } from "lit/decorators.js";
+import { toLower } from "lodash-es";
+import getShoelaceStyles from "../../styles/shoelace.styles.js";
+import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
+import "@shoelace-style/shoelace/dist/components/tab/tab.js";
+import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
+import "@shoelace-style/shoelace/dist/components/copy-button/copy-button.js";
+import "@shoelace-style/shoelace/dist/components/button/button.js";
+import "@shoelace-style/shoelace/dist/components/tag/tag.js";
+import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+import { hostStyles } from "../../styles/host.styles.js";
 
 interface Children {
   key: string;
   label: string;
   value: string | number | Array<string> | Record<string, string>;
-  type: 'text' | 'long-text' | 'array' | 'object';
+  type: "text" | "long-text" | "array" | "object";
   textOptions?: {
     copy?: boolean;
   };
@@ -34,8 +34,8 @@ interface Field {
 interface FooterButton {
   key: string;
   name: string;
-  size: 'small' | 'medium' | 'large';
-  variant: 'primary' | 'success' | 'neutral' | 'warning' | 'danger';
+  size: "small" | "medium" | "large";
+  variant: "primary" | "success" | "neutral" | "warning" | "danger";
   outline: boolean;
   pill: boolean;
   icon?: {
@@ -48,7 +48,7 @@ interface FooterButton {
 export default class EccUtilsDesignDetails extends LitElement {
   static styles = [
     getShoelaceStyles(
-      document.querySelector('html')?.classList.contains('dark')
+      document.querySelector("html")?.classList.contains("dark")
     ),
     hostStyles,
     css`
@@ -140,7 +140,7 @@ export default class EccUtilsDesignDetails extends LitElement {
         align-items: flex-start;
       }
 
-      [name='footer-container'] {
+      [name="footer-container"] {
         display: flex;
         justify-content: space-between;
         padding: 0.2rem;
@@ -166,9 +166,9 @@ export default class EccUtilsDesignDetails extends LitElement {
   ): TemplateResult {
     return html`
       <div
-        class="details-container ${flexDir ? 'column' : ''} ${alignItems
-          ? 'align'
-          : ''}"
+        class="details-container ${flexDir ? "column" : ""} ${alignItems
+          ? "align"
+          : ""}"
       >
         <div class="label">${child.label}</div>
         <div class="value-container" id=${child.key}>
@@ -250,7 +250,7 @@ export default class EccUtilsDesignDetails extends LitElement {
 
     const content = html`
       <div
-        class="array-value ${child.arrayOptions?.vertical ? 'vertical' : ''}"
+        class="array-value ${child.arrayOptions?.vertical ? "vertical" : ""}"
       >
         ${(child.value as Array<string>).map(
           (value) => html`<div class="array-item">${arrayRenderer(value)}</div>`
@@ -268,13 +268,13 @@ export default class EccUtilsDesignDetails extends LitElement {
         <div class="panel-container">
           ${data.map((child) => {
             switch (child.type) {
-              case 'text':
+              case "text":
                 return this._renderText(child);
-              case 'long-text':
+              case "long-text":
                 return this._renderLongText(child);
-              case 'array':
+              case "array":
                 return this._renderArray(child);
-              case 'object':
+              case "object":
                 return this._renderObject(child);
               default:
                 return html``;
@@ -296,7 +296,7 @@ export default class EccUtilsDesignDetails extends LitElement {
     `;
   }
 
-  private _renderSvg(icon: FooterButton['icon']): TemplateResult {
+  private _renderSvg(icon: FooterButton["icon"]): TemplateResult {
     return html`
       <svg
         slot="prefix"
@@ -341,7 +341,7 @@ export default class EccUtilsDesignDetails extends LitElement {
                 @click="${(event: Event) =>
                   this._handleClick(event, key, index)}"
               >
-                ${icon ? this._renderSvg(icon) : ''} ${name}
+                ${icon ? this._renderSvg(icon) : ""} ${name}
               </sl-button>
             `;
           })}

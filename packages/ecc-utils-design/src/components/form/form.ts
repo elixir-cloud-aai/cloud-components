@@ -1,34 +1,34 @@
-import { html, LitElement, TemplateResult } from 'lit';
-import { property, state } from 'lit/decorators.js';
-import '@shoelace-style/shoelace/dist/components/input/input.js';
-import '@shoelace-style/shoelace/dist/components/button/button.js';
-import '@shoelace-style/shoelace/dist/components/switch/switch.js';
-import '@shoelace-style/shoelace/dist/components/icon-button/icon-button.js';
-import '@shoelace-style/shoelace/dist/components/alert/alert.js';
-import '@shoelace-style/shoelace/dist/components/details/details.js';
-import _ from 'lodash-es';
-import getShoelaceStyles from '../../styles/shoelace.styles.js';
-import { hostStyles } from '../../styles/host.styles.js';
-import formStyles from './form.styles.js';
+import { html, LitElement, TemplateResult } from "lit";
+import { property, state } from "lit/decorators.js";
+import "@shoelace-style/shoelace/dist/components/input/input.js";
+import "@shoelace-style/shoelace/dist/components/button/button.js";
+import "@shoelace-style/shoelace/dist/components/switch/switch.js";
+import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
+import "@shoelace-style/shoelace/dist/components/alert/alert.js";
+import "@shoelace-style/shoelace/dist/components/details/details.js";
+import _ from "lodash-es";
+import getShoelaceStyles from "../../styles/shoelace.styles.js";
+import { hostStyles } from "../../styles/host.styles.js";
+import formStyles from "./form.styles.js";
 
 interface Field {
   key: string;
   label: string;
   type?:
-    | 'text'
-    | 'date'
-    | 'number'
-    | 'email'
-    | 'password'
-    | 'tel'
-    | 'url'
-    | 'search'
-    | 'datetime-local'
-    | 'time'
-    | 'array'
-    | 'switch'
-    | 'file'
-    | 'group';
+    | "text"
+    | "date"
+    | "number"
+    | "email"
+    | "password"
+    | "tel"
+    | "url"
+    | "search"
+    | "datetime-local"
+    | "time"
+    | "array"
+    | "switch"
+    | "file"
+    | "group";
   fieldOptions?: {
     required?: boolean;
     default?: string | boolean;
@@ -64,7 +64,7 @@ interface Field {
 export default class EccUtilsDesignForm extends LitElement {
   static styles = [
     getShoelaceStyles(
-      document.querySelector('html')?.classList.contains('dark')
+      document.querySelector("html")?.classList.contains("dark")
     ),
     hostStyles,
     formStyles,
@@ -72,47 +72,47 @@ export default class EccUtilsDesignForm extends LitElement {
 
   @property({ type: Array, reflect: true }) fields: Array<Field> = [];
   @state() private form: object = {};
-  @state() private formState: 'idle' | 'loading' | 'error' | 'success' = 'idle';
-  @state() private errorMessage = 'Form submitted successfully';
-  @state() private successMessage = 'Something went wrong';
+  @state() private formState: "idle" | "loading" | "error" | "success" = "idle";
+  @state() private errorMessage = "Form submitted successfully";
+  @state() private successMessage = "Something went wrong";
   protected cssParts = {
-    switchControl: 'switch',
-    switchThumb: 'switch-thumb',
-    switchLabel: 'switch-label',
-    formControl: 'field',
-    formControlLabel: 'input-label',
-    input: 'input',
-    inputBase: 'input-base',
-    button: 'button',
-    addButton: 'add-button',
-    removeButton: 'remove-button',
-    submitButton: 'submit-button',
-    header: 'header',
-    label: 'label',
-    arrayHeader: 'array-header',
-    arrayContainer: 'array-container',
-    arrayLabel: 'array-label',
-    arrayItem: 'array-item',
-    groupBase: 'group',
-    groupHeader: 'group-header',
-    groupItem: 'group-item',
-    groupLabel: 'group-label',
-    groupToggleIcon: 'group-toggle-icon',
-    groupContent: 'group-content',
-    container: 'container',
-    item: 'item',
-    form: 'form',
+    switchControl: "switch",
+    switchThumb: "switch-thumb",
+    switchLabel: "switch-label",
+    formControl: "field",
+    formControlLabel: "input-label",
+    input: "input",
+    inputBase: "input-base",
+    button: "button",
+    addButton: "add-button",
+    removeButton: "remove-button",
+    submitButton: "submit-button",
+    header: "header",
+    label: "label",
+    arrayHeader: "array-header",
+    arrayContainer: "array-container",
+    arrayLabel: "array-label",
+    arrayItem: "array-item",
+    groupBase: "group",
+    groupHeader: "group-header",
+    groupItem: "group-item",
+    groupLabel: "group-label",
+    groupToggleIcon: "group-toggle-icon",
+    groupContent: "group-content",
+    container: "container",
+    item: "item",
+    form: "form",
   };
 
   connectedCallback() {
     super.connectedCallback();
     if (!this.fields) {
-      throw new Error('Fields is required');
+      throw new Error("Fields is required");
     }
   }
 
   private renderSwitchTemplate(field: Field, path: string): TemplateResult {
-    if (field.type !== 'switch') return html``;
+    if (field.type !== "switch") return html``;
 
     if (!_.get(this.form, path) && !this.hasUpdated) {
       _.set(this.form, path, field.fieldOptions?.default || false);
@@ -143,25 +143,25 @@ export default class EccUtilsDesignForm extends LitElement {
 
   renderInputTemplate(field: Field, path: string): TemplateResult {
     if (
-      field.type === 'array' ||
-      field.type === 'switch' ||
-      field.type === 'group'
+      field.type === "array" ||
+      field.type === "switch" ||
+      field.type === "group"
     )
       return html``;
 
     const { formControl, formControlLabel, input, inputBase, label } =
       this.cssParts;
-    if (field.type === 'file') {
+    if (field.type === "file") {
       return html`
         <div part="${formControl}" class="row">
           <label part="${label} ${formControlLabel}">
-            ${field.label} ${field.fieldOptions?.required ? '*' : ''}
+            ${field.label} ${field.fieldOptions?.required ? "*" : ""}
           </label>
           <input
             class="input"
             part="${inputBase} ${input}"
             type="file"
-            accept=${field.fieldOptions?.accept || '*'}
+            accept=${field.fieldOptions?.accept || "*"}
             ?multiple=${field.fieldOptions?.multiple}
             ?required=${field.fieldOptions?.required}
             @change=${async (e: Event) => {
@@ -178,7 +178,7 @@ export default class EccUtilsDesignForm extends LitElement {
       if (field.fieldOptions?.default && !this.hasUpdated) {
         _.set(this.form, path, field.fieldOptions.default);
       } else if (field.fieldOptions?.returnIfEmpty) {
-        _.set(this.form, path, '');
+        _.set(this.form, path, "");
       }
     }
 
@@ -187,10 +187,10 @@ export default class EccUtilsDesignForm extends LitElement {
         exportparts="form-control: ${formControl}, form-control-label: ${formControlLabel}, form-control-label: ${label}, input: ${input}, base: ${inputBase}"
         class="input"
         label=${field.label}
-        type=${field.type || 'text'}
+        type=${field.type || "text"}
         ?required=${field.fieldOptions?.required}
         value=${_.get(this.form, path)}
-        ?password-toggle=${field.type === 'password'}
+        ?password-toggle=${field.type === "password"}
         @sl-change=${(e: Event) => {
           const { value } = e.target as HTMLInputElement;
           if (!value) {
@@ -359,7 +359,7 @@ export default class EccUtilsDesignForm extends LitElement {
         : html`
             <div part="${header} ${groupHeader}" class="group-header">
               <label part="${groupLabel} ${label}" class="group-label">
-                ${field.groupOptions?.collapsible ? '' : field.label}
+                ${field.groupOptions?.collapsible ? "" : field.label}
               </label>
             </div>
             ${renderChildren()}
@@ -368,20 +368,20 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   private renderTemplate(field: Field, path: string): TemplateResult {
-    if (field.type === 'group') {
+    if (field.type === "group") {
       return this.renderGroupTemplate(field, `${path}.${field.key}`);
     }
-    if (field.type === 'array') {
+    if (field.type === "array") {
       return this.renderArrayTemplate(field, `${path}.${field.key}`);
     }
-    if (field.type === 'switch') {
+    if (field.type === "switch") {
       return this.renderSwitchTemplate(field, `${path}.${field.key}`);
     }
     return this.renderInputTemplate(field, `${path}.${field.key}`);
   }
 
   private renderErrorTemplate(): TemplateResult {
-    if (this.formState !== 'error') return html``;
+    if (this.formState !== "error") return html``;
     return html`<sl-alert variant="danger" open>
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -403,7 +403,7 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   private renderSuccessTemplate(): TemplateResult {
-    if (this.formState !== 'success') return html``;
+    if (this.formState !== "success") return html``;
     return html`
       <sl-alert variant="success" open>
         <svg
@@ -428,28 +428,28 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   public loading() {
-    this.formState = 'loading';
+    this.formState = "loading";
   }
 
   public success({ message }: { message?: string }) {
-    this.formState = 'success';
-    this.successMessage = message || 'Form submitted successfully';
+    this.formState = "success";
+    this.successMessage = message || "Form submitted successfully";
   }
 
   public error({ message }: { message?: string }) {
-    this.formState = 'error';
-    this.errorMessage = message || 'Something went wrong';
+    this.formState = "error";
+    this.errorMessage = message || "Something went wrong";
   }
 
   public idle() {
-    this.formState = 'idle';
+    this.formState = "idle";
   }
 
   render() {
     if (!this.fields || this.fields.length === 0) {
-      throw new Error('Fields is required & should not be empty array');
+      throw new Error("Fields is required & should not be empty array");
     }
-    if (this.formState === 'success') {
+    if (this.formState === "success") {
       return html` ${this.renderSuccessTemplate()} `;
     }
 
@@ -459,12 +459,12 @@ export default class EccUtilsDesignForm extends LitElement {
         part="${csspartForm}"
         @submit=${(e: Event) => {
           e.preventDefault();
-          const form = this.shadowRoot?.querySelector('form');
+          const form = this.shadowRoot?.querySelector("form");
           const isValid = form?.reportValidity();
           if (!isValid) {
             return;
           }
-          const event = new CustomEvent('ecc-utils-submit', {
+          const event = new CustomEvent("ecc-utils-submit", {
             detail: {
               form: this.form,
             },
@@ -474,13 +474,13 @@ export default class EccUtilsDesignForm extends LitElement {
           this.dispatchEvent(event);
         }}
       >
-        ${this.fields.map((field) => this.renderTemplate(field, 'data'))}
+        ${this.fields.map((field) => this.renderTemplate(field, "data"))}
         ${this.renderErrorTemplate()}
         <sl-button
           type="submit"
           exportparts="base: ${button}, base: ${submitButton}"
-          ?loading=${this.formState === 'loading'}
-          ?disabled=${this.formState === 'loading'}
+          ?loading=${this.formState === "loading"}
+          ?disabled=${this.formState === "loading"}
         >
           Submit
         </sl-button>
