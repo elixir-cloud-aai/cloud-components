@@ -26,7 +26,8 @@
   },
   "dependencies": {
     "@elixir-cloud/design": "*",
-    "lit": "^2.8.0"
+    "lit": "^2.8.0",
+    "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.4.17",
