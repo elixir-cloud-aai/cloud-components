@@ -20,8 +20,8 @@ const bundleDirectories = [npmDir];
 async function nextTask(label, action) {
   try {
     const spinner = ora(label).start();
-    spinner.succeed();
     await action();
+    spinner.succeed();
   } catch (err) {
     console.error(err);
     if (err.stdout) console.error(err.stdout);
@@ -74,7 +74,7 @@ nextTask("Building source", async () => {
     watch: commanderOpts.watch,
   };
 
-  tsup.build({
+  await tsup.build({
     ...config,
     esbuildOptions(buildOptions) {
       buildOptions.chunkNames = "chunks/[name].[hash]";
