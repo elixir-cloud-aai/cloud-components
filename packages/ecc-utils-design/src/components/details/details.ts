@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import { html, css, LitElement, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
-import { toLower } from "lodash-es";
+import _, { toLower } from "lodash-es";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
 import "@shoelace-style/shoelace/dist/components/tab/tab.js";
@@ -12,21 +12,14 @@ import "@shoelace-style/shoelace/dist/components/tag/tag.js";
 import "@shoelace-style/shoelace/dist/components/icon/icon.js";
 import { hostStyles } from "../../styles/host.styles.js";
 
-interface Children {
-  key: string;
-  label: string;
-  value: string | number | Array<string> | Record<string, string>;
-  type: "text" | "long-text" | "array" | "object";
-  textOptions?: {
-    copy?: boolean;
-  };
-  arrayOptions?: {
-    vertical?: boolean;
-    pill?: boolean;
-  };
+export interface Children {
+  label?: string;
+  path: string;
+  copy?: boolean;
+  defaultValue?: any;
 }
 
-interface Field {
+export interface Field {
   tabGroup: string;
   children: Array<Children>;
 }
@@ -51,103 +44,10 @@ export default class EccUtilsDesignDetails extends LitElement {
       document.querySelector("html")?.classList.contains("dark")
     ),
     hostStyles,
-    css`
-      .panel-container {
-        height: 400px;
-        overflow: scroll;
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-
-      .panel-container::-webkit-scrollbar {
-        display: none;
-      }
-
-      .details-container {
-        display: flex;
-        margin-bottom: 1rem;
-        align-items: center;
-      }
-
-      .details-container-object {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .column {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .align {
-        align-items: flex-start;
-      }
-
-      .label {
-        font-weight: bold;
-        margin-right: 0.5rem;
-      }
-
-      .value-container {
-        display: flex;
-        align-items: center;
-      }
-
-      .value {
-      }
-
-      .large-text {
-        height: 6rem;
-        overflow: scroll;
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-
-      .large-text::-webkit-scrollbar {
-        display: none;
-      }
-
-      .object-item {
-        display: flex;
-        margin-bottom: 0.5rem;
-      }
-
-      .object-key {
-        font-weight: bold;
-        margin-right: 0.5rem;
-      }
-
-      .object-value-container {
-        margin-left: 1rem;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .object-value {
-      }
-
-      .array-value {
-        display: flex;
-        gap: 0.2rem;
-      }
-
-      .array-item {
-        margin-bottom: 0.2rem;
-      }
-
-      .vertical {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      [name="footer-container"] {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.2rem;
-      }
-    `,
+    css``,
   ];
 
+  @property({ type: Object, reflect: true }) data = {};
   @property({ type: Array, reflect: true }) fields: Array<Field> = [];
   @property({ type: Array, reflect: true }) buttons: Array<FooterButton> = [];
 
@@ -156,31 +56,6 @@ export default class EccUtilsDesignDetails extends LitElement {
   constructor() {
     super();
     this.loading = new Array(this.buttons.length).fill(false);
-  }
-
-  private _renderContainer(
-    child: Children,
-    content: TemplateResult,
-    flexDir = false,
-    alignItems = false
-  ): TemplateResult {
-    return html`
-      <div
-        class="details-container ${flexDir ? "column" : ""} ${alignItems
-          ? "align"
-          : ""}"
-      >
-        <div class="label">${child.label}</div>
-        <div class="value-container" id=${child.key}>
-          ${content}
-          ${child.textOptions?.copy &&
-          html`<sl-copy-button
-            class="copy-button"
-            from=${child.key}
-          ></sl-copy-button>`}
-        </div>
-      </div>
-    `;
   }
 
   /**
@@ -193,92 +68,235 @@ export default class EccUtilsDesignDetails extends LitElement {
     this.requestUpdate();
   }
 
-  private _renderText(child: Children): TemplateResult {
-    const content = html`<div class="value">${child.value}</div>`;
-    return this._renderContainer(child, content);
-  }
-
-  private _renderLongText(child: Children): TemplateResult {
-    const content = html`<div id="${child.key}" class="value large-text">
-      ${child.value}
-    </div>`;
-    return this._renderContainer(child, content, true);
-  }
-
-  private _renderObjectItem(
-    [key, value]: [string, string],
-    child: Children
+  private _renderData(
+    data: string,
+    label: string,
+    copy = false
   ): TemplateResult {
     return html`
-      <div class="object-item">
-        <div class="object-key">${key}:</div>
-        <div id="${child.key}" class="object-value">${value}</div>
-        ${child.textOptions?.copy &&
-        html`<sl-copy-button
-          class="copy-button"
-          from=${child.key}
-        ></sl-copy-button>`}
+      <div class="container">
+        <div class="label">
+          <span>${label}</span>
+          ${copy
+            ? html`
+                <sl-copy-button
+                  value=${data}
+                  copy-label="Click to copy ${label}"
+                  success-label="${label} copied"
+                  error-label="Error"
+                ></sl-copy-button>
+              `
+            : html``}
+        </div>
+        <div class="value">${data}</div>
       </div>
     `;
   }
 
-  private _renderObject(child: Children): TemplateResult {
+  private _renderText(data: string): TemplateResult {
+    return html` <div>${data}</div> `;
+  }
+
+  private _renderArray(
+    data: Array<any>,
+    label: string,
+    copy = false
+  ): TemplateResult {
     return html`
-      <div class="details-container details-container-object">
-        <div class="label">${child.label}</div>
-        <div class="object-value-container">
-          ${Object.entries(child.value).map((entry) =>
-            this._renderObjectItem(entry, child)
-          )}
+      <div class="container">
+        <div class="label">
+          <span>${label}</span>
+          ${copy
+            ? html`
+                <sl-copy-button
+                  value=${JSON.stringify(data)}
+                  copy-label="Click to copy strigified JSON of ${label}"
+                  success-label="${label} copied"
+                  error-label="Error"
+                ></sl-copy-button>
+              `
+            : html``}
+        </div>
+        <div class="value">
+          ${data.map((value, index) => {
+            if (value === null || value === undefined) {
+              return null; // Skip rendering for null or undefined values
+            }
+
+            if (Array.isArray(value)) {
+              return this._renderArray(value, `${label}-${index}`);
+            }
+            if (typeof value === "object") {
+              return this._renderObject(value, `${label}-${index}`);
+            }
+            return this._renderText(value);
+          })}
         </div>
       </div>
     `;
   }
 
-  private _renderArrayValue(value: string): TemplateResult {
-    return html`<div class="value">${value}</div>`;
-  }
+  private _renderObject(
+    data: any,
+    label: string,
+    copy = false
+  ): TemplateResult {
+    return html`
+      <div class="container">
+        <div class="label">
+          <span>${label}</span>
+          ${copy
+            ? html`
+                <sl-copy-button
+                  value=${JSON.stringify(data)}
+                  copy-label="Click to copy strigified JSON of ${label}"
+                  success-label="${label} copied"
+                  error-label="Error"
+                ></sl-copy-button>
+              `
+            : html``}
+        </div>
+        <div class="value">
+          ${Object.entries(data).map(([dataLabel, dataValue], index) => {
+            if (dataValue === null || dataValue === undefined) {
+              return null; // Skip rendering for null or undefined values
+            }
 
-  private _renderArrayPill(value: string): TemplateResult {
-    return html`<sl-tag size="medium" pill>${value}</sl-tag>`;
-  }
-
-  private _renderArray(child: Children): TemplateResult {
-    const arrayRenderer = child?.arrayOptions?.pill
-      ? this._renderArrayPill
-      : this._renderArrayValue;
-
-    const content = html`
-      <div
-        class="array-value ${child.arrayOptions?.vertical ? "vertical" : ""}"
-      >
-        ${(child.value as Array<string>).map(
-          (value) => html`<div class="array-item">${arrayRenderer(value)}</div>`
-        )}
+            if (Array.isArray(dataValue)) {
+              return this._renderArray(dataValue, `${dataLabel}-${index}`);
+            }
+            if (typeof dataValue === "object") {
+              return this._renderObject(dataValue, `${dataLabel}-${index}`);
+            }
+            return this._renderText(dataValue as string);
+          })}
+        </div>
       </div>
     `;
-
-    return this._renderContainer(child, content, false, true);
   }
 
-  private _renderField(tabName: string, data: Array<Children>): TemplateResult {
+  // private _renderObject(
+  // 	data: any,
+  // 	label: string,
+  // 	copy = false
+  // ): TemplateResult {
+  // 	return html`
+  // 		<div class="container">
+  // 			<div class="label">
+  // 				<span>${label}</span>
+  // 				${copy
+  // 					? html`
+  // 							<sl-copy-button
+  // 								value=${JSON.stringify(data)}
+  // 								copy-label="Click to copy strigified JSON of ${label}"
+  // 								success-label="${label} copied"
+  // 								error-label="Error"
+  // 							></sl-copy-button>
+  // 					  `
+  // 					: html``}
+  // 			</div>
+  // 			<div class="value">
+  // 				${Object.entries(data).map(([label, value], index) => {
+  // 					if (value === null || value === undefined) {
+  // 						return null; // Skip rendering for null or undefined values
+  // 					}
+
+  // 					return Array.isArray(value)
+  // 						? this._renderArray(value, label)
+  // 						: typeof value === 'object'
+  // 						? this._renderObject(value, label)
+  // 						: this._renderText(value as string);
+  // 				})}
+  // 			</div>
+  // 		</div>
+  // 	`;
+  // }
+
+  // private _renderArray(
+  // 	data: Array<any>,
+  // 	label: string,
+  // 	copy = false
+  // ): TemplateResult {
+  // 	return html`
+  // 		<div class="container">
+  // 			<div class="label">
+  // 				<span>${label}</span>
+  // 				${copy
+  // 					? html`
+  // 							<sl-copy-button
+  // 								value=${JSON.stringify(data)}
+  // 								copy-label="Click to copy strigified JSON of ${label}"
+  // 								success-label="${label} copied"
+  // 								error-label="Error"
+  // 							></sl-copy-button>
+  // 					  `
+  // 					: html``}
+  // 			</div>
+  // 			<div class="value">
+  // 				${data.map((data, index) => {
+  // 					if (data === null || data === undefined) {
+  // 						return null; // Skip rendering for null or undefined values
+  // 					}
+
+  // 					return Array.isArray(data)
+  // 						? this._renderArray(data, `${label}-${index}`)
+  // 						: typeof data === 'object'
+  // 						? this._renderObject(data, `${label}-${index}`)
+  // 						: this._renderText(data);
+  // 				})}
+  // 			</div>
+  // 		</div>
+  // 	`;
+  // }
+
+  private _renderField(
+    tabName: string,
+    children: Array<Children>
+  ): TemplateResult {
     return html`
       <sl-tab slot="nav" panel="${toLower(tabName)}">${tabName}</sl-tab>
       <sl-tab-panel name="${toLower(tabName)}">
         <div class="panel-container">
-          ${data.map((child) => {
-            switch (child.type) {
-              case "text":
-                return this._renderText(child);
-              case "long-text":
-                return this._renderLongText(child);
-              case "array":
-                return this._renderArray(child);
-              case "object":
-                return this._renderObject(child);
-              default:
-                return html``;
+          ${children.map((childFieldInfo: Children) => {
+            const childData = _.get(
+              this.data,
+              childFieldInfo.path,
+              childFieldInfo.defaultValue
+            );
+            if (
+              childData == null ||
+              (Array.isArray(childData) && childData.length === 0) ||
+              Object.entries(childData).length === 0
+            )
+              return html``;
+
+            const label =
+              (
+                childFieldInfo.label ||
+                childFieldInfo.path.split(".").pop() ||
+                "Undefined"
+              )
+                .replace(/_/g, " ") // Replace underscores with spaces globally
+                .charAt(0)
+                .toUpperCase() +
+              (
+                childFieldInfo.label ||
+                childFieldInfo.path.split(".").pop() ||
+                "Undefined"
+              ).slice(1);
+
+            const copy =
+              childFieldInfo.copy !== undefined ? childFieldInfo.copy : false;
+
+            console.log(childData, label, copy);
+
+            if (Array.isArray(childData)) {
+              return this._renderArray(childData, label, copy);
             }
+            if (typeof childData === "object") {
+              return this._renderObject(childData, label, copy);
+            }
+            return this._renderData(childData, label, copy);
           })}
         </div>
       </sl-tab-panel>
