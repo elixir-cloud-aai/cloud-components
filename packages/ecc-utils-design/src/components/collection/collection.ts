@@ -1,4 +1,4 @@
-import { html, css, LitElement, TemplateResult } from "lit";
+import { html, LitElement, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
@@ -11,6 +11,7 @@ import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/skeleton/skeleton.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import { hostStyles } from "../../styles/host.styles.js";
+import collectionStyles from "./collection.styles.js";
 
 interface ItemProp {
   index: number;
@@ -33,72 +34,35 @@ interface FilterProp {
   placeholder?: string;
 }
 
-export default class Collection extends LitElement {
+/**
+ * @summary This component is used to render a collection of items. It can be used to render a filters & pagination component for a list of items.
+ * @since 1.0.0
+ *
+ * @property {array} items - An array of items to render
+ * @property {array} filters - An array of filters to render
+ * @property {number} totalItems - The total number of items in the collection. If not provided, the collection will render pagination without fixed page numbers.
+ * @property {number} pageSize - The number of items per pagination.
+ *
+ * @method setPage - Can be used to set the page of the collection.
+ * @method error - Can be used to display error alert to the user.
+ *
+ * @event ecc-utils-page-change - Fired when the page is changed.
+ * @event ecc-utils-expand - Fired when an item is expanded.
+ * @event ecc-utils-filter - Fired when a filter is applied.
+ */
+export default class EccUtilsDesignCollection extends LitElement {
   static styles = [
     getShoelaceStyles(
       document.querySelector("html")?.classList.contains("dark")
     ),
     hostStyles,
-    css`
-      :host {
-        display: block;
-      }
-      .collection {
-        position: relative;
-      }
-      .title {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        margin-right: 1rem;
-        align-items: center;
-      }
-      .filters {
-        display: flex;
-        justify-content: flex-end;
-        gap: 1rem;
-      }
-      .header {
-        margin-bottom: 1rem;
-      }
-      .footer {
-        margin-top: 1rem;
-        display: flex;
-        justify-content: center;
-      }
-      .skeleton-title {
-        width: 30%;
-        height: 1.5rem;
-      }
-      .skeleton-body {
-        width: 100%;
-        height: 1rem;
-      }
-      .lazy {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-      .badge {
-        height: 1.5rem;
-      }
-      .hidden {
-        visibility: hidden;
-      }
-      .error {
-        width: 100%;
-        position: absolute;
-        top: 1rem;
-        display: flex;
-        justify-content: center;
-      }
-    `,
+    collectionStyles,
   ];
 
-  @property({ type: Array }) private items: ItemProp[] = [];
-  @property({ type: Array }) private filters: FilterProp[] = [];
-  @property({ type: Number }) private totalItems = -1;
-  @property({ type: Number }) private pageSize = 5;
+  @property({ type: Array, reflect: true }) items: ItemProp[] = [];
+  @property({ type: Array, reflect: true }) filters: FilterProp[] = [];
+  @property({ type: Number, reflect: true }) totalItems = -1;
+  @property({ type: Number, reflect: true }) pageSize = 5;
 
   @state() private _page = 1;
   @state() private _pagesRendered = 1; // Only used when totalItems is not provided
@@ -121,7 +85,7 @@ export default class Collection extends LitElement {
         this._page = 1;
         if (this.totalItems === -1) this._pagesRendered = 1;
         this.dispatchEvent(
-          new CustomEvent("filter", {
+          new CustomEvent("ecc-utils-filter", {
             detail: {
               key: filter.key,
               value: (e.target as HTMLInputElement)?.value,
@@ -141,7 +105,7 @@ export default class Collection extends LitElement {
         this._page = 1;
         if (this.totalItems === -1) this._pagesRendered = 1;
         this.dispatchEvent(
-          new CustomEvent("filter", {
+          new CustomEvent("ecc-utils-filter", {
             detail: {
               key: filter.key,
               value: (e.target as HTMLInputElement)?.value,
@@ -181,7 +145,7 @@ export default class Collection extends LitElement {
           @click=${() => {
             this._page -= 1;
             this.dispatchEvent(
-              new CustomEvent("page-change", {
+              new CustomEvent("ecc-utils-page-change", {
                 detail: {
                   page: this._page,
                 },
@@ -201,7 +165,7 @@ export default class Collection extends LitElement {
             @click=${() => {
               this._page = page + 1;
               this.dispatchEvent(
-                new CustomEvent("page-change", {
+                new CustomEvent("ecc-utils-page-change", {
                   detail: {
                     page: this._page,
                   },
@@ -223,7 +187,7 @@ export default class Collection extends LitElement {
             }
             this._page += 1;
             this.dispatchEvent(
-              new CustomEvent("page-change", {
+              new CustomEvent("ecc-utils-page-change", {
                 detail: {
                   page: this._page,
                 },
@@ -249,7 +213,7 @@ export default class Collection extends LitElement {
       class="${hidden ? "hidden" : ""}"
       @sl-show=${() => {
         this.dispatchEvent(
-          new CustomEvent("expand-item", {
+          new CustomEvent("ecc-utils-expand", {
             detail: {
               key: item.key,
             },

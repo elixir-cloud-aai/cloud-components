@@ -10,21 +10,39 @@ This component is used to render a form with the given fields.
 ::: code-group
 
 ```js [HTML]
-import "@elixir-cloud/design/dist/form/index.js";
+import "@elixir-cloud/design/dist/components/form/index.js";
 
 const fields = [...];
 
 <ecc-utils-design-form
     .fields=${fields}
-    @form-submit=${(e) => {
+    @ecc-utils-submit=${(e) => {
         console.log("form-submitted", e.detail);
     }}
 />
 ```
 
-  <!-- ```jsx [React]
+```jsx [React]
+import { EccUtilsDesignForm } from '@elixir-cloud/design/dist/react';
 
-  ``` -->
+const fields = [...];
+
+function App() {
+  return (
+    <div className='App'>
+      <EccUtilsDesignForm
+        fields={fields}
+        onEccUtilsSubmit={(e) => {
+          console.log("form-submitted", e.detail);
+        }}
+      >
+      </EccUtilsDesignForm>
+    </div>
+  );
+}
+
+export default App;
+```
 
 :::
 
@@ -34,7 +52,7 @@ const fields = [...];
 ## Importing
 
 ```js [HTML]
-import "@elixir-cloud/design/dist/form/index.js";
+import "@elixir-cloud/design/dist/components/form/index.js";
 ```
 
 ## Properties
@@ -65,9 +83,9 @@ This property is used to render the fields in the form. Fields can be passed as 
 
 ## Events
 
-| Event Name    | Description                                                                              |
-| ------------- | ---------------------------------------------------------------------------------------- |
-| `form-submit` | This event is fired when the form is submitted. The event detail contains the form data. |
+| Event Name         | Description                                                                              |
+| ------------------ | ---------------------------------------------------------------------------------------- |
+| `ecc-utils-submit` | This event is fired when the form is submitted. The event detail contains the form data. |
 
 ## Methods
 
@@ -80,27 +98,32 @@ This property is used to render the fields in the form. Fields can be passed as 
 
 ## Parts
 
-| Part Name           | Description                                                                       |
-| ------------------- | --------------------------------------------------------------------------------- |
-| `form`              | Component's internal form.                                                        |
-| `submit-button`     | Component's internal submit button                                                |
-| `field`             | Component's row containing a input, label & other elements.                       |
-| `label`             | Component's label for field.                                                      |
-| `input-base`        | Component's input base element.                                                   |
-| `input`             | Component's input element. :placeholder and other pseudo selectors are supported. |
-| `header`            | Component's header for array and group type fields                                |
-| `array-header`      | Component's header for array type field containing label & add button.            |
-| `array-label`       | Component's label for array type field.                                           |
-| `array-item`        | Component's item for array type field.                                            |
-| `add-button`        | Component's add button for array type field.                                      |
-| `remove-button`     | Component's remove button for array type field.                                   |
-| `switch`            | Component's switch.                                                               |
-| `switch-thumb`      | Component's switch thumb element.                                                 |
-| `group`             | Component's group field                                                           |
-| `group-header`      | Component's header for group type field, containing label                         |
-| `group-label`       | Component's label for group type field                                            |
-| `group-toggle-icon` | Component's toggle icon for group type field                                      |
-| `group-content`     | Content area for group type field, where the children are rendered                |
+| Part Name           | Description                                                                                                            |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `form`              | Component's internal form.                                                                                             |
+| `submit-button`     | Component's internal submit button                                                                                     |
+| `field`             | Component's row containing a input, label & other elements.                                                            |
+| `label`             | Component's label for field.                                                                                           |
+| `input-base`        | Component's input base element.                                                                                        |
+| `input`             | Component's input element. :placeholder and other pseudo selectors are supported.                                      |
+| `input-label`       | Component's label for email, file, text, date, number, tel, url, search, datetime-local, time and password type fields |
+| `header`            | Component's header for array and group type fields                                                                     |
+| `container`         | Component's container for array and group type fields                                                                  |
+| `item`              | Individual child fields in an array and group type field                                                               |
+| `array-header`      | Component's header for array type field containing label & add button.                                                 |
+| `array-label`       | Component's label for array type field.                                                                                |
+| `array-item`        | Individual child fields in an array type field.                                                                        |
+| `add-button`        | Component's add button for array type field.                                                                           |
+| `remove-button`     | Component's remove button for array type field.                                                                        |
+| `switch`            | Component's switch.                                                                                                    |
+| `switch-thumb`      | Component's switch thumb element.                                                                                      |
+| `switch-label`      | Component's label for switch type field                                                                                |
+| `group`             | Component's group field                                                                                                |
+| `group-item`        | Individual child fields in a group type field                                                                          |
+| `group-header`      | Component's header for group type field, containing label                                                              |
+| `group-label`       | Component's label for group type field                                                                                 |
+| `group-toggle-icon` | Component's toggle icon for group type field                                                                           |
+| `group-content`     | Content area for group type field, where the children are rendered                                                     |
 
 ## CSS Variables
 
@@ -117,8 +140,7 @@ This property is used to render the fields in the form. Fields can be passed as 
 ::: code-group
 
 ```js [HTML]
-import "@elixir-cloud/design/dist/form/index.js";
-
+import "@elixir-cloud/design/dist/components/form/index.js";
 
 const fields = [
   {
@@ -206,15 +228,119 @@ const fields = [
 <ecc-utils-design-form
     class="complex-form-example"
     .fields=${fields}
-    @form-submit=${(e) => {
+    @ecc-utils-submit=${(e) => {
         console.log("form-submitted", e.detail);
     }}
 />
 ```
 
-  <!-- ```jsx [React]
+```jsx [React]
+import EccUtilsDesignForm from "@elixir-cloud/design/dist/react/form";
 
-  ``` -->
+const fields = [
+  {
+    key: "name",
+    label: "Name",
+    type: "text",
+    fieldOptions: {
+      required: true,
+    },
+  },
+  {
+    key: "email",
+    label: "Email",
+    type: "email",
+    fieldOptions: {
+      // required: false,
+    },
+  },
+  {
+    key: "address",
+    label: "Address",
+    type: "array",
+    arrayOptions: {
+      defaultInstances: 1,
+      max: 3,
+      min: 1,
+    },
+    children: [
+      {
+        key: "Details",
+        label: "Details",
+        type: "array",
+        arrayOptions: {
+          defaultInstances: 1,
+          max: 1,
+          min: 1,
+        },
+        children: [
+          {
+            key: "houseNumber",
+            label: "House Number",
+            type: "text",
+            fieldOptions: {
+              required: true,
+            },
+          },
+          {
+            key: "street",
+            label: "Street",
+            type: "text",
+            fieldOptions: {
+              // required: false,
+            },
+          },
+          {
+            key: "city",
+            label: "City",
+            type: "text",
+            fieldOptions: {
+              required: true,
+            },
+          },
+        ],
+      },
+      {
+        key: "isPrimary",
+        label: "Primary",
+        type: "switch",
+      },
+    ],
+  },
+  {
+    key: "18+",
+    label: "18+",
+    type: "switch",
+    fieldOptions: {
+      default: true,
+    },
+  },
+  {
+    key: "id",
+    label: "ID",
+    type: "file",
+    fieldOptions: {
+      required: true,
+    },
+  },
+];
+
+function App() {
+  return (
+    <div className="App">
+      <EccUtilsDesignForm
+        className="complex-form-example"
+        fields={fields}
+        onEccUtilsSubmit={(e) => {
+          console.log("form-submitted", e.detail);
+        }}
+      ></EccUtilsDesignForm>
+    </div>
+  );
+}
+
+export default App;
+```
 
 :::
 
@@ -232,7 +358,7 @@ const fields = [
 ::: code-group
 
 ```js [HTML]
-import "@elixir-cloud/design/dist/form/index.js";
+import "@elixir-cloud/design/dist/components/form/index.js";
 
 const fields = [
   {
@@ -250,7 +376,7 @@ const fields = [
 <ecc-utils-design-form
     class="methods-example"
     .fields=${fields}
-    @form-submit=${(e) => {
+    @ecc-utils-submit=${(e) => {
       document.querySelector(".methods-example").loading();
       await new Promise((resolve) => setTimeout(resolve, 3000));
       if (e.detail.form.data["throw-error"]) {
@@ -266,9 +392,47 @@ const fields = [
 />
 ```
 
-  <!-- ```jsx [React]
+```jsx [React]
+import EccUtilsDesignForm from "@elixir-cloud/design/dist/react/form";
 
-  ``` -->
+const fields = [
+  {
+    key: "custom-message",
+    label: "Custom Message",
+    type: "text",
+  },
+  {
+    key: "throw-error",
+    label: "Throw Error",
+    type: "switch",
+  },
+];
+
+function App() {
+  return (
+    <div className="App">
+      <EccUtilsDesignForm
+        fields={fields}
+        onEccUtilsSubmit={async (e) => {
+          e.target.loading();
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          if (e.detail.form.data["throw-error"]) {
+            e.target.error({
+              message: e.detail.form.data["custom-message"],
+            });
+          } else {
+            e.target.success({
+              message: e.detail.form.data["custom-message"],
+            });
+          }
+        }}
+      ></EccUtilsDesignForm>
+    </div>
+  );
+}
+
+export default App;
+```
 
 :::
 
@@ -286,7 +450,7 @@ const fields = [
 ::: code-group
 
 ```js [HTML]
-import "@elixir-cloud/design/dist/form/index.js";
+import "@elixir-cloud/design/dist/components/form/index.js";
 
 
 const fields = [
@@ -355,10 +519,92 @@ const fields = [
 <ecc-utils-design-form
     class="styled-form-example"
     .fields=${fields}
-    @form-submit=${(e) => {
+    @ecc-utils-submit=${(e) => {
         console.log("form-submitted", e.detail);
     }}
 />
+```
+
+```jsx [React]
+import EccUtilsDesignForm from "@elixir-cloud/design/dist/react/form";
+
+const fields = [
+  {
+    key: "name",
+    label: "Name",
+    type: "text",
+    fieldOptions: {
+      required: true,
+    },
+  },
+  {
+    key: "email",
+    label: "Email",
+    type: "email",
+  },
+  {
+    key: "address",
+    label: "Address",
+    type: "array",
+    arrayOptions: {
+      defaultInstances: 1,
+      max: 1,
+      min: 1,
+    },
+    children: [
+      {
+        key: "street",
+        label: "Street",
+        type: "text",
+      },
+      {
+        key: "city",
+        label: "City",
+        type: "text",
+        fieldOptions: {
+          required: true,
+        },
+      },
+      {
+        key: "isPrimary",
+        label: "Primary",
+        type: "switch",
+      },
+    ],
+  },
+  {
+    key: "18+",
+    label: "18+",
+    type: "switch",
+    fieldOptions: {
+      default: true,
+    },
+  },
+  {
+    key: "id",
+    label: "ID",
+    type: "file",
+    fieldOptions: {
+      required: true,
+    },
+  },
+];
+
+function App() {
+  return (
+    <div className="App">
+      <EccUtilsDesignForm
+        className="styled-form-example"
+        fields={fields}
+        onEccUtilsSubmit={(e) => {
+          console.log("form-submitted", e.detail);
+        }}
+      ></EccUtilsDesignForm>
+    </div>
+  );
+}
+
+export default App;
 ```
 
 ```css [CSS]
@@ -437,10 +683,6 @@ const fields = [
 }
 ```
 
-  <!-- ```jsx [React]
-
-  ``` -->
-
 :::
 
   </div>
@@ -456,7 +698,7 @@ const complexExampleFields = ref([]);
 const styledExampleFields = ref([]);
 const methodsExampleFields = ref([]);
 onMounted(() => {
-  import("@elixir-cloud/design/dist/form/index.js").then((module) => {
+  import("@elixir-cloud/design/dist/components/form/index.js").then((module) => {
     renderComponent.value = false;
     primaryFields.value =  [
         {
@@ -626,12 +868,12 @@ onMounted(() => {
 
     renderComponent.value = true;
     document.querySelectorAll("ecc-utils-design-form").forEach((element) => {
-      element.addEventListener("form-submit", (e) => {
+      element.addEventListener("ecc-utils-submit", (e) => {
         console.log("form-submitted", e.detail);
       });
     });
     document.querySelectorAll(".methods-example").forEach((element) => {
-      element.addEventListener("form-submit", async (e) => {
+      element.addEventListener("ecc-utils-submit", async (e) => {
         document.querySelector(".methods-example").loading();
         await new Promise((resolve) => setTimeout(resolve, 3000));
         if (e.detail.form.data["throw-error"]) {
