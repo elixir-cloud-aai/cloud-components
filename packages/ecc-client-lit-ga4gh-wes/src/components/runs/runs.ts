@@ -2,7 +2,11 @@ import { html, LitElement, render } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import "@elixir-cloud/design";
 import _ from "lodash-es";
-import { fetchWorkflow, fetchWorkflows } from "../../API/Workflow/wesGet.js";
+import {
+  cancelWorkflow,
+  fetchWorkflow,
+  fetchWorkflows,
+} from "../../API/Workflow/wesGet.js";
 
 interface Children {
   key: string;
@@ -360,11 +364,13 @@ export class WESRuns extends LitElement {
     return transformedData;
   }
 
-  private async handleExpandItem(e: CustomEvent) {
+  private async handleExpandItem(event: CustomEvent) {
     const eccUtilsDesignCollection = this.shadowRoot?.querySelector(
       "ecc-utils-design-collection"
     ) as any;
-    const { target, detail } = e;
+
+    const { target, detail } = event;
+
     if (!target || !(target instanceof HTMLElement)) {
       eccUtilsDesignCollection.error("Target is null or not an HTMLElement");
       return;
@@ -373,21 +379,55 @@ export class WESRuns extends LitElement {
     const { key } = detail;
     const children = target.querySelectorAll(`[slot="${key}"]`);
     const runData = await fetchWorkflow(this.baseURL, detail.key);
-    if (children.length === 0) {
+
+    if (children) {
       try {
-        const nice = this._transformData(this.dataType, runData);
+        const dataFields = this._transformData(this.dataType, runData);
         const child = document.createElement("div");
         child.setAttribute("slot", key);
 
+        const buttons = [
+          {
+            key,
+            isPresent: true,
+            name: "Delete",
+            size: "medium",
+            variant: "danger",
+            outline: false,
+            pill: false,
+            icon: {
+              name: "trash",
+              viewBox: "0 0 16 16",
+              path: "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z",
+            },
+          },
+        ];
+
         // Use LitElement's html template to create the details component
         const detailsComponent = html`<ecc-utils-design-details
-          .fields=${nice}
+          id=${key}
+          .fields=${dataFields}
+          .buttons=${buttons}
         ></ecc-utils-design-details>`;
 
         // Render the details component using Lit's render function
         // Append the child to the target
         render(detailsComponent, child);
         target.appendChild(child);
+
+        // Add button event
+        child
+          .querySelector("ecc-utils-design-details")
+          ?.addEventListener(`button-${key}-click`, async () => {
+            // Delete run
+            try {
+              // TODO: fix cancel, giving CORS error
+              const del = await cancelWorkflow(this.baseURL, key);
+              console.log(del);
+            } catch (error) {
+              eccUtilsDesignCollection.error(`Failed to cancel run: ${key}`);
+            }
+          });
       } catch (error) {
         eccUtilsDesignCollection.error(`Failed to fetch data for run: ${key}`);
       }
@@ -400,7 +440,7 @@ export class WESRuns extends LitElement {
         .filters=${this.filters}
         .items=${this.items}
         @page-change=${this.fetchData}
-        @expand-item=${(e: any) => this.handleExpandItem(e)}
+        @expand-item=${(event: CustomEvent) => this.handleExpandItem(event)}
       >
       </ecc-utils-design-collection>
     `;
