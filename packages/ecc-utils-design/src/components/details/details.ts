@@ -336,7 +336,6 @@ export default class Details extends LitElement {
         detail: {
           index,
           Key: key,
-          originalEvent: event,
         },
         bubbles: true,
         composed: true,
