@@ -7,7 +7,6 @@ import * as tsup from "tsup";
 import { program } from "commander";
 import { execSync } from "child_process";
 import fs from "fs";
-import ora from "ora";
 import { npmDir } from "./utils.js";
 
 const commanderOpts = program.option("-w --watch").parse().opts();
@@ -19,9 +18,8 @@ const bundleDirectories = [npmDir];
 
 async function nextTask(label, action) {
   try {
-    const spinner = ora(label).start();
+    console.log(label, "...");
     await action();
-    spinner.succeed();
   } catch (err) {
     console.error(err);
     if (err.stdout) console.error(err.stdout);
