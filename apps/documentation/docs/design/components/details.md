@@ -4,7 +4,7 @@
 This component is used to render a detailed view of items.
 <ClientOnly>
   <div :class="isDark ? 'component-dark component' : 'component-light component'">
-<ecc-utils-design-details :v-if="renderComponent" :fields="fields" :buttons="buttons">
+<ecc-utils-design-details :v-if="renderComponent" :data="data" :fields="fields" :buttons="buttons">
 <p slot="footer">26 Nov 2023</p>
 </ecc-utils-design-details>
 
@@ -13,139 +13,183 @@ This component is used to render a detailed view of items.
 
 ```js [HTML]
 import "@elixir-cloud/design/dist/components/details/index.js";
-const fields = [
-  {
-    tabGroup: "General Info",
-    children: [
-      { key: "name", label: "Name", value: "John Doe", type: "text" },
-      { key: "age", label: "Age", value: 28, type: "text" },
-      {
-        key: "hobby",
-        label: "Hobby",
-        value: ["swimming", "dancing", "singing"],
-        type: "array",
-        arrayOptions: {
-          pill: true,
-        },
-      },
-      {
-        key: "email",
-        label: "Email",
-        value: "john@example.com",
-        type: "text",
-        textOptions: {
-          copy: true,
-        },
-      },
-      {
-        key: "credentials",
-        label: "Credentials",
-        value: {
-          username: "john.doe",
-          domain: "example",
-          extension: "com",
-        },
-        type: "object",
-      },
-    ],
-  },
-  {
-    tabGroup: "Address",
-    children: [
-      {
-        key: "street",
-        label: "Street",
-        value: "123 Main St",
-        type: "text",
-      },
-      { key: "city", label: "City", value: "Anytown", type: "text" },
-      { key: "zip", label: "Zip Code", value: "12345", type: "text" },
-    ],
-  },
-  {
-    tabGroup: "Description",
-    children: [
-      {
-        key: "bio",
-        label: "Bio",
-        value:
-          "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde rerum maxime repellat ea numquam provident, iusto iste deleniti magni debitis, laborum excepturi inventore sed. Magni explicabo eligendi beatae labore dignissimos totam dolor voluptates veritatis molestias voluptatum commodi, expedita vel esse et officia distinctio debitis amet perspiciatis, sequi atque blanditiis, repellat quas saepe! A eos deserunt rerum repellat nobis corporis quam et ipsam voluptates totam pariatur modi cumque quibusdam, eius illo maxime. Numquam eos autem illo? Laudantium facilis autem quo nostrum cum, repellat sint vitae culpa libero recusandae deserunt quaerat ducimus labore possimus perspiciatis eius itaque ipsam mollitia eos amet maxime repellendus id minima molestiae. Sunt cumque harum, nihil adipisci deleniti libero repellendus. Dolorum consequatur ratione explicabo similique quasi. Aut, ullam rerum ipsa quam dicta mollitia inventore suscipit minus maxime nulla delectus rem unde itaque sunt illo. Illum quisquam, eligendi accusantium fugit consequuntur distinctio delectus quidem sed esse ducimus. Quis officiis repellendus magni debitis. Nihil odio cum aperiam quaerat fugit ducimus suscipit ab tenetur. Quisquam laudantium nulla ea maxime. Earum ab odit maxime iure. Excepturi eos sed magni iste, illum, architecto, voluptatibus nobis iusto obcaecati sequi consectetur consequatur laboriosam. Eaque repellat nihil dolore quidem nam consequuntur explicabo ex. Vero laborum quisquam, delectus nesciunt velit hic officia qui ratione itaque quos laudantium consequuntur, excepturi in quidem dignissimos saepe eligendi veritatis omnis ipsam officiis. Quaerat obcaecati laboriosam esse sequi. Magnam consequuntur, harum numquam obcaecati animi in nihil consectetur quis earum officia? Impedit, rem! Ratione, perspiciatis et, hic iusto unde numquam odit id reprehenderit laudantium quia laboriosam dolores quos dolorum rem labore ut? Itaque quod fuga sunt vel adipisci incidunt qui? Laborum maxime aspernatur voluptatem asperiores, laudantium assumenda explicabo exercitationem corporis quam est suscipit voluptate reprehenderit iure vitae? Eaque ad commodi, fugiat expedita aspernatur illum distinctio tempora cum tempore? Ad possimus quae ratione voluptatum.",
-        type: "long-text",
-        textOptions: {
-          copy: true,
-        },
-      },
-      {
-        key: "more-bio",
-        label: "More bio",
-        value:
-          "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde rerum maxime repellat ea numquam provident, iusto iste deleniti magni debitis, laborum excepturi inventore sed. Magni explicabo eligendi beatae labore dignissimos totam dolor voluptates veritatis molestias voluptatum commodi, expedita vel esse et officia distinctio debitis amet perspiciatis, sequi atque blanditiis, repellat quas saepe! A eos deserunt rerum repellat nobis corporis quam et ipsam voluptates totam pariatur modi cumque quibusdam, eius illo maxime. Numquam eos autem illo? Laudantium facilis autem quo nostrum cum, repellat sint vitae culpa libero recusandae deserunt quaerat ducimus labore possimus perspiciatis eius itaque ipsam mollitia eos amet maxime repellendus id minima molestiae. Sunt cumque harum, nihil adipisci deleniti libero repellendus. Dolorum consequatur ratione explicabo similique quasi. Aut, ullam rerum ipsa quam dicta mollitia inventore suscipit minus maxime nulla delectus rem unde itaque sunt illo. Illum quisquam, eligendi accusantium fugit consequuntur distinctio delectus quidem sed esse ducimus. Quis officiis repellendus magni debitis. Nihil odio cum aperiam quaerat fugit ducimus suscipit ab tenetur. Quisquam laudantium nulla ea maxime. Earum ab odit maxime iure. Excepturi eos sed magni iste, illum, architecto, voluptatibus nobis iusto obcaecati sequi consectetur consequatur laboriosam. Eaque repellat nihil dolore quidem nam consequuntur explicabo ex. Vero laborum quisquam, delectus nesciunt velit hic officia qui ratione itaque quos laudantium consequuntur, excepturi in quidem dignissimos saepe eligendi veritatis omnis ipsam officiis. Quaerat obcaecati laboriosam esse sequi. Magnam consequuntur, harum numquam obcaecati animi in nihil consectetur quis earum officia? Impedit, rem! Ratione, perspiciatis et, hic iusto unde numquam odit id reprehenderit laudantium quia laboriosam dolores quos dolorum rem labore ut? Itaque quod fuga sunt vel adipisci incidunt qui? Laborum maxime aspernatur voluptatem asperiores, laudantium assumenda explicabo exercitationem corporis quam est suscipit voluptate reprehenderit iure vitae? Eaque ad commodi, fugiat expedita aspernatur illum distinctio tempora cum tempore? Ad possimus quae ratione voluptatum.",
-        type: "long-text",
-      },
-      {
-        key: "alot-more-bio",
-        label: "Alot more Bio",
-        value:
-          "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde rerum maxime repellat ea numquam provident, iusto iste deleniti magni debitis, laborum excepturi inventore sed. Magni explicabo eligendi beatae labore dignissimos totam dolor voluptates veritatis molestias voluptatum commodi, expedita vel esse et officia distinctio debitis amet perspiciatis, sequi atque blanditiis, repellat quas saepe! A eos deserunt rerum repellat nobis corporis quam et ipsam voluptates totam pariatur modi cumque quibusdam, eius illo maxime. Numquam eos autem illo? Laudantium facilis autem quo nostrum cum, repellat sint vitae culpa libero recusandae deserunt quaerat ducimus labore possimus perspiciatis eius itaque ipsam mollitia eos amet maxime repellendus id minima molestiae. Sunt cumque harum, nihil adipisci deleniti libero repellendus. Dolorum consequatur ratione explicabo similique quasi. Aut, ullam rerum ipsa quam dicta mollitia inventore suscipit minus maxime nulla delectus rem unde itaque sunt illo. Illum quisquam, eligendi accusantium fugit consequuntur distinctio delectus quidem sed esse ducimus. Quis officiis repellendus magni debitis. Nihil odio cum aperiam quaerat fugit ducimus suscipit ab tenetur. Quisquam laudantium nulla ea maxime. Earum ab odit maxime iure. Excepturi eos sed magni iste, illum, architecto, voluptatibus nobis iusto obcaecati sequi consectetur consequatur laboriosam. Eaque repellat nihil dolore quidem nam consequuntur explicabo ex. Vero laborum quisquam, delectus nesciunt velit hic officia qui ratione itaque quos laudantium consequuntur, excepturi in quidem dignissimos saepe eligendi veritatis omnis ipsam officiis. Quaerat obcaecati laboriosam esse sequi. Magnam consequuntur, harum numquam obcaecati animi in nihil consectetur quis earum officia? Impedit, rem! Ratione, perspiciatis et, hic iusto unde numquam odit id reprehenderit laudantium quia laboriosam dolores quos dolorum rem labore ut? Itaque quod fuga sunt vel adipisci incidunt qui? Laborum maxime aspernatur voluptatem asperiores, laudantium assumenda explicabo exercitationem corporis quam est suscipit voluptate reprehenderit iure vitae? Eaque ad commodi, fugiat expedita aspernatur illum distinctio tempora cum tempore? Ad possimus quae ratione voluptatum.",
-        type: "long-text",
-        textOptions: {
-          copy: true,
-        },
-      },
-      {
-        key: "website",
-        label: "Website",
-        value: "http://johndoe.com",
-        type: "text",
-        textOptions: {
-          copy: true,
-        },
-      },
-      {
-        key: "values",
-        label: "Values",
-        value: [
-          "Friendly and outgoing",
-          "Enjoys outdoor activities",
-          "Passionate about technology",
-          "Loves trying new cuisines",
-        ],
-        type: "array",
-        arrayOptions: {
-          vertical: true,
-        },
-      },
-    ],
-  },
-];
+			const data = {
+				company: {
+					name: 'TechCorp',
+					industry: 'Technology',
+					employees: [
+						{
+							id: 101,
+							name: 'Alice Johnson',
+							position: 'Software Engineer',
+							skills: ['Java', 'JavaScript', 'SQL'],
+							projects: [
+								{
+									projectId: 'P123',
+									projectName: 'SmartApp',
+									startDate: '2022-05-01',
+									endDate: '2023-01-15',
+									status: 'Completed',
+									team: ['Alice Johnson', 'Bob Smith'],
+								},
+								{
+									projectId: 'P124',
+									projectName: 'DataAnalyzer',
+									startDate: '2023-02-01',
+									endDate: null,
+									status: 'In Progress',
+									team: ['Alice Johnson', 'Charlie Brown'],
+								},
+							],
+							address: {
+								street: '123 Tech Street',
+								city: 'Techville',
+								zipCode: 'T12345',
+								country: 'Techland',
+							},
+						},
+						{
+							id: 102,
+							name: 'Bob Smith',
+							position: 'UI/UX Designer',
+							skills: ['UI Design', 'CSS', 'Adobe XD'],
+							projects: [
+								{
+									projectId: 'P123',
+									projectName: 'SmartApp',
+									startDate: '2022-05-01',
+									endDate: '2023-01-15',
+									status: 'Completed',
+									team: ['Alice Johnson', 'Bob Smith'],
+								},
+								{
+									projectId: 'P125',
+									projectName: 'MobileApp',
+									startDate: '2023-03-01',
+									endDate: null,
+									status: 'In Progress',
+									team: ['Bob Smith', 'Eve White'],
+								},
+							],
+							address: {
+								street: '456 Design Avenue',
+								city: 'DesignCity',
+								zipCode: 'D67890',
+								country: 'Designland',
+							},
+						},
+					],
+				},
+				clients: [
+					{
+						clientId: 'C001',
+						clientName: 'GlobalTech Solutions',
+						contactPerson: 'John Johnson',
+						email: 'john.johnson@globaltech.com',
+						projects: ['SmartApp', 'DataAnalyzer'],
+					},
+					{
+						clientId: 'C002',
+						clientName: 'DesignMaster Co.',
+						contactPerson: 'Eva Designer',
+						email: 'eva.designer@designmaster.com',
+						projects: ['MobileApp'],
+					},
+				],
+				financials: {
+					revenue: 1500000.5,
+					expenses: {
+						operating: 500000.25,
+						marketing: 200000.75,
+						research: 100000.5,
+					},
+					profit: 696969,
+				},
+				marketSegments: ['Enterprise', 'Startups', 'Government'],
+				partners: [
+					{
+						partnerId: 'P001',
+						partnerName: 'InnoTech Innovations',
+						contactPerson: 'Mark Innovator',
+						email: 'mark@innotech.com',
+						projects: ['SmartApp'],
+					},
+					{
+						partnerId: 'P002',
+						partnerName: 'CreatiDesign Solutions',
+						contactPerson: 'Lisa Designer',
+						email: 'lisa@creatidesign.com',
+						projects: ['MobileApp'],
+					},
+				],
+				debt: {
+					partnerId: 'P001',
+					partnerName: 'InnoTech Innovations',
+					contactPerson: 'Mark Innovator',
+					email: 'mark@innotech.com',
+					projects: ['SmartApp'],
+				},
+			};
 
-const buttons = [
-  {
-    key: "1",
-    isPresent: true,
-    name: "Button 1",
-    size: "medium",
-    variant: "primary",
-    outline: false,
-    pill: false,
-    icon: {
-      name: "trash",
-      viewBox: "0 0 16 16",
-      path: "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z",
-    },
-  },
-  {
-    key: "2",
-    isPresent: false,
-    name: "Button 2",
-    size: "medium",
-    variant: "warning",
-    outline: true,
-    pill: false,
-  },
-];
+			const fields = [
+				{
+					tabGroup: 'Company Info',
+					children: [{ path: 'company.name' }, { path: 'company.industry' }],
+				},
+				{
+					tabGroup: 'Employees',
+					children: [{ path: 'company.employees', copy: true }],
+				},
+				{
+					tabGroup: 'Clients',
+					children: [{ path: 'clients' }],
+				},
+				{
+					tabGroup: 'Market Segments',
+					children: [
+						{ path: 'financials.revenue' },
+						{ path: 'financials.expenses.operating' },
+						{ path: 'financials.expenses.marketing' },
+						{ path: 'financials.expenses.research' },
+						{ path: 'financials.profit' },
+						{ path: 'marketSegments' },
+						{ path: 'debt' },
+					],
+				},
+				{
+					tabGroup: 'Partners',
+					children: [{ path: 'partners' }],
+				},
+			];
+
+			const buttons = [
+				{
+					key: '1',
+					isPresent: true,
+					name: 'Button 1',
+					size: 'medium',
+					variant: 'primary',
+					outline: false,
+					pill: false,
+					icon: {
+						name: 'trash',
+						viewBox: '0 0 16 16',
+						path: 'M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z',
+					},
+				},
+				{
+					key: '2',
+					isPresent: false,
+					name: 'Button 2',
+					size: 'medium',
+					variant: 'warning',
+					outline: true,
+					pill: false,
+				},
+			];
 
 <ecc-utils-design-details
+  .data=${data}
   .fields=${fields}
   .buttons={buttons}
   @ecc-utils-button-click=${async (e) => {
@@ -182,10 +226,11 @@ import "@elixir-cloud/design/dist/components/details/index.js";
 
 ## Properties
 
-| Property              | Required | Default | Type    | Description                               |
-| --------------------- | -------- | ------- | ------- | ----------------------------------------- |
-| [`fields`](#fields)   | `true`   |         | `Array` | An array of fields to render              |
-| [`buttons`](#buttons) | `false`  |         | `Array` | An array of buttons and its configuration |
+| Property              | Required | Default | Type     | Description                               |
+| --------------------- | -------- | ------- | -------- | ----------------------------------------- |
+| `data`                | `true`   |         | `Object` | Data to be rendered                       |
+| [`fields`](#fields)   | `true`   |         | `Array`  | An array of fields to render              |
+| [`buttons`](#buttons) | `false`  |         | `Array`  | An array of buttons and its configuration |
 
 ### fields\*
 
@@ -196,15 +241,12 @@ import "@elixir-cloud/design/dist/components/details/index.js";
 
 ### children\*
 
-| Property                  | Required | Default | Type                                           | Description                                     |
-| ------------------------- | -------- | ------- | ---------------------------------------------- | ----------------------------------------------- |
-| `key`                     | `true`   |         | `string`                                       | The unique key of field                         |
-| `label`                   | `true`   |         | `string`                                       | The label of the information to be rendered.    |
-| `value`                   | `true`   |         | `string \| number \| Array \| object`          | The info to be rendered                         |
-| `type`                    | `true`   |         | `'text' \| 'long-text' \| 'array' \| 'object'` | The type of information                         |
-| `textOptions.copy`        | `false`  | `false` | `boolean`                                      | Text will have a copy to clip button            |
-| `arrayOptions.isVertical` | `false`  | `false` | `boolean`                                      | Direction of rendering of array of string       |
-| `arrayOptions.pill`       | `false`  | `false` | `boolean`                                      | Puts the string of array into a pill shaped tag |
+| Property       | Required | Default               | Type      | Description                                                 |
+| -------------- | -------- | --------------------- | --------- | ----------------------------------------------------------- |
+| `label`        | `false`  | Last part of the path | `string`  | Label of the child data                                     |
+| `path`         | `true`   |                       | `string`  | Path of the child data to be rendered                       |
+| `copy`         | `false`  | `false`               | `boolean` | Defines if the child data should have a copy button         |
+| `defaultValue` | `false`  |                       | `any`     | Default value if child data is `null` at the specified path |
 
 ### Buttons
 
@@ -286,109 +328,152 @@ The component emits a custom event named `ecc-utils-button-click` when a button 
 	onMounted(() => {
 		import('@elixir-cloud/design/dist/components/details/index.js').then((module) => {
 			renderComponent.value = false;
+
+			data.value = {
+			  company: {
+			    name: "TechCorp",
+			    industry: "Technology",
+			    employees: [
+			      {
+			        id: 101,
+			        name: "Alice Johnson",
+			        position: "Software Engineer",
+			        skills: ["Java", "JavaScript", "SQL"],
+			        projects: [
+			          {
+			            projectId: "P123",
+			            projectName: "SmartApp",
+			            startDate: "2022-05-01",
+			            endDate: "2023-01-15",
+			            status: "Completed",
+			            team: ["Alice Johnson", "Bob Smith"],
+			          },
+			          {
+			            projectId: "P124",
+			            projectName: "DataAnalyzer",
+			            startDate: "2023-02-01",
+			            endDate: null,
+			            status: "In Progress",
+			            team: ["Alice Johnson", "Charlie Brown"],
+			          },
+			        ],
+			        address: {
+			          street: "123 Tech Street",
+			          city: "Techville",
+			          zipCode: "T12345",
+			          country: "Techland",
+			        },
+			      },
+			      {
+			        id: 102,
+			        name: "Bob Smith",
+			        position: "UI/UX Designer",
+			        skills: ["UI Design", "CSS", "Adobe XD"],
+			        projects: [
+			          {
+			            projectId: "P123",
+			            projectName: "SmartApp",
+			            startDate: "2022-05-01",
+			            endDate: "2023-01-15",
+			            status: "Completed",
+			            team: ["Alice Johnson", "Bob Smith"],
+			          },
+			          {
+			            projectId: "P125",
+			            projectName: "MobileApp",
+			            startDate: "2023-03-01",
+			            endDate: null,
+			            status: "In Progress",
+			            team: ["Bob Smith", "Eve White"],
+			          },
+			        ],
+			        address: {
+			          street: "456 Design Avenue",
+			          city: "DesignCity",
+			          zipCode: "D67890",
+			          country: "Designland",
+			        },
+			      },
+			    ],
+			  },
+			  clients: [
+			    {
+			      clientId: "C001",
+			      clientName: "GlobalTech Solutions",
+			      contactPerson: "John Johnson",
+			      email: "john.johnson@globaltech.com",
+			      projects: ["SmartApp", "DataAnalyzer"],
+			    },
+			    {
+			      clientId: "C002",
+			      clientName: "DesignMaster Co.",
+			      contactPerson: "Eva Designer",
+			      email: "eva.designer@designmaster.com",
+			      projects: ["MobileApp"],
+			    },
+			  ],
+			  financials: {
+			    revenue: 1500000.5,
+			    expenses: {
+			      operating: 500000.25,
+			      marketing: 200000.75,
+			      research: 100000.5,
+			    },
+			    profit: null,
+			  },
+			  marketSegments: ["Enterprise", "Startups", "Government"],
+			  partners: [
+			    {
+			      partnerId: "P001",
+			      partnerName: "InnoTech Innovations",
+			      contactPerson: "Mark Innovator",
+			      email: "mark@innotech.com",
+			      projects: ["SmartApp"],
+			    },
+			    {
+			      partnerId: "P002",
+			      partnerName: "CreatiDesign Solutions",
+			      contactPerson: "Lisa Designer",
+			      email: "lisa@creatidesign.com",
+			      projects: ["MobileApp"],
+			    },
+			  ],
+			};
+
 			fields.value = [
 			  {
-			    tabGroup: "General Info",
+			    tabGroup: "Company Info",
 			    children: [
-			      { key: "name", label: "Name", value: "John Doe", type: "text" },
-			      { key: "age", label: "Age", value: 28, type: "text" },
-			      {
-			        key: "hobby",
-			        label: "Hobby",
-			        value: ["swimming", "dancing", "singing"],
-			        type: "array",
-			        arrayOptions: {
-			          pill: true,
-			        },
-			      },
-			      {
-			        key: "email",
-			        label: "Email",
-			        value: "john@example.com",
-			        type: "text",
-			        textOptions: {
-			          copy: true,
-			        },
-			      },
-			      {
-			        key: "credentials",
-			        label: "Credentials",
-			        value: {
-			          username: "john.doe",
-			          domain: "example",
-			          extension: "com",
-			        },
-			        type: "object",
-			      },
+			      { path: "company.name" },
+			      { path: "company.industry" },
+			      { path: "company.stats.followers" },
+			      { path: "company.stats.following" },
+			      { path: "company.stats.likes" },
+			      { path: "company.lastLogin" },
+			      { path: "company.isPremiumUser" },
 			    ],
 			  },
 			  {
-			    tabGroup: "Address",
-			    children: [
-			      {
-			        key: "street",
-			        label: "Street",
-			        value: "123 Main St",
-			        type: "text",
-			      },
-			      { key: "city", label: "City", value: "Anytown", type: "text" },
-			      { key: "zip", label: "Zip Code", value: "12345", type: "text" },
-			    ],
+			    tabGroup: "Employees",
+			    children: [{ path: "company.employees", copy: true }],
 			  },
 			  {
-			    tabGroup: "Description",
+			    tabGroup: "Clients",
+			    children: [{ path: "clients" }],
+			  },
+			  {
+			    tabGroup: "Market Segments",
 			    children: [
-			      {
-			        key: "bio",
-			        label: "Bio",
-			        value:
-			          "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde rerum maxime repellat ea numquam provident, iusto iste deleniti magni debitis, laborum excepturi inventore sed. Magni explicabo eligendi beatae labore dignissimos totam dolor voluptates veritatis molestias voluptatum commodi, expedita vel esse et officia distinctio debitis amet perspiciatis, sequi atque blanditiis, repellat quas saepe! A eos deserunt rerum repellat nobis corporis quam et ipsam voluptates totam pariatur modi cumque quibusdam, eius illo maxime. Numquam eos autem illo? Laudantium facilis autem quo nostrum cum, repellat sint vitae culpa libero recusandae deserunt quaerat ducimus labore possimus perspiciatis eius itaque ipsam mollitia eos amet maxime repellendus id minima molestiae. Sunt cumque harum, nihil adipisci deleniti libero repellendus. Dolorum consequatur ratione explicabo similique quasi. Aut, ullam rerum ipsa quam dicta mollitia inventore suscipit minus maxime nulla delectus rem unde itaque sunt illo. Illum quisquam, eligendi accusantium fugit consequuntur distinctio delectus quidem sed esse ducimus. Quis officiis repellendus magni debitis. Nihil odio cum aperiam quaerat fugit ducimus suscipit ab tenetur. Quisquam laudantium nulla ea maxime. Earum ab odit maxime iure. Excepturi eos sed magni iste, illum, architecto, voluptatibus nobis iusto obcaecati sequi consectetur consequatur laboriosam. Eaque repellat nihil dolore quidem nam consequuntur explicabo ex. Vero laborum quisquam, delectus nesciunt velit hic officia qui ratione itaque quos laudantium consequuntur, excepturi in quidem dignissimos saepe eligendi veritatis omnis ipsam officiis. Quaerat obcaecati laboriosam esse sequi. Magnam consequuntur, harum numquam obcaecati animi in nihil consectetur quis earum officia? Impedit, rem! Ratione, perspiciatis et, hic iusto unde numquam odit id reprehenderit laudantium quia laboriosam dolores quos dolorum rem labore ut? Itaque quod fuga sunt vel adipisci incidunt qui? Laborum maxime aspernatur voluptatem asperiores, laudantium assumenda explicabo exercitationem corporis quam est suscipit voluptate reprehenderit iure vitae? Eaque ad commodi, fugiat expedita aspernatur illum distinctio tempora cum tempore? Ad possimus quae ratione voluptatum.",
-			        type: "long-text",
-			        textOptions: {
-			          copy: true,
-			        },
-			      },
-			      {
-			        key: "more-bio",
-			        label: "More bio",
-			        value:
-			          "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde rerum maxime repellat ea numquam provident, iusto iste deleniti magni debitis, laborum excepturi inventore sed. Magni explicabo eligendi beatae labore dignissimos totam dolor voluptates veritatis molestias voluptatum commodi, expedita vel esse et officia distinctio debitis amet perspiciatis, sequi atque blanditiis, repellat quas saepe! A eos deserunt rerum repellat nobis corporis quam et ipsam voluptates totam pariatur modi cumque quibusdam, eius illo maxime. Numquam eos autem illo? Laudantium facilis autem quo nostrum cum, repellat sint vitae culpa libero recusandae deserunt quaerat ducimus labore possimus perspiciatis eius itaque ipsam mollitia eos amet maxime repellendus id minima molestiae. Sunt cumque harum, nihil adipisci deleniti libero repellendus. Dolorum consequatur ratione explicabo similique quasi. Aut, ullam rerum ipsa quam dicta mollitia inventore suscipit minus maxime nulla delectus rem unde itaque sunt illo. Illum quisquam, eligendi accusantium fugit consequuntur distinctio delectus quidem sed esse ducimus. Quis officiis repellendus magni debitis. Nihil odio cum aperiam quaerat fugit ducimus suscipit ab tenetur. Quisquam laudantium nulla ea maxime. Earum ab odit maxime iure. Excepturi eos sed magni iste, illum, architecto, voluptatibus nobis iusto obcaecati sequi consectetur consequatur laboriosam. Eaque repellat nihil dolore quidem nam consequuntur explicabo ex. Vero laborum quisquam, delectus nesciunt velit hic officia qui ratione itaque quos laudantium consequuntur, excepturi in quidem dignissimos saepe eligendi veritatis omnis ipsam officiis. Quaerat obcaecati laboriosam esse sequi. Magnam consequuntur, harum numquam obcaecati animi in nihil consectetur quis earum officia? Impedit, rem! Ratione, perspiciatis et, hic iusto unde numquam odit id reprehenderit laudantium quia laboriosam dolores quos dolorum rem labore ut? Itaque quod fuga sunt vel adipisci incidunt qui? Laborum maxime aspernatur voluptatem asperiores, laudantium assumenda explicabo exercitationem corporis quam est suscipit voluptate reprehenderit iure vitae? Eaque ad commodi, fugiat expedita aspernatur illum distinctio tempora cum tempore? Ad possimus quae ratione voluptatum.",
-			        type: "long-text",
-			      },
-			      {
-			        key: "alot-more-bio",
-			        label: "Alot more Bio",
-			        value:
-			          "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Unde rerum maxime repellat ea numquam provident, iusto iste deleniti magni debitis, laborum excepturi inventore sed. Magni explicabo eligendi beatae labore dignissimos totam dolor voluptates veritatis molestias voluptatum commodi, expedita vel esse et officia distinctio debitis amet perspiciatis, sequi atque blanditiis, repellat quas saepe! A eos deserunt rerum repellat nobis corporis quam et ipsam voluptates totam pariatur modi cumque quibusdam, eius illo maxime. Numquam eos autem illo? Laudantium facilis autem quo nostrum cum, repellat sint vitae culpa libero recusandae deserunt quaerat ducimus labore possimus perspiciatis eius itaque ipsam mollitia eos amet maxime repellendus id minima molestiae. Sunt cumque harum, nihil adipisci deleniti libero repellendus. Dolorum consequatur ratione explicabo similique quasi. Aut, ullam rerum ipsa quam dicta mollitia inventore suscipit minus maxime nulla delectus rem unde itaque sunt illo. Illum quisquam, eligendi accusantium fugit consequuntur distinctio delectus quidem sed esse ducimus. Quis officiis repellendus magni debitis. Nihil odio cum aperiam quaerat fugit ducimus suscipit ab tenetur. Quisquam laudantium nulla ea maxime. Earum ab odit maxime iure. Excepturi eos sed magni iste, illum, architecto, voluptatibus nobis iusto obcaecati sequi consectetur consequatur laboriosam. Eaque repellat nihil dolore quidem nam consequuntur explicabo ex. Vero laborum quisquam, delectus nesciunt velit hic officia qui ratione itaque quos laudantium consequuntur, excepturi in quidem dignissimos saepe eligendi veritatis omnis ipsam officiis. Quaerat obcaecati laboriosam esse sequi. Magnam consequuntur, harum numquam obcaecati animi in nihil consectetur quis earum officia? Impedit, rem! Ratione, perspiciatis et, hic iusto unde numquam odit id reprehenderit laudantium quia laboriosam dolores quos dolorum rem labore ut? Itaque quod fuga sunt vel adipisci incidunt qui? Laborum maxime aspernatur voluptatem asperiores, laudantium assumenda explicabo exercitationem corporis quam est suscipit voluptate reprehenderit iure vitae? Eaque ad commodi, fugiat expedita aspernatur illum distinctio tempora cum tempore? Ad possimus quae ratione voluptatum.",
-			        type: "long-text",
-			        textOptions: {
-			          copy: true,
-			        },
-			      },
-			      {
-			        key: "website",
-			        label: "Website",
-			        value: "http://johndoe.com",
-			        type: "text",
-			        textOptions: {
-			          copy: true,
-			        },
-			      },
-			      {
-			        key: "values",
-			        label: "Values",
-			        value: [
-			          "Friendly and outgoing",
-			          "Enjoys outdoor activities",
-			          "Passionate about technology",
-			          "Loves trying new cuisines",
-			        ],
-			        type: "array",
-			        arrayOptions: {
-			          vertical: true,
-			        },
-			      },
-			    ],
+					{ path: "financials.revenue" },
+			      { path: "financials.expenses.operating" },
+			      { path: "financials.expenses.marketing" },
+			      { path: "financials.expenses.research" },
+			      { path: "financials.profit" },
+					{ path: "marketSegments" }],
+			  },
+			  {
+			    tabGroup: "Partners",
+			    children: [{ path: "partners" }],
 			  },
 			];
 
@@ -417,6 +502,7 @@ The component emits a custom event named `ecc-utils-button-click` when a button 
 			    pill: false,
 			  },
 			];
+
 			renderComponent.value = true;
 			
 			document.querySelectorAll("ecc-utils-design-details")

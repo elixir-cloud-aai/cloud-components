@@ -109,7 +109,7 @@
 			      marketing: 200000.75,
 			      research: 100000.5,
 			    },
-			    profit: null,
+			    profit: 696969,
 			  },
 			  marketSegments: ["Enterprise", "Startups", "Government"],
 			  partners: [
@@ -128,46 +128,39 @@
 			      projects: ["MobileApp"],
 			    },
 			  ],
+			  debt: {
+			    partnerId: "P001",
+			    partnerName: "InnoTech Innovations",
+			    contactPerson: "Mark Innovator",
+			    email: "mark@innotech.com",
+			    projects: ["SmartApp"],
+			  },
 			};
 
 			const fields = [
 			  {
 			    tabGroup: "Company Info",
-			    children: [
-			      { path: "company.name" },
-			      { path: "company.industry" },
-			      { path: "company.stats.followers" },
-			      { path: "company.stats.following" },
-			      { path: "company.stats.likes" },
-			      { path: "company.lastLogin" },
-			      { path: "company.isPremiumUser" },
-			    ],
+			    children: [{ path: "company.name" }, { path: "company.industry" }],
 			  },
 			  {
 			    tabGroup: "Employees",
 			    children: [{ path: "company.employees", copy: true }],
 			  },
 			  {
-			    tabGroup: "Employee Details",
-			    children: [{ path: "company.employees" }],
-			  },
-			  {
 			    tabGroup: "Clients",
 			    children: [{ path: "clients" }],
 			  },
 			  {
-			    tabGroup: "Financials",
+			    tabGroup: "Market Segments",
 			    children: [
 			      { path: "financials.revenue" },
 			      { path: "financials.expenses.operating" },
 			      { path: "financials.expenses.marketing" },
 			      { path: "financials.expenses.research" },
 			      { path: "financials.profit" },
+			      { path: "marketSegments" },
+			      { path: "debt" },
 			    ],
-			  },
-			  {
-			    tabGroup: "Market Segments",
-			    children: [{ path: "marketSegments" }],
 			  },
 			  {
 			    tabGroup: "Partners",
@@ -207,7 +200,7 @@
 			    .fields=${fields}
 			    .buttons=${buttons}
 			  >
-			    <div slot="footer">hello</div>
+			    <div slot="footer">Dec 13 2023</div>
 			  </ecc-utils-design-details>`,
 			  document.querySelector("#demo")
 			);

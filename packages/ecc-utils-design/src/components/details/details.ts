@@ -10,6 +10,7 @@ import "@shoelace-style/shoelace/dist/components/copy-button/copy-button.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/tag/tag.js";
 import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+import "@shoelace-style/shoelace/dist/components/details/details.js";
 import { hostStyles } from "../../styles/host.styles.js";
 
 export interface Children {
@@ -44,7 +45,47 @@ export default class EccUtilsDesignDetails extends LitElement {
       document.querySelector("html")?.classList.contains("dark")
     ),
     hostStyles,
-    css``,
+    css`
+      /* Add your global styles here */
+
+      :host {
+        display: block;
+        font-family: "Arial", sans-serif;
+        /* Add more global styles if needed */
+      }
+
+      .container {
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 5px;
+      }
+
+      .label {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .value {
+        /* Adjust styles for the values */
+      }
+
+      .panel-container {
+        /* Add styles for the tab panels if needed */
+      }
+
+      .details {
+        /* Add styles for the tab group if needed */
+      }
+
+      .footer-container {
+        display: flex;
+      }
+
+      .footer-button {
+        display: flex;
+      }
+    `,
   ];
 
   @property({ type: Object, reflect: true }) data = {};
@@ -73,6 +114,7 @@ export default class EccUtilsDesignDetails extends LitElement {
     label: string,
     copy = false
   ): TemplateResult {
+    if (data === null || data === undefined) return html``;
     return html`
       <div class="container">
         <div class="label">
@@ -93,15 +135,12 @@ export default class EccUtilsDesignDetails extends LitElement {
     `;
   }
 
-  private _renderText(data: string): TemplateResult {
-    return html` <div>${data}</div> `;
-  }
-
   private _renderArray(
     data: Array<any>,
     label: string,
     copy = false
   ): TemplateResult {
+    if (data === null || data === undefined || data.length === 0) return html``;
     return html`
       <div class="container">
         <div class="label">
@@ -122,14 +161,13 @@ export default class EccUtilsDesignDetails extends LitElement {
             if (value === null || value === undefined) {
               return null; // Skip rendering for null or undefined values
             }
-
             if (Array.isArray(value)) {
               return this._renderArray(value, `${label}-${index}`);
             }
             if (typeof value === "object") {
               return this._renderObject(value, `${label}-${index}`);
             }
-            return this._renderText(value);
+            return html` <div>${value}</div> `;
           })}
         </div>
       </div>
@@ -141,6 +179,12 @@ export default class EccUtilsDesignDetails extends LitElement {
     label: string,
     copy = false
   ): TemplateResult {
+    if (
+      data === null ||
+      data === undefined ||
+      Object.entries(data).length === 0
+    )
+      return html``;
     return html`
       <div class="container">
         <div class="label">
@@ -161,93 +205,18 @@ export default class EccUtilsDesignDetails extends LitElement {
             if (dataValue === null || dataValue === undefined) {
               return null; // Skip rendering for null or undefined values
             }
-
             if (Array.isArray(dataValue)) {
               return this._renderArray(dataValue, `${dataLabel}-${index}`);
             }
             if (typeof dataValue === "object") {
               return this._renderObject(dataValue, `${dataLabel}-${index}`);
             }
-            return this._renderText(dataValue as string);
+            return this._renderData(dataValue.toString(), dataLabel);
           })}
         </div>
       </div>
     `;
   }
-
-  // private _renderObject(
-  // 	data: any,
-  // 	label: string,
-  // 	copy = false
-  // ): TemplateResult {
-  // 	return html`
-  // 		<div class="container">
-  // 			<div class="label">
-  // 				<span>${label}</span>
-  // 				${copy
-  // 					? html`
-  // 							<sl-copy-button
-  // 								value=${JSON.stringify(data)}
-  // 								copy-label="Click to copy strigified JSON of ${label}"
-  // 								success-label="${label} copied"
-  // 								error-label="Error"
-  // 							></sl-copy-button>
-  // 					  `
-  // 					: html``}
-  // 			</div>
-  // 			<div class="value">
-  // 				${Object.entries(data).map(([label, value], index) => {
-  // 					if (value === null || value === undefined) {
-  // 						return null; // Skip rendering for null or undefined values
-  // 					}
-
-  // 					return Array.isArray(value)
-  // 						? this._renderArray(value, label)
-  // 						: typeof value === 'object'
-  // 						? this._renderObject(value, label)
-  // 						: this._renderText(value as string);
-  // 				})}
-  // 			</div>
-  // 		</div>
-  // 	`;
-  // }
-
-  // private _renderArray(
-  // 	data: Array<any>,
-  // 	label: string,
-  // 	copy = false
-  // ): TemplateResult {
-  // 	return html`
-  // 		<div class="container">
-  // 			<div class="label">
-  // 				<span>${label}</span>
-  // 				${copy
-  // 					? html`
-  // 							<sl-copy-button
-  // 								value=${JSON.stringify(data)}
-  // 								copy-label="Click to copy strigified JSON of ${label}"
-  // 								success-label="${label} copied"
-  // 								error-label="Error"
-  // 							></sl-copy-button>
-  // 					  `
-  // 					: html``}
-  // 			</div>
-  // 			<div class="value">
-  // 				${data.map((data, index) => {
-  // 					if (data === null || data === undefined) {
-  // 						return null; // Skip rendering for null or undefined values
-  // 					}
-
-  // 					return Array.isArray(data)
-  // 						? this._renderArray(data, `${label}-${index}`)
-  // 						: typeof data === 'object'
-  // 						? this._renderObject(data, `${label}-${index}`)
-  // 						: this._renderText(data);
-  // 				})}
-  // 			</div>
-  // 		</div>
-  // 	`;
-  // }
 
   private _renderField(
     tabName: string,
@@ -263,12 +232,14 @@ export default class EccUtilsDesignDetails extends LitElement {
               childFieldInfo.path,
               childFieldInfo.defaultValue
             );
+
             if (
               childData == null ||
               (Array.isArray(childData) && childData.length === 0) ||
               Object.entries(childData).length === 0
-            )
-              return html``;
+            ) {
+              if (typeof childData !== "number") return html``;
+            }
 
             const label =
               (
@@ -287,16 +258,14 @@ export default class EccUtilsDesignDetails extends LitElement {
 
             const copy =
               childFieldInfo.copy !== undefined ? childFieldInfo.copy : false;
-
-            console.log(childData, label, copy);
-
+            // console.log(childData);
             if (Array.isArray(childData)) {
               return this._renderArray(childData, label, copy);
             }
             if (typeof childData === "object") {
               return this._renderObject(childData, label, copy);
             }
-            return this._renderData(childData, label, copy);
+            return this._renderData(childData.toString(), label, copy);
           })}
         </div>
       </sl-tab-panel>
@@ -304,7 +273,8 @@ export default class EccUtilsDesignDetails extends LitElement {
   }
 
   private _renderFields(fields: Array<Field>): TemplateResult {
-    if (!fields.length) return html``;
+    if (fields === null || fields === undefined || fields.length === 0)
+      return html``;
     return html`
       <sl-tab-group class="details">
         ${fields.map((field) =>
@@ -364,7 +334,9 @@ export default class EccUtilsDesignDetails extends LitElement {
             `;
           })}
         </div>
-        <slot name="footer"></slot>
+        <div class="footer-slot">
+          <slot name="footer"></slot>
+        </div>
       </div>
     `;
   }
