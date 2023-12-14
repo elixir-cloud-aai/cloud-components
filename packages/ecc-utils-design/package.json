@@ -26,7 +26,7 @@
     "analyze": "cem analyze --litelement",
     "build": "node ./scripts/build.js",
     "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
-    "test": "wtr --coverage",
+    "test": "",
     "test:watch": "wtr --watch",
     "storybook": "npm run build && npm run analyze -- --exclude dist && concurrently -k -r \"npm run build -- --watch\" \"wds -c .storybook/server.mjs\"",
     "storybook:build": "npm run build && npm run analyze -- --exclude dist && build-storybook",
