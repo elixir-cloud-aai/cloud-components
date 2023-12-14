@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import { html, css, LitElement, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
-import { toLower } from "lodash-es";
+import _, { toLower } from "lodash-es";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
 import "@shoelace-style/shoelace/dist/components/tab/tab.js";
@@ -10,23 +10,17 @@ import "@shoelace-style/shoelace/dist/components/copy-button/copy-button.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/tag/tag.js";
 import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+import "@shoelace-style/shoelace/dist/components/details/details.js";
 import { hostStyles } from "../../styles/host.styles.js";
 
-interface Children {
-  key: string;
-  label: string;
-  value: string | number | Array<string> | Record<string, string>;
-  type: "text" | "long-text" | "array" | "object";
-  textOptions?: {
-    copy?: boolean;
-  };
-  arrayOptions?: {
-    vertical?: boolean;
-    pill?: boolean;
-  };
+export interface Children {
+  label?: string;
+  path: string;
+  copy?: boolean;
+  defaultValue?: any;
 }
 
-interface Field {
+export interface Field {
   tabGroup: string;
   children: Array<Children>;
 }
@@ -52,135 +46,57 @@ export default class Details extends LitElement {
     ),
     hostStyles,
     css`
-      .panel-container {
-        height: 400px;
-        overflow: scroll;
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+      /* Add your global styles here */
+
+      :host {
+        display: block;
+        font-family: "Arial", sans-serif;
+        /* Add more global styles if needed */
       }
 
-      .panel-container::-webkit-scrollbar {
-        display: none;
-      }
-
-      .details-container {
-        display: flex;
-        margin-bottom: 1rem;
-        align-items: center;
-      }
-
-      .details-container-object {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .column {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .align {
-        align-items: flex-start;
+      .container {
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 5px;
       }
 
       .label {
         font-weight: bold;
-        margin-right: 0.5rem;
-      }
-
-      .value-container {
-        display: flex;
-        align-items: center;
+        margin-bottom: 5px;
       }
 
       .value {
+        /* Adjust styles for the values */
       }
 
-      .large-text {
-        height: 6rem;
-        overflow: scroll;
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+      .panel-container {
+        /* Add styles for the tab panels if needed */
       }
 
-      .large-text::-webkit-scrollbar {
-        display: none;
+      .details {
+        /* Add styles for the tab group if needed */
       }
 
-      .object-item {
+      .footer-container {
         display: flex;
-        margin-bottom: 0.5rem;
       }
 
-      .object-key {
-        font-weight: bold;
-        margin-right: 0.5rem;
-      }
-
-      .object-value-container {
-        margin-left: 1rem;
+      .footer-button {
         display: flex;
-        flex-direction: column;
-      }
-
-      .object-value {
-      }
-
-      .array-value {
-        display: flex;
-        gap: 0.2rem;
-      }
-
-      .array-item {
-        margin-bottom: 0.2rem;
-      }
-
-      .vertical {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      [name="footer-container"] {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.2rem;
       }
     `,
   ];
 
-  @property({ type: Array }) private fields: Array<Field> = [];
-  @property({ type: Array }) private buttons: Array<FooterButton> = [];
+  @property({ type: Object, reflect: true }) data = {};
+  @property({ type: Array, reflect: true }) fields: Array<Field> = [];
+  @property({ type: Array, reflect: true }) buttons: Array<FooterButton> = [];
 
   @state() private loading: Array<boolean> = [];
 
   constructor() {
     super();
     this.loading = new Array(this.buttons.length).fill(false);
-  }
-
-  private _renderContainer(
-    child: Children,
-    content: TemplateResult,
-    flexDir = false,
-    alignItems = false
-  ): TemplateResult {
-    return html`
-      <div
-        class="details-container ${flexDir ? "column" : ""} ${alignItems
-          ? "align"
-          : ""}"
-      >
-        <div class="label">${child.label}</div>
-        <div class="value-container" id=${child.key}>
-          ${content}
-          ${child.textOptions?.copy &&
-          html`<sl-copy-button
-            class="copy-button"
-            from=${child.key}
-          ></sl-copy-button>`}
-        </div>
-      </div>
-    `;
   }
 
   /**
@@ -193,92 +109,163 @@ export default class Details extends LitElement {
     this.requestUpdate();
   }
 
-  private _renderText(child: Children): TemplateResult {
-    const content = html`<div class="value">${child.value}</div>`;
-    return this._renderContainer(child, content);
-  }
-
-  private _renderLongText(child: Children): TemplateResult {
-    const content = html`<div id="${child.key}" class="value large-text">
-      ${child.value}
-    </div>`;
-    return this._renderContainer(child, content, true);
-  }
-
-  private _renderObjectItem(
-    [key, value]: [string, string],
-    child: Children
+  private _renderData(
+    data: string,
+    label: string,
+    copy = false
   ): TemplateResult {
+    if (data === null || data === undefined) return html``;
     return html`
-      <div class="object-item">
-        <div class="object-key">${key}:</div>
-        <div id="${child.key}" class="object-value">${value}</div>
-        ${child.textOptions?.copy &&
-        html`<sl-copy-button
-          class="copy-button"
-          from=${child.key}
-        ></sl-copy-button>`}
+      <div class="container">
+        <div class="label">
+          <span>${label}</span>
+          ${copy
+            ? html`
+                <sl-copy-button
+                  value=${data}
+                  copy-label="Click to copy ${label}"
+                  success-label="${label} copied"
+                  error-label="Error"
+                ></sl-copy-button>
+              `
+            : html``}
+        </div>
+        <div class="value">${data}</div>
       </div>
     `;
   }
 
-  private _renderObject(child: Children): TemplateResult {
+  private _renderArray(
+    data: Array<any>,
+    label: string,
+    copy = false
+  ): TemplateResult {
+    if (data === null || data === undefined || data.length === 0) return html``;
     return html`
-      <div class="details-container details-container-object">
-        <div class="label">${child.label}</div>
-        <div class="object-value-container">
-          ${Object.entries(child.value).map((entry) =>
-            this._renderObjectItem(entry, child)
-          )}
+      <div class="container">
+        <div class="label">
+          <span>${label}</span>
+          ${copy
+            ? html`
+                <sl-copy-button
+                  value=${JSON.stringify(data)}
+                  copy-label="Click to copy strigified JSON of ${label}"
+                  success-label="${label} copied"
+                  error-label="Error"
+                ></sl-copy-button>
+              `
+            : html``}
+        </div>
+        <div class="value">
+          ${data.map((value, index) => {
+            if (value === null || value === undefined) {
+              return null; // Skip rendering for null or undefined values
+            }
+            if (Array.isArray(value)) {
+              return this._renderArray(value, `${label}-${index}`);
+            }
+            if (typeof value === "object") {
+              return this._renderObject(value, `${label}-${index}`);
+            }
+            return html` <div>${value}</div> `;
+          })}
         </div>
       </div>
     `;
   }
 
-  private _renderArrayValue(value: string): TemplateResult {
-    return html`<div class="value">${value}</div>`;
-  }
-
-  private _renderArrayPill(value: string): TemplateResult {
-    return html`<sl-tag size="medium" pill>${value}</sl-tag>`;
-  }
-
-  private _renderArray(child: Children): TemplateResult {
-    const arrayRenderer = child?.arrayOptions?.pill
-      ? this._renderArrayPill
-      : this._renderArrayValue;
-
-    const content = html`
-      <div
-        class="array-value ${child.arrayOptions?.vertical ? "vertical" : ""}"
-      >
-        ${(child.value as Array<string>).map(
-          (value) => html`<div class="array-item">${arrayRenderer(value)}</div>`
-        )}
+  private _renderObject(
+    data: any,
+    label: string,
+    copy = false
+  ): TemplateResult {
+    if (
+      data === null ||
+      data === undefined ||
+      Object.entries(data).length === 0
+    )
+      return html``;
+    return html`
+      <div class="container">
+        <div class="label">
+          <span>${label}</span>
+          ${copy
+            ? html`
+                <sl-copy-button
+                  value=${JSON.stringify(data)}
+                  copy-label="Click to copy strigified JSON of ${label}"
+                  success-label="${label} copied"
+                  error-label="Error"
+                ></sl-copy-button>
+              `
+            : html``}
+        </div>
+        <div class="value">
+          ${Object.entries(data).map(([dataLabel, dataValue], index) => {
+            if (dataValue === null || dataValue === undefined) {
+              return null; // Skip rendering for null or undefined values
+            }
+            if (Array.isArray(dataValue)) {
+              return this._renderArray(dataValue, `${dataLabel}-${index}`);
+            }
+            if (typeof dataValue === "object") {
+              return this._renderObject(dataValue, `${dataLabel}-${index}`);
+            }
+            return this._renderData(dataValue.toString(), dataLabel);
+          })}
+        </div>
       </div>
     `;
-
-    return this._renderContainer(child, content, false, true);
   }
 
-  private _renderField(tabName: string, data: Array<Children>): TemplateResult {
+  private _renderField(
+    tabName: string,
+    children: Array<Children>
+  ): TemplateResult {
     return html`
       <sl-tab slot="nav" panel="${toLower(tabName)}">${tabName}</sl-tab>
       <sl-tab-panel name="${toLower(tabName)}">
         <div class="panel-container">
-          ${data.map((child) => {
-            switch (child.type) {
-              case "text":
-                return this._renderText(child);
-              case "long-text":
-                return this._renderLongText(child);
-              case "array":
-                return this._renderArray(child);
-              case "object":
-                return this._renderObject(child);
-              default:
-                return html``;
+          ${children.map((childFieldInfo: Children) => {
+            const childData = _.get(
+              this.data,
+              childFieldInfo.path,
+              childFieldInfo.defaultValue
+            );
+
+            if (
+              childData == null ||
+              (Array.isArray(childData) && childData.length === 0) ||
+              Object.entries(childData).length === 0
+            ) {
+              if (typeof childData !== "number") return html``;
             }
+
+            const label =
+              (
+                childFieldInfo.label ||
+                childFieldInfo.path.split(".").pop() ||
+                "Undefined"
+              )
+                .replace(/_/g, " ") // Replace underscores with spaces globally
+                .charAt(0)
+                .toUpperCase() +
+              (
+                childFieldInfo.label ||
+                childFieldInfo.path.split(".").pop() ||
+                "Undefined"
+              ).slice(1);
+
+            const copy =
+              childFieldInfo.copy !== undefined ? childFieldInfo.copy : false;
+            // console.log(childData);
+            if (Array.isArray(childData)) {
+              return this._renderArray(childData, label, copy);
+            }
+            if (typeof childData === "object") {
+              return this._renderObject(childData, label, copy);
+            }
+            return this._renderData(childData.toString(), label, copy);
           })}
         </div>
       </sl-tab-panel>
@@ -286,7 +273,8 @@ export default class Details extends LitElement {
   }
 
   private _renderFields(fields: Array<Field>): TemplateResult {
-    if (!fields.length) return html``;
+    if (fields === null || fields === undefined || fields.length === 0)
+      return html``;
     return html`
       <sl-tab-group class="details">
         ${fields.map((field) =>
@@ -313,11 +301,11 @@ export default class Details extends LitElement {
 
   private _handleClick(event: Event, key: string, index: number) {
     this.dispatchEvent(
-      new CustomEvent(`button-${key}-click`, {
+      new CustomEvent(`ecc-utils-button-click`, {
         detail: {
           index,
           Key: key,
-          event,
+          originalEvent: event,
         },
         bubbles: true,
         composed: true,
@@ -332,36 +320,23 @@ export default class Details extends LitElement {
           ${this.buttons.map((button, index) => {
             const { size, variant, outline, pill, name, icon, key } = button;
             return html`
-              ${this.loading[index]
-                ? html`
-                    <sl-button
-                      loading
-                      ?pill="${pill}"
-                      variant="${variant}"
-                      ?outline="${outline}"
-                      size="${size}"
-                      @click="${(event: Event) =>
-                        this._handleClick(event, key, index)}"
-                    >
-                      ${icon ? this._renderSvg(icon) : ""} ${name}
-                    </sl-button>
-                  `
-                : html`
-                    <sl-button
-                      ?pill="${pill}"
-                      variant="${variant}"
-                      ?outline="${outline}"
-                      size="${size}"
-                      @click="${(event: Event) =>
-                        this._handleClick(event, key, index)}"
-                    >
-                      ${icon ? this._renderSvg(icon) : ""} ${name}
-                    </sl-button>
-                  `}
+              <sl-button
+                ?loading="${this.loading[index]}"
+                ?pill="${pill}"
+                variant="${variant}"
+                ?outline="${outline}"
+                size="${size}"
+                @click="${(event: Event) =>
+                  this._handleClick(event, key, index)}"
+              >
+                ${icon ? this._renderSvg(icon) : ""} ${name}
+              </sl-button>
             `;
           })}
         </div>
-        <slot name="footer"></slot>
+        <div class="footer-slot">
+          <slot name="footer"></slot>
+        </div>
       </div>
     `;
   }
