@@ -54,13 +54,19 @@ nextTask("Wrapping components for React", () =>
   })
 );
 
+await nextTask("Running the TypeScript compiler", () =>
+  execSync(`tsc --project ./tsconfig.prod.json --outdir "${npmDir}"`, {
+    stdio: "inherit",
+  })
+);
+
 nextTask("Building source", async () => {
   const config = {
     format: "esm",
     target: "es2017",
     entry: [
       "./src/index.ts",
-      ...(await globby("./src/components/**/!(*.(styles|test)).ts")),
+      ...(await globby("./src/components/**/!(*.(test)).ts")),
       ...(await globby("./src/react/**/*.ts")),
       ...(await globby("./src/utilities/**/*.ts")),
     ],
@@ -68,7 +74,8 @@ nextTask("Building source", async () => {
     treeshake: true,
     bundle: true,
     outDir: npmDir,
-    dts: true,
+    external: ["@lit/react", "react"],
+    // dts: true,
     watch: commanderOpts.watch,
   };
 

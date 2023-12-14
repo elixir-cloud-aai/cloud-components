@@ -106,6 +106,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+
     if (!this.fields) {
       throw new Error("Fields is required");
     }

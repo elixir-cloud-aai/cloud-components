@@ -1,3 +1,4 @@
+// This config file has a wider scope so eslint can use it to provide type checking for the entire package
 {
   "compilerOptions": {
     "target": "es2018",
@@ -15,8 +16,9 @@
     "inlineSources": true,
     "rootDir": "./",
     "declaration": true,
+    "emitDeclarationOnly": true,
     "skipLibCheck": true
   },
-  "include": ["**/*.ts"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }
