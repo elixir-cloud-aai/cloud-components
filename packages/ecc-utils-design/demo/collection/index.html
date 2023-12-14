@@ -17,7 +17,7 @@
 
     <script type="module">
       import { html, render } from "lit";
-      import "../dist/components/collection/index.js";
+      import "../dist/collection/index.js";
 
       let items = [];
       let search = "";
@@ -67,7 +67,7 @@
         html`<ecc-utils-design-collection
           .items=${items}
           .filters=${filters}
-          @ecc-utils-expand=${async (e) => {
+          @expand-item=${async (e) => {
             // Check if child already exists
             const children = e.target.querySelectorAll(`[slot="${e.detail.key}"]`);
             if (children.length === 0) {
@@ -84,7 +84,7 @@
               e.target.appendChild(child);
             }
           }}
-          @ecc-utils-filter=${async (e) => {
+          @filter=${async (e) => {
             if (e.detail.key === "title") {
               search = e.detail.value;
               const data = await fetchDummyData(
@@ -126,7 +126,7 @@
               }
             }
           }}
-          @ecc-utils-page-change=${async (e) => {
+          @page-change=${async (e) => {
             if (e.detail.page === 3) {
               setTimeout(() => {
                 document

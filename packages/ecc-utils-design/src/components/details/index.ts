@@ -1,12 +1,12 @@
-import EccUtilsDesignDetails from "./details.js";
+import Details from "./details.js";
 
 export * from "./details.js";
-export default EccUtilsDesignDetails;
+export default Details;
 
-window.customElements.define("ecc-utils-design-details", EccUtilsDesignDetails);
+window.customElements.define("ecc-utils-design-details", Details);
 
 declare global {
   interface HTMLElementTagNameMap {
-    "ecc-utils-design-details": EccUtilsDesignDetails;
+    "ecc-utils-design-details": Details;
   }
 }

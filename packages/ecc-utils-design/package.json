@@ -5,22 +5,13 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./dist/custom-elements.json": "./dist/custom-elements.json",
-    "./dist/index.js": "./dist/index.js",
-    "./dist/components/*": "./dist/components/*",
-    "./dist/react": "./dist/react/index.js",
-    "./dist/react/*": "./dist/react/*",
-    "./dist/utilities/*": "./dist/utilities/*"
+    ".": "./dist/index.js",
+    "./dist/*": "./dist/*"
   },
   "type": "module",
   "version": "0.0.1",
   "author": "",
   "license": "ISC",
-  "customElements": "./dist/custom-elements.json",
   "repository": "",
   "scripts": {
     "analyze": "cem analyze --litelement",
@@ -45,23 +36,18 @@
     "@web/test-runner": "^0.17.0",
     "commander": "^11.1.0",
     "concurrently": "^8.2.1",
-    "custom-element-jet-brains-integration": "^1.4.0",
-    "custom-element-vs-code-integration": "^1.2.1",
     "esbuild": "0.18.20",
     "eslint": "^8.41.0",
     "eslint-config-elixir": "*",
     "eslint-plugin-prettier": "^4.2.1",
     "globby": "^14.0.0",
-    "ora": "^7.0.1",
     "tslib": "^2.6.2",
     "tsup": "^7.2.0",
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@lit/react": "^1.0.2",
     "@shoelace-style/shoelace": "^2.8.0",
     "lit": "^2.8.0",
-    "lodash-es": "^4.17.21",
-    "react": "^18.2.0"
+    "lodash-es": "^4.17.21"
   }
 }

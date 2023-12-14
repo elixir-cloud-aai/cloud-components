@@ -1,7 +1,7 @@
 import { html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { postWorkflow } from "../../API/Workflow/wesGet.js";
-import "@elixir-cloud/design/dist/components/form/index.js";
+import "@elixir-cloud/design";
 
 @customElement("ecc-client-lit-ga4gh-wes-create-run")
 export class WESCreateRun extends LitElement {
@@ -113,7 +113,7 @@ export class WESCreateRun extends LitElement {
     return html`
       <ecc-utils-design-form
         .fields=${this.fields}
-        @ecc-utils-submit=${(e: CustomEvent) => {
+        @form-submit=${(e: CustomEvent) => {
           this.submitForm(e.detail.form.data);
         }}
       ></ecc-utils-design-form>

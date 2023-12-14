@@ -30,13 +30,10 @@ yarn-error.log*
 ## temp folders
 /.tmp/
 
-## build
+# build
 /_site/
 /dist/
 /out-tsc/
-
-## generated files
-/src/react
 
 storybook-static
 custom-elements.json

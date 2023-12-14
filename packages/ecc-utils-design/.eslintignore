@@ -1,41 +1,28 @@
 # Never lint playwright config
-
-playwright.\*.ts
+playwright.*.ts
 
 # Never lint test files
-
-\*.spec.ts
+*.spec.ts
 
 # Never lint node_modules
-
 node_modules
 
 # Never lint build output
-
 dist
 
 # Never lint coverage output
-
 coverage
 
-# Never lint automatically generated files
-
-src/react
-
-# Never lint
-
+# Never lint 
 **/.git
 **/.svn
 **/.hg
 **/node_modules
 
-/.github/\*
+/.github/*
 CONTRIBUTING.md
 LICENSE
 README.md
 CONTRIBUTORS.md
 CODE_OF_CONDUCT.md
-
-```
-
 ```

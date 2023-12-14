@@ -10,7 +10,7 @@ This component is used to render a collection of items. It can be used to render
 ::: code-group
 
 ```js [HTML]
-import "@elixir-cloud/design/dist/components/collection/index.js";
+import "@elixir-cloud/design/dist/collection/index.js";
 ```
 
   <!-- ```jsx [React]
@@ -25,7 +25,7 @@ import "@elixir-cloud/design/dist/components/collection/index.js";
 ## Importing
 
 ```js [HTML]
-import "@elixir-cloud/design/dist/components/collection/index.js";
+import "@elixir-cloud/design/dist/collection/index.js";
 ```
 
 ## Properties
@@ -59,11 +59,11 @@ import "@elixir-cloud/design/dist/components/collection/index.js";
 
 ## Events
 
-| Event Name              | Payload                          | Description                     |
-| ----------------------- | -------------------------------- | ------------------------------- |
-| `ecc-utils-page-change` | `{ page: Number }`               | Fired when the page is changed. |
-| `ecc-utils-expand`      | `{ key: String }`                | Fired when an item is expanded. |
-| `ecc-utils-filter`      | `{ key: String, value: String }` | Fired when a filter is applied. |
+| Event Name    | Payload                          | Description                     |
+| ------------- | -------------------------------- | ------------------------------- |
+| `page-change` | `{ page: Number }`               | Fired when the page is changed. |
+| `expand-item` | `{ key: String }`                | Fired when an item is expanded. |
+| `filter`      | `{ key: String, value: String }` | Fired when a filter is applied. |
 
 ## Methods
 
@@ -100,7 +100,7 @@ const primaryFilters = ref([]);
 const primaryTag = ref()
 
 onMounted(() => {
-  import("@elixir-cloud/design/dist/components/collection/index.js").then((module) => {
+  import("@elixir-cloud/design/dist/collection/index.js").then((module) => {
     renderComponent.value = false;
     primaryItems.value = [];
     primaryFilters.value = [
@@ -121,7 +121,7 @@ onMounted(() => {
     ];
     renderComponent.value = true;
     document.querySelectorAll("ecc-utils-design-collection").forEach((element) => {
-      element.addEventListener("ecc-utils-page-change", async (e) => {
+      element.addEventListener("page-change", async (e) => {
         const res = await fetch(`https://jsonplaceholder.typicode.com/posts?_page=${e.detail.page}&_limit=5${primaryTag.value ? `&userId=${primaryTag.value}` : ""}}`);
         const data = await res.json();
         for (let i = 0; i < data.length; i += 1) {
@@ -147,7 +147,7 @@ onMounted(() => {
           ];
         }
       });
-      element.addEventListener("ecc-utils-expand", async (e) => {
+      element.addEventListener("expand-item", async (e) => {
           // Check if child already exists
           const children = e.target.querySelectorAll(`[slot="${e.detail.key}"]`);
           if (children.length === 0) {
@@ -165,7 +165,7 @@ onMounted(() => {
           }
         }
       );
-      element.addEventListener("ecc-utils-filter", async (e) => {
+      element.addEventListener("filter", async (e) => {
         if (e.detail.key === "title") {
           const res = await fetch(`https://jsonplaceholder.typicode.com/posts?_page=1&_limit=5&title_like=${e.detail.value.toLowerCase()}`)
           const data = await res.json();

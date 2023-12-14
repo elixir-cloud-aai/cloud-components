@@ -45,7 +45,7 @@ interface FooterButton {
   };
 }
 
-export default class EccUtilsDesignDetails extends LitElement {
+export default class Details extends LitElement {
   static styles = [
     getShoelaceStyles(
       document.querySelector("html")?.classList.contains("dark")
@@ -148,8 +148,8 @@ export default class EccUtilsDesignDetails extends LitElement {
     `,
   ];
 
-  @property({ type: Array, reflect: true }) fields: Array<Field> = [];
-  @property({ type: Array, reflect: true }) buttons: Array<FooterButton> = [];
+  @property({ type: Array }) private fields: Array<Field> = [];
+  @property({ type: Array }) private buttons: Array<FooterButton> = [];
 
   @state() private loading: Array<boolean> = [];
 
@@ -313,11 +313,11 @@ export default class EccUtilsDesignDetails extends LitElement {
 
   private _handleClick(event: Event, key: string, index: number) {
     this.dispatchEvent(
-      new CustomEvent(`ecc-utils-button-click`, {
+      new CustomEvent(`button-${key}-click`, {
         detail: {
           index,
           Key: key,
-          originalEvent: event,
+          event,
         },
         bubbles: true,
         composed: true,
@@ -332,17 +332,32 @@ export default class EccUtilsDesignDetails extends LitElement {
           ${this.buttons.map((button, index) => {
             const { size, variant, outline, pill, name, icon, key } = button;
             return html`
-              <sl-button
-                ?loading="${this.loading[index]}"
-                ?pill="${pill}"
-                variant="${variant}"
-                ?outline="${outline}"
-                size="${size}"
-                @click="${(event: Event) =>
-                  this._handleClick(event, key, index)}"
-              >
-                ${icon ? this._renderSvg(icon) : ""} ${name}
-              </sl-button>
+              ${this.loading[index]
+                ? html`
+                    <sl-button
+                      loading
+                      ?pill="${pill}"
+                      variant="${variant}"
+                      ?outline="${outline}"
+                      size="${size}"
+                      @click="${(event: Event) =>
+                        this._handleClick(event, key, index)}"
+                    >
+                      ${icon ? this._renderSvg(icon) : ""} ${name}
+                    </sl-button>
+                  `
+                : html`
+                    <sl-button
+                      ?pill="${pill}"
+                      variant="${variant}"
+                      ?outline="${outline}"
+                      size="${size}"
+                      @click="${(event: Event) =>
+                        this._handleClick(event, key, index)}"
+                    >
+                      ${icon ? this._renderSvg(icon) : ""} ${name}
+                    </sl-button>
+                  `}
             `;
           })}
         </div>
