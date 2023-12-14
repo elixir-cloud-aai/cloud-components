@@ -152,7 +152,7 @@ import "@elixir-cloud/design/dist/components/details/index.js";
 						{ path: 'financials.expenses.marketing' },
 						{ path: 'financials.expenses.research' },
 						{ path: 'financials.profit' },
-						{ path: 'marketSegments' },
+						{ path: 'marketSegments', copy: true },
 						{ path: 'debt' },
 					],
 				},
@@ -439,44 +439,46 @@ The component emits a custom event named `ecc-utils-button-click` when a button 
 			      projects: ["MobileApp"],
 			    },
 			  ],
+			  debt: {
+				  partnerId: 'P001',
+				  partnerName: 'InnoTech Innovations',
+				  contactPerson: 'Mark Innovator',
+				  email: 'mark@innotech.com',
+				  projects: ['SmartApp'],
+			  },
 			};
 
 			fields.value = [
-			  {
-			    tabGroup: "Company Info",
-			    children: [
-			      { path: "company.name" },
-			      { path: "company.industry" },
-			      { path: "company.stats.followers" },
-			      { path: "company.stats.following" },
-			      { path: "company.stats.likes" },
-			      { path: "company.lastLogin" },
-			      { path: "company.isPremiumUser" },
-			    ],
-			  },
-			  {
-			    tabGroup: "Employees",
-			    children: [{ path: "company.employees", copy: true }],
-			  },
-			  {
-			    tabGroup: "Clients",
-			    children: [{ path: "clients" }],
-			  },
-			  {
-			    tabGroup: "Market Segments",
-			    children: [
-					{ path: "financials.revenue" },
-			      { path: "financials.expenses.operating" },
-			      { path: "financials.expenses.marketing" },
-			      { path: "financials.expenses.research" },
-			      { path: "financials.profit" },
-					{ path: "marketSegments" }],
-			  },
-			  {
-			    tabGroup: "Partners",
-			    children: [{ path: "partners" }],
-			  },
+				{
+					tabGroup: 'Company Info',
+					children: [{ path: 'company.name' }, { path: 'company.industry' }, { path: 'company.employees', copy: true }],
+				},
+				{
+					tabGroup: 'Employees',
+					children: [{ path: 'company.employees', copy: true }],
+				},
+				{
+					tabGroup: 'Clients',
+					children: [{ path: 'clients' }],
+				},
+				{
+					tabGroup: 'Market Segments',
+					children: [
+						{ path: 'financials.revenue' },
+						{ path: 'financials.expenses.operating' },
+						{ path: 'financials.expenses.marketing' },
+						{ path: 'financials.expenses.research' },
+						{ path: 'financials.profit' },
+						{ path: 'marketSegments', copy: true },
+						{ path: 'debt' },
+					],
+				},
+				{
+					tabGroup: 'Partners',
+					children: [{ path: 'partners' }],
+				},
 			];
+			
 
 			buttons.value = [
 			  {

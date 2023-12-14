@@ -51,9 +51,8 @@ export default class Details extends LitElement {
       }
 
       .container {
-        margin-bottom: 15px;
-        padding: 10px;
-        border-radius: 5px;
+        padding: var(--sl-spacing-2x-small);
+        margin-bottom: var(--sl-spacing-medium);
       }
 
       .data-container {
@@ -62,15 +61,26 @@ export default class Details extends LitElement {
       }
 
       .label {
-        font-weight: bold;
-        margin-bottom: 5px;
+        font-weight: var(--sl-font-weight-semibold);
       }
 
-      .value {
+      /* CSS related to footer */
+
+      .footer-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       }
+
+      .footer-buttons {
+        display: flex;
+        gap: var(--sl-spacing-small);
+      }
+
+      /* CSS related to collapsable fields */
 
       .panel-container {
-        height: 320px;
+        height: calc(5 * var(--sl-spacing-4x-large));
         overflow-y: scroll;
         -ms-overflow-style: none; /* Internet Explorer 10+ */
         scrollbar-width: none; /* Firefox */
@@ -80,20 +90,28 @@ export default class Details extends LitElement {
         display: none; /* Safari and Chrome */
       }
 
-      .details {
-      }
-
-      .footer-container {
+      .summary {
         display: flex;
         justify-content: space-between;
         align-items: center;
       }
 
-      .footer-button {
-        display: flex;
+      sl-details::part(base) {
+        padding: var(--sl-spacing-3x-small);
+        border: none;
+        background-color: transparent;
       }
 
-      .footer-slot {
+      sl-details::part(base):hover {
+        cursor: pointer;
+      }
+
+      sl-details::part(header) {
+        padding: 0px;
+      }
+
+      sl-details::part(content) {
+        padding: var(--sl-spacing-3x-small);
       }
     `,
   ];
@@ -126,8 +144,8 @@ export default class Details extends LitElement {
   ): TemplateResult {
     if (data === null || data === undefined) return html``;
     return html`
-      <div class="container data-container">
-        <div class="label">
+      <div part="data-container" class="container data-container">
+        <div part="label" class="label">
           <span>${label}</span>
           ${copy
             ? html`
@@ -150,33 +168,25 @@ export default class Details extends LitElement {
     label: string,
     copy = false
   ): TemplateResult {
-    // <div class="label">
-    //   <span>${label}</span>
-    //   ${copy
-    //   ? html`
-    //       <sl-copy-button
-    //         value=${JSON.stringify(data)}
-    //         copy-label="Click to copy strigified JSON of ${label}"
-    //         success-label="${label} copied"
-    //         error-label="Error"
-    //       ></sl-copy-button>
-    //     `
-    //   : html``}
-    // </div>
     if (data === null || data === undefined || data.length === 0) return html``;
     return html`
-      <div class="container">
-        <sl-details summary="${label}">
-          ${copy
-            ? html`
-                <sl-copy-button
-                  value=${JSON.stringify(data)}
-                  copy-label="Click to copy strigified JSON of ${label}"
-                  success-label="${label} copied"
-                  error-label="Error"
-                ></sl-copy-button>
-              `
-            : html``}
+      <div part="container" class="container">
+        <sl-details>
+          <div part="summary-container" slot="summary" class="summary">
+            <span part="label" class="label">${label}</span>
+            <span>
+              ${copy
+                ? html`
+                    <sl-copy-button
+                      value=${JSON.stringify(data)}
+                      copy-label="Click to copy strigified JSON of ${label}"
+                      success-label="${label} copied"
+                      error-label="Error"
+                    ></sl-copy-button>
+                  `
+                : html``}
+            </span>
+          </div>
           ${data.map((value, index) => {
             if (value === null || value === undefined) {
               return null; // Skip rendering for null or undefined values
@@ -192,20 +202,6 @@ export default class Details extends LitElement {
         </sl-details>
       </div>
     `;
-    // <div class="value">
-    //   ${data.map((value, index) => {
-    //   if (value === null || value === undefined) {
-    //     return null; // Skip rendering for null or undefined values
-    //   }
-    //   if (Array.isArray(value)) {
-    //     return this._renderArray(value, `${label}-${index}`);
-    //   }
-    //   if (typeof value === "object") {
-    //     return this._renderObject(value, `${label}-${index}`);
-    //   }
-    //   return html` <div>${value}</div> `;
-    // })}
-    // </div>
   }
 
   private _renderObject(
@@ -218,33 +214,25 @@ export default class Details extends LitElement {
       data === undefined ||
       Object.entries(data).length === 0
     )
-      // <div class="label">
-      //   <span>${label}</span>
-      //   ${copy
-      //   ? html`
-      //       <sl-copy-button
-      //         value=${JSON.stringify(data)}
-      //         copy-label="Click to copy strigified JSON of ${label}"
-      //         success-label="${label} copied"
-      //         error-label="Error"
-      //       ></sl-copy-button>
-      //     `
-      //   : html``}
-      // </div>
       return html``;
     return html`
-      <div class="container">
-        <sl-details summary=${label}>
-          ${copy
-            ? html`
-                <sl-copy-button
-                  value=${JSON.stringify(data)}
-                  copy-label="Click to copy strigified JSON of ${label}"
-                  success-label="${label} copied"
-                  error-label="Error"
-                ></sl-copy-button>
-              `
-            : html``}
+      <div part="container" class="container">
+        <sl-details>
+          <div part="summary-container" slot="summary" class="summary">
+            <span part="label" class="label">${label}</span>
+            <span class="copy-button">
+              ${copy
+                ? html`
+                    <sl-copy-button
+                      value=${JSON.stringify(data)}
+                      copy-label="Click to copy strigified JSON of ${label}"
+                      success-label="${label} copied"
+                      error-label="Error"
+                    ></sl-copy-button>
+                  `
+                : html``}
+            </span>
+          </div>
           ${Object.entries(data).map(([dataLabel, dataValue], index) => {
             if (dataValue === null || dataValue === undefined) {
               return null; // Skip rendering for null or undefined values
@@ -260,20 +248,6 @@ export default class Details extends LitElement {
         </sl-details>
       </div>
     `;
-    // <div class="value">
-    //   ${Object.entries(data).map(([dataLabel, dataValue], index) => {
-    //   if (dataValue === null || dataValue === undefined) {
-    //     return null; // Skip rendering for null or undefined values
-    //   }
-    //   if (Array.isArray(dataValue)) {
-    //     return this._renderArray(dataValue, `${dataLabel}-${index}`);
-    //   }
-    //   if (typeof dataValue === "object") {
-    //     return this._renderObject(dataValue, `${dataLabel}-${index}`);
-    //   }
-    //   return this._renderData(dataValue.toString(), dataLabel);
-    // })}
-    // </div>
   }
 
   private _renderField(
@@ -283,7 +257,7 @@ export default class Details extends LitElement {
     return html`
       <sl-tab slot="nav" panel="${toLower(tabName)}">${tabName}</sl-tab>
       <sl-tab-panel name="${toLower(tabName)}">
-        <div class="panel-container">
+        <div part="panel-container" class="panel-container">
           ${children.map((childFieldInfo: Children) => {
             const childData = _.get(
               this.data,
@@ -316,7 +290,6 @@ export default class Details extends LitElement {
 
             const copy =
               childFieldInfo.copy !== undefined ? childFieldInfo.copy : false;
-            // console.log(childData);
             if (Array.isArray(childData)) {
               return this._renderArray(childData, label, copy);
             }
@@ -373,8 +346,8 @@ export default class Details extends LitElement {
 
   private _renderFooter(): TemplateResult {
     return html`
-      <div class="footer-container">
-        <div class="footer-button">
+      <div part="footer-container" class="footer-container">
+        <span part="footer-buttons" class="footer-buttons">
           ${this.buttons.map((button, index) => {
             const { size, variant, outline, pill, name, icon, key } = button;
             return html`
@@ -391,10 +364,10 @@ export default class Details extends LitElement {
               </sl-button>
             `;
           })}
-        </div>
-        <div class="footer-slot">
+        </span>
+        <span part="footer-slot" class="footer-slot">
           <slot name="footer"></slot>
-        </div>
+        </span>
       </div>
     `;
   }
