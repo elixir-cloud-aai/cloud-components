@@ -46,19 +46,19 @@ export default class Details extends LitElement {
     ),
     hostStyles,
     css`
-      /* Add your global styles here */
-
       :host {
         display: block;
-        font-family: "Arial", sans-serif;
-        /* Add more global styles if needed */
       }
 
       .container {
         margin-bottom: 15px;
-        border: 1px solid #ddd;
         padding: 10px;
         border-radius: 5px;
+      }
+
+      .data-container {
+        display: flex;
+        justify-content: space-between;
       }
 
       .label {
@@ -67,23 +67,33 @@ export default class Details extends LitElement {
       }
 
       .value {
-        /* Adjust styles for the values */
       }
 
       .panel-container {
-        /* Add styles for the tab panels if needed */
+        height: 320px;
+        overflow-y: scroll;
+        -ms-overflow-style: none; /* Internet Explorer 10+ */
+        scrollbar-width: none; /* Firefox */
+      }
+
+      .panel-container::-webkit-scrollbar {
+        display: none; /* Safari and Chrome */
       }
 
       .details {
-        /* Add styles for the tab group if needed */
       }
 
       .footer-container {
         display: flex;
+        justify-content: space-between;
+        align-items: center;
       }
 
       .footer-button {
         display: flex;
+      }
+
+      .footer-slot {
       }
     `,
   ];
@@ -116,7 +126,7 @@ export default class Details extends LitElement {
   ): TemplateResult {
     if (data === null || data === undefined) return html``;
     return html`
-      <div class="container">
+      <div class="container data-container">
         <div class="label">
           <span>${label}</span>
           ${copy
@@ -140,11 +150,23 @@ export default class Details extends LitElement {
     label: string,
     copy = false
   ): TemplateResult {
+    // <div class="label">
+    //   <span>${label}</span>
+    //   ${copy
+    //   ? html`
+    //       <sl-copy-button
+    //         value=${JSON.stringify(data)}
+    //         copy-label="Click to copy strigified JSON of ${label}"
+    //         success-label="${label} copied"
+    //         error-label="Error"
+    //       ></sl-copy-button>
+    //     `
+    //   : html``}
+    // </div>
     if (data === null || data === undefined || data.length === 0) return html``;
     return html`
       <div class="container">
-        <div class="label">
-          <span>${label}</span>
+        <sl-details summary="${label}">
           ${copy
             ? html`
                 <sl-copy-button
@@ -155,8 +177,6 @@ export default class Details extends LitElement {
                 ></sl-copy-button>
               `
             : html``}
-        </div>
-        <div class="value">
           ${data.map((value, index) => {
             if (value === null || value === undefined) {
               return null; // Skip rendering for null or undefined values
@@ -169,9 +189,23 @@ export default class Details extends LitElement {
             }
             return html` <div>${value}</div> `;
           })}
-        </div>
+        </sl-details>
       </div>
     `;
+    // <div class="value">
+    //   ${data.map((value, index) => {
+    //   if (value === null || value === undefined) {
+    //     return null; // Skip rendering for null or undefined values
+    //   }
+    //   if (Array.isArray(value)) {
+    //     return this._renderArray(value, `${label}-${index}`);
+    //   }
+    //   if (typeof value === "object") {
+    //     return this._renderObject(value, `${label}-${index}`);
+    //   }
+    //   return html` <div>${value}</div> `;
+    // })}
+    // </div>
   }
 
   private _renderObject(
@@ -184,11 +218,23 @@ export default class Details extends LitElement {
       data === undefined ||
       Object.entries(data).length === 0
     )
+      // <div class="label">
+      //   <span>${label}</span>
+      //   ${copy
+      //   ? html`
+      //       <sl-copy-button
+      //         value=${JSON.stringify(data)}
+      //         copy-label="Click to copy strigified JSON of ${label}"
+      //         success-label="${label} copied"
+      //         error-label="Error"
+      //       ></sl-copy-button>
+      //     `
+      //   : html``}
+      // </div>
       return html``;
     return html`
       <div class="container">
-        <div class="label">
-          <span>${label}</span>
+        <sl-details summary=${label}>
           ${copy
             ? html`
                 <sl-copy-button
@@ -199,8 +245,6 @@ export default class Details extends LitElement {
                 ></sl-copy-button>
               `
             : html``}
-        </div>
-        <div class="value">
           ${Object.entries(data).map(([dataLabel, dataValue], index) => {
             if (dataValue === null || dataValue === undefined) {
               return null; // Skip rendering for null or undefined values
@@ -213,9 +257,23 @@ export default class Details extends LitElement {
             }
             return this._renderData(dataValue.toString(), dataLabel);
           })}
-        </div>
+        </sl-details>
       </div>
     `;
+    // <div class="value">
+    //   ${Object.entries(data).map(([dataLabel, dataValue], index) => {
+    //   if (dataValue === null || dataValue === undefined) {
+    //     return null; // Skip rendering for null or undefined values
+    //   }
+    //   if (Array.isArray(dataValue)) {
+    //     return this._renderArray(dataValue, `${dataLabel}-${index}`);
+    //   }
+    //   if (typeof dataValue === "object") {
+    //     return this._renderObject(dataValue, `${dataLabel}-${index}`);
+    //   }
+    //   return this._renderData(dataValue.toString(), dataLabel);
+    // })}
+    // </div>
   }
 
   private _renderField(
@@ -315,7 +373,7 @@ export default class Details extends LitElement {
 
   private _renderFooter(): TemplateResult {
     return html`
-      <div name="footer-container">
+      <div class="footer-container">
         <div class="footer-button">
           ${this.buttons.map((button, index) => {
             const { size, variant, outline, pill, name, icon, key } = button;
