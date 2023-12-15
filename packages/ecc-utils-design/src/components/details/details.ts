@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import { html, css, LitElement, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import _, { toLower } from "lodash-es";
@@ -53,15 +52,33 @@ export default class Details extends LitElement {
       .container {
         padding: var(--sl-spacing-2x-small);
         margin-bottom: var(--sl-spacing-medium);
+        border-radius: var(--sl-border-radius-small);
       }
 
       .data-container {
         display: flex;
         justify-content: space-between;
+        padding: var(--sl-spacing-small);
       }
 
       .label {
+        display: flex;
+        align-items: flex-start;
+        width: 100%;
+        height: 100%;
         font-weight: var(--sl-font-weight-semibold);
+      }
+
+      .value {
+        width: 100%;
+        max-height: var(--sl-spacing-4x-large);
+        overflow-y: scroll;
+        -ms-overflow-style: none; /* Internet Explorer 10+ */
+        scrollbar-width: none; /* Firefox */
+      }
+
+      .value::-webkit-scrollbar {
+        display: none; /* Safari and Chrome */
       }
 
       /* CSS related to footer */
@@ -107,7 +124,11 @@ export default class Details extends LitElement {
       }
 
       sl-details::part(header) {
-        padding: 0px;
+        padding: var(--sl-spacing-small);
+      }
+
+      sl-details::part(header):hover {
+        box-shadow: var(--sl-shadow-medium);
       }
 
       sl-details::part(content) {
@@ -143,6 +164,7 @@ export default class Details extends LitElement {
     copy = false
   ): TemplateResult {
     if (data === null || data === undefined) return html``;
+    this.requestUpdate();
     return html`
       <div part="data-container" class="container data-container">
         <div part="label" class="label">
@@ -158,7 +180,7 @@ export default class Details extends LitElement {
               `
             : html``}
         </div>
-        <div class="value">${data}</div>
+        <div part="value" class="value">${data}</div>
       </div>
     `;
   }
@@ -188,16 +210,17 @@ export default class Details extends LitElement {
             </span>
           </div>
           ${data.map((value, index) => {
+            const newLabel = `${label}[${index}]`;
             if (value === null || value === undefined) {
               return null; // Skip rendering for null or undefined values
             }
             if (Array.isArray(value)) {
-              return this._renderArray(value, `${label}-${index}`);
+              return this._renderArray(value, newLabel);
             }
             if (typeof value === "object") {
-              return this._renderObject(value, `${label}-${index}`);
+              return this._renderObject(value, newLabel);
             }
-            return html` <div>${value}</div> `;
+            return html` <div class="data-container value">${value}</div> `;
           })}
         </sl-details>
       </div>
@@ -316,6 +339,7 @@ export default class Details extends LitElement {
   }
 
   private _renderSvg(icon: FooterButton["icon"]): TemplateResult {
+    this.requestUpdate();
     return html`
       <svg
         slot="prefix"

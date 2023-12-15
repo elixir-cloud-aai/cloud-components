@@ -94,7 +94,7 @@ const cancelWorkflow = async (baseURL: string, id: string) => {
  * @param {object} data - The data of the run to be posted.
  *                        This should be an object containing the necessary fields for the task.
  */
-const postWorkflow = async (baseURL: string, data: any) => {
+const postWorkflow = async (baseURL: string, data: FormData) => {
   const url = `${baseURL}/runs`;
 
   try {
