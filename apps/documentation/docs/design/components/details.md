@@ -331,6 +331,7 @@ The component emits a custom event named `ecc-utils-button-click` when a button 
 | ------------------- | -------------------------------------------------------------------- |
 | `data-container`    | Container for simple data ie {string, string}, {string, number} etc. |
 | `label`             | Label for each data render.                                          |
+| `value`             | Container for Value field for each render.                           |
 | `container`         | Container for Array, Object and simple data render.                  |
 | `summary-container` | Container for list-view or uncollapsed view with label and icon.     |
 | `panel-container`   | Container for uncollapsed view.                                      |
