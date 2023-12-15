@@ -148,16 +148,15 @@ export class WESRuns extends LitElement {
     CANCELING: "danger",
   };
 
-  protected firstUpdated(): void {
-    this.fetchData();
-  }
-
-  protected updated(): void {
+  protected updated(changedProperties: Map<PropertyKey, unknown>): void {
     const eccUtilsDesignCollection = this.shadowRoot?.querySelector(
       "ecc-utils-design-collection"
       // Todo: Get the typeof Collections and use it instead of `any`
     ) as any;
     eccUtilsDesignCollection.pageSize = this.pageSize;
+    if (changedProperties.has("pageSize")) {
+      this.fetchData();
+    }
   }
 
   private async fetchData() {
