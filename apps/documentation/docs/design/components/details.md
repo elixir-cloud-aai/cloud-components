@@ -345,22 +345,18 @@ The component emits a custom event named `ecc-utils-button-click` when a button 
 
 ### Methods
 
-## setButtonLoading
+#### setButtonLoading
 
 | Method Name          | Arguments                                 | Description                                                      |
 | -------------------- | ----------------------------------------- | ---------------------------------------------------------------- |
 | `setButtonLoading()` | {`index`: `number`, `loading`: `boolean`} | Sets the state of button with given index to given loading state |
 
-## Slots
+### Slots
 
 | Slot Name     | Description                            |
 | ------------- | -------------------------------------- |
 | `footer`      | Content of the footer next to buttons. |
 | `icon-${key}` | Icon if the button with specified key. |
-
-## footer
-
-The
 
 ## Parts
 
@@ -373,6 +369,7 @@ The
 | `summary-container` | Container for list-view or uncollapsed view with label and icon.     |
 | `panel-container`   | Container for uncollapsed view.                                      |
 | `footer-container`  | Container for footer which container buttons and slot.               |
+| `button`            | Span containing button icon and name.                                |
 | `footer-buttons`    | Container for footer buttons.                                        |
 | `footer-slot`       | Container for footer slot.                                           |
 
