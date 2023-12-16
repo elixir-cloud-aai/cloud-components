@@ -3,9 +3,40 @@
 <div class="component-name">&lt;ecc-utils-design-details&gt;</div>
 This component is used to render a detailed view of items.
 <ClientOnly>
-  <div :class="isDark ? 'component-dark component' : 'component-light component'">
+<div :class="isDark ? 'component-dark component' : 'component-light component'">
 <ecc-utils-design-details :v-if="renderComponent" :data="data" :fields="fields" :buttons="buttons">
-<p slot="footer">26 Nov 2023</p>
+   <span slot="icon-1">
+      <svg
+         xmlns="http://www.w3.org/2000/svg"
+         width="16"
+         height="16"
+         fill="currentColor"
+         class="bi bi-trash"
+         viewBox="0 0 16 16"
+         >
+         <path
+            d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
+            />
+         <path
+            d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
+            />
+      </svg>
+   </span>
+   <span slot="icon-2">
+      <svg
+         xmlns="http://www.w3.org/2000/svg"
+         width="16"
+         height="16"
+         fill="currentColor"
+         class="bi bi-heart"
+         viewBox="0 0 16 16"
+         >
+         <path
+            d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"
+            />
+      </svg>
+   </span>
+   <p slot="footer">26 Nov 2023</p>
 </ecc-utils-design-details>
 
 ::: details Code Blocks
@@ -190,11 +221,6 @@ const buttons = [{
 		variant: 'primary',
 		outline: false,
 		pill: false,
-		icon: {
-			name: 'trash',
-			viewBox: '0 0 16 16',
-			path: 'M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z',
-		},
 	},
 	{
 		key: '2',
@@ -206,6 +232,7 @@ const buttons = [{
 		pill: false,
 	},
 ];
+
 <ecc-utils-design-details
 	.data=${data}
 	.fields=${fields}
@@ -276,7 +303,6 @@ The `buttons` property allows you to define an array of buttons along with their
 | `variant` | `false`  | `'primary'` | `'primary' \| 'success' \| 'neutral' \| 'warning' \| 'danger'` | The visual style or color variant of the button.                                              |
 | `outline` | `false`  | `false`     | `boolean`                                                      | Specifies whether the button should have an outlined style.                                   |
 | `pill`    | `false`  | `false`     | `boolean`                                                      | Specifies whether the button should have a pill-shaped style.                                 |
-| `icon`    | `false`  |             | `object`                                                       | Configuration object for an optional icon associated with the button.                         |
 
 #### Example
 
@@ -319,11 +345,22 @@ The component emits a custom event named `ecc-utils-button-click` when a button 
 
 ### Methods
 
-## Methods
+## setButtonLoading
 
 | Method Name          | Arguments                                 | Description                                                      |
 | -------------------- | ----------------------------------------- | ---------------------------------------------------------------- |
 | `setButtonLoading()` | {`index`: `number`, `loading`: `boolean`} | Sets the state of button with given index to given loading state |
+
+## Slots
+
+| Slot Name     | Description                            |
+| ------------- | -------------------------------------- |
+| `footer`      | Content of the footer next to buttons. |
+| `icon-${key}` | Icon if the button with specified key. |
+
+## footer
+
+The
 
 ## Parts
 
@@ -372,11 +409,6 @@ const buttons = [{
 	variant: "primary",
 	outline: true,
 	pill: true,
-	icon: {
-		name: "smile",
-		viewBox: "0 0 16 16",
-		path: "M11.315 10.014a.5.5 0 0 1 .548.736A4.498 4.498 0 0 1 7.965 13a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .548-.736h.005l.017.005.067.015.252.055c.215.046.515.108.857.169.693.124 1.522.242 2.152.242.63 0 1.46-.118 2.152-.242a26.58 26.58 0 0 0 1.109-.224l.067-.015.017-.004.005-.002zM4.756 4.566c.763-1.424 4.02-.12.952 3.434-4.496-1.596-2.35-4.298-.952-3.434m6.488 0c1.398-.864 3.544 1.838-.952 3.434-3.067-3.554.19-4.858.952-3.434",
-	},
 }];
 
 const data = {
@@ -838,11 +870,6 @@ const fields = [{
 				variant: "primary",
 				outline: true,
 				pill: true,
-				icon: {
-					name: "smile",
-					viewBox: "0 0 16 16",
-					path: "M11.315 10.014a.5.5 0 0 1 .548.736A4.498 4.498 0 0 1 7.965 13a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .548-.736h.005l.017.005.067.015.252.055c.215.046.515.108.857.169.693.124 1.522.242 2.152.242.63 0 1.46-.118 2.152-.242a26.58 26.58 0 0 0 1.109-.224l.067-.015.017-.004.005-.002zM4.756 4.566c.763-1.424 4.02-.12.952 3.434-4.496-1.596-2.35-4.298-.952-3.434m6.488 0c1.398-.864 3.544 1.838-.952 3.434-3.067-3.554.19-4.858.952-3.434",
-				},
 			}];
 
 			styledData.value = {
@@ -1038,49 +1065,56 @@ const fields = [{
 	});
 </script>
 <style>
-/* Styling for data-container part */
-.styled-details-example::part(data-container) {
-  background-color: #ffd700; /* Gold background */
-  padding: var(--sl-spacing-small);
-  margin-bottom: var(--sl-spacing-medium);
+/* Styling for the entire component */
+.styled-details-example {
+  background-color: #f5f5f5; /* Light grey background */
+  padding: var(--sl-spacing-medium);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow */
+}
+
+/* Styling for data-container part */
+.styled-details-example::part(data-container) {
+  background-color: #fff8e1; /* Light yellow background */
+  padding: var(--sl-spacing-small);
+  margin-bottom: var(--sl-spacing-small);
+  border-radius: 4px;
 }
 
 /* Styling for label part */
 .styled-details-example::part(label) {
   font-weight: var(--sl-font-weight-semibold);
   font-style: italic;
-  color: #ff6347; /* Tomato color */
+  color: #757575; /* Grey text color */
 }
 
 /* Styling for container part */
 .styled-details-example::part(container) {
-  border: 2px solid #4169e1; /* Royal blue border */
-  padding: var(--sl-spacing-medium);
-  border-radius: 8px;
+  border: 1px solid #e0e0e0; /* Light grey border */
+  padding: var(--sl-spacing-small);
+  border-radius: 4px;
 }
 
 /* Styling for summary-container part */
 .styled-details-example::part(summary-container) {
-  background-color: #90ee90; /* Light green background */
+  background-color: #e8f5e9; /* Light green background */
   width: 100%;
   margin-bottom: 3px;
   padding: var(--sl-spacing-small);
-  border-radius: 8px;
+  border-radius: 4px;
 }
 
 /* Styling for panel-container part */
 .styled-details-example::part(panel-container) {
-  height: calc(4 * var(--sl-spacing-4x-large));
-  border-radius: 8px;
+  height: calc(5 * var(--sl-spacing-4x-large));
+  border-radius: 4px;
 }
 
 /* Styling for footer-container part */
 .styled-details-example::part(footer-container) {
-  background-color: #ff8c00; /* Dark orange background */
-  padding: 2px;
-  border-radius: 10px;
+  background-color: #ffecb3; /* Light orange background */
+  padding: 4px;
+  border-radius: 6px;
 }
 
 /* Styling for footer-buttons part */
@@ -1091,6 +1125,6 @@ const fields = [{
 
 /* Styling for footer-slot part */
 .styled-details-example::part(footer-slot) {
-  color: #fff; /* White text color */
+  color: #616161; /* Dark grey text color */
 }
 </style>

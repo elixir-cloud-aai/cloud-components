@@ -31,11 +31,6 @@ interface FooterButton {
   variant: "primary" | "success" | "neutral" | "warning" | "danger";
   outline: boolean;
   pill: boolean;
-  icon?: {
-    name: string;
-    viewBox: string;
-    path: string;
-  };
 }
 
 export default class Details extends LitElement {
@@ -92,6 +87,17 @@ export default class Details extends LitElement {
       .footer-buttons {
         display: flex;
         gap: var(--sl-spacing-small);
+      }
+
+      .footer-slot {
+        display: block;
+      }
+
+      .button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: var(--sl-spacing-3x-small);
       }
 
       /* CSS related to collapsable fields */
@@ -201,7 +207,7 @@ export default class Details extends LitElement {
                 ? html`
                     <sl-copy-button
                       value=${JSON.stringify(data)}
-                      copy-label="Click to copy strigified JSON of ${label}"
+                      copy-label="Click to copy stringified JSON of ${label}"
                       success-label="${label} copied"
                       error-label="Error"
                     ></sl-copy-button>
@@ -248,7 +254,7 @@ export default class Details extends LitElement {
                 ? html`
                     <sl-copy-button
                       value=${JSON.stringify(data)}
-                      copy-label="Click to copy strigified JSON of ${label}"
+                      copy-label="Click to copy stringified JSON of ${label}"
                       success-label="${label} copied"
                       error-label="Error"
                     ></sl-copy-button>
@@ -339,23 +345,7 @@ export default class Details extends LitElement {
     `;
   }
 
-  private _renderSvg(icon: FooterButton["icon"]): TemplateResult {
-    this.requestUpdate();
-    return html`
-      <svg
-        slot="prefix"
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        fill="currentColor"
-        viewBox="${icon?.viewBox}"
-      >
-        <path d="${icon?.path}" />
-      </svg>
-    `;
-  }
-
-  private _handleClick(event: Event, key: string, index: number) {
+  private _handleClick(key: string, index: number) {
     this.dispatchEvent(
       new CustomEvent(`ecc-utils-button-click`, {
         detail: {
@@ -373,7 +363,7 @@ export default class Details extends LitElement {
       <div part="footer-container" class="footer-container">
         <span part="footer-buttons" class="footer-buttons">
           ${this.buttons.map((button, index) => {
-            const { size, variant, outline, pill, name, icon, key } = button;
+            const { size, variant, outline, pill, name, key } = button;
             return html`
               <sl-button
                 ?loading="${this.loading[index]}"
@@ -381,10 +371,12 @@ export default class Details extends LitElement {
                 variant="${variant}"
                 ?outline="${outline}"
                 size="${size}"
-                @click="${(event: Event) =>
-                  this._handleClick(event, key, index)}"
+                @click=${() => this._handleClick(key, index)}
               >
-                ${icon ? this._renderSvg(icon) : ""} ${name}
+                <span part="button" class="button">
+                  <slot name="icon-${key}"></slot>
+                  ${name}
+                </span>
               </sl-button>
             `;
           })}
