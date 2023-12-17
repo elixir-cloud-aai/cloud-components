@@ -76,6 +76,12 @@ export default class Details extends LitElement {
         display: none; /* Safari and Chrome */
       }
 
+      .label-copy {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
       /* CSS related to footer */
 
       .footer-container {
@@ -164,6 +170,30 @@ export default class Details extends LitElement {
     this.requestUpdate();
   }
 
+  private _renderLabel(
+    label: string,
+    copy: boolean,
+    data: any,
+    copyLabel: string,
+    successLabel: string,
+    errorLabel: string
+  ) {
+    this.requestUpdate();
+    return html` <span class="label-copy">
+      <span>${label}</span>
+      ${copy
+        ? html`
+            <sl-copy-button
+              value=${data}
+              copy-label=${copyLabel}
+              success-label=${successLabel}
+              error-label=${errorLabel}
+            ></sl-copy-button>
+          `
+        : html``}
+    </span>`;
+  }
+
   private _renderData(
     data: string,
     label: string,
@@ -174,17 +204,14 @@ export default class Details extends LitElement {
     return html`
       <div part="data-container" class="container data-container">
         <div part="label" class="label">
-          <span>${label}</span>
-          ${copy
-            ? html`
-                <sl-copy-button
-                  value=${data}
-                  copy-label="Click to copy ${label}"
-                  success-label="${label} copied"
-                  error-label="Error"
-                ></sl-copy-button>
-              `
-            : html``}
+          ${this._renderLabel(
+            label,
+            copy,
+            data,
+            `Click to copy ${label}`,
+            `${label} copied!`,
+            "Error"
+          )}
         </div>
         <div part="value" class="value">${data}</div>
       </div>
@@ -198,24 +225,20 @@ export default class Details extends LitElement {
   ): TemplateResult {
     if (data === null || data === undefined || data.length === 0) return html``;
     return html`
-      <div part="container" class="container">
-        <sl-details>
-          <div part="summary-container" slot="summary" class="summary">
-            <span part="label" class="label">${label}</span>
-            <span>
-              ${copy
-                ? html`
-                    <sl-copy-button
-                      value=${JSON.stringify(data)}
-                      copy-label="Click to copy stringified JSON of ${label}"
-                      success-label="${label} copied"
-                      error-label="Error"
-                    ></sl-copy-button>
-                  `
-                : html``}
-            </span>
-          </div>
-          ${data.map((value, index) => {
+			<div part="container" class="container">
+				<sl-details>
+					<div part="summary-container" slot="summary" class="summary">
+          ${this._renderLabel(
+            label,
+            copy,
+            data,
+            `Click to copy stringified JSON of ${label}`,
+            `${label} copied!`,
+            "Error"
+          )}
+						</span>
+					</div>
+					${data.map((value, index) => {
             const newLabel = `${label} ${index}`;
             if (value === null || value === undefined) {
               return null; // Skip rendering for null or undefined values
@@ -228,9 +251,9 @@ export default class Details extends LitElement {
             }
             return html` <div class="data-container value">${value}</div> `;
           })}
-        </sl-details>
-      </div>
-    `;
+				</sl-details>
+			</div>
+		`;
   }
 
   private _renderObject(
@@ -248,19 +271,14 @@ export default class Details extends LitElement {
       <div part="container" class="container">
         <sl-details>
           <div part="summary-container" slot="summary" class="summary">
-            <span part="label" class="label">${label}</span>
-            <span class="copy-button">
-              ${copy
-                ? html`
-                    <sl-copy-button
-                      value=${JSON.stringify(data)}
-                      copy-label="Click to copy stringified JSON of ${label}"
-                      success-label="${label} copied"
-                      error-label="Error"
-                    ></sl-copy-button>
-                  `
-                : html``}
-            </span>
+            ${this._renderLabel(
+              label,
+              copy,
+              data,
+              `Click to copy ${label}`,
+              `${label} copied!`,
+              "Error"
+            )}
           </div>
           ${Object.entries(data).map(([dataLabel, dataValue], index) => {
             const newLabel = `${dataLabel} ${index}`;
@@ -375,7 +393,7 @@ export default class Details extends LitElement {
               >
                 <span part="button" class="button">
                   <slot name="icon-${key}"></slot>
-                  ${name}
+                  <span> ${name} </span>
                 </span>
               </sl-button>
             `;
