@@ -216,7 +216,7 @@ export default class Details extends LitElement {
             </span>
           </div>
           ${data.map((value, index) => {
-            const newLabel = `${label}[${index}]`;
+            const newLabel = `${label} ${index}`;
             if (value === null || value === undefined) {
               return null; // Skip rendering for null or undefined values
             }
@@ -263,7 +263,7 @@ export default class Details extends LitElement {
             </span>
           </div>
           ${Object.entries(data).map(([dataLabel, dataValue], index) => {
-            const newLabel = `${dataLabel}-${index}`;
+            const newLabel = `${dataLabel} ${index}`;
             if (dataValue === null || dataValue === undefined) {
               return null; // Skip rendering for null or undefined values
             }
