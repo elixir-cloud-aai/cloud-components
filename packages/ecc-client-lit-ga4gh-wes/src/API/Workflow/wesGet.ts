@@ -121,4 +121,40 @@ const postWorkflow = async (baseURL: string, data: any) => {
   }
 };
 
-export { fetchWorkflows, fetchWorkflow, cancelWorkflow, postWorkflow };
+/**
+ * Get service info
+ * @param {string} baseURL - Base URL for fetching workflows
+ */
+const getServiceInfo = async (baseURL: string) => {
+  const url = `${baseURL}/service-info`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+    });
+
+    if (!response) {
+      return {
+        isError: true,
+        breakpoint: "postTask",
+        error: "No response from server",
+      };
+    }
+
+    return await response.json();
+  } catch (error) {
+    return {
+      isError: true,
+      breakpoint: "postTask",
+      error,
+    };
+  }
+};
+
+export {
+  fetchWorkflows,
+  fetchWorkflow,
+  cancelWorkflow,
+  postWorkflow,
+  getServiceInfo,
+};

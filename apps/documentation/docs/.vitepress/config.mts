@@ -46,7 +46,9 @@ export default defineConfig({
           { text: 'Usage', link: '/tes/usage' },
           {
             text: 'Components',
-            items: [{ text: 'Create Run', link: '/tes/components/create-run' }],
+            items: [
+              { text: 'Create Run', link: '/tes/components/create-run' },
+            ],
           },
         ],
       },
@@ -59,7 +61,7 @@ export default defineConfig({
           { text: 'Usage', link: '/wes/usage' },
           {
             text: 'Components',
-            items: [{ text: 'Create Run', link: '/wes/components/wes-create-run.md' }],
+            items: [{ text: 'Create Run', link: '/wes/components/wes-create-run.md' },{ text: 'Service info', link: '/wes/components/service-info.md' }],
           },
         ],
       },

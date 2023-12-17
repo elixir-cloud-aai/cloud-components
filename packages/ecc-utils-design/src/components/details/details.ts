@@ -365,7 +365,7 @@ export default class Details extends LitElement {
 
   private _handleClick(key: string, index: number) {
     this.dispatchEvent(
-      new CustomEvent(`ecc-utils-button-click`, {
+      new CustomEvent(`ecc-utils-button-${key}-click`, {
         detail: {
           index,
           Key: key,
