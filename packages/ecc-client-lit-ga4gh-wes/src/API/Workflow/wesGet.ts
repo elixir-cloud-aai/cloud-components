@@ -3,7 +3,7 @@
  * @param baseURL - The base URL for fetching workflows
  * @param pageSize - OPTIONAL The preferred number of workflow runs to return in a page
  * @param nextPageToken - OPTIONAL Token to use to indicate where to start getting results.
- * @returns Promise if fullfilled an array of workflows
+ * @returns Promise if fulfilled an array of workflows
  */
 const fetchWorkflows = async (
   baseURL: string,
@@ -69,7 +69,7 @@ const fetchWorkflow = async (baseURL: string, id: string) => {
 };
 
 /**
- *This mathod cancel a specific workflow
+ *This method cancel a specific workflow
  * @param id ID of the workflow to be deleted
  */
 const cancelWorkflow = async (baseURL: string, id: string) => {

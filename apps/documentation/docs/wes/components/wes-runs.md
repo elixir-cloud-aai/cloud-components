@@ -42,7 +42,7 @@ import "@elixir-cloud/lit-wes";
 
 This property is used to give `POST` endpoint to create workflow. The provided baseURL is concatenated with `/runs` and is used as an endpoint to create a `POST` request.
 
-### baseURL
+### pageSize
 
 This property is used to define the number of runs to be rendered per pagination window.
 

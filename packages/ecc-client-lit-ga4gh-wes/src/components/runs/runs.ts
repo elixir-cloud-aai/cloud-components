@@ -300,8 +300,11 @@ export class WESRuns extends LitElement {
   }
 
   private _handleFilter(event: CustomEvent) {
-    this.filterTag = event.detail.value;
-    this._filterData();
+    const filterValue = event.detail.value;
+    if (Array.isArray(filterValue)) {
+      this.filterTag = filterValue;
+      this._filterData();
+    }
   }
 
   render() {
