@@ -102,11 +102,6 @@ export class WESRuns extends LitElement {
 
   @state() private filters: FilterProp[] = [
     {
-      key: "title",
-      type: "search",
-      placeholder: "Search",
-    },
-    {
       key: "tag",
       type: "select",
       options: [
