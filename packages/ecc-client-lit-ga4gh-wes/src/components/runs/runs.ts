@@ -1,7 +1,6 @@
 import { html, LitElement, render } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import "@elixir-cloud/design";
-// import _ from "lodash-es";
 import {
   cancelWorkflow,
   fetchWorkflow,
@@ -130,7 +129,9 @@ export class WESRuns extends LitElement {
     },
   ];
 
+  @state() private filterTag: string[] = [];
   @state() private items: ItemProp[] = [];
+  @state() private itemsToBeRendered: ItemProp[] = [];
   @state() private nextPageToken: string | null = "";
   @state() private cache = new Map();
 
@@ -155,11 +156,11 @@ export class WESRuns extends LitElement {
     ) as any;
     eccUtilsDesignCollection.pageSize = this.pageSize;
     if (changedProperties.has("pageSize")) {
-      this.fetchData();
+      this._fetchData();
     }
   }
 
-  private async fetchData() {
+  private async _fetchData() {
     try {
       // If all the items have been cached, don't invoke API call
       if (this.nextPageToken === null) return;
@@ -180,10 +181,10 @@ export class WESRuns extends LitElement {
 
         eccUtilsDesignCollection.totalItems = this.items.length;
       } else this.nextPageToken = data.next_page_token;
-      const covertedData: ItemProp[] = [];
+      const convertedData: ItemProp[] = [];
       data.runs.forEach((run: { run_id: string; state: string }) => {
-        covertedData.push({
-          index: this.items.length + covertedData.length + 1,
+        convertedData.push({
+          index: this.items.length + convertedData.length + 1,
           name: run.run_id,
           key: `${run.run_id}`,
           lazy: true,
@@ -199,7 +200,8 @@ export class WESRuns extends LitElement {
         });
       });
 
-      this.items = [...this.items, ...covertedData];
+      this.items = [...this.items, ...convertedData];
+      this._filterData();
     } catch (error) {
       console.error({
         error,
@@ -208,7 +210,7 @@ export class WESRuns extends LitElement {
     }
   }
 
-  private async handleExpandItem(event: CustomEvent) {
+  private async _handleExpandItem(event: CustomEvent) {
     const eccUtilsDesignCollection = this.shadowRoot?.querySelector(
       "ecc-utils-design-collection"
     ) as any;
@@ -241,11 +243,6 @@ export class WESRuns extends LitElement {
             variant: "danger",
             outline: false,
             pill: false,
-            icon: {
-              name: "trash",
-              viewBox: "0 0 16 16",
-              path: "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z",
-            },
           },
         ];
 
@@ -253,7 +250,21 @@ export class WESRuns extends LitElement {
           .data=${runData}
           .fields=${this.fields}
           .buttons=${button}
-        ></ecc-utils-design-details>`;
+        >
+          <svg
+            slot="icon-${key}"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-trash3"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"
+            />
+          </svg>
+        </ecc-utils-design-details>`;
 
         // Render the details component using Lit's render function
         // Append the child to the target
@@ -278,13 +289,31 @@ export class WESRuns extends LitElement {
     }
   }
 
+  private _filterData() {
+    if (this.filterTag.length === 0) {
+      this.itemsToBeRendered = this.items;
+    } else {
+      this.itemsToBeRendered = this.items.filter((item) =>
+        this.filterTag.some((tag) => item.tag?.name === tag)
+      );
+    }
+  }
+
+  private _handleFilter(event: CustomEvent) {
+    this.filterTag = event.detail.value;
+    this._filterData();
+  }
+
   render() {
     return html`
       <ecc-utils-design-collection
         .filters=${this.filters}
-        .items=${this.items}
-        @page-change=${this.fetchData}
-        @expand-item=${(event: CustomEvent) => this.handleExpandItem(event)}
+        .items=${this.itemsToBeRendered}
+        @page-change=${this._fetchData}
+        @expand-item=${(event: CustomEvent) => this._handleExpandItem(event)}
+        @filter=${(event: CustomEvent) => {
+          this._handleFilter(event);
+        }}
       >
       </ecc-utils-design-collection>
     `;
