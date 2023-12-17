@@ -242,6 +242,7 @@ export class WESRuns extends LitElement {
         ];
 
         const detailsComponent = html`<ecc-utils-design-details
+          id=${key}
           .data=${runData}
           .fields=${this.fields}
           .buttons=${button}
@@ -267,17 +268,30 @@ export class WESRuns extends LitElement {
         target.appendChild(child);
 
         // Add button event
-        child
-          .querySelector("ecc-utils-design-details")
-          ?.addEventListener(`button-${key}-click`, async () => {
-            // Delete run
-            try {
-              // TODO: fix cancel, giving CORS error
-              await cancelWorkflow(this.baseURL, key);
-            } catch (error) {
-              eccUtilsDesignCollection.error(`Failed to cancel run: ${key}`);
+        const detailsElement = child.querySelector("ecc-utils-design-details");
+        if (detailsElement) {
+          detailsElement.addEventListener(
+            `ecc-utils-button-${key}-click`,
+            async () => {
+              // Delete run
+              try {
+                // 0 is the index of the button as there is only one button
+                detailsElement.setButtonLoading(0, true);
+                const resp = (await cancelWorkflow(this.baseURL, key)) as any;
+                detailsElement.setButtonLoading(0, false);
+
+                // If the response doesn't have run ID that means the run wasn't canceled.
+                if (!resp.run_id) throw new Error();
+              } catch (error) {
+                eccUtilsDesignCollection.error(`Failed to cancel run: ${key}`);
+              }
             }
-          });
+          );
+        } else {
+          eccUtilsDesignCollection.error(
+            `Failed to find ecc-utils-design-details element for run: ${key}`
+          );
+        }
       } catch (error) {
         eccUtilsDesignCollection.error(`Failed to fetch data for run: ${key}`);
       }
