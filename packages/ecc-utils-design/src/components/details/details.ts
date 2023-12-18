@@ -16,7 +16,7 @@ export interface Children {
   label?: string;
   path: string;
   copy?: boolean;
-  defaultValue?: any;
+  // collapsible?: boolean;
 }
 
 export interface Field {
@@ -27,10 +27,6 @@ export interface Field {
 interface FooterButton {
   key: string;
   name: string;
-  size: "small" | "medium" | "large";
-  variant: "primary" | "success" | "neutral" | "warning" | "danger";
-  outline: boolean;
-  pill: boolean;
 }
 
 export default class Details extends LitElement {
@@ -42,18 +38,16 @@ export default class Details extends LitElement {
     css`
       :host {
         display: block;
+        color: var(--sl-color-gray-900);
       }
 
       .container {
-        padding: var(--sl-spacing-2x-small);
-        margin-bottom: var(--sl-spacing-medium);
         border-radius: var(--sl-border-radius-small);
       }
 
       .data-container {
         display: flex;
         justify-content: space-between;
-        padding: var(--sl-spacing-small);
       }
 
       .label {
@@ -107,16 +101,14 @@ export default class Details extends LitElement {
       }
 
       /* CSS related to collapsable fields */
-
-      .panel-container {
-        height: calc(5 * var(--sl-spacing-4x-large));
-        overflow-y: scroll;
-        -ms-overflow-style: none; /* Internet Explorer 10+ */
-        scrollbar-width: none; /* Firefox */
+      .panel {
+        min-height: 40vh;
       }
 
-      .panel-container::-webkit-scrollbar {
-        display: none; /* Safari and Chrome */
+      .panel-container {
+        display: flex;
+        flex-direction: column;
+        gap: var(--sl-spacing-large);
       }
 
       .summary {
@@ -125,26 +117,9 @@ export default class Details extends LitElement {
         align-items: center;
       }
 
-      sl-details::part(base) {
-        padding: var(--sl-spacing-3x-small);
-        border: none;
-        background-color: transparent;
-      }
-
-      sl-details::part(base):hover {
-        cursor: pointer;
-      }
-
-      sl-details::part(header) {
-        padding: var(--sl-spacing-small);
-      }
-
-      sl-details::part(header):hover {
-        box-shadow: var(--sl-shadow-medium);
-      }
-
-      sl-details::part(content) {
-        padding: var(--sl-spacing-3x-small);
+      sl-copy-button::part(button) {
+        padding: 0;
+        margin-left: var(--sl-font-size-2x-small);
       }
     `,
   ];
@@ -208,7 +183,7 @@ export default class Details extends LitElement {
             label,
             copy,
             data,
-            `Click to copy ${label}`,
+            `Copy`,
             `${label} copied!`,
             "Error"
           )}
@@ -232,25 +207,27 @@ export default class Details extends LitElement {
             label,
             copy,
             data,
-            `Click to copy stringified JSON of ${label}`,
+            `Copy JSON`,
             `${label} copied!`,
             "Error"
           )}
 						</span>
 					</div>
-					${data.map((value, index) => {
-            const newLabel = `${label} ${index}`;
-            if (value === null || value === undefined) {
-              return null; // Skip rendering for null or undefined values
-            }
-            if (Array.isArray(value)) {
-              return this._renderArray(value, newLabel);
-            }
-            if (typeof value === "object") {
-              return this._renderObject(value, newLabel);
-            }
-            return html` <div class="data-container value">${value}</div> `;
-          })}
+          <div class="panel-container">
+            ${data.map((value, index) => {
+              const newLabel = `${label} ${index + 1}`;
+              if (value === null || value === undefined) {
+                return null; // Skip rendering for null or undefined values
+              }
+              if (Array.isArray(value)) {
+                return this._renderArray(value, newLabel);
+              }
+              if (typeof value === "object") {
+                return this._renderObject(value, newLabel);
+              }
+              return html` <div class="data-container value">${value}</div> `;
+            })}
+          </div>
 				</sl-details>
 			</div>
 		`;
@@ -275,24 +252,26 @@ export default class Details extends LitElement {
               label,
               copy,
               data,
-              `Click to copy ${label}`,
+              `Copy JSON`,
               `${label} copied!`,
               "Error"
             )}
           </div>
-          ${Object.entries(data).map(([dataLabel, dataValue], index) => {
-            const newLabel = `${dataLabel} ${index}`;
-            if (dataValue === null || dataValue === undefined) {
-              return null; // Skip rendering for null or undefined values
-            }
-            if (Array.isArray(dataValue)) {
-              return this._renderArray(dataValue, newLabel);
-            }
-            if (typeof dataValue === "object") {
-              return this._renderObject(dataValue, newLabel);
-            }
-            return this._renderData(dataValue.toString(), dataLabel);
-          })}
+          <div class="panel-container">
+            ${Object.entries(data).map(([dataLabel, dataValue], index) => {
+              const newLabel = `${dataLabel} ${index}`;
+              if (dataValue === null || dataValue === undefined) {
+                return null; // Skip rendering for null or undefined values
+              }
+              if (Array.isArray(dataValue)) {
+                return this._renderArray(dataValue, newLabel);
+              }
+              if (typeof dataValue === "object") {
+                return this._renderObject(dataValue, newLabel);
+              }
+              return this._renderData(dataValue.toString(), dataLabel);
+            })}
+          </div>
         </sl-details>
       </div>
     `;
@@ -305,13 +284,9 @@ export default class Details extends LitElement {
     return html`
       <sl-tab slot="nav" panel="${toLower(tabName)}">${tabName}</sl-tab>
       <sl-tab-panel name="${toLower(tabName)}">
-        <div part="panel-container" class="panel-container">
+        <div part="panel-container" class="panel-container panel">
           ${children.map((childFieldInfo: Children) => {
-            const childData = _.get(
-              this.data,
-              childFieldInfo.path,
-              childFieldInfo.defaultValue
-            );
+            const childData = _.get(this.data, childFieldInfo.path);
 
             if (
               childData == null ||
@@ -381,14 +356,10 @@ export default class Details extends LitElement {
       <div part="footer-container" class="footer-container">
         <span part="footer-buttons" class="footer-buttons">
           ${this.buttons.map((button, index) => {
-            const { size, variant, outline, pill, name, key } = button;
+            const { name, key } = button;
             return html`
               <sl-button
                 ?loading="${this.loading[index]}"
-                ?pill="${pill}"
-                variant="${variant}"
-                ?outline="${outline}"
-                size="${size}"
                 @click=${() => this._handleClick(key, index)}
               >
                 <span part="button" class="button">
