@@ -334,7 +334,7 @@ buttons: [
 
 ### Events
 
-The component emits a custom event named `ecc-utils-button-click` when a button is clicked. The event provides information about the clicked button, such as its key and name.
+The component emits a custom event named `ecc-utils-button-key-click` when a button with specific key is clicked. The event provides information about the clicked button, such as its key and name.
 
 #### Event Payload
 
