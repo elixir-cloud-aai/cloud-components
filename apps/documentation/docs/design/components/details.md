@@ -284,11 +284,11 @@ import "@elixir-cloud/design/dist/components/details/index.js";
 
 ### children\*
 
-| Property       | Required | Default               | Type      | Description                                                 |
-| -------------- | -------- | --------------------- | --------- | ----------------------------------------------------------- |
-| `label`        | `false`  | Last part of the path | `string`  | Label of the child data                                     |
-| `path`         | `true`   |                       | `string`  | Path of the child data to be rendered                       |
-| `copy`         | `false`  | `false`               | `boolean` | Defines if the child data should have a copy button         |
+| Property | Required | Default               | Type      | Description                                         |
+| -------- | -------- | --------------------- | --------- | --------------------------------------------------- |
+| `label`  | `false`  | Last part of the path | `string`  | Label of the child data                             |
+| `path`   | `true`   |                       | `string`  | Path of the child data to be rendered               |
+| `copy`   | `false`  | `false`               | `boolean` | Defines if the child data should have a copy button |
 
 ### Buttons
 
@@ -333,7 +333,7 @@ buttons: [
 
 ### Events
 
-The component emits a custom event named `ecc-utils-button-key-click` when a button with specific key is clicked. The event provides information about the clicked button, such as its key and name.
+The component triggers a custom event, named `ecc-utils-button-click`, upon clicking a button with a specific `key`. This event conveys details about the clicked button, including its `key` and `index`. The app-author is expected to fire the event based on the key provided in the `buttons` prop to the element. This action is intended to activate the corresponding button associated with the specified key.
 
 #### Event Payload
 
@@ -1043,18 +1043,32 @@ const fields = [{
 			
 			document.querySelectorAll("ecc-utils-design-details")
 			.forEach((element) => {
-				element.addEventListener("ecc-utils-button-1-click", async (e) => {
+				element.addEventListener("ecc-utils-button-click", async (e) => {
           const { index, key } = e.detail;
-					console.log('button 1 clicked', e.detail);
-          e.target.setButtonLoading(index, true);
-
-          await new Promise((resolve) => {
-            setTimeout(() => {
-              resolve();
-            }, 2000);
-          });
-
-          e.target.setButtonLoading(index, false);
+          if(key === '1'){
+            console.log('button 1 clicked', e.detail);
+            e.target.setButtonLoading(index, true);
+  
+            await new Promise((resolve) => {
+              setTimeout(() => {
+                resolve();
+              }, 2000);
+            });
+  
+            e.target.setButtonLoading(index, false);
+            }
+          else {
+            console.log('button 2 clicked', e.detail);
+            e.target.setButtonLoading(index, true);
+  
+            await new Promise((resolve) => {
+              setTimeout(() => {
+                resolve();
+              }, 2000);
+            });
+  
+            e.target.setButtonLoading(index, false);
+          }
 				});
 			});
 		});

@@ -343,7 +343,7 @@ export default class EccUtilsDesignDetails extends LitElement {
       new CustomEvent(`ecc-utils-button-click`, {
         detail: {
           index,
-          Key: key,
+          key,
         },
         bubbles: true,
         composed: true,
