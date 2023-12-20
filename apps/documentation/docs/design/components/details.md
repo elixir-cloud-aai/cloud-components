@@ -43,7 +43,7 @@ This component is used to render a detailed view of items.
 ::: code-group
 
 ```js [HTML]
-import "@elixir - cloud / design / dist / components / details / index.js ";
+import "@elixir-cloud/design/dist/components/details/index.js ";
 
 const data = {
 	company: {
