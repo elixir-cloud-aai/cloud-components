@@ -7,7 +7,6 @@ import * as tsup from "tsup";
 import { program } from "commander";
 import { execSync } from "child_process";
 import fs from "fs";
-import ora from "ora";
 import { npmDir } from "./utils.js";
 
 const commanderOpts = program.option("-w --watch").parse().opts();
@@ -19,9 +18,8 @@ const bundleDirectories = [npmDir];
 
 async function nextTask(label, action) {
   try {
-    const spinner = ora(label).start();
+    console.log(label, "...");
     await action();
-    spinner.succeed();
   } catch (err) {
     console.error(err);
     if (err.stdout) console.error(err.stdout);
@@ -56,13 +54,19 @@ nextTask("Wrapping components for React", () =>
   })
 );
 
+await nextTask("Running the TypeScript compiler", () =>
+  execSync(`tsc --project ./tsconfig.prod.json --outdir "${npmDir}"`, {
+    stdio: "inherit",
+  })
+);
+
 nextTask("Building source", async () => {
   const config = {
     format: "esm",
     target: "es2017",
     entry: [
       "./src/index.ts",
-      ...(await globby("./src/components/**/!(*.(styles|test)).ts")),
+      ...(await globby("./src/components/**/!(*.(test)).ts")),
       ...(await globby("./src/react/**/*.ts")),
       ...(await globby("./src/utilities/**/*.ts")),
     ],
@@ -70,11 +74,11 @@ nextTask("Building source", async () => {
     treeshake: true,
     bundle: true,
     outDir: npmDir,
-    dts: true,
+    external: ["@lit/react", "react"],
     watch: commanderOpts.watch,
   };
 
-  await tsup.build({
+  tsup.build({
     ...config,
     esbuildOptions(buildOptions) {
       buildOptions.chunkNames = "chunks/[name].[hash]";
