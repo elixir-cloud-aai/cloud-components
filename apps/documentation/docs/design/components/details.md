@@ -298,7 +298,7 @@ The `buttons` property allows you to define an array of buttons along with their
 | --------- | -------- | ----------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | `key`     | `true`   |             | `string`                                                       | A unique identifier for the button, used to distinguish between buttons in the configuration. |
 | `name`    | `true`   |             | `string`                                                       | The display name or label for the button.                                                     |
-| `size`    | `false`  | `'medium'`  | `'small' \| 'meduim' \| 'large'`                               | The size of the button.                                                                       |
+| `size`    | `false`  | `'medium'`  | `'small' \| 'medium' \| 'large'`                               | The size of the button.                                                                       |
 | `variant` | `false`  | `'primary'` | `'primary' \| 'success' \| 'neutral' \| 'warning' \| 'danger'` | The visual style or color variant of the button.                                              |
 | `outline` | `false`  | `false`     | `boolean`                                                      | Specifies whether the button should have an outlined style.                                   |
 | `pill`    | `false`  | `false`     | `boolean`                                                      | Specifies whether the button should have a pill-shaped style.                                 |
@@ -314,11 +314,6 @@ buttons: [
     variant: "primary",
     outline: false,
     pill: false,
-    icon: {
-      name: "trash",
-      viewBox: "0 0 16 16",
-      path: "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z",
-    },
   },
   {
     key: "2",
@@ -331,7 +326,7 @@ buttons: [
 ];
 ```
 
-### Events
+## Events
 
 The component triggers a custom event, named `ecc-utils-button-click`, upon clicking a button with a specific `key`. This event conveys details about the clicked button, including its `key` and `index`. The app-author is expected to fire the event based on the key provided in the `buttons` prop to the element. This action is intended to activate the corresponding button associated with the specified key.
 
@@ -342,7 +337,7 @@ The component triggers a custom event, named `ecc-utils-button-click`, upon clic
 | `key`    | `string` | The unique identifier of the clicked button.          |
 | `index`  | `number` | The index of the button in reference to other buttons |
 
-### Methods
+## Methods
 
 #### setButtonLoading
 
@@ -350,7 +345,7 @@ The component triggers a custom event, named `ecc-utils-button-click`, upon clic
 | -------------------- | ----------------------------------------- | ---------------------------------------------------------------- |
 | `setButtonLoading()` | {`index`: `number`, `loading`: `boolean`} | Sets the state of button with given index to given loading state |
 
-### Slots
+## Slots
 
 | Slot Name     | Description                            |
 | ------------- | -------------------------------------- |
@@ -359,18 +354,52 @@ The component triggers a custom event, named `ecc-utils-button-click`, upon clic
 
 ## Parts
 
-| Part Name           | Description                                                          |
-| ------------------- | -------------------------------------------------------------------- |
-| `data-container`    | Container for simple data ie {string, string}, {string, number} etc. |
-| `label`             | Label for each data render.                                          |
-| `value`             | Container for Value field for each render.                           |
-| `container`         | Container for Array, Object and simple data render.                  |
-| `summary-container` | Container for list-view or uncollapsed view with label and icon.     |
-| `panel-container`   | Container for uncollapsed view.                                      |
-| `footer-container`  | Container for footer which container buttons and slot.               |
-| `button`            | Span containing button icon and name.                                |
-| `footer-buttons`    | Container for footer buttons.                                        |
-| `footer-slot`       | Container for footer slot.                                           |
+| Part Name                          | Description                                                                                 |
+| ---------------------------------- | ------------------------------------------------------------------------------------------- |
+| `data-container`                   | Container for simple data, such as {string, string}, {string, number}, etc.                 |
+| `label`                            | Label for each data render.                                                                 |
+| `value`                            | Container for the value field for each render.                                              |
+| `container`                        | Container for array, object, and simple data render.                                        |
+| `summary-container`                | Container for list-view or uncollapsed view with label and icon.                            |
+| `panel-container`                  | Container for the uncollapsed view.                                                         |
+| `footer-container`                 | Container for the footer, which contains buttons and slots.                                 |
+| `button`                           | Span containing button icon and name.                                                       |
+| `footer-buttons`                   | Container for footer buttons.                                                               |
+| `footer-slot`                      | Container for footer slot.                                                                  |
+| `copy-button-button`               | Copy button's internal `<button>` element.                                                  |
+| `copy-button-copy-icon`            | Container that holds the copy icon.                                                         |
+| `copy-button-success-icon`         | Container that holds the success icon.                                                      |
+| `copy-button-error-icon`           | Container that holds the error icon.                                                        |
+| `copy-button-tooltip__base`        | The tooltip's exported base part.                                                           |
+| `copy-button-tooltip__base__popup` | The tooltip's exported popup part.                                                          |
+| `copy-button-tooltip__base__arrow` | The tooltip's exported arrow part.                                                          |
+| `copy-button-tooltip__body`        | The tooltip's exported body part.                                                           |
+| `button-base`                      | The base wrapper for the component.                                                         |
+| `button-prefix`                    | The container that wraps the prefix.                                                        |
+| `button-label`                     | The button's label.                                                                         |
+| `button-suffix`                    | The container that wraps the suffix.                                                        |
+| `button-caret`                     | The button's caret icon, represented by an `<sl-icon>` element.                             |
+| `button-spinner`                   | The spinner displayed when the button is in the loading state.                              |
+| `tab-group-base`                   | The tab group component's base wrapper.                                                     |
+| `tab-group-nav`                    | The tab group's navigation container where tabs are slotted in.                             |
+| `tab-group-tabs`                   | The container that wraps the tabs.                                                          |
+| `tab-group-active-tab-indicator`   | The line that highlights the currently selected tab.                                        |
+| `tab-group-scroll-button`          | The tab group's body where tab panels are slotted in.                                       |
+| `tab-group-scroll-button`          | The previous/next scroll buttons that show when tabs are scrollable, an `<sl-icon-button>`. |
+| `tab-group-scroll-button--start`   | The starting scroll button.                                                                 |
+| `tab-group-scroll-button--end`     | The ending scroll button.                                                                   |
+| `tab-group-scroll-button__base`    | The scroll button's exported base part.                                                     |
+| `tab-base`                         | The tab's base wrapper.                                                                     |
+| `tab-close-button`                 | The close button, an `<sl-icon-button>`.                                                    |
+| `tab-close-button__base`           | The close button's exported base part.                                                      |
+| `tab-panel-padding`                | The tab panel's padding.                                                                    |
+| `details-base`                     | The details's (`sl-details`) base wrapper.                                                  |
+| `details-header`                   | The header that wraps both the summary and the expand/collapse icon.                        |
+| `details-summary`                  | The container that wraps the summary.                                                       |
+| `details-summary-icon`             | The container that wraps the expand/collapse icons.                                         |
+| `details-content`                  | The details content.                                                                        |
+
+> This component exposes almost all the CSS parts of [`sl-tab-group`](https://shoelace.style/components/tab-group/#parts), [`sl-tab`](https://shoelace.style/components/tab/#parts), [`sl-tab-panel`](https://shoelace.style/components/tab-panel/#parts), [`sl-copy-button`](https://shoelace.style/components/copy-button/#parts), [`sl-button`](https://shoelace.style/components/button/#parts), and [`sl-details`](https://shoelace.style/components/details/#parts).
 
 ## CSS Variables
 

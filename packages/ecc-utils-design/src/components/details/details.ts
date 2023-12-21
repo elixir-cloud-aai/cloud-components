@@ -7,8 +7,6 @@ import "@shoelace-style/shoelace/dist/components/tab/tab.js";
 import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
 import "@shoelace-style/shoelace/dist/components/copy-button/copy-button.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
-import "@shoelace-style/shoelace/dist/components/tag/tag.js";
-import "@shoelace-style/shoelace/dist/components/icon/icon.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
 import { hostStyles } from "../../styles/host.styles.js";
 
@@ -130,6 +128,65 @@ export default class EccUtilsDesignDetails extends LitElement {
 
   @state() private loading: Array<boolean> = [];
 
+  private cssParts = {
+    // Parts
+    dataContainer: "data-container",
+    label: "label",
+    value: "value",
+    container: "container",
+    summaryContainer: "summary-container",
+    panelContainer: "panel-container",
+    footerContainer: "footer-container",
+    button: "button",
+    footerButtons: "footer-buttons",
+    footerSlot: "footer-slot",
+
+    // ExportParts
+    // https://shoelace.style/components/tab-group/#parts
+    tabGroupBase: "tab-group-base", // base
+    tabGroupNav: "tab-group-nav", // nav
+    tabGroupTabs: "tab-group-tabs", // tabs
+    tabGroupActiveTabIndicator: "tab-group-active-tab-indicator", // active-tab-indicator
+    tabGroupBody: "tab-group-body", // body
+    tabGroupScrollButton: "tab-group-scroll-button", // scroll-button
+    tabGroupScrollButtonStart: "tab-group-scroll-button--start", // scroll-button--start
+    tabGroupScrollButtonEnd: "tab-group-scroll-button--end", // scroll-button--end
+    tabGroupScrollButtonBase: "tab-group-scroll-button__base", // scroll-button__base
+
+    // https://shoelace.style/components/tab/#parts
+    tabBase: "tab-base", // base
+    tabCloseButton: "tab-close-button", // close-button
+    tabCloseButtonBase: "tab-close-button__base", // close-button__base
+
+    // https://shoelace.style/components/tab-panel/#parts
+    tabPanelBase: "tab-panel-base", // base
+
+    // https://shoelace.style/components/copy-button/#parts
+    copyButtonButton: "copy-button-button", // button
+    copyButtonCopyIcon: "copy-button-copy-icon", // copy-icon
+    copyButtonSuccessIcon: "copy-button-success-icon", // success-icon
+    copyButtonErrorIcon: "copy-button-error-icon", // error-icon
+    copyButtonTooltipBase: "copy-button-tooltip__base", // tooltip__base
+    copyButtonTooltipBasePopup: "copy-button-tooltip__base__popup", // tooltip__base__popup
+    copyButtonTooltipBaseArrow: "copy-button-tooltip__base__arrow", // tooltip__base__arrow
+    copyButtonTooltipBody: "copy-button-tooltip__body", // tooltip__body
+
+    // https://shoelace.style/components/button/#parts
+    buttonBase: "button-base", // base,
+    // buttonPrefix: "button-prefix", // prefix,
+    buttonLabel: "button-label", // label,
+    // buttonSuffix: "button-suffix", // suffix,
+    buttonCaret: "button-caret", // caret,
+    buttonSpinner: "button-spinner", // spinner,
+
+    // https://shoelace.style/components/details/#parts
+    detailsBase: "details-base", // base
+    detailsHeader: "details-header", // header
+    detailsSummary: "details-summary", // summary
+    detailsSummaryIcon: "details-summary-icon", // summary-icon
+    detailsContent: "details-content", // content
+  };
+
   constructor() {
     super();
     this.loading = new Array(this.buttons.length).fill(false);
@@ -153,12 +210,22 @@ export default class EccUtilsDesignDetails extends LitElement {
     successLabel: string,
     errorLabel: string
   ) {
-    this.requestUpdate();
+    const {
+      copyButtonButton,
+      copyButtonCopyIcon,
+      copyButtonSuccessIcon,
+      copyButtonErrorIcon,
+      copyButtonTooltipBase,
+      copyButtonTooltipBasePopup,
+      copyButtonTooltipBaseArrow,
+      copyButtonTooltipBody,
+    } = this.cssParts;
     return html` <span class="label-copy">
       <span>${label}</span>
       ${copy
         ? html`
             <sl-copy-button
+              exportparts="button: ${copyButtonButton}, copy-icon: ${copyButtonCopyIcon}, success-icon: ${copyButtonSuccessIcon}, error-icon: ${copyButtonErrorIcon}, tooltip__base: ${copyButtonTooltipBase}, tooltip__base__popup: ${copyButtonTooltipBasePopup}, tooltip__base__arrow: ${copyButtonTooltipBaseArrow}, tooltip__body: ${copyButtonTooltipBody}"
               value=${data}
               copy-label=${copyLabel}
               success-label=${successLabel}
@@ -175,10 +242,11 @@ export default class EccUtilsDesignDetails extends LitElement {
     copy = false
   ): TemplateResult {
     if (data === null || data === undefined) return html``;
-    this.requestUpdate();
+
+    const { label: cssLabel, dataContainer, value } = this.cssParts;
     return html`
-      <div part="data-container" class="container data-container">
-        <div part="label" class="label">
+      <div part="${dataContainer}" class="container data-container">
+        <div part="${cssLabel}" class="label">
           ${this._renderLabel(
             label,
             copy,
@@ -188,7 +256,7 @@ export default class EccUtilsDesignDetails extends LitElement {
             "Error"
           )}
         </div>
-        <div part="value" class="value">${data}</div>
+        <div part="${value}" class="value">${data}</div>
       </div>
     `;
   }
@@ -199,10 +267,25 @@ export default class EccUtilsDesignDetails extends LitElement {
     copy = false
   ): TemplateResult {
     if (data === null || data === undefined || data.length === 0) return html``;
+
+    const {
+      container,
+      summaryContainer,
+      panelContainer,
+      dataContainer,
+      value: cssValue,
+      detailsBase,
+      detailsHeader,
+      detailsSummary,
+      detailsSummaryIcon,
+      detailsContent,
+    } = this.cssParts;
     return html`
-			<div part="container" class="container">
-				<sl-details>
-					<div part="summary-container" slot="summary" class="summary">
+			<div part="${container}" class="container">
+				<sl-details
+        exportparts="base: ${detailsBase}, header: ${detailsHeader}, summary: ${detailsSummary}, summary-icon: ${detailsSummaryIcon}, content: ${detailsContent}"
+        >
+					<div part="${summaryContainer}" slot="summary" class="summary">
           ${this._renderLabel(
             label,
             copy,
@@ -213,7 +296,7 @@ export default class EccUtilsDesignDetails extends LitElement {
           )}
 						</span>
 					</div>
-          <div class="panel-container">
+          <div class="${panelContainer}">
             ${data.map((value, index) => {
               const newLabel = `${label} ${index + 1}`;
               if (value === null || value === undefined) {
@@ -225,7 +308,9 @@ export default class EccUtilsDesignDetails extends LitElement {
               if (typeof value === "object") {
                 return this._renderObject(value, newLabel);
               }
-              return html` <div class="data-container value">${value}</div> `;
+              return html`
+                <div class="${dataContainer} ${cssValue}">${value}</div>
+              `;
             })}
           </div>
 				</sl-details>
@@ -244,10 +329,23 @@ export default class EccUtilsDesignDetails extends LitElement {
       Object.entries(data).length === 0
     )
       return html``;
+
+    const {
+      container,
+      summaryContainer,
+      panelContainer,
+      detailsBase,
+      detailsHeader,
+      detailsSummary,
+      detailsSummaryIcon,
+      detailsContent,
+    } = this.cssParts;
     return html`
-      <div part="container" class="container">
-        <sl-details>
-          <div part="summary-container" slot="summary" class="summary">
+      <div part="${container}" class="container">
+        <sl-details
+          exportparts="base: ${detailsBase}, header: ${detailsHeader}, summary: ${detailsSummary}, summary-icon: ${detailsSummaryIcon}, content: ${detailsContent}"
+        >
+          <div part="${summaryContainer}" slot="summary" class="summary">
             ${this._renderLabel(
               label,
               copy,
@@ -257,7 +355,7 @@ export default class EccUtilsDesignDetails extends LitElement {
               "Error"
             )}
           </div>
-          <div class="panel-container">
+          <div class="${panelContainer}">
             ${Object.entries(data).map(([dataLabel, dataValue], index) => {
               const newLabel = `${dataLabel} ${index + 1}`;
               if (dataValue === null || dataValue === undefined) {
@@ -281,10 +379,25 @@ export default class EccUtilsDesignDetails extends LitElement {
     tabName: string,
     children: Array<Children>
   ): TemplateResult {
+    const {
+      panelContainer,
+      tabBase,
+      tabCloseButton,
+      tabCloseButtonBase,
+      tabPanelBase,
+    } = this.cssParts;
     return html`
-      <sl-tab slot="nav" panel="${toLower(tabName)}">${tabName}</sl-tab>
-      <sl-tab-panel name="${toLower(tabName)}">
-        <div part="panel-container" class="panel-container panel">
+      <sl-tab
+        exportparts="base: ${tabBase}, close-button: ${tabCloseButton}, close-button__base: ${tabCloseButtonBase}"
+        slot="nav"
+        panel="${toLower(tabName)}"
+        >${tabName}</sl-tab
+      >
+      <sl-tab-panel
+        exportparts="base: ${tabPanelBase}"
+        name="${toLower(tabName)}"
+      >
+        <div part="${panelContainer}" class="panel-container panel">
           ${children.map((childFieldInfo: Children) => {
             const childData = _.get(this.data, childFieldInfo.path);
 
@@ -329,8 +442,21 @@ export default class EccUtilsDesignDetails extends LitElement {
   private _renderFields(fields: Array<Field>): TemplateResult {
     if (fields === null || fields === undefined || fields.length === 0)
       return html``;
+    const {
+      tabGroupBase,
+      tabGroupNav,
+      tabGroupActiveTabIndicator,
+      tabGroupBody,
+      tabGroupScrollButton,
+      tabGroupScrollButtonStart,
+      tabGroupScrollButtonEnd,
+      tabGroupScrollButtonBase,
+    } = this.cssParts;
     return html`
-      <sl-tab-group class="details">
+      <sl-tab-group
+        exportparts="base: ${tabGroupBase}, nav: ${tabGroupNav}, tabs: ${tabGroupNav}, active-tab-indicator: ${tabGroupActiveTabIndicator}, body: ${tabGroupBody}, scroll-button: ${tabGroupScrollButton}, scroll-button--start: ${tabGroupScrollButtonStart}, scroll-button--end: ${tabGroupScrollButtonEnd}, scroll-button__base: ${tabGroupScrollButtonBase}"
+        class="details"
+      >
         ${fields.map((field) =>
           this._renderField(field.tabGroup, field.children)
         )}
@@ -352,17 +478,28 @@ export default class EccUtilsDesignDetails extends LitElement {
   }
 
   private _renderFooter(): TemplateResult {
+    const {
+      footerContainer,
+      footerSlot,
+      footerButtons,
+      button: cssButton,
+      buttonBase,
+      buttonLabel,
+      buttonCaret,
+      buttonSpinner,
+    } = this.cssParts;
     return html`
-      <div part="footer-container" class="footer-container">
-        <span part="footer-buttons" class="footer-buttons">
+      <div part="${footerContainer}" class="footer-container">
+        <span part="${footerButtons}" class="footer-buttons">
           ${this.buttons.map((button, index) => {
             const { name, key } = button;
             return html`
               <sl-button
+                exportparts="base: ${buttonBase}, label: ${buttonLabel}, caret: ${buttonCaret}, spinner: ${buttonSpinner}"
                 ?loading="${this.loading[index]}"
                 @click=${() => this._handleClick(key, index)}
               >
-                <span part="button" class="button">
+                <span part="${cssButton}" class="button">
                   <slot name="icon-${key}"></slot>
                   <span> ${name} </span>
                 </span>
@@ -370,7 +507,7 @@ export default class EccUtilsDesignDetails extends LitElement {
             `;
           })}
         </span>
-        <span part="footer-slot" class="footer-slot">
+        <span part="${footerSlot}" class="footer-slot">
           <slot name="footer"></slot>
         </span>
       </div>
