@@ -1,4 +1,4 @@
-import { html, LitElement, render } from "lit";
+import { html, css, LitElement, render } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import "@elixir-cloud/design";
 import {
@@ -46,19 +46,12 @@ interface FilterProp {
 interface FooterButton {
   key: string;
   name: string;
-  size: "small" | "medium" | "large";
-  variant: "primary" | "success" | "neutral" | "warning" | "danger";
-  outline: boolean;
-  pill: boolean;
-  icon?: {
-    name: string;
-    viewBox: string;
-    path: string;
-  };
+  variant?: "primary" | "success" | "neutral" | "warning" | "danger";
 }
 
 @customElement("ecc-client-lit-ga4gh-wes-runs")
 export class WESRuns extends LitElement {
+  static styles = css``;
   @property({ type: Number }) private pageSize = 5;
   @property({ type: String }) private baseURL =
     "https://prowes.rahtiapp.fi/ga4gh/wes/v1";
@@ -68,33 +61,55 @@ export class WESRuns extends LitElement {
       tabGroup: "Overview",
       children: [
         {
+          label: "Tags",
           path: "request.tags",
         },
         {
+          label: "Engine parameters",
           path: "request.workflow_engine_parameters",
+          copy: true,
         },
         {
+          label: "Parameters",
           path: "request.workflow_params",
+          copy: true,
         },
         {
+          label: "Type",
           path: "request.workflow_type",
         },
         {
+          label: "Version",
           path: "request.workflow_type_version",
         },
         {
+          label: "Url",
           path: "request.workflow_url",
+          copy: true,
         },
       ],
     },
     {
-      tabGroup: "Log",
+      tabGroup: "Logs",
       children: [
         {
+          label: "Run Logs",
           path: "run_log",
+          copy: true,
         },
         {
+          label: "Task Logs",
           path: "task_logs",
+          copy: true,
+        },
+      ],
+    },
+    {
+      tabGroup: "Output",
+      children: [
+        {
+          label: "Output",
+          path: "output",
         },
       ],
     },
@@ -234,14 +249,12 @@ export class WESRuns extends LitElement {
           {
             key,
             name: "Delete",
-            size: "medium",
             variant: "danger",
-            outline: false,
-            pill: false,
           },
         ];
 
         const detailsComponent = html`<ecc-utils-design-details
+          class="details"
           id=${key}
           .data=${runData}
           .fields=${this.fields}
@@ -273,17 +286,19 @@ export class WESRuns extends LitElement {
         ) as any;
         if (detailsElement) {
           detailsElement.addEventListener(
-            `ecc-utils-button-${key}-click`,
-            async () => {
-              // Delete run
+            `ecc-utils-button-click`,
+            async (buttonEvent: CustomEvent) => {
+              const { key: buttonKey } = buttonEvent.detail;
               try {
-                // 0 is the index of the button as there is only one button
-                detailsElement.setButtonLoading(0, true);
-                const resp = (await cancelWorkflow(this.baseURL, key)) as any;
-                detailsElement.setButtonLoading(0, false);
+                if (buttonKey === key) {
+                  // 0 is the index of the button as there is only one button
+                  detailsElement.setButtonLoading(0, true);
+                  const resp = (await cancelWorkflow(this.baseURL, key)) as any;
+                  detailsElement.setButtonLoading(0, false);
 
-                // If the response doesn't have run ID that means the run wasn't canceled.
-                if (!resp.run_id) throw new Error();
+                  // If the response doesn't have run ID that means the run wasn't canceled.
+                  if (!resp.run_id) throw new Error();
+                }
               } catch (error) {
                 eccUtilsDesignCollection.error(`Failed to cancel run: ${key}`);
               }
@@ -321,11 +336,13 @@ export class WESRuns extends LitElement {
   render() {
     return html`
       <ecc-utils-design-collection
+        id="collection"
         .filters=${this.filters}
         .items=${this.itemsToBeRendered}
-        @page-change=${this._fetchData}
-        @expand-item=${(event: CustomEvent) => this._handleExpandItem(event)}
-        @filter=${(event: CustomEvent) => {
+        @ecc-utils-page-change=${this._fetchData}
+        @ecc-utils-expand=${(event: CustomEvent) =>
+          this._handleExpandItem(event)}
+        @ecc-utils-filter=${(event: CustomEvent) => {
           this._handleFilter(event);
         }}
       >
