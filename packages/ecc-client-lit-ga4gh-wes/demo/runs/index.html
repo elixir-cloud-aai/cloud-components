@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+	<head>
+		<meta charset="utf-8" />
+		<style>
+			body {
+				background: #fafafa;
+			}
+		</style>
+	</head>
+	<title>ecc-client-ga4gh-wes-runs</title>
+	<body>
+		<div id="demo"></div>
+
+		<script type="module">
+			import { html, render } from "lit";
+			import "../../dist/index.js";
+
+			const baseURL = "http://localhost:8090/ga4gh/wes/v1";
+			const pageSize = 10;
+			
+			render(
+			  html`<ecc-client-lit-ga4gh-wes-runs
+    .pageSize="${pageSize}"
+			    .baseURL="${baseURL}"
+			  />`,
+			  document.querySelector("#demo")
+			);
+		</script>
+	</body>
+</html>
