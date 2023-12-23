@@ -1,4 +1,5 @@
 import { html, css, LitElement, TemplateResult } from "lit";
+import { ifDefined } from "lit/directives/if-defined.js";
 import { property, state } from "lit/decorators.js";
 import _, { toLower } from "lodash-es";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
@@ -25,6 +26,7 @@ export interface Field {
 interface FooterButton {
   key: string;
   name: string;
+  variant?: "primary" | "success" | "neutral" | "warning" | "danger";
 }
 
 export default class EccUtilsDesignDetails extends LitElement {
@@ -492,12 +494,13 @@ export default class EccUtilsDesignDetails extends LitElement {
       <div part="${footerContainer}" class="footer-container">
         <span part="${footerButtons}" class="footer-buttons">
           ${this.buttons.map((button, index) => {
-            const { name, key } = button;
+            const { name, key, variant } = button;
             return html`
               <sl-button
                 exportparts="base: ${buttonBase}, label: ${buttonLabel}, caret: ${buttonCaret}, spinner: ${buttonSpinner}"
                 ?loading="${this.loading[index]}"
                 @click=${() => this._handleClick(key, index)}
+                variant=${ifDefined(variant)}
               >
                 <span part="${cssButton}" class="button">
                   <slot name="icon-${key}"></slot>

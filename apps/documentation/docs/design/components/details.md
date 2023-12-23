@@ -298,10 +298,7 @@ The `buttons` property allows you to define an array of buttons along with their
 | --------- | -------- | ----------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | `key`     | `true`   |             | `string`                                                       | A unique identifier for the button, used to distinguish between buttons in the configuration. |
 | `name`    | `true`   |             | `string`                                                       | The display name or label for the button.                                                     |
-| `size`    | `false`  | `'medium'`  | `'small' \| 'medium' \| 'large'`                               | The size of the button.                                                                       |
 | `variant` | `false`  | `'primary'` | `'primary' \| 'success' \| 'neutral' \| 'warning' \| 'danger'` | The visual style or color variant of the button.                                              |
-| `outline` | `false`  | `false`     | `boolean`                                                      | Specifies whether the button should have an outlined style.                                   |
-| `pill`    | `false`  | `false`     | `boolean`                                                      | Specifies whether the button should have a pill-shaped style.                                 |
 
 #### Example
 
@@ -310,18 +307,12 @@ buttons: [
   {
     key: "1",
     name: "Button 1",
-    size: "medium",
     variant: "primary",
-    outline: false,
-    pill: false,
   },
   {
     key: "2",
     name: "Button 2",
-    size: "medium",
     variant: "warning",
-    outline: true,
-    pill: false,
   },
 ];
 ```
