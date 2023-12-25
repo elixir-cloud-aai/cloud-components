@@ -52,6 +52,8 @@ export class TESRuns extends LitElement {
   @property({ type: String }) private accessor baseURL =
     "https://protes.rahtiapp.fi/ga4gh/tes/v1";
 
+  @property({ type: Boolean }) private accessor filter = true;
+  @property({ type: Boolean }) private accessor search = true;
   @property({ type: Array }) private accessor fields: Array<Field> = [
     {
       tabGroup: "Overview",
@@ -143,7 +145,6 @@ export class TESRuns extends LitElement {
 
   @state() private accessor filterTag: string[] = [];
   @state() private accessor items: ItemProp[] = [];
-  @state() private accessor itemsToBeRendered: ItemProp[] = [];
   @state() private accessor nextPageToken: string | null = "";
   @state() private accessor cache = new Map();
 
@@ -170,6 +171,29 @@ export class TESRuns extends LitElement {
     if (changedProperties.has("pageSize")) {
       this._fetchData();
     }
+
+    // Handle filter render
+    if (changedProperties.has("filter") || changedProperties.has("search")) {
+      this.filters = this.getUpdatedFilters();
+    }
+  }
+
+  private getUpdatedFilters(): FilterProp[] {
+    let updatedFilters = [...this.filters];
+
+    // Modify the array based on the conditions
+    if (!this.filter) {
+      updatedFilters = updatedFilters.filter(
+        (filter) => filter.type !== "select"
+      );
+    }
+    if (!this.search) {
+      updatedFilters = updatedFilters.filter(
+        (filter) => filter.type !== "search"
+      );
+    }
+
+    return updatedFilters;
   }
 
   private async _fetchData() {
@@ -211,12 +235,24 @@ export class TESRuns extends LitElement {
         });
       });
 
-      this.items = [...this.items, ...convertedData];
-      this._filterData();
+      const filteredData = convertedData.filter((run) => this._filterData(run));
+      const modifiedData = filteredData.map((item, index) => ({
+        ...item,
+        index: this.items.length + index + 1,
+      }));
+
+      this.items = [...this.items, ...modifiedData];
+
+      // If enough tasks are not fetched, fetch more based on filter
+      if (
+        this.items.length % this.pageSize !== 0 ||
+        (modifiedData.length === 0 && this.filterTag.length !== 0)
+      )
+        this._fetchData();
     } catch (error) {
       console.error({
         error,
-        breakPoint: "WESRuns.fetchData",
+        breakPoint: "TESRuns.fetchData",
       });
     }
   }
@@ -298,7 +334,7 @@ export class TESRuns extends LitElement {
                   detailsElement.setButtonLoading(0, false);
 
                   // If the response doesn't have run ID that means the run wasn't canceled.
-                  if (!resp.run_id) throw new Error();
+                  if (!resp.id) throw new Error();
                 }
               } catch (error) {
                 eccUtilsDesignCollection.error(`Failed to cancel run: ${key}`);
@@ -316,21 +352,23 @@ export class TESRuns extends LitElement {
     }
   }
 
-  private _filterData() {
-    if (this.filterTag.length === 0) {
-      this.itemsToBeRendered = this.items;
-    } else {
-      this.itemsToBeRendered = this.items.filter((item) =>
-        this.filterTag.some((tag) => item.tag?.name === tag)
-      );
+  private _filterData(item: ItemProp) {
+    if (
+      (item.tag && this.filterTag.includes(item.tag.name)) ||
+      this.filterTag.length === 0
+    ) {
+      return true;
     }
+    return false;
   }
 
   private _handleFilter(event: CustomEvent) {
+    this.items = [];
+    this.nextPageToken = "";
     const filterValue = event.detail.value;
     if (Array.isArray(filterValue)) {
       this.filterTag = filterValue;
-      this._filterData();
+      this._fetchData();
     } else console.log("text filter received.");
   }
 
@@ -339,7 +377,7 @@ export class TESRuns extends LitElement {
       <ecc-utils-design-collection
         id="collection"
         .filters=${this.filters}
-        .items=${this.itemsToBeRendered}
+        .items=${this.items}
         @ecc-utils-page-change=${this._fetchData}
         @ecc-utils-expand=${(event: CustomEvent) =>
           this._handleExpandItem(event)}
@@ -353,6 +391,6 @@ export class TESRuns extends LitElement {
 }
 declare global {
   interface HTMLElementTagNameMap {
-    "ecc-client-lit-ga4gh-wes-runs": TESRuns;
+    "ecc-client-lit-ga4gh-tes-runs": TESRuns;
   }
 }

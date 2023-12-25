@@ -20,9 +20,10 @@
 			// const pageSize = 10;
 			// .pageSize="${pageSize}"
 			// .baseURL="${baseURL}"
-			
+			const filter = true;
+			const search = false;
 			render(
-  html`<ecc-client-lit-ga4gh-tes-runs />`,
+			  html`<ecc-client-lit-ga4gh-tes-runs .filter=${filter} .search=${search} />`,
 			  document.querySelector("#demo")
 			);
 		</script>
