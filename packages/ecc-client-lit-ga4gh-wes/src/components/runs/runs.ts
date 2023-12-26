@@ -140,8 +140,8 @@ export class WESRuns extends LitElement {
   ];
 
   @state() private filterTag: string[] = [];
+  @state() private filter = true;
   @state() private items: ItemProp[] = [];
-  @state() private itemsToBeRendered: ItemProp[] = [];
   @state() private nextPageToken: string | null = "";
   @state() private cache = new Map();
 
@@ -167,6 +167,9 @@ export class WESRuns extends LitElement {
     eccUtilsDesignCollection.pageSize = this.pageSize;
     if (changedProperties.has("pageSize")) {
       this._fetchData();
+    }
+    if (changedProperties.has("filter") && this.filter === false) {
+      this.filters = [];
     }
   }
 
@@ -209,9 +212,19 @@ export class WESRuns extends LitElement {
           },
         });
       });
+      const filteredData = convertedData.filter((run) => this._filterData(run));
+      const modifiedData = filteredData.map((item, index) => ({
+        ...item,
+        index: this.items.length + index + 1,
+      }));
 
-      this.items = [...this.items, ...convertedData];
-      this._filterData();
+      this.items = [...this.items, ...modifiedData];
+      // If enough tasks are not fetched, fetch more based on filter
+      if (
+        this.items.length % this.pageSize !== 0 ||
+        (modifiedData.length === 0 && this.filterTag.length !== 0)
+      )
+        this._fetchData();
     } catch (error) {
       console.error({
         error,
@@ -315,21 +328,24 @@ export class WESRuns extends LitElement {
     }
   }
 
-  private _filterData() {
-    if (this.filterTag.length === 0) {
-      this.itemsToBeRendered = this.items;
-    } else {
-      this.itemsToBeRendered = this.items.filter((item) =>
-        this.filterTag.some((tag) => item.tag?.name === tag)
-      );
+  private _filterData(item: ItemProp) {
+    if (
+      (item.tag && this.filterTag.includes(item.tag.name)) ||
+      this.filterTag.length === 0
+    ) {
+      return true;
     }
+    return false;
   }
 
   private _handleFilter(event: CustomEvent) {
+    this.items = [];
+    this.nextPageToken = "";
     const filterValue = event.detail.value;
     if (Array.isArray(filterValue)) {
       this.filterTag = filterValue;
-      this._filterData();
+      console.log(this.filterTag);
+      this._fetchData();
     }
   }
 
@@ -338,7 +354,7 @@ export class WESRuns extends LitElement {
       <ecc-utils-design-collection
         id="collection"
         .filters=${this.filters}
-        .items=${this.itemsToBeRendered}
+        .items=${this.items}
         @ecc-utils-page-change=${this._fetchData}
         @ecc-utils-expand=${(event: CustomEvent) =>
           this._handleExpandItem(event)}

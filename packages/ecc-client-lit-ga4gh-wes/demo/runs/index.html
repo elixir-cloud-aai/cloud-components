@@ -16,13 +16,15 @@
 			import { html, render } from "lit";
 			import "../../dist/index.js";
 
-			// const baseURL = "http://localhost:8090/ga4gh/wes/v1";
-			// const pageSize = 10;
-			// .pageSize="${pageSize}"
-			// 			.baseURL="${baseURL}"
-			
+			const baseURL = "http://localhost:8090/ga4gh/wes/v1";
+			const pageSize = 10;
+			const filter = false;
 			render(
-			  html`<ecc-client-lit-ga4gh-wes-runs />`,
+			  html`<ecc-client-lit-ga4gh-wes-runs
+			    .pageSize="${pageSize}"
+			    .baseURL="${baseURL}"
+			    .filter=${filter}
+			  />`,
 			  document.querySelector("#demo")
 			);
 		</script>

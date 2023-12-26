@@ -1,4 +1,4 @@
-# Runs Component <Badge type="warning" text="beta" />
+# List Component <Badge type="warning" text="beta" />
 
 <div class="component-name">&lt;ecc-client-lit-ga4gh-wes-runs&gt;</div>
 This component facilitates browsing workflow runs via WES API.
@@ -37,6 +37,7 @@ import "@elixir-cloud/lit-wes";
 | [`baseURL`](#baseURL)                                 | `false`  | `https://prowes.rahtiapp.fi/ga4gh/wes/v1` | `String`        | Base URL                                                      |
 | [`pageSize`](#pageSize)                               | `false`  | 5                                         | `Number`        | Number of runs per page                                       |
 | [`fields`](../../design/components/details.md#fields) | `false`  | [`default`](#default)                     | `Array<Fields>` | Configuration based on which data will be rendered in groups. |
+| `filter`                                              | `false`  | `true`                                    | `Boolean`       | Defines the rendering of the filter-by-state bar.             |
 
 ### baseURL
 
@@ -97,11 +98,12 @@ The default value of `fields` property.
 
 ## CSS Variables
  -->
+
 ## Examples
 
-### With baseURL, pageSize and fields
+### With baseURL, pageSize, fields and filter
 
-Runs component here renders 7 runs per page.
+Runs component here renders 7 runs per page and no filtering.
 
 <ClientOnly>
   <div :class="isDark ? 'component-dark component' : 'component-light component'">
@@ -109,6 +111,8 @@ Runs component here renders 7 runs per page.
     <ecc-client-lit-ga4gh-wes-runs
         :pageSize="examplePageSize"
         :fields="exampleFields"
+        :filter="exampleFilter"
+        :baseURL="exampleURL"
     />
 
 ::: details Code Blocks
@@ -192,10 +196,13 @@ const fields = [
 ]
 ;
 
+const filter = false;
+
 <ecc-client-lit-ga4gh-wes-create-run
-  baseURL="http://localhost:8090/ga4gh/wes/v1"
-  pageSize="7"
-  fields=${fields}
+  .baseURL="http://localhost:8090/ga4gh/wes/v1"
+  .pageSize="7"
+  .fields=${fields}
+  .filter=${filter}
 />;
 ```
 
@@ -220,12 +227,14 @@ const { isDark } = useData();
 const exampleFields = ref([]);
 const exampleURL = ref("");
 const examplePageSize = ref(0);
+const exampleFilter = ref();
 
 onMounted(async () => {
   try {
     const module = await import("@elixir-cloud/lit-wes");
 
     // Assuming the module exports exampleFields, exampleURL, and examplePageSize
+    exampleFilter.value = false;
     exampleFields.value =  [
   {
     "tabGroup": "Experiment",

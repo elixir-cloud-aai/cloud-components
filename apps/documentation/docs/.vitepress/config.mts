@@ -60,8 +60,8 @@ export default defineConfig({
           {
             text: 'Components',
             items: [
-              { text: 'Create Run', link: '/wes/components/wes-create-run.md' },
-              { text: 'Runs', link: '/wes/components/wes-runs.md' },
+              { text: 'Runs', link: '/wes/components/runs.md' },
+              { text: 'Create Run', link: '/wes/components/create-run.md' },
             ],
           },
         ],
