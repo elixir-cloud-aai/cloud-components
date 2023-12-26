@@ -27,6 +27,7 @@ interface FooterButton {
   key: string;
   name: string;
   variant?: "primary" | "success" | "neutral" | "warning" | "danger";
+  icon: string;
 }
 
 export default class EccUtilsDesignDetails extends LitElement {
@@ -120,6 +121,10 @@ export default class EccUtilsDesignDetails extends LitElement {
       sl-copy-button::part(button) {
         padding: 0;
         margin-left: var(--sl-font-size-2x-small);
+      }
+
+      .button-icon {
+        height: 1rem;
       }
     `,
   ];
@@ -494,7 +499,7 @@ export default class EccUtilsDesignDetails extends LitElement {
       <div part="${footerContainer}" class="footer-container">
         <span part="${footerButtons}" class="footer-buttons">
           ${this.buttons.map((button, index) => {
-            const { name, key, variant } = button;
+            const { name, key, variant, icon } = button;
             return html`
               <sl-button
                 exportparts="base: ${buttonBase}, label: ${buttonLabel}, caret: ${buttonCaret}, spinner: ${buttonSpinner}"
@@ -503,7 +508,7 @@ export default class EccUtilsDesignDetails extends LitElement {
                 variant=${ifDefined(variant)}
               >
                 <span part="${cssButton}" class="button">
-                  <slot name="icon-${key}"></slot>
+                  <img src=${icon} class="button-icon" alt=${name} />
                   <span> ${name} </span>
                 </span>
               </sl-button>
