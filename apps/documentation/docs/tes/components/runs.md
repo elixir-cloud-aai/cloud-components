@@ -38,8 +38,8 @@ import "@elixir-cloud/lit-tes";
 | [`baseURL`](#baseURL)                                 | `false`  | `https://protes.rahtiapp.fi/ga4gh/tes/v1` | `String`        | Base URL                                                      |
 | [`pageSize`](#pageSize)                               | `false`  | 5                                         | `Number`        | Number of runs per page                                       |
 | [`fields`](../../design/components/details.md#fields) | `false`  | [`default`](#default)                     | `Array<Fields>` | Configuration based on which data will be rendered in groups. |
-| [`filter`]                                            | `false`  | `true`                                    | `Boolean`       | Defines if filter by state should be rendered.                |
-| [`search`]                                            | `false`  | `true`                                    | `Boolean`       | Defines if search by prefix should be rendered.               |
+| `filter`                                              | `false`  | `true`                                    | `Boolean`       | Defines if filter by state should be rendered.                |
+| `search`                                              | `false`  | `true`                                    | `Boolean`       | Defines if search by prefix should be rendered.               |
 
 ### baseURL
 

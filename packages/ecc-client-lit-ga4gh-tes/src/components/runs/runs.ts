@@ -147,6 +147,8 @@ export class TESRuns extends LitElement {
   @state() private filterTag: string[] = [];
   @state() private items: ItemProp[] = [];
   @state() private nextPageToken: string | null = "";
+  @state() private view: "MINIMAL" | "BASIC" | "FULL" = "MINIMAL";
+  @state() private namePrefix = "";
   @state() private cache = new Map();
 
   private tagType: Record<string, string> = {
@@ -204,8 +206,11 @@ export class TESRuns extends LitElement {
       const data = await fetchTasks(
         this.baseURL,
         this.pageSize,
-        this.nextPageToken
+        this.nextPageToken,
+        this.view,
+        this.namePrefix
       );
+
       // Set nextPageToken to null if at the last page
       if (data.next_page_token === "") {
         this.nextPageToken = null;
@@ -370,7 +375,9 @@ export class TESRuns extends LitElement {
     if (Array.isArray(filterValue)) {
       this.filterTag = filterValue;
       this._fetchData();
-    } else console.log("text filter received.");
+    } else {
+      this.namePrefix = filterValue;
+    }
   }
 
   render() {
