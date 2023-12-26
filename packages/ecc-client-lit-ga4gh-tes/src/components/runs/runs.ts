@@ -1,3 +1,4 @@
+/* eslint-disable lit/no-classfield-shadowing */
 import { html, css, LitElement, render } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import "@elixir-cloud/design";
@@ -48,13 +49,13 @@ interface FooterButton {
 @customElement("ecc-client-lit-ga4gh-tes-runs")
 export class TESRuns extends LitElement {
   static styles = css``;
-  @property({ type: Number }) private accessor pageSize = 5;
-  @property({ type: String }) private accessor baseURL =
+  @property({ type: Number }) private pageSize = 5;
+  @property({ type: String }) private baseURL =
     "https://protes.rahtiapp.fi/ga4gh/tes/v1";
 
-  @property({ type: Boolean }) private accessor filter = true;
-  @property({ type: Boolean }) private accessor search = true;
-  @property({ type: Array }) private accessor fields: Array<Field> = [
+  @property({ type: Boolean }) private filter = true;
+  @property({ type: Boolean }) private search = true;
+  @property({ type: Array }) private fields: Array<Field> = [
     {
       tabGroup: "Overview",
       children: [
@@ -114,7 +115,7 @@ export class TESRuns extends LitElement {
     },
   ];
 
-  @state() private accessor filters: FilterProp[] = [
+  @state() private filters: FilterProp[] = [
     {
       key: "search",
       type: "search",
@@ -143,10 +144,10 @@ export class TESRuns extends LitElement {
     },
   ];
 
-  @state() private accessor filterTag: string[] = [];
-  @state() private accessor items: ItemProp[] = [];
-  @state() private accessor nextPageToken: string | null = "";
-  @state() private accessor cache = new Map();
+  @state() private filterTag: string[] = [];
+  @state() private items: ItemProp[] = [];
+  @state() private nextPageToken: string | null = "";
+  @state() private cache = new Map();
 
   private tagType: Record<string, string> = {
     UNKNOWN: "neutral",
