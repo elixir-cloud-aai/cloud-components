@@ -27,7 +27,7 @@ interface FooterButton {
   key: string;
   name: string;
   variant?: "primary" | "success" | "neutral" | "warning" | "danger";
-  icon: string;
+  icon?: string;
 }
 
 export default class EccUtilsDesignDetails extends LitElement {
@@ -508,7 +508,15 @@ export default class EccUtilsDesignDetails extends LitElement {
                 variant=${ifDefined(variant)}
               >
                 <span part="${cssButton}" class="button">
-                  <img src=${icon} class="button-icon" alt=${name} />
+                  ${html`
+                    ${icon
+                      ? html`<img
+                          src=${icon}
+                          class="button-icon"
+                          alt=${name}
+                        />`
+                      : ""}
+                  `}
                   <span> ${name} </span>
                 </span>
               </sl-button>
