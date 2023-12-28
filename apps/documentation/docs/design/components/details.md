@@ -5,37 +5,6 @@ This component is used to render a detailed view of items.
 <ClientOnly>
 <div :class="isDark ? 'component-dark component' : 'component-light component'">
 <ecc-utils-design-details :v-if="renderComponent" :data="data" :fields="fields" :buttons="buttons">
-   <span slot="icon-1">
-      <svg
-         xmlns="http://www.w3.org/2000/svg"
-         width="16"
-         height="16"
-         fill="currentColor"
-         class="bi bi-trash"
-         viewBox="0 0 16 16"
-         >
-         <path
-            d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
-            />
-         <path
-            d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
-            />
-      </svg>
-   </span>
-   <span slot="icon-2">
-      <svg
-         xmlns="http://www.w3.org/2000/svg"
-         width="16"
-         height="16"
-         fill="currentColor"
-         class="bi bi-heart"
-         viewBox="0 0 16 16"
-         >
-         <path
-            d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"
-            />
-      </svg>
-   </span>
    <p slot="footer">26 Nov 2023</p>
 </ecc-utils-design-details>
 
@@ -215,21 +184,13 @@ const fields = [{
 
 const buttons = [{
 		key: '1',
-		isPresent: true,
 		name: 'Button 1',
-		size: 'medium',
 		variant: 'primary',
-		outline: false,
-		pill: false,
 	},
 	{
 		key: '2',
-		isPresent: false,
 		name: 'Button 2',
-		size: 'medium',
 		variant: 'warning',
-		outline: true,
-		pill: false,
 	},
 ];
 
@@ -299,6 +260,7 @@ The `buttons` property allows you to define an array of buttons along with their
 | `key`     | `true`   |             | `string`                                                       | A unique identifier for the button, used to distinguish between buttons in the configuration. |
 | `name`    | `true`   |             | `string`                                                       | The display name or label for the button.                                                     |
 | `variant` | `false`  | `'primary'` | `'primary' \| 'success' \| 'neutral' \| 'warning' \| 'danger'` | The visual style or color variant of the button.                                              |
+| `path`    | `false`  |             | `string`                                                       | The path (URL) of prefix for the button to be rendered.                                       |
 
 #### Example
 
@@ -855,37 +817,20 @@ const fields = [{
 			buttons.value = [
 			  {
 			    key: "1",
-			    isPresent: true,
 			    name: "Button 1",
-			    size: "medium",
 			    variant: "primary",
-			    outline: false,
-			    pill: false,
-			    icon: {
-			      name: "trash",
-			      viewBox: "0 0 16 16",
-			      path: "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z",
-			    },
 			  },
 			  {
 			    key: "2",
-			    isPresent: false,
 			    name: "Button 2",
-			    size: "medium",
 			    variant: "warning",
-			    outline: true,
-			    pill: false,
 			  },
 			];
 
 			styledButtons.value = [{
 				key: "1",
-				isPresent: true,
 				name: "Button 1",
-				size: "medium",
 				variant: "primary",
-				outline: true,
-				pill: true,
 			}];
 
 			styledData.value = {

@@ -2,6 +2,7 @@
   "extends": ["@open-wc", "elixir", "prettier"],
   "plugins": ["prettier"],
   "rules": {
+    "camelcase":"warn",
     "prettier/prettier": "error"
   }
 }
