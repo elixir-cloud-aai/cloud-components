@@ -144,9 +144,8 @@ export class TESRuns extends LitElement {
     },
   ];
 
-  @state() private filterTag: string[] = [];
   @state() private items: ItemProp[] = [];
-  @state() private nextPageToken: string | null = "";
+  @state() private nextPageToken: string[] = [""];
   @state() private view: "MINIMAL" | "BASIC" | "FULL" = "MINIMAL";
   @state() private namePrefix = "";
   @state() private cache = new Map();
@@ -172,7 +171,7 @@ export class TESRuns extends LitElement {
     ) as any;
     eccUtilsDesignCollection.pageSize = this.pageSize;
     if (changedProperties.has("pageSize")) {
-      this._fetchData();
+      this._fetchData(1);
     }
 
     // Handle filter render
@@ -199,29 +198,18 @@ export class TESRuns extends LitElement {
     return updatedFilters;
   }
 
-  private async _fetchData() {
+  private async _fetchData(page = 1) {
     try {
       // If all the items have been cached, don't invoke API call
       if (this.nextPageToken === null) return;
       const data = await fetchTasks(
         this.baseURL,
         this.pageSize,
-        this.nextPageToken,
+        this.nextPageToken[page - 1],
         this.view,
         this.namePrefix
       );
 
-      // Set nextPageToken to null if at the last page
-      if (data.next_page_token === "") {
-        this.nextPageToken = null;
-
-        const eccUtilsDesignCollection = this.shadowRoot?.querySelector(
-          "ecc-utils-design-collection"
-          // Todo: Get the typeof Collections and use it instead of `any`
-        ) as any;
-
-        eccUtilsDesignCollection.totalItems = this.items.length;
-      } else this.nextPageToken = data.next_page_token;
       const convertedData: ItemProp[] = [];
       data.tasks?.forEach((task: { id: string; state: string }) => {
         convertedData.push({
@@ -241,20 +229,21 @@ export class TESRuns extends LitElement {
         });
       });
 
-      const filteredData = convertedData.filter((run) => this._filterData(run));
-      const modifiedData = filteredData.map((item, index) => ({
-        ...item,
-        index: this.items.length + index + 1,
-      }));
+      // remove old items with the same index as the new items to be added
+      this.items = this.items.filter(
+        (item) => !convertedData.some((newItem) => newItem.index === item.index)
+      );
 
-      this.items = [...this.items, ...modifiedData];
+      this.items = [...this.items, ...convertedData];
 
-      // If enough tasks are not fetched, fetch more based on filter
-      if (
-        this.items.length % this.pageSize !== 0 ||
-        (modifiedData.length === 0 && this.filterTag.length !== 0)
-      )
-        this._fetchData();
+      if (data.next_page_token === "" || data.tasks.length < this.pageSize) {
+        const eccUtilsDesignCollection = this.shadowRoot?.querySelector(
+          "ecc-utils-design-collection"
+          // Todo: Get the typeof Collections and use it instead of `any`
+        ) as any;
+
+        eccUtilsDesignCollection.totalItems = this.items.length;
+      } else this.nextPageToken[page] = data.next_page_token;
     } catch (error) {
       console.error({
         error,
@@ -358,40 +347,18 @@ export class TESRuns extends LitElement {
     }
   }
 
-  private _filterData(item: ItemProp) {
-    if (
-      (item.tag && this.filterTag.includes(item.tag.name)) ||
-      this.filterTag.length === 0
-    ) {
-      return true;
-    }
-    return false;
-  }
-
-  private _handleFilter(event: CustomEvent) {
-    this.items = [];
-    this.nextPageToken = "";
-    const filterValue = event.detail.value;
-    if (Array.isArray(filterValue)) {
-      this.filterTag = filterValue;
-      this._fetchData();
-    } else {
-      this.namePrefix = filterValue;
-    }
-  }
-
+  /* TODO: Add @ecc-utils-filter when backend implements filtering */
   render() {
     return html`
       <ecc-utils-design-collection
         id="collection"
         .filters=${this.filters}
         .items=${this.items}
-        @ecc-utils-page-change=${this._fetchData}
+        @ecc-utils-page-change=${(event: CustomEvent) => {
+          this._fetchData(event.detail.page);
+        }}
         @ecc-utils-expand=${(event: CustomEvent) =>
           this._handleExpandItem(event)}
-        @ecc-utils-filter=${(event: CustomEvent) => {
-          this._handleFilter(event);
-        }}
       >
       </ecc-utils-design-collection>
     `;
