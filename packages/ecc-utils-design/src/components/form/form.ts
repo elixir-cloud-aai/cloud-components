@@ -149,7 +149,8 @@ export default class EccUtilsDesignForm extends LitElement {
             _.set(this.form, path, (e.target as HTMLInputElement).checked);
             this.requestUpdate();
           }}
-        ></sl-switch>
+        >
+        </sl-switch>
       </div>
     `;
   }
@@ -212,7 +213,6 @@ export default class EccUtilsDesignForm extends LitElement {
       <sl-input
         exportparts="form-control: ${formControl}, form-control-label: ${formControlLabel}, form-control-label: ${label}, input: ${input}, base: ${inputBase}"
         class="input"
-        label=${field.label}
         type=${field.type || "text"}
         ?required=${field.fieldOptions?.required}
         value=${_.get(this.form, path)}
@@ -227,8 +227,13 @@ export default class EccUtilsDesignForm extends LitElement {
 
           this.requestUpdate();
         }}
-        help-text=${field.fieldOptions?.tooltip ?? ""}
-      ></sl-input>
+      >
+        <label slot="label">
+          <sl-tooltip content=${field.fieldOptions?.tooltip ?? ""}>
+            <label> ${field.label} </label>
+          </sl-tooltip>
+        </label>
+      </sl-input>
     `;
   }
 
