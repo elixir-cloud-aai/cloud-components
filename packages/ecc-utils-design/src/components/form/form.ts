@@ -6,6 +6,7 @@ import "@shoelace-style/shoelace/dist/components/switch/switch.js";
 import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
+import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import _ from "lodash-es";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
@@ -35,6 +36,7 @@ interface Field {
     multiple?: boolean;
     accept?: string;
     returnIfEmpty?: string;
+    tooltip?: string;
   };
   arrayOptions?: {
     defaultInstances?: number;
@@ -123,9 +125,19 @@ export default class EccUtilsDesignForm extends LitElement {
       this.cssParts;
     return html`
       <div part="${formControl}" class="switch-container">
-        <label part="${label} ${switchLabel}" class="switch-label"
-          >${field.label}</label
-        >
+        ${field.fieldOptions?.tooltip
+          ? html`
+              <sl-tooltip content=${field.fieldOptions?.tooltip ?? ""}>
+                <label part="${label} ${switchLabel}" class="switch-label"
+                  >${field.label}
+                </label>
+              </sl-tooltip>
+            `
+          : html`
+              <label part="${label} ${switchLabel}" class="switch-label"
+                >${field.label}
+              </label>
+            `}
         <sl-switch
           exportparts="control: ${switchControl}, thumb: ${switchThumb}"
           size="small"
@@ -155,9 +167,22 @@ export default class EccUtilsDesignForm extends LitElement {
     if (field.type === "file") {
       return html`
         <div part="${formControl}" class="row">
-          <label part="${label} ${formControlLabel}">
-            ${field.label} ${field.fieldOptions?.required ? "*" : ""}
-          </label>
+          ${field.fieldOptions?.tooltip
+            ? html`
+                <sl-tooltip
+                  id=${field.key}
+                  content=${field.fieldOptions?.tooltip ?? ""}
+                >
+                  <label part="${label} ${formControlLabel}">
+                    ${field.label} ${field.fieldOptions?.required ? "*" : ""}
+                  </label>
+                </sl-tooltip>
+              `
+            : html`
+                <label part="${label} ${formControlLabel}">
+                  ${field.label} ${field.fieldOptions?.required ? "*" : ""}
+                </label>
+              `}
           <input
             class="input"
             part="${inputBase} ${input}"
@@ -202,6 +227,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
           this.requestUpdate();
         }}
+        help-text=${field.fieldOptions?.tooltip ?? ""}
       ></sl-input>
     `;
   }
@@ -251,9 +277,16 @@ export default class EccUtilsDesignForm extends LitElement {
           part="header: ${arrayHeader}, header: ${header}"
           class="array-header"
         >
-          <label part="${label} ${arrayLabel}" class="array-label">
-            ${field.label}
-          </label>
+          ${field.fieldOptions?.tooltip
+            ? html`
+                <sl-tooltip content=${field.fieldOptions?.tooltip ?? ""}>
+                </sl-tooltip>
+              `
+            : html`
+                <label part="${label} ${arrayLabel}" class="array-label">
+                  ${field.label}
+                </label>
+              `}
           <sl-button
             variant="text"
             size="small"
@@ -359,9 +392,19 @@ export default class EccUtilsDesignForm extends LitElement {
           </sl-details>`
         : html`
             <div part="${header} ${groupHeader}" class="group-header">
-              <label part="${groupLabel} ${label}" class="group-label">
-                ${field.groupOptions?.collapsible ? "" : field.label}
-              </label>
+              ${field.fieldOptions?.tooltip
+                ? html`
+                    <sl-tooltip content=${field.fieldOptions?.tooltip ?? ""}>
+                      <label part="${groupLabel} ${label}" class="group-label">
+                        ${field.groupOptions?.collapsible ? "" : field.label}
+                      </label>
+                    </sl-tooltip>
+                  `
+                : html`
+                    <label part="${groupLabel} ${label}" class="group-label">
+                      ${field.groupOptions?.collapsible ? "" : field.label}
+                    </label>
+                  `}
             </div>
             ${renderChildren()}
           `}
