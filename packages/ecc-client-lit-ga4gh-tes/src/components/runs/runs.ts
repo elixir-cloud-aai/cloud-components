@@ -44,6 +44,7 @@ interface FooterButton {
   key: string;
   name: string;
   variant?: "primary" | "success" | "neutral" | "warning" | "danger";
+  icon?: string;
 }
 
 @customElement("ecc-client-lit-ga4gh-tes-runs")
@@ -101,12 +102,17 @@ export class TESRuns extends LitElement {
       ],
     },
     {
-      tabGroup: "Output and Inputs",
+      tabGroup: "Output",
       children: [
         {
           label: "Output",
           path: "outputs",
         },
+      ],
+    },
+    {
+      tabGroup: "Inputs",
+      children: [
         {
           label: "Input",
           path: "inputs",
@@ -139,7 +145,7 @@ export class TESRuns extends LitElement {
       ],
       placeholder: "Filter by status",
       selectConfig: {
-        multiple: true,
+        multiple: false,
       },
     },
   ];
@@ -209,8 +215,8 @@ export class TESRuns extends LitElement {
       );
 
       const convertedData: ItemProp[] = data.tasks?.map(
-        (task: { id: string; state: string }) => ({
-          index: this.items.length + convertedData.length + 1,
+        (task: { id: string; state: string }, index: number) => ({
+          index: (page - 1) * this.pageSize + (index + 1),
           name: task.id,
           key: `${task.id}`,
           lazy: true,
@@ -279,6 +285,7 @@ export class TESRuns extends LitElement {
             key,
             name: "Delete",
             variant: "danger",
+            icon: "../../../assets/delete.svg",
           },
         ];
 
