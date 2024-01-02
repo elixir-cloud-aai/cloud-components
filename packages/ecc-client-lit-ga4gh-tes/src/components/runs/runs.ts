@@ -285,7 +285,7 @@ export class TESRuns extends LitElement {
             key,
             name: "Delete",
             variant: "danger",
-            icon: "../../../assets/delete.svg",
+            icon: "/assets/delete.svg",
           },
         ];
 
