@@ -39,6 +39,8 @@ import "@elixir-cloud/lit-wes";
 | [`fields`](../../design/components/details.md#fields) | `false`  | [`default`](#default)                     | `Array<Fields>` | Configuration based on which data will be rendered in groups. |
 | `filter`                                              | `false`  | `true`                                    | `Boolean`       | Defines the rendering of the filter-by-state bar.             |
 
+> Filter feature isn't implemented in the package as it isn't implemented in backend and client side filtering is not an ideal solution.
+
 ### baseURL
 
 This property is used to give `POST` endpoint to create workflow. The provided baseURL is concatenated with `/runs` and is used as an endpoint to create a `POST` request.
