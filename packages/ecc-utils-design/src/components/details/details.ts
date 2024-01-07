@@ -56,7 +56,7 @@ export default class EccUtilsDesignDetails extends LitElement {
         align-items: flex-start;
         width: 100%;
         height: 100%;
-        font-weight: var(--sl-font-weight-semibold);
+        font-weightcould be shown as labels/shields/badges, but agai: var(--sl-font-weight-semibold);
       }
 
       .value {
