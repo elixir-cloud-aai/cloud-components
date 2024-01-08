@@ -46,7 +46,10 @@ export default defineConfig({
           { text: 'Usage', link: '/tes/usage' },
           {
             text: 'Components',
-            items: [{ text: 'Create Run', link: '/tes/components/create-run' }],
+            items: [
+              { text: 'Runs', link: '/tes/components/runs' },
+              { text: 'Create Run', link: '/tes/components/create-run' },
+            ],
           },
         ],
       },
