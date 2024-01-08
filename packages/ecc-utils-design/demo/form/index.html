@@ -2,7 +2,7 @@
 <html lang="en-GB">
 	<head>
 		<meta charset="utf-8" />
-		<!-- <style>
+		<style>
 			body {
 				background: #f5f5f5;
 			}
@@ -82,7 +82,7 @@
 				color: #4caf50;
 				font-weight: bold;
 			}
-		</style> -->
+		</style>
 		<title>ecc-utils-design</title>
 		<script src="https://cdn.tailwindcss.com"></script>
 	</head>
@@ -105,7 +105,7 @@
 			    type: "text",
 			    fieldOptions: {
 			      required: true,
-			      tooltip: "Your name", // Tooltip added
+			      tooltip: "Your name",
 			    },
 			  },
 			  {
@@ -113,7 +113,6 @@
 			    label: "Email",
 			    type: "email",
 			    fieldOptions: {
-			      // required: false,
 			      tooltip: "Your email address",
 			    },
 			  },
@@ -128,11 +127,11 @@
 			    fieldOptions: {
 			      tooltip: "Group for address",
 			    },
-			    // arrayOptions: {
-			    //   defaultInstances: 1,
-			    //   max: 4,
-			    //   min: 1,
-			    // },
+			    arrayOptions: {
+			      defaultInstances: 1,
+			      max: 4,
+			      min: 1,
+			    },
 			    children: [
 			      {
 			        key: "Details",
@@ -161,8 +160,8 @@
 			            type: "text",
 			            fieldOptions: {
 			              default: "1601 Harrier Ln",
-			              // required: false,
-			              tooltip: "Your street name", // Tooltip added
+			              required: false,
+			              tooltip: "Your street name",
 			            },
 			          },
 			          {
@@ -171,7 +170,7 @@
 			            type: "text",
 			            fieldOptions: {
 			              required: true,
-			              tooltip: "Your city name", // Tooltip added
+			              tooltip: "Your city name",
 			            },
 			          },
 			          {

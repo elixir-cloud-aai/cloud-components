@@ -125,9 +125,9 @@ export default class EccUtilsDesignForm extends LitElement {
       this.cssParts;
     return html`
       <div part="${formControl}" class="switch-container">
-        ${field.fieldOptions?.tooltip
+        ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
           ? html`
-              <sl-tooltip content=${field.fieldOptions?.tooltip ?? ""}>
+              <sl-tooltip content=${field.fieldOptions?.tooltip}>
                 <label part="${label} ${switchLabel}" class="switch-label"
                   >${field.label}
                 </label>
@@ -168,11 +168,11 @@ export default class EccUtilsDesignForm extends LitElement {
     if (field.type === "file") {
       return html`
         <div part="${formControl}" class="row">
-          ${field.fieldOptions?.tooltip
+          ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
             ? html`
                 <sl-tooltip
                   id=${field.key}
-                  content=${field.fieldOptions?.tooltip ?? ""}
+                  content=${field.fieldOptions?.tooltip}
                 >
                   <label part="${label} ${formControlLabel}">
                     ${field.label} ${field.fieldOptions?.required ? "*" : ""}
@@ -229,9 +229,14 @@ export default class EccUtilsDesignForm extends LitElement {
         }}
       >
         <label slot="label">
-          <sl-tooltip content=${field.fieldOptions?.tooltip ?? ""}>
-            <label> ${field.label} </label>
-          </sl-tooltip>
+          ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
+            ? html`
+              <sl-tooltip content=${field.fieldOptions?.tooltip}>
+                <label> ${field.label} </label>
+              </sl-tooltip>
+            </label>
+            `
+            : html` <label> ${field.label} </label> `}
         </label>
       </sl-input>
     `;
@@ -282,9 +287,12 @@ export default class EccUtilsDesignForm extends LitElement {
           part="header: ${arrayHeader}, header: ${header}"
           class="array-header"
         >
-          ${field.fieldOptions?.tooltip
+          ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
             ? html`
-                <sl-tooltip content=${field.fieldOptions?.tooltip ?? ""}>
+                <sl-tooltip content=${field.fieldOptions?.tooltip}>
+                  <label part="${label} ${arrayLabel}" class="array-label">
+                    ${field.label}
+                  </label>
                 </sl-tooltip>
               `
             : html`
@@ -397,9 +405,9 @@ export default class EccUtilsDesignForm extends LitElement {
           </sl-details>`
         : html`
             <div part="${header} ${groupHeader}" class="group-header">
-              ${field.fieldOptions?.tooltip
+              ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
                 ? html`
-                    <sl-tooltip content=${field.fieldOptions?.tooltip ?? ""}>
+                    <sl-tooltip content=${field.fieldOptions?.tooltip}>
                       <label part="${groupLabel} ${label}" class="group-label">
                         ${field.groupOptions?.collapsible ? "" : field.label}
                       </label>
