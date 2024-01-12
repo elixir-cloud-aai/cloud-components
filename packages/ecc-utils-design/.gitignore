@@ -37,6 +37,8 @@ yarn-error.log*
 
 ## generated files
 /src/react
+custom-elements-manifest.config.js
+tsconfig.prod.json
 
 storybook-static
 custom-elements.json

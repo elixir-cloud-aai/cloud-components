@@ -24,7 +24,7 @@
   "repository": "",
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "node ./scripts/build.js",
+    "build": "node ../../scripts/build.js",
     "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
     "test": "",
     "test:watch": "wtr --watch",
@@ -34,8 +34,8 @@
     "lint:fix": "npm run lint -- --fix",
     "prepublish": "npm run build"
   },
+  "elixirConfig": {},
   "devDependencies": {
-    "@custom-elements-manifest/analyzer": "^0.8.4",
     "@lit/react": "^1.0.2",
     "@open-wc/eslint-config": "^12.0.0",
     "@open-wc/testing": "^3.2.0",

@@ -1,6 +1,4 @@
 {
-  "extends": "../../scripts/templates/tsconfig.json",
-
   "compilerOptions": {
     "target": "es2018",
     "module": "esnext",
@@ -13,17 +11,11 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "outDir": "dist",
-    "sourceMap": true,
-    "inlineSources": true,
-    "rootDir": "./",
+    "sourceMap": false,
+    "rootDir": "./src",
     "declaration": true,
     "emitDeclarationOnly": true,
     "skipLibCheck": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"],
-  "compilerOptions": {
-    "rootDir": "./src"
-  },
-  "exclude": ["node_modules", "dist", "src/**/*.test.ts"]
+  "include": ["src"]
 }
