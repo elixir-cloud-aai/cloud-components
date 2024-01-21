@@ -140,44 +140,118 @@
 
       const fields = [
         {
-          tabGroup: "Company Info",
-          children: [{ path: "company.name" }, { path: "company.industry" }],
+          key: "company.name",
+          path: "company.name",
+          tab: "Company Info",
         },
         {
-          tabGroup: "Employees",
-          children: [{ path: "company.employees", copy: true }],
+          key: "company.industry",
+          path: "company.industry",
+          tab: "Company Info",
         },
         {
-          tabGroup: "Clients",
-          children: [{ path: "clients" }],
+          key: "company.employees",
+          path: "company.employees[*]",
+          tab: "Employees",
+          arrayOptions: {
+            labelOptions: {
+              path: ".id",
+              prefix: "Employee ",
+            },
+          },
         },
         {
-          tabGroup: "Market Segments",
-          children: [
-            { path: "financials.revenue" },
-            { path: "financials.expenses.operating" },
-            { path: "financials.expenses.marketing" },
-            { path: "financials.expenses.research" },
-            { path: "financials.profit" },
-            { path: "marketSegments", copy: true },
-            { path: "debt" },
-          ],
+          key: "company.employees.skills",
+          parentKey: "company.employees",
+          path: "company.employees[*].skills",
+          copy: true,
+          arrayOptions: {
+            type: "tag",
+          },
         },
         {
-          tabGroup: "Partners",
-          children: [{ path: "partners" }],
+          key: "company.employees.projects.team",
+          parentKey: "company.employees",
+          path: "company.employees[*].projects[*].team",
+          arrayOptions: {
+            type: "tag",
+          },
+        },
+        {
+          key: "company.employees.projects",
+          parentKey: "company.employees",
+          path: "company.employees[*].projects[*]",
+          arrayOptions: {
+            labelOptions: {
+              path: ".projectName",
+            },
+          },
+        },
+        {
+          key: "company.employees.projects",
+          parentKey: "company.employees",
+          path: "company.employees[0].projects[1]",
+          copy: true,
+        },
+        {
+          key: "clients",
+          path: "clients[*]",
+          tab: "Clients",
+          arrayOptions: {
+            labelOptions: {
+              path: ".clientName",
+            },
+          },
+        },
+        {
+          key: "clients.projects",
+          parentKey: "clients",
+          path: "clients[*].projects",
+          arrayOptions: {
+            type: "tag",
+          },
+        },
+        {
+          key: "financials",
+          path: "financials.*",
+          tab: "Financials",
+        },
+        {
+          key: "financials.expenses",
+          parentKey: "financials",
+          path: "financials.expenses",
+          tooltip: "Different fields of expenses",
         },
       ];
 
-      const buttons = [
+      const actions = [
         {
-          key: "1",
-          name: "Button 1",
-          icon: "/demo/assets/delete.svg",
+          key: "3",
+          label: "View More",
+          type: "link",
+          linkOptions: {
+            url: "https://www.google.com",
+          },
+          position: "left",
         },
         {
           key: "2",
-          name: "Button 2",
+          label: "Cancel",
+          type: "button",
+          buttonOptions: {
+            variant: "danger",
+          },
+        },
+        {
+          key: "1",
+          label: "Save",
+          type: "button",
+          buttonOptions: {
+            variant: "primary",
+            icon: {
+              url: "https://img.icons8.com/ios/50/ffffff/save--v1.png",
+            },
+          },
         },
       ];
 
@@ -185,7 +259,7 @@
         html`<ecc-utils-design-details
           .data=${data}
           .fields=${fields}
-          .buttons=${buttons}
+          .actions=${actions}
         >
           <div slot="footer">Dec 13 2023</div>
         </ecc-utils-design-details>`,
