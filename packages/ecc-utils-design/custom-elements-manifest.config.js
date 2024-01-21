@@ -5,8 +5,8 @@ import { program } from "commander";
 import { pascalCase } from "pascal-case";
 import { customElementVsCodePlugin } from "custom-element-vs-code-integration";
 import { customElementJetBrainsPlugin } from "custom-element-jet-brains-integration";
-import { componentsPrefix } from "./scripts/utils.js";
 
+const componentsPrefix = "ecc-utils-design-";
 const packageData = JSON.parse(fs.readFileSync("package.json", "utf8"));
 const { name, description, version, author, homepage, license } = packageData;
 

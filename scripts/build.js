@@ -10,6 +10,7 @@ const { execSync } = require("child_process");
 const fs = require("fs");
 const { npmDir } = require("./utils.js");
 const path = require("path");
+// const packageJson = require('../package.json');
 
 const commanderOpts = program.option("-w --watch").parse().opts();
 
@@ -37,6 +38,30 @@ nextTask("Cleaning up previous build", () => {
       recursive: true,
     })
   );
+});
+
+nextTask("install dependencies", async () => {
+  const packageJsonDir = `${process.cwd()}/package.json`;
+  const packageJson = await import(packageJsonDir, {
+    assert: { type: "json" },
+  });
+  const devDependencies = {
+    ...packageJson.default.devDependencies,
+    "@lit/react": "*",
+    react: "*",
+    commander: "*",
+    "custom-element-jet-brains-integration": "*",
+    "custom-element-vs-code-integration": "*",
+    "pascal-case": "*",
+  };
+
+  const updatedPackageJson = JSON.stringify({
+    ...packageJson.default,
+    devDependencies,
+  });
+  fs.writeFileSync(packageJsonDir, updatedPackageJson, { flag: "w" });
+
+  execSync("npm i");
 });
 
 nextTask("Generating CEM config", () => {

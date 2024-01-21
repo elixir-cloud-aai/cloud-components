@@ -1,4 +1,6 @@
 {
   "extends": ["@open-wc", "elixir"],
-  "rules": {}
+  "rules": {
+    "lit/no-classfield-shadowing": 1
+  }
 }

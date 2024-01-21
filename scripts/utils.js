@@ -13,7 +13,7 @@ const getAllComponents = (metadata) => {
         const component = declaration;
         const { path } = module;
 
-        if (component) {
+        if (component && component.tagName) {
           allComponents.push(Object.assign(component, { path }));
         }
       }
