@@ -16,7 +16,7 @@ import { hostStyles } from "../../styles/host.styles.js";
 export interface Field {
   key: string;
   path: string;
-  tab: string;
+  tab?: string;
   label?: string;
   arrayOptions?: {
     labelOptions?: {
@@ -183,16 +183,7 @@ export default class EccUtilsDesignDetails extends LitElement {
   connectedCallback() {
     super.connectedCallback();
 
-    if (!this.fields || this.fields.length === 0) {
-      this._tabs = ["Details"];
-      this.fields = Object.keys(this.data).map((key) => ({
-        key,
-        path: key,
-        tab: "Details",
-      }));
-    }
-
-    this._tabs = this._getTabs();
+    this._tabs = this._getTabs() as Array<string>;
 
     const arrayFields = this.fields.filter((field) =>
       field.path.includes("[*]")
@@ -302,6 +293,8 @@ export default class EccUtilsDesignDetails extends LitElement {
       if (key === matchingField?.parentKey) {
         const omitedField = _.omit(matchingField, "parentKey");
         fieldwithProps = _.merge(field, omitedField);
+      } else if (!matchingField?.parentKey) {
+        fieldwithProps = _.merge(field, matchingField);
       }
     });
     fieldwithProps.key = key;
@@ -432,9 +425,21 @@ export default class EccUtilsDesignDetails extends LitElement {
     `;
   }
 
+  private _renderFields(data: any) {
+    return Object.keys(data).map((key) =>
+      this._renderField({
+        key,
+        path: key,
+        tab: "",
+      })
+    );
+  }
+
   render() {
     return html`<div>
-      <sl-tab-group> ${this._renderTabs()} </sl-tab-group>
+      ${this._tabs.length > 0
+        ? html`<sl-tab-group> ${this._renderTabs()} </sl-tab-group>`
+        : this._renderFields(this.data)}
       ${this._renderActions()}
     </div>`;
   }
