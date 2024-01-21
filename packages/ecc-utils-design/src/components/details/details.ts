@@ -372,7 +372,14 @@ export default class EccUtilsDesignDetails extends LitElement {
       </sl-button>`;
     }
     return html`<sl-button
-      @click=${() => this.dispatchEvent(new CustomEvent(action.key))}
+      @click=${() =>
+        this.dispatchEvent(
+          new CustomEvent("ecc-utils-button-click", {
+            detail: {
+              key: action.key,
+            },
+          })
+        )}
       ?loading=${action.buttonOptions?.loading}
       ?disabled=${action.buttonOptions?.disabled}
       variant=${ifDefined(action.buttonOptions?.variant)}
