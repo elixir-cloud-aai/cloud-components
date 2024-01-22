@@ -1,7 +1,7 @@
 # Collection Component <Badge type="warning" text="beta" />
 
 <div class="component-name">&lt;ecc-utils-design-code&gt;</div>
-Simple code editor to handle Yaml, JSON and text manipulation and input.
+Simple code editor to handle Yaml, JSON and multiline text input.
 <ClientOnly>
   <div :class="isDark ? 'component-dark component' : 'component-light component'">
     <ecc-utils-design-code :v-if="renderComponent" :items="primaryItems" :filters="primaryFilters" totalItems="50"></ecc-utils-design-code>
@@ -36,6 +36,12 @@ import "@elixir-cloud/design/dist/components/code/index.js";
 | `language` | `false`  |         | `String`  | Specifies the language interpreter for syntax highlighting.            |
 | `lnu`      | `true`   |         | `Boolean` | Specifies whether the editor should display line numbers.              |
 
+## Events
+
+| Event Name         | Description                                                                                                                                                                                                                                                             |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ecc-utils-change` | This event is triggered when there is a change in the code within the editor. The event details include the language set by the package author, the code as value, and an error attribute indicating whether the entered code is valid based on the specified language. |
+
 ## Methods
 
 | Method Name | Arguments | Description        |
@@ -46,35 +52,20 @@ import "@elixir-cloud/design/dist/components/code/index.js";
 
 ## Parts
 
-| Part Name                         | Description                                                                   |
-| --------------------------------- | ----------------------------------------------------------------------------- |
-| `container`                       | Wrapper container for code and header (select, copy, etc.)                    |
-| `header`                          | Header container                                                              |
-| [`code`](#code)                   | Code wrapper of this element (see the [css variable](#code) for more info).   |
-| `select-form-control`             | The form control that wraps the label, input, and help text.                  |
-| `select-form-control-label`       | The labels wrapper.                                                           |
-| `select-form-control-input`       | The selects wrapper.                                                          |
-| `select-form-control-help-text`   | The help texts wrapper.                                                       |
-| `select-combobox`                 | The container that wraps the prefix, combobox, clear icon, and expand button. |
-| `select-prefix`                   | The container that wraps the prefix slot.                                     |
-| `select-display-input`            | The element that displays the selected options label, an <input> element.     |
-| `select-listbox`                  | The listbox container where options are slotted.                              |
-| `select-tags`                     | The container that houses option tags when multiselect is used.               |
-| `select-tag`                      | The individual tags that represent each multiselect option.                   |
-| `select-tag__base`                | The tags base part.                                                           |
-| `select-tag__content`             | The tags content part.                                                        |
-| `select-tag__remove-button`       | The tags remove button.                                                       |
-| `select-tag__remove-button__base` | The tags remove button base part.                                             |
-| `select-clear-button`             | The clear button.                                                             |
-| `select-expand-icon`              | The container that wraps the expand icon.                                     |
-| `copy-button`                     | The internal `<button>` element.                                              |
-| `copy-icon`                       | The container that holds the copy icon.                                       |
-| `copy-success-icon`               | The container that holds the success icon.                                    |
-| `copy-error-icon`                 | The container that holds the error icon.                                      |
-| `copy-tooltip__base`              | The tooltips exported base part.                                              |
-| `copy-tooltip__base__popup`       | The tooltips exported popup part.                                             |
-| `copy-tooltip__base__arrow`       | The tooltips exported arrow part.                                             |
-| `copy-tooltip__body`              | The tooltips exported body part.                                              |
+| Part Name                   | Description                                                                 |
+| --------------------------- | --------------------------------------------------------------------------- |
+| `container`                 | Wrapper container for code and header (select, copy, etc.)                  |
+| `header`                    | Header container                                                            |
+| [`code`](#code)             | Code wrapper of this element (see the [css variable](#code) for more info). |
+| `badge-base`                | The base wrapper for bage.                                                  |
+| `copy-button`               | The internal `<button>` element.                                            |
+| `copy-icon`                 | The container that holds the copy icon.                                     |
+| `copy-success-icon`         | The container that holds the success icon.                                  |
+| `copy-error-icon`           | The container that holds the error icon.                                    |
+| `copy-tooltip__base`        | The tooltips exported base part.                                            |
+| `copy-tooltip__base__popup` | The tooltips exported popup part.                                           |
+| `copy-tooltip__base__arrow` | The tooltips exported arrow part.                                           |
+| `copy-tooltip__body`        | The tooltips exported body part.                                            |
 
 ## CSS Variables
 
