@@ -1,8 +1,7 @@
 const path = require("path");
-const { cwd } = require("process");
 
 const componentsPrefix = "ecc-utils-design-";
-const npmDir = path.join(cwd(), "dist");
+const npmDir = path.join("./dist");
 
 const getAllComponents = (metadata) => {
   const allComponents = [];

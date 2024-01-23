@@ -12,6 +12,7 @@ const { npmDir } = require("./utils.js");
 const path = require("path");
 // const packageJson = require('../package.json');
 
+const packageJsonDir = `${process.cwd()}/package.json`;
 const commanderOpts = program.option("-w --watch").parse().opts();
 
 const bundleDirectories = [npmDir];
@@ -40,8 +41,7 @@ nextTask("Cleaning up previous build", () => {
   );
 });
 
-nextTask("install dependencies", async () => {
-  const packageJsonDir = `${process.cwd()}/package.json`;
+nextTask("installing dependencies", async () => {
   const packageJson = await import(packageJsonDir, {
     assert: { type: "json" },
   });
@@ -81,11 +81,20 @@ nextTask("Generating component metadata", () =>
   )
 );
 
-nextTask("Wrapping components for React", () =>
-  execSync(`node  ${path.join(__dirname, "make-react.js")}`, {
-    stdio: "inherit",
-  })
-);
+nextTask("Wrapping components for React", async () => {
+  const packageJson = await import(packageJsonDir, {
+    assert: { type: "json" },
+  });
+
+  execSync(
+    `node  ${path.join(__dirname, "make-react.js")} -p "${
+      packageJson.default.componentsPrefix
+    }"`,
+    {
+      stdio: "inherit",
+    }
+  );
+});
 
 nextTask("Generating tsconfig", () => {
   execSync(`node  ${path.join(__dirname, "make-tsconfig.js")}`, {

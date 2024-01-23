@@ -2,10 +2,13 @@
 
 const { cwd } = process;
 const fs = require("fs");
+const { program } = require("commander");
 const path = require("path");
 const prettier = require("prettier");
 const pascalCase = require("pascal-case");
-const { componentsPrefix, npmDir, getAllComponents } = require("./utils.js");
+const { npmDir, getAllComponents } = require("./utils.js");
+
+const options = program.option("-p, --prefix <string>").parse().opts();
 
 const reactDir = path.join(cwd(), "./src/react");
 // Clear build directory
@@ -22,7 +25,7 @@ const index = [];
 // the add react to build
 
 components.forEach((component) => {
-  const tagWithoutPrefix = component.tagName.replace(componentsPrefix, "");
+  const tagWithoutPrefix = component.tagName.replace(options.prefix, "");
   const componentDir = path.join(reactDir, tagWithoutPrefix);
   const componentFile = path.join(componentDir, "index.ts");
   const eventImports = (component.events || [])

@@ -5,11 +5,7 @@ import { program } from "commander";
 import pkg from "pascal-case";
 import { customElementVsCodePlugin } from "custom-element-vs-code-integration";
 import { customElementJetBrainsPlugin } from "custom-element-jet-brains-integration";
-
-const { pascalCase } = pkg;
-const componentsPrefix = "ecc-utils-design-";
-const packageData = JSON.parse(fs.readFileSync("package.json", "utf8"));
-const { name, description, version, author, homepage, license } = packageData;
+import packageJson from "./package.json" assert { type: "json" };
 
 const options = program
   .option("-o, --outdir <string>")
@@ -17,6 +13,11 @@ const options = program
   .option("--analyze", "", true)
   .parse()
   .opts();
+
+const { pascalCase } = pkg;
+const componentsPrefix = packageJson.componentsPrefix;
+const packageData = JSON.parse(fs.readFileSync("package.json", "utf8"));
+const { name, description, version, author, homepage, license } = packageData;
 
 const getComponentDocumentation = (tag) =>
   `https://elixir-cloud-components.vercel.app/design/components/${tag.replace(
