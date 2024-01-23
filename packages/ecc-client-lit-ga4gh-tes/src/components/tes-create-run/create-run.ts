@@ -35,6 +35,9 @@ export class TESCreateRun extends LitElement {
       key: "executors",
       label: "Executors",
       type: "group",
+      fieldOptions: {
+        required: true,
+      },
       groupOptions: {
         collapsible: true,
       },
@@ -43,9 +46,6 @@ export class TESCreateRun extends LitElement {
           key: "executors",
           label: "",
           type: "array",
-          fieldOptions: {
-            required: true,
-          },
           arrayOptions: {
             defaultInstances: 1,
             min: 1,
@@ -65,11 +65,8 @@ export class TESCreateRun extends LitElement {
               children: [
                 {
                   key: "command",
-                  label: "Command",
+                  label: "",
                   type: "text",
-                  fieldOptions: {
-                    required: true,
-                  },
                 },
               ],
             },

@@ -252,7 +252,7 @@ export default class EccUtilsDesignForm extends LitElement {
           class="array-header"
         >
           <label part="${label} ${arrayLabel}" class="array-label">
-            ${field.label}
+            ${field.label} ${field.fieldOptions?.required ? "*" : ""}
           </label>
           <sl-button
             variant="text"
@@ -352,7 +352,9 @@ export default class EccUtilsDesignForm extends LitElement {
     return html` <div class="group-container">
       ${field.groupOptions?.collapsible
         ? html` <sl-details
-            summary=${field.label}
+            summary=${`${field.label} ${
+              field.fieldOptions?.required ? "*" : ""
+            }`}
             exportparts="base: ${groupBase}, header: ${groupHeader}, header: ${header}, summary: ${label}, summary: ${groupLabel}, summary-icon: ${groupToggleIcon}, content: ${groupContent}"
           >
             ${renderChildren()}
