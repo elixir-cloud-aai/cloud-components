@@ -1,5 +1,5 @@
 import { html, css, LitElement, render } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { property, state } from "lit/decorators.js";
 import "@elixir-cloud/design";
 import {
   cancelWorkflow,
@@ -49,8 +49,7 @@ interface FooterButton {
   variant?: "primary" | "success" | "neutral" | "warning" | "danger";
 }
 
-@customElement("ecc-client-lit-ga4gh-wes-runs")
-export class WESRuns extends LitElement {
+export default class ECCClientGA4GHWESRuns extends LitElement {
   static styles = css``;
   @property({ type: Number }) private pageSize = 5;
   @property({ type: String }) private baseURL =
@@ -318,7 +317,6 @@ export class WESRuns extends LitElement {
   }
 
   render() {
-    console.log(this.items);
     return html`
       <ecc-utils-design-collection
         id="collection"
@@ -332,10 +330,5 @@ export class WESRuns extends LitElement {
       >
       </ecc-utils-design-collection>
     `;
-  }
-}
-declare global {
-  interface HTMLElementTagNameMap {
-    "ecc-client-lit-ga4gh-wes-runs": WESRuns;
   }
 }

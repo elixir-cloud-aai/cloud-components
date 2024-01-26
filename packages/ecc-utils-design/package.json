@@ -1,1 +1,68 @@
-{"name":"@elixir-cloud/design","description":"Abstraction layer that provides utility components to manage the headless yet constitent design across ecc component","main":"./dist/index.js","module":"./dist/index.mjs","types":"./dist/index.d.ts","exports":{".":{"types":"./dist/index.d.ts","import":"./dist/index.js"},"./dist/custom-elements.json":"./dist/custom-elements.json","./dist/index.js":"./dist/index.js","./dist/components/*":"./dist/components/*","./dist/react":"./dist/react/index.js","./dist/react/*":"./dist/react/*","./dist/utilities/*":"./dist/utilities/*"},"type":"module","version":"0.0.1","author":"","license":"ISC","customElements":"./dist/custom-elements.json","repository":"","componentsPrefix":"ecc-utils-design-","scripts":{"analyze":"cem analyze --litelement","build":"node ../../scripts/build.js","dev":"concurrently -r \"npm run build -- --watch\" \"wds\"","test":"","test:watch":"wtr --watch","storybook":"npm run build && npm run analyze -- --exclude dist && concurrently -k -r \"npm run build -- --watch\" \"wds -c .storybook/server.mjs\"","storybook:build":"npm run build && npm run analyze -- --exclude dist && build-storybook","lint":"npx eslint .","lint:fix":"npm run lint -- --fix","prepublish":"npm run build"},"elixirConfig":{},"devDependencies":{"@lit/react":"*","@open-wc/eslint-config":"*","@open-wc/testing":"*","@types/lodash-es":"^4.17.10","@web/dev-server":"*","@web/dev-server-esbuild":"^0.4.3","@web/dev-server-storybook":"^1.0.2","@web/test-runner":"^0.17.0","commander":"*","concurrently":"*","custom-element-jet-brains-integration":"*","custom-element-vs-code-integration":"*","esbuild":"0.18.20","eslint":"*","eslint-config-elixir":"*","eslint-plugin-prettier":"^4.2.1","globby":"^14.0.0","react":"*","tslib":"^2.6.2","tsup":"^7.2.0","typescript":"*","pascal-case":"*"},"dependencies":{"@shoelace-style/shoelace":"^2.8.0","lit":"^2.8.0","lodash-es":"^4.17.21"}}
+{
+	"name": "@elixir-cloud/design",
+	"description": "Abstraction layer that provides utility components to manage the headless yet constitent design across ecc component",
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		},
+		"./dist/custom-elements.json": "./dist/custom-elements.json",
+		"./dist/index.js": "./dist/index.js",
+		"./dist/components/*": "./dist/components/*",
+		"./dist/react": "./dist/react/index.js",
+		"./dist/react/*": "./dist/react/*",
+		"./dist/utilities/*": "./dist/utilities/*"
+	},
+	"type": "module",
+	"version": "0.0.1",
+	"author": "",
+	"license": "ISC",
+	"customElements": "./dist/custom-elements.json",
+	"repository": "",
+	"componentsPrefix": "ecc-utils-design-",
+	"scripts": {
+		"analyze": "cem analyze --litelement",
+		"build": "node ../../scripts/build.js",
+		"dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
+		"test": "",
+		"test:watch": "wtr --watch",
+		"storybook": "npm run build && npm run analyze -- --exclude dist && concurrently -k -r \"npm run build -- --watch\" \"wds -c .storybook/server.mjs\"",
+		"storybook:build": "npm run build && npm run analyze -- --exclude dist && build-storybook",
+		"lint": "npx eslint .",
+		"lint:fix": "npm run lint -- --fix",
+		"prepublish": "npm run build"
+	},
+	"elixirConfig": {},
+	"devDependencies": {
+		"@lit/react": "*",
+		"@open-wc/eslint-config": "*",
+		"@open-wc/testing": "*",
+		"@types/lodash-es": "^4.17.10",
+		"@web/dev-server": "*",
+		"@web/dev-server-esbuild": "^0.4.3",
+		"@web/dev-server-storybook": "^1.0.2",
+		"@web/test-runner": "^0.17.0",
+		"commander": "*",
+		"concurrently": "*",
+		"custom-element-jet-brains-integration": "*",
+		"custom-element-vs-code-integration": "*",
+		"esbuild": "0.18.20",
+		"eslint": "*",
+		"eslint-config-elixir": "*",
+		"eslint-plugin-prettier": "^4.2.1",
+		"globby": "^14.0.0",
+		"react": "*",
+		"tslib": "^2.6.2",
+		"tsup": "^7.2.0",
+		"typescript": "*",
+		"pascal-case": "*"
+	},
+	"dependencies": {
+		"@shoelace-style/shoelace": "^2.8.0",
+		"lit": "^2.8.0",
+		"lodash-es": "^4.17.21"
+	}
+}

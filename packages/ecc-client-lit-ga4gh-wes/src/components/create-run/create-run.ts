@@ -1,15 +1,51 @@
 import { html, LitElement } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { property, state } from "lit/decorators.js";
 import { postWorkflow } from "../../API/Workflow/wesGet.js";
 import "@elixir-cloud/design/dist/components/form/index.js";
 
-@customElement("ecc-client-lit-ga4gh-wes-create-run")
-export class WESCreateRun extends LitElement {
-  @state() private form: FormData = new FormData();
+interface Field {
+  key: string;
+  label: string;
+  type?:
+    | "text"
+    | "date"
+    | "number"
+    | "email"
+    | "password"
+    | "tel"
+    | "url"
+    | "search"
+    | "datetime-local"
+    | "time"
+    | "array"
+    | "switch"
+    | "file"
+    | "group";
+  fieldOptions?: {
+    required?: boolean;
+    default?: string | boolean;
+    multiple?: boolean;
+    accept?: string;
+    returnIfEmpty?: string;
+  };
+  arrayOptions?: {
+    defaultInstances?: number;
+    max?: number;
+    min?: number;
+  };
+  groupOptions?: {
+    collapsible: boolean;
+  };
+  error?: string;
+  children?: Array<Field>;
+}
+
+export default class ECCClientGA4GHWESCreateRuns extends LitElement {
   @property({ type: String }) private baseURL =
     "https://prowes.rahtiapp.fi/ga4gh/wes/v1";
 
-  fields = [
+  @state() private form: FormData = new FormData();
+  @state() private fields: Field[] = [
     {
       key: "workflow_url",
       label: "Workflow URL",
@@ -118,10 +154,5 @@ export class WESCreateRun extends LitElement {
         }}
       ></ecc-utils-design-form>
     `;
-  }
-}
-declare global {
-  interface HTMLElementTagNameMap {
-    "ecc-client-lit-ga4gh-wes-create-run": WESCreateRun;
   }
 }
