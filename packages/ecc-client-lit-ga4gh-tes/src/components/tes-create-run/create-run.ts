@@ -81,6 +81,11 @@ export class TESCreateRun extends LitElement {
       key: "executors",
       label: "Executors",
       type: "group",
+      fieldOptions: {
+        required: true,
+        tooltip:
+          "A sequence of program arguments to execute, where the first argument is the program to execute (i.e. argv).",
+      },
       groupOptions: {
         collapsible: true,
       },
@@ -89,9 +94,6 @@ export class TESCreateRun extends LitElement {
           key: "executors",
           label: "",
           type: "array",
-          fieldOptions: {
-            required: true,
-          },
           arrayOptions: {
             defaultInstances: 1,
             min: 1,
@@ -103,6 +105,8 @@ export class TESCreateRun extends LitElement {
               type: "array",
               fieldOptions: {
                 required: true,
+                tooltip:
+                  "A sequence of program arguments to execute, where the first argument is the program to execute (i.e. argv).",
               },
               arrayOptions: {
                 defaultInstances: 1,
@@ -111,13 +115,8 @@ export class TESCreateRun extends LitElement {
               children: [
                 {
                   key: "command",
-                  label: "Command",
+                  label: "",
                   type: "text",
-                  fieldOptions: {
-                    required: true,
-                    tooltip:
-                      "A sequence of program arguments to execute, where the first argument is the program to execute (i.e. argv).",
-                  },
                 },
               ],
             },
