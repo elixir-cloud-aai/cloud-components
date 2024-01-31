@@ -28,8 +28,8 @@ export default class EccUtilsDesignCode extends LitElement {
   @property({ type: String }) code = "";
   @property({ type: String }) label = "Code";
   @property({ type: String }) language: Language = "YAML";
-  @property({ type: Boolean }) lnu = true;
   @property({ type: Number }) indentation = 2;
+  @property({ type: Number }) blurDelay = 150;
 
   @state() value = "";
   @state() elTextarea: HTMLTextAreaElement | null = null;
@@ -38,6 +38,7 @@ export default class EccUtilsDesignCode extends LitElement {
   @state() currentIndentation = "";
   @state() opening = ["(", "{", "[", "'", '"'];
   @state() closing = [")", "}", "]", "'", '"'];
+  @state() lastTabPressTime = 0;
 
   private cssParts = {};
 
@@ -259,9 +260,19 @@ export default class EccUtilsDesignCode extends LitElement {
   }
 
   private _handleKeys(e: KeyboardEvent) {
+    const currentTime = new Date().getTime();
+    const timeSinceLastTabPress = currentTime - this.lastTabPressTime;
+
     switch (e.code) {
       case "Tab":
-        this._handleTabs(e);
+        if (timeSinceLastTabPress > this.blurDelay) {
+          this._handleTabs(e);
+        } else {
+          this.shadowRoot?.querySelector("sl-textarea")?.blur();
+          e.preventDefault();
+        }
+
+        this.lastTabPressTime = currentTime;
         break;
       case "Enter":
         this._handleNewLine(e);
