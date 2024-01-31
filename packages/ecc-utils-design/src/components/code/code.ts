@@ -4,6 +4,7 @@ import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/badge/badge.js";
 import "@shoelace-style/shoelace/dist/components/textarea/textarea.js";
 import "@shoelace-style/shoelace/dist/components/copy-button/copy-button.js";
+import jsyaml from "js-yaml";
 import { hostStyles } from "../../styles/host.styles.js";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
 
@@ -31,7 +32,6 @@ export default class EccUtilsDesignCode extends LitElement {
   @property({ type: Number }) indentation = 2;
   @property({ type: Number }) blurDelay = 150;
 
-  @state() value = "";
   @state() elTextarea: HTMLTextAreaElement | null = null;
   @state() error = false;
   @state() indent = "";
@@ -62,11 +62,6 @@ export default class EccUtilsDesignCode extends LitElement {
 
   public getCode() {
     return this.code;
-  }
-
-  private _setCode(code: string) {
-    this.code = code;
-    this._updateTextarea();
   }
 
   private _setCursor(pos: number) {
@@ -128,6 +123,7 @@ export default class EccUtilsDesignCode extends LitElement {
 
   private _handleInput(e: InputEvent) {
     this.code = (e.target as HTMLInputElement).value;
+    this._validateCode();
     this.dispatchEvent(
       new CustomEvent("ecc-utils-change", { detail: this.code })
     );
@@ -284,6 +280,25 @@ export default class EccUtilsDesignCode extends LitElement {
         if (this.opening.includes(e.key)) this._handleAutoClose(e);
         else if (this.closing.includes(e.key)) this._handleAutoSkip(e);
     }
+    this._validateCode();
+  }
+
+  private _validateCode(): void {
+    if (this.language === "JSON") {
+      try {
+        JSON.parse(this.code);
+        this.error = false;
+      } catch (error) {
+        this.error = true;
+      }
+    } else if (this.language === "YAML") {
+      try {
+        jsyaml.loadAll(this.code);
+        this.error = false;
+      } catch (error) {
+        this.error = true;
+      }
+    } else this.error = false;
   }
 
   render() {
@@ -296,7 +311,9 @@ export default class EccUtilsDesignCode extends LitElement {
       >
         <div id="label" slot="label">
           ${this.label}
-          <sl-badge>${this.language}</sl-badge>
+          <sl-badge variant=${this.error ? "danger" : "primary"}
+            >${this.language}</sl-badge
+          >
           <sl-copy-button></sl-copy-button>
         </div>
       </sl-textarea>
