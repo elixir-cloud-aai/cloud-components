@@ -39,6 +39,7 @@ export default class EccUtilsDesignCode extends LitElement {
   @state() opening = ["(", "{", "[", "'", '"'];
   @state() closing = [")", "}", "]", "'", '"'];
   @state() lastTabPressTime = 0;
+  @state() errorLanguage: Language = "Text";
 
   private cssParts = {};
 
@@ -289,6 +290,12 @@ export default class EccUtilsDesignCode extends LitElement {
         JSON.parse(this.code);
         this.error = false;
       } catch (error) {
+        try {
+          jsyaml.loadAll(this.code);
+          this.errorLanguage = "YAML";
+        } catch (err) {
+          this.errorLanguage = "Text";
+        }
         this.error = true;
       }
     } else if (this.language === "YAML") {
@@ -297,6 +304,7 @@ export default class EccUtilsDesignCode extends LitElement {
         this.error = false;
       } catch (error) {
         this.error = true;
+        this.errorLanguage = "Text";
       }
     } else this.error = false;
   }
@@ -314,7 +322,10 @@ export default class EccUtilsDesignCode extends LitElement {
           <sl-badge variant=${this.error ? "danger" : "primary"}
             >${this.language}</sl-badge
           >
-          <sl-copy-button></sl-copy-button>
+          ${this.error
+            ? html`<sl-badge variant="neutral">${this.errorLanguage}</sl-badge>`
+            : html``}
+          <sl-copy-button value=${this.code}></sl-copy-button>
         </div>
       </sl-textarea>
     `;
