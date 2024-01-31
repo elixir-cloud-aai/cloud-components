@@ -282,6 +282,9 @@ export default class EccUtilsDesignCode extends LitElement {
         else if (this.closing.includes(e.key)) this._handleAutoSkip(e);
     }
     this._validateCode();
+    this.dispatchEvent(
+      new CustomEvent("ecc-utils-change", { detail: this.code })
+    );
   }
 
   private _validateCode(): void {
