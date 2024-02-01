@@ -74,6 +74,7 @@ This property is used to render the fields in the form. Fields can be passed as 
 | fieldOptions.required         | `false`  | `false` | `boolean`                                                                                                                             | Whether the field is required or not.                                                                                                                                                                                     |
 | fieldOptions.default          | `false`  | `null`  | `string \| boolean`                                                                                                                   | Value of the field                                                                                                                                                                                                        |
 | fieldOptions.multiple         | `false`  | `false` | `boolean`                                                                                                                             | Whether fields of type `file` accept multiple values. Only applies to fields of type `file`                                                                                                                               |
+| fieldOptions.tooltip          | `false`  | `null`  | `string`                                                                                                                              | Tooltip or help-text that will render a popup when hovered over label of form field.                                                                                                                                      |
 | fieldOptions.accept           | `false`  | `null`  | `string`                                                                                                                              | A comma seperated string that determines the types of files that fields of type `file` will accept. [Example](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept). Only applies to fields of type `file` |
 | fieldOptions.returnIfEmpty    | `false`  | `false` | `boolean`                                                                                                                             | Determines if the data from an empty input field will be returned in the form data when empty.                                                                                                                            |
 | arrayOptions.defaultInstances | `false`  | `null`  | `number`                                                                                                                              | Sets a default number of instances for fields of type `array` Only applies to fields of type `array`                                                                                                                      |
@@ -149,12 +150,16 @@ const fields = [
     type: "text",
     fieldOptions: {
       required: true,
+      tooltip: "Your name",
     },
   },
   {
     key: "email",
     label: "Email",
     type: "email",
+    fieldOptions: {
+      tooltip: "Your email address",
+    },
   },
   {
     key: "address",
@@ -162,12 +167,24 @@ const fields = [
     type: "group",
     groupOptions: {
       collapsible: true,
+      tooltip: "Your address",
+    },
+    fieldOptions: {
+      tooltip: "Group for address",
+    },
+    arrayOptions: {
+      defaultInstances: 1,
+      max: 4,
+      min: 1,
     },
     children: [
       {
         key: "Details",
         label: "Details",
         type: "array",
+        fieldOptions: {
+          tooltip: "Details for address",
+        },
         arrayOptions: {
           defaultInstances: 0,
           max: 2,
@@ -179,6 +196,7 @@ const fields = [
             type: "text",
             fieldOptions: {
               required: true,
+              tooltip: "Your house number",
             },
           },
           {
@@ -187,6 +205,8 @@ const fields = [
             type: "text",
             fieldOptions: {
               default: "1601 Harrier Ln",
+              required: false,
+              tooltip: "Your street name",
             },
           },
           {
@@ -195,6 +215,7 @@ const fields = [
             type: "text",
             fieldOptions: {
               required: true,
+              tooltip: "Your city name",
             },
           },
           {
@@ -203,6 +224,7 @@ const fields = [
             type: "switch",
             fieldOptions: {
               default: true,
+              tooltip: "Is this your primary residence?",
             },
           },
         ],
@@ -213,6 +235,9 @@ const fields = [
     key: "18+",
     label: "18+",
     type: "switch",
+    fieldOptions: {
+      tooltip: "Are you over 18 years old?",
+    },
   },
   {
     key: "id",
@@ -220,10 +245,10 @@ const fields = [
     type: "file",
     fieldOptions: {
       required: true,
+      tooltip: "Your ID document",
     },
   },
 ];
-
 
 <ecc-utils-design-form
     class="complex-form-example"
@@ -244,6 +269,7 @@ const fields = [
     type: "text",
     fieldOptions: {
       required: true,
+      tooltip: "Your name",
     },
   },
   {
@@ -251,16 +277,23 @@ const fields = [
     label: "Email",
     type: "email",
     fieldOptions: {
-      // required: false,
+      tooltip: "Your email address",
     },
   },
   {
     key: "address",
     label: "Address",
-    type: "array",
+    type: "group",
+    groupOptions: {
+      collapsible: true,
+      tooltip: "Your address",
+    },
+    fieldOptions: {
+      tooltip: "Group for address",
+    },
     arrayOptions: {
       defaultInstances: 1,
-      max: 3,
+      max: 4,
       min: 1,
     },
     children: [
@@ -268,10 +301,12 @@ const fields = [
         key: "Details",
         label: "Details",
         type: "array",
+        fieldOptions: {
+          tooltip: "Details for address",
+        },
         arrayOptions: {
-          defaultInstances: 1,
-          max: 1,
-          min: 1,
+          defaultInstances: 0,
+          max: 2,
         },
         children: [
           {
@@ -280,6 +315,7 @@ const fields = [
             type: "text",
             fieldOptions: {
               required: true,
+              tooltip: "Your house number",
             },
           },
           {
@@ -287,7 +323,9 @@ const fields = [
             label: "Street",
             type: "text",
             fieldOptions: {
-              // required: false,
+              default: "1601 Harrier Ln",
+              required: false,
+              tooltip: "Your street name",
             },
           },
           {
@@ -296,14 +334,19 @@ const fields = [
             type: "text",
             fieldOptions: {
               required: true,
+              tooltip: "Your city name",
+            },
+          },
+          {
+            key: "isPrimary",
+            label: "Primary",
+            type: "switch",
+            fieldOptions: {
+              default: true,
+              tooltip: "Is this your primary residence?",
             },
           },
         ],
-      },
-      {
-        key: "isPrimary",
-        label: "Primary",
-        type: "switch",
       },
     ],
   },
@@ -312,7 +355,7 @@ const fields = [
     label: "18+",
     type: "switch",
     fieldOptions: {
-      default: true,
+      tooltip: "Are you over 18 years old?",
     },
   },
   {
@@ -321,6 +364,7 @@ const fields = [
     type: "file",
     fieldOptions: {
       required: true,
+      tooltip: "Your ID document",
     },
   },
 ];
@@ -452,7 +496,6 @@ export default App;
 ```js [HTML]
 import "@elixir-cloud/design/dist/components/form/index.js";
 
-
 const fields = [
   {
     key: "name",
@@ -460,40 +503,84 @@ const fields = [
     type: "text",
     fieldOptions: {
       required: true,
+      tooltip: "Your name",
     },
   },
   {
     key: "email",
     label: "Email",
     type: "email",
+    fieldOptions: {
+      tooltip: "Your email address",
+    },
   },
   {
     key: "address",
     label: "Address",
-    type: "array",
+    type: "group",
+    groupOptions: {
+      collapsible: true,
+      tooltip: "Your address",
+    },
+    fieldOptions: {
+      tooltip: "Group for address",
+    },
     arrayOptions: {
       defaultInstances: 1,
-      max: 1,
-      min: 1
+      max: 4,
+      min: 1,
     },
     children: [
       {
-        key: "street",
-        label: "Street",
-        type: "text",
-      },
-      {
-        key: "city",
-        label: "City",
-        type: "text",
+        key: "Details",
+        label: "Details",
+        type: "array",
         fieldOptions: {
-          required: true,
+          tooltip: "Details for address",
         },
-      },
-      {
-        key: "isPrimary",
-        label: "Primary",
-        type: "switch",
+        arrayOptions: {
+          defaultInstances: 0,
+          max: 2,
+        },
+        children: [
+          {
+            key: "houseNumber",
+            label: "House Number",
+            type: "text",
+            fieldOptions: {
+              required: true,
+              tooltip: "Your house number",
+            },
+          },
+          {
+            key: "street",
+            label: "Street",
+            type: "text",
+            fieldOptions: {
+              default: "1601 Harrier Ln",
+              required: false,
+              tooltip: "Your street name",
+            },
+          },
+          {
+            key: "city",
+            label: "City",
+            type: "text",
+            fieldOptions: {
+              required: true,
+              tooltip: "Your city name",
+            },
+          },
+          {
+            key: "isPrimary",
+            label: "Primary",
+            type: "switch",
+            fieldOptions: {
+              default: true,
+              tooltip: "Is this your primary residence?",
+            },
+          },
+        ],
       },
     ],
   },
@@ -502,7 +589,7 @@ const fields = [
     label: "18+",
     type: "switch",
     fieldOptions: {
-      default: true,
+      tooltip: "Are you over 18 years old?",
     },
   },
   {
@@ -511,10 +598,10 @@ const fields = [
     type: "file",
     fieldOptions: {
       required: true,
+      tooltip: "Your ID document",
     },
   },
 ];
-
 
 <ecc-utils-design-form
     class="styled-form-example"
@@ -535,40 +622,84 @@ const fields = [
     type: "text",
     fieldOptions: {
       required: true,
+      tooltip: "Your name",
     },
   },
   {
     key: "email",
     label: "Email",
     type: "email",
+    fieldOptions: {
+      tooltip: "Your email address",
+    },
   },
   {
     key: "address",
     label: "Address",
-    type: "array",
+    type: "group",
+    groupOptions: {
+      collapsible: true,
+      tooltip: "Your address",
+    },
+    fieldOptions: {
+      tooltip: "Group for address",
+    },
     arrayOptions: {
       defaultInstances: 1,
-      max: 1,
+      max: 4,
       min: 1,
     },
     children: [
       {
-        key: "street",
-        label: "Street",
-        type: "text",
-      },
-      {
-        key: "city",
-        label: "City",
-        type: "text",
+        key: "Details",
+        label: "Details",
+        type: "array",
         fieldOptions: {
-          required: true,
+          tooltip: "Details for address",
         },
-      },
-      {
-        key: "isPrimary",
-        label: "Primary",
-        type: "switch",
+        arrayOptions: {
+          defaultInstances: 0,
+          max: 2,
+        },
+        children: [
+          {
+            key: "houseNumber",
+            label: "House Number",
+            type: "text",
+            fieldOptions: {
+              required: true,
+              tooltip: "Your house number",
+            },
+          },
+          {
+            key: "street",
+            label: "Street",
+            type: "text",
+            fieldOptions: {
+              default: "1601 Harrier Ln",
+              required: false,
+              tooltip: "Your street name",
+            },
+          },
+          {
+            key: "city",
+            label: "City",
+            type: "text",
+            fieldOptions: {
+              required: true,
+              tooltip: "Your city name",
+            },
+          },
+          {
+            key: "isPrimary",
+            label: "Primary",
+            type: "switch",
+            fieldOptions: {
+              default: true,
+              tooltip: "Is this your primary residence?",
+            },
+          },
+        ],
       },
     ],
   },
@@ -577,7 +708,7 @@ const fields = [
     label: "18+",
     type: "switch",
     fieldOptions: {
-      default: true,
+      tooltip: "Are you over 18 years old?",
     },
   },
   {
@@ -586,6 +717,7 @@ const fields = [
     type: "file",
     fieldOptions: {
       required: true,
+      tooltip: "Your ID document",
     },
   },
 ];
@@ -698,9 +830,10 @@ const complexExampleFields = ref([]);
 const styledExampleFields = ref([]);
 const methodsExampleFields = ref([]);
 onMounted(() => {
-  import("@elixir-cloud/design/dist/components/form/index.js").then((module) => {
-    renderComponent.value = false;
-    primaryFields.value =  [
+  import("@elixir-cloud/design/dist/components/form/index.js").then(
+    (module) => {
+      renderComponent.value = false;
+      primaryFields.value = [
         {
           key: "service-name",
           label: "Service name",
@@ -711,19 +844,23 @@ onMounted(() => {
         },
       ];
 
-    complexExampleFields.value =  [
+      complexExampleFields.value = [
         {
           key: "name",
           label: "Name",
           type: "text",
           fieldOptions: {
             required: true,
+            tooltip: "Your name",
           },
         },
         {
           key: "email",
           label: "Email",
           type: "email",
+          fieldOptions: {
+            tooltip: "Your email address",
+          },
         },
         {
           key: "address",
@@ -731,12 +868,24 @@ onMounted(() => {
           type: "group",
           groupOptions: {
             collapsible: true,
+            tooltip: "Your address",
+          },
+          fieldOptions: {
+            tooltip: "Group for address",
+          },
+          arrayOptions: {
+            defaultInstances: 1,
+            max: 4,
+            min: 1,
           },
           children: [
             {
               key: "Details",
               label: "Details",
               type: "array",
+              fieldOptions: {
+                tooltip: "Details for address",
+              },
               arrayOptions: {
                 defaultInstances: 0,
                 max: 2,
@@ -748,6 +897,7 @@ onMounted(() => {
                   type: "text",
                   fieldOptions: {
                     required: true,
+                    tooltip: "Your house number",
                   },
                 },
                 {
@@ -756,6 +906,8 @@ onMounted(() => {
                   type: "text",
                   fieldOptions: {
                     default: "1601 Harrier Ln",
+                    required: false,
+                    tooltip: "Your street name",
                   },
                 },
                 {
@@ -764,6 +916,7 @@ onMounted(() => {
                   type: "text",
                   fieldOptions: {
                     required: true,
+                    tooltip: "Your city name",
                   },
                 },
                 {
@@ -772,6 +925,7 @@ onMounted(() => {
                   type: "switch",
                   fieldOptions: {
                     default: true,
+                    tooltip: "Is this your primary residence?",
                   },
                 },
               ],
@@ -782,6 +936,9 @@ onMounted(() => {
           key: "18+",
           label: "18+",
           type: "switch",
+          fieldOptions: {
+            tooltip: "Are you over 18 years old?",
+          },
         },
         {
           key: "id",
@@ -789,105 +946,46 @@ onMounted(() => {
           type: "file",
           fieldOptions: {
             required: true,
+            tooltip: "Your ID document",
           },
         },
       ];
-    styledExampleFields.value = [
+      methodsExampleFields.value = [
         {
-          key: "name",
-          label: "Name",
+          key: "custom-message",
+          label: "Custom Message",
           type: "text",
-          fieldOptions: {
-            required: true,
-          },
         },
         {
-          key: "email",
-          label: "Email",
-          type: "email",
-        },
-        {
-          key: "address",
-          label: "Address",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 1,
-            max: 3,
-            min: 1
-          },
-          children: [
-            {
-              key: "street",
-              label: "Street",
-              type: "text",
-            },
-            {
-              key: "city",
-              label: "City",
-              type: "text",
-              fieldOptions: {
-                required: true,
-              },
-            },
-            {
-              key: "isPrimary",
-              label: "Primary",
-              type: "switch",
-            },
-          ],
-        },
-        {
-          key: "18+",
-          label: "18+",
+          key: "throw-error",
+          label: "Throw Error",
           type: "switch",
-          fieldOptions: {
-            default: true,
-          },
-        },
-        {
-          key: "id",
-          label: "ID",
-          type: "file",
-          fieldOptions: {
-            required: true,
-          },
         },
       ];
-    methodsExampleFields.value = [
-      {
-        key: "custom-message",
-        label: "Custom Message",
-        type: "text",
-      },
-      {
-        key: "throw-error",
-        label: "Throw Error",
-        type: "switch",
-      },
-    ]
 
-    renderComponent.value = true;
-    document.querySelectorAll("ecc-utils-design-form").forEach((element) => {
-      element.addEventListener("ecc-utils-submit", (e) => {
-        console.log("form-submitted", e.detail);
+      renderComponent.value = true;
+      document.querySelectorAll("ecc-utils-design-form").forEach((element) => {
+        element.addEventListener("ecc-utils-submit", (e) => {
+          console.log("form-submitted", e.detail);
+        });
       });
-    });
-    document.querySelectorAll(".methods-example").forEach((element) => {
-      element.addEventListener("ecc-utils-submit", async (e) => {
-        document.querySelector(".methods-example").loading();
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        if (e.detail.form.data["throw-error"]) {
-          document.querySelector(".methods-example").error({
-            message: e.detail.form.data["custom-message"],
-          });
-        } else {
-          document.querySelector(".methods-example").success({
-            message: e.detail.form.data["custom-message"],
-          });
-        }
+      document.querySelectorAll(".methods-example").forEach((element) => {
+        element.addEventListener("ecc-utils-submit", async (e) => {
+          document.querySelector(".methods-example").loading();
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          if (e.detail.form.data["throw-error"]) {
+            document.querySelector(".methods-example").error({
+              message: e.detail.form.data["custom-message"],
+            });
+          } else {
+            document.querySelector(".methods-example").success({
+              message: e.detail.form.data["custom-message"],
+            });
+          }
+        });
       });
-    });
-  });
+    },
+  );
 });
 </script>
 
