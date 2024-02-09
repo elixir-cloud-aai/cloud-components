@@ -81,6 +81,11 @@ export class TESCreateRun extends LitElement {
       key: "executors",
       label: "Executors",
       type: "group",
+      fieldOptions: {
+        required: true,
+        tooltip:
+          "A sequence of program arguments to execute, where the first argument is the program to execute (i.e. argv).",
+      },
       groupOptions: {
         collapsible: true,
       },
@@ -89,9 +94,6 @@ export class TESCreateRun extends LitElement {
           key: "executors",
           label: "",
           type: "array",
-          fieldOptions: {
-            required: true,
-          },
           arrayOptions: {
             defaultInstances: 1,
             min: 1,
@@ -103,6 +105,8 @@ export class TESCreateRun extends LitElement {
               type: "array",
               fieldOptions: {
                 required: true,
+                tooltip:
+                  "A sequence of program arguments to execute, where the first argument is the program to execute (i.e. argv).",
               },
               arrayOptions: {
                 defaultInstances: 1,
@@ -111,13 +115,8 @@ export class TESCreateRun extends LitElement {
               children: [
                 {
                   key: "command",
-                  label: "Command",
+                  label: "",
                   type: "text",
-                  fieldOptions: {
-                    required: true,
-                    tooltip:
-                      "A sequence of program arguments to execute, where the first argument is the program to execute (i.e. argv).",
-                  },
                 },
               ],
             },
@@ -496,7 +495,7 @@ export class TESCreateRun extends LitElement {
       });
   };
 
-  // Process env data
+  // eslint-disable-next-line
   private _processEnv = (
     envArray: Record<string, string>[]
   ): Record<string, string> =>
@@ -508,11 +507,11 @@ export class TESCreateRun extends LitElement {
       {}
     );
 
-  // Process volume data
+  // eslint-disable-next-line
   private _processVolumes = (value: Array<{ volume: string }>) =>
     value.map((vol) => vol.volume);
 
-  // Process tags data
+  // eslint-disable-next-line
   private _processTags = (
     tagArray: Array<{ name: string; value: string }>
   ): Record<string, string> =>

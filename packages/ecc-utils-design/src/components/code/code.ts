@@ -1,4 +1,4 @@
-import { LitElement, html, css } from "lit";
+import { LitElement, html } from "lit";
 import { property, state } from "lit/decorators.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/badge/badge.js";
@@ -7,6 +7,7 @@ import "@shoelace-style/shoelace/dist/components/copy-button/copy-button.js";
 import jsyaml from "js-yaml";
 import { hostStyles } from "../../styles/host.styles.js";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
+import codeStyles from "./code.styles.js";
 
 type Language = "YAML" | "JSON" | "Text";
 
@@ -16,14 +17,7 @@ export default class EccUtilsDesignCode extends LitElement {
       document.querySelector("html")?.classList.contains("dark")
     ),
     hostStyles,
-    css`
-      #label {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: var(--sl-spacing-x-small);
-      }
-    `,
+    codeStyles,
   ];
 
   @property({ type: String }) code = "";
@@ -43,11 +37,6 @@ export default class EccUtilsDesignCode extends LitElement {
 
   private cssParts = {};
 
-  constructor() {
-    super();
-    this.indent = " ".repeat(this.indentation);
-  }
-
   private _getTextAreaEle(): HTMLTextAreaElement {
     const slTextarea = this.shadowRoot?.querySelector("sl-textarea");
     const ele = slTextarea?.shadowRoot?.querySelector("textarea");
@@ -58,6 +47,7 @@ export default class EccUtilsDesignCode extends LitElement {
   }
 
   firstUpdated() {
+    this.indent = " ".repeat(this.indentation);
     this._updateTextarea();
   }
 
@@ -186,7 +176,6 @@ export default class EccUtilsDesignCode extends LitElement {
 
     e.preventDefault();
 
-    // remove brackets pairs
     const prevSymbol = this.code[selStart - 1];
     const curSymbol = this.code[selStart];
     const isInPairs =
@@ -196,7 +185,6 @@ export default class EccUtilsDesignCode extends LitElement {
     if (isInPairs && isPair) {
       this._replaceCode(selStart - 1, selStart + 1);
     } else {
-      // remove indent
       const chunkStart = selStart - this.indent.length;
       const chunkEnd = selStart;
       const chunk = this.code.substring(chunkStart, chunkEnd);

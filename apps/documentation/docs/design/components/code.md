@@ -14,7 +14,6 @@ import "@elixir-cloud/design/dist/components/code/index.js";
 ```
 
   <!-- ```jsx [React]
-
   ``` -->
 
 :::
@@ -56,21 +55,58 @@ import "@elixir-cloud/design/dist/components/code/index.js";
 
 ## Examples
 
-### Styled Collection
+### JSON
+
+<ClientOnly>
+  <div :class="isDark ? 'component-dark component' : 'component-light component'">
+    <ecc-utils-design-code :v-if="renderComponent" :items="primaryItems" :filters="primaryFilters" totalItems="50" language="JSON"></ecc-utils-design-code>
+
+::: details Code Blocks
+::: code-group
+
+```js [HTML]
+import "@elixir-cloud/design/dist/components/code/index.js";
+```
+
+  <!-- ```jsx [React]
+  ``` -->
+
+:::
+
+  </div>
+</ClientOnly>
+
+### Indentation
+
+<ClientOnly>
+  <div :class="isDark ? 'component-dark component' : 'component-light component'">
+    <ecc-utils-design-code :v-if="renderComponent" indentation="4"></ecc-utils-design-code>
+
+::: details Code Blocks
+::: code-group
+
+```js [HTML]
+import "@elixir-cloud/design/dist/components/code/index.js";
+
+<ecc-utils-design-code indentation=12></ecc-utils-design-code>;
+```
+
+  <!-- ```jsx [React]
+  ``` -->
+
+:::
+
+  </div>
+</ClientOnly>
 
 <script setup>
 import { onMounted, ref } from "vue";
 import { useData } from "vitepress";
 const { isDark } = useData();
 const renderComponent = ref(false);
-const primaryItems = ref([]);
-const primaryFilters = ref([]);
-
-const primaryTag = ref();
 
 onMounted(() => {
   import("@elixir-cloud/design/dist/components/code/index.js").then((module) => {
-    // Your code logic here
   });
 });
 </script>
