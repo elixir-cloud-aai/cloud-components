@@ -57,8 +57,6 @@ import "@elixir-cloud/design/dist/components/code/index.js";
 
 ### JSON
 
-<div class="component-name">&lt;ecc-utils-design-code&gt;</div>
-Simple code editor to handle Yaml, JSON and multiline text input.
 <ClientOnly>
   <div :class="isDark ? 'component-dark component' : 'component-light component'">
     <ecc-utils-design-code :v-if="renderComponent" :items="primaryItems" :filters="primaryFilters" totalItems="50" language="JSON"></ecc-utils-design-code>
@@ -80,8 +78,6 @@ import "@elixir-cloud/design/dist/components/code/index.js";
 
 ### Indentation
 
-<div class="component-name">&lt;ecc-utils-design-code&gt;</div>
-Simple code editor to handle Yaml, JSON and multiline text input.
 <ClientOnly>
   <div :class="isDark ? 'component-dark component' : 'component-light component'">
     <ecc-utils-design-code :v-if="renderComponent" indentation="4"></ecc-utils-design-code>
