@@ -25,6 +25,8 @@ export default class EccUtilsDesignCode extends LitElement {
   @property({ type: String }) language: Language = "YAML";
   @property({ type: Number }) indentation = 2;
   @property({ type: Number }) blurDelay = 150;
+  @property({ type: Boolean }) required = true;
+  @property({ type: Boolean }) disabled = false;
 
   @state() elTextarea: HTMLTextAreaElement | null = null;
   @state() error = false;
@@ -47,6 +49,11 @@ export default class EccUtilsDesignCode extends LitElement {
   }
 
   firstUpdated() {
+    const slTextarea = this.shadowRoot?.querySelector("sl-textarea");
+    const ele = slTextarea?.shadowRoot?.querySelector("textarea");
+    if (ele instanceof HTMLTextAreaElement) {
+      ele.value = this.code;
+    }
     this.indent = " ".repeat(this.indentation);
     this._updateTextarea();
   }
@@ -276,6 +283,11 @@ export default class EccUtilsDesignCode extends LitElement {
   }
 
   private _validateCode(): void {
+    if (this.code === "") {
+      this.error = false;
+      return;
+    }
+
     if (this.language === "JSON") {
       try {
         JSON.parse(this.code);
@@ -307,6 +319,8 @@ export default class EccUtilsDesignCode extends LitElement {
         @input=${this._handleInput}
         value=${this.code}
         resize="auto"
+        ?required=${this.required}
+        ?disabled=${this.disabled}
       >
         <div id="label" slot="label">
           ${this.label}
@@ -316,7 +330,10 @@ export default class EccUtilsDesignCode extends LitElement {
           ${this.error
             ? html`<sl-badge variant="neutral">${this.errorLanguage}</sl-badge>`
             : html``}
-          <sl-copy-button value=${this.code}></sl-copy-button>
+          <sl-copy-button
+            value=${this.code}
+            error-label="Nothing to copy"
+          ></sl-copy-button>
         </div>
       </sl-textarea>
     `;

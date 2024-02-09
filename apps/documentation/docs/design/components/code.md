@@ -29,13 +29,15 @@ import "@elixir-cloud/design/dist/components/code/index.js";
 
 ## Properties
 
-| Property      | Required | Default | Type     | Description                                                            |
-| ------------- | -------- | ------- | -------- | ---------------------------------------------------------------------- |
-| `code`        | `false`  |         | `String` | Specifies the code to be rendered in the editor during initialization. |
-| `label`       | `Code`   |         | `String` | Label for code editor input field.                                     |
-| `language`    | `false`  |         | `String` | Specifies the language interpreter for syntax highlighting.            |
-| `indentation` | `2`      |         | `Number` | Specifies number of spaces that should be considered for 1 Tab space.  |
-| `blurDelay`   | `150`    |         | `Number` | Time in ms between 2 Tab key presses that should move the focus.       |
+| Property      | Required | Default | Type      | Description                                                            |
+| ------------- | -------- | ------- | --------- | ---------------------------------------------------------------------- |
+| `code`        | `false`  |         | `String`  | Specifies the code to be rendered in the editor during initialization. |
+| `label`       | `Code`   |         | `String`  | Label for code editor input field.                                     |
+| `language`    | `false`  |         | `String`  | Specifies the language interpreter for syntax highlighting.            |
+| `indentation` | `false`  | `2`     | `Number`  | Specifies number of spaces that should be considered for 1 Tab space.  |
+| `blurDelay`   | `false`  | `150`   | `Number`  | Time in ms between 2 Tab key presses that should move the focus.       |
+| `required`    | `false`  | `true`  | `Boolean` | Makes the code area a required field.                                  |
+| `disabled`    | `false`  | `false` | `Boolean` | Disables the code area.                                                |
 
 ## Events
 
