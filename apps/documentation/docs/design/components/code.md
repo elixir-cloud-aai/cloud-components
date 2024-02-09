@@ -107,8 +107,6 @@ const renderComponent = ref(false);
 
 onMounted(() => {
   import("@elixir-cloud/design/dist/components/code/index.js").then((module) => {
-    renderComponent.value = false;
-    renderComponent.value = true;
   });
 });
 </script>

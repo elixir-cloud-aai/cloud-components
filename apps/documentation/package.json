@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vitepress dev docs",
     "build": "vitepress build docs",
-    "start": "vitepress preview docs",
+    "start": "npm run build && vitepress preview docs",
     "lint": "prettier .",
     "lint:fix": "prettier --write ."
   },
