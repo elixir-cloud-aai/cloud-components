@@ -1,10 +1,17 @@
 import { html, LitElement } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { property, state } from "lit/decorators.js";
 import { postWorkflow } from "../../API/Workflow/wesGet.js";
 import "@elixir-cloud/design/dist/components/form/index.js";
 
-@customElement("ecc-client-lit-ga4gh-wes-create-run")
-export class WESCreateRun extends LitElement {
+/**
+ * @summary This component is used to create task runs using WES API.
+ * @since 1.0.0
+ *
+ * @property {string} baseURL - Base URL
+ *
+ */
+
+export default class ECCClientGa4ghWesCreateRuns extends LitElement {
   @state() private form: FormData = new FormData();
   @property({ type: String }) private baseURL =
     "https://prowes.rahtiapp.fi/ga4gh/wes/v1";
@@ -118,10 +125,5 @@ export class WESCreateRun extends LitElement {
         }}
       ></ecc-utils-design-form>
     `;
-  }
-}
-declare global {
-  interface HTMLElementTagNameMap {
-    "ecc-client-lit-ga4gh-wes-create-run": WESCreateRun;
   }
 }

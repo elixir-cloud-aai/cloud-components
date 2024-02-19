@@ -1,11 +1,18 @@
 import { html, LitElement } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { property, state } from "lit/decorators.js";
 import { postTask } from "../../API/Task/tesGet.js";
 import { Executor, postTaskForm } from "./types.js";
 import "@elixir-cloud/design/dist/components/form/index.js";
 
-@customElement("ecc-client-lit-ga4gh-tes-create-run")
-export class TESCreateRun extends LitElement {
+/**
+ * @summary This component is used to create task runs using TES API.
+ * @since 1.0.0
+ *
+ * @property {string} baseURL - Base URL
+ *
+ */
+
+export default class ECCCLientGa4ghTesCreateRun extends LitElement {
   @property({ type: String }) accessor baseURL =
     "https://protes.rahtiapp.fi/ga4gh/tes/v1";
 
@@ -423,11 +430,5 @@ export class TESCreateRun extends LitElement {
       >
       </ecc-utils-design-form>
     `;
-  }
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    "ecc-client-lit-ga4gh-tes-create-run": TESCreateRun;
   }
 }

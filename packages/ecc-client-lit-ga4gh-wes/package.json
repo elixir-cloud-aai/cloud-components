@@ -7,16 +7,15 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "exports": {
-    ".": "./dist/index.js"
-  },
+  "componentsPrefix": "ecc-client-ga4gh-wes-",
+  "exports": { ".": "./dist/index.js" },
   "repository": {
     "type": "git",
     "url": "https://github.com/elixir-cloud-aai/cloud-components.git"
   },
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "node ../../scripts/build.js",
     "dev": "npm run build && concurrently -k -r \"npm run build -- --watch\" \"wds\"",
     "test": "wtr --coverage",
     "test:watch": "wtr --watch",
@@ -24,10 +23,7 @@
     "lint:fix": "npm run lint -- --fix",
     "prepublish": "npm run build"
   },
-  "dependencies": {
-    "@elixir-cloud/design": "*",
-    "lit": "^2.8.0"
-  },
+  "dependencies": { "@elixir-cloud/design": "*", "lit": "^2.8.0" },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.4.17",
     "@open-wc/eslint-config": "^9.2.1",
@@ -42,7 +38,13 @@
     "eslint-config-prettier": "^8.3.0",
     "tslib": "^2.3.1",
     "tsup": "^7.2.0",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "@lit/react": "*",
+    "react": "*",
+    "commander": "*",
+    "custom-element-jet-brains-integration": "*",
+    "custom-element-vs-code-integration": "*",
+    "pascal-case": "*"
   },
-  "customElements": "custom-elements.json"
+  "customElements": "dist/custom-elements.json"
 }

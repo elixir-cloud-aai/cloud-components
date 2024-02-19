@@ -10,6 +10,7 @@ const { execSync } = require("child_process");
 const fs = require("fs");
 const { npmDir } = require("./utils.js");
 const path = require("path");
+const prettier = require("prettier");
 // const packageJson = require('../package.json');
 
 const packageJsonDir = `${process.cwd()}/package.json`;
@@ -59,9 +60,13 @@ nextTask("installing dependencies", async () => {
     ...packageJson.default,
     devDependencies,
   });
-  fs.writeFileSync(packageJsonDir, updatedPackageJson, { flag: "w" });
-
-  execSync("npm i");
+  fs.writeFileSync(
+    packageJsonDir,
+    prettier.format(updatedPackageJson, {
+      parser: "json",
+    }),
+    { flag: "w" }
+  );
 });
 
 nextTask("Generating CEM config", () => {
@@ -94,12 +99,6 @@ nextTask("Wrapping components for React", async () => {
       stdio: "inherit",
     }
   );
-});
-
-nextTask("Generating tsconfig", () => {
-  execSync(`node  ${path.join(__dirname, "make-tsconfig.js")}`, {
-    stdio: "inherit",
-  });
 });
 
 nextTask("Running the TypeScript compiler", () => {
