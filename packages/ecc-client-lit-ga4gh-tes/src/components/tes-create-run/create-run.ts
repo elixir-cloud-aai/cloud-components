@@ -1,3 +1,4 @@
+/* eslint-disable lit/no-classfield-shadowing */
 import { html, LitElement } from "lit";
 import { property, state } from "lit/decorators.js";
 import { postTask } from "../../API/Task/tesGet.js";

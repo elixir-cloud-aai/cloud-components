@@ -105,6 +105,7 @@
           type: "text",
           fieldOptions: {
             required: true,
+            tooltip: "Your name",
           },
         },
         {
@@ -112,7 +113,7 @@
           label: "Email",
           type: "email",
           fieldOptions: {
-            // required: false,
+            tooltip: "Your email address",
           },
         },
         {
@@ -121,17 +122,24 @@
           type: "group",
           groupOptions: {
             collapsible: true,
+            tooltip: "Your address",
           },
-          // arrayOptions: {
-          //   defaultInstances: 1,
-          //   max: 4,
-          //   min: 1,
-          // },
+          fieldOptions: {
+            tooltip: "Group for address",
+          },
+          arrayOptions: {
+            defaultInstances: 1,
+            max: 4,
+            min: 1,
+          },
           children: [
             {
               key: "Details",
               label: "Details",
               type: "array",
+              fieldOptions: {
+                tooltip: "Details for address",
+              },
               arrayOptions: {
                 defaultInstances: 0,
                 max: 2,
@@ -143,6 +151,7 @@
                   type: "text",
                   fieldOptions: {
                     required: true,
+                    tooltip: "Your house number",
                   },
                 },
                 {
@@ -151,7 +160,8 @@
                   type: "text",
                   fieldOptions: {
                     default: "1601 Harrier Ln",
-                    // required: false,
+                    required: false,
+                    tooltip: "Your street name",
                   },
                 },
                 {
@@ -160,6 +170,7 @@
                   type: "text",
                   fieldOptions: {
                     required: true,
+                    tooltip: "Your city name",
                   },
                 },
                 {
@@ -168,6 +179,7 @@
                   type: "switch",
                   fieldOptions: {
                     default: true,
+                    tooltip: "Is this your primary residence?",
                   },
                 },
               ],
@@ -178,6 +190,9 @@
           key: "18+",
           label: "18+",
           type: "switch",
+          fieldOptions: {
+            tooltip: "Are you over 18 years old?",
+          },
         },
         {
           key: "id",
@@ -185,6 +200,7 @@
           type: "file",
           fieldOptions: {
             required: true,
+            tooltip: "Your ID document",
           },
         },
       ];

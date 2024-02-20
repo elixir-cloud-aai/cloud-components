@@ -1,7 +1,46 @@
 import { html, LitElement } from "lit";
 import { property, state } from "lit/decorators.js";
 import { postWorkflow } from "../../API/Workflow/wesGet.js";
-import "@elixir-cloud/design/dist/components/form/index.js";
+import "@elixir-cloud/design";
+
+// TODO: import the interface from the design package
+interface Field {
+  key: string;
+  label: string;
+  type?:
+    | "text"
+    | "date"
+    | "number"
+    | "email"
+    | "password"
+    | "tel"
+    | "url"
+    | "search"
+    | "datetime-local"
+    | "time"
+    | "array"
+    | "switch"
+    | "file"
+    | "group";
+  fieldOptions?: {
+    required?: boolean;
+    default?: string | boolean;
+    multiple?: boolean;
+    accept?: string;
+    returnIfEmpty?: string;
+    tooltip?: string;
+  };
+  arrayOptions?: {
+    defaultInstances?: number;
+    max?: number;
+    min?: number;
+  };
+  groupOptions?: {
+    collapsible: boolean;
+  };
+  error?: string;
+  children?: Array<Field>;
+}
 
 /**
  * @summary This component is used to create task runs using WES API.
@@ -16,48 +55,64 @@ export default class ECCClientGa4ghWesCreateRuns extends LitElement {
   @property({ type: String }) private baseURL =
     "https://prowes.rahtiapp.fi/ga4gh/wes/v1";
 
-  fields = [
+  @state() fields: Array<Field> = [
     {
       key: "workflow_url",
-      label: "Workflow URL",
+      label: "URL",
       type: "text",
       fieldOptions: {
         required: true,
+        tooltip:
+          "An absolute URL to a workflow file that is accessible by the WES endpoint, or a relative URL corresponding to one of the files attached using `workflow_attachment`.",
       },
     },
     {
       key: "workflow_type",
-      label: "Workflow type",
+      label: "Type",
       type: "text",
       fieldOptions: {
         required: true,
+        tooltip:
+          "The type of workflow language and must be CWL or WDL currently.",
       },
     },
     {
       key: "workflow_type_version",
-      label: "Workflow type version",
+      label: "Type version",
       type: "text",
       fieldOptions: {
         required: true,
+        tooltip:
+          "The version of the workflow language submitted and must be one supported by this WES instance.",
       },
     },
     {
       key: "workflow_params",
-      label: "Workflow parameters",
+      label: "Parameters",
       type: "text",
       fieldOptions: {
         required: true,
+        tooltip:
+          "JSON object specifies input parameters, such as input files. The exact format of the JSON object depends on the conventions of the workflow language being used. Input files should either be absolute URLs, or relative URLs corresponding to files uploaded using `workflow_attachment`.",
       },
     },
     {
       key: "tags",
       label: "Tags",
       type: "text",
+      fieldOptions: {
+        tooltip:
+          "Arbitrary key/value tags added by the client during run creation.",
+      },
     },
     {
       key: "workflow_engine_parameters",
-      label: "Workflow engine parameters",
+      label: "Engine parameters",
       type: "text",
+      fieldOptions: {
+        tooltip:
+          "Each workflow engine can present additional parameters that can be sent to the workflow engine. This message will list the default values, and their types for each workflow engine.",
+      },
     },
     // {
     // 	key: 'workflow_engine',
@@ -71,10 +126,12 @@ export default class ECCClientGa4ghWesCreateRuns extends LitElement {
     // },
     {
       key: "workflow_attachment",
-      label: "Workflow attachment",
+      label: "Attachment",
       type: "file",
       fieldOptions: {
         multiple: true,
+        tooltip:
+          "Used to upload files that are required to execute the workflow, including the primary workflow, tools imported by the workflow, other files referenced by the workflow, or files which are part of the input.",
       },
     },
   ];
