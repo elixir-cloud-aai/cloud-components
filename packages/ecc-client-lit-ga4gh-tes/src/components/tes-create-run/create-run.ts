@@ -495,8 +495,8 @@ export class TESCreateRun extends LitElement {
       });
   };
 
-  // Process env data
-  private _processEnv = (
+  // eslint-disable-next-line
+	private _processEnv = (
     envArray: Record<string, string>[]
   ): Record<string, string> =>
     envArray.reduce(
@@ -507,12 +507,12 @@ export class TESCreateRun extends LitElement {
       {}
     );
 
-  // Process volume data
-  private _processVolumes = (value: Array<{ volume: string }>) =>
+  // eslint-disable-next-line
+	private _processVolumes = (value: Array<{ volume: string }>) =>
     value.map((vol) => vol.volume);
 
-  // Process tags data
-  private _processTags = (
+  // eslint-disable-next-line
+	private _processTags = (
     tagArray: Array<{ name: string; value: string }>
   ): Record<string, string> =>
     tagArray.reduce(
