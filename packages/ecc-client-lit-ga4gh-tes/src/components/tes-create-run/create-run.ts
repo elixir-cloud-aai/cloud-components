@@ -422,6 +422,47 @@ export class TESCreateRun extends LitElement {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  private _processExecutors(value: any): Executor[] {
+    if (!Array.isArray(value)) return [];
+
+    const _executor = value
+      .filter(
+        (executorElement: any) =>
+          typeof executorElement === "object" && executorElement !== null
+      )
+      .map((executorElement: any) => {
+        const executor: any = {};
+
+        if (executorElement.command && Array.isArray(executorElement.command)) {
+          executor.command = executorElement.command.map(
+            (execObject: any) => execObject.command
+          );
+        }
+
+        if (executorElement.env && Array.isArray(executorElement.env)) {
+          executor.env = (
+            executorElement.env as Record<string, string>[]
+          ).reduce(
+            (envObject, item) => ({
+              ...envObject,
+              [item.name]: item.value,
+            }),
+            {}
+          );
+        }
+
+        const execOptions = ["image", "stderr", "stdin", "stdout", "workdir"];
+        for (const opt of execOptions) {
+          if (executorElement[opt]) executor[opt] = executorElement[opt];
+        }
+
+        return executor;
+      });
+
+    return _executor;
+  }
+
   // form submit method
   private async _submitForm(form: any) {
     const data: any = {};
@@ -445,10 +486,18 @@ export class TESCreateRun extends LitElement {
           data.output = (value as { outputs: unknown }).outputs;
           break;
         case "volumes":
-          data.volumes = this._processVolumes(value as any);
+          data.volumes = (value as Array<{ volume: string }>).map(
+            (vol) => vol.volume
+          );
           break;
         case "tags":
-          data.tags = this._processTags(value as any);
+          data.tags = (value as Array<{ name: string; value: string }>).reduce(
+            (tagObject, item) => ({
+              ...tagObject,
+              [item.name]: item.value,
+            }),
+            {}
+          );
           break;
         default:
           break;
@@ -463,65 +512,6 @@ export class TESCreateRun extends LitElement {
       this._handleError("Couldn't call the API", "submitForm");
     }
   }
-
-  // Process executors data
-  private _processExecutors = (value: any): Executor[] => {
-    if (!Array.isArray(value)) return [];
-
-    return value
-      .filter(
-        (executorElement: any) =>
-          typeof executorElement === "object" && executorElement !== null
-      )
-      .map((executorElement: any) => {
-        const executor: any = {};
-
-        if (executorElement.command && Array.isArray(executorElement.command)) {
-          executor.command = executorElement.command.map(
-            (execObject: any) => execObject.command
-          );
-        }
-
-        if (executorElement.env && Array.isArray(executorElement.env)) {
-          executor.env = this._processEnv(executorElement.env);
-        }
-
-        const execOptions = ["image", "stderr", "stdin", "stdout", "workdir"];
-        for (const opt of execOptions) {
-          if (executorElement[opt]) executor[opt] = executorElement[opt];
-        }
-
-        return executor;
-      });
-  };
-
-  // eslint-disable-next-line
-	private _processEnv = (
-    envArray: Record<string, string>[]
-  ): Record<string, string> =>
-    envArray.reduce(
-      (envObject, item) => ({
-        ...envObject,
-        [item.name]: item.value,
-      }),
-      {}
-    );
-
-  // eslint-disable-next-line
-	private _processVolumes = (value: Array<{ volume: string }>) =>
-    value.map((vol) => vol.volume);
-
-  // eslint-disable-next-line
-	private _processTags = (
-    tagArray: Array<{ name: string; value: string }>
-  ): Record<string, string> =>
-    tagArray.reduce(
-      (tagObject, item) => ({
-        ...tagObject,
-        [item.name]: item.value,
-      }),
-      {}
-    );
 
   // Render component
   render() {
