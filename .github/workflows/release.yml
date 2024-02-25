@@ -1,12 +1,10 @@
+---
 name: Release
-
 on:
   push:
     branches:
       - main
-
 concurrency: ${{ github.workflow }}-${{ github.ref }}
-
 jobs:
   release:
     name: Release
@@ -14,18 +12,14 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
-
       - name: Setup Node.js 16
         uses: actions/setup-node@v3
         with:
           node-version: 16
-
       - name: Install Dependencies
         run: npm i
-
       - name: Unset Git Hooks
         run: git config --unset core.hooksPath
-
       - name: Create Release Pull Request
         uses: changesets/action@v1
         env:
