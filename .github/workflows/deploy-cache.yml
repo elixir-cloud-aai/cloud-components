@@ -1,4 +1,4 @@
-name: Deployment Workflow
+name: Deployment Workflow - CACHED
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 jobs:
 
   linters:
-    name: Linting checks
+    name: Linting checks - CACHED
     runs-on: ubuntu-latest
 
     steps:
@@ -42,7 +42,7 @@ jobs:
         run: npm run lint
 
   tests:
-    name: Test checks
+    name: Test checks - CACHED
     runs-on: ubuntu-latest
     strategy:
       matrix:

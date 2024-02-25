@@ -1,4 +1,4 @@
-name: Release
+name: Release - CACHED
 
 on:
   push:
@@ -9,7 +9,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   release:
-    name: Release
+    name: Release - CACHED
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
