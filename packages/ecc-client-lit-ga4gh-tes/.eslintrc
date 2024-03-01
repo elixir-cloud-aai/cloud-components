@@ -3,6 +3,6 @@
   "plugins": ["prettier"],
   "rules": {
     "prettier/prettier": "error",
-    "class-methods-use-this": 1
+    "class-methods-use-this": "warn"
   }
 }
