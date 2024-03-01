@@ -23,7 +23,7 @@ export interface Field {
   children: Array<Children>;
 }
 
-interface FooterButton {
+export interface FooterButton {
   key: string;
   name: string;
   variant?: "primary" | "success" | "neutral" | "warning" | "danger";
