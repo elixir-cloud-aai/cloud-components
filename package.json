@@ -1,52 +1,52 @@
 {
-  "name": "elixir-cloud-components",
-  "version": "2.0.0",
-  "description": "Elixir Cloud Components is lightweight, fast, and reusable web-components developed by Elixir Cloud and AAI Community for managing and accessing various services.",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/elixir-cloud-aai/cloud-components.git"
-  },
-  "bugs": {
-    "url": "https://github.com/elixir-cloud-aai/cloud-components/issues"
-  },
-  "homepage": "https://github.com/elixir-cloud-aai/cloud-components#readme",
-  "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "eslint . && turbo run lint --parallel",
-    "lint:fix": "eslint . --fix && turbo run lint:fix",
-    "test": "turbo run test --parallel",
-    "test:watch": "turbo run test --watch",
-    "clean": "rm -rf node_modules && rm -rf */*/node_modules",
-    "new": "turbo gen",
-    "prepare": "husky install",
-    "cz": "cz",
-    "release": "standard-version",
-    "release:minor": "standard-version --release-as minor",
-    "release:patch": "standard-version --release-as patch",
-    "release:major": "standard-version --release-as major"
-  },
-  "devDependencies": {
-    "@changesets/cli": "^2.26.2",
-    "@commitlint/cli": "17.6.3",
-    "@commitlint/config-conventional": "17.6.3",
-    "@turbo/gen": "^1.9.8",
-    "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^7.32.0",
-    "eslint-config-elixir": "*",
-    "husky": "^8.0.0",
-    "prettier": "^2.8.8",
-    "standard-version": "^9.5.0",
-    "turbo": "^1.10.7"
-  },
-  "packageManager": "npm@9.2.0",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  }
+	"name": "elixir-cloud-components",
+	"version": "2.0.0",
+	"description": "Elixir Cloud Components is lightweight, fast, and reusable web-components developed by Elixir Cloud and AAI Community for managing and accessing various services.",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/elixir-cloud-aai/cloud-components.git"
+	},
+	"bugs": {
+		"url": "https://github.com/elixir-cloud-aai/cloud-components/issues"
+	},
+	"homepage": "https://github.com/elixir-cloud-aai/cloud-components#readme",
+	"scripts": {
+		"build": "turbo run build",
+		"dev": "turbo run dev",
+		"lint": "eslint . && turbo run lint --parallel",
+		"lint:fix": "eslint . --fix && turbo run lint:fix",
+		"test": "turbo run test --parallel",
+		"test:watch": "turbo run test --watch",
+		"clean": "rm -rf node_modules && rm -rf */*/node_modules",
+		"new": "turbo gen",
+		"prepare": "husky install",
+		"cz": "cz",
+		"release": "standard-version",
+		"release:minor": "standard-version --release-as minor",
+		"release:patch": "standard-version --release-as patch",
+		"release:major": "standard-version --release-as major"
+	},
+	"devDependencies": {
+		"@changesets/cli": "^2.26.2",
+		"@commitlint/cli": "17.6.3",
+		"@commitlint/config-conventional": "17.6.3",
+		"@turbo/gen": "^1.9.8",
+		"cz-conventional-changelog": "^3.3.0",
+		"eslint": "^7.32.0",
+		"eslint-config-elixir": "*",
+		"husky": "^8.0.0",
+		"prettier": "^2.8.8",
+		"standard-version": "^9.5.0",
+		"turbo": "^1.10.7"
+	},
+	"packageManager": "npm@9.2.0",
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-conventional-changelog"
+		}
+	}
 }
