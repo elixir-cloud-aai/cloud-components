@@ -22,7 +22,7 @@ export interface Field {
   tabGroup: string;
   children: Array<Children>;
 }
-interface ItemProp {
+export interface ItemProp {
   index: number;
   name: string;
   key: string;
@@ -33,7 +33,7 @@ interface ItemProp {
   };
 }
 
-interface FilterProp {
+export interface FilterProp {
   key: string;
   type: "search" | "select";
   options?: string[];
@@ -43,7 +43,7 @@ interface FilterProp {
   placeholder?: string;
 }
 
-interface FooterButton {
+export interface FooterButton {
   key: string;
   name: string;
   variant?: "primary" | "success" | "neutral" | "warning" | "danger";

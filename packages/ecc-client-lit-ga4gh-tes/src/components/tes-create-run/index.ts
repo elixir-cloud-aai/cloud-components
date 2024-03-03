@@ -1,6 +1,7 @@
 import ECCCLientGa4ghTesCreateRun from "./create-run.js";
 
 export * from "./create-run.js";
+export * from "./types.js"; // export types from type.d.ts where one is used
 export default ECCCLientGa4ghTesCreateRun;
 
 window.customElements.define(

@@ -4,7 +4,7 @@ import { postWorkflow } from "../../API/Workflow/wesGet.js";
 import "@elixir-cloud/design";
 
 // TODO: import the interface from the design package
-interface Field {
+export interface Field {
   key: string;
   label: string;
   type?:
