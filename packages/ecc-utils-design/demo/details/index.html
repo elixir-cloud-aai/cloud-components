@@ -229,17 +229,6 @@
         },
       ];
 
-      // const fields = [
-      //   {
-      //     key: "company.employees.skills",
-      //     path: "company.employees[*].skills",
-      //     copy: true,
-      //     arrayOptions: {
-      //       type: "tag",
-      //     },
-      //   },
-      // ];
-
       const actions = [
         {
           key: "3",
@@ -276,9 +265,7 @@
           .data=${data}
           .fields=${fields}
           .actions=${actions}
-        >
-          <div slot="footer">Dec 13 2023</div>
-        </ecc-utils-design-details>`,
+        ></ecc-utils-design-details>`,
         document.querySelector("#demo")
       );
 

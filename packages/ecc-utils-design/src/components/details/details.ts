@@ -34,7 +34,7 @@ export interface Field {
 export interface Action {
   key: string;
   label: string;
-  type: "button" | "link";
+  type?: "button" | "link";
   buttonOptions?: {
     variant?: "primary" | "success" | "neutral" | "warning" | "danger" | "text";
     loading?: boolean;
@@ -62,6 +62,7 @@ export default class EccUtilsDesignDetails extends LitElement {
       :host {
         display: block;
         padding: 1rem;
+        width: auto;
       }
 
       .field {
@@ -113,6 +114,10 @@ export default class EccUtilsDesignDetails extends LitElement {
       .icon {
         height: 1.25rem;
         width: 1.25rem;
+      }
+
+      sl-copy-button::part(button) {
+        padding: 0;
       }
     `,
   ];
@@ -180,9 +185,7 @@ export default class EccUtilsDesignDetails extends LitElement {
     return objectFields;
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-
+  private _prepareFields() {
     const arrayFields = this.fields.filter((field) =>
       field.path.includes("[*]")
     );
@@ -214,6 +217,11 @@ export default class EccUtilsDesignDetails extends LitElement {
     this.fields = fields;
 
     this._tabs = this._getTabs() as Array<string>;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this._prepareFields();
   }
 
   private _renderArrayField(field: Field) {
@@ -311,7 +319,10 @@ export default class EccUtilsDesignDetails extends LitElement {
     fieldwithProps.key = key;
     fieldwithProps.path = path;
 
-    const value = _.get(this.data, fieldwithProps.path);
+    let value = _.get(this.data, fieldwithProps.path);
+
+    if (value === undefined) return html``;
+    if (value === null) value = "-";
 
     let label =
       fieldwithProps.label ||
@@ -454,6 +465,8 @@ export default class EccUtilsDesignDetails extends LitElement {
   }
 
   render() {
+    this._prepareFields();
+    if (!this.data) return html``;
     return html`<div>
       ${this._tabs.length > 0
         ? html`<sl-tab-group> ${this._renderTabs()} </sl-tab-group>`
