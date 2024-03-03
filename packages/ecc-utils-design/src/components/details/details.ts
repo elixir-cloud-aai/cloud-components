@@ -183,8 +183,6 @@ export default class EccUtilsDesignDetails extends LitElement {
   connectedCallback() {
     super.connectedCallback();
 
-    this._tabs = this._getTabs() as Array<string>;
-
     const arrayFields = this.fields.filter((field) =>
       field.path.includes("[*]")
     );
@@ -203,6 +201,19 @@ export default class EccUtilsDesignDetails extends LitElement {
       this.fields = this.fields.filter((f) => f.path !== field.path);
       this.fields.push(...expandedFields);
     });
+
+    let { fields } = this;
+
+    for (const field of this.fields) {
+      const value = _.get(this.data, field.path);
+      if (value === undefined) {
+        fields = fields.filter((f) => f.key !== field.key);
+      }
+    }
+
+    this.fields = fields;
+
+    this._tabs = this._getTabs() as Array<string>;
   }
 
   private _renderArrayField(field: Field) {
