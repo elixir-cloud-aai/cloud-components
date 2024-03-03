@@ -377,7 +377,7 @@ export class TESRuns extends LitElement {
             buttonOptions: {
               variant: "danger",
               icon: {
-                url: "/assets/delete.svg",
+                url: "https://cdn.iconscout.com/icon/free/png-256/free-delete-2902143-2411575.png",
               },
             },
           },
