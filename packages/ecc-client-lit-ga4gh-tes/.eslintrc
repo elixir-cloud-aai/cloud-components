@@ -1,7 +1,8 @@
 {
-  "extends": ["@open-wc", "elixir", "prettier"],
-  "plugins": ["prettier"],
-  "rules": {
-    "prettier/prettier": "error"
-  }
+	"extends": ["@open-wc", "elixir", "prettier"],
+	"plugins": ["prettier"],
+	"rules": {
+		"prettier/prettier": "error",
+		"class-methods-use-this": "warn"
+	}
 }

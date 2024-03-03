@@ -19,9 +19,23 @@ export interface Children {
 }
 
 export interface Field {
-  tabGroup: string;
-  children: Array<Children>;
+  key: string;
+  path: string;
+  tab?: string;
+  label?: string;
+  arrayOptions?: {
+    labelOptions?: {
+      path?: string;
+      prefix?: string;
+      suffix?: string;
+    };
+    type?: "detail" | "tag";
+  };
+  tooltip?: string;
+  copy?: boolean;
+  parentKey?: string;
 }
+
 interface ItemProp {
   index: number;
   name: string;
@@ -31,6 +45,27 @@ interface ItemProp {
     name: string;
     type?: "primary" | "success" | "neutral" | "warning" | "danger";
   };
+}
+
+export interface Action {
+  key: string;
+  label: string;
+  type: "button" | "link";
+  buttonOptions?: {
+    variant?: "primary" | "success" | "neutral" | "warning" | "danger" | "text";
+    loading?: boolean;
+    disabled?: boolean;
+    size?: "small" | "medium" | "large";
+    icon?: {
+      url: string;
+      position?: "prefix" | "suffix";
+    };
+  };
+  linkOptions?: {
+    url: string;
+    size?: "small" | "medium" | "large";
+  };
+  position?: "left" | "right";
 }
 
 interface FilterProp {
@@ -43,12 +78,6 @@ interface FilterProp {
   placeholder?: string;
 }
 
-interface FooterButton {
-  key: string;
-  name: string;
-  variant?: "primary" | "success" | "neutral" | "warning" | "danger";
-}
-
 @customElement("ecc-client-lit-ga4gh-wes-runs")
 export class WESRuns extends LitElement {
   static styles = css``;
@@ -58,60 +87,130 @@ export class WESRuns extends LitElement {
 
   @property({ type: Array }) private fields: Array<Field> = [
     {
-      tabGroup: "Overview",
-      children: [
-        {
-          label: "Tags",
-          path: "request.tags",
-        },
-        {
-          label: "Engine parameters",
-          path: "request.workflow_engine_parameters",
-          copy: true,
-        },
-        {
-          label: "Parameters",
-          path: "request.workflow_params",
-          copy: true,
-        },
-        {
-          label: "Type",
-          path: "request.workflow_type",
-        },
-        {
-          label: "Version",
-          path: "request.workflow_type_version",
-        },
-        {
-          label: "Url",
-          path: "request.workflow_url",
-          copy: true,
-        },
-      ],
+      label: "Tags",
+      tab: "Overview",
+      key: "request.tags",
+      path: "request.tags",
     },
     {
-      tabGroup: "Logs",
-      children: [
-        {
-          label: "Run Logs",
-          path: "run_log",
-          copy: true,
-        },
-        {
-          label: "Task Logs",
-          path: "task_logs",
-          copy: true,
-        },
-      ],
+      label: "Engine parameters",
+      tab: "Parameter",
+      key: "request.workflow_engine_parameters",
+      path: "request.workflow_engine_parameters",
+      copy: true,
     },
     {
-      tabGroup: "Output",
-      children: [
-        {
-          label: "Output",
-          path: "output",
+      label: "Parameters",
+      tab: "Parameter",
+      key: "request.workflow_params",
+      path: "request.workflow_params",
+      copy: true,
+    },
+    {
+      label: "Type",
+      tab: "Parameter",
+      key: "request.workflow_type",
+      path: "request.workflow_type",
+    },
+    {
+      label: "Version",
+      tab: "Parameter",
+      key: "request.workflow_type_version",
+      path: "request.workflow_type_version",
+    },
+    {
+      label: "Url",
+      tab: "Overview",
+      key: "request.workflow_url",
+      path: "request.workflow_url",
+      copy: true,
+    },
+    {
+      label: "Run Logs",
+      key: "run_log",
+      path: "run_log",
+      tab: "Run logs",
+      copy: true,
+    },
+    {
+      key: "run_log.max_retries",
+      path: "run_log.max_retries",
+      label: "Max retries",
+    },
+    {
+      key: "run_log.max_retries",
+      path: "run_log.max_retries",
+      label: "Max retries",
+    },
+    {
+      key: "run_log.stderr",
+      path: "run_log.stderr",
+      label: "STDERR",
+    },
+    {
+      key: "run_log.stdout",
+      path: "run_log.stdout",
+      label: "STDOUT",
+    },
+    {
+      key: "run_log.task_finished",
+      path: "run_log.task_finished",
+      label: "Finished at",
+    },
+    {
+      key: "run_log.task_received",
+      path: "run_log.task_received",
+      label: "Received at",
+    },
+    {
+      key: "run_log.task_received",
+      path: "run_log.task_received",
+      label: "Received at",
+    },
+    {
+      key: "run_log.time_execution",
+      path: "run_log.time_execution",
+      label: "Execution time",
+    },
+    {
+      key: "run_log.time_queue",
+      path: "run_log.time_queue",
+      label: "Queue time",
+    },
+    {
+      key: "run_log.time_total",
+      path: "run_log.time_total",
+      label: "Total time",
+    },
+    {
+      key: "run_log.utc_offset",
+      path: "run_log.utc_offset",
+      label: "UTC offset",
+    },
+    {
+      label: "Task Logs",
+      key: "task_logs",
+      path: "task_logs",
+      tab: "Task logs",
+      copy: true,
+    },
+    {
+      key: "task_logs[*]",
+      path: "task_logs[*]",
+      arrayOptions: {
+        labelOptions: {
+          prefix: "Creation time: ",
+          path: "creation_time",
         },
-      ],
+      },
+      copy: true,
+    },
+    {
+      key: "output",
+      tab: "Output",
+      label: "Output",
+      path: "outputs",
+      copy: true,
     },
   ];
 
@@ -247,11 +346,17 @@ export class WESRuns extends LitElement {
         const child = document.createElement("div");
         child.setAttribute("slot", key);
 
-        const button: FooterButton[] = [
+        const button: Action[] = [
           {
             key,
-            name: "Delete",
-            variant: "danger",
+            label: "Delete",
+            type: "button",
+            buttonOptions: {
+              variant: "danger",
+              icon: {
+                url: "/assets/delete.svg",
+              },
+            },
           },
         ];
 
@@ -260,21 +365,8 @@ export class WESRuns extends LitElement {
           id=${key}
           .data=${runData}
           .fields=${this.fields}
-          .buttons=${button}
+          .actions=${button}
         >
-          <svg
-            slot="icon-${key}"
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            class="bi bi-trash3"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"
-            />
-          </svg>
         </ecc-utils-design-details>`;
 
         // Render the details component using Lit's render function

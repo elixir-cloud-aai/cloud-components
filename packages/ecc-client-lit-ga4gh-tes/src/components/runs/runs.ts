@@ -16,8 +16,21 @@ export interface Children {
 }
 
 export interface Field {
-  tabGroup: string;
-  children: Array<Children>;
+  key: string;
+  path: string;
+  tab?: string;
+  label?: string;
+  arrayOptions?: {
+    labelOptions?: {
+      path?: string;
+      prefix?: string;
+      suffix?: string;
+    };
+    type?: "detail" | "tag";
+  };
+  tooltip?: string;
+  copy?: boolean;
+  parentKey?: string;
 }
 interface ItemProp {
   index: number;
@@ -40,11 +53,25 @@ interface FilterProp {
   placeholder?: string;
 }
 
-interface FooterButton {
+export interface Action {
   key: string;
-  name: string;
-  variant?: "primary" | "success" | "neutral" | "warning" | "danger";
-  icon?: string;
+  label: string;
+  type: "button" | "link";
+  buttonOptions?: {
+    variant?: "primary" | "success" | "neutral" | "warning" | "danger" | "text";
+    loading?: boolean;
+    disabled?: boolean;
+    size?: "small" | "medium" | "large";
+    icon?: {
+      url: string;
+      position?: "prefix" | "suffix";
+    };
+  };
+  linkOptions?: {
+    url: string;
+    size?: "small" | "medium" | "large";
+  };
+  position?: "left" | "right";
 }
 
 @customElement("ecc-client-lit-ga4gh-tes-runs")
@@ -58,66 +85,128 @@ export class TESRuns extends LitElement {
   @property({ type: Boolean }) private search = true;
   @property({ type: Array }) private fields: Array<Field> = [
     {
-      tabGroup: "Overview",
-      children: [
-        {
-          label: "Name",
-          path: "name",
-          copy: true,
-        },
-        {
-          label: "Description",
-          path: "description",
-        },
-        {
-          label: "Resources",
-          path: "resources",
-        },
-        {
-          label: "Tags",
-          path: "tags",
-        },
-        {
-          label: "Executor",
-          path: "executors",
-        },
-        {
-          label: "Volumes",
-          path: "volumes",
-        },
-        {
-          label: "Creation time",
-          path: "creation_time",
-        },
-      ],
+      key: "name",
+      path: "name",
+      tab: "Overview",
+      label: "Name",
+      copy: true,
     },
     {
-      tabGroup: "Logs",
-      children: [
-        {
-          label: "Logs",
-          path: "logs",
-          copy: true,
-        },
-      ],
+      key: "description",
+      path: "description",
+      tab: "Overview",
+      label: "Description",
     },
     {
-      tabGroup: "Output",
-      children: [
-        {
-          label: "Output",
-          path: "outputs",
-        },
-      ],
+      key: "resources",
+      path: "resources",
+      tab: "Overview",
+      label: "Resources",
     },
     {
-      tabGroup: "Inputs",
-      children: [
-        {
-          label: "Input",
-          path: "inputs",
+      key: "tags",
+      path: "tags",
+      tab: "Overview",
+      label: "Tags",
+    },
+    {
+      key: "executors",
+      path: "executors",
+      tab: "Overview",
+      label: "Executor",
+    },
+    {
+      key: "executors*",
+      path: "executors[*]",
+      arrayOptions: {
+        labelOptions: {
+          path: "image",
         },
-      ],
+      },
+    },
+    {
+      key: "executors*command",
+      path: "executors[*].command",
+      arrayOptions: {
+        type: "tag",
+      },
+    },
+    {
+      key: "volumes",
+      path: "volumes",
+      tab: "Overview",
+      label: "Volumes",
+    },
+    {
+      key: "creation_time",
+      path: "creation_time",
+      tab: "Overview",
+      label: "Creation time",
+    },
+    {
+      key: "logs",
+      path: "logs",
+      tab: "Logs",
+      label: "Logs",
+      copy: true,
+    },
+    {
+      key: "logs[*].logs[*].stderr",
+      path: "logs[*].logs[*].stderr",
+      label: "STDERR",
+      copy: true,
+    },
+    {
+      key: "logs[*].logs[*].stdout",
+      path: "logs[*].logs[*].stdout",
+      label: "STDOUT",
+      copy: true,
+    },
+    {
+      key: "logs[*]",
+      path: "logs[*]",
+      arrayOptions: {
+        labelOptions: {
+          path: "start_time",
+          prefix: "Start time: ",
+        },
+      },
+      copy: true,
+    },
+    {
+      key: "logs[*].logs[*]",
+      path: "logs[*].logs[*]",
+      arrayOptions: {
+        labelOptions: {
+          path: "start_time",
+          prefix: "Start time: ",
+        },
+      },
+      copy: true,
+    },
+    {
+      key: "outputs",
+      path: "outputs",
+      tab: "Output",
+      label: "Output",
+      copy: true,
+    },
+    {
+      key: "inputs",
+      path: "inputs",
+      tab: "Inputs",
+      label: "Input",
+      copy: true,
+    },
+    {
+      key: "inputs",
+      path: "inputs[*]",
+      arrayOptions: {
+        labelOptions: {
+          path: "path",
+        },
+      },
+      copy: true,
     },
   ];
 
@@ -280,12 +369,17 @@ export class TESRuns extends LitElement {
         const child = document.createElement("div");
         child.setAttribute("slot", key);
 
-        const button: FooterButton[] = [
+        const button: Action[] = [
           {
             key,
-            name: "Delete",
-            variant: "danger",
-            icon: "/assets/delete.svg",
+            label: "Delete",
+            type: "button",
+            buttonOptions: {
+              variant: "danger",
+              icon: {
+                url: "/assets/delete.svg",
+              },
+            },
           },
         ];
 
@@ -294,7 +388,7 @@ export class TESRuns extends LitElement {
           id=${key}
           .data=${runData}
           .fields=${this.fields}
-          .buttons=${button}
+          .actions=${button}
         >
         </ecc-utils-design-details>`;
 
