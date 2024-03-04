@@ -11,7 +11,7 @@
   },
   "homepage": "https://github.com/elixir-cloud-aai/cloud-components#readme",
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build --cache-dir=.turbo",
     "dev": "turbo run dev",
     "lint": "eslint . && turbo run lint --parallel",
     "lint:fix": "eslint . --fix && turbo run lint:fix",
