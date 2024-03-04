@@ -1,6 +1,6 @@
 {
   "extends": ["@open-wc", "elixir"],
   "rules": {
-    "lit/no-classfield-shadowing": 1
+    "lit/no-classfield-shadowing": "warn"
   }
 }

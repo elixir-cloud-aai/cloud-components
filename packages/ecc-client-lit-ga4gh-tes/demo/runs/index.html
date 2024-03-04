@@ -16,14 +16,12 @@
       import { html, render } from "lit";
       import "../../dist/components/runs/index.js";
 
-      const baseURL = "http://localhost:8080/ga4gh/tes/v1";
+      // const baseURL = "http://localhost:8080/ga4gh/tes/v1";
       const pageSize = 10;
+      // .baseURL="${baseURL}"
 
       render(
-        html`<ecc-client-lit-ga4gh-tes-runs
-          .pageSize="${pageSize}"
-          .baseURL="${baseURL}"
-        />`,
+        html`<ecc-client-lit-ga4gh-tes-runs .pageSize="${pageSize}" />`,
         document.querySelector("#demo")
       );
     </script>

@@ -1,9 +1,53 @@
-/* eslint-disable lit/no-classfield-shadowing */
+/* eslint-disable camelcase */
+
 import { html, LitElement } from "lit";
 import { property, state } from "lit/decorators.js";
 import { postTask } from "../../API/Task/tesGet.js";
-import { Executor, postTaskForm } from "./types.js";
 import "@elixir-cloud/design/dist/components/form/index.js";
+
+export interface Executor {
+  command: string[];
+  env?: Record<string, string>;
+  image: string;
+  stderr?: string;
+  stdin?: string;
+  stdout?: string;
+  workdir?: string;
+}
+
+export interface Input {
+  path?: string;
+  url?: string;
+}
+
+export interface Output {
+  path?: string;
+  type?: string;
+  url?: string;
+}
+
+export interface Resources {
+  cpu_cores?: number;
+  disk_gb?: number;
+  preemptible?: boolean;
+  ram_gb?: number;
+  zones?: string;
+}
+
+export interface Tags {
+  [key: string]: string;
+}
+
+export interface postTaskForm {
+  name?: string;
+  description?: string;
+  executors: Executor[];
+  inputs?: Input[];
+  outputs?: Output[];
+  resources?: Resources;
+  tags?: Tags;
+  volumes?: string[];
+}
 
 /**
  * @summary This component is used to create task runs using TES API.
