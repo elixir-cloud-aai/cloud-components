@@ -1,32 +1,32 @@
 <!DOCTYPE html>
 <html lang="en-GB">
-  <head>
-    <meta charset="utf-8" />
-    <style>
-      body {
-        background: #fafafa;
-      }
-    </style>
-  </head>
-  <title>ecc-client-ga4gh-wes-runs</title>
-  <body>
-    <div id="demo"></div>
+	<head>
+		<meta charset="utf-8" />
+		<style>
+			body {
+				background: #fafafa;
+			}
+		</style>
+	</head>
+	<title>ecc-client-ga4gh-wes-runs</title>
+	<body>
+		<div id="demo"></div>
 
-    <script type="module">
-      import { html, render } from "lit";
-      import "../../dist/index.js";
+		<script type="module">
+			import { html, render } from "lit";
+			import "../../dist/index.js";
 
-      const baseURL = "http://localhost:8090/ga4gh/wes/v1";
-      const pageSize = 10;
-      const filter = false;
-      render(
-        html`<ecc-client-lit-ga4gh-wes-runs
-          .pageSize="${pageSize}"
-          .baseURL="${baseURL}"
-          .filter=${filter}
-        />`,
-        document.querySelector("#demo")
-      );
-    </script>
-  </body>
+			// const baseURL = "http://localhost:8090/ga4gh/wes/v1";
+			const pageSize = 10;
+			const filter = false;
+			// .baseURL="${baseURL}"
+			render(
+			  html`<ecc-client-lit-ga4gh-wes-runs
+			    .pageSize="${pageSize}"
+			    .filter=${filter}
+			  />`,
+			  document.querySelector("#demo")
+			);
+		</script>
+	</body>
 </html>
