@@ -18,11 +18,9 @@ dist
 
 coverage
 
-# Never lint automatically generated files
+# Never lint
 
 src/react
-
-# Never lint
 
 **/.git
 **/.svn

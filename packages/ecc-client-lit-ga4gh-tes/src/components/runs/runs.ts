@@ -1,6 +1,6 @@
 /* eslint-disable lit/no-classfield-shadowing */
 import { html, css, LitElement, render } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { property, state } from "lit/decorators.js";
 import "@elixir-cloud/design";
 import { deleteTask, fetchTask, fetchTasks } from "../../API/Task/tesGet.js";
 
@@ -32,7 +32,7 @@ export interface Field {
   copy?: boolean;
   parentKey?: string;
 }
-interface ItemProp {
+export interface ItemProp {
   index: number;
   name: string;
   key: string;
@@ -43,7 +43,7 @@ interface ItemProp {
   };
 }
 
-interface FilterProp {
+export interface FilterProp {
   key: string;
   type: "search" | "select";
   options?: string[];
@@ -74,8 +74,7 @@ export interface Action {
   position?: "left" | "right";
 }
 
-@customElement("ecc-client-lit-ga4gh-tes-runs")
-export class TESRuns extends LitElement {
+export default class ECCClientGa4ghTesRuns extends LitElement {
   static styles = css``;
   @property({ type: Number }) private pageSize = 5;
   @property({ type: String }) private baseURL =
@@ -446,10 +445,5 @@ export class TESRuns extends LitElement {
       >
       </ecc-utils-design-collection>
     `;
-  }
-}
-declare global {
-  interface HTMLElementTagNameMap {
-    "ecc-client-lit-ga4gh-tes-runs": TESRuns;
   }
 }

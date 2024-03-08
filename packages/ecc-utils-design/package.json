@@ -5,10 +5,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
     "./dist/custom-elements.json": "./dist/custom-elements.json",
     "./dist/index.js": "./dist/index.js",
     "./dist/components/*": "./dist/components/*",
@@ -22,9 +19,10 @@
   "license": "ISC",
   "customElements": "./dist/custom-elements.json",
   "repository": "",
+  "componentsPrefix": "ecc-utils-design-",
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "node ./scripts/build.js",
+    "build": "node ../../scripts/build.js",
     "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
     "test": "",
     "test:watch": "wtr --watch",
@@ -34,6 +32,7 @@
     "lint:fix": "npm run lint -- --fix",
     "prepublish": "npm run build"
   },
+  "elixirConfig": {},
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.8.4",
     "@lit/react": "^1.0.2",
@@ -41,23 +40,24 @@
     "@open-wc/testing": "^3.2.0",
     "@types/js-yaml": "^4.0.9",
     "@types/lodash-es": "^4.17.10",
-    "@web/dev-server": "^0.3.0",
+    "@web/dev-server": "*",
     "@web/dev-server-esbuild": "^0.4.3",
     "@web/dev-server-storybook": "^1.0.2",
     "@web/test-runner": "^0.17.0",
-    "commander": "^11.1.0",
-    "concurrently": "^8.2.1",
-    "custom-element-jet-brains-integration": "^1.4.0",
-    "custom-element-vs-code-integration": "^1.2.1",
+    "commander": "*",
+    "concurrently": "*",
+    "custom-element-jet-brains-integration": "*",
+    "custom-element-vs-code-integration": "*",
     "esbuild": "0.18.20",
-    "eslint": "^8.41.0",
+    "eslint": "*",
     "eslint-config-elixir": "*",
     "eslint-plugin-prettier": "^4.2.1",
     "globby": "^14.0.0",
-    "react": "^18.2.0",
+    "react": "*",
     "tslib": "^2.6.2",
     "tsup": "^7.2.0",
-    "typescript": "^5.0.4"
+    "typescript": "*",
+    "pascal-case": "*"
   },
   "dependencies": {
     "@shoelace-style/shoelace": "^2.8.0",

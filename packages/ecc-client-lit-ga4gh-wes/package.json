@@ -7,8 +7,17 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "componentsPrefix": "ecc-client-ga4gh-wes-",
   "exports": {
-    ".": "./dist/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./dist/custom-elements.json": "./dist/custom-elements.json",
+    "./dist/index.js": "./dist/index.js",
+    "./dist/components/*": "./dist/components/*",
+    "./dist/react": "./dist/react/index.js",
+    "./dist/react/*": "./dist/react/*"
   },
   "repository": {
     "type": "git",
@@ -16,7 +25,7 @@
   },
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "node ../../scripts/build.js",
     "dev": "npm run build && concurrently -k -r \"npm run build -- --watch\" \"wds\"",
     "test": "wtr --coverage",
     "test:watch": "wtr --watch",
@@ -42,7 +51,13 @@
     "eslint-config-prettier": "^8.3.0",
     "tslib": "^2.3.1",
     "tsup": "^7.2.0",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "@lit/react": "*",
+    "react": "*",
+    "commander": "*",
+    "custom-element-jet-brains-integration": "*",
+    "custom-element-vs-code-integration": "*",
+    "pascal-case": "*"
   },
-  "customElements": "custom-elements.json"
+  "customElements": "dist/custom-elements.json"
 }

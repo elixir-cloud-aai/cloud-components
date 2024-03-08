@@ -1,55 +1,67 @@
-/* eslint-disable lit/no-classfield-shadowing */
+/* eslint-disable camelcase */
+
 import { html, LitElement } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { property, state } from "lit/decorators.js";
 import { postTask } from "../../API/Task/tesGet.js";
-import { Executor, postTaskForm } from "./types.js";
 import "@elixir-cloud/design/dist/components/form/index.js";
 
-// TODO: import the interface from the design package
-interface Field {
-  key: string;
-  label: string;
-  type?:
-    | "text"
-    | "date"
-    | "number"
-    | "email"
-    | "password"
-    | "tel"
-    | "url"
-    | "search"
-    | "datetime-local"
-    | "time"
-    | "array"
-    | "switch"
-    | "file"
-    | "group";
-  fieldOptions?: {
-    required?: boolean;
-    default?: string | boolean;
-    multiple?: boolean;
-    accept?: string;
-    returnIfEmpty?: string;
-    tooltip?: string;
-  };
-  arrayOptions?: {
-    defaultInstances?: number;
-    max?: number;
-    min?: number;
-  };
-  groupOptions?: {
-    collapsible: boolean;
-  };
-  error?: string;
-  children?: Array<Field>;
+export interface Executor {
+  command: string[];
+  env?: Record<string, string>;
+  image: string;
+  stderr?: string;
+  stdin?: string;
+  stdout?: string;
+  workdir?: string;
 }
 
-@customElement("ecc-client-lit-ga4gh-tes-create-run")
-export class TESCreateRun extends LitElement {
-  @property({ type: String }) baseURL =
+export interface Input {
+  path?: string;
+  url?: string;
+}
+
+export interface Output {
+  path?: string;
+  type?: string;
+  url?: string;
+}
+
+export interface Resources {
+  cpu_cores?: number;
+  disk_gb?: number;
+  preemptible?: boolean;
+  ram_gb?: number;
+  zones?: string;
+}
+
+export interface Tags {
+  [key: string]: string;
+}
+
+export interface postTaskForm {
+  name?: string;
+  description?: string;
+  executors: Executor[];
+  inputs?: Input[];
+  outputs?: Output[];
+  resources?: Resources;
+  tags?: Tags;
+  volumes?: string[];
+}
+
+/**
+ * @summary This component is used to create task runs using TES API.
+ * @since 1.0.0
+ *
+ * @property {string} baseURL - Base URL
+ *
+ */
+
+export default class ECCCLientGa4ghTesCreateRun extends LitElement {
+  @property({ type: String }) accessor baseURL =
     "https://protes.rahtiapp.fi/ga4gh/tes/v1";
 
-  @state() form: postTaskForm = {
+  @state() accessor form: postTaskForm = {
     executors: [
       {
         command: [],
@@ -58,34 +70,23 @@ export class TESCreateRun extends LitElement {
     ],
   };
 
-  @state() response: any = {};
+  @state() accessor response: any = {};
 
-  @state() private fields: Array<Field> = [
+  private fields = [
     {
       key: "name",
       label: "Name",
       type: "text",
-      fieldOptions: {
-        tooltip: "Task name.",
-      },
     },
     {
       key: "description",
       label: "Description",
-      type: "text",
-      fieldOptions: {
-        tooltip: "Task description for documentation purposes.",
-      },
+      type: "test",
     },
     {
       key: "executors",
       label: "Executors",
       type: "group",
-      fieldOptions: {
-        required: true,
-        tooltip:
-          "A sequence of program arguments to execute, where the first argument is the program to execute (i.e. argv).",
-      },
       groupOptions: {
         collapsible: true,
       },
@@ -94,6 +95,9 @@ export class TESCreateRun extends LitElement {
           key: "executors",
           label: "",
           type: "array",
+          fieldOptions: {
+            required: true,
+          },
           arrayOptions: {
             defaultInstances: 1,
             min: 1,
@@ -105,8 +109,6 @@ export class TESCreateRun extends LitElement {
               type: "array",
               fieldOptions: {
                 required: true,
-                tooltip:
-                  "A sequence of program arguments to execute, where the first argument is the program to execute (i.e. argv).",
               },
               arrayOptions: {
                 defaultInstances: 1,
@@ -115,8 +117,11 @@ export class TESCreateRun extends LitElement {
               children: [
                 {
                   key: "command",
-                  label: "",
+                  label: "Command",
                   type: "text",
+                  fieldOptions: {
+                    required: true,
+                  },
                 },
               ],
             },
@@ -124,9 +129,6 @@ export class TESCreateRun extends LitElement {
               key: "env",
               label: "Env",
               type: "array",
-              fieldOptions: {
-                tooltip: "Enviromental variables to set within the container",
-              },
               arrayOptions: {
                 defaultInstances: 0,
               },
@@ -149,45 +151,27 @@ export class TESCreateRun extends LitElement {
               type: "text",
               fieldOptions: {
                 required: true,
-                tooltip:
-                  " Name of the container image. The string will be passed as the image argument to the containerization run command.",
               },
             },
             {
               key: "stderr",
-              label: "STDERR",
+              label: "Stderr",
               type: "text",
-              fieldOptions: {
-                tooltip:
-                  "Path inside the container to a file where the executor's stderr will be written to. Must be an absolute path.",
-              },
             },
             {
               key: "stdin",
-              label: "STDIN",
+              label: "Stdin",
               type: "text",
-              fieldOptions: {
-                tooltip:
-                  "Path inside the container to a file where the executor's stdout will be written to. Must be an absolute path.",
-              },
             },
             {
               key: "stdout",
-              label: "STDOUT",
+              label: "Stdout",
               type: "text",
-              fieldOptions: {
-                tooltip:
-                  "Path inside the container to a file where the executor's stdout will be written to. Must be an absolute path.",
-              },
             },
             {
               key: "workdir",
               label: "Workdir",
               type: "text",
-              fieldOptions: {
-                tooltip:
-                  "The working directory that the command will be executed in. If not defined, the system will default to the directory set by the container image.",
-              },
             },
           ],
         },
@@ -197,10 +181,6 @@ export class TESCreateRun extends LitElement {
       key: "inputs",
       label: "Inputs",
       type: "group",
-      fieldOptions: {
-        tooltip:
-          "Input files that will be used by the task. Inputs will be downloaded and mounted into the executor container as defined by the task request document.",
-      },
       groupOptions: {
         collapsible: true,
       },
@@ -217,19 +197,11 @@ export class TESCreateRun extends LitElement {
               key: "path",
               label: "Path",
               type: "text",
-              fieldOptions: {
-                tooltip:
-                  "Path of the file inside the container. Must be an absolute path.",
-              },
             },
             {
               key: "url",
               label: "URL",
               type: "text",
-              fieldOptions: {
-                tooltip:
-                  "REQUIRED, unless content is set. URL in long term storage, for example:- s3://my-object-store/file1.",
-              },
             },
           ],
         },
@@ -241,9 +213,6 @@ export class TESCreateRun extends LitElement {
       type: "group",
       groupOptions: {
         collapsible: true,
-      },
-      fieldOptions: {
-        tooltip: "Output describes Task output files.",
       },
       children: [
         {
@@ -258,10 +227,6 @@ export class TESCreateRun extends LitElement {
               key: "path",
               label: "Path",
               type: "text",
-              fieldOptions: {
-                tooltip:
-                  "Path of the file inside the container. Must be an absolute path.",
-              },
             },
             {
               key: "type",
@@ -272,10 +237,6 @@ export class TESCreateRun extends LitElement {
               key: "url",
               label: "URL",
               type: "text",
-              fieldOptions: {
-                tooltip:
-                  "URL at which the TES server makes the output accessible after the task is complete.",
-              },
             },
           ],
         },
@@ -293,42 +254,26 @@ export class TESCreateRun extends LitElement {
           key: "cpu_cores",
           label: "CPU cores",
           type: "number",
-          fieldOptions: {
-            tooltip: "Number of CPUs requested for the task.",
-          },
         },
         {
           key: "disk_gb",
-          label: "Disk space",
+          label: "Disk space (Gb)",
           type: "number",
-          fieldOptions: {
-            tooltip: "Disk space required in gigabytes (GB).",
-          },
         },
         {
           key: "ram_gb",
-          label: "Ram space",
+          label: "Ram space (Gb)",
           type: "number",
-          fieldOptions: {
-            tooltip: "RAM required in gigabytes (GB).",
-          },
         },
         {
           key: "zones",
           label: "Zones",
           type: "text",
-          fieldOptions: {
-            tooltip: "Compute zones in which the task should be run.",
-          },
         },
         {
           key: "preemptible",
           label: "Preemptible",
           type: "switch",
-          fieldOptions: {
-            tooltip:
-              "Define if the task is allowed to run on preemptible compute instances, for example: AWS Spot.",
-          },
         },
       ],
     },
@@ -356,10 +301,6 @@ export class TESCreateRun extends LitElement {
       key: "volumes",
       label: "Volumes",
       type: "array",
-      fieldOptions: {
-        tooltip:
-          "Directories which may be used to share data between Executors. Volumes are initialized as empty directories by the system when the task starts and are mounted at the same path in each Executor.",
-      },
       arrayOptions: {
         defaultInstances: 0,
       },
@@ -534,11 +475,5 @@ export class TESCreateRun extends LitElement {
       >
       </ecc-utils-design-form>
     `;
-  }
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    "ecc-client-lit-ga4gh-tes-create-run": TESCreateRun;
   }
 }

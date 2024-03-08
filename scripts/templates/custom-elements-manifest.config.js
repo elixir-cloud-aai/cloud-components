@@ -15,7 +15,7 @@ const options = program
   .opts();
 
 const { pascalCase } = pkg;
-const { componentsPrefix } = packageJson;
+const componentsPrefix = packageJson.componentsPrefix;
 const packageData = JSON.parse(fs.readFileSync("package.json", "utf8"));
 const { name, description, version, author, homepage, license } = packageData;
 
