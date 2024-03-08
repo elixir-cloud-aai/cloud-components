@@ -13,7 +13,7 @@ import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import collectionStyles from "./collection.styles.js";
 
-interface ItemProp {
+export interface ItemProp {
   index: number;
   name: string;
   key: string;
@@ -24,7 +24,7 @@ interface ItemProp {
   };
 }
 
-interface FilterProp {
+export interface FilterProp {
   key: string;
   type: "search" | "select";
   options?: string[];

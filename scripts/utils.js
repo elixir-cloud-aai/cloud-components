@@ -1,7 +1,9 @@
-export const componentsPrefix = "ecc-utils-design-";
-export const npmDir = "dist";
+const path = require("path");
 
-export const getAllComponents = (metadata) => {
+const componentsPrefix = "ecc-utils-design-";
+const npmDir = path.join("./dist");
+
+const getAllComponents = (metadata) => {
   const allComponents = [];
 
   metadata.modules.forEach((module) => {
@@ -10,7 +12,7 @@ export const getAllComponents = (metadata) => {
         const component = declaration;
         const { path } = module;
 
-        if (component) {
+        if (component && component.tagName) {
           allComponents.push(Object.assign(component, { path }));
         }
       }
@@ -18,4 +20,10 @@ export const getAllComponents = (metadata) => {
   });
 
   return allComponents;
+};
+
+module.exports = {
+  componentsPrefix,
+  npmDir,
+  getAllComponents,
 };

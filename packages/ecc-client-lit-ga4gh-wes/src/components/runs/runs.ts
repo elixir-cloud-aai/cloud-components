@@ -1,5 +1,5 @@
 import { html, css, LitElement, render } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { property, state } from "lit/decorators.js";
 import "@elixir-cloud/design";
 import {
   cancelWorkflow,
@@ -35,8 +35,7 @@ export interface Field {
   copy?: boolean;
   parentKey?: string;
 }
-
-interface ItemProp {
+export interface ItemProp {
   index: number;
   name: string;
   key: string;
@@ -68,7 +67,7 @@ export interface Action {
   position?: "left" | "right";
 }
 
-interface FilterProp {
+export interface FilterProp {
   key: string;
   type: "search" | "select";
   options?: string[];
@@ -78,8 +77,18 @@ interface FilterProp {
   placeholder?: string;
 }
 
-@customElement("ecc-client-lit-ga4gh-wes-runs")
-export class WESRuns extends LitElement {
+/**
+ * @summary This component facilitates browsing workflow runs via WES API.
+ * @since 1.0.0
+ *
+ * @property {string} baseURL - Base URL
+ * @property {number} pageSize - Number of runs per page
+ * @property {array} fields - Configuration based on which data will be rendered in groups
+ * @property {boolean} filter - Defines the rendering of the filter-by-state bar.
+ *
+ */
+
+export default class ECCClientGa4ghWesRuns extends LitElement {
   static styles = css``;
   @property({ type: Number }) private pageSize = 5;
   @property({ type: String }) private baseURL =
@@ -424,10 +433,5 @@ export class WESRuns extends LitElement {
       >
       </ecc-utils-design-collection>
     `;
-  }
-}
-declare global {
-  interface HTMLElementTagNameMap {
-    "ecc-client-lit-ga4gh-wes-runs": WESRuns;
   }
 }

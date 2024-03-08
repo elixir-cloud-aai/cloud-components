@@ -12,7 +12,7 @@ import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import formStyles from "./form.styles.js";
 
-interface Field {
+export interface Field {
   key: string;
   label: string;
   type?:
