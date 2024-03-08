@@ -1,14 +1,16 @@
 # ecc-utils-design Components
 
-This package serves as an abstraction layer & provides utility components to manage the headless yet constitent design across ecc component
+This package serves as an abstraction layer & provides utility components to manage the headless yet constitent design across ecc component.
 
 ## Introduction
-...
+Please read the [docs] for on how to use, customise and make these components you own.
 
 ### Components
-| Component              | Issue  | Status             |
-|------------------------|--------|--------------------|
-|                        |        |                    |
+| Component                   | Issue | Status |
+| --------------------------- | ----- | ------ |
+| ecc-utils-design-collection | #166  | beta   |
+| ecc-utils-design-form       | #141  | beta   |
+| ecc-utils-design-details    | #224  | beta   |
 
 ## Getting Started
 
@@ -16,15 +18,20 @@ To get started with this project, follow these steps:
 
 1. Install dependencies:
 
-   ```
+   ```bash
    npm ci
    ```
 2. Run dev server: 
 
-   ```
+   ```bash
    cd packages/ecc-utils-design
    npm run dev
    ```
+3. Run build
+    ```bash
+    cd packages/ecc-utils-design
+    npm run build
+    ```
    
 ## Contributing
 
@@ -109,5 +116,6 @@ To get in touch with use, please use one of the following routes:
 [elixir-compute]: https://elixir-europe.org/platforms/compute
 [ga4gh]: https://ga4gh.org/
 [license]: LICENSE
-[logo-elixir]: images/logo-elixir.svg
-[logo-elixir-cloud-aai]: images/logo-elixir-cloud-aai.svg
+[logo-elixir]: https://raw.githubusercontent.com/elixir-cloud-aai/cloud-components/main/images/logo-elixir.svg
+[logo-elixir-cloud-aai]: https://raw.githubusercontent.com/elixir-cloud-aai/cloud-components/main/images/logo-elixir-cloud-aai.svg
+[docs]: https://elixir-cloud-components.vercel.app/
