@@ -11,13 +11,11 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "outDir": "dist",
-    "sourceMap": true,
-    "inlineSources": true,
-    "rootDir": "./",
+    "sourceMap": false,
+    "rootDir": "./src",
     "declaration": true,
     "emitDeclarationOnly": true,
     "skipLibCheck": true
   },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src"]
 }

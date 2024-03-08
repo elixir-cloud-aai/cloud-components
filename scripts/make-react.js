@@ -1,13 +1,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
-import fs from "fs";
-import path from "path";
-import prettier from "prettier";
-import { pascalCase } from "pascal-case";
-import { componentsPrefix, npmDir, getAllComponents } from "./utils.js";
+const { cwd } = process;
+const fs = require("fs");
+const { program } = require("commander");
+const path = require("path");
+const prettier = require("prettier");
+const pascalCase = require("pascal-case");
+const { npmDir, getAllComponents } = require("./utils.js");
 
-const reactDir = path.join("./src/react");
+const options = program.option("-p, --prefix <string>").parse().opts();
 
+const reactDir = path.join(cwd(), "./src/react");
 // Clear build directory
 fs.rmSync(reactDir, { recursive: true, force: true });
 fs.mkdirSync(reactDir, { recursive: true });
@@ -22,7 +25,7 @@ const index = [];
 // the add react to build
 
 components.forEach((component) => {
-  const tagWithoutPrefix = component.tagName.replace(componentsPrefix, "");
+  const tagWithoutPrefix = component.tagName.replace(options.prefix, "");
   const componentDir = path.join(reactDir, tagWithoutPrefix);
   const componentFile = path.join(componentDir, "index.ts");
   const eventImports = (component.events || [])

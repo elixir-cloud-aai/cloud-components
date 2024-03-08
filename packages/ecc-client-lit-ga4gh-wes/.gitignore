@@ -20,5 +20,10 @@
 /dist/
 /out-tsc/
 
+
+## generated files
+/src/react
+custom-elements-manifest.config.js
+
 storybook-static
 custom-elements.json
