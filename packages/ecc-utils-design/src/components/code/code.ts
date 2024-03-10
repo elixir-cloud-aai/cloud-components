@@ -9,7 +9,7 @@ import { hostStyles } from "../../styles/host.styles.js";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import codeStyles from "./code.styles.js";
 
-type Language = "YAML" | "JSON" | "Text";
+export type Language = "YAML" | "JSON" | "Text";
 
 export default class EccUtilsDesignCode extends LitElement {
   static styles = [

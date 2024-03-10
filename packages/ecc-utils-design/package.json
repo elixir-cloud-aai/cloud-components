@@ -35,9 +35,9 @@
   "elixirConfig": {},
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.8.4",
-    "@lit/react": "^1.0.2",
-    "@open-wc/eslint-config": "^12.0.0",
-    "@open-wc/testing": "^3.2.0",
+    "@lit/react": "*",
+    "@open-wc/eslint-config": "*",
+    "@open-wc/testing": "*",
     "@types/js-yaml": "^4.0.9",
     "@types/lodash-es": "^4.17.10",
     "@web/dev-server": "*",
