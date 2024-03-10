@@ -1,81 +1,18 @@
 import { html, css, LitElement, render } from "lit";
 import { property, state } from "lit/decorators.js";
-import "@elixir-cloud/design";
+import {
+  FilterProp,
+  ItemProp,
+} from "@elixir-cloud/design/src/components/collection/index.js";
+import {
+  Field,
+  Action,
+} from "@elixir-cloud/design/src/components/details/index.js";
 import {
   cancelWorkflow,
   fetchWorkflow,
   fetchWorkflows,
 } from "../../API/Workflow/wesGet.js";
-
-// TODO: Remove the interfaces once design package
-//       can export them, as they are copied from
-//       from there.
-
-export interface Children {
-  label?: string;
-  path: string;
-  copy?: boolean;
-  defaultValue?: any;
-}
-
-export interface Field {
-  key: string;
-  path: string;
-  tab?: string;
-  label?: string;
-  arrayOptions?: {
-    labelOptions?: {
-      path?: string;
-      prefix?: string;
-      suffix?: string;
-    };
-    type?: "detail" | "tag";
-  };
-  tooltip?: string;
-  copy?: boolean;
-  parentKey?: string;
-}
-export interface ItemProp {
-  index: number;
-  name: string;
-  key: string;
-  lazy?: boolean;
-  tag?: {
-    name: string;
-    type?: "primary" | "success" | "neutral" | "warning" | "danger";
-  };
-}
-
-export interface Action {
-  key: string;
-  label: string;
-  type: "button" | "link";
-  buttonOptions?: {
-    variant?: "primary" | "success" | "neutral" | "warning" | "danger" | "text";
-    loading?: boolean;
-    disabled?: boolean;
-    size?: "small" | "medium" | "large";
-    icon?: {
-      url: string;
-      position?: "prefix" | "suffix";
-    };
-  };
-  linkOptions?: {
-    url: string;
-    size?: "small" | "medium" | "large";
-  };
-  position?: "left" | "right";
-}
-
-export interface FilterProp {
-  key: string;
-  type: "search" | "select";
-  options?: string[];
-  selectConfig?: {
-    multiple?: boolean;
-  };
-  placeholder?: string;
-}
 
 /**
  * @summary This component facilitates browsing workflow runs via WES API.
@@ -94,7 +31,7 @@ export default class ECCClientGa4ghWesRuns extends LitElement {
   @property({ type: String }) private baseURL =
     "https://prowes.rahtiapp.fi/ga4gh/wes/v1";
 
-  @property({ type: Array }) private fields: Array<Field> = [
+  @property({ type: Array }) private fields: Field[] = [
     {
       label: "Tags",
       tab: "Overview",
@@ -247,7 +184,6 @@ export default class ECCClientGa4ghWesRuns extends LitElement {
     },
   ];
 
-  @state() private filterTag: string[] = [];
   @state() private filter = true;
   @state() private items: ItemProp[] = [];
   @state() private nextPageToken: string[] = [""];

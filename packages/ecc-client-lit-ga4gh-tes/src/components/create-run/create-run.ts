@@ -2,8 +2,9 @@
 
 import { html, LitElement } from "lit";
 import { property, state } from "lit/decorators.js";
+import { Field } from "@elixir-cloud/design/src/components/form/index.js";
+import type { EccUtilsButtonClickEvent } from "@elixir-cloud/design/src/events/index.js";
 import { postTask } from "../../API/Task/tesGet.js";
-import "@elixir-cloud/design/dist/components/form/index.js";
 
 export interface Executor {
   command: string[];
@@ -72,7 +73,7 @@ export default class ECCCLientGa4ghTesCreateRun extends LitElement {
 
   @state() accessor response: any = {};
 
-  private fields = [
+  @state() private fields: Field[] = [
     {
       key: "name",
       label: "Name",
@@ -81,7 +82,7 @@ export default class ECCCLientGa4ghTesCreateRun extends LitElement {
     {
       key: "description",
       label: "Description",
-      type: "test",
+      type: "text",
     },
     {
       key: "executors",
@@ -469,7 +470,7 @@ export default class ECCCLientGa4ghTesCreateRun extends LitElement {
     return html`
       <ecc-utils-design-form
         .fields=${this.fields}
-        @ecc-utils-submit=${(e: any) => {
+        @ecc-utils-submit=${(e: EccUtilsButtonClickEvent) => {
           this._submitForm(e.detail.form.data);
         }}
       >
