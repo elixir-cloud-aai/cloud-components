@@ -436,7 +436,7 @@ export default class ECCCLientGa4ghTesCreateRun extends LitElement {
       });
   };
 
-  // eslint-disable-next-line
+  // Process env data
   private _processEnv = (
     envArray: Record<string, string>[]
   ): Record<string, string> =>
@@ -448,11 +448,11 @@ export default class ECCCLientGa4ghTesCreateRun extends LitElement {
       {}
     );
 
-  // eslint-disable-next-line
+  // Process volume data
   private _processVolumes = (value: Array<{ volume: string }>) =>
     value.map((vol) => vol.volume);
 
-  // eslint-disable-next-line
+  // Process tags data
   private _processTags = (
     tagArray: Array<{ name: string; value: string }>
   ): Record<string, string> =>
