@@ -1,10 +1,10 @@
 import { html, LitElement } from "lit";
-import { property, state } from "lit/decorators.js";
-import { postWorkflow } from "../../API/Workflow/wesGet.js";
+import { customElement, property, state } from "lit/decorators.js";
+import { postWorkflow, fetchWorkflowType } from "../../API/Workflow/wesGet.js";
 import "@elixir-cloud/design";
 
 // TODO: import the interface from the design package
-export interface Field {
+interface Field {
   key: string;
   label: string;
   type?:
@@ -21,7 +21,8 @@ export interface Field {
     | "array"
     | "switch"
     | "file"
-    | "group";
+    | "group"
+    | "select";
   fieldOptions?: {
     required?: boolean;
     default?: string | boolean;
@@ -29,6 +30,7 @@ export interface Field {
     accept?: string;
     returnIfEmpty?: string;
     tooltip?: string;
+    options?: Array<{ label: string; value: string }>;
   };
   arrayOptions?: {
     defaultInstances?: number;
@@ -42,15 +44,8 @@ export interface Field {
   children?: Array<Field>;
 }
 
-/**
- * @summary This component is used to create task runs using WES API.
- * @since 1.0.0
- *
- * @property {string} baseURL - Base URL
- *
- */
-
-export default class ECCClientGa4ghWesCreateRuns extends LitElement {
+@customElement("ecc-client-lit-ga4gh-wes-create-run")
+export class WESCreateRun extends LitElement {
   @state() private form: FormData = new FormData();
   @property({ type: String }) private baseURL =
     "https://prowes.rahtiapp.fi/ga4gh/wes/v1";
@@ -69,21 +64,23 @@ export default class ECCClientGa4ghWesCreateRuns extends LitElement {
     {
       key: "workflow_type",
       label: "Type",
-      type: "text",
+      type: "select",
       fieldOptions: {
         required: true,
         tooltip:
           "The type of workflow language and must be CWL or WDL currently.",
+        options: [],
       },
     },
     {
       key: "workflow_type_version",
       label: "Type version",
-      type: "text",
+      type: "select",
       fieldOptions: {
         required: true,
         tooltip:
           "The version of the workflow language submitted and must be one supported by this WES instance.",
+        options: [],
       },
     },
     {
@@ -135,6 +132,71 @@ export default class ECCClientGa4ghWesCreateRuns extends LitElement {
       },
     },
   ];
+
+  connectedCallback() {
+    super.connectedCallback?.();
+    this._updateWorkflowType();
+  }
+
+  private async _updateWorkflowType() {
+    const data = await fetchWorkflowType(this.baseURL);
+    const workflowTypes = data.workflow_type_versions;
+
+    const eccUtilsDesignForm = this.shadowRoot?.querySelector(
+      "ecc-utils-design-form"
+    ) as any;
+
+    if (eccUtilsDesignForm) {
+      const workflowTypeKey = "workflow_type";
+      const workflowTypeVersionKey = "workflow_type_version";
+
+      // Find the dropdown field for workflow_type in this.fields
+      const workflowTypeDropdown = this.fields.find(
+        (field) => field.key === workflowTypeKey
+      );
+
+      // Find the dropdown field for workflow_type_version in this.fields
+      const workflowTypeVersionDropdown = this.fields.find(
+        (field) => field.key === workflowTypeVersionKey
+      );
+
+      // Check if the dropdown fields exist and have fieldOptions
+      if (
+        workflowTypeDropdown &&
+        workflowTypeDropdown.fieldOptions &&
+        workflowTypeVersionDropdown &&
+        workflowTypeVersionDropdown.fieldOptions
+      ) {
+        // Update the options of the workflow_type dropdown
+        workflowTypeDropdown.fieldOptions.options = Object.keys(
+          workflowTypes
+        ).map((type: string) => ({
+          label: type,
+          value: type,
+        }));
+
+        // Manually trigger a re-render or update of the form
+        eccUtilsDesignForm.requestUpdate();
+        // Add an event listener to workflow_type dropdown change
+        const formData = eccUtilsDesignForm.getFormData();
+        const selectedWorkflowType = formData[workflowTypeKey];
+
+        // Check if fieldOptions is defined
+        if (workflowTypeVersionDropdown.fieldOptions) {
+          // Update the options of the workflow_type_version dropdown based on the selected workflow_type
+          workflowTypeVersionDropdown.fieldOptions.options =
+            workflowTypes[selectedWorkflowType] || [];
+
+          eccUtilsDesignForm.requestUpdate();
+        }
+      }
+    } else {
+      console.error({
+        message: "ecc-utils-design-form not found",
+        breakPoint: "WESCreateRun.updateDropdown",
+      });
+    }
+  }
 
   async submitForm(form: any) {
     Object.keys(form).forEach((key) => {

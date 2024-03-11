@@ -1,5 +1,8 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
+import "@shoelace-style/shoelace/dist/components/dropdown/dropdown.js";
+import "@shoelace-style/shoelace/dist/components/menu/menu.js";
+import "@shoelace-style/shoelace/dist/components/menu-item/menu-item.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/switch/switch.js";
@@ -12,7 +15,7 @@ import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import formStyles from "./form.styles.js";
 
-export interface Field {
+interface Field {
   key: string;
   label: string;
   type?:
@@ -29,7 +32,8 @@ export interface Field {
     | "array"
     | "switch"
     | "file"
-    | "group";
+    | "group"
+    | "select";
   fieldOptions?: {
     required?: boolean;
     default?: string | boolean;
@@ -37,6 +41,7 @@ export interface Field {
     accept?: string;
     returnIfEmpty?: string;
     tooltip?: string;
+    options?: Array<{ label: string; value: string }>;
   };
   arrayOptions?: {
     defaultInstances?: number;
@@ -198,6 +203,46 @@ export default class EccUtilsDesignForm extends LitElement {
             }}
           />
         </div>
+      `;
+    }
+
+    if (field.type === "select" && field.fieldOptions?.options) {
+      if (!_.get(this.form, path) && !this.hasUpdated) {
+        _.set(
+          this.form,
+          path,
+          field.fieldOptions?.default ||
+            field.fieldOptions?.options[0]?.value ||
+            ""
+        );
+      }
+
+      return html`
+        <sl-dropdown>
+          <sl-button slot="trigger" caret>${field.label}</sl-button>
+          <sl-menu>
+            ${field.fieldOptions?.options.map(
+              (option) => html`
+                <sl-menu-item
+                  value="${option.value}"
+                  ?selected="${option.value === _.get(this.form, path)}"
+                  ?required="${field.fieldOptions?.required ? "*" : ""}"
+                  @click="${(e: Event) => {
+                    const { value } = e.target as HTMLSelectElement;
+                    if (!value) {
+                      _.unset(this.form, path);
+                    } else {
+                      _.set(this.form, path, value);
+                    }
+                    this.requestUpdate();
+                  }}"
+                >
+                  ${option.label}
+                </sl-menu-item>
+              `
+            )}
+          </sl-menu>
+        </sl-dropdown>
       `;
     }
 
@@ -484,6 +529,10 @@ export default class EccUtilsDesignForm extends LitElement {
         <strong>${this.successMessage}</strong>
       </sl-alert>
     `;
+  }
+
+  public getFormData(): object {
+    return this.form;
   }
 
   public loading() {

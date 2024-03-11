@@ -12,6 +12,10 @@ const styles = css`
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
   }
+  form sl-dropdown {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
   form sl-switch {
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;

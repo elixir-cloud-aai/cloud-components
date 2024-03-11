@@ -69,6 +69,31 @@ const fetchWorkflow = async (baseURL: string, id: string) => {
 };
 
 /**
+ * Create a workflow run
+ * @param {string} baseURL - Base URL for fetching workflows
+ */
+const fetchWorkflowType = async (baseURL: string) => {
+  const url = `${baseURL}/service-info`;
+  try {
+    const response = await fetch(url);
+    if (!response) {
+      return {
+        isError: true,
+        breakpoint: "fetchWorkflowtype",
+        error: "No response from server",
+      };
+    }
+    return await response.json();
+  } catch (error) {
+    return {
+      isError: true,
+      breakpoint: "fetchworkflowtype",
+      error,
+    };
+  }
+};
+
+/**
  *This mathod cancel a specific workflow
  * @param id ID of the workflow to be deleted
  */
@@ -121,4 +146,4 @@ const postWorkflow = async (baseURL: string, data: any) => {
   }
 };
 
-export { fetchWorkflows, fetchWorkflow, cancelWorkflow, postWorkflow };
+export { fetchWorkflows, fetchWorkflow, fetchWorkflowType, cancelWorkflow, postWorkflow };
