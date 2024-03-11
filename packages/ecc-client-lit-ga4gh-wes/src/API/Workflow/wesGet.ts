@@ -146,4 +146,10 @@ const postWorkflow = async (baseURL: string, data: any) => {
   }
 };
 
-export { fetchWorkflows, fetchWorkflow, fetchWorkflowType, cancelWorkflow, postWorkflow };
+export {
+  fetchWorkflows,
+  fetchWorkflow,
+  fetchWorkflowType,
+  cancelWorkflow,
+  postWorkflow,
+};
