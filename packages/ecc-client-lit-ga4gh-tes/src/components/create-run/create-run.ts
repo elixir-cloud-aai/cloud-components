@@ -2,7 +2,9 @@
 
 import { html, LitElement } from "lit";
 import { property, state } from "lit/decorators.js";
-import { Field } from "@elixir-cloud/design/src/components/form/index.js";
+import EccUtilsDesignForm, {
+  Field,
+} from "@elixir-cloud/design/src/components/form/index.js";
 import type { EccUtilsButtonClickEvent } from "@elixir-cloud/design/src/events/index.js";
 import { postTask } from "../../API/Task/tesGet.js";
 
@@ -321,9 +323,10 @@ export default class ECCCLientGa4ghTesCreateRun extends LitElement {
    * @param breakMethod The class method where the error occured
    */
   private _handleError(message: string, breakMethod: string) {
-    const eccUtilsDesignForm = this.shadowRoot?.querySelector(
-      "ecc-utils-design-form"
-    ) as any;
+    const eccUtilsDesignForm =
+      this.shadowRoot?.querySelector<EccUtilsDesignForm>(
+        "ecc-utils-design-form"
+      );
     if (eccUtilsDesignForm) {
       eccUtilsDesignForm.error({
         message,
@@ -339,9 +342,10 @@ export default class ECCCLientGa4ghTesCreateRun extends LitElement {
   // Extracting the API call into a separate method
   private async _callAPI(data: any) {
     try {
-      const eccUtilsDesignForm = this.shadowRoot?.querySelector(
-        "ecc-utils-design-form"
-      ) as any;
+      const eccUtilsDesignForm =
+        this.shadowRoot?.querySelector<EccUtilsDesignForm>(
+          "ecc-utils-design-form"
+        );
       if (eccUtilsDesignForm) {
         eccUtilsDesignForm.loading();
         this.response = await postTask(this.baseURL, data);

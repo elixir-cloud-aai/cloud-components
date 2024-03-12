@@ -1,6 +1,8 @@
 import { html, LitElement } from "lit";
 import { property, state } from "lit/decorators.js";
-import { Field } from "@elixir-cloud/design/src/components/form/index.js";
+import EccUtilsDesignForm, {
+  Field,
+} from "@elixir-cloud/design/src/components/form/index.js";
 import { postWorkflow } from "../../API/Workflow/wesGet.js";
 
 /**
@@ -102,9 +104,10 @@ export default class ECCClientGa4ghWesCreateRuns extends LitElement {
       this.form.append(key, form[key]);
     });
 
-    const eccUtilsDesignForm = this.shadowRoot?.querySelector(
-      "ecc-utils-design-form"
-    ) as any;
+    const eccUtilsDesignForm =
+      this.shadowRoot?.querySelector<EccUtilsDesignForm>(
+        "ecc-utils-design-form"
+      );
 
     if (eccUtilsDesignForm) {
       eccUtilsDesignForm.loading();
@@ -129,7 +132,7 @@ export default class ECCClientGa4ghWesCreateRuns extends LitElement {
     } else {
       console.error({
         message: "ecc-utils-design-form not found",
-        breakPoint: "WESCreateRun.submitForm",
+        breakPoint: "ECCClientGa4ghWesCreateRuns.submitForm",
       });
     }
   }

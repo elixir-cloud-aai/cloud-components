@@ -1,11 +1,11 @@
 /* eslint-disable lit/no-classfield-shadowing */
 import { html, css, LitElement, render } from "lit";
 import { property, state } from "lit/decorators.js";
-import {
+import EccUtilsDesignCollection, {
   FilterProp,
   ItemProp,
 } from "@elixir-cloud/design/src/components/collection/index.js";
-import {
+import EccUtilsDesignDetails, {
   Field,
   Action,
 } from "@elixir-cloud/design/src/components/details/index.js";
@@ -196,10 +196,19 @@ export default class ECCClientGa4ghTesRuns extends LitElement {
   };
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
-    const eccUtilsDesignCollection = this.shadowRoot?.querySelector(
-      "ecc-utils-design-collection"
-      // Todo: Get the typeof Collections and use it instead of `any`
-    ) as any;
+    const eccUtilsDesignCollection =
+      this.shadowRoot?.querySelector<EccUtilsDesignCollection>(
+        "ecc-utils-design-collection"
+      );
+
+    if (!eccUtilsDesignCollection) {
+      console.error({
+        error: "ecc-utils-design-collection not found",
+        breakPoint: "ECCClientGa4ghTesRuns.fetchData",
+      });
+      return;
+    }
+
     eccUtilsDesignCollection.pageSize = this.pageSize;
     if (changedProperties.has("pageSize")) {
       this._fetchData(1);
@@ -265,25 +274,42 @@ export default class ECCClientGa4ghTesRuns extends LitElement {
       this.items = [...this.items, ...convertedData];
 
       if (data.next_page_token === "" || data.tasks.length < this.pageSize) {
-        const eccUtilsDesignCollection = this.shadowRoot?.querySelector(
-          "ecc-utils-design-collection"
-          // Todo: Get the typeof Collections and use it instead of `any`
-        ) as any;
+        const eccUtilsDesignCollection =
+          this.shadowRoot?.querySelector<EccUtilsDesignCollection>(
+            "ecc-utils-design-collection"
+          );
+
+        if (!eccUtilsDesignCollection) {
+          console.error({
+            error: "ecc-utils-design-collection not found",
+            breakPoint: "ECCClientGa4ghTesRuns.fetchData",
+          });
+          return;
+        }
 
         eccUtilsDesignCollection.totalItems = this.items.length;
       } else this.nextPageToken[page] = data.next_page_token;
     } catch (error) {
       console.error({
         error,
-        breakPoint: "TESRuns.fetchData",
+        breakPoint: "ECCClientGa4ghTesRuns.fetchData",
       });
     }
   }
 
   private async _handleExpandItem(event: CustomEvent) {
-    const eccUtilsDesignCollection = this.shadowRoot?.querySelector(
-      "ecc-utils-design-collection"
-    ) as any;
+    const eccUtilsDesignCollection =
+      this.shadowRoot?.querySelector<EccUtilsDesignCollection>(
+        "ecc-utils-design-collection"
+      );
+
+    if (!eccUtilsDesignCollection) {
+      console.error({
+        error: "ecc-utils-design-collection not found",
+        breakPoint: "ECCClientGa4ghTesRuns.handleExpandItem",
+      });
+      return;
+    }
 
     const { target, detail } = event;
 
@@ -334,20 +360,19 @@ export default class ECCClientGa4ghTesRuns extends LitElement {
         target.appendChild(child);
 
         // Add button event
-        const detailsElement = child.querySelector(
+        const detailsElement = child.querySelector<EccUtilsDesignDetails>(
           "ecc-utils-design-details"
-        ) as any;
+        );
         if (detailsElement) {
           detailsElement.addEventListener(
-            `ecc-utils-button-click`,
-            async (buttonEvent: CustomEvent) => {
-              const { key: buttonKey } = buttonEvent.detail;
+            "ecc-utils-button-click",
+            async (buttonEvent: Event) => {
+              const customEvent = buttonEvent as CustomEvent<{ key: string }>;
+              const { key: buttonKey } = customEvent.detail;
               try {
                 if (buttonKey === key) {
                   // 0 is the index of the button as there is only one button
-                  detailsElement.setButtonLoading(0, true);
                   const resp = (await deleteTask(this.baseURL, key)) as any;
-                  detailsElement.setButtonLoading(0, false);
 
                   // If the response doesn't have run ID that means the run wasn't canceled.
                   if (!resp.id) throw new Error();
