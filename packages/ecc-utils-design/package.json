@@ -34,9 +34,11 @@
   },
   "elixirConfig": {},
   "devDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.8.4",
     "@lit/react": "*",
     "@open-wc/eslint-config": "*",
     "@open-wc/testing": "*",
+    "@types/js-yaml": "^4.0.9",
     "@types/lodash-es": "^4.17.10",
     "@web/dev-server": "*",
     "@web/dev-server-esbuild": "^0.4.3",
@@ -59,6 +61,7 @@
   },
   "dependencies": {
     "@shoelace-style/shoelace": "^2.8.0",
+    "js-yaml": "^4.1.0",
     "lit": "^2.8.0",
     "lodash-es": "^4.17.21"
   }
