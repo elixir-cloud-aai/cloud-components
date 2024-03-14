@@ -512,6 +512,13 @@ export default class EccUtilsDesignForm extends LitElement {
       return html` ${this.renderSuccessTemplate()} `;
     }
 
+    const allRequiredFieldsFilled = this.fields.every(field => {
+      if (field.fieldOptions?.required) {
+        return !!_.get(this.form, `data.${field.key}`);
+      }
+      return true;
+    });
+
     const { button, submitButton, form: csspartForm } = this.cssParts;
     return html`
       <form
@@ -539,7 +546,7 @@ export default class EccUtilsDesignForm extends LitElement {
           type="submit"
           exportparts="base: ${button}, base: ${submitButton}"
           ?loading=${this.formState === "loading"}
-          ?disabled=${this.formState === "loading"}
+          ?disabled=${!allRequiredFieldsFilled || this.formState === "loading"}
         >
           Submit
         </sl-button>
