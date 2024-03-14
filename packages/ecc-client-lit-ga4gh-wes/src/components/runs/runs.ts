@@ -428,8 +428,11 @@ export default class ECCClientGa4ghWesRuns extends LitElement {
         @ecc-utils-page-change=${(event: CustomEvent) => {
           this._fetchData(event.detail.page);
         }}
-        @ecc-utils-expand=${(event: CustomEvent) =>
-          this._handleExpandItem(event)}
+        @ecc-utils-expand=${(event: CustomEvent) => {
+          if (!this.cache.has(event.detail.key)) {
+            this._handleExpandItem(event);
+          }
+        }}
       >
       </ecc-utils-design-collection>
     `;
