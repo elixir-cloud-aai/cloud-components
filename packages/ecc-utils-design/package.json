@@ -64,5 +64,11 @@
     "js-yaml": "^4.1.0",
     "lit": "^2.8.0",
     "lodash-es": "^4.17.21"
-  }
+  },
+  "files":[
+    "dist",
+    "Readme.md",
+    "package.json",
+    "../../LICENSE"
+  ]
 }

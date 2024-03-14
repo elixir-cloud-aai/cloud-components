@@ -1,25 +1,38 @@
-# ecc-client-lit-ga4gh-tes Components
+# ecc-client-ga4gh-wes Components
 
-Web components for TES
+This package contains highly customizable and configurable `Web Component` for [ga4gh] [TES] API.
 
 ## Introduction
-...
+Please read the [docs] for on how to use, customise and make these components you own.
 
 ### Components
-| Component              | Issue  | Status             |
-|------------------------|--------|--------------------|
-|    TESCreateRun        |  #156  |      Beta          |
+| Component                       | Status |
+| ------------------------------- | ------ |
+| ecc-client-ga4gh-tes-runs       | beta   |
+| ecc-client-ga4gh-tes-create-run | beta   |
+
 
 ## Getting Started
 
 To get started with this project, follow these steps:
 
-1. Start the dev environment for @elixir-cloud/lit-tes
+1. Install dependencies:
 
+   ```bash
+   npm ci
    ```
+2. Run dev server: 
+
+   ```bash
+   cd packages/ecc-utils-design
    npm run dev
    ```
-
+3. Run build
+    ```bash
+    cd packages/ecc-utils-design
+    npm run build
+    ```
+   
 ## Contributing
 
 This project is a community effort and lives off _your_ contributions, be it in
@@ -85,7 +98,7 @@ To get in touch with use, please use one of the following routes:
 [![logo-elixir][logo-elixir]][elixir]
 [![logo-elixir-cloud-aai][logo-elixir-cloud-aai]][elixir-cloud-aai]
 
-> Note: This repo is created using the template ecc-client-lit-ga4gh-tes.
+> Note: This repo is created using the template ecc-utils-design.
 
 [all-contributors]: https://allcontributors.org/docs/en/specification
 [all-contributors-bot]: https://allcontributors.org/docs/en/bot/overview
@@ -103,5 +116,7 @@ To get in touch with use, please use one of the following routes:
 [elixir-compute]: https://elixir-europe.org/platforms/compute
 [ga4gh]: https://ga4gh.org/
 [license]: LICENSE
-[logo-elixir]: images/logo-elixir.svg
-[logo-elixir-cloud-aai]: images/logo-elixir-cloud-aai.svg
+[logo-elixir]: https://raw.githubusercontent.com/elixir-cloud-aai/cloud-components/main/images/logo-elixir.svg
+[logo-elixir-cloud-aai]: https://raw.githubusercontent.com/elixir-cloud-aai/cloud-components/main/images/logo-elixir-cloud-aai.svg
+[docs]: https://elixir-cloud-components.vercel.app/
+[TES]: https://github.com/ga4gh/task-execution-schemas/

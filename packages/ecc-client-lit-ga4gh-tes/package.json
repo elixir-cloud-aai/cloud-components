@@ -59,5 +59,11 @@
     "custom-element-vs-code-integration": "*",
     "pascal-case": "*"
   },
-  "customElements": "dist/custom-elements.json"
+  "customElements": "dist/custom-elements.json",
+  "files":[
+    "dist",
+    "Readme.md",
+    "package.json",
+    "../../LICENSE"
+  ]
 }
