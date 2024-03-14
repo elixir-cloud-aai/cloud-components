@@ -2,9 +2,10 @@
 
 import { html, LitElement } from "lit";
 import { property, state } from "lit/decorators.js";
+import "@elixir-cloud/design";
 import EccUtilsDesignForm, {
   Field,
-} from "@elixir-cloud/design/src/components/form/index.js";
+} from "@elixir-cloud/design/dist/components/form/index.js";
 import type { EccUtilsButtonClickEvent } from "@elixir-cloud/design/src/events/index.js";
 import { postTask } from "../../API/Task/tesGet.js";
 
@@ -334,7 +335,7 @@ export default class ECCCLientGa4ghTesCreateRun extends LitElement {
     } else {
       console.error({
         message: "ecc-utils-design-form not found",
-        breakPoint: `TESCreateRun.${breakMethod}`,
+        breakPoint: `ECCCLientGa4ghTesCreateRun.${breakMethod}`,
       });
     }
   }
@@ -360,7 +361,7 @@ export default class ECCCLientGa4ghTesCreateRun extends LitElement {
       } else {
         console.error({
           message: "ecc-utils-design-form not found",
-          breakPoint: "TESCreateRun.callApi",
+          breakPoint: "ECCCLientGa4ghTesCreateRun.callApi",
         });
       }
     } catch (error) {
