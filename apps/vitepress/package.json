@@ -1,0 +1,22 @@
+{
+  "name": "ecc-docs-depricated",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs",
+    "start": "vitepress preview docs",
+    "lint": "prettier .",
+    "lint:fix": "prettier --write ."
+  },
+  "dependencies": {
+    "@elixir-cloud/design": "*",
+    "@elixir-cloud/lit-tes": "*",
+    "@elixir-cloud/lit-wes": "*",
+    "vitepress": "^1.0.0-rc.24",
+    "vue": "3.3.5"
+  },
+  "devDependencies": {
+    "prettier": "3.0.3"
+  }
+}

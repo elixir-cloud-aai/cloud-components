@@ -1,20 +1,16 @@
 {
-  "trailingComma": "all",
   "singleQuote": true,
+  "trailingComma": "all",
+  "tabWidth": 2,
+  "semi": true,
   "printWidth": 100,
+  "jsxSingleQuote": true,
+  "arrowParens": "always",
   "overrides": [
     {
-      "files": "*.md",
+      "files": ".prettierrc",
       "options": {
-        "parser": "markdown",
-        "singleQuote": false
-      }
-    },
-    {
-      "files": "*.vue",
-      "options": {
-        "parser": "vue",
-        "singleQuote": false
+        "parser": "json"
       }
     }
   ]
