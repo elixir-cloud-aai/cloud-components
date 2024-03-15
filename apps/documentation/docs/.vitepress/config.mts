@@ -91,6 +91,10 @@ export default defineConfig({
                 text: 'Details',
                 link: '/design/components/details',
               },
+              {
+                text: 'Code',
+                link: '/design/components/code',
+              },
             ],
           },
         ],
