@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 function Hero() {
   return (
@@ -14,9 +15,12 @@ function Hero() {
             A suite of highly reusable Web Components for operationalising ELIXIR and GA4GH Cloud
             Services.
           </p>
-          <button className='btn btn-primary mt-4 w-fit rounded-full bg-[#3692d6] hover:bg-[#32a8f2] text-white font-bold py-2 px-6 shadow-md transition duration-300 ease-in-out'>
-            <a href='/design/introduction'>Get Started</a>
-          </button>
+          <Link
+            href='/design/introduction'
+            className='btn btn-primary mt-4 w-fit rounded-full bg-[#3692d6] hover:bg-[#32a8f2] text-white font-bold py-2 px-6 shadow-md transition duration-300 ease-in-out'
+          >
+            <button>Get Started</button>
+          </Link>
         </div>
       </div>
       <div className='flex flex-start items-start'>

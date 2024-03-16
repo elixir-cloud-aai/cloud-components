@@ -1,7 +1,7 @@
 import { DocsThemeConfig } from 'nextra-theme-docs';
 import Image from 'next/image';
 import { FaSlack, FaGithub } from 'react-icons/fa';
-import Footer from './components/Footer';
+import Footer from './components/layout/footer';
 
 const config: DocsThemeConfig = {
   logo: (
@@ -11,7 +11,7 @@ const config: DocsThemeConfig = {
     </>
   ),
   project: {
-    link: 'https://github.com/shuding/nextra-docs-template',
+    link: 'https://github.com/elixir-cloud-aai/cloud-components/',
     icon: <FaGithub size={25} />,
   },
   chat: {

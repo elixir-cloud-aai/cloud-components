@@ -1,25 +1,26 @@
+import { Callout } from 'nextra/components';
+
 # Utilities
 
-These are utility functions that help to enhance the features of the Elixir cloud components
+These are utility functions that help to enhance the features of the Elixir cloud components.
 
 ## getComponentCssParts
 
 This returns the css parts of an Elixir cloud component or the class that constructs the component.
 
-You can use this to export all the parts of the component as is.
+<Callout emoji='👀' type='info'>
+  You can use this to export all the parts of the component as is.
+</Callout>
 
-#### params
+#### Params
 
 - component - type: `any`. An Elixir Cloud component or class that constructs the component.
 
-#### return type
+#### Return type
 
-- string
+Return string.
 
-::: details Code Blocks
-::: code-group
-
-```js [HTML]
+```js [HTML] filename="example" showLineNumbers {3, 10, 18}
 import "@elixir-cloud/design/dist/components/form/index.js";
 import { EccUtilsDesignForm } from "@elixir-cloud/design/dist/components/index.js";
 import { getComponentCssParts } from "@elixir-cloud/design/dist/utilities/index.js";
