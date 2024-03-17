@@ -356,14 +356,14 @@ export default class ECCClientGa4ghTesRuns extends LitElement {
     }
 
     const { key } = detail;
-    const children = target.querySelectorAll(`[slot="${key}"]`);
-    const runData = await fetchTask(this.baseURL, detail.key);
+    const children = target!.shadowRoot?.querySelectorAll(
+      `slot[name='${key}']`
+    );
 
-    if (this.cache.has(key)) return;
-    // Cache the run data if not present
+    const runData = await fetchTask(this.baseURL, detail.key);
     this.cache.set(key, runData);
 
-    if (children) {
+    if (children?.length) {
       try {
         const child = document.createElement("div");
         child.setAttribute("slot", key);

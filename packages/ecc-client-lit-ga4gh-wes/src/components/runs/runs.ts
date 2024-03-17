@@ -343,14 +343,13 @@ export default class ECCClientGa4ghWesRuns extends LitElement {
     }
 
     const { key } = detail;
-    const children = target.querySelectorAll(`[slot="${key}"]`);
+    const children = target!.shadowRoot?.querySelectorAll(
+      `slot[name='${key}']`
+    );
     const runData = await fetchWorkflow(this.baseURL, detail.key);
-
-    if (this.cache.has(key)) return;
-    // Cache the run data if not present
     this.cache.set(key, runData);
 
-    if (children) {
+    if (children?.length) {
       try {
         const child = document.createElement("div");
         child.setAttribute("slot", key);
