@@ -19,7 +19,30 @@ This component is used to render a form with the given fields.
 
 <DesignForm />
 
-<Tabs items={['HTML/Lit', 'React']}>
+<Tabs items={['React', 'HTML/Lit']}>
+  <Tabs.Tab>
+  ````ts showLineNumbers {3, 17} copy filename="EccUtilsDesignForm"
+  import React from 'react';
+  import { Field } from '@elixir-cloud/design/dist/components/form/form';
+  import EccUtilDesignForm from '@elixir-cloud/design/dist/react/form/index';
+  
+  export default function Form() {
+    const fields: Field[] = [
+      {
+        key: 'service-name',
+        label: 'Service name',
+        type: 'text',
+        fieldOptions: {
+          required: true,
+        },
+      },
+    ];
+  
+  return <EccUtilDesignForm fields={fields} />
+  }
+  
+  `````
+  </Tabs.Tab>
   <Tabs.Tab>
 ````html showLineNumbers {6, 20-26} copy filename="ecc-utils-design-form"
   <body>
@@ -53,29 +76,6 @@ This component is used to render a form with the given fields.
 
   </script>
 ````
-</Tabs.Tab>
-<Tabs.Tab>
-````ts showLineNumbers {3, 17} copy filename="EccUtilsDesignForm"
-import React from 'react';
-import { Field } from '@elixir-cloud/design/dist/components/form/form';
-import EccUtilDesignForm from '@elixir-cloud/design/dist/react/form/index';
-
-export default function Form() {
-  const fields: Field[] = [
-    {
-      key: 'service-name',
-      label: 'Service name',
-      type: 'text',
-      fieldOptions: {
-        required: true,
-      },
-    },
-  ];
-
-return <EccUtilDesignForm fields={fields} />
-}
-
-`````
 </Tabs.Tab>
 </Tabs>
 ## Properties
@@ -151,43 +151,46 @@ This property is used to render the fields in the form. Fields can be passed as 
 
 ## CSS Variables
 
-<Callout emoji="👨‍🏭" type="warning"> Under construction</Callout>
+<Callout emoji='👨‍🏭' type='warning'>
+  {' '}
+  Under construction
+</Callout>
 
 ## Examples
 
 ### Complex Form
 
-<ComplexForm/>
+<ComplexForm />
 
-````ts showLineNumbers copy filename="fields"
-const fields: Fields[] =[
+```ts showLineNumbers copy filename="fields"
+const fields: Fields[] = [
   {
-    key: "name",
-    label: "Name",
-    type: "text",
+    key: 'name',
+    label: 'Name',
+    type: 'text',
     fieldOptions: {
       required: true,
-      tooltip: "Your name",
+      tooltip: 'Your name',
     },
   },
   {
-    key: "email",
-    label: "Email",
-    type: "email",
+    key: 'email',
+    label: 'Email',
+    type: 'email',
     fieldOptions: {
-      tooltip: "Your email address",
+      tooltip: 'Your email address',
     },
   },
   {
-    key: "address",
-    label: "Address",
-    type: "group",
+    key: 'address',
+    label: 'Address',
+    type: 'group',
     groupOptions: {
       collapsible: true,
-      tooltip: "Your address",
+      tooltip: 'Your address',
     },
     fieldOptions: {
-      tooltip: "Group for address",
+      tooltip: 'Group for address',
     },
     arrayOptions: {
       defaultInstances: 1,
@@ -196,11 +199,11 @@ const fields: Fields[] =[
     },
     children: [
       {
-        key: "Details",
-        label: "Details",
-        type: "array",
+        key: 'Details',
+        label: 'Details',
+        type: 'array',
         fieldOptions: {
-          tooltip: "Details for address",
+          tooltip: 'Details for address',
         },
         arrayOptions: {
           defaultInstances: 0,
@@ -208,40 +211,40 @@ const fields: Fields[] =[
         },
         children: [
           {
-            key: "houseNumber",
-            label: "House Number",
-            type: "text",
+            key: 'houseNumber',
+            label: 'House Number',
+            type: 'text',
             fieldOptions: {
               required: true,
-              tooltip: "Your house number",
+              tooltip: 'Your house number',
             },
           },
           {
-            key: "street",
-            label: "Street",
-            type: "text",
+            key: 'street',
+            label: 'Street',
+            type: 'text',
             fieldOptions: {
-              default: "1601 Harrier Ln",
+              default: '1601 Harrier Ln',
               required: false,
-              tooltip: "Your street name",
+              tooltip: 'Your street name',
             },
           },
           {
-            key: "city",
-            label: "City",
-            type: "text",
+            key: 'city',
+            label: 'City',
+            type: 'text',
             fieldOptions: {
               required: true,
-              tooltip: "Your city name",
+              tooltip: 'Your city name',
             },
           },
           {
-            key: "isPrimary",
-            label: "Primary",
-            type: "switch",
+            key: 'isPrimary',
+            label: 'Primary',
+            type: 'switch',
             fieldOptions: {
               default: true,
-              tooltip: "Is this your primary residence?",
+              tooltip: 'Is this your primary residence?',
             },
           },
         ],
@@ -249,30 +252,30 @@ const fields: Fields[] =[
     ],
   },
   {
-    key: "18+",
-    label: "18+",
-    type: "switch",
+    key: '18+',
+    label: '18+',
+    type: 'switch',
     fieldOptions: {
-      tooltip: "Are you over 18 years old?",
+      tooltip: 'Are you over 18 years old?',
     },
   },
   {
-    key: "id",
-    label: "ID",
-    type: "file",
+    key: 'id',
+    label: 'ID',
+    type: 'file',
     fieldOptions: {
       required: true,
-      tooltip: "Your ID document",
+      tooltip: 'Your ID document',
     },
   },
-]
-````
+];
+```
 
 ### Styled Form
+
 <StyledForm />
 
-
-````css filename="form.css" copy
+```css filename="form.css" copy
 .styled-form-example::part(form) {
   display: flex;
   flex-direction: column;
@@ -360,4 +363,4 @@ const fields: Fields[] =[
   color: #4caf50;
   font-weight: bold;
 }
-````
+```

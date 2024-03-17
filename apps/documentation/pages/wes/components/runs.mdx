@@ -1,0 +1,190 @@
+import ComponentName from '@/components/utils/componentName';
+import { Tabs, Callout } from 'nextra/components';
+import Runs from '@/components/packages/wes/runs/runs.tsx';
+
+# WES Runs Component
+
+<ComponentName
+  tagName='ecc-client-ga4gh-wes-runs'
+  reactTagName='ECCClientGa4ghWesRuns'
+  version='0.0.1'
+  beta
+/>
+
+This component facilitates browsing workflow runs via WES API.
+
+<Runs />
+
+## Properties
+
+| Property                                              | Required | Default                                   | Type            | Description                                                   |
+| ----------------------------------------------------- | -------- | ----------------------------------------- | --------------- | ------------------------------------------------------------- |
+| [`baseURL`](#baseURL)                                 | `false`  | `https://prowes.rahtiapp.fi/ga4gh/wes/v1` | `String`        | Base URL                                                      |
+| [`pageSize`](#pageSize)                               | `false`  | 5                                         | `Number`        | Number of runs per page                                       |
+| [`fields`](../../design/components/details.md#fields) | `false`  | [`default`](#default)                     | `Array<Fields>` | Configuration based on which data will be rendered in groups. |
+| `filter`                                              | `false`  | `true`                                    | `Boolean`       | Defines the rendering of the filter-by-state bar.             |
+
+<Callout emoji='🙅' type='error'>
+  `Filter` feature isn't implemented in the package as it isn't implemented in backend and client
+  side filtering is not an ideal solution.
+</Callout>
+
+### baseURL
+
+This property is used to give `POST` endpoint to create workflow. The provided baseURL is concatenated with `/runs` and is used as an endpoint to create a `POST` request.
+
+### pageSize
+
+This property is used to define the number of runs to be rendered per pagination window.
+
+### fields
+
+This is an `Array<Field>` which defines how structure of the data to be rendered.
+
+<Callout emoji="🔁" type='info'>
+  `Field` prop is passed on to out UI package's [details](/design/components/details) component,
+  read about [fields](/design/components/details#fields) more there.
+</Callout>
+
+#### default
+
+The default value of `fields` property.
+
+```json
+[
+  {
+    "label": "Tags",
+    "tab": "Overview",
+    "key": "request.tags",
+    "path": "request.tags"
+  },
+  {
+    "label": "Engine parameters",
+    "tab": "Parameter",
+    "key": "request.workflow_engine_parameters",
+    "path": "request.workflow_engine_parameters",
+    "copy": true
+  },
+  {
+    "label": "Parameters",
+    "tab": "Parameter",
+    "key": "request.workflow_params",
+    "path": "request.workflow_params",
+    "copy": true
+  },
+  {
+    "label": "Type",
+    "tab": "Parameter",
+    "key": "request.workflow_type",
+    "path": "request.workflow_type"
+  },
+  {
+    "label": "Version",
+    "tab": "Parameter",
+    "key": "request.workflow_type_version",
+    "path": "request.workflow_type_version"
+  },
+  {
+    "label": "Url",
+    "tab": "Overview",
+    "key": "request.workflow_url",
+    "path": "request.workflow_url",
+    "copy": true
+  },
+  {
+    "label": "Run Logs",
+    "key": "run_log",
+    "path": "run_log",
+    "tab": "Run logs",
+    "copy": true
+  },
+  {
+    "key": "run_log.max_retries",
+    "path": "run_log.max_retries",
+    "label": "Max retries"
+  },
+  {
+    "key": "run_log.max_retries",
+    "path": "run_log.max_retries",
+    "label": "Max retries"
+  },
+  {
+    "key": "run_log.stderr",
+    "path": "run_log.stderr",
+    "label": "STDERR"
+  },
+  {
+    "key": "run_log.stdout",
+    "path": "run_log.stdout",
+    "label": "STDOUT"
+  },
+  {
+    "key": "run_log.task_finished",
+    "path": "run_log.task_finished",
+    "label": "Finished at"
+  },
+  {
+    "key": "run_log.task_received",
+    "path": "run_log.task_received",
+    "label": "Received at"
+  },
+  {
+    "key": "run_log.task_received",
+    "path": "run_log.task_received",
+    "label": "Received at"
+  },
+  {
+    "key": "run_log.time_execution",
+    "path": "run_log.time_execution",
+    "label": "Execution time"
+  },
+  {
+    "key": "run_log.time_queue",
+    "path": "run_log.time_queue",
+    "label": "Queue time"
+  },
+  {
+    "key": "run_log.time_total",
+    "path": "run_log.time_total",
+    "label": "Total time"
+  },
+  {
+    "key": "run_log.utc_offset",
+    "path": "run_log.utc_offset",
+    "label": "UTC offset"
+  },
+  {
+    "label": "Task Logs",
+    "key": "task_logs",
+    "path": "task_logs",
+    "tab": "Task logs",
+    "copy": true
+  },
+  {
+    "key": "task_logs[*]",
+    "path": "task_logs[*]",
+    "arrayOptions": {
+      "labelOptions": {
+        "prefix": "Creation time: ",
+        "path": "creation_time"
+      }
+    },
+    "copy": true
+  },
+  {
+    "key": "output",
+    "tab": "Output",
+    "label": "Output",
+    "path": "outputs",
+    "copy": true
+  }
+]
+```
+
+## Parts
+
+<Callout emoji='🔨'>Under progress!</Callout>
+
+## CSS Variables
+
+<Callout emoji='👷'>Almost done!</Callout>

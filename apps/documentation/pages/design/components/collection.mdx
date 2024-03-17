@@ -1,0 +1,77 @@
+import ComponentName from '@/components/utils/componentName';
+import { Tabs, Callout } from 'nextra/components';
+import EccUtilsDesignCollection from '@/components/packages/design/collection/collection.tsx';
+
+# Collection Component
+
+<ComponentName
+  tagName='ecc-utils-design-collection'
+  reactTagName='EccUtilsDesignCollection'
+  version='0.0.1'
+  beta
+/>
+
+This component is used to render a collection of items. It can be used to render a filters & pagination
+component for a list of items.
+
+<EccUtilsDesignCollection/>
+
+<Tabs items={['React', 'HTML/Lit']}>
+  <Tabs.Tab>
+  ````ts showLineNumbers {3, 17} copy filename="EccUtilsDesignForm"
+  import React from 'react';
+  import { Field } from '@elixir-cloud/design/dist/components/form/form';
+  import EccUtilDesignForm from '@elixir-cloud/design/dist/react/form/index';
+  
+  export default function Form() {
+    const fields: Field[] = [
+      {
+        key: 'service-name',
+        label: 'Service name',
+        type: 'text',
+        fieldOptions: {
+          required: true,
+        },
+      },
+    ];
+  
+  return <EccUtilDesignForm fields={fields} />
+  }
+  
+  `````
+  </Tabs.Tab>
+  <Tabs.Tab>
+````html showLineNumbers {6, 20-26} copy filename="ecc-utils-design-form"
+  <body>
+      <div id="demo"></div>
+  </div>
+  <script type="module">
+    import { html, render } from "lit";
+    import "@elixir-cloud/design/dist/components/form/index.js";
+
+    const fields = [
+      {
+        key: "service-name",
+        label: "Service name",
+        type: "text",
+        fieldOptions: {
+          required: true,
+        },
+      },
+    ];
+
+    render(
+      html`<ecc-utils-design-form
+        .fields=${fields}
+        @ecc-utils-submit=${(e) => {
+          console.log(e.detail);
+        }}
+      >
+      </ecc-utils-design-form> `,
+      document.querySelector("#demo")
+    );
+
+  </script>
+````
+</Tabs.Tab>
+</Tabs>

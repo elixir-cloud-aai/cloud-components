@@ -1,0 +1,36 @@
+import { Callout } from 'nextra/components';
+import ComponentName from '@/components/utils/componentName.tsx';
+import ECCClientGa4ghWesCreateRun from '@/components/packages/wes/createRun/createRun';
+
+# Wes Create Run Component
+
+<ComponentName
+  tagName='ecc-client-ga4gh-wes-create-run'
+  reactTagName='ECCClientGa4ghWesCreateRun'
+  version='0.0.1'
+  beta
+/>
+
+This component is used to create workflow runs using WES API.
+
+<ECCClientGa4ghWesCreateRun />
+
+## Properties
+
+| Property              | Required | Default                                   | Type     | Description |
+| --------------------- | -------- | ----------------------------------------- | -------- | ----------- |
+| [`baseURL`](#baseURL) | `false`  | `https://protes.rahtiapp.fi/ga4gh/tes/v1` | `String` | Base URL    |
+
+### baseURL
+
+This property is used to give `POST` endpoint to create `Task run`. The provided baseURL is concatinated with `/runs` and is used as an endpoint to create a `POST` request.
+
+<Callout emoji='🌝' type='info'>
+  Wanna change it and try, maybe locally deploy
+  [proWES](https://github.com/elixir-cloud-aai/proWES)!, to change, pass the baseURL as
+  `http://localhost:8090` to the component.
+</Callout>
+
+## Parts
+
+<Callout emoji='👩‍🏭'>Hold on! We are working here.</Callout>
