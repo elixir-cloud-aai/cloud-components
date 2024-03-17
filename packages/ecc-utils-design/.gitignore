@@ -39,5 +39,4 @@ yarn-error.log*
 /src/react
 custom-elements-manifest.config.js
 
-storybook-static
 custom-elements.json
