@@ -7,8 +7,8 @@
     "start": "next start",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
-    "lint": "npx eslint .",
-    "lint:fix": "npm run lint -- --fix"
+    "lint": "npx eslint . && cspell **/*.{tsx,mdx}",
+    "lint:fix": "npm run lint -- --fix && cspell"
   },
   "dependencies": {
     "@shoelace-style/shoelace": "^2.14.0",
@@ -22,6 +22,7 @@
   "devDependencies": {
     "@types/node": "18.11.10",
     "autoprefixer": "^10.4.18",
+    "cspell": "^8.6.0",
     "eslint": "^8.31.0",
     "eslint-config-elixir": "*",
     "eslint-config-prettier": "^8.3.0",

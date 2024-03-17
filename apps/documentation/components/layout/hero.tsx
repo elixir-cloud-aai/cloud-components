@@ -12,7 +12,7 @@ function Hero() {
             Components
           </h1>
           <p className='text text-start text-gray-500'>
-            A suite of highly reusable Web Components for operationalising ELIXIR and GA4GH Cloud
+            A suite of highly reusable Web Components to operationalize ELIXIR and GA4GH Cloud
             Services.
           </p>
           <Link

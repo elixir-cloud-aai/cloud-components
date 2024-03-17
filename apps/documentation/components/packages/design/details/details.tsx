@@ -1,10 +1,22 @@
+/* cSpell:disable */
 import dynamic from 'next/dynamic';
 import { Action, Field } from '@elixir-cloud/design/dist/components/details/details';
+import SlSkeleton from '@shoelace-style/shoelace/dist/react/skeleton';
 
 const EccUtilsDesignDetails = dynamic(
   () => import('@elixir-cloud/design/dist/react/details/index'),
   {
     ssr: false,
+    loading: () => (
+      <div className='flex flex-col gap-4'>
+        <SlSkeleton effect='pulse' className='h-10' />
+        <SlSkeleton effect='pulse' className='h-20' />
+        <div className='flex gap-2 justify-end'>
+          <SlSkeleton effect='pulse' className='h-10 w-20' />
+          <SlSkeleton effect='pulse' className='h-10 w-20' />
+        </div>
+      </div>
+    ),
   },
 );
 

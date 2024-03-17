@@ -47,7 +47,7 @@ export default function collection() {
     // Check if child already exists
     const children = e.target.querySelectorAll(`[slot="${e.detail.key}"]`);
     if (children.length === 0) {
-      // Add chlld to ecc-utils-design-collection
+      // Add child to ecc-utils-design-collection
       const res = await fetch(
         `https://jsonplaceholder.typicode.com/todos/${e.detail.key.split('-')[1]}`,
       );
