@@ -1,9 +1,9 @@
 import { html, LitElement } from "lit";
 import { property, state } from "lit/decorators.js";
-import "@elixir-cloud/design";
+import "@elixir-cloud/design/dist/components/form/index.js";
 import EccUtilsDesignForm, {
   Field,
-} from "@elixir-cloud/design/dist/components/form/index.js";
+} from "@elixir-cloud/design/dist/components/form";
 import { postWorkflow } from "../../API/Workflow/wesGet.js";
 
 /**
