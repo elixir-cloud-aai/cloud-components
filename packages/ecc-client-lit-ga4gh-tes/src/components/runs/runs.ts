@@ -356,14 +356,14 @@ export default class ECCClientGa4ghTesRuns extends LitElement {
     }
 
     const { key } = detail;
-    const children = target.querySelectorAll(`[slot="${key}"]`);
-    const runData = await fetchTask(this.baseURL, detail.key);
+    const children = target!.shadowRoot?.querySelectorAll(
+      `slot[name='${key}']`
+    );
 
-    if (this.cache.has(key)) return;
-    // Cache the run data if not present
+    const runData = await fetchTask(this.baseURL, detail.key);
     this.cache.set(key, runData);
 
-    if (children) {
+    if (children?.length) {
       try {
         const child = document.createElement("div");
         child.setAttribute("slot", key);
@@ -440,8 +440,11 @@ export default class ECCClientGa4ghTesRuns extends LitElement {
         @ecc-utils-page-change=${(event: CustomEvent) => {
           this._fetchData(event.detail.page);
         }}
-        @ecc-utils-expand=${(event: CustomEvent) =>
-          this._handleExpandItem(event)}
+        @ecc-utils-expand=${(event: CustomEvent) => {
+          if (!this.cache.has(event.detail.key)) {
+            this._handleExpandItem(event);
+          }
+        }}
       >
       </ecc-utils-design-collection>
     `;
