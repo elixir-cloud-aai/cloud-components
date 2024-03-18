@@ -9,7 +9,8 @@
       "pagination": false
     }
   },
-  "design":"Elixir's UI (design)",
+  "design": "Elixir's UI (design)",
   "tes": "Task execution service (TES)",
-  "wes": "Workflow execution service (WES)"
+  "wes": "Workflow execution service (WES)",
+  "nerd": "Nerd docs 🤓"
 }
