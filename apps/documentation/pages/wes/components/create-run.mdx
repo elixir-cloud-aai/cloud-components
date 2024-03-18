@@ -1,4 +1,4 @@
-import { Callout } from 'nextra/components';
+import { Callout, Tabs } from 'nextra/components';
 import ComponentName from '@/components/utils/componentName.tsx';
 import ECCClientGa4ghWesCreateRun from '@/components/packages/wes/createRun/createRun';
 
@@ -13,7 +13,56 @@ import ECCClientGa4ghWesCreateRun from '@/components/packages/wes/createRun/crea
 
 This component is used to create workflow runs using WES API.
 
+## Preview
+
 <ECCClientGa4ghWesCreateRun />
+
+## Imports
+
+<Tabs items={['React', 'HTML/Lit']}>
+  <Tabs.Tab>
+    ```ts copy
+    import ECCClientGa4ghWesCreateRun from '@elixir-cloud/lit-wes/dist/react/ecc-client-lit-ga4gh-wes-create-run/index';
+    ```
+  
+    ### Example
+  
+    ````ts showLineNumbers {2, 5} copy filename="ECCClientGa4ghWesCreateRun"
+    import React from 'react';
+    import ECCClientGa4ghWesCreateRun from '@elixir-cloud/lit-wes/dist/react/ecc-client-lit-ga4gh-wes-create-run/index';
+
+    export default function Runs() {
+      return <ECCClientGa4ghWesCreateRun />;
+    }
+    ````
+
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```js copy
+    import "@elixir-cloud/lit-wes/dist/components/ecc-client-lit-ga4gh-wes-create-run/index";
+    ```
+  
+    ### Example
+  
+    ````html showLineNumbers {6, 8-10} copy filename="ecc-client-ga4gh-wes-create-run"
+    <body>
+      <div id="demo"></div>
+    </div>
+    <script type="module">
+    import { html, render } from "lit";
+    import "@elixir-cloud/lit-wes/dist/components/ecc-client-lit-ga4gh-wes-create-run/index";
+
+    render(
+      html`<ecc-client-ga4gh-wes-create-run />`,
+      document.querySelector("#demo")
+    );
+
+    </script>
+    `````
+
+  </Tabs.Tab>
+</Tabs>
 
 ## Properties
 

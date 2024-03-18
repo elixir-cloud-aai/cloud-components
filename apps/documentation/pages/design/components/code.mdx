@@ -15,35 +15,52 @@ import { Tabs, Callout } from 'nextra/components';
 
 Simple code editor to handle `YAML`, `JSON` and `multiline text` input.
 
+## Preview
+
 <Code />
 
+## Imports
+
 <Tabs items={['React', 'HTML/Lit']}>
-<Tabs.Tab>
-````ts showLineNumbers {2, 5} copy filename="EccUtilsDesignCode"
-import React from 'react';
-import EccUtilDesignCode from '@elixir-cloud/design/dist/react/code/index';
+  <Tabs.Tab>
+    ```ts copy
+    import EccUtilDesignCode from '@elixir-cloud/design/dist/react/code/index';
+    ```
+  
+    ### Example
+  
+    ````ts showLineNumbers {2, 5} copy filename="EccUtilsDesignCode"
+    import React from 'react';
+    import EccUtilDesignCode from '@elixir-cloud/design/dist/react/code/index';
 
-export default function Code() {
-  return <EccUtilDesignCode />
-}
-`````
-</Tabs.Tab>
-<Tabs.Tab>
-````html showLineNumbers {6, 20-26} copy filename="ecc-utils-design-code"
-  <body>
-      <div id="demo"></div>
-  </div>
-  <script type="module">
-    import { html, render } from "lit";
+    export default function Code() {
+      return <EccUtilDesignCode />
+    }
+    ````
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+  ```ts copy
     import "@elixir-cloud/design/dist/components/code/index.js";
+  ```
+  
+  ### Example
+  
+  ````html showLineNumbers {6, 20-26} copy filename="ecc-utils-design-code"
+    <body>
+        <div id="demo"></div>
+    </div>
+    <script type="module">
+      import { html, render } from "lit";
+      import "@elixir-cloud/design/dist/components/code/index.js";
 
-    render(
-      html`<ecc-utils-design-code/> `,
-      document.querySelector("#demo")
-    );
+      render(
+        html`<ecc-utils-design-code/> `,
+        document.querySelector("#demo")
+      );
+    </script>
+    ````
 
-  </script>
-````
 </Tabs.Tab>
 </Tabs>
 
@@ -93,8 +110,11 @@ the first badge will turn red.
   Try, putting valid `YAML`!
 </Callout>
 
-```ts filename="code" copy showLineNumbers
-<EccUtilsDesignCode language='JSON' />
+```ts filename="codeWithJson" copy showLineNumbers {3}
+import React from 'react';
+export default function CodeWithJson() {
+  return <EccUtilsDesignCode language='JSON' />;
+}
 ```
 
 ### Indentation
@@ -103,6 +123,9 @@ This has a default indentation of 8 spaces.
 
 <CodeIndentation />
 
-```ts filename="code" copy showLineNumbers
-<EccUtilsDesignCode indentation={8} />
+```ts filename="codeWithIndents" copy showLineNumbers {3}
+import React from 'react';
+export default function CodeWithIndents() {
+  return <EccUtilsDesignCode indentation={8} />;
+}
 ```

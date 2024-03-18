@@ -13,10 +13,20 @@ import { Tabs, Callout } from 'nextra/components';
 
 This component is used to render a detailed view of items.
 
+## Preview
+
 <Details />
+
+## Imports
 
 <Tabs items={['React', 'HTML/Lit']}>
   <Tabs.Tab>
+    ```ts copy
+    import EccUtilDesignDetails from '@elixir-cloud/design/dist/react/details/index';
+    ```
+  
+    ### Example
+  
     ````ts showLineNumbers {2, 3, 10} copy filename="EccUtilsDesignDetails"
     import React from 'react';
     import EccUtilDesignDetails from '@elixir-cloud/design/dist/react/details/index';
@@ -33,6 +43,12 @@ This component is used to render a detailed view of items.
 
   </Tabs.Tab>
   <Tabs.Tab>
+    ```ts copy
+    import "@elixir-cloud/design/dist/components/details/index.js";
+    ```
+  
+    ### Example
+  
     ````html showLineNumbers {6, 13-16} copy filename="ecc-utils-design-details"
     <body>
         <div id="demo"></div>

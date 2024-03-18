@@ -14,11 +14,22 @@ import EccUtilsDesignCollection from '@/components/packages/design/collection/co
 This component is used to render a collection of items. It can be used to render a filters & pagination
 component for a list of items.
 
+## Preview
+
 <EccUtilsDesignCollection/>
+
+## Imports
 
 <Tabs items={['React', 'HTML/Lit']}>
   <Tabs.Tab>
-  ````ts showLineNumbers {3, 17} copy filename="EccUtilsDesignForm"
+  
+  ```ts copy
+  import EccUtilDesignForm from '@elixir-cloud/design/dist/react/form/index';
+  ```
+
+  ### Example
+  
+  ````ts showLineNumbers {3, 17} copy filename="EccUtilsDesignCollection"
   import React from 'react';
   import { Field } from '@elixir-cloud/design/dist/components/form/form';
   import EccUtilDesignForm from '@elixir-cloud/design/dist/react/form/index';
@@ -38,9 +49,12 @@ component for a list of items.
   return <EccUtilDesignForm fields={fields} />
   }
   
-  `````
+  ````
+  
   </Tabs.Tab>
+  
   <Tabs.Tab>
+  
 ````html showLineNumbers {6, 20-26} copy filename="ecc-utils-design-form"
   <body>
       <div id="demo"></div>

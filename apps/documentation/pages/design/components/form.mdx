@@ -17,66 +17,82 @@ import { Tabs, Callout } from 'nextra/components';
 
 This component is used to render a form with the given fields.
 
+## Preview
+
 <DesignForm />
+
+## Imports
 
 <Tabs items={['React', 'HTML/Lit']}>
   <Tabs.Tab>
-  ````ts showLineNumbers {3, 17} copy filename="EccUtilsDesignForm"
-  import React from 'react';
-  import { Field } from '@elixir-cloud/design/dist/components/form/form';
-  import EccUtilDesignForm from '@elixir-cloud/design/dist/react/form/index';
+    ```ts copy
+    import EccUtilDesignForm from '@elixir-cloud/design/dist/react/form/index';
+    ```
   
-  export default function Form() {
-    const fields: Field[] = [
-      {
-        key: 'service-name',
-        label: 'Service name',
-        type: 'text',
-        fieldOptions: {
-          required: true,
+    ### Example
+  
+    ````ts showLineNumbers {3, 17} copy filename="EccUtilsDesignForm"
+    import React from 'react';
+    import { Field } from '@elixir-cloud/design/dist/components/form/form';
+    import EccUtilDesignForm from '@elixir-cloud/design/dist/react/form/index';
+    
+    export default function Form() {
+      const fields: Field[] = [
+        {
+          key: 'service-name',
+          label: 'Service name',
+          type: 'text',
+          fieldOptions: {
+            required: true,
+          },
         },
-      },
-    ];
-  
-  return <EccUtilDesignForm fields={fields} />
-  }
-  
-  `````
+      ];
+    
+    return <EccUtilDesignForm fields={fields} />
+    }
+    ````
   </Tabs.Tab>
+    
   <Tabs.Tab>
-````html showLineNumbers {6, 20-26} copy filename="ecc-utils-design-form"
-  <body>
-      <div id="demo"></div>
-  </div>
-  <script type="module">
-    import { html, render } from "lit";
+    ```ts copy
     import "@elixir-cloud/design/dist/components/form/index.js";
+    ```
+  
+    ### Example
+  
+    ````html showLineNumbers {6, 20-26} copy filename="ecc-utils-design-form"
+      <body>
+          <div id="demo"></div>
+      </div>
+      <script type="module">
+        import { html, render } from "lit";
+        import "@elixir-cloud/design/dist/components/form/index.js";
 
-    const fields = [
-      {
-        key: "service-name",
-        label: "Service name",
-        type: "text",
-        fieldOptions: {
-          required: true,
-        },
-      },
-    ];
+        const fields = [
+          {
+            key: "service-name",
+            label: "Service name",
+            type: "text",
+            fieldOptions: {
+              required: true,
+            },
+          },
+        ];
 
-    render(
-      html`<ecc-utils-design-form
-        .fields=${fields}
-        @ecc-utils-submit=${(e) => {
-          console.log(e.detail);
-        }}
-      >
-      </ecc-utils-design-form> `,
-      document.querySelector("#demo")
-    );
+        render(
+          html`<ecc-utils-design-form
+            .fields=${fields}
+            @ecc-utils-submit=${(e) => {
+              console.log(e.detail);
+            }}
+          >
+          </ecc-utils-design-form> `,
+          document.querySelector("#demo")
+        );
+      </script>
+    ````
 
-  </script>
-````
-</Tabs.Tab>
+  </Tabs.Tab>
 </Tabs>
 ## Properties
 
