@@ -8,7 +8,7 @@ import {
   fastTextField,
 } from '@microsoft/fast-components';
 import { html, repeat, when } from '@microsoft/fast-element';
-import TESRuns, { stateOption } from './tesRuns.js';
+import TESRuns from './tesRuns.js';
 import { TESRun } from '../../tes-run/index.js';
 
 provideFASTDesignSystem().register(
@@ -29,16 +29,6 @@ const template = html<TESRuns>`
         @input=${(x, c) => x.handleNameInput(c.event)}
       >
       </fast-text-field>
-      <fast-select
-        :value=${(x) => x.stateInput}
-        @input=${(x, c) => x.handleStateInput(c.event)}
-      >
-        <fast-option value="ALL">ALL</fast-option>
-        ${repeat(
-          () => stateOption,
-          html`<fast-option value=${(x) => x}>${(x) => x}</fast-option>`
-        )}
-      </fast-select>
     </div>
     <div class="list">
       <fast-accordion>
@@ -113,7 +103,9 @@ const template = html<TESRuns>`
           >
           <fast-button
             appearance="neutral"
-            ?disabled=${(x) => x.tokens[x.pageNumber + 1] === undefined}
+            ?disabled=${(x) =>
+              x.tokens[x.pageNumber + 1] === undefined ||
+              Object.entries(x.data).length === 0}
             @click=${(x) => x.handleNext()}
           >
             <svg
