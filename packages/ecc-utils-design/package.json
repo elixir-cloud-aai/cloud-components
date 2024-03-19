@@ -26,8 +26,6 @@
     "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
     "test": "",
     "test:watch": "wtr --watch",
-    "storybook": "npm run build && npm run analyze -- --exclude dist && concurrently -k -r \"npm run build -- --watch\" \"wds -c .storybook/server.mjs\"",
-    "storybook:build": "npm run build && npm run analyze -- --exclude dist && build-storybook",
     "lint": "npx eslint .",
     "lint:fix": "npm run lint -- --fix",
     "prepublish": "npm run build"
@@ -42,7 +40,6 @@
     "@types/lodash-es": "^4.17.10",
     "@web/dev-server": "*",
     "@web/dev-server-esbuild": "^0.4.3",
-    "@web/dev-server-storybook": "^1.0.2",
     "@web/test-runner": "^0.17.0",
     "commander": "*",
     "concurrently": "*",
