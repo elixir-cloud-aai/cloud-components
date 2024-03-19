@@ -5,10 +5,13 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./dist/custom-elements.json": "./dist/custom-elements.json",
     "./dist/index.js": "./dist/index.js",
-    "./dist/components/**/*": "./dist/components/**/*",
+    "./dist/components/*": "./dist/components/*",
     "./dist/react": "./dist/react/index.js",
     "./dist/react/*": "./dist/react/*",
     "./dist/utilities/*": "./dist/utilities/*"

@@ -1,15 +1,15 @@
 /* eslint-disable lit/no-classfield-shadowing */
 import { html, css, LitElement, render } from "lit";
 import { property, state } from "lit/decorators.js";
-import "@elixir-cloud/design";
+import "@elixir-cloud/design/dist/components/collection/index.js";
 import EccUtilsDesignCollection, {
   FilterProp,
   ItemProp,
-} from "@elixir-cloud/design/dist/components/collection/index.js";
+} from "@elixir-cloud/design/dist/components/collection";
 import EccUtilsDesignDetails, {
   Field,
   Action,
-} from "@elixir-cloud/design/dist/components/details/index.js";
+} from "@elixir-cloud/design/dist/components/details";
 import { deleteTask, fetchTask, fetchTasks } from "../../API/Task/tesGet.js";
 
 export default class ECCClientGa4ghTesRuns extends LitElement {
