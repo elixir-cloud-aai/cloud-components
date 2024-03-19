@@ -10,8 +10,8 @@
   "componentsPrefix": "ecc-client-lit-ga4gh-wes-",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts", 
-      "import": "./dist/index.js" 
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     },
     "./dist/custom-elements.json": "./dist/custom-elements.json",
     "./dist/index.js": "./dist/index.js",
@@ -34,8 +34,8 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "@elixir-cloud/design": "*", 
-    "lit": "^2.8.0" 
+    "@elixir-cloud/design": "*",
+    "lit": "^2.8.0"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.4.17",
