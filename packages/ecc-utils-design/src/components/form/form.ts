@@ -512,7 +512,7 @@ export default class EccUtilsDesignForm extends LitElement {
       return html` ${this.renderSuccessTemplate()} `;
     }
 
-    const allRequiredFieldsFilled = this.fields.every(field => {
+    const allRequiredFieldsFilled = this.fields.every((field) => {
       if (field.fieldOptions?.required) {
         return !!_.get(this.form, `data.${field.key}`);
       }
