@@ -7,7 +7,7 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "componentsPrefix": "ecc-client-ga4gh-wes-",
+  "componentsPrefix": "ecc-client-lit-ga4gh-wes-",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
