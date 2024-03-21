@@ -9,6 +9,8 @@
       "pagination": false
     }
   },
+  "components": "Elixir components",
+  "ui": "Make your own components",
   "design": "Elixir's UI (design)",
   "tes": "Task execution service (TES)",
   "wes": "Workflow execution service (WES)",

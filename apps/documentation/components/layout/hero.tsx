@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 function Hero() {
   return (
-    <div className='flex justify-between pb-16'>
+    <div className='flex justify-between'>
       <div>
         <div className='flex flex-col flex-start max-w-4xl mx-auto text-center'>
           <h1 className='text-start text-[2rem] sm:text-[3rem] font-bold bg-gradient-to-r from-[#3692d6] to-[#32a8f2] inline-block text-transparent bg-clip-text'>
@@ -15,12 +15,20 @@ function Hero() {
             A suite of highly reusable Web Components to operationalize ELIXIR and GA4GH Cloud
             Services.
           </p>
-          <Link
-            href='/design/introduction'
-            className='btn btn-primary mt-4 w-fit rounded-full bg-[#3692d6] hover:bg-[#32a8f2] text-white font-bold py-2 px-6 shadow-md transition duration-300 ease-in-out'
-          >
-            <button>Get Started</button>
-          </Link>
+          <div className='flex gap-2'>
+            <Link
+              href='/components'
+              className='btn btn-primary mt-4 w-fit rounded-full bg-[#3692d6] hover:bg-[#32a8f2] text-white font-bold py-2 px-6 shadow-2xl transition duration-300 ease-in-out'
+            >
+              <button>Get started</button>
+            </Link>
+            <Link
+              href='/ui'
+              className='btn btn-primary mt-4 w-fit rounded-full bg-[#3692d6] hover:bg-[#32a8f2] text-white font-bold py-2 px-6 shadow-md transition duration-300 ease-in-out'
+            >
+              <button>Make your own?</button>
+            </Link>
+          </div>
         </div>
       </div>
       <div className='flex flex-start items-start'>

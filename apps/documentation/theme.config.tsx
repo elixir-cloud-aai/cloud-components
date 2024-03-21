@@ -15,7 +15,7 @@ const config: DocsThemeConfig = {
     icon: <FaGithub size={25} />,
   },
   chat: {
-    link: 'https://elixir-cloud.slack.com',
+    link: 'https://join.slack.com/t/elixir-cloud/shared_invite/enQtNzA3NTQ5Mzg2NjQ3LTZjZGI1OGQ5ZTRiOTRkY2ExMGUxNmQyODAxMDdjM2EyZDQ1YWM0ZGFjOTJhNzg5NjE0YmJiZTZhZDVhOWE4MWM',
     icon: <FaSlack size={25} />,
   },
   docsRepositoryBase: 'https://github.com/elixir-cloud-aai/cloud-components',
