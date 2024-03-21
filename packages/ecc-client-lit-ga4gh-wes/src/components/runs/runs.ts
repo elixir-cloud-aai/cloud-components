@@ -343,14 +343,13 @@ export default class ECCClientGa4ghWesRuns extends LitElement {
     }
 
     const { key } = detail;
-    const children = target.querySelectorAll(`[slot="${key}"]`);
+    const children = target!.shadowRoot?.querySelectorAll(
+      `slot[name='${key}']`
+    );
     const runData = await fetchWorkflow(this.baseURL, detail.key);
-
-    if (this.cache.has(key)) return;
-    // Cache the run data if not present
     this.cache.set(key, runData);
 
-    if (children) {
+    if (children?.length) {
       try {
         const child = document.createElement("div");
         child.setAttribute("slot", key);
@@ -428,8 +427,11 @@ export default class ECCClientGa4ghWesRuns extends LitElement {
         @ecc-utils-page-change=${(event: CustomEvent) => {
           this._fetchData(event.detail.page);
         }}
-        @ecc-utils-expand=${(event: CustomEvent) =>
-          this._handleExpandItem(event)}
+        @ecc-utils-expand=${(event: CustomEvent) => {
+          if (!this.cache.has(event.detail.key)) {
+            this._handleExpandItem(event);
+          }
+        }}
       >
       </ecc-utils-design-collection>
     `;
