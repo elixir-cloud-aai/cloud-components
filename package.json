@@ -24,7 +24,10 @@
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",
     "release:patch": "standard-version --release-as patch",
-    "release:major": "standard-version --release-as major"
+    "release:major": "standard-version --release-as major",
+    "format:md": "prettier --write \"**/*.md\"",
+    "format:html": "prettier --write \"**/*.html\"",
+    "format:all": "npm run format:md && npm run format:html"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
@@ -60,6 +63,8 @@
   },
   "dependencies": {
     "commander": "^11.1.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "globby": "^14.0.0",
     "tsup": "^8.0.1"
   }
