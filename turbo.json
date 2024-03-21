@@ -1,25 +1,27 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
-  "pipeline": {
-    "topo": {
-      "dependsOn": ["^topo"]
-    },
-    "build": {
-      "outputs": ["www/**", ".next/**", "dist/**"],
-      "dependsOn": ["^build"]
-    },
-    "test": {
-      "dependsOn": ["topo"]
-    },
-    "lint": {},
-    "lint:fix": {
-      "cache": false
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true,
-      "dependsOn": ["topo"]
-    }
-  }
+	"$schema": "https://turbo.build/schema.json",
+	"globalDependencies": [
+		"**/.env.*local",
+		"**/tsconfig.json",
+		"**/package.json"
+	],
+	"globalEnv": ["GITHUB_TOKEN"],
+	"pipeline": {
+		"build": {
+			"outputs": ["www/**", ".next/**", "dist/**"],
+			"dependsOn": ["^build"]
+		},
+		"test": {
+			"dependsOn": ["build"]
+		},
+		"lint": {},
+		"lint:fix": {
+			"cache": false
+		},
+		"dev": {
+			"cache": false,
+			"persistent": true,
+			"dependsOn": ["build"]
+		}
+	}
 }
