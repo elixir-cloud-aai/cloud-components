@@ -11,9 +11,11 @@ const EccUtilsDesignCode = dynamic(() => import('@elixir-cloud/design/dist/react
 });
 
 export default function Code() {
+  const indentation = 8;
+
   return (
     <div>
-      <EccUtilsDesignCode indentation={8} />
+      <EccUtilsDesignCode indentation={indentation} />
     </div>
   );
 }
