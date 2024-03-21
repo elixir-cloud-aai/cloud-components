@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic';
 import SlSkeleton from '@shoelace-style/shoelace/dist/react/skeleton';
 
 const ECCClientGa4ghWesRuns = dynamic(
-  () => import('@elixir-cloud/lit-wes/dist/react/ecc-client-lit-ga4gh-wes-runs/index'),
+  () => import('@elixir-cloud/lit-wes/dist/react/runs/index'),
   {
     ssr: false,
     loading: () => (
