@@ -60,8 +60,6 @@ export interface Action {
  * @property {array} fields - An array of fields to render
  * @property {array} buttons - An array of buttons and its configuration
  *
- * @method setButtonLoading - Sets the state of button with given index to given loading state
- *
  * @event ecc-utils-button-click - This event is fired when a button in the details component is clicked.
  */
 

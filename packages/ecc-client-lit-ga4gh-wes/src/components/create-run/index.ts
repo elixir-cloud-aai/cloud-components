@@ -1,6 +1,6 @@
-import ECCClientGa4ghWesCreateRuns from "./wes-create-run.js";
+import ECCClientGa4ghWesCreateRuns from "./create-run.js";
 
-export * from "./wes-create-run.js";
+export * from "./create-run.js";
 export default ECCClientGa4ghWesCreateRuns;
 
 window.customElements.define(
