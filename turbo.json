@@ -15,7 +15,7 @@
 			]
 		},
 		"build": {
-			"outputs": ["www/**", ".next/**", "dist/**"],
+			"outputs": ["./apps/documentation/.next/**"],
 			"dependsOn": ["^build"]
 		},
 		"test": {
