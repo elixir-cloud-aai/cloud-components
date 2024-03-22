@@ -24,5 +24,4 @@ custom-elements-manifest.config.js
 /dist/
 /out-tsc/
 
-storybook-static
 custom-elements.json
