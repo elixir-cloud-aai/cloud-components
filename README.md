@@ -130,9 +130,6 @@ To get in touch with use, please use one of the following routes:
 
 - For filing bug reports, feature requests or other code-related issues, please
   make use of the project's [issue tracker][issues].
-- For more general discussions or questions on usage, please use the
-  organization's [discussion forum][forum]. If the issue is related to this
-  project, please indicate its name in your message body.
 - For private/personal issues, more involved communication, or if you would
   like to join our team as a regular contributor, you can either join our
   [chat board][badge-chat-url] or send an [email][email] to the community
