@@ -17,7 +17,7 @@
     "./dist/utilities/*": "./dist/utilities/*"
   },
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "",
   "license": "ISC",
   "customElements": "./dist/custom-elements.json",

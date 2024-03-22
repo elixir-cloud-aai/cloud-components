@@ -2,7 +2,7 @@
   "name": "@elixir-cloud/trs-filer",
   "description": "TRS Filer component",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": "",
   "license": "ISC",
   "repository": "",

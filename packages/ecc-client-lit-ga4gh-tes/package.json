@@ -2,14 +2,17 @@
   "name": "@elixir-cloud/lit-tes",
   "description": "Web Component for interactive with TES API",
   "license": "MIT",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "componentsPrefix": "ecc-client-lit-ga4gh-tes-",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./dist/custom-elements.json": "./dist/custom-elements.json",
     "./dist/index.js": "./dist/index.js",
     "./dist/components/*": "./dist/components/*",
@@ -30,7 +33,10 @@
     "lint:fix": "npm run lint -- --fix",
     "prepublish": "npm run build"
   },
-  "dependencies": { "@elixir-cloud/design": "*", "lit": "^2.8.0" },
+  "dependencies": {
+    "@elixir-cloud/design": "*",
+    "lit": "^2.8.0"
+  },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.4.17",
     "@open-wc/eslint-config": "^9.2.1",
