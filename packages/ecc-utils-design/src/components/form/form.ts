@@ -526,6 +526,16 @@ export default class EccUtilsDesignForm extends LitElement {
       return html` ${this.renderSuccessTemplate()} `;
     }
 
+    const toggleButtonState = () => {
+      if (this.requiredButEmpty.length > 0) {
+        this.canSubmit = false;
+      } else {
+        this.canSubmit = true;
+      }
+
+      return '';
+    };
+
     const { button, submitButton, form: csspartForm } = this.cssParts;
     return html`
       <form
@@ -548,10 +558,7 @@ export default class EccUtilsDesignForm extends LitElement {
         }}
       >
         ${this.fields.map((field) => this.renderTemplate(field, "data"))}
-        ${this.renderErrorTemplate()}
-        ${this.requiredButEmpty.length > 0
-          ? (this.canSubmit = false)
-          : (this.canSubmit = true)}
+        ${this.renderErrorTemplate()} ${toggleButtonState()}
 
         <sl-button
           type="submit"
