@@ -56,8 +56,6 @@ export default class TESRuns extends FASTElement {
   // Seach input for name_prefix filter
   @observable searchInput = '';
 
-  @observable stateInput = 'ALL';
-
   @observable unfilterdData: Data = {
     tasks: [],
     next_page_token: '',
@@ -102,9 +100,6 @@ export default class TESRuns extends FASTElement {
 
   // Cache next click
   handleNext = async () => {
-    // Reset the state filter
-    this.stateInput = 'ALL';
-
     // Calculate the next page
     const nextPageNumber = this.pageNumber + 1;
     this.pageNumber = nextPageNumber; // Increment the pageNumber
@@ -121,7 +116,6 @@ export default class TESRuns extends FASTElement {
 
   // Handle prev click
   handlePrev = async () => {
-    this.stateInput = 'ALL';
     const prevPageNumber = this.pageNumber - 1;
     const prevPageToken = this.tokens[prevPageNumber];
     await this.fetchData(prevPageToken, this.searchInput);
@@ -136,17 +130,5 @@ export default class TESRuns extends FASTElement {
 
     // Fetch new data
     this.fetchData('', this.searchInput);
-  }
-
-  handleStateInput(event: Event) {
-    this.stateInput = (event.target as HTMLInputElement).value;
-
-    // Filter data on current page based on the filter input
-    if (this.stateInput === 'ALL') this.data = this.unfilterdData.tasks;
-    else {
-      this.data = this.unfilterdData.tasks.filter(
-        (task) => task.state === this.stateInput
-      );
-    }
   }
 }

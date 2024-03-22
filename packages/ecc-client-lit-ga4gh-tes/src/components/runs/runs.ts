@@ -45,7 +45,7 @@ export interface ItemProp {
 
 export interface FilterProp {
   key: string;
-  type: "search" | "select";
+  type: "search";
   options?: string[];
   selectConfig?: {
     multiple?: boolean;
@@ -80,7 +80,6 @@ export default class ECCClientGa4ghTesRuns extends LitElement {
   @property({ type: String }) private baseURL =
     "https://protes.rahtiapp.fi/ga4gh/tes/v1";
 
-  @property({ type: Boolean }) private filter = true;
   @property({ type: Boolean }) private search = true;
   @property({ type: Array }) private fields: Array<Field> = [
     {
@@ -215,27 +214,6 @@ export default class ECCClientGa4ghTesRuns extends LitElement {
       type: "search",
       placeholder: "Search by prefix",
     },
-    {
-      key: "tag",
-      type: "select",
-      options: [
-        "UNKNOWN",
-        "QUEUED",
-        "INITIALIZING",
-        "RUNNING",
-        "PAUSED",
-        "COMPLETE",
-        "EXECUTOR_ERROR",
-        "SYSTEM_ERROR",
-        "CANCELED",
-        "PREEMPTED",
-        "CANCELING",
-      ],
-      placeholder: "Filter by status",
-      selectConfig: {
-        multiple: false,
-      },
-    },
   ];
 
   @state() private items: ItemProp[] = [];
@@ -268,8 +246,8 @@ export default class ECCClientGa4ghTesRuns extends LitElement {
       this._fetchData(1);
     }
 
-    // Handle filter render
-    if (changedProperties.has("filter") || changedProperties.has("search")) {
+    // Handle search by prefix render
+    if (changedProperties.has("search")) {
       this.filters = this.getUpdatedFilters();
     }
   }
@@ -278,11 +256,6 @@ export default class ECCClientGa4ghTesRuns extends LitElement {
     let updatedFilters = [...this.filters];
 
     // Modify the array based on the conditions
-    if (!this.filter) {
-      updatedFilters = updatedFilters.filter(
-        (filter) => filter.type !== "select"
-      );
-    }
     if (!this.search) {
       updatedFilters = updatedFilters.filter(
         (filter) => filter.type !== "search"
