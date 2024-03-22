@@ -1,46 +1,10 @@
 import { html, LitElement } from "lit";
 import { property, state } from "lit/decorators.js";
+import "@elixir-cloud/design/dist/components/form/index.js";
+import EccUtilsDesignForm, {
+  Field,
+} from "@elixir-cloud/design/dist/components/form";
 import { postWorkflow } from "../../API/Workflow/wesGet.js";
-import "@elixir-cloud/design";
-
-// TODO: import the interface from the design package
-export interface Field {
-  key: string;
-  label: string;
-  type?:
-    | "text"
-    | "date"
-    | "number"
-    | "email"
-    | "password"
-    | "tel"
-    | "url"
-    | "search"
-    | "datetime-local"
-    | "time"
-    | "array"
-    | "switch"
-    | "file"
-    | "group";
-  fieldOptions?: {
-    required?: boolean;
-    default?: string | boolean;
-    multiple?: boolean;
-    accept?: string;
-    returnIfEmpty?: string;
-    tooltip?: string;
-  };
-  arrayOptions?: {
-    defaultInstances?: number;
-    max?: number;
-    min?: number;
-  };
-  groupOptions?: {
-    collapsible: boolean;
-  };
-  error?: string;
-  children?: Array<Field>;
-}
 
 /**
  * @summary This component is used to create task runs using WES API.
@@ -55,7 +19,7 @@ export default class ECCClientGa4ghWesCreateRuns extends LitElement {
   @property({ type: String }) private baseURL =
     "https://prowes.rahtiapp.fi/ga4gh/wes/v1";
 
-  @state() fields: Array<Field> = [
+  @state() fields: Field[] = [
     {
       key: "workflow_url",
       label: "URL",
@@ -141,9 +105,10 @@ export default class ECCClientGa4ghWesCreateRuns extends LitElement {
       this.form.append(key, form[key]);
     });
 
-    const eccUtilsDesignForm = this.shadowRoot?.querySelector(
-      "ecc-utils-design-form"
-    ) as any;
+    const eccUtilsDesignForm =
+      this.shadowRoot?.querySelector<EccUtilsDesignForm>(
+        "ecc-utils-design-form"
+      );
 
     if (eccUtilsDesignForm) {
       eccUtilsDesignForm.loading();
@@ -168,7 +133,7 @@ export default class ECCClientGa4ghWesCreateRuns extends LitElement {
     } else {
       console.error({
         message: "ecc-utils-design-form not found",
-        breakPoint: "WESCreateRun.submitForm",
+        breakPoint: "ECCClientGa4ghWesCreateRuns.submitForm",
       });
     }
   }

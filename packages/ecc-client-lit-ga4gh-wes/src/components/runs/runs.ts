@@ -1,81 +1,20 @@
 import { html, css, LitElement, render } from "lit";
 import { property, state } from "lit/decorators.js";
-import "@elixir-cloud/design";
+import "@elixir-cloud/design/dist/components/collection/index.js";
+import "@elixir-cloud/design/dist/components/details/index.js";
+import EccUtilsDesignCollection, {
+  FilterProp,
+  ItemProp,
+} from "@elixir-cloud/design/dist/components/collection";
+import EccUtilsDesignDetails, {
+  Field,
+  Action,
+} from "@elixir-cloud/design/dist/components/details";
 import {
   cancelWorkflow,
   fetchWorkflow,
   fetchWorkflows,
 } from "../../API/Workflow/wesGet.js";
-
-// TODO: Remove the interfaces once design package
-//       can export them, as they are copied from
-//       from there.
-
-export interface Children {
-  label?: string;
-  path: string;
-  copy?: boolean;
-  defaultValue?: any;
-}
-
-export interface Field {
-  key: string;
-  path: string;
-  tab?: string;
-  label?: string;
-  arrayOptions?: {
-    labelOptions?: {
-      path?: string;
-      prefix?: string;
-      suffix?: string;
-    };
-    type?: "detail" | "tag";
-  };
-  tooltip?: string;
-  copy?: boolean;
-  parentKey?: string;
-}
-export interface ItemProp {
-  index: number;
-  name: string;
-  key: string;
-  lazy?: boolean;
-  tag?: {
-    name: string;
-    type?: "primary" | "success" | "neutral" | "warning" | "danger";
-  };
-}
-
-export interface Action {
-  key: string;
-  label: string;
-  type: "button" | "link";
-  buttonOptions?: {
-    variant?: "primary" | "success" | "neutral" | "warning" | "danger" | "text";
-    loading?: boolean;
-    disabled?: boolean;
-    size?: "small" | "medium" | "large";
-    icon?: {
-      url: string;
-      position?: "prefix" | "suffix";
-    };
-  };
-  linkOptions?: {
-    url: string;
-    size?: "small" | "medium" | "large";
-  };
-  position?: "left" | "right";
-}
-
-export interface FilterProp {
-  key: string;
-  type: "search" | "select";
-  options?: string[];
-  selectConfig?: {
-    multiple?: boolean;
-  };
-  placeholder?: string;
-}
 
 /**
  * @summary This component facilitates browsing workflow runs via WES API.
@@ -92,9 +31,9 @@ export default class ECCClientGa4ghWesRuns extends LitElement {
   static styles = css``;
   @property({ type: Number }) private pageSize = 5;
   @property({ type: String }) private baseURL =
-    "https://prowes.rahtiapp.fi/ga4gh/wes/v1";
+    "`https://prowes.rahtiapp.fi/ga4gh/wes/v1`";
 
-  @property({ type: Array }) private fields: Array<Field> = [
+  @property({ type: Array }) private fields: Field[] = [
     {
       label: "Tags",
       tab: "Overview",
@@ -247,7 +186,6 @@ export default class ECCClientGa4ghWesRuns extends LitElement {
     },
   ];
 
-  @state() private filterTag: string[] = [];
   @state() private filter = true;
   @state() private items: ItemProp[] = [];
   @state() private nextPageToken: string[] = [""];
@@ -268,10 +206,18 @@ export default class ECCClientGa4ghWesRuns extends LitElement {
   };
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
-    const eccUtilsDesignCollection = this.shadowRoot?.querySelector(
-      "ecc-utils-design-collection"
-      // Todo: Get the typeof Collections and use it instead of `any`
-    ) as any;
+    const eccUtilsDesignCollection =
+      this.shadowRoot?.querySelector<EccUtilsDesignCollection>(
+        "ecc-utils-design-collection"
+      );
+    if (!eccUtilsDesignCollection) {
+      console.error({
+        error: "Failed to find ecc-utils-design-collection element",
+        breakPoint: "ECCClientGa4ghWesRuns.updated",
+      });
+      return;
+    }
+
     eccUtilsDesignCollection.pageSize = this.pageSize;
     if (changedProperties.has("pageSize")) {
       this._fetchData(1);
@@ -315,25 +261,42 @@ export default class ECCClientGa4ghWesRuns extends LitElement {
       this.items = [...this.items, ...convertedData];
 
       if (data.next_page_token === "" || data.runs.length < this.pageSize) {
-        const eccUtilsDesignCollection = this.shadowRoot?.querySelector(
-          "ecc-utils-design-collection"
-          // Todo: Get the typeof Collections and use it instead of `any`
-        ) as any;
+        const eccUtilsDesignCollection =
+          this.shadowRoot?.querySelector<EccUtilsDesignCollection>(
+            "ecc-utils-design-collection"
+          );
+
+        if (!eccUtilsDesignCollection) {
+          console.error({
+            error: "ecc-utils-design-collection not found",
+            breakPoint: "ECCClientGa4ghWesRuns.fetchData",
+          });
+          return;
+        }
 
         eccUtilsDesignCollection.totalItems = this.items.length;
       } else this.nextPageToken[page] = data.next_page_token;
     } catch (error) {
       console.error({
         error,
-        breakPoint: "WESRuns.fetchData",
+        breakPoint: "ECCClientGa4ghWesRuns.fetchData",
       });
     }
   }
 
   private async _handleExpandItem(event: CustomEvent) {
-    const eccUtilsDesignCollection = this.shadowRoot?.querySelector(
-      "ecc-utils-design-collection"
-    ) as any;
+    const eccUtilsDesignCollection =
+      this.shadowRoot?.querySelector<EccUtilsDesignCollection>(
+        "ecc-utils-design-collection"
+      );
+
+    if (!eccUtilsDesignCollection) {
+      console.error({
+        error: "ecc-utils-design-collection not found",
+        breakPoint: "ECCClientGa4ghWesRuns.handleExpandItem",
+      });
+      return;
+    }
 
     const { target, detail } = event;
 
@@ -383,20 +346,18 @@ export default class ECCClientGa4ghWesRuns extends LitElement {
         target.appendChild(child);
 
         // Add button event
-        const detailsElement = child.querySelector(
+        const detailsElement = child.querySelector<EccUtilsDesignDetails>(
           "ecc-utils-design-details"
-        ) as any;
+        );
         if (detailsElement) {
           detailsElement.addEventListener(
-            `ecc-utils-button-click`,
-            async (buttonEvent: CustomEvent) => {
-              const { key: buttonKey } = buttonEvent.detail;
+            "ecc-utils-button-click",
+            async (buttonEvent: Event) => {
+              const customEvent = buttonEvent as CustomEvent<{ key: string }>;
+              const { key: buttonKey } = customEvent.detail;
               try {
                 if (buttonKey === key) {
-                  // 0 is the index of the button as there is only one button
-                  detailsElement.setButtonLoading(0, true);
                   const resp = (await cancelWorkflow(this.baseURL, key)) as any;
-                  detailsElement.setButtonLoading(0, false);
 
                   // If the response doesn't have run ID that means the run wasn't canceled.
                   if (!resp.run_id) throw new Error();
@@ -418,7 +379,6 @@ export default class ECCClientGa4ghWesRuns extends LitElement {
   }
 
   render() {
-    console.log(this.items);
     return html`
       <ecc-utils-design-collection
         id="collection"

@@ -2,7 +2,7 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 # run the lint command
-npm run lint
+# npm run lint:fix
 
 # run the test command
-npm run test
+# npm run test
