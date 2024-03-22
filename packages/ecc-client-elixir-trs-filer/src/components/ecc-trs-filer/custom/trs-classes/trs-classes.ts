@@ -22,6 +22,7 @@ type DataItem = {
 })
 export class TRSClasses extends FASTElement {
   @attr public baseUrl = "";
+  @observable public toolClasses: ToolClass[] = [];
   @observable public data: ToolClass[] = [];
   @observable public isModalOpen = false;
   @observable public modalDescription = "";
@@ -34,7 +35,7 @@ export class TRSClasses extends FASTElement {
    */
   public connectedCallback(): void {
     super.connectedCallback();
-    this.fetchData();
+    this.data = this.toolClasses;
   }
 
   /**

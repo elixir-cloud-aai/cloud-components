@@ -212,7 +212,6 @@ export class TRSToolsList extends FASTElement {
   async connectedCallback() {
     super.connectedCallback();
     await this.loadData();
-    await this.loadTools();
   }
 
   /**
@@ -254,20 +253,7 @@ export class TRSToolsList extends FASTElement {
     this.ready = true;
   }
 
-  /**
-   * @method
-   * @description Load tools from the backend.
-   * @async
-   * @returns {Promise<void>}
-   */
-  async loadTools(): Promise<void> {
-    const url = `${this.baseUrl}/toolClasses`;
-    const response = await fetch(url);
-    const data = await response.json();
-    this.toolClasses = data;
-  }
-
-  /**
+    /**
    * @method
    * @description Handle search input change.
    * @param {Event} e - The triggering event.
