@@ -75,8 +75,11 @@ export default class EccUtilsDesignForm extends LitElement {
   @property({ type: Array, reflect: true }) fields: Array<Field> = [];
   @state() private form: object = {};
   @state() private formState: "idle" | "loading" | "error" | "success" = "idle";
-  @state() private errorMessage = "Form submitted successfully";
-  @state() private successMessage = "Something went wrong";
+  @state() private canSubmit = false;
+  @state() private errorMessage = "Something went wrong";
+  @state() private successMessage = "Form submitted successfully";
+  @state() private requiredButEmpty: string[] = [];
+
   protected cssParts = {
     switchControl: "switch",
     switchThumb: "switch-thumb",
@@ -217,7 +220,7 @@ export default class EccUtilsDesignForm extends LitElement {
         ?required=${field.fieldOptions?.required}
         value=${_.get(this.form, path)}
         ?password-toggle=${field.type === "password"}
-        @sl-change=${(e: Event) => {
+        @sl-input=${(e: Event) => {
           const { value } = e.target as HTMLInputElement;
           if (!value) {
             _.unset(this.form, path);
@@ -427,16 +430,21 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   private renderTemplate(field: Field, path: string): TemplateResult {
+    const newPath = `${path}.${field.key}`;
     if (field.type === "group") {
-      return this.renderGroupTemplate(field, `${path}.${field.key}`);
+      return this.renderGroupTemplate(field, newPath);
     }
     if (field.type === "array") {
-      return this.renderArrayTemplate(field, `${path}.${field.key}`);
+      return this.renderArrayTemplate(field, newPath);
+    }
+
+    if (field.fieldOptions?.required && !_.get(this.form, newPath)) {
+      this.requiredButEmpty.push(field.key);
     }
     if (field.type === "switch") {
-      return this.renderSwitchTemplate(field, `${path}.${field.key}`);
+      return this.renderSwitchTemplate(field, newPath);
     }
-    return this.renderInputTemplate(field, `${path}.${field.key}`);
+    return this.renderInputTemplate(field, newPath);
   }
 
   private renderErrorTemplate(): TemplateResult {
@@ -486,6 +494,10 @@ export default class EccUtilsDesignForm extends LitElement {
     `;
   }
 
+  public disableSubmit(disable: boolean) {
+    this.canSubmit = !disable;
+  }
+
   public loading() {
     this.formState = "loading";
   }
@@ -505,19 +517,13 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   render() {
+    this.requiredButEmpty = [];
     if (!this.fields || this.fields.length === 0) {
       throw new Error("Fields is required & should not be empty array");
     }
     if (this.formState === "success") {
       return html` ${this.renderSuccessTemplate()} `;
     }
-
-    const allRequiredFieldsFilled = this.fields.every((field) => {
-      if (field.fieldOptions?.required) {
-        return !!_.get(this.form, `data.${field.key}`);
-      }
-      return true;
-    });
 
     const { button, submitButton, form: csspartForm } = this.cssParts;
     return html`
@@ -542,11 +548,15 @@ export default class EccUtilsDesignForm extends LitElement {
       >
         ${this.fields.map((field) => this.renderTemplate(field, "data"))}
         ${this.renderErrorTemplate()}
+        ${this.requiredButEmpty.length > 0
+          ? this.disableSubmit(true)
+          : this.disableSubmit(false)}
+
         <sl-button
           type="submit"
           exportparts="base: ${button}, base: ${submitButton}"
           ?loading=${this.formState === "loading"}
-          ?disabled=${!allRequiredFieldsFilled || this.formState === "loading"}
+          ?disabled=${!this.canSubmit || this.formState === "loading"}
         >
           Submit
         </sl-button>
