@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 function Footer() {
   return (
-    <div className='footer flex justify-center items-center p-1 border-2 rounded-md'>
+    <div className='footer flex justify-center items-center p-1 border-t-2 rounded-md'>
       <div className='container flex flex-col sm:flex-row justify-between px-4'>
         <div className='footer-icons flex justify-center items-center my-2 gap-2'>
           <a href='https://elixir-cloud.dcc.sib.swiss/' target='_blank' rel='noopener noreferrer'>

@@ -5,3 +5,4 @@ webcomponents
 turborepo
 shadowdom
 exportpart
+drei
