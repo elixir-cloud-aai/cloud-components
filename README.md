@@ -20,22 +20,6 @@ The apps folder should contain workspaces for launchable apps, such as a [Next.j
 
 Workspaces are the building blocks of your monorepo. Each app and package you add to your monorepo will be inside its own workspace. 
 
-### Packages
-
-| Name                 | Description                                                                                            | Version   | Status      |
-| -------------------- | ------------------------------------------------------------------------------------------------------ | --------- | ----------- |
-| ecc-utils-design     | Encapsulation & Utility components to manage the headless yet constitent design accross ecc components | [0.0.1]() | In progress |
-| ecc-client-ga4gh-tes | Collection of Web Components for interacting with TES (Task Execution Service)                         | [0.0.1]() | In progress |
-| ecc-client-ga4gh-trs | Collection of Web Components for interacting with TRS (Tool Registry Service)                          | [0.0.1]() | In progress |
-| eslint-config-elixir | Custom & common eslint configuration for elixir packages                                               | [0.0.1]() | In progress |
-
-<!-- ### Apps
-
-| Name          | Description                                                                                                            | Deployment |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------- |
-| example-usage | This application serves as a comprehensive guide for users on how to utilize the packages available in the sample app. | [NA]()     | 
-
--->
 
 ## Getting Started
 
@@ -82,7 +66,7 @@ This project is a community effort and lives off _your_ contributions, be it in
 the form of bug reports, feature requests, discussions, fixes or any other form
 of contribution!
 
-Please refer to the guidelines available at [`CONTRIBUTING.md`][contributing] if
+Please refer to the guidelines available at [contributor guide][contributing] if
 you are interested in contributing.
 
 ## Contributors
@@ -150,7 +134,7 @@ To get in touch with use, please use one of the following routes:
 [badge-chat-url]: https://join.slack.com/t/elixir-cloud/shared_invite/enQtNzA3NTQ5Mzg2NjQ3LTZjZGI1OGQ5ZTRiOTRkY2ExMGUxNmQyODAxMDdjM2EyZDQ1YWM0ZGFjOTJhNzg5NjE0YmJiZTZhZDVhOWE4MWM
 [email]: alexander.kanitz@alumni.ethz.ch
 [code-of-conduct]: CODE_OF_CONDUCT.md
-[contributing]: CONTRIBUTING.md
+[contributing]: https://elixir-cloud-aai.github.io/guides/guide-contributor/
 [contributors]: CONTRIBUTORS.md
 [elixir]: https://elixir-europe.org/
 [elixir-cloud-aai]: https://elixir-cloud.dcc.sib.swiss/
