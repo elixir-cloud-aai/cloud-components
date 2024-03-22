@@ -76,6 +76,7 @@ export default class EccUtilsDesignForm extends LitElement {
   @state() private form: object = {};
   @state() private formState: "idle" | "loading" | "error" | "success" = "idle";
   @state() private canSubmit = false;
+  @state() private submitDisabledByUser = false;
   @state() private errorMessage = "Something went wrong";
   @state() private successMessage = "Form submitted successfully";
   @state() private requiredButEmpty: string[] = [];
@@ -494,8 +495,8 @@ export default class EccUtilsDesignForm extends LitElement {
     `;
   }
 
-  public disableSubmit(disable: boolean) {
-    this.canSubmit = !disable;
+  public disableSubmit(disable = true) {
+    this.submitDisabledByUser = disable;
   }
 
   public loading() {
@@ -549,14 +550,16 @@ export default class EccUtilsDesignForm extends LitElement {
         ${this.fields.map((field) => this.renderTemplate(field, "data"))}
         ${this.renderErrorTemplate()}
         ${this.requiredButEmpty.length > 0
-          ? this.disableSubmit(true)
-          : this.disableSubmit(false)}
+          ? (this.canSubmit = false)
+          : (this.canSubmit = true)}
 
         <sl-button
           type="submit"
           exportparts="base: ${button}, base: ${submitButton}"
           ?loading=${this.formState === "loading"}
-          ?disabled=${!this.canSubmit || this.formState === "loading"}
+          ?disabled=${this.submitDisabledByUser ||
+          !this.canSubmit ||
+          this.formState === "loading"}
         >
           Submit
         </sl-button>

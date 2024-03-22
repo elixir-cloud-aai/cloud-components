@@ -96,6 +96,7 @@ This property is used to render the fields in the form. Fields can be passed as 
 | `loading()`               | `none`                | Set the form state to loading. Disables the submit button.    |
 | [`success()`](#methods-1) | {`message`: `string`} | Set the form state to success. Show the success message.      |
 | [`error()`](#methods-1)   | {`message`: `string`} | Set the form state to error. Show the error message at end.   |
+| `disableSubmit()`         | `boolean`             | Toggled the disbled state on the form submit button           |
 
 ## Parts
 
