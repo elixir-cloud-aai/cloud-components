@@ -22,14 +22,14 @@ This component is used to create workflow runs using WES API.
 <Tabs items={['React', 'HTML/Lit']}>
   <Tabs.Tab>
     ```ts copy
-    import ECCClientGa4ghWesCreateRun from '@elixir-cloud/lit-wes/dist/react/ecc-client-lit-ga4gh-wes-create-run/index';
+    import ECCClientGa4ghWesCreateRun from '@elixir-cloud/wes/dist/react/create-run/index';
     ```
   
     ### Example
   
     ````ts showLineNumbers {2, 5} copy filename="ECCClientGa4ghWesCreateRun"
     import React from 'react';
-    import ECCClientGa4ghWesCreateRun from '@elixir-cloud/lit-wes/dist/react/ecc-client-lit-ga4gh-wes-create-run/index';
+    import ECCClientGa4ghWesCreateRun from '@elixir-cloud/wes/dist/react/create-run/index';
 
     export default function Runs() {
       return <ECCClientGa4ghWesCreateRun />;
@@ -40,7 +40,7 @@ This component is used to create workflow runs using WES API.
   
   <Tabs.Tab>
     ```js copy
-    import "@elixir-cloud/lit-wes/dist/components/ecc-client-lit-ga4gh-wes-create-run/index";
+    import "@elixir-cloud/wes/dist/components/create-run/index";
     ```
   
     ### Example
@@ -51,7 +51,7 @@ This component is used to create workflow runs using WES API.
     </div>
     <script type="module">
     import { html, render } from "lit";
-    import "@elixir-cloud/lit-wes/dist/components/ecc-client-lit-ga4gh-wes-create-run/index";
+    import "@elixir-cloud/wes/dist/components/create-run/index";
 
     render(
       html`<ecc-client-ga4gh-wes-create-run />`,
@@ -80,6 +80,9 @@ This property is used to give `POST` endpoint to create `Task run`. The provided
   `http://localhost:8090` to the component.
 </Callout>
 
+<Callout emoji='🚨' type="error">proWES is still in beta, many of its feature are yet to be stable.</Callout>
+
 ## Parts
 
 <Callout emoji='👩‍🏭'>Hold on! We are working here.</Callout>
+

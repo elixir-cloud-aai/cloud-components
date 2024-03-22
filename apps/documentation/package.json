@@ -8,7 +8,7 @@
     "format:check": "prettier --check ./**/*.{md,mdx,ts,tsx,js,jsx}",
     "format": "prettier --write ./**/*.{md,mdx,ts,tsx,js,jsx}",
     "lint": "npx eslint . && cspell **/*.{tsx,mdx}",
-    "lint:fix": "npx eslint . -- --fix"
+    "lint:fix": "npx eslint . --fix"
   },
   "dependencies": {
     "@elixir-cloud/design": "*",
