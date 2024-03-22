@@ -75,8 +75,8 @@ export default class EccUtilsDesignForm extends LitElement {
   @property({ type: Array, reflect: true }) fields: Array<Field> = [];
   @state() private form: object = {};
   @state() private formState: "idle" | "loading" | "error" | "success" = "idle";
-  @state() private errorMessage = "Form submitted successfully";
-  @state() private successMessage = "Something went wrong";
+  @state() private errorMessage = "Something went wrong";
+  @state() private successMessage = "Form submitted successfully";
   protected cssParts = {
     switchControl: "switch",
     switchThumb: "switch-thumb",
@@ -173,14 +173,21 @@ export default class EccUtilsDesignForm extends LitElement {
                 <sl-tooltip
                   id=${field.key}
                   content=${field.fieldOptions?.tooltip}
+                  data-testid="form-input-tooltip"
                 >
-                  <label part="${label} ${formControlLabel}">
+                  <label
+                    part="${label} ${formControlLabel}"
+                    data-testid="form-input-label"
+                  >
                     ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                   </label>
                 </sl-tooltip>
               `
             : html`
-                <label part="${label} ${formControlLabel}">
+                <label
+                  part="${label} ${formControlLabel}"
+                  data-testid="form-input-label"
+                >
                   ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                 </label>
               `}
@@ -189,6 +196,7 @@ export default class EccUtilsDesignForm extends LitElement {
             part="${inputBase} ${input}"
             type="file"
             accept=${field.fieldOptions?.accept || "*"}
+            data-testid="form-input-file"
             ?multiple=${field.fieldOptions?.multiple}
             ?required=${field.fieldOptions?.required}
             @change=${async (e: Event) => {
@@ -201,6 +209,7 @@ export default class EccUtilsDesignForm extends LitElement {
       `;
     }
 
+    // if the field is empty and has a default value, set the default value on first render
     if (!_.get(this.form, path)) {
       if (field.fieldOptions?.default && !this.hasUpdated) {
         _.set(this.form, path, field.fieldOptions.default);
@@ -213,6 +222,7 @@ export default class EccUtilsDesignForm extends LitElement {
       <sl-input
         exportparts="form-control: ${formControl}, form-control-label: ${formControlLabel}, form-control-label: ${label}, input: ${input}, base: ${inputBase}"
         class="input"
+        data-testid="form-input"
         type=${field.type || "text"}
         ?required=${field.fieldOptions?.required}
         value=${_.get(this.form, path)}
@@ -441,7 +451,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
   private renderErrorTemplate(): TemplateResult {
     if (this.formState !== "error") return html``;
-    return html`<sl-alert variant="danger" open>
+    return html`<sl-alert data-testid="form-error" variant="danger" open>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         slot="icon"
@@ -464,7 +474,7 @@ export default class EccUtilsDesignForm extends LitElement {
   private renderSuccessTemplate(): TemplateResult {
     if (this.formState !== "success") return html``;
     return html`
-      <sl-alert variant="success" open>
+      <sl-alert variant="success" open data-testid="form-success">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           slot="icon"
@@ -523,6 +533,10 @@ export default class EccUtilsDesignForm extends LitElement {
           if (!isValid) {
             return;
           }
+          if (Object.keys(this.form).length === 0) {
+            this.error({ message: "Form is empty" });
+            return;
+          }
           const event = new CustomEvent("ecc-utils-submit", {
             detail: {
               form: this.form,
@@ -537,6 +551,7 @@ export default class EccUtilsDesignForm extends LitElement {
         ${this.renderErrorTemplate()}
         <sl-button
           type="submit"
+          data-testid="form-submit"
           exportparts="base: ${button}, base: ${submitButton}"
           ?loading=${this.formState === "loading"}
           ?disabled=${this.formState === "loading"}

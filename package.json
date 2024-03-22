@@ -33,18 +33,24 @@
     "@custom-elements-manifest/analyzer": "^0.9.0",
     "@lit/react": "^1.0.2",
     "@open-wc/eslint-config": "^12.0.3",
-    "@open-wc/testing": "^4.0.0",
+    "@open-wc/testing": "^3.0.0-next.5",
     "@turbo/gen": "^1.9.8",
     "@web/dev-server": "^0.4.1",
+    "@web/dev-server-esbuild": "^1.0.2",
+    "@web/test-runner-playwright": "^0.11.0",
     "change-case": "^5.3.0",
+    "commander": "^12.0.0",
     "concurrently": "^8.2.2",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.32.0",
     "eslint-config-elixir": "*",
     "fast-glob": "^3.3.2",
+    "globby": "^14.0.1",
     "husky": "^8.0.0",
     "prettier": "^2.8.8",
+    "sinon": "^17.0.1",
     "standard-version": "^9.5.0",
+    "tsup": "^8.0.2",
     "turbo": "^1.10.7",
     "typescript": "^5.3.3"
   },
@@ -57,10 +63,5 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
-  },
-  "dependencies": {
-    "commander": "^11.1.0",
-    "globby": "^14.0.0",
-    "tsup": "^8.0.1"
   }
 }
