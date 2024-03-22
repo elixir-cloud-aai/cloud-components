@@ -6,6 +6,7 @@ import {
 } from "@microsoft/fast-element";
 import { template } from "./ecc-trs-filer.template.js";
 import { styles } from "./ecc-trs-filer.styles.js";
+import { ToolClass } from "../custom/trs-list/trs-list.types.js";
 
 @customElement({
   name: "ecc-client-elixir-trs-filer",
@@ -19,11 +20,14 @@ export class TRSFiler extends FASTElement {
   @attr public baseUrl = "";
   @attr public isOpenModal = false;
 
-  @observable toolClasses: {
-    description: string;
-    id: string;
-    name: string;
-  }[] = [];
+  // @observable toolClasses: {
+  //   description: string;
+  //   id: string;
+  //   name: string;
+  // }[] = [];
+  @observable public toolClasses: ToolClass[] = [];
+
+  @observable public isLoading = false; 
 
   @observable createToolForm = {
     aliases: [""],
@@ -46,6 +50,7 @@ export class TRSFiler extends FASTElement {
    * @async
    */
   async loadToolClasses() {
+    this.isLoading = true;
     const url = `${this.baseUrl}/toolClasses`;
     const response = await fetch(url, {
       method: "GET",
@@ -55,9 +60,11 @@ export class TRSFiler extends FASTElement {
     });
     if (!response.ok) {
       console.log("Error");
+      this.isLoading = false;
     }
     const data = await response.json();
     this.toolClasses = data;
+    this.isLoading = false;
   }
 
   /**

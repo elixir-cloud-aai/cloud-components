@@ -158,11 +158,33 @@ export const template = html<TRSFiler>`
           )}
         </div>
         <div class="u-mt-md"></div>
-        <trs-list baseUrl="${(x) => x.baseUrl}"></trs-list
+        ${when(
+          (x) => !x.isLoading,
+          html`
+            <trs-list baseUrl="${(x) => x.baseUrl}" :toolClasses="${(x) => x.toolClasses}"></trs-list>
+          `,
+        )}
+        ${when(
+          (x) => x.isLoading,
+          html`
+            <div class="spinner"></div>
+          `,
+        )}
       ></fast-tab-panel>
       <fast-tab-panel slot="tabpanel" class="custom-tabpanel">
         <div class="u-mt-md"></div>
-        <trs-classes baseUrl="${(x) => x.baseUrl}"></trs-classes>
+        ${when(
+          (x) => !x.isLoading,
+          html`
+            <trs-classes baseUrl="${(x) => x.baseUrl}" :toolClasses="${(x) => x.toolClasses}"></trs-classes>
+          `,
+        )}
+         ${when(
+          (x) => x.isLoading,
+          html`
+            <div class="spinner"></div>
+          `,
+        )}
       </fast-tab-panel>
     </fast-tabs>
   </div>
