@@ -1,10 +1,11 @@
 // import { playwrightLauncher } from '@web/test-runner-playwright';
+import { esbuildPlugin } from "@web/dev-server-esbuild";
 
-const filteredLogs = ["Running in dev mode"];
+const filteredLogs = ["Running in dev mode", "lit-html is in dev mode"];
 
 export default /** @type {import("@web/test-runner").TestRunnerConfig} */ ({
   /** Test files to run */
-  files: "out-tsc/src/**/*.test.js",
+  files: "src/**/**/*.test.ts",
 
   /** Resolve bare module imports */
   nodeResolve: {
@@ -24,7 +25,9 @@ export default /** @type {import("@web/test-runner").TestRunnerConfig} */ ({
     return true;
   },
 
-  port: 8002,
+  port: 8005,
+
+  plugins: [esbuildPlugin({ ts: true })],
 
   /** Compile JS for older browsers. Requires @web/dev-server-esbuild plugin */
   // esbuildTarget: 'auto',

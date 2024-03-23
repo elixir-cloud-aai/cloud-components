@@ -17,10 +17,9 @@
     "lint:fix": "eslint . --fix && turbo run lint:fix",
     "test": "turbo run test --parallel",
     "test:watch": "turbo run test --watch",
-    "clean": "rm -rf node_modules && rm -rf */*/node_modules",
+    "clean": "rm -rf node_modules && turbo run clean",
     "new": "turbo gen",
     "prepare": "husky install",
-    "cz": "cz",
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",
     "release:patch": "standard-version --release-as patch",
@@ -38,7 +37,6 @@
     "@web/dev-server": "^0.4.1",
     "change-case": "^5.3.0",
     "concurrently": "^8.2.2",
-    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.32.0",
     "eslint-config-elixir": "*",
     "fast-glob": "^3.3.2",
@@ -53,11 +51,6 @@
     "apps/*",
     "packages/*"
   ],
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
   "dependencies": {
     "commander": "^11.1.0",
     "globby": "^14.0.0",
