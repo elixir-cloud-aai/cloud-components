@@ -1,5 +1,4 @@
 /* eslint-disable import/no-extraneous-dependencies */
-
 const { cwd } = process;
 const fs = require("fs");
 const { program } = require("commander");
