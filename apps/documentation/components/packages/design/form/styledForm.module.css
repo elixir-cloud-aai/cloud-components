@@ -1,0 +1,87 @@
+.styled-form-example::part(form) {
+  display: flex;
+  flex-direction: column;
+}
+
+.styled-form-example::part(submit-button) {
+  margin-top: 20px;
+  background-color: #4caf50;
+  border: none;
+  color: white;
+  border-radius: 10px;
+}
+
+.styled-form-example::part(field) {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.styled-form-example::part(array-header) {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.styled-form-example::part(array-label) {
+  font-weight: bold;
+}
+
+.styled-form-example::part(array-item) {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.styled-form-example::part(add-button) {
+  color: #4caf50;
+  border: none;
+  border-radius: 10px;
+}
+
+.styled-form-example::part(remove-button) {
+  color: #f44336;
+  margin-bottom: -12px;
+}
+
+.styled-form-example::part(label) {
+  font-size: 0.85rem;
+}
+
+.styled-form-example::part(switch) {
+  background-color: #fff;
+  height: 20px;
+  border: 1px solid #ccc;
+  box-shadow: 1px 1px 1px 1px #ccc;
+}
+
+.styled-form-example::part(switch-thumb) {
+  background-color: #4caf50;
+  height: 20px;
+  width: 20px;
+  border: 0px;
+}
+
+.styled-form-example::part(input-base) {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 1px 1px 1px 1px #ccc;
+}
+
+.styled-form-example::part(input) {
+  font-size: small;
+}
+
+.styled-form-example::part(input):focus {
+  outline: none;
+  background-color: #f5f5f5;
+}
+
+.styled-form-example::part(input)::file-selector-button {
+  background-color: #fff;
+  color: #4caf50;
+  font-weight: bold;
+}
