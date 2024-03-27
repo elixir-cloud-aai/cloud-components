@@ -157,11 +157,11 @@ export default class EccUtilsDesignCode extends LitElement {
         linesInChunk = (
           codeChunk.match(new RegExp(`\n${this.indent}`, "g")) || []
         ).length;
-        codeChunk = codeChunk.replaceAll(`\n${this.indent}`, "\n");
+        codeChunk = codeChunk.split(`\n${this.indent}`).join("\n");
       } else {
         // Indent
         linesInChunk = (codeChunk.match(/\n/g) || []).length;
-        codeChunk = codeChunk.replaceAll("\n", `\n${this.indent}`);
+        codeChunk = codeChunk.split("\n").join(`\n${this.indent}`);
       }
 
       if (selLineStart === 0) codeChunk = codeChunk.replace(/^\n/, "");

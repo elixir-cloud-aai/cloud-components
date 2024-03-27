@@ -4,7 +4,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "noEmitOnError": true,
-    "lib": ["es2017", "dom", "es5", "es6", "dom.iterable"],
+    "lib": ["es2017", "dom"],
     "strict": true,
     "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
@@ -14,8 +14,10 @@
     "sourceMap": true,
     "inlineSources": true,
     "rootDir": "./",
+    "declaration": true,
+    "emitDeclarationOnly": true,
     "skipLibCheck": true
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }

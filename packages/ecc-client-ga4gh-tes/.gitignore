@@ -15,6 +15,10 @@
 ## temp folders
 /.tmp/
 
+## generated files
+/src/react
+custom-elements-manifest.config.js
+
 # build
 /_site/
 /dist/
