@@ -17,7 +17,7 @@
     "lint:fix": "eslint . --fix && turbo run lint:fix",
     "test": "turbo run test --parallel",
     "test:watch": "turbo run test --watch",
-    "clean": "rm -rf node_modules && turbo run clean",
+    "clean": "turbo run clean && rm -rf node_modules",
     "new": "turbo gen",
     "prepare": "husky install",
     "release": "standard-version",
