@@ -25,7 +25,7 @@ export default /** @type {import("@web/test-runner").TestRunnerConfig} */ ({
     return true;
   },
 
-  port: 8005,
+  port: 8002,
 
   plugins: [esbuildPlugin({ ts: true })],
 

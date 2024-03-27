@@ -2,7 +2,6 @@
 /* eslint-disable no-param-reassign */
 import fs from "fs";
 import { program } from "commander";
-import pkg from "pascal-case";
 import { customElementVsCodePlugin } from "custom-element-vs-code-integration";
 import { customElementJetBrainsPlugin } from "custom-element-jet-brains-integration";
 import packageJson from "./package.json" assert { type: "json" };
@@ -14,7 +13,13 @@ const options = program
   .parse()
   .opts();
 
-const { pascalCase } = pkg;
+function pascalCase(text) {
+  const a = text
+    .toLowerCase()
+    .replace(/[-_\s.]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ""));
+  return a.substring(0, 1).toLowerCase() + a.substring(1);
+}
+
 const componentsPrefix = packageJson.componentsPrefix;
 const packageData = JSON.parse(fs.readFileSync("package.json", "utf8"));
 const { name, description, version, author, homepage, license } = packageData;
