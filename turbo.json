@@ -12,9 +12,12 @@
     "test": {
       "dependsOn": ["topo"]
     },
-    "lint": {},
+    "lint": {
+      "dependsOn": ["build"]
+    },
     "lint:fix": {
-      "cache": false
+      "cache": false,
+      "dependsOn": ["build"]
     },
     "dev": {
       "cache": false,
@@ -23,6 +26,7 @@
     },
     "clean": {
       "dependsOn": ["^clean"]
-    }
+    },
+    "clean:react": {}
   }
 }
