@@ -1,7 +1,7 @@
 {
   "name": "@elixir-cloud/tes",
   "description": "Web Component for interactive with TES API",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "version": "0.0.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -19,6 +19,13 @@
     "type": "git",
     "url": "https://github.com/elixir-cloud-aai/cloud-components.git"
   },
+  "customElements": "dist/custom-elements.json",
+  "files":[
+    "dist",
+    "README.md",
+    "package.json",
+    "LICENSE"
+  ],
   "scripts": {
     "analyze": "cem analyze --litelement",
     "build": "node ../../scripts/build.js -p ecc-client-ga4gh-tes-",
@@ -51,6 +58,5 @@
     "commander": "*",
     "custom-element-jet-brains-integration": "*",
     "custom-element-vs-code-integration": "*"
-  },
-  "customElements": "dist/custom-elements.json"
+  }
 }
