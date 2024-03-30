@@ -22,7 +22,7 @@
   "componentsPrefix": "ecc-utils-design-",
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "node ../../scripts/build.js",
+    "build": "node ../../scripts/build.js -p ecc-utils-design-",
     "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
     "clean": "rm -rf dist node_modules src/react custom-elements-manifest.config.js",
     "test": "",

@@ -14,6 +14,15 @@ function pascalCase(text) {
   return a.substring(0, 1).toLowerCase() + a.substring(1);
 }
 
+function camelCaseToPascalCase(text) {
+  const a = text
+    .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
+      return index === 0 ? word.toUpperCase() : word.toUpperCase();
+    })
+    .replace(/\s+/g, "");
+  return a;
+}
+
 const options = program.option("-p, --prefix <string>").parse().opts();
 
 const reactDir = path.join(cwd(), "./src/react");
@@ -37,23 +46,29 @@ components.forEach((component) => {
   const eventImports = (component.events || [])
     .map(
       (event) =>
-        `import type { ${event.eventName} } from '../../events/index.js';`
+        `import type { ${camelCaseToPascalCase(
+          event.eventName
+        )} } from '../../events/index.js';`
     )
     .join("\n");
   const eventExports = (component.events || [])
     .map(
       (event) =>
-        `export type { ${event.eventName} } from '../../events/index.js';`
+        `export type { ${camelCaseToPascalCase(
+          event.eventName
+        )} } from '../../events/index.js';`
     )
     .join("\n");
   const eventNameImport =
     (component.events || []).length > 0
-      ? `import { type EventName } from '@lit/react';`
+      ? `import { EventName } from '@lit/react';`
       : ``;
   const events = (component.events || [])
     .map(
       (event) =>
-        `${event.reactName}: '${event.name}'  as EventName<${event.eventName}>`
+        `${event.reactName}: '${
+          event.name
+        }'  as EventName<${camelCaseToPascalCase(event.eventName)}>`
     )
     .join(",\n");
 
@@ -65,7 +80,7 @@ components.forEach((component) => {
     `
       import * as React from 'react';
       import { createComponent } from '@lit/react';
-      import Component from '../../../${component.path}';
+      import Component from '../../${component.path}';
 
       ${eventNameImport}
       ${eventImports}
