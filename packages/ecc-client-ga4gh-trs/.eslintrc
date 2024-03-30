@@ -9,6 +9,8 @@
   ],
   "plugins": ["import", "prettier"],
   "rules": {
+    "camelcase": "warn",
+
     "no-unused-vars": "off"
   },
   "parserOptions": {

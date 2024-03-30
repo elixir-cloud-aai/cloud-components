@@ -1,9 +1,10 @@
 {
-	"extends": ["@open-wc", "elixir", "prettier"],
-	"plugins": ["prettier"],
-	"rules": {
-		"camelcase": "warn",
-		"prettier/prettier": "error",
-		"no-console": ["error", { "allow": ["warn", "error"] }]
-	}
+  "extends": ["@open-wc", "elixir", "prettier"],
+  "plugins": ["prettier"],
+  "rules": {
+    "camelcase": "warn",
+    "prettier/prettier": "error",
+    "lit/no-classfield-shadowing": "warn",
+    "no-console": ["error", { "allow": ["warn", "error"] }]
+  }
 }
