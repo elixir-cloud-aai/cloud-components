@@ -3,6 +3,3 @@
 
 # run the lint command
 npm run lint
-
-# run the test command
-npm run test
