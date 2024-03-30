@@ -12,69 +12,9 @@ ELIXIR Cloud Components (ECC) are lightweight, fast and reusable Web Components 
 [![All Contributors][badge-all-contributors-image]][contributors]
 [![Chat][badge-chat-image]][badge-chat-url]
 
-## Introduction
+## Introduction and Getting started
 
-This repository follows the monorepo architecture (using [TurboRepo](https://turbo.build/repo)) that follows the common convention of having having top-level `apps/` and `packages/` directories. 
-The packages folder should contain workspaces for packages used by either an app or another package.
-The apps folder should contain workspaces for launchable apps, such as a [Next.js](https://nextjs.org/) or [Svelte](https://svelte.dev/) app.
-
-Workspaces are the building blocks of your monorepo. Each app and package you add to your monorepo will be inside its own workspace. 
-
-### Packages
-
-| Name                 | Description                                                                                            | Version   | Status      |
-| -------------------- | ------------------------------------------------------------------------------------------------------ | --------- | ----------- |
-| ecc-utils-design     | Encapsulation & Utility components to manage the headless yet constitent design accross ecc components | [0.0.1]() | In progress |
-| ecc-client-ga4gh-tes | Collection of Web Components for interacting with TES (Task Execution Service)                         | [0.0.1]() | In progress |
-| ecc-client-ga4gh-trs | Collection of Web Components for interacting with TRS (Tool Registry Service)                          | [0.0.1]() | In progress |
-| eslint-config-elixir | Custom & common eslint configuration for elixir packages                                               | [0.0.1]() | In progress |
-
-<!-- ### Apps
-
-| Name          | Description                                                                                                            | Deployment |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------- |
-| example-usage | This application serves as a comprehensive guide for users on how to utilize the packages available in the sample app. | [NA]()     | 
-
--->
-
-## Getting Started
-
-To get started with this project, follow these steps:
-
-> Note: All of the following commands should be executed on all the packages & apps. In case you want to execute the script on any one particular app/package, you can define the [workspace tag](https://turbo.build/repo/docs/handbook/package-installation#addingremovingupgrading-packages) along with any of the below commands like `-w=ecc-utils-design`.
-
-1. Install the dependencies involved by running the following command:
-
-   ```
-   npm install
-   ```
-
-2. Run the development server by running the following command:
-   
-   ```
-   npm run dev
-   ```
-   This will start the development server on your local machine and allow you to start working on the project.
-
-3. If you want to start a new package run:
-
-   ```
-   npm run new
-   ```
-
-4. Run linter by the following command:
-   
-   ```
-   npm run lint
-   ```
-
-5. Run all test using the following command.
-
-   ```
-   npm run test
-   ``` 
-
-> Note: Since packages have interdependency, you need to run `dev` script atleast once before running `lint` and `test` scripts globally.
+<!-- TODO: Add doc link -->
 
 ## Contributing
 
@@ -130,9 +70,6 @@ To get in touch with use, please use one of the following routes:
 
 - For filing bug reports, feature requests or other code-related issues, please
   make use of the project's [issue tracker][issues].
-- For more general discussions or questions on usage, please use the
-  organization's [discussion forum][forum]. If the issue is related to this
-  project, please indicate its name in your message body.
 - For private/personal issues, more involved communication, or if you would
   like to join our team as a regular contributor, you can either join our
   [chat board][badge-chat-url] or send an [email][email] to the community
@@ -150,7 +87,7 @@ To get in touch with use, please use one of the following routes:
 [badge-chat-url]: https://join.slack.com/t/elixir-cloud/shared_invite/enQtNzA3NTQ5Mzg2NjQ3LTZjZGI1OGQ5ZTRiOTRkY2ExMGUxNmQyODAxMDdjM2EyZDQ1YWM0ZGFjOTJhNzg5NjE0YmJiZTZhZDVhOWE4MWM
 [email]: alexander.kanitz@alumni.ethz.ch
 [code-of-conduct]: CODE_OF_CONDUCT.md
-[contributing]: CONTRIBUTING.md
+[contributing]: https://elixir-cloud-aai.github.io/guides/guide-contributor/
 [contributors]: CONTRIBUTORS.md
 [elixir]: https://elixir-europe.org/
 [elixir-cloud-aai]: https://elixir-cloud.dcc.sib.swiss/
