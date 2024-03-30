@@ -7,9 +7,12 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "componentsPrefix": "ecc-client-lit-ga4gh-tes-",
+  "componentsPrefix": "ecc-client-ga4gh-tes-",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./dist/custom-elements.json": "./dist/custom-elements.json",
     "./dist/index.js": "./dist/index.js",
     "./dist/components/*": "./dist/components/*",
@@ -22,7 +25,7 @@
   },
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "node ../../scripts/build.js",
+    "build": "node ../../scripts/build.js -p work",
     "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
     "clean": "rm -rf dist node_modules src/react custom-elements-manifest.config.js",
     "test": "wtr --coverage",
@@ -31,7 +34,10 @@
     "lint:fix": "npm run lint -- --fix",
     "prepublish": "npm run build"
   },
-  "dependencies": { "@elixir-cloud/design": "*", "lit": "^2.8.0" },
+  "dependencies": {
+    "@elixir-cloud/design": "*",
+    "lit": "^2.8.0"
+  },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.4.17",
     "@open-wc/eslint-config": "^9.2.1",

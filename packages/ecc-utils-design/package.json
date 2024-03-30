@@ -31,7 +31,6 @@
     "lint:fix": "npm run lint -- --fix",
     "prepublish": "npm run build"
   },
-  "elixirConfig": {},
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.8.4",
     "@lit/react": "*",

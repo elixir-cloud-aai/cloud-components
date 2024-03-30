@@ -11,7 +11,6 @@ const fs = require("fs");
 const { npmDir } = require("./utils.js");
 const path = require("path");
 const prettier = require("prettier");
-// const packageJson = require('../package.json');
 
 const packageJsonDir = `${process.cwd()}/package.json`;
 const commanderOpts = program.option("-w --watch").parse().opts();

@@ -5,14 +5,7 @@ const fs = require("fs");
 const { program } = require("commander");
 const path = require("path");
 const prettier = require("prettier");
-const { npmDir, getAllComponents } = require("./utils.js");
-
-function pascalCase(text) {
-  const a = text
-    .toLowerCase()
-    .replace(/[-_\s.]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ""));
-  return a.substring(0, 1).toLowerCase() + a.substring(1);
-}
+const { npmDir, getAllComponents, pascalCase } = require("./utils.js");
 
 const options = program.option("-p, --prefix <string>").parse().opts();
 
@@ -48,7 +41,7 @@ components.forEach((component) => {
     .join("\n");
   const eventNameImport =
     (component.events || []).length > 0
-      ? `import { type EventName } from '@lit/react';`
+      ? `import type { EventName } from '@lit/react';`
       : ``;
   const events = (component.events || [])
     .map(
@@ -65,7 +58,7 @@ components.forEach((component) => {
     `
       import * as React from 'react';
       import { createComponent } from '@lit/react';
-      import Component from '../../../${component.path}';
+      import Component from '../../${component.path}';
 
       ${eventNameImport}
       ${eventImports}
