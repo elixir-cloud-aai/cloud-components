@@ -20,4 +20,9 @@
 /dist/
 /out-tsc/
 
+
+## generated files
+/src/react
+custom-elements-manifest.config.js
+
 custom-elements.json

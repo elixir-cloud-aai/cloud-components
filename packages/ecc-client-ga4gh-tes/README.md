@@ -1,29 +1,24 @@
-# ecc-client-ga4gh-tes Components
+# ecc-client-lit-ga4gh-tes Components
 
 Web components for TES
 
 ## Introduction
-This package provides a collection of Web Components for interacting with TES (Task Execution Service). It offers functionalities for listing, creating, and deleting task runs. These components facilitate seamless integration and enhanced user experience when working with TES tasks.
+...
+
 ### Components
-| Component                          | Issue | Status |
-|------------------------------------|-------|--------|
-| ecc-client-ga4gh-tes-get-run       | #48   | Done   |
-| ecc-client-ga4gh-tes-get-runs      | #48   | Done   |
-| ecc-client-ga4gh-tes-create-run    | #79   | Done   |
-| ecc-client-ga4gh-tes-service       | #93   | Done   |
+| Component              | Issue  | Status             |
+|------------------------|--------|--------------------|
+|    TESCreateRun        |  #156  |      Beta          |
 
 ## Getting Started
 
 To get started with this project, follow these steps:
 
-- `start` runs your app for development, reloading on file changes
-- `start:build` runs your app after it has been built using the build command
-- `build` builds your app and outputs it in your `dist` directory
-- `test` runs your test suite with Web Test Runner
-- `lint` runs the linter for your project
-> Note: For test script, chrome browser is required.
+1. Start the dev environment for @elixir-cloud/lit-tes
 
-
+   ```
+   npm run dev
+   ```
 
 ## Contributing
 
@@ -90,7 +85,7 @@ To get in touch with use, please use one of the following routes:
 [![logo-elixir][logo-elixir]][elixir]
 [![logo-elixir-cloud-aai][logo-elixir-cloud-aai]][elixir-cloud-aai]
 
-> Note: This repo is created using the template ecc-client-ga4gh-tes.
+> Note: This repo is created using the template ecc-client-lit-ga4gh-tes.
 
 [all-contributors]: https://allcontributors.org/docs/en/specification
 [all-contributors-bot]: https://allcontributors.org/docs/en/bot/overview

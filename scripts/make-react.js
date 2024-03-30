@@ -4,8 +4,7 @@ const fs = require("fs");
 const { program } = require("commander");
 const path = require("path");
 const prettier = require("prettier");
-const pascalCase = require("pascal-case");
-const { npmDir, getAllComponents } = require("./utils.js");
+const { npmDir, getAllComponents, pascalCase } = require("./utils.js");
 
 const options = program.option("-p, --prefix <string>").parse().opts();
 
@@ -41,7 +40,7 @@ components.forEach((component) => {
     .join("\n");
   const eventNameImport =
     (component.events || []).length > 0
-      ? `import { type EventName } from '@lit/react';`
+      ? `import type { EventName } from '@lit/react';`
       : ``;
   const events = (component.events || [])
     .map(

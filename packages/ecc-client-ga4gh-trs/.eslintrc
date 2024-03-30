@@ -9,9 +9,8 @@
   ],
   "plugins": ["import", "prettier"],
   "rules": {
-    "camelcase": "warn",
-
-    "no-unused-vars": "off"
+    "no-unused-vars": "off",
+    "camelcase": "off"
   },
   "parserOptions": {
     "project": ["./tsconfig.json"]

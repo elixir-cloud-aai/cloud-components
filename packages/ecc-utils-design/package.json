@@ -23,13 +23,13 @@
     "analyze": "cem analyze --litelement",
     "build": "node ../../scripts/build.js -p ecc-utils-design-",
     "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
+    "clean": "rm -rf dist node_modules src/react custom-elements-manifest.config.js",
     "test": "",
     "test:watch": "wtr --watch",
     "lint": "npx eslint .",
     "lint:fix": "npm run lint -- --fix",
     "prepublish": "npm run build"
   },
-  "elixirConfig": {},
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.8.4",
     "@open-wc/eslint-config": "*",
@@ -52,7 +52,6 @@
     "tslib": "^2.6.2",
     "tsup": "^7.2.0",
     "typescript": "*",
-    "pascal-case": "*",
     "@lit/react": "*"
   },
   "dependencies": {

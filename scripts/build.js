@@ -64,7 +64,6 @@ nextTask("installing dependencies", async () => {
     commander: "*",
     "custom-element-jet-brains-integration": "*",
     "custom-element-vs-code-integration": "*",
-    "pascal-case": "*",
   };
 
   const updatedPackageJson = JSON.stringify({

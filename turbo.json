@@ -20,6 +20,9 @@
       "cache": false,
       "persistent": true,
       "dependsOn": ["topo"]
+    },
+    "clean": {
+      "dependsOn": ["^clean"]
     }
   }
 }

@@ -1,35 +1,10 @@
 {
-  "extends": [
-    "elixir",
-    "@open-wc",
-    "airbnb-typescript/base",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:import/typescript",
-    "prettier"
-  ],
-  "plugins": ["import", "prettier"],
-  "rules": {
-    "no-unused-vars": "off",
-    "wc/guard-super-call": "off",
-    "@typescript-eslint/no-unused-vars": ["error"],
-    "@typescript-eslint/no-use-before-define": ["warn"],
-    "import/no-unresolved": "off",
-    "import/no-extraneous-dependencies": "off",
-    "import/extensions": [
-      "error",
-      "always",
-      {
-        "ignorePackages": true
-      }
-    ],
-    "prettier/prettier": [
-      "error",
-      {
-        "singleQuote": true
-      }
-    ]
-  },
-  "parserOptions": {
-    "project": ["./tsconfig.json"]
-  }
+	"extends": ["@open-wc", "elixir", "prettier"],
+	"plugins": ["prettier"],
+	"rules": {
+		"prettier/prettier": "error",
+		"class-methods-use-this": "warn",
+		"lit/no-classfield-shadowing": "warn",
+		"no-console": ["error", { "allow": ["warn", "error"] }]
+	}
 }

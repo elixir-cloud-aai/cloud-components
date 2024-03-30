@@ -12,6 +12,9 @@ coverage
 
 # Never lint
 
+src/react
+custom-elements-manifest.config.js
+
 **/.git
 **/.svn
 **/.hg
