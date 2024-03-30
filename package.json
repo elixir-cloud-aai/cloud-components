@@ -18,7 +18,6 @@
     "test": "turbo run test --parallel",
     "test:watch": "turbo run test --watch",
     "clean": "turbo run clean && rm -rf node_modules",
-    "clean:react": "turbo run clean:react",
     "new": "turbo gen",
     "prepare": "husky install",
     "release": "standard-version",

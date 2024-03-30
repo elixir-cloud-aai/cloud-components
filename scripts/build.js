@@ -141,3 +141,18 @@ nextTask("Building source", async () => {
     },
   });
 });
+
+nextTask("Cleanup", async () => {
+  fs.rmSync(
+    path.join(
+      __dirname,
+      "../packages",
+      commanderOpts.prefix.slice(0, -1),
+      "/src/react"
+    ),
+    {
+      force: true,
+      recursive: true,
+    }
+  );
+});

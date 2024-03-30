@@ -7,7 +7,6 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "componentsPrefix": "ecc-client-lit-ga4gh-wes-",
   "exports": {
     ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
     "./dist/custom-elements.json": "./dist/custom-elements.json",
@@ -22,10 +21,9 @@
   },
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "npm run clean:react && node ../../scripts/build.js -p ecc-client-lit-ga4gh-wes-",
+    "build": "node ../../scripts/build.js -p ecc-client-ga4gh-wes-",
     "dev": "npm run build && concurrently -k -r \"npm run build -- --watch\" \"wds\"",
-    "clean": "rm -rf dist node_modules src/react custom-elements-manifest.config.js",
-    "clean:react": "rm -rf src/react",
+    "clean": "rm -rf dist node_modules custom-elements-manifest.config.js",
     "test": "wtr --coverage",
     "test:watch": "wtr --watch",
     "lint": "npx eslint .",

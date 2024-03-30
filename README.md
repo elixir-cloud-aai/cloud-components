@@ -12,9 +12,17 @@ ELIXIR Cloud Components (ECC) are lightweight, fast and reusable Web Components 
 [![All Contributors][badge-all-contributors-image]][contributors]
 [![Chat][badge-chat-image]][badge-chat-url]
 
-## Introduction and Getting started
 
-<!-- TODO: Add doc link -->
+### Packages
+
+| Name                       | Description                                                                                            |
+|----------------------------|--------------------------------------------------------------------------------------------------------|
+| ecc-utils-design           | Encapsulation & Utility components to manage the headless yet constitent design accross ecc components |
+| ecc-client-ga4gh-tes       | Collection of Web Components for interacting with TES (Task Execution Service)                         |
+| ecc-client-ga4gh-wes       | Collection of Web Components for interacting with WES (Workflow Execution Service)                     |
+| ecc-client-ga4gh-trs       | Collection of Web Components for interacting with TRS (Tool Registry Service)                          |
+| ecc-client-ga4gh-trs-filer | Collection of Web Components for interacting with Elixir TRS Filer                                     |
+| eslint-config-elixir       | Custom & common eslint configuration for elixir packages                                               |
 
 ## Contributing
 
@@ -51,7 +59,7 @@ leaders.
 
 ## Versioning
 
-The project adopts the [semantic versioning][res-semver] scheme for versioning.
+The project adopts the [semantic versioning](https://semver.org/) scheme for versioning.
 Currently the service is in a pre-release stage, so changes to the API,
 including breaking changes, may occur at any time without further notice.
 
@@ -69,10 +77,10 @@ the umbrella of the [ELIXIR][elixir] [Compute Platform][elixir-compute].
 To get in touch with use, please use one of the following routes:
 
 - For filing bug reports, feature requests or other code-related issues, please
-  make use of the project's [issue tracker][issues].
+  make use of the project's [issue tracker](https://github.com/elixir-cloud-aai/cloud-components/issues).
 - For private/personal issues, more involved communication, or if you would
   like to join our team as a regular contributor, you can either join our
-  [chat board][badge-chat-url] or send an [email][email] to the community
+  [chat board][badge-chat-url] or [email] the community
   leaders.
 
 [![logo-elixir][logo-elixir]][elixir]
@@ -85,7 +93,7 @@ To get in touch with use, please use one of the following routes:
 [badge-license-url]: http://www.apache.org/licenses/LICENSE-2.0
 [badge-chat-image]: https://img.shields.io/static/v1?label=chat&message=Slack&color=ff6994
 [badge-chat-url]: https://join.slack.com/t/elixir-cloud/shared_invite/enQtNzA3NTQ5Mzg2NjQ3LTZjZGI1OGQ5ZTRiOTRkY2ExMGUxNmQyODAxMDdjM2EyZDQ1YWM0ZGFjOTJhNzg5NjE0YmJiZTZhZDVhOWE4MWM
-[email]: alexander.kanitz@alumni.ethz.ch
+[email]: mailto:alexander.kanitz@alumni.ethz.ch
 [code-of-conduct]: CODE_OF_CONDUCT.md
 [contributing]: https://elixir-cloud-aai.github.io/guides/guide-contributor/
 [contributors]: CONTRIBUTORS.md
