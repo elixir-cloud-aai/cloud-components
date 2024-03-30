@@ -22,9 +22,10 @@
   "componentsPrefix": "ecc-utils-design-",
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "node ../../scripts/build.js",
+    "build": "npm run clean:react && node ../../scripts/build.js -p ecc-utils-design-",
     "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
     "clean": "rm -rf dist node_modules src/react custom-elements-manifest.config.js",
+    "clean:react": "rm -rf src/react",
     "test": "",
     "test:watch": "wtr --watch",
     "lint": "npx eslint .",

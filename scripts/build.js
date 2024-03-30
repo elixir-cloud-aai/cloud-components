@@ -2,6 +2,8 @@
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
 
+// TODO
+// Add cleanup function for when an errror is encountered or user terminates process
 const { cwd } = require("process");
 const fg = require("fast-glob");
 const tsup = require("tsup");
@@ -11,10 +13,13 @@ const fs = require("fs");
 const { npmDir } = require("./utils.js");
 const path = require("path");
 const prettier = require("prettier");
-// const packageJson = require('../package.json');
 
 const packageJsonDir = `${process.cwd()}/package.json`;
-const commanderOpts = program.option("-w --watch").parse().opts();
+const commanderOpts = program
+  .option("-w --watch")
+  .option("-p, --prefix <string>")
+  .parse()
+  .opts();
 
 const bundleDirectories = [npmDir];
 
@@ -42,12 +47,18 @@ nextTask("Cleaning up previous build", () => {
   );
 });
 
+// TODO:
+// force installing dependencies is not ideal
+// rewrite to ask for permission for each dependency that isnr present or just throw error
+// add option for user to add prettier config
+// reading from package json for some reason does not block other processes
 nextTask("installing dependencies", async () => {
-  const packageJson = await import(packageJsonDir, {
-    assert: { type: "json" },
-  });
+  const packageJson = await JSON.parse(
+    fs.readFileSync(packageJsonDir, "utf-8")
+  );
+
   const devDependencies = {
-    ...packageJson.default.devDependencies,
+    ...packageJson.devDependencies,
     "@lit/react": "*",
     react: "*",
     commander: "*",
@@ -56,7 +67,7 @@ nextTask("installing dependencies", async () => {
   };
 
   const updatedPackageJson = JSON.stringify({
-    ...packageJson.default,
+    ...packageJson,
     devDependencies,
   });
   fs.writeFileSync(
@@ -74,7 +85,7 @@ nextTask("Generating CEM config", () => {
   });
 });
 
-nextTask("Generating component metadata", () =>
+nextTask("Generating component metadata", () => {
   bundleDirectories.map((dir) =>
     execSync(
       `node  ${path.join(__dirname, "make-metadata.js")} --outdir "${dir}"`,
@@ -82,17 +93,13 @@ nextTask("Generating component metadata", () =>
         stdio: "inherit",
       }
     )
-  )
-);
+  );
+});
 
 nextTask("Wrapping components for React", async () => {
-  const packageJson = await import(packageJsonDir, {
-    assert: { type: "json" },
-  });
-
   execSync(
     `node  ${path.join(__dirname, "make-react.js")} -p "${
-      packageJson.default.componentsPrefix
+      commanderOpts.prefix
     }"`,
     {
       stdio: "inherit",
@@ -106,7 +113,8 @@ nextTask("Running the TypeScript compiler", () => {
   });
 });
 
-// allow for custom tsup config
+// TODO
+// allow for custom tsup config (might not be necessary)
 nextTask("Building source", async () => {
   const sourceDir = path.join(cwd(), "src");
   const config = {
