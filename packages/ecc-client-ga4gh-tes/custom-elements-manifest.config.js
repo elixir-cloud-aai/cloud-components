@@ -65,7 +65,9 @@ export default {
 
             if (classDoc?.events) {
               classDoc.events.forEach((event) => {
+                // eslint-disable-next-line no-undef
                 event.reactName = `on${pascalCase(event.name)}`;
+                // eslint-disable-next-line no-undef
                 event.eventName = `${pascalCase(event.name)}Event`;
               });
             }
