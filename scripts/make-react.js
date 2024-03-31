@@ -1,22 +1,21 @@
 /* eslint-disable import/no-extraneous-dependencies */
-
 const { cwd } = process;
-const fs = require("fs");
-const { program } = require("commander");
-const path = require("path");
-const prettier = require("prettier");
-const { npmDir, getAllComponents, pascalCase } = require("./utils.js");
+const fs = require('fs');
+const { program } = require('commander');
+const path = require('path');
+const prettier = require('prettier');
+const { npmDir, getAllComponents, pascalCase } = require('./utils.js');
 
-const options = program.option("-p, --prefix <string>").parse().opts();
+const options = program.option('-p, --prefix <string>').parse().opts();
 
-const reactDir = path.join(cwd(), "./src/react");
+const reactDir = path.join(cwd(), './src/react');
 // Clear build directory
 fs.rmSync(reactDir, { recursive: true, force: true });
 fs.mkdirSync(reactDir, { recursive: true });
 
 // Fetch component metadata
 const metadata = JSON.parse(
-  fs.readFileSync(path.join(npmDir, "custom-elements.json"), "utf8")
+  fs.readFileSync(path.join(npmDir, 'custom-elements.json'), 'utf8')
 );
 const components = getAllComponents(metadata);
 const index = [];
@@ -24,21 +23,19 @@ const index = [];
 // the add react to build
 
 components.forEach((component) => {
-  const tagWithoutPrefix = component.tagName.replace(options.prefix, "");
+  const tagWithoutPrefix = component.tagName.replace(options.prefix, '');
   const componentDir = path.join(reactDir, tagWithoutPrefix);
-  const componentFile = path.join(componentDir, "index.ts");
+  const componentFile = path.join(componentDir, 'index.ts');
   const eventImports = (component.events || [])
     .map(
-      (event) =>
-        `import type { ${event.eventName} } from '../../events/index.js';`
+      (event) => `import type { ${event.eventName} } from '../../events/index.js';`
     )
-    .join("\n");
+    .join('\n');
   const eventExports = (component.events || [])
     .map(
-      (event) =>
-        `export type { ${event.eventName} } from '../../events/index.js';`
+      (event) => `export type { ${event.eventName} } from '../../events/index.js';`
     )
-    .join("\n");
+    .join('\n');
   const eventNameImport =
     (component.events || []).length > 0
       ? `import type { EventName } from '@lit/react';`
@@ -48,11 +45,11 @@ components.forEach((component) => {
       (event) =>
         `${event.reactName}: '${event.name}'  as EventName<${event.eventName}>`
     )
-    .join(",\n");
+    .join(',\n');
 
   fs.mkdirSync(componentDir, { recursive: true });
 
-  const jsDoc = component.jsDoc || "";
+  const jsDoc = component.jsDoc || '';
 
   const source = prettier.format(
     `
@@ -81,7 +78,7 @@ components.forEach((component) => {
       export default reactWrapper
     `,
     {
-      parser: "babel-ts",
+      parser: 'babel-ts',
     }
   );
 
@@ -89,8 +86,8 @@ components.forEach((component) => {
     `export { default as ${component.name} } from './${tagWithoutPrefix}/index.js';`
   );
 
-  fs.writeFileSync(componentFile, source, "utf8");
+  fs.writeFileSync(componentFile, source, 'utf8');
 });
 
 // Generate the index file
-fs.writeFileSync(path.join(reactDir, "index.ts"), index.join("\n"), "utf8");
+fs.writeFileSync(path.join(reactDir, 'index.ts'), index.join('\n'), 'utf8');

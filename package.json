@@ -1,6 +1,6 @@
 {
   "name": "elixir-cloud-components",
-  "version": "2.0.0",
+  "version": "0.0.0",
   "description": "Elixir Cloud Components is lightweight, fast, and reusable web-components developed by Elixir Cloud and AAI Community for managing and accessing various services.",
   "repository": {
     "type": "git",
@@ -13,11 +13,11 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "lint": "eslint . && turbo run lint --parallel",
+    "lint": "eslint . && turbo run lint",
     "lint:fix": "eslint . --fix && turbo run lint:fix",
     "test": "turbo run test --parallel",
     "test:watch": "turbo run test --watch",
-    "clean": "rm -rf node_modules && turbo run clean",
+    "clean": "turbo run clean && rm -rf node_modules",
     "new": "turbo gen",
     "prepare": "husky install",
     "release": "standard-version",
@@ -42,6 +42,9 @@
     "standard-version": "^9.5.0",
     "turbo": "^1.10.7",
     "typescript": "^5.3.3"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.6.1"
   },
   "packageManager": "npm@9.2.0",
   "workspaces": [

@@ -6,23 +6,25 @@
       "dependsOn": ["^topo"]
     },
     "build": {
-      "outputs": ["www/**", ".next/**", "dist/**"],
+      "outputs": ["dist/**"],
       "dependsOn": ["^build"]
     },
     "test": {
+      "inputs": [],
       "dependsOn": ["topo"]
     },
-    "lint": {},
-    "lint:fix": {
-      "cache": false
+    "lint": {
+      "dependsOn": ["build"]
     },
+    "lint:fix": {
+      "cache": false,
+      "dependsOn": ["build"]
+    },
+    "clean": {},
     "dev": {
       "cache": false,
       "persistent": true,
       "dependsOn": ["topo"]
-    },
-    "clean": {
-      "dependsOn": ["^clean"]
     }
   }
 }

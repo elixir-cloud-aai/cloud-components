@@ -1,26 +1,26 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-param-reassign */
-import fs from "fs";
-import { program } from "commander";
-import { customElementVsCodePlugin } from "custom-element-vs-code-integration";
-import { customElementJetBrainsPlugin } from "custom-element-jet-brains-integration";
-import packageJson from "./package.json" assert { type: "json" };
+import fs from 'fs';
+import { program } from 'commander';
+import { customElementVsCodePlugin } from 'custom-element-vs-code-integration';
+import { customElementJetBrainsPlugin } from 'custom-element-jet-brains-integration';
+import packageJson from './package.json' assert { type: 'json' };
 
 const options = program
-  .option("-o, --outdir <string>")
-  .option("--litelement")
-  .option("--analyze", "", true)
+  .option('-o, --outdir <string>')
+  .option('--litelement')
+  .option('--analyze', '', true)
   .parse()
   .opts();
 
 const componentsPrefix = packageJson.componentsPrefix;
-const packageData = JSON.parse(fs.readFileSync("package.json", "utf8"));
+const packageData = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 const { name, description, version, author, homepage, license } = packageData;
 
 const getComponentDocumentation = (tag) =>
   `https://elixir-cloud-components.vercel.app/design/components/${tag.replace(
     componentsPrefix,
-    ""
+    ''
   )}.html`;
 
 function replace(string, terms) {
@@ -32,12 +32,12 @@ function replace(string, terms) {
 }
 
 export default {
-  globs: ["src/components/**/*.ts"],
-  exclude: ["**/*.styles.ts", "**/*.test.ts", "index.ts"],
+  globs: ['src/components/**/*.ts'],
+  exclude: ['**/*.styles.ts', '**/*.test.ts', 'index.ts'],
   plugins: [
     // Append package data
     {
-      name: "elixir-cloud-package-data",
+      name: 'elixir-cloud-package-data',
       packageLinkPhase({ customElementsManifest }) {
         customElementsManifest.package = {
           name,
@@ -50,7 +50,7 @@ export default {
       },
     },
     {
-      name: "shoelace-react-event-names",
+      name: 'shoelace-react-event-names',
       analyzePhase({ ts, node, moduleDoc }) {
         switch (node.kind) {
           case ts.SyntaxKind.ClassDeclaration: {
@@ -61,7 +61,7 @@ export default {
 
             classDoc.jsDoc = node.jsDoc
               ?.map((jsDoc) => jsDoc.getFullText())
-              .join("\n");
+              .join('\n');
 
             if (classDoc?.events) {
               classDoc.events.forEach((event) => {
@@ -79,7 +79,7 @@ export default {
       },
     },
     {
-      name: "shoelace-translate-module-paths",
+      name: 'shoelace-translate-module-paths',
       packageLinkPhase({ customElementsManifest }) {
         customElementsManifest?.modules?.forEach((mod) => {
           //
@@ -92,8 +92,8 @@ export default {
           //  components/form/index.js
           //
           const terms = [
-            { from: /^src\//, to: "" }, // Strip the src/ prefix
-            { from: /\.(t|j)sx?$/, to: ".js" }, // Convert .ts to .js
+            { from: /^src\//, to: '' }, // Strip the src/ prefix
+            { from: /\.(t|j)sx?$/, to: '.js' }, // Convert .ts to .js
           ];
 
           mod.path = replace(mod.path, terms);
@@ -103,7 +103,7 @@ export default {
           }
 
           for (const dec of mod.declarations ?? []) {
-            if (dec.kind === "class") {
+            if (dec.kind === 'class') {
               for (const member of dec.members ?? []) {
                 if (member.inheritedFrom) {
                   member.inheritedFrom.module = replace(
@@ -123,17 +123,17 @@ export default {
       cssFileName: null,
       referencesTemplate: (_, tag) => [
         {
-          name: "Documentation",
+          name: 'Documentation',
           url: getComponentDocumentation(tag),
         },
       ],
     }),
     customElementJetBrainsPlugin({
-      outdir: "./dist",
+      outdir: './dist',
       excludeCss: true,
       packageJson: false,
       referencesTemplate: (_, tag) => ({
-        name: "Documentation",
+        name: 'Documentation',
         url: getComponentDocumentation(tag),
       }),
     }),
