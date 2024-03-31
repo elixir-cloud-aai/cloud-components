@@ -4,20 +4,20 @@
 
 // TODO
 // Add cleanup function for when an errror is encountered or user terminates process
-const { cwd } = require('process');
-const fg = require('fast-glob');
-const tsup = require('tsup');
-const { program } = require('commander');
-const { execSync } = require('child_process');
-const fs = require('fs');
-const { npmDir } = require('./utils.js');
-const path = require('path');
-const prettier = require('prettier');
+const { cwd } = require("process");
+const fg = require("fast-glob");
+const tsup = require("tsup");
+const { program } = require("commander");
+const { execSync } = require("child_process");
+const fs = require("fs");
+const { npmDir } = require("./utils.js");
+const path = require("path");
+const prettier = require("prettier");
 
 const packageJsonDir = `${process.cwd()}/package.json`;
 const commanderOpts = program
-  .option('-w --watch')
-  .option('-p, --prefix <string>')
+  .option("-w --watch")
+  .option("-p, --prefix <string>")
   .parse()
   .opts();
 
@@ -25,7 +25,7 @@ const bundleDirectories = [npmDir];
 
 async function nextTask(label, action) {
   try {
-    console.log(label, '...');
+    console.log(label, "...");
     await action();
   } catch (err) {
     console.error(err);
@@ -35,8 +35,10 @@ async function nextTask(label, action) {
   }
 }
 
-nextTask('Cleaning up previous build', () => {
-  bundleDirectories.map((dir) => fs.rmSync(dir, { force: true, recursive: true }));
+nextTask("Cleaning up previous build", () => {
+  bundleDirectories.map((dir) =>
+    fs.rmSync(dir, { force: true, recursive: true })
+  );
 
   bundleDirectories.map((dir) =>
     fs.mkdirSync(dir, {
@@ -50,16 +52,18 @@ nextTask('Cleaning up previous build', () => {
 // rewrite to ask for permission for each dependency that isnr present or just throw error
 // add option for user to add prettier config
 // reading from package json for some reason does not block other processes
-nextTask('installing dependencies', async () => {
-  const packageJson = await JSON.parse(fs.readFileSync(packageJsonDir, 'utf-8'));
+nextTask("installing dependencies", async () => {
+  const packageJson = await JSON.parse(
+    fs.readFileSync(packageJsonDir, "utf-8")
+  );
 
   const devDependencies = {
     ...packageJson.devDependencies,
-    '@lit/react': '*',
-    react: '*',
-    commander: '*',
-    'custom-element-jet-brains-integration': '*',
-    'custom-element-vs-code-integration': '*',
+    "@lit/react": "*",
+    react: "*",
+    commander: "*",
+    "custom-element-jet-brains-integration": "*",
+    "custom-element-vs-code-integration": "*",
   };
 
   const updatedPackageJson = JSON.stringify({
@@ -69,48 +73,53 @@ nextTask('installing dependencies', async () => {
   fs.writeFileSync(
     packageJsonDir,
     prettier.format(updatedPackageJson, {
-      parser: 'json',
+      parser: "json",
     }),
-    { flag: 'w' }
+    { flag: "w" }
   );
 });
 
-nextTask('Generating CEM config', () => {
-  execSync(`node ${path.join(__dirname, 'make-CEMconfig.js')}`, {
-    stdio: 'inherit',
+nextTask("Generating CEM config", () => {
+  execSync(`node ${path.join(__dirname, "make-CEMconfig.js")}`, {
+    stdio: "inherit",
   });
 });
 
-nextTask('Generating component metadata', () => {
+nextTask("Generating component metadata", () => {
   bundleDirectories.map((dir) =>
-    execSync(`node  ${path.join(__dirname, 'make-metadata.js')} --outdir "${dir}"`, {
-      stdio: 'inherit',
-    })
+    execSync(
+      `node  ${path.join(__dirname, "make-metadata.js")} --outdir "${dir}"`,
+      {
+        stdio: "inherit",
+      }
+    )
   );
 });
 
-nextTask('Wrapping components for React', async () => {
+nextTask("Wrapping components for React", async () => {
   execSync(
-    `node  ${path.join(__dirname, 'make-react.js')} -p "${commanderOpts.prefix}"`,
+    `node  ${path.join(__dirname, "make-react.js")} -p "${
+      commanderOpts.prefix
+    }"`,
     {
-      stdio: 'inherit',
+      stdio: "inherit",
     }
   );
 });
 
-nextTask('Running the TypeScript compiler', () => {
+nextTask("Running the TypeScript compiler", () => {
   execSync(`tsc --project ./tsconfig.prod.json --outdir "${npmDir}"`, {
-    stdio: 'inherit',
+    stdio: "inherit",
   });
 });
 
 // TODO
 // allow for custom tsup config (might not be necessary)
-nextTask('Building source', async () => {
-  const sourceDir = path.join(cwd(), 'src');
+nextTask("Building source", async () => {
+  const sourceDir = path.join(cwd(), "src");
   const config = {
-    format: 'esm',
-    target: 'es2017',
+    format: "esm",
+    target: "es2017",
     entry: [
       `${sourceDir}/index.ts`,
       ...(await fg(`${sourceDir}/components/**/!(*.(test)).ts`)),
@@ -121,17 +130,14 @@ nextTask('Building source', async () => {
     treeshake: true,
     bundle: true,
     outDir: npmDir,
-    external: ['@lit/react', 'react'],
+    external: ["@lit/react", "react"],
     watch: commanderOpts.watch,
   };
 
   tsup.build({
     ...config,
     esbuildOptions(buildOptions) {
-      buildOptions.chunkNames = 'chunks/[name].[hash]';
+      buildOptions.chunkNames = "chunks/[name].[hash]";
     },
   });
 });
-
-// finish checking changes made in build scripts
-// test react and regular components
