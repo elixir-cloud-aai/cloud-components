@@ -2,16 +2,22 @@
   "name": "{{name}}",
   "description": "{{description}}",
   "main": "index.js",
-  "private": true,
   "type": "module",
   "version": "0.1.0",
-  "author": "",
-  "license": "ISC",
-  "repository": "",
+  "license": "Apache-2.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/elixir-cloud-aai/cloud-components.git"
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"package.json",
+		"LICENSE"
+	],
   "scripts": {
     "build": "",
     "clean": "rm -rf node_modules",
-    "clean:react": "",
     "dev": "",
     "test": "",
     "lint": "npx eslint .",
@@ -21,6 +27,6 @@
     "eslint": "^8.41.0",
     "eslint-config-elixir": "*",
     "eslint-plugin-prettier": "^4.2.1",
-    "typescript": "^5.0.4"
+    "typescript": "*"
   }
 }
