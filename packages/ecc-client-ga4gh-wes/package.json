@@ -25,7 +25,7 @@
     "analyze": "cem analyze --litelement",
     "build": "node ../../scripts/build.js -p ecc-client-ga4gh-wes-",
     "dev": "concurrently -k -r \"npm run build -- --watch\" \"wds\"",
-    "clean": "rm -rf dist node_modules custom-elements-manifest.config.js",
+    "clean": "rm -rf dist node_modules src/react custom-elements-manifest.config.js",
     "test": "wtr --coverage",
     "test:watch": "wtr --watch",
     "lint": "npx eslint .",

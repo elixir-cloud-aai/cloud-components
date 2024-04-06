@@ -13,13 +13,6 @@ const options = program
   .parse()
   .opts();
 
-function pascalCase(text) {
-  const a = text
-    .toLowerCase()
-    .replace(/[-_\s.]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ""));
-  return a.substring(0, 1).toLowerCase() + a.substring(1);
-}
-
 const componentsPrefix = packageJson.componentsPrefix;
 const packageData = JSON.parse(fs.readFileSync("package.json", "utf8"));
 const { name, description, version, author, homepage, license } = packageData;
@@ -72,7 +65,9 @@ export default {
 
             if (classDoc?.events) {
               classDoc.events.forEach((event) => {
+                // eslint-disable-next-line no-undef
                 event.reactName = `on${pascalCase(event.name)}`;
+                // eslint-disable-next-line no-undef
                 event.eventName = `${pascalCase(event.name)}Event`;
               });
             }

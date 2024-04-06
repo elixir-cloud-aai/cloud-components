@@ -33,7 +33,6 @@
     "@open-wc/testing": "^4.0.0",
     "@turbo/gen": "^1.9.8",
     "@web/dev-server": "^0.4.1",
-    "change-case": "^5.3.0",
     "concurrently": "^8.2.2",
     "eslint": "^7.32.0",
     "eslint-config-elixir": "*",
@@ -41,7 +40,7 @@
     "husky": "^8.0.0",
     "prettier": "^2.8.8",
     "standard-version": "^9.5.0",
-    "turbo": "^1.10.7",
+    "turbo": "^1.13.0",
     "typescript": "^5.3.3"
   },
   "optionalDependencies": {

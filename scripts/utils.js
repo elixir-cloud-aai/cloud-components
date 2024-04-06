@@ -1,7 +1,8 @@
-const path = require("path");
+const path = require('path');
+const cwd = require('process').cwd;
 
-const componentsPrefix = "ecc-utils-design-";
-const npmDir = path.join("./dist");
+const componentsPrefix = 'ecc-utils-design-';
+const npmDir = path.join('./dist');
 
 const getAllComponents = (metadata) => {
   const allComponents = [];
@@ -22,8 +23,23 @@ const getAllComponents = (metadata) => {
   return allComponents;
 };
 
+// do not convert to arrow function
+// because this is taking advantage of function hoisting when it is added to the CEM config file
+function pascalCase(str) {
+  if (!str || typeof str !== 'string') return '';
+
+  return str
+    .match(/[a-z]+/gi)
+    .map(function (word) {
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join('');
+}
+
 module.exports = {
   componentsPrefix,
   npmDir,
   getAllComponents,
+  pascalCase,
+  reactDir: path.join(cwd(), './src/react'),
 };
