@@ -2,7 +2,6 @@
 /* eslint-disable no-param-reassign */
 import fs from "fs";
 import { program } from "commander";
-import pkg from "pascal-case";
 import { customElementVsCodePlugin } from "custom-element-vs-code-integration";
 import { customElementJetBrainsPlugin } from "custom-element-jet-brains-integration";
 import packageJson from "./package.json" assert { type: "json" };
@@ -14,7 +13,6 @@ const options = program
   .parse()
   .opts();
 
-const { pascalCase } = pkg;
 const componentsPrefix = packageJson.componentsPrefix;
 const packageData = JSON.parse(fs.readFileSync("package.json", "utf8"));
 const { name, description, version, author, homepage, license } = packageData;
@@ -67,7 +65,9 @@ export default {
 
             if (classDoc?.events) {
               classDoc.events.forEach((event) => {
+                // eslint-disable-next-line no-undef
                 event.reactName = `on${pascalCase(event.name)}`;
+                // eslint-disable-next-line no-undef
                 event.eventName = `${pascalCase(event.name)}Event`;
               });
             }

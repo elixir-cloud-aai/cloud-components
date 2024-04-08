@@ -8,11 +8,11 @@
   "license": "ISC",
   "repository": "",
   "scripts": {
-    "build": "webpack --config=./webpack.prod.cjs",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
-    "dev": "webpack-dev-server --config=./webpack.dev.cjs --history-api-fallback --progress --port 3500",
-    "test:serve": "node ./test-server.cjs"
+    "depricated-build": "webpack --config=./webpack.prod.cjs",
+    "depricated-lint": "eslint . --ext .ts",
+    "depricated-lint:fix": "eslint . --ext .ts --fix",
+    "depricated-dev": "webpack-dev-server --config=./webpack.dev.cjs --history-api-fallback --progress --port 3500",
+    "depricated-test:serve": "node ./test-server.cjs"
   },
   "dependencies": {
     "@microsoft/fast-components": "^2.30.6",
