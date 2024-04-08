@@ -12,7 +12,6 @@ const { execSync } = require("child_process");
 const fs = require("fs");
 const { npmDir } = require("./utils.js");
 const path = require("path");
-const prettier = require("prettier");
 const { reactDir } = require("./utils.js");
 
 const packageJsonDir = `${process.cwd()}/package.json`;
@@ -53,31 +52,30 @@ nextTask("Cleaning up previous build", () => {
 // rewrite to ask for permission for each dependency that isnr present or just throw error
 // add option for user to add prettier config
 // reading from package json for some reason does not block other processes
-nextTask("installing dependencies", async () => {
-  const packageJson = await JSON.parse(
-    fs.readFileSync(packageJsonDir, "utf-8")
-  );
+nextTask("verifying dependencies", async () => {
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonDir, "utf-8"));
 
-  const devDependencies = {
-    ...packageJson.devDependencies,
-    "@lit/react": "*",
-    react: "*",
-    commander: "*",
-    "custom-element-jet-brains-integration": "*",
-    "custom-element-vs-code-integration": "*",
-  };
+  const dependencies = [
+    "@lit/react",
+    "react",
+    "commander",
+    "custom-element-jet-brains-integration",
+    "custom-element-vs-code-integration",
+  ];
 
-  const updatedPackageJson = JSON.stringify({
-    ...packageJson,
-    devDependencies,
+  dependencies.forEach((dep) => {
+    if (!packageJson.devDependencies[dep] && !packageJson.dependencies[dep]) {
+      console.error(`${dep} is not installed, please install and try again`);
+      console.log(
+        `You should be able to do this by adding "${dep}":"*" to your devDependencies`
+      );
+
+      bundleDirectories.map((dir) =>
+        fs.rmSync(dir, { force: true, recursive: true })
+      );
+      process.exit(1);
+    }
   });
-  fs.writeFileSync(
-    packageJsonDir,
-    prettier.format(updatedPackageJson, {
-      parser: "json",
-    }),
-    { flag: "w" }
-  );
 });
 
 nextTask("Generating CEM config", () => {
@@ -144,11 +142,11 @@ nextTask("Building source", async () => {
     })
     .catch((err) => {
       console.error(err);
-      bundleDirectories.map((dir) =>
-        nextTask("Cleaning up failed build", () => {
-          fs.rmSync(dir, { force: true, recursive: true });
-        })
-      );
+      nextTask("Cleaning up failed build", () => {
+        bundleDirectories.map((dir) =>
+          fs.rmSync(dir, { force: true, recursive: true })
+        );
+      });
     })
     .finally(() =>
       nextTask("Cleaning up react source", () => {
