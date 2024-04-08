@@ -1,6 +1,6 @@
 {
   "name": "@elixir-cloud/tes",
-  "description": "Web Component for interactive with TES API",
+  "description": "Web Component for interacting with TES API",
   "license": "Apache-2.0",
   "version": "0.0.0",
   "type": "module",
