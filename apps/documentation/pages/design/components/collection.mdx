@@ -1,0 +1,76 @@
+import ComponentName from '@/components/utils/componentName';
+import Collection from '@/components/packages/design/collection/collection.tsx';
+import { Tabs, Callout } from 'nextra/components';
+
+# Collection Component
+
+<ComponentName
+  tagName='ecc-utils-design-code'
+  reactTagName='EccUtilsDesignCode'
+  version='0.0.0'
+  beta
+/>
+
+This component is used to render a collection of items. It can be used to render a filters & pagination component for a list of items.
+
+<Collection />
+
+## Imports
+
+## Properties
+
+| Property              | Required | Default | Type     | Description                                                                                                                     |
+| --------------------- | -------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| [`items`](#items)     | `true`   |         | `Array`  | An array of items to render                                                                                                     |
+| [`filters`](#filters) | `false`  |         | `Array`  | An array of filters to render                                                                                                   |
+| `totalItems`          | `false`  |         | `Number` | The total number of items in the collection. If not provided, the collection will render pagination without fixed page numbers. |
+| `pageSize`            | `false`  | 5       | `Number` | The number of items per pagination.                                                                                             |
+
+### items\*
+
+| Property | Required | Default | Type      | Description                                                   |
+| -------- | -------- | ------- | --------- | ------------------------------------------------------------- |
+| `key`    | `true`   |         | `String`  | The key of the item                                           |
+| `index`  | `true`   |         | `Number`  | The index of the item                                         |
+| `name`   | `true`   |         | `String`  | The name of the item                                          |
+| `lazy`   | `false`  | `false` | `Boolean` | Whether or not the contents of the item should be lazy loaded |
+| `tag`    | `false`  |         | `Object`  | The tag to render with the item                               |
+
+### filters
+
+| Property                | Required | Default | Type                 | Description                                                                                       |
+| ----------------------- | -------- | ------- | -------------------- | ------------------------------------------------------------------------------------------------- |
+| `key`                   | `true`   |         | `String`             | The key of the filter                                                                             |
+| `type`                  | `true`   |         | `search` \| `select` | The type of the filter.                                                                           |
+| `options`               | `false`  |         | `Array`              | The options to render for the filter. Only applicable for `select` filters.                       |
+| `selectConfig.multiple` | `false`  | `false` | `Boolean`            | Whether or not the select should allow multiple selections. Only applicable for `select` filters. |
+| `placeholder`           | `false`  |         | `String`             | The placeholder to render for the filter.                                                         |
+
+## Events
+
+| Event Name              | Reach Event Name          | Payload                          | Description                     |
+| ----------------------- | ------------------------- | -------------------------------- | ------------------------------- |
+| `ecc-utils-page-change` | `EccUtilsPageChangeEvent` | `{ page: Number }`               | Fired when the page is changed. |
+| `ecc-utils-expand`      | `EccUtilsExpandEvent`     | `{ key: String }`                | Fired when an item is expanded. |
+| `ecc-utils-filter`      | `EccUtilsFilterEvent`     | `{ key: String, value: String }` | Fired when a filter is applied. |
+
+## Methods
+
+| Method Name | Arguments | Description                                     |
+| ----------- | --------- | ----------------------------------------------- |
+| `setPage()` | `page`    | Can be used to set the page of the collection.  |
+| `error()`   | `message` | Can be used to display error alert to the user. |
+
+## Slots
+
+| Slot Name      | Description                                                                                                             |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `${items.key}` | The contents of the item. This slot will be named after the key of the item provided by the [`items`](#items) property. |
+
+## Parts
+
+<Callout emoji='🔫'> Bro! We are working!</Callout>
+
+## CSS Variables
+
+<Callout emoji='💣'> Under construction.</Callout>
