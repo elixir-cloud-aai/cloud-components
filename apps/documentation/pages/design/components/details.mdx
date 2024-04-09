@@ -136,6 +136,10 @@ The `actions` property allows you to define an array of actions along with their
 
 The component triggers a custom event, named `ecc-utils-button-click`, upon clicking a button with a specific `key`. This event conveys details about the clicked button, including its `key` and `index`. The app-author is expected to fire the event based on the key provided in the `buttons` prop to the element. This action is intended to activate the corresponding button associated with the specified key.
 
+| Event Name               | React Event Name           | Description                                                                                                                                                                                                                                                                                          |
+| ------------------------ | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ecc-utils-button-click` | `EccUtilsButtonClickEvent` | This event conveys details about the clicked button, including its `key` and `index`. The `app-author` is expected to fire the event based on the key provided in the `buttons` prop to the element. This action is intended to activate the corresponding button associated with the specified key. |
+
 #### Event Payload
 
 | Property | Type     | Description                                           |
