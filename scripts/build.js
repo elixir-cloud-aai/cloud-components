@@ -2,6 +2,8 @@
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
 
+// TODO
+// Add cleanup function for when an errror is encountered or user terminates process
 const { cwd } = require("process");
 const fg = require("fast-glob");
 const tsup = require("tsup");
@@ -10,11 +12,14 @@ const { execSync } = require("child_process");
 const fs = require("fs");
 const { npmDir } = require("./utils.js");
 const path = require("path");
-const prettier = require("prettier");
-// const packageJson = require('../package.json');
+const { reactDir } = require("./utils.js");
 
 const packageJsonDir = `${process.cwd()}/package.json`;
-const commanderOpts = program.option("-w --watch").parse().opts();
+const commanderOpts = program
+  .option("-w --watch")
+  .option("-p, --prefix <string>")
+  .parse()
+  .opts();
 
 const bundleDirectories = [npmDir];
 
@@ -42,31 +47,35 @@ nextTask("Cleaning up previous build", () => {
   );
 });
 
-nextTask("installing dependencies", async () => {
-  const packageJson = await import(packageJsonDir, {
-    assert: { type: "json" },
-  });
-  const devDependencies = {
-    ...packageJson.default.devDependencies,
-    "@lit/react": "*",
-    react: "*",
-    commander: "*",
-    "custom-element-jet-brains-integration": "*",
-    "custom-element-vs-code-integration": "*",
-    "pascal-case": "*",
-  };
+// TODO:
+// force installing dependencies is not ideal
+// rewrite to ask for permission for each dependency that isnr present or just throw error
+// add option for user to add prettier config
+// reading from package json for some reason does not block other processes
+nextTask("verifying dependencies", async () => {
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonDir, "utf-8"));
 
-  const updatedPackageJson = JSON.stringify({
-    ...packageJson.default,
-    devDependencies,
+  const dependencies = [
+    "@lit/react",
+    "react",
+    "commander",
+    "custom-element-jet-brains-integration",
+    "custom-element-vs-code-integration",
+  ];
+
+  dependencies.forEach((dep) => {
+    if (!packageJson.devDependencies[dep] && !packageJson.dependencies[dep]) {
+      console.error(`${dep} is not installed, please install and try again`);
+      console.log(
+        `You should be able to do this by adding "${dep}":"*" to your devDependencies`
+      );
+
+      bundleDirectories.map((dir) =>
+        fs.rmSync(dir, { force: true, recursive: true })
+      );
+      process.exit(1);
+    }
   });
-  fs.writeFileSync(
-    packageJsonDir,
-    prettier.format(updatedPackageJson, {
-      parser: "json",
-    }),
-    { flag: "w" }
-  );
 });
 
 nextTask("Generating CEM config", () => {
@@ -75,7 +84,7 @@ nextTask("Generating CEM config", () => {
   });
 });
 
-nextTask("Generating component metadata", () =>
+nextTask("Generating component metadata", () => {
   bundleDirectories.map((dir) =>
     execSync(
       `node  ${path.join(__dirname, "make-metadata.js")} --outdir "${dir}"`,
@@ -83,17 +92,13 @@ nextTask("Generating component metadata", () =>
         stdio: "inherit",
       }
     )
-  )
-);
+  );
+});
 
 nextTask("Wrapping components for React", async () => {
-  const packageJson = await import(packageJsonDir, {
-    assert: { type: "json" },
-  });
-
   execSync(
     `node  ${path.join(__dirname, "make-react.js")} -p "${
-      packageJson.default.componentsPrefix
+      commanderOpts.prefix
     }"`,
     {
       stdio: "inherit",
@@ -107,7 +112,8 @@ nextTask("Running the TypeScript compiler", () => {
   });
 });
 
-// allow for custom tsup config
+// TODO
+// allow for custom tsup config (might not be necessary)
 nextTask("Building source", async () => {
   const sourceDir = path.join(cwd(), "src");
   const config = {
@@ -127,10 +133,29 @@ nextTask("Building source", async () => {
     watch: commanderOpts.watch,
   };
 
-  tsup.build({
-    ...config,
-    esbuildOptions(buildOptions) {
-      buildOptions.chunkNames = "chunks/[name].[hash]";
-    },
-  });
+  tsup
+    .build({
+      ...config,
+      esbuildOptions(buildOptions) {
+        buildOptions.chunkNames = "chunks/[name].[hash]";
+      },
+    })
+    .catch((err) => {
+      console.error(err);
+      nextTask("Cleaning up failed build", () => {
+        bundleDirectories.map((dir) =>
+          fs.rmSync(dir, { force: true, recursive: true })
+        );
+      });
+    })
+    .finally(() =>
+      nextTask("Cleaning up react source", () => {
+        fs.rmSync(reactDir, {
+          force: true,
+          recursive: true,
+        });
+      })
+    );
 });
+
+module.exports = {};

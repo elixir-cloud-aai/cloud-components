@@ -1,16 +1,17 @@
 /* eslint-disable import/no-extraneous-dependencies */
-
-const { cwd } = process;
 const fs = require("fs");
 const { program } = require("commander");
 const path = require("path");
 const prettier = require("prettier");
-const pascalCase = require("pascal-case");
-const { npmDir, getAllComponents } = require("./utils.js");
+const {
+  npmDir,
+  getAllComponents,
+  pascalCase,
+  reactDir,
+} = require("./utils.js");
 
 const options = program.option("-p, --prefix <string>").parse().opts();
 
-const reactDir = path.join(cwd(), "./src/react");
 // Clear build directory
 fs.rmSync(reactDir, { recursive: true, force: true });
 fs.mkdirSync(reactDir, { recursive: true });
@@ -42,7 +43,7 @@ components.forEach((component) => {
     .join("\n");
   const eventNameImport =
     (component.events || []).length > 0
-      ? `import { type EventName } from '@lit/react';`
+      ? `import type { EventName } from '@lit/react';`
       : ``;
   const events = (component.events || [])
     .map(

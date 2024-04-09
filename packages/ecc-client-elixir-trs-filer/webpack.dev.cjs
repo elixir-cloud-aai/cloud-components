@@ -6,7 +6,7 @@ const baseConfig = require("./webpack.common.cjs");
 module.exports = merge(baseConfig, {
     devServer: {
         open: true,
-        port: 3000,
+        port: 8004,
     },
     mode: "development",
     output: {

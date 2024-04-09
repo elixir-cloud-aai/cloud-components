@@ -1,11 +1,10 @@
-// This config file has a wider scope so eslint can use it to provide type checking for the entire package
 {
   "compilerOptions": {
     "target": "es2018",
     "module": "esnext",
     "moduleResolution": "node",
     "noEmitOnError": true,
-    "lib": ["es2017", "dom", "es2021.String"],
+    "lib": ["es2017", "dom"],
     "strict": true,
     "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
@@ -19,6 +18,6 @@
     "emitDeclarationOnly": true,
     "skipLibCheck": true
   },
-  "include": ["src"],
+  "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

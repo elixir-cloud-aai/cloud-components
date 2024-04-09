@@ -1,6 +1,8 @@
 {
   "name": "@elixir-cloud/design",
   "description": "Abstraction layer that provides utility components to manage the headless yet constitent design across ecc component",
+  "license": "Apache-2.0",
+  "version": "0.0.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -14,23 +16,28 @@
     "./dist/utilities/*": "./dist/utilities/*"
   },
   "type": "module",
-  "version": "0.0.1",
-  "author": "",
-  "license": "ISC",
-  "customElements": "./dist/custom-elements.json",
-  "repository": "",
-  "componentsPrefix": "ecc-utils-design-",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elixir-cloud-aai/cloud-components.git"
+  },
+  "customElements": "dist/custom-elements.json",
+  "files": [
+    "dist",
+    "README.md",
+    "package.json",
+    "LICENSE"
+  ],
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "node ../../scripts/build.js",
+    "build": "node ../../scripts/build.js -p ecc-utils-design-",
     "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
-    "test": "",
+    "clean": "rm -rf dist node_modules custom-elements-manifest.config.js",
+    "test": "wtr --coverage",
     "test:watch": "wtr --watch",
     "lint": "npx eslint .",
     "lint:fix": "npm run lint -- --fix",
     "prepublish": "npm run build"
   },
-  "elixirConfig": {},
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.8.4",
     "@lit/react": "*",
@@ -53,8 +60,7 @@
     "react": "*",
     "tslib": "^2.6.2",
     "tsup": "^7.2.0",
-    "typescript": "*",
-    "pascal-case": "*"
+    "typescript": "*"
   },
   "dependencies": {
     "@shoelace-style/shoelace": "^2.8.0",

@@ -8,12 +8,13 @@
     "format:check": "prettier --check ./**/*.{md,mdx,ts,tsx,js,jsx}",
     "format": "prettier --write ./**/*.{md,mdx,ts,tsx,js,jsx}",
     "lint": "npx eslint . && cspell **/*.{tsx,mdx}",
-    "lint:fix": "npx eslint . --fix"
+    "lint:fix": "npx eslint --fix",
+    "clean": "rm -rf dist node_modules .next"
   },
   "dependencies": {
     "@elixir-cloud/design": "*",
-    "@elixir-cloud/lit-tes": "*",
-    "@elixir-cloud/lit-wes": "*",
+    "@elixir-cloud/tes": "*",
+    "@elixir-cloud/wes": "*",
     "@react-three/drei": "^9.102.6",
     "@react-three/fiber": "^8.15.19",
     "@shoelace-style/shoelace": "^2.14.0",
@@ -33,7 +34,7 @@
     "@types/node": "18.11.10",
     "autoprefixer": "^10.4.18",
     "cspell": "^8.6.0",
-    "eslint": "^8.31.0",
+    "eslint": "^8.57.0",
     "eslint-config-elixir": "*",
     "eslint-config-prettier": "^8.3.0",
     "postcss": "^8.4.35",

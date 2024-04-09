@@ -1,22 +1,29 @@
 # Never lint node_modules
+
 node_modules
 
 # Never lint build output
+
 dist
 
 # Never lint coverage output
+
 coverage
 
 # Never lint
+
+src/react
+custom-elements-manifest.config.js
+
 **/.git
 **/.svn
 **/.hg
 **/node_modules
 
-/.github/*
+/.github/\*
 CONTRIBUTING.md
 LICENSE
 README.md
 CONTRIBUTORS.md
 CODE_OF_CONDUCT.md
-```
+
