@@ -1,12 +1,26 @@
+# Ignore version control directories
 **/.git
 **/.svn
 **/.hg
+
+# Ignore node_modules directory
 **/node_modules
 
+# Ignore GitHub workflow files
 /.github/*
+
+# Ignore specific files
 CONTRIBUTING.md
 LICENSE
 README.md
 CONTRIBUTORS.md
 CODE_OF_CONDUCT.md
-```
+
+# Ignore build directory
+build/
+
+# Ignore environment files
+.env
+
+# Ignore JavaScript, TypeScript, and configuration files, but allow .md and .html files
+**/*.!(md|html)
