@@ -1,5 +1,5 @@
 {
-  "name": "eslint-config-elixir",
+  "name": "@elixir-cloud/eslint-config",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",

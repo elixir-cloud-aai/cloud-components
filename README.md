@@ -22,7 +22,7 @@ ELIXIR Cloud Components (ECC) are lightweight, fast and reusable Web Components 
 | ecc-client-ga4gh-wes       | Collection of Web Components for interacting with WES (Workflow Execution Service)                     |
 | ecc-client-ga4gh-trs       | Collection of Web Components for interacting with TRS (Tool Registry Service)                          |
 | ecc-client-ga4gh-trs-filer | Collection of Web Components for interacting with Elixir TRS Filer                                     |
-| eslint-config-elixir       | Custom & common eslint configuration for elixir packages                                               |
+| eslint-config              | Custom & common eslint configuration for elixir packages                                               |
 
 ## Contributing
 

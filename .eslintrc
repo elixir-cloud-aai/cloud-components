@@ -1,6 +1,6 @@
 {
   "root": true,
-  "extends": ["elixir"],
+  "extends": ["@elixir-cloud"],
   "settings": {},
   "rules": {
     "@typescript-eslint/no-var-requires": 0
