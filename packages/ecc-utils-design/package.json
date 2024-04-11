@@ -24,8 +24,9 @@
     "analyze": "cem analyze --litelement",
     "build": "node ../../scripts/build.js",
     "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
-    "test": "",
-    "test:watch": "wtr --watch",
+    "test": "web-test-runner --group default --config ../../web-test.runner-config.mjs",
+    "test:component": "web-test-runner -- --watch --config ../../web-test.runner-config.mjs --group",
+    "test:watch": "npm run test:component default",
     "lint": "npx eslint .",
     "lint:fix": "npm run lint -- --fix",
     "prepublish": "npm run build"

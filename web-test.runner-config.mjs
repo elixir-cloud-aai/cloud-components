@@ -1,6 +1,7 @@
 import { esbuildPlugin } from '@web/dev-server-esbuild';
 import { globbySync } from 'globby';
 import fg from 'fast-glob';
+import { fileURLToPath } from 'url';
 import { playwrightLauncher } from '@web/test-runner-playwright';
 
 export default {
@@ -20,6 +21,7 @@ export default {
     esbuildPlugin({
       ts: true,
       target: 'es2020',
+      // tsconfig: fileURLToPath(new URL('./tsconfig.json', import.meta.url)),
     }),
   ],
   browsers: [
@@ -41,8 +43,7 @@ export default {
   // Create a named group for every test file to enable running single tests. If a test file is `form.test.ts`
   // then you can run `npm run test -- --group form` to run only that component's tests.
   groups: fg.sync('src/**/*.test.ts').map((path) => {
-    const groupName = path.match(/^.*\/(?<fileName>.*)\.test\.ts/).groups
-      .fileName;
+    const groupName = path.match(/^.*\/(?<fileName>.*)\.test\.ts/).groups.fileName;
     return {
       name: groupName,
       files: path,

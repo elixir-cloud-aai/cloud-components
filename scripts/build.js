@@ -115,7 +115,7 @@ nextTask("Building source", async () => {
     target: "es2017",
     entry: [
       `${sourceDir}/index.ts`,
-      ...(await fg(`${sourceDir}/components/**/!(*.(test)).ts`)),
+      ...(await fg(`${sourceDir}/components/**/!(*.(test|component)).ts`)),
       ...(await fg(`${sourceDir}/react/**/*.ts`)),
       ...(await fg(`${sourceDir}/utilities/**/*.ts`)),
     ],

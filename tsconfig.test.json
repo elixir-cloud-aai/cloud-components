@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "ewfwef": "none",
+    "strictNullChecks": true,
+    "exactOptionalPropertyTypes": true
+  }
+}
