@@ -3,6 +3,7 @@
   "description": "TRS Filer component",
   "type": "module",
   "version": "0.0.0",
+  "private": true,
   "author": "",
   "license": "ISC",
   "repository": "",
