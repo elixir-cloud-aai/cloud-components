@@ -2,10 +2,10 @@
 /* eslint-disable no-unused-expressions */
 
 // parentElement should not be optional as that is allowing false positive tests
-import "../../../../dist/index.js";
-import { fixture, html } from "@open-wc/testing";
-import EccUtilsDesignForm, { Field } from "../index.js";
-import {} from "@web/test-runner";
+import '../../../../dist/index.js';
+import { fixture, html } from '@open-wc/testing';
+import EccUtilsDesignForm, { Field } from '../index.js';
+import {} from '@web/test-runner';
 
 type methodOptions = {
   retrieveAll?: boolean;
@@ -23,9 +23,7 @@ class FormComponent {
   public initializeForm = async (fields: Field[]) => {
     this.fields = fields;
     this.form = await fixture<EccUtilsDesignForm>(
-      html`<ecc-utils-design-form
-        .fields="${this.fields}"
-      ></ecc-utils-design-form>`
+      html`<ecc-utils-design-form .fields="${this.fields}"></ecc-utils-design-form>`
     );
   };
 
@@ -46,10 +44,7 @@ class FormComponent {
   // use objects to make sure the an actual element is sent when the correct overload is used
   inputField(): HTMLInputElement;
   inputField(retrieveAll: true): NodeListOf<HTMLInputElement>;
-  inputField(
-    retrieveAll: false,
-    parentElement: ParentElement
-  ): HTMLInputElement;
+  inputField(retrieveAll: false, parentElement: ParentElement): HTMLInputElement;
 
   inputField(
     retrieveAll: true,
@@ -58,7 +53,7 @@ class FormComponent {
 
   inputField(retrieveAll = false, parentElement?: ParentElement) {
     return this.getFieldsThatCouldBeMultiple(
-      "form-input",
+      'form-input',
       parentElement,
       retrieveAll
     );
@@ -66,10 +61,7 @@ class FormComponent {
 
   inputFileField(): HTMLInputElement;
   inputFileField(retrieveAll: true): NodeListOf<HTMLInputElement>;
-  inputFileField(
-    retrieveAll: false,
-    parentElement: ParentElement
-  ): HTMLInputElement;
+  inputFileField(retrieveAll: false, parentElement: ParentElement): HTMLInputElement;
 
   inputFileField(
     retrieveAll: true,
@@ -78,7 +70,7 @@ class FormComponent {
 
   inputFileField(retrieveAll = false, parentElement?: ParentElement) {
     return this.getFieldsThatCouldBeMultiple(
-      "form-input-file",
+      'form-input-file',
       parentElement,
       retrieveAll
     );
@@ -86,10 +78,7 @@ class FormComponent {
 
   switchField(): HTMLInputElement;
   switchField(retrieveAll: true): NodeListOf<HTMLInputElement>;
-  switchField(
-    retrieveAll: false,
-    parentElement: ParentElement
-  ): HTMLInputElement;
+  switchField(retrieveAll: false, parentElement: ParentElement): HTMLInputElement;
 
   switchField(
     retrieveAll: true,
@@ -98,7 +87,7 @@ class FormComponent {
 
   switchField(retrieveAll = false, parentElement?: ParentElement) {
     return this.getFieldsThatCouldBeMultiple(
-      "form-switch",
+      'form-switch',
       parentElement,
       retrieveAll
     );
@@ -118,7 +107,7 @@ class FormComponent {
 
   arrayAddButton(retrieveAll = false, parentElement?: ParentElement) {
     return this.getFieldsThatCouldBeMultiple(
-      "form-array-add",
+      'form-array-add',
       parentElement,
       retrieveAll
     );
@@ -138,7 +127,7 @@ class FormComponent {
 
   arrayDeleteButton(retrieveAll = false, parentElement?: ParentElement) {
     return this.getFieldsThatCouldBeMultiple(
-      "form-array-delete",
+      'form-array-delete',
       parentElement,
       retrieveAll
     );
@@ -154,7 +143,7 @@ class FormComponent {
 
   arrayItem(retrieveAll = false, parentElement?: ParentElement) {
     return this.getFieldsThatCouldBeMultiple(
-      "form-array-item",
+      'form-array-item',
       parentElement,
       retrieveAll
     );
@@ -170,7 +159,7 @@ class FormComponent {
 
   arrayTemplate(retrieveAll = false, parentElement?: ParentElement) {
     return this.getFieldsThatCouldBeMultiple(
-      "form-array",
+      'form-array',
       parentElement,
       retrieveAll
     );
@@ -186,7 +175,7 @@ class FormComponent {
 
   groupTemplate(retrieveAll = false, parentElement?: ParentElement) {
     return this.getFieldsThatCouldBeMultiple(
-      "form-group",
+      'form-group',
       parentElement,
       retrieveAll
     );
@@ -202,7 +191,7 @@ class FormComponent {
 
   groupItem(retrieveAll = false, parentElement?: ParentElement) {
     return this.getFieldsThatCouldBeMultiple(
-      "form-group-item",
+      'form-group-item',
       parentElement,
       retrieveAll
     );
@@ -210,10 +199,7 @@ class FormComponent {
 
   collapsibleGroup(): HTMLElement;
   collapsibleGroup(retrieveAll: true): NodeListOf<HTMLElement>;
-  collapsibleGroup(
-    retrieveAll: false,
-    parentElement: ParentElement
-  ): HTMLElement;
+  collapsibleGroup(retrieveAll: false, parentElement: ParentElement): HTMLElement;
 
   collapsibleGroup(
     retrieveAll: true,
@@ -222,7 +208,7 @@ class FormComponent {
 
   collapsibleGroup(retrieveAll = false, parentElement?: ParentElement) {
     return this.getFieldsThatCouldBeMultiple(
-      "form-group-collapsible",
+      'form-group-collapsible',
       parentElement,
       retrieveAll
     );
@@ -230,10 +216,7 @@ class FormComponent {
 
   nonCollapsibleGroup(): HTMLElement;
   nonCollapsibleGroup(retrieveAll: true): NodeListOf<HTMLElement>;
-  nonCollapsibleGroup(
-    retrieveAll: false,
-    parentElement: ParentElement
-  ): HTMLElement;
+  nonCollapsibleGroup(retrieveAll: false, parentElement: ParentElement): HTMLElement;
 
   nonCollapsibleGroup(
     retrieveAll: true,
@@ -242,7 +225,7 @@ class FormComponent {
 
   nonCollapsibleGroup(retrieveAll = false, parentElement?: ParentElement) {
     return this.getFieldsThatCouldBeMultiple(
-      "form-group-non-collapsible",
+      'form-group-non-collapsible',
       parentElement,
       retrieveAll
     );
@@ -257,8 +240,7 @@ class FormComponent {
   successTemplate = () =>
     this.form.shadowRoot?.querySelector('[data-testid="form-success"]')!;
 
-  innerForm = () =>
-    this.form.shadowRoot?.querySelector('[data-testid="form"]')!;
+  innerForm = () => this.form.shadowRoot?.querySelector('[data-testid="form"]')!;
 
   // actions
   public clickSubmitButton() {
@@ -271,7 +253,7 @@ class FormComponent {
 
   public fillInputField(
     parentElement: ParentElement,
-    value = "test value",
+    value = 'test value',
     fieldIndex?: number
   ) {
     if (fieldIndex) {

@@ -101,110 +101,110 @@
       import "../../dist/components/form/index.js";
 
       const fields = [
-        // {
-        //   key: 'name',
-        //   label: 'Name',
-        //   type: 'text',
-        //   fieldOptions: {
-        //     required: true,
-        //     tooltip: 'Your name',
-        //   },
-        // },
-        // {
-        //   key: 'email',
-        //   label: 'Email',
-        //   type: 'email',
-        //   fieldOptions: {
-        //     tooltip: 'Your email address',
-        //   },
-        // },
-        // {
-        //   key: 'address',
-        //   label: 'Address',
-        //   type: 'group',
-        //   groupOptions: {
-        //     collapsible: true,
-        //     tooltip: 'Your address',
-        //   },
-        //   fieldOptions: {
-        //     tooltip: 'Group for address',
-        //   },
-        //   arrayOptions: {
-        //     defaultInstances: 1,
-        //     max: 4,
-        //     min: 1,
-        //   },
-        //   children: [
-        //     {
-        //       key: 'Details',
-        //       label: 'Details',
-        //       type: 'array',
-        //       fieldOptions: {
-        //         tooltip: 'Details for address',
-        //       },
-        //       arrayOptions: {
-        //         defaultInstances: 0,
-        //         max: 2,
-        //       },
-        //       children: [
-        //         {
-        //           key: 'houseNumber',
-        //           label: 'House Number',
-        //           type: 'text',
-        //           fieldOptions: {
-        //             required: true,
-        //             tooltip: 'Your house number',
-        //           },
-        //         },
-        //         {
-        //           key: 'street',
-        //           label: 'Street',
-        //           type: 'text',
-        //           fieldOptions: {
-        //             default: '1601 Harrier Ln',
-        //             required: false,
-        //             tooltip: 'Your street name',
-        //           },
-        //         },
-        //         {
-        //           key: 'city',
-        //           label: 'City',
-        //           type: 'text',
-        //           fieldOptions: {
-        //             required: true,
-        //             tooltip: 'Your city name',
-        //           },
-        //         },
-        //         {
-        //           key: 'isPrimary',
-        //           label: 'Primary',
-        //           type: 'switch',
-        //           fieldOptions: {
-        //             default: true,
-        //             tooltip: 'Is this your primary residence?',
-        //           },
-        //         },
-        //       ],
-        //     },
-        //   ],
-        // },
-        // {
-        //   key: '18+',
-        //   label: '18+',
-        //   type: 'switch',
-        //   fieldOptions: {
-        //     tooltip: 'Are you over 18 years old?',
-        //   },
-        // },
-        // {
-        //   key: 'id',
-        //   label: 'ID',
-        //   type: 'file',
-        //   fieldOptions: {
-        //     required: true,
-        //     tooltip: 'Your ID document',
-        //   },
-        // },
+        {
+          key: "name",
+          label: "Name",
+          type: "text",
+          fieldOptions: {
+            required: true,
+            tooltip: "Your name",
+          },
+        },
+        {
+          key: "email",
+          label: "Email",
+          type: "email",
+          fieldOptions: {
+            tooltip: "Your email address",
+          },
+        },
+        {
+          key: "address",
+          label: "Address",
+          type: "group",
+          groupOptions: {
+            collapsible: true,
+            tooltip: "Your address",
+          },
+          fieldOptions: {
+            tooltip: "Group for address",
+          },
+          arrayOptions: {
+            defaultInstances: 1,
+            max: 4,
+            min: 1,
+          },
+          children: [
+            {
+              key: "Details",
+              label: "Details",
+              type: "array",
+              fieldOptions: {
+                tooltip: "Details for address",
+              },
+              arrayOptions: {
+                defaultInstances: 0,
+                max: 2,
+              },
+              children: [
+                {
+                  key: "houseNumber",
+                  label: "House Number",
+                  type: "text",
+                  fieldOptions: {
+                    required: true,
+                    tooltip: "Your house number",
+                  },
+                },
+                {
+                  key: "street",
+                  label: "Street",
+                  type: "text",
+                  fieldOptions: {
+                    default: "1601 Harrier Ln",
+                    required: false,
+                    tooltip: "Your street name",
+                  },
+                },
+                {
+                  key: "city",
+                  label: "City",
+                  type: "text",
+                  fieldOptions: {
+                    required: true,
+                    tooltip: "Your city name",
+                  },
+                },
+                {
+                  key: "isPrimary",
+                  label: "Primary",
+                  type: "switch",
+                  fieldOptions: {
+                    default: true,
+                    tooltip: "Is this your primary residence?",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        {
+          key: "18+",
+          label: "18+",
+          type: "switch",
+          fieldOptions: {
+            tooltip: "Are you over 18 years old?",
+          },
+        },
+        {
+          key: "id",
+          label: "ID",
+          type: "file",
+          fieldOptions: {
+            required: true,
+            tooltip: "Your ID document",
+          },
+        },
 
         {
           key: "addresses",
