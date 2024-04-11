@@ -1,5 +1,13 @@
 # @elixir-cloud/tes
 
+## 0.1.1
+
+### Patch Changes
+
+- ad4188f: chore(elixir-cloud-eslint): change eslint scope to @elixir-cloud
+- Updated dependencies [ad4188f]
+  - @elixir-cloud/design@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes
