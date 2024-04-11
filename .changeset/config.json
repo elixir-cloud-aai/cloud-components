@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@elixir-cloud/trs-filer", "@elixir-cloud/trs", "eslint-config-elixir"]
+  "ignore": ["@elixir-cloud/trs-filer", "@elixir-cloud/trs"]
 }
