@@ -1,6 +1,6 @@
 {
   "extends": [
-    "elixir",
+    "@elixir-cloud",
     "plugin:import/typescript",
     "prettier",
     "turbo",

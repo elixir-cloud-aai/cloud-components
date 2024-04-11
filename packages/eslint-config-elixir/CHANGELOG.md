@@ -1,4 +1,4 @@
-# eslint-config-elixir
+# @elixir-cloud/eslint-config
 
 ## 0.0.1
 

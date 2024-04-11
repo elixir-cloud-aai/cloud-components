@@ -57,7 +57,7 @@
     "custom-element-vs-code-integration": "*",
     "esbuild": "0.18.20",
     "eslint": "*",
-    "eslint-config-elixir": "*",
+    "@elixir-cloud/eslint-config": "*",
     "eslint-plugin-prettier": "^4.2.1",
     "globby": "^14.0.0",
     "react": "*",
