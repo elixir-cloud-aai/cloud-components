@@ -32,7 +32,7 @@
     "@web/dev-server": "^0.4.1",
     "concurrently": "^8.2.2",
     "eslint": "^7.32.0",
-    "eslint-config-elixir": "*",
+    "@elixir-cloud/eslint-config": "*",
     "fast-glob": "^3.3.2",
     "husky": "^8.0.0",
     "prettier": "^2.8.8",
