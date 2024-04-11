@@ -1,5 +1,11 @@
 # @elixir-cloud/eslint-config
 
+## 0.1.1
+
+### Patch Changes
+
+- 7471cf6: chore(elixir-cloud-eslint): change eslint scope to @elixir-cloud
+
 ## 0.0.1
 
 ### Patch Changes
