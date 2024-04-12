@@ -22,6 +22,11 @@ const config: DocsThemeConfig = {
   footer: {
     component: <Footer />,
   },
+  useNextSeoProps() {
+    return {
+      titleTemplate: '%s – Elixir Cloud Components',
+    };
+  },
 };
 
 export default config;
