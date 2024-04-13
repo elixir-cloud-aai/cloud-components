@@ -9,7 +9,6 @@ ELIXIR Cloud Components (ECC) are lightweight, fast and reusable Web Components 
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![License][badge-license-image]][badge-license-url]
-[![All Contributors][badge-all-contributors-image]][contributors]
 [![Chat][badge-chat-image]][badge-chat-url]
 
 
@@ -32,19 +31,6 @@ of contribution!
 
 Please refer to the guidelines available at [`CONTRIBUTING.md`][contributing] if
 you are interested in contributing.
-
-## Contributors
-
-We believe that any contribution should be duly acknowledged. Therefore, we
-implement the [All Contributors Specification][all-contributors] and encourage
-you to comment on any issue or PR you contributed to with a request to the
-[@all-contributors bot][all-contributors-bot] of the form `@all-contributors
-please add @<YOUR_GITHUB_HANDLE for TYPE_1, TYPE_2, ...`, where `TYPE_1` etc.
-refer to [contribution types supported by the All Contributors
-Specification][all-contributors-types].
-
-Information about contributors, including information about the specific they
-have made to the project, are listed in [`CONTRIBUTORS.md`][contributors].
 
 ## Code of Conduct
 
