@@ -1,6 +1,6 @@
 {
-  "name": "eslint-config-elixir",
-  "version": "1.0.0",
+  "name": "@elixir-cloud/eslint-config",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {

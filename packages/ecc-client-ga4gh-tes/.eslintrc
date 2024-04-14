@@ -1,5 +1,5 @@
 {
-	"extends": ["@open-wc", "elixir", "prettier"],
+	"extends": ["@open-wc", "@elixir-cloud", "prettier"],
 	"plugins": ["prettier"],
 	"rules": {
 		"prettier/prettier": "error",

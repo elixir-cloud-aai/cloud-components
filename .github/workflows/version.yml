@@ -1,4 +1,4 @@
-name: Release
+name: Versioning packages
 
 on:
   push:

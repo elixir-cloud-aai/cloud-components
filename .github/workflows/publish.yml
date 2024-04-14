@@ -1,0 +1,150 @@
+name: Publish packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+
+  linters:
+    name: Linting checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+
+      - name: Get node version
+        id: node
+        run: |
+          echo "::set-output name=version::$(node -v)"
+
+      - name: Get node_modules cache
+        uses: actions/cache@v3.0.2
+        id: node_modules
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package.lock') }}-${{ steps.node.outputs.version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run linters
+        run: npm run lint
+
+  tests:
+    name: Test checks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Get node version
+        id: node
+        run: |
+          echo "::set-output name=version::$(node -v)"
+
+      - name: Get node_modules cache
+        uses: actions/cache@v3.0.2
+        id: node_modules
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package.lock') }}-${{ steps.node.outputs.version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm run test
+
+  bump-monorepo:
+    name: Bump monorepo
+    runs-on: ubuntu-latest
+    needs:
+      - linters
+      - tests
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Remove 'v' from RELEASE_VERSION
+        run: |
+          echo "Original RELEASE_VERSION: $RELEASE_VERSION"
+          RELEASE_VERSION=$(echo "$RELEASE_VERSION" | sed 's/^v//')
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_ENV
+        shell: bash
+      - name: Install SSH Client
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - name: Git user config
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update version
+        run: npm version $RELEASE_VERSION --no-git-tag-version
+
+      - name: Commit version
+        run: |
+          git add .
+          git commit -m "bump: v$RELEASE_VERSION"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          force-with-lease: true
+          ssh: true
+          branch: main
+
+  publish:
+    name: Publish on npm
+    runs-on: ubuntu-latest
+    needs: bump-monorepo
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+
+      - name: Login to npm
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Packages
+        run: npm run build
+
+      - name: Publish to npm
+        run: npm run release

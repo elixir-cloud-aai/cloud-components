@@ -1,5 +1,5 @@
 {
-  "extends": ["elixir"],
+  "extends": ["@elixir-cloud"],
   "rules": {
     "prettier/prettier": "off",
     "import/extensions": [
