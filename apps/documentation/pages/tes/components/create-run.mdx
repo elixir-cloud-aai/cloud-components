@@ -1,0 +1,90 @@
+import CreateRun from '@/components/packages/tes/createRun/createRun';
+import ComponentName from '@/components/utils/componentName';
+import { Tabs, Callout } from 'nextra/components';
+
+# TES Create run
+
+<ComponentName
+  tagName='ecc-client-ga4gh-tes-create-run'
+  reactTagName='ECCClientGa4ghTesCreateRun'
+  version='0.1.1'
+  beta
+/>
+
+This component is used to create task runs using TES API.
+
+<Callout emoji='👀' type='info'>
+  Might wanna take a look at the
+  [POST](https://github.com/ga4gh/workflow-execution-service-schemas/blob/3a832abeeafeffc1cb8d79045ba0d42b790773d9/openapi/workflow_execution_service.openapi.yaml#L234C1-L320C24)
+  endpoint.
+</Callout>
+
+## Preview
+
+<CreateRun />
+
+<Callout emoji='🕵️‍♀️' type='info'>
+  Be mindful of the fields, we have client side data validation, but keep the data schema/data types
+  in mind while filling to avoid retries.
+</Callout>
+
+## Imports
+
+<Tabs items={['React', 'HTML/Lit']}>
+  <Tabs.Tab>
+    ```ts copy
+    import ECCClientGa4ghTesCreateRun from '@elixir-cloud/tes/dist/react/create-run/index';
+    ```
+
+    ### Example
+
+    ````ts showLineNumbers {2, 5} copy filename="ECCClientGa4ghTesCreateRun"
+    import React from 'react';
+    import ECCClientGa4ghTesCreateRun from '@elixir-cloud/lit/dist/react/create-run/index';
+
+    export default function CreateRun() {
+      return <ECCClientGa4ghTesCreateRun />;
+    }
+    ````
+
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```ts copy
+    import "@elixir-cloud/tes/dist/components/create-run/index.js";
+    ```
+
+    ### Example
+
+    ````html showLineNumbers {6, 9} copy filename="ecc-client-ga4gh-tes-create-run"
+    <body>
+      <div id="demo"></div>
+    </div>
+    <script type="module">
+    import { html, render } from "lit";
+    import "@elixir-cloud/tes/dist/components/create-run/index.js";
+
+    render(
+      html`<ecc-client-ga4gh-tes-create-run />`,
+      document.querySelector("#demo")
+    );
+
+    </script>
+    `````
+
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property              | Required | Default                                   | Type     | Description |
+| --------------------- | -------- | ----------------------------------------- | -------- | ----------- |
+| [`baseURL`](#baseURL) | `false`  | `https://protes.rahtiapp.fi/ga4gh/tes/v1` | `String` | Base URL    |
+
+### baseURL
+
+This property is used to give `POST` endpoint to create `Task run`. The provided baseURL is concatenated with `/runs` and is used as an endpoint to create a `POST` request.
+
+## Parts
+
+<Callout emoji='😙'>Almost done, hold your horses 🏇!</Callout>

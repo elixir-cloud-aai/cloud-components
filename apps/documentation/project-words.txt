@@ -1,0 +1,8 @@
+nextra
+operationalize
+ECC
+webcomponents
+turborepo
+shadowdom
+exportpart
+drei
