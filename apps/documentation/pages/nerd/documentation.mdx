@@ -1,0 +1,70 @@
+import { Cards, Card, Steps, Callout, FileTree } from 'nextra/components';
+
+# How to write Documentation
+
+<Callout emoji='🤣' type='info'>
+  Welcome to documentation about documentation!
+</Callout>
+
+We welcome all kinds of contribution, and documentation is no exception. Cloud components's documentation (this very documentation), is written
+using the [nextra](https://nextra.site/) framework, which is a wrapper around [Next.js](https://nextjs.org/). This means that you can write
+documentation using Markdown, and also use React components to make your documentation more interactive and engaging.
+
+The documentation is organized into sections, and each section is a folder in the `/apps/documentation/pages` directory. We aim to write documentation,
+so that its optimized for [SEO](https://nextjs.org/learn-pages-router/seo/introduction-to-seo), and also easy to navigate. Please follow the guidelines
+of nextjs and nextra when writing documentation. But here is the overview of how to write documentation.
+
+All the non interactive component should be written in `mdx` format and define your component in the `/apps/documentation/components` folder. `pages` directory will
+contain `mdx`, `_meta.json` is used to configure, rename, and add metadata to the page. Nesting or separation of concerns is done by creating folders in the `pages` directory.
+
+<FileTree>
+  <FileTree.Folder name='pages' defaultOpen>
+    <FileTree.File name='_meta.json' />
+    <FileTree.File name='myIndexPage.mdx' />
+    <FileTree.File name='mySecondCoolDoc.mdx' />
+    <FileTree.Folder name='myFirstNestedDoc'>
+      <FileTree.File name='_meta.json' />
+      <FileTree.File name='myNestedIndex.mdx' />
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
+
+## Writing Documentation for components
+
+Each new component should contain all the below sections.
+
+```mdx copy
+import { Callout, Tabs } from 'nextra/components';
+import ComponentName from '@/components/utils/componentName.tsx';
+import MyECCComponent from '@/components/packages/my-component/my-component.tsx';
+
+# My ECC Component
+
+<ComponentName tagName='my-ecc-component' reactTagName='MyECCComponent' version='0.0.1' beta />
+
+MyECCComponent's description
+
+## Preview
+
+<MyECCComponent />
+
+## Imports
+
+<Tabs items={['React', 'HTML/Lit']}>
+  <Tabs.Tab>
+
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+## Parts
+```
+
+<Callout emoji='😉' type='info'>
+  Use this as boilerplate for your next doc about a new component!
+</Callout>

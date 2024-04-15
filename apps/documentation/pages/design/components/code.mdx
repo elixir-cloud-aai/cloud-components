@@ -1,0 +1,131 @@
+import ComponentName from '@/components/utils/componentName';
+import Code from '@/components/packages/design/code/code.tsx';
+import CodeJSON from '@/components/packages/design/code/codeJSON.tsx';
+import CodeIndentation from '@/components/packages/design/code/codeIndentation.tsx';
+import { Tabs, Callout } from 'nextra/components';
+
+# Code Component
+
+<ComponentName
+  tagName='ecc-utils-design-code'
+  reactTagName='EccUtilsDesignCode'
+  version='0.1.1'
+  beta
+/>
+
+Simple code editor to handle `YAML`, `JSON` and `multiline text` input.
+
+## Preview
+
+<Code />
+
+## Imports
+
+<Tabs items={['React', 'HTML/Lit']}>
+  <Tabs.Tab>
+    ```ts copy
+    import EccUtilDesignCode from '@elixir-cloud/design/dist/react/code/index';
+    ```
+  
+    ### Example
+  
+    ````ts showLineNumbers {2, 5} copy filename="EccUtilsDesignCode"
+    import React from 'react';
+    import EccUtilDesignCode from '@elixir-cloud/design/dist/react/code/index';
+
+    export default function Code() {
+      return <EccUtilDesignCode />
+    }
+    ````
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+  ```ts copy
+    import "@elixir-cloud/design/dist/components/code/index.js";
+  ```
+  
+  ### Example
+  
+  ````html showLineNumbers {6, 20-26} copy filename="ecc-utils-design-code"
+    <body>
+        <div id="demo"></div>
+    </div>
+    <script type="module">
+      import { html, render } from "lit";
+      import "@elixir-cloud/design/dist/components/code/index.js";
+
+      render(
+        html`<ecc-utils-design-code/> `,
+        document.querySelector("#demo")
+      );
+    </script>
+    ````
+
+</Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property      | Required | Default | Type      | Description                                                            |
+| ------------- | -------- | ------- | --------- | ---------------------------------------------------------------------- |
+| `code`        | `false`  |         | `String`  | Specifies the code to be rendered in the editor during initialization. |
+| `label`       | `Code`   |         | `String`  | Label for code editor input field.                                     |
+| `language`    | `false`  |         | `String`  | Specifies the language interpreter for syntax highlighting.            |
+| `indentation` | `false`  | `2`     | `Number`  | Specifies number of spaces that should be considered for 1 Tab space.  |
+| `blurDelay`   | `false`  | `150`   | `Number`  | Time in ms between 2 Tab key presses that should move the focus.       |
+| `required`    | `false`  | `true`  | `Boolean` | Makes the code area a required field.                                  |
+| `disabled`    | `false`  | `false` | `Boolean` | Disables the code area.                                                |
+
+## Events
+
+| Event Name         | React Event Name      | Description                                                                                                                                                                                                                                                             |
+| ------------------ | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ecc-utils-change` | `EccUtilsChangeEvent` | This event is triggered when there is a change in the code within the editor. The event details include the language set by the package author, the code as value, and an error attribute indicating whether the entered code is valid based on the specified language. |
+
+## Methods
+
+| Method Name | Arguments | Description        |
+| ----------- | --------- | ------------------ |
+| `getCode()` |           | Returns the input. |
+
+## Slots
+
+<Callout emoji='👷‍♀️'>Come back soon, huh!</Callout>
+
+## Parts
+
+<Callout emoji='👩‍🏭'>Hold on! We are working here.</Callout>
+
+## Examples
+
+### JSON
+
+Control the language, the first tag shows the language the `app-author` defaulted for this
+component, so this means `users` are supposed to input `JSON` (in this case), but if they put something else
+the first badge will turn red.
+
+<CodeJSON />
+
+<Callout emoji='😎' type='info'>
+  Try, putting valid `YAML`!
+</Callout>
+
+```ts filename="codeWithJson" copy showLineNumbers {3}
+import React from 'react';
+export default function CodeWithJson() {
+  return <EccUtilsDesignCode language='JSON' />;
+}
+```
+
+### Indentation
+
+This has a default indentation of 8 spaces.
+
+<CodeIndentation />
+
+```ts filename="codeWithIndents" copy showLineNumbers {3}
+import React from 'react';
+export default function CodeWithIndents() {
+  return <EccUtilsDesignCode indentation={8} />;
+}
+```
