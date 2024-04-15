@@ -14,13 +14,7 @@ import { deleteTask, fetchTask, fetchTasks } from "../../API/Task/tesGet.js";
 
 export default class ECCClientGa4ghTesRuns extends LitElement {
   static styles = css``;
-  @property({ type: Number }) private pageSize = 5;
-  @property({ type: String }) private baseURL =
-    "https://protes.rahtiapp.fi/ga4gh/tes/v1";
-
-  @property({ type: Boolean }) private filter = true;
-  @property({ type: Boolean }) private search = true;
-  @property({ type: Array }) private fields: Array<Field> = [
+  static defaultFields: Field[] = [
     {
       key: "name",
       path: "name",
@@ -147,6 +141,15 @@ export default class ECCClientGa4ghTesRuns extends LitElement {
     },
   ];
 
+  @property({ type: Number }) private pageSize = 5;
+  @property({ type: String }) private baseURL =
+    "https://protes.rahtiapp.fi/ga4gh/tes/v1";
+
+  @property({ type: Boolean }) private filter = true;
+  @property({ type: Boolean }) private search = true;
+  @property({ type: Array }) private fields: Field[] = [];
+  @property({ type: Boolean }) private extendFields = false;
+
   @state() private filters: FilterProp[] = [
     {
       key: "search",
@@ -218,6 +221,16 @@ export default class ECCClientGa4ghTesRuns extends LitElement {
     // Handle filter render
     if (changedProperties.has("filter") || changedProperties.has("search")) {
       this.filters = this.getUpdatedFilters();
+    }
+
+    // extend the default fields
+    if (changedProperties.has("extendFields")) {
+      if (this.extendFields) {
+        const fields = ECCClientGa4ghTesRuns.defaultFields;
+        this.fields = [...this.fields, ...fields];
+      } else if (this.fields.length === 0 && this.extendFields === false) {
+        this.fields = ECCClientGa4ghTesRuns.defaultFields;
+      }
     }
   }
 
