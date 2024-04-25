@@ -21,7 +21,6 @@ coverage
 # Never lint
 
 src/react
-src/components/form/tests
 
 **/.git
 **/.svn
