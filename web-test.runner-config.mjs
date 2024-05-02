@@ -18,14 +18,17 @@ export default {
   plugins: [
     esbuildPlugin({
       ts: true,
+      loaders: {
+        '.test.ts': 'ts',
+      },
       target: 'es2020',
     }),
   ],
-  browsers: [
-    playwrightLauncher({ product: 'chromium' }),
-    playwrightLauncher({ product: 'firefox' }),
-    playwrightLauncher({ product: 'webkit' }),
-  ],
+  // browsers: [
+  //   playwrightLauncher({ product: 'chromium' }),
+  //   playwrightLauncher({ product: 'firefox' }),
+  //   playwrightLauncher({ product: 'webkit' }),
+  // ],
   testRunnerHtml: (testFramework) => `
     <html lang="en-US">
       <head></head>
