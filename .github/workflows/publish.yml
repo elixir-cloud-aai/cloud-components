@@ -73,7 +73,7 @@ jobs:
           key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package.lock') }}-${{ steps.node.outputs.version }}
 
       - name: Install dependencies
-        run: npm install
+        run: npm install && npx playwright install
 
       - name: Run tests
         run: npm run test
