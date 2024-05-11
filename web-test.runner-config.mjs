@@ -1,6 +1,7 @@
 import { esbuildPlugin } from '@web/dev-server-esbuild';
 import fg from 'fast-glob';
-import { playwrightLauncher } from '@web/test-runner-playwright';
+// import { playwrightLauncher } from '@web/test-runner-playwright';
+// import { puppeteerLauncher } from '@web/test-runner-puppeteer';
 
 export default {
   rootDir: '.',
@@ -18,16 +19,14 @@ export default {
   plugins: [
     esbuildPlugin({
       ts: true,
-      loaders: {
-        '.test.ts': 'ts',
-      },
       target: 'es2020',
     }),
   ],
   // browsers: [
-  //   playwrightLauncher({ product: 'chromium' }),
-  //   playwrightLauncher({ product: 'firefox' }),
-  //   playwrightLauncher({ product: 'webkit' }),
+  //   // puppeteerLauncher({ concurrency: 1 }),
+  //   // playwrightLauncher({ product: 'chromium' }),
+  //   // playwrightLauncher({ product: 'firefox' }),
+  //   // playwrightLauncher({ product: 'webkit' }),
   // ],
   testRunnerHtml: (testFramework) => `
     <html lang="en-US">
