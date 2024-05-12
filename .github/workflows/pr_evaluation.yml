@@ -131,7 +131,7 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: Install dependencies
-        run: npm ci 
+        run: npm ci
         
       - name: Install playwright 
         run: npx playwright install --with-deps
