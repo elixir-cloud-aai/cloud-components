@@ -7,7 +7,10 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./dist/custom-elements.json": "./dist/custom-elements.json",
     "./dist/index.js": "./dist/index.js",
     "./dist/components/*": "./dist/components/*",
@@ -33,7 +36,7 @@
     "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
     "clean": "rm -rf dist node_modules custom-elements-manifest.config.js",
     "test": "web-test-runner --group default --config ../../web-test.runner-config.mjs",
-    "test:component": "web-test-runner -- --watch --config ../../web-test.runner-config.mjs --group",
+    "test:component": "web-test-runner --watch --config ../../web-test.runner-config.mjs --group",
     "test:watch": "npm run test:component default",
     "lint": "npx eslint .",
     "lint:fix": "npm run lint -- --fix",

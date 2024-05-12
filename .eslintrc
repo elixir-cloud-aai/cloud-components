@@ -3,6 +3,12 @@
   "extends": ["@elixir-cloud"],
   "settings": {},
   "rules": {
-    "@typescript-eslint/no-var-requires": 0
-  }
+    "@typescript-eslint/no-var-requires": 0,
+    "import/no-extraneous-dependencies": 0
+  },
+  "overrides": [
+    {
+      "files": ["*.ts", "*.mjs", "*.js"]
+    }
+  ]
 }
