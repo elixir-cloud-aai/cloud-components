@@ -4,6 +4,7 @@ import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/badge/badge.js";
 import "@shoelace-style/shoelace/dist/components/textarea/textarea.js";
 import "@shoelace-style/shoelace/dist/components/copy-button/copy-button.js";
+import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import jsyaml from "js-yaml";
 import { hostStyles } from "../../styles/host.styles.js";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
@@ -25,8 +26,9 @@ export default class EccUtilsDesignCode extends LitElement {
   @property({ type: String }) language: Language = "YAML";
   @property({ type: Number }) indentation = 2;
   @property({ type: Number }) blurDelay = 150;
-  @property({ type: Boolean }) required = true;
+  @property({ type: Boolean }) required = false;
   @property({ type: Boolean }) disabled = false;
+  @property({ type: String }) tooltip = "code";
 
   @state() elTextarea: HTMLTextAreaElement | null = null;
   @state() error = false;
@@ -323,12 +325,20 @@ export default class EccUtilsDesignCode extends LitElement {
         ?disabled=${this.disabled}
       >
         <div id="label" slot="label">
-          ${this.label}
-          <sl-badge variant=${this.error ? "danger" : "primary"}
-            >${this.language}</sl-badge
-          >
+          <sl-tooltip content=${this.tooltip}>
+            <div>${this.label}</div>
+          </sl-tooltip>
+          <sl-tooltip content=${`Expecting ${this.language}`}>
+            <sl-badge variant=${this.error ? "danger" : "primary"}
+              >${this.language}</sl-badge
+            >
+          </sl-tooltip>
           ${this.error
-            ? html`<sl-badge variant="neutral">${this.errorLanguage}</sl-badge>`
+            ? html` <sl-tooltip
+                content=${`Unexpected ${this.errorLanguage} found`}
+              >
+                <sl-badge variant="neutral">${this.errorLanguage}</sl-badge>
+              </sl-tooltip>`
             : html``}
           <sl-copy-button
             value=${this.code}

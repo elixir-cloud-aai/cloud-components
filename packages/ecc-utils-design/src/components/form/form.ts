@@ -7,10 +7,14 @@ import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
-import _ from "lodash-es";
+// import '@elixir-cloud/design/dist/components/code/index.js';
+import "../code/index.js";
+import * as _ from "lodash-es";
+import { ifDefined } from "lit/directives/if-defined.js";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import formStyles from "./form.styles.js";
+import { Language } from "../code/code.js";
 
 export interface Field {
   key: string;
@@ -29,8 +33,15 @@ export interface Field {
     | "array"
     | "switch"
     | "file"
+    | "code"
     | "group";
+  codeOptions?: {
+    language: Language;
+    indentation: number;
+    blurDelay: number;
+  };
   fieldOptions?: {
+    disabled?: boolean;
     required?: boolean;
     default?: string | boolean;
     multiple?: boolean;
@@ -246,6 +257,23 @@ export default class EccUtilsDesignForm extends LitElement {
     `;
   }
 
+  private renderCodeTemplate(field: Field, path: string): TemplateResult {
+    if (field.type !== "code") return html``;
+    // TODO: add CSS parts
+
+    const { fieldOptions, codeOptions } = field;
+
+    return html`<ecc-utils-design-code
+      ?required=${fieldOptions?.required}
+      ?disabled=${fieldOptions?.disabled}
+      language=${ifDefined(codeOptions?.language)}
+      indentation=${ifDefined(codeOptions?.indentation)}
+      blurDelay=${ifDefined(codeOptions?.blurDelay)}
+      tooltip=${ifDefined(fieldOptions?.tooltip)}
+      @ecc-utils-change=${(e: CustomEvent) => _.set(this.form, path, e.detail)}
+    ></ecc-utils-design-code>`;
+  }
+
   private renderArrayTemplate(field: Field, path: string): TemplateResult {
     const { arrayOptions } = field;
 
@@ -438,7 +466,9 @@ export default class EccUtilsDesignForm extends LitElement {
     if (field.type === "array") {
       return this.renderArrayTemplate(field, newPath);
     }
-
+    if (field.type === "code") {
+      return this.renderCodeTemplate(field, newPath);
+    }
     if (field.fieldOptions?.required && !_.get(this.form, newPath)) {
       this.requiredButEmpty.push(field.key);
     }
