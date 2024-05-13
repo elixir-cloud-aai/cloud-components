@@ -38,6 +38,20 @@ export default function Form() {
       },
     },
     {
+      key: 'code',
+      label: 'Code',
+      type: 'code',
+      fieldOptions: {
+        required: true,
+        tooltip: 'Your code, note this has indentation of 4 spaces and blur delay of 300ms',
+      },
+      codeOptions: {
+        language: 'YAML',
+        indentation: 4,
+        blurDelay: 300,
+      },
+    },
+    {
       key: 'address',
       label: 'Address',
       type: 'group',
@@ -72,6 +86,20 @@ export default function Form() {
               fieldOptions: {
                 required: true,
                 tooltip: 'Your house number',
+              },
+            },
+            {
+              key: 'code2',
+              label: 'Code2',
+              type: 'code',
+              fieldOptions: {
+                required: true,
+                tooltip: 'Your code2, note this has indentation of 12 spaces and blur delay of 1000ms',
+              },
+              codeOptions: {
+                language: 'YAML',
+                indentation: 12,
+                blurDelay: 1000,
               },
             },
             {

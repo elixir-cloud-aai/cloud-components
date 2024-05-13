@@ -39,7 +39,13 @@ export default class EccUtilsDesignCode extends LitElement {
   @state() lastTabPressTime = 0;
   @state() errorLanguage: Language = "Text";
 
-  private cssParts = {};
+  private cssParts = {
+    formControl: "form-control",
+    formControlLabel: "form-control-label",
+    formControlInput: "form-control-input",
+    base: "base",
+    textarea: "textarea",
+  };
 
   private _getTextAreaEle(): HTMLTextAreaElement {
     const slTextarea = this.shadowRoot?.querySelector("sl-textarea");
@@ -315,8 +321,11 @@ export default class EccUtilsDesignCode extends LitElement {
   }
 
   render() {
+    const { formControl, formControlLabel, formControlInput, base, textarea } =
+      this.cssParts;
     return html`
       <sl-textarea
+        exportparts="form-control: ${formControl}, form-control-label: ${formControlLabel}, form-control-input: ${formControlInput}, base: ${base}, textarea: ${textarea}"
         @keydown=${this._handleKeys}
         @input=${this._handleInput}
         value=${this.code}
@@ -324,12 +333,14 @@ export default class EccUtilsDesignCode extends LitElement {
         ?required=${this.required}
         ?disabled=${this.disabled}
       >
-        <div id="label" slot="label">
+        <label id="label" slot="label">
           <sl-tooltip content=${this.tooltip}>
-            <div>${this.label}</div>
+            <label>${this.label}</label>
           </sl-tooltip>
           <sl-tooltip content=${`Expecting ${this.language}`}>
-            <sl-badge variant=${this.error ? "danger" : "primary"}
+            <sl-badge
+              exportparts="base: ${base}"
+              variant=${this.error ? "danger" : "primary"}
               >${this.language}</sl-badge
             >
           </sl-tooltip>
@@ -337,14 +348,16 @@ export default class EccUtilsDesignCode extends LitElement {
             ? html` <sl-tooltip
                 content=${`Unexpected ${this.errorLanguage} found`}
               >
-                <sl-badge variant="neutral">${this.errorLanguage}</sl-badge>
+                <sl-badge exportparts="base: ${base}" variant="neutral"
+                  >${this.errorLanguage}</sl-badge
+                >
               </sl-tooltip>`
             : html``}
           <sl-copy-button
             value=${this.code}
             error-label="Nothing to copy"
           ></sl-copy-button>
-        </div>
+        </label>
       </sl-textarea>
     `;
   }
