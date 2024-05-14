@@ -265,8 +265,16 @@ export default class EccUtilsDesignForm extends LitElement {
     const { formControl, formControlLabel } = this.cssParts;
 
     return html`<ecc-utils-design-code
-      exportparts="form-control: ${formControl},form-control-label: ${formControlLabel}, input: ${this
-        .cssParts.input}, base: ${this.cssParts.inputBase}"
+      part="form-control: ${formControl},
+			form-control-label: ${formControlLabel}, 
+			input: ${this.cssParts.input},
+			base: ${this.cssParts.inputBase}
+      label: ${this.cssParts.label}"
+      exportparts="form-control: ${formControl},
+			form-control-label: ${formControlLabel}, 
+			input: ${this.cssParts.input}, 
+			base: ${this.cssParts.inputBase}
+      label: ${this.cssParts.label}"
       ?required=${fieldOptions?.required}
       ?disabled=${fieldOptions?.disabled}
       language=${ifDefined(codeOptions?.language)}

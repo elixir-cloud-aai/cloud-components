@@ -325,7 +325,11 @@ export default class EccUtilsDesignCode extends LitElement {
       this.cssParts;
     return html`
       <sl-textarea
-        exportparts="form-control: ${formControl}, form-control-label: ${formControlLabel}, form-control-input: ${formControlInput}, base: ${base}, textarea: ${textarea}"
+        exportparts="form-control: ${formControl},
+        form-control-label: ${formControlLabel},
+        form-control-input: ${formControlInput},
+        base: ${base},
+        textarea: ${textarea}"
         @keydown=${this._handleKeys}
         @input=${this._handleInput}
         value=${this.code}
@@ -335,7 +339,7 @@ export default class EccUtilsDesignCode extends LitElement {
       >
         <label id="label" slot="label">
           <sl-tooltip content=${this.tooltip}>
-            <label>${this.label}</label>
+            <label part="label" exportparts="label">${this.label}</label>
           </sl-tooltip>
           <sl-tooltip content=${`Expecting ${this.language}`}>
             <sl-badge
