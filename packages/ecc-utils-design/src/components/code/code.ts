@@ -339,7 +339,7 @@ export default class EccUtilsDesignCode extends LitElement {
       >
         <label id="label" slot="label">
           <sl-tooltip content=${this.tooltip}>
-            <label part="label" exportparts="label">${this.label}</label>
+            <label part="label">${this.label}</label>
           </sl-tooltip>
           <sl-tooltip content=${`Expecting ${this.language}`}>
             <sl-badge
