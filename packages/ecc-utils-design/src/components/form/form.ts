@@ -36,9 +36,9 @@ export interface Field {
     | "code"
     | "group";
   codeOptions?: {
-    language: Language;
-    indentation: number;
-    blurDelay: number;
+    language?: Language;
+    indentation?: number;
+    blurDelay?: number;
   };
   fieldOptions?: {
     disabled?: boolean;
@@ -261,6 +261,7 @@ export default class EccUtilsDesignForm extends LitElement {
     if (field.type !== "code") return html``;
     // TODO: add CSS parts
 
+    const { label, key } = field;
     const { fieldOptions, codeOptions } = field;
     const { formControl, formControlLabel } = this.cssParts;
 
@@ -272,6 +273,8 @@ export default class EccUtilsDesignForm extends LitElement {
       label: ${this.cssParts.label},"
       ?required=${fieldOptions?.required}
       ?disabled=${fieldOptions?.disabled}
+      key=${key}
+      label=${label}
       language=${ifDefined(codeOptions?.language)}
       indentation=${ifDefined(codeOptions?.indentation)}
       blurDelay=${ifDefined(codeOptions?.blurDelay)}
