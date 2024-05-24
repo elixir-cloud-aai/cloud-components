@@ -150,10 +150,14 @@ nextTask("Building source", async () => {
     })
     .finally(() =>
       nextTask("Cleaning up react source", () => {
-        fs.rmSync(reactDir, {
-          force: true,
-          recursive: true,
-        });
+        if (!commanderOpts.watch) {
+          nextTask("Cleaning up react source", () => {
+            fs.rmSync(reactDir, {
+              force: true,
+              recursive: true,
+            });
+          });
+        }
       })
     );
 });
