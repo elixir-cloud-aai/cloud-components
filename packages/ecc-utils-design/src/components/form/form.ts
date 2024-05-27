@@ -475,11 +475,11 @@ export default class EccUtilsDesignForm extends LitElement {
     if (field.type === "array") {
       return this.renderArrayTemplate(field, newPath);
     }
-    if (field.type === "code") {
-      return this.renderCodeTemplate(field, newPath);
-    }
     if (field.fieldOptions?.required && !_.get(this.form, newPath)) {
       this.requiredButEmpty.push(field.key);
+    }
+    if (field.type === "code") {
+      return this.renderCodeTemplate(field, newPath);
     }
     if (field.type === "switch") {
       return this.renderSwitchTemplate(field, newPath);

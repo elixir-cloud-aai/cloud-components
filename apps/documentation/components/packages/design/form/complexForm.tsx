@@ -94,7 +94,8 @@ export default function Form() {
               type: 'code',
               fieldOptions: {
                 required: true,
-                tooltip: 'Your code2, note this has indentation of 12 spaces and blur delay of 1000ms',
+                tooltip:
+                  'Your code2, note this has indentation of 12 spaces and blur delay of 1000ms',
               },
               codeOptions: {
                 language: 'YAML',
