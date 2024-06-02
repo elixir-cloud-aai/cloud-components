@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html lang="en-GB">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" href="./logo-elixir-cloud-aai.svg" type="image/x-icon">
-		<style></style>
-		<title>ecc-utils-design</title>
-		<script src="https://cdn.tailwindcss.com"></script>
-	</head>
-	<body>
-		<div class="p-10">
-			<div id="demo"></div>
-		</div>
-		<script type="module">
-			import { html, render } from "lit";
-			import "../../dist/components/code/index.js";
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./logo-elixir-cloud-aai.svg" type="image/x-icon" />
+    <style></style>
+    <title>ecc-utils-design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div class="p-10">
+      <div id="demo"></div>
+    </div>
+    <script type="module">
+      import { html, render } from "lit";
+      import "../../dist/components/code/index.js";
 
-			render(
-			  html`<ecc-utils-design-code> </ecc-utils-design-code> `,
-			  document.querySelector("#demo")
-			);
-		</script>
-	</body>
+      render(
+        html`<ecc-utils-design-code> </ecc-utils-design-code> `,
+        document.querySelector("#demo")
+      );
+    </script>
+  </body>
 </html>
