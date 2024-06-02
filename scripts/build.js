@@ -145,14 +145,17 @@ nextTask("Building source", async () => {
         );
       });
     })
-    .finally(() =>
-      nextTask("Cleaning up react source", () => {
-        fs.rmSync(reactDir, {
-          force: true,
-          recursive: true,
+    .finally(() => {
+      // Skip cleanup if watch mode is enabled to preserve the react source for incremental builds
+      if (!commanderOpts.watch) {
+        nextTask("Cleaning up react source", () => {
+          fs.rmSync(reactDir, {
+            force: true,
+            recursive: true,
+          });
         });
-      })
-    );
+      }
+    });
 });
 
 module.exports = {};
