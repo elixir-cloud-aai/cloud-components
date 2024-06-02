@@ -8,7 +8,7 @@ import _ from "lodash-es";
 import sinon from "sinon";
 import createNewFormComponent, {
   FormComponentType,
-  clickButton,
+  testIds,
 } from "./form.class.js";
 import {
   simpleTestData,
@@ -20,6 +20,22 @@ import {
   requiredFieldsTestData,
   testDataForFileOptions,
 } from "./testData.js";
+
+const {
+  formInput,
+  formInputFile,
+  formInputParent,
+  formSwitch,
+  formSwitchParent,
+  formArrayAddButton,
+  formArrayDeleteButton,
+  formArrayItem,
+  formArray,
+  formGroup,
+  formCollapsibleGroup,
+  formNonCollapsibleGroup,
+  formTooltip,
+} = testIds;
 
 describe("renders correctly", () => {
   let formComponent: FormComponentType;
@@ -41,7 +57,7 @@ describe("renders correctly", () => {
   it("works correctly with minimum required fields", async () => {
     // renders correctly
     expect(formComponent.form).to.be.visible;
-    expect(formComponent.inputField("root")).to.be.visible;
+    expect(formComponent.inputField(formInput, "root")).to.be.visible;
 
     // throws error sumbit is attempted and no field is filled
     const formError = sinon.stub(formComponent.form, "error");
@@ -89,23 +105,35 @@ describe("when array template is rendered", () => {
   });
 
   it("should render children fields correctly", () => {
-    const arrayFields = formComponent.arrayTemplate("root", true);
+    const arrayFields = formComponent.element(formArray, "root", true);
 
     // 10 input fields should be rendered by default
-    expect(formComponent.inputField("root", true)).to.have.lengthOf(10);
+    expect(formComponent.inputField(formInput, "root", true)).to.have.lengthOf(
+      10
+    );
     // 2 switch field should be rendered by default
-    expect(formComponent.switchField("root", true)).to.have.lengthOf(2);
+    expect(formComponent.inputField(formSwitch, "root", true)).to.have.lengthOf(
+      2
+    );
     // 2 file fields should be rendered by default
-    expect(formComponent.inputFileField("root", true)).to.have.lengthOf(2);
+    expect(
+      formComponent.inputField(formInputFile, "root", true)
+    ).to.have.lengthOf(2);
 
     // check default instances
-    expect(formComponent.arrayItem(arrayFields[0], true)).to.have.lengthOf(0);
-    expect(formComponent.arrayItem(arrayFields[1], true)).to.have.lengthOf(2);
+    expect(
+      formComponent.element(formArrayItem, arrayFields[0], true)
+    ).to.have.lengthOf(0);
+    expect(
+      formComponent.element(formArrayItem, arrayFields[1], true)
+    ).to.have.lengthOf(2);
   });
 
   it("delete button should work properly", async () => {
-    const secondArrayField = formComponent.arrayTemplate("root", true)[1];
-    const deletebuttons = formComponent.arrayDeleteButton(
+    const secondArrayField = formComponent.element(formArray, "root", true)[1];
+
+    const deletebuttons = formComponent.buttonElement(
+      formArrayDeleteButton,
       secondArrayField,
       true
     );
@@ -113,78 +141,87 @@ describe("when array template is rendered", () => {
     // check default instances
     expect(deletebuttons).to.have.lengthOf(2);
 
-    clickButton(deletebuttons[0]);
-    await formComponent.form.updateComplete;
-    expect(formComponent.arrayItem(secondArrayField, true)).to.have.lengthOf(1);
+    await formComponent.clickButton(deletebuttons[0]);
+    expect(
+      formComponent.element(formArrayItem, secondArrayField, true)
+    ).to.have.lengthOf(1);
 
     // should not work when the number of instaces is already at the min
-    clickButton(deletebuttons[1]);
-    await formComponent.form.updateComplete;
-    expect(formComponent.arrayItem(secondArrayField, true)).to.have.lengthOf(1);
+    await formComponent.clickButton(deletebuttons[1]);
+    expect(
+      formComponent.element(formArrayItem, secondArrayField, true)
+    ).to.have.lengthOf(1);
   });
 
   it("delete button should delete the correct instance", async () => {
     await formComponent.initializeForm(simpleArrayTestData);
 
-    clickButton(formComponent.arrayAddButton("root"), 2);
-    await formComponent.form.updateComplete;
+    await formComponent.clickButton(
+      formComponent.buttonElement(formArrayAddButton, "root"),
+      2
+    );
 
-    let arrayItems = formComponent.arrayItem("root", true);
+    let arrayItems = formComponent.element(formArrayItem, "root", true);
     expect(arrayItems).to.have.lengthOf(3);
 
-    const firstInputField = formComponent.inputField(arrayItems[0]);
-    const secondInputField = formComponent.inputField(arrayItems[1]);
-    const thirdInputField = formComponent.inputField(arrayItems[2]);
+    const firstInputField = formComponent.inputField(formInput, arrayItems[0]);
+    const secondInputField = formComponent.inputField(formInput, arrayItems[1]);
+    const thirdInputField = formComponent.inputField(formInput, arrayItems[2]);
 
     formComponent.fillInputField(firstInputField, "test value 1");
     formComponent.fillInputField(secondInputField, "test value 2");
     formComponent.fillInputField(thirdInputField, "test value 3");
 
     // delete the instance in the middle
-    clickButton(formComponent.arrayDeleteButton(arrayItems[1], false));
-    await formComponent.form.updateComplete;
+    await formComponent.clickButton(
+      formComponent.buttonElement(formArrayDeleteButton, arrayItems[1], false)
+    );
 
-    arrayItems = formComponent.arrayItem("root", true);
+    arrayItems = formComponent.element(formArrayItem, "root", true);
     expect(arrayItems).to.have.lengthOf(2);
-    expect(formComponent.inputField(arrayItems[0], false).value).to.equal(
-      "test value 1"
-    );
-    expect(formComponent.inputField(arrayItems[1], false).value).to.equal(
-      "test value 3"
-    );
+    expect(
+      formComponent.inputField(formInput, arrayItems[0], false).value
+    ).to.equal("test value 1");
+    expect(
+      formComponent.inputField(formInput, arrayItems[1], false).value
+    ).to.equal("test value 3");
   });
 
   it("add button should work properly", async () => {
-    const firstArrayField = formComponent.arrayTemplate("root", true)[0];
+    const firstArrayField = formComponent.element(formArray, "root", true)[0];
 
-    clickButton(formComponent.arrayAddButton(firstArrayField));
-    await formComponent.form.updateComplete;
-    expect(formComponent.arrayItem(firstArrayField, true)).to.have.lengthOf(1);
+    await formComponent.clickButton(
+      formComponent.buttonElement(formArrayAddButton, firstArrayField)
+    );
+    expect(
+      formComponent.element(formArrayItem, firstArrayField, true)
+    ).to.have.lengthOf(1);
   });
 
   it("add Button should new instance at the bottom", async () => {
     await formComponent.initializeForm(simpleArrayTestData);
 
-    let arrayItems = formComponent.arrayItem("root", true);
+    let arrayItems = formComponent.element(formArrayItem, "root", true);
 
     // check default instances
     expect(arrayItems).to.have.lengthOf(1);
 
-    const firstInputField = formComponent.inputField(arrayItems[0]);
+    const firstInputField = formComponent.inputField(formInput, arrayItems[0]);
     formComponent.fillInputField(firstInputField, "test value 1");
-    clickButton(formComponent.arrayAddButton("root"));
-    await formComponent.form.updateComplete;
+    await formComponent.clickButton(
+      formComponent.buttonElement(formArrayAddButton, "root")
+    );
 
-    arrayItems = formComponent.arrayItem("root", true);
-    const secondInputField = formComponent.inputField(arrayItems[1]);
+    arrayItems = formComponent.element(formArrayItem, "root", true);
+    const secondInputField = formComponent.inputField(formInput, arrayItems[1]);
     formComponent.fillInputField(secondInputField, "test value 2");
 
-    expect(formComponent.inputField(arrayItems[0], false).value).to.equal(
-      "test value 1"
-    );
-    expect(formComponent.inputField(arrayItems[1], false).value).to.equal(
-      "test value 2"
-    );
+    expect(
+      formComponent.inputField(formInput, arrayItems[0], false).value
+    ).to.equal("test value 1");
+    expect(
+      formComponent.inputField(formInput, arrayItems[1], false).value
+    ).to.equal("test value 2");
   });
 });
 
@@ -195,24 +232,25 @@ describe("when group template is rendered", () => {
   });
 
   it("should render children fields correctly", async () => {
-    const groupTemplate = formComponent.groupTemplate("root");
-    const collapsibleGroup = formComponent.collapsibleGroup(
+    const groupTemplate = formComponent.element(formGroup, "root");
+    const collapsibleGroup = formComponent.element(
+      formCollapsibleGroup,
       groupTemplate,
       false
     );
 
     expect(groupTemplate).to.be.visible;
     expect(collapsibleGroup).to.be.visible;
-    expect(formComponent.nonCollapsibleGroup(groupTemplate, false)).to.be.not
-      .exist;
-    expect(formComponent.inputField(collapsibleGroup, true)).to.have.lengthOf(
-      3
-    );
-    expect(formComponent.switchField(collapsibleGroup, true)).to.have.lengthOf(
-      1
-    );
+    expect(formComponent.element(formNonCollapsibleGroup, groupTemplate, false))
+      .to.be.not.exist;
     expect(
-      formComponent.inputFileField(collapsibleGroup, true)
+      formComponent.inputField(formInput, collapsibleGroup, true)
+    ).to.have.lengthOf(3);
+    expect(
+      formComponent.inputField(formSwitch, collapsibleGroup, true)
+    ).to.have.lengthOf(1);
+    expect(
+      formComponent.inputField(formInputFile, collapsibleGroup, true)
     ).to.have.lengthOf(1);
   });
 });
@@ -229,7 +267,7 @@ describe("when submit button is clicked", () => {
   it("should verify that all required fields are filled in simple scenarios", async () => {
     const formComponent = await createNewFormComponent(requiredFieldsTestData);
 
-    const inputFields = formComponent.inputField("root", true);
+    const inputFields = formComponent.inputField(formInput, "root", true);
 
     await formComponent.fillInputField(inputFields[0]);
     expect(formComponent.submitButton()).to.have.attribute("disabled");
@@ -242,14 +280,16 @@ describe("when submit button is clicked", () => {
   it("should verify that all required fields are filled in array scenarios", async () => {
     const formComponent = await createNewFormComponent(complexArrayTestData);
     expect(formComponent.submitButton()).to.have.attribute("disabled");
-    const arrayTemplates = formComponent.arrayTemplate("root", true);
+    const arrayTemplates = formComponent.element(formArray, "root", true);
 
     // grab all input fields
     const inputTemplatesForSecondArray = formComponent.inputField(
+      formInput,
       arrayTemplates[1],
       true
     );
-    const fileFieldsForSecondArray = formComponent.inputFileField(
+    const fileFieldsForSecondArray = formComponent.inputField(
+      formInputFile,
       arrayTemplates[1],
       true
     );
@@ -278,13 +318,15 @@ describe("when submit button is clicked", () => {
     expect(formComponent.submitButton()).to.not.have.attribute("disabled");
 
     // add an instance for the other array template
-    clickButton(formComponent.arrayAddButton("root"));
-    await formComponent.form.updateComplete;
+    await formComponent.clickButton(
+      formComponent.buttonElement(formArrayAddButton, "root")
+    );
     // submit button should be disabled since the required fields in the new array instance are not filled
     expect(formComponent.submitButton()).to.have.attribute("disabled");
 
     // grab all input fields from the new instance
     const inputTemplatesForFirstArray = formComponent.inputField(
+      formInput,
       arrayTemplates[0],
       true
     );
@@ -301,14 +343,23 @@ describe("when submit button is clicked", () => {
     const formComponent = await createNewFormComponent(groupTestData);
     expect(formComponent.submitButton()).to.have.attribute("disabled");
 
-    const groupTemplate = formComponent.groupTemplate("root");
-    const collapsibleGroup = formComponent.collapsibleGroup(
+    const groupTemplate = formComponent.element(formGroup, "root");
+    const collapsibleGroup = formComponent.element(
+      formCollapsibleGroup,
       groupTemplate,
       false
     );
 
-    const inputFields = formComponent.inputField(collapsibleGroup, true);
-    const fileFields = formComponent.inputFileField(collapsibleGroup, true);
+    const inputFields = formComponent.inputField(
+      formInput,
+      collapsibleGroup,
+      true
+    );
+    const fileFields = formComponent.inputField(
+      formInputFile,
+      collapsibleGroup,
+      true
+    );
 
     // fill all required fields
     inputFields.forEach((field) => formComponent.fillInputField(field));
@@ -329,54 +380,57 @@ describe("when form is submitted", () => {
   });
 
   it("should call the submit function with the correct data", async () => {
-    formComponent.form.addEventListener("ecc-utils-submit", (e) => {
-      expect(
-        _.isEqual(e.detail, {
-          form: {
-            data: {
-              isMarried: true,
-              address: {
-                street: "test value",
-                phoneNumbers: [
+    formComponent.form.addEventListener(
+      "ecc-utils-submit",
+      (e: CustomEvent) => {
+        expect(
+          _.isEqual(e.detail, {
+            form: {
+              data: {
+                isMarried: true,
+                address: {
+                  street: "test value",
+                  phoneNumbers: [
+                    {
+                      phoneNumber: "test value",
+                    },
+                    {
+                      phoneNumber: "test value",
+                    },
+                  ],
+                  houseNumber: "test value",
+                  city: "test value",
+                },
+                bankAccounts: [
                   {
-                    phoneNumber: "test value",
+                    accountBalance: "",
+                    isPrimary: false,
+                    bankName: "test value",
+                    branchCode: "test value",
+                    accountNumber: "test value",
+                    beneficiaryName: "test value",
                   },
                   {
-                    phoneNumber: "test value",
+                    accountBalance: "",
+                    isPrimary: false,
+                    bankName: "test value",
+                    branchCode: "test value",
+                    accountNumber: "test value",
+                    beneficiaryName: "test value",
                   },
                 ],
-                houseNumber: "test value",
-                city: "test value",
+                name: "test value",
+                age: "test value",
               },
-              bankAccounts: [
-                {
-                  accountBalance: "",
-                  isPrimary: false,
-                  bankName: "test value",
-                  branchCode: "test value",
-                  accountNumber: "test value",
-                  beneficiaryName: "test value",
-                },
-                {
-                  accountBalance: "",
-                  isPrimary: false,
-                  bankName: "test value",
-                  branchCode: "test value",
-                  accountNumber: "test value",
-                  beneficiaryName: "test value",
-                },
-              ],
-              name: "test value",
-              age: "test value",
             },
-          },
-        })
-      ).to.be.true;
-    });
+          })
+        ).to.be.true;
+      }
+    );
 
-    const inputFields = formComponent.inputField("root", true);
-    const switchFields = formComponent.switchField("root", true);
-    const fileFields = formComponent.inputFileField("root", true);
+    const inputFields = formComponent.inputField(formInput, "root", true);
+    const switchFields = formComponent.inputField(formSwitch, "root", true);
+    const fileFields = formComponent.inputField(formInputFile, "root", true);
 
     // fill all input fields
     inputFields.forEach((field) => {
@@ -414,11 +468,11 @@ describe("when fieldOptions are set", async () => {
   });
 
   it("should render tooltip when set", async () => {
-    const inputFields = formComponent.inputField("root", true);
-    const fileFields = formComponent.inputFileParent("root", true);
-    const arrayFields = formComponent.arrayTemplate("root", true);
-    const groupFields = formComponent.groupTemplate("root", true);
-    const switchFields = formComponent.switchParent("root", true);
+    const inputFields = formComponent.inputField(formInput, "root", true);
+    const fileFields = formComponent.element(formInputParent, "root", true);
+    const arrayFields = formComponent.element(formArray, "root", true);
+    const groupFields = formComponent.element(formGroup, "root", true);
+    const switchFields = formComponent.element(formSwitchParent, "root", true);
 
     [
       ...Array.from(inputFields),
@@ -427,24 +481,26 @@ describe("when fieldOptions are set", async () => {
       ...Array.from(groupFields),
       ...Array.from(switchFields),
     ].forEach((field) => {
-      expect(formComponent.tooltip(field)).to.be.visible.and.to.have.attribute(
-        "content",
-        "test tooltip"
-      );
+      expect(
+        formComponent.element(formTooltip, field)
+      ).to.be.visible.and.to.have.attribute("content", "test tooltip");
     });
   });
 
   it("should set default value correctly", async () => {
     // this is pretty brittle but the test is simple enough
-    formComponent.form.addEventListener("ecc-utils-submit", (e) => {
-      expect(
-        _.isEqual(e.detail, {
-          form: {
-            data: { participants: [{ name: "John Doe", isMarried: true }] },
-          },
-        })
-      ).to.be.true;
-    });
+    formComponent.form.addEventListener(
+      "ecc-utils-submit",
+      (e: CustomEvent) => {
+        expect(
+          _.isEqual(e.detail, {
+            form: {
+              data: { participants: [{ name: "John Doe", isMarried: true }] },
+            },
+          })
+        ).to.be.true;
+      }
+    );
     const inputField = formComponent.form.shadowRoot!.querySelector(
       '[data-label="Name"]'
     );
@@ -463,12 +519,21 @@ describe("when fieldOptions are set", async () => {
       testDataForFileOptions
     );
 
-    const idField = localFormComponent.inputFileField("root", true)[0];
-    const vactionPhotosField = localFormComponent.inputFileField(
+    const idField = localFormComponent.inputField(
+      formInputFile,
+      "root",
+      true
+    )[0];
+    const vactionPhotosField = localFormComponent.inputField(
+      formInputFile,
       "root",
       true
     )[1];
-    const passportField = localFormComponent.inputFileField("root", true)[2];
+    const passportField = localFormComponent.inputField(
+      formInputFile,
+      "root",
+      true
+    )[2];
 
     expect(idField).to.not.have.attribute("multiple");
     expect(vactionPhotosField).to.have.attribute("multiple");
@@ -480,12 +545,21 @@ describe("when fieldOptions are set", async () => {
       testDataForFileOptions
     );
 
-    const idField = localFormComponent.inputFileField("root", true)[0];
-    const vactionPhotosField = localFormComponent.inputFileField(
+    const idField = localFormComponent.inputField(
+      formInputFile,
+      "root",
+      true
+    )[0];
+    const vactionPhotosField = localFormComponent.inputField(
+      formInputFile,
       "root",
       true
     )[1];
-    const passportField = localFormComponent.inputFileField("root", true)[2];
+    const passportField = localFormComponent.inputField(
+      formInputFile,
+      "root",
+      true
+    )[2];
 
     expect(idField).to.have.attribute("accept", ".pdf .doc .docx");
     expect(vactionPhotosField).to.have.attribute("accept", "image/*");
