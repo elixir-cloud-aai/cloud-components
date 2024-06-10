@@ -1,10 +1,13 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-unused-expressions */
+/* eslint-disable import/no-named-as-default */
+/* eslint-disable import/no-named-as-default-member */
 
 // parentElement should not be optional as that is allowing false positive tests
-import "../../../../dist/index.js";
 import { fixture, html } from "@open-wc/testing";
-import EccUtilsDesignForm, { Field } from "../../../../dist/components/form.js";
+import EccUtilsDesignForm, {
+  type Field,
+} from "../../../../dist/components/form/index.js";
 import TestComponent from "../../../internal/TestComponent.js";
 
 class FormComponent extends TestComponent {

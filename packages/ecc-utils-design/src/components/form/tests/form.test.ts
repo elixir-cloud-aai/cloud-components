@@ -1,10 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-unused-expressions */
 
-// REMEMBER TO RE-ENABLE LINTING FOR TESTS
-
 import { expect } from "@open-wc/testing";
-import _ from "lodash-es";
+import * as _ from "lodash-es";
 import sinon from "sinon";
 import createNewFormComponent, {
   FormComponentType,
