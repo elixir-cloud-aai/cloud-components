@@ -122,7 +122,10 @@ export default class ECCCLientGa4ghTesCreateRun extends LitElement {
                 {
                   key: "command",
                   label: "Command",
-                  type: "text",
+                  type: "code",
+                  codeOptions: {
+                    language: "Text",
+                  },
                   fieldOptions: {
                     required: true,
                   },

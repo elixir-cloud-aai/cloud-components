@@ -4,6 +4,7 @@ import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/badge/badge.js";
 import "@shoelace-style/shoelace/dist/components/textarea/textarea.js";
 import "@shoelace-style/shoelace/dist/components/copy-button/copy-button.js";
+import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import jsyaml from "js-yaml";
 import { hostStyles } from "../../styles/host.styles.js";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
@@ -25,8 +26,9 @@ export default class EccUtilsDesignCode extends LitElement {
   @property({ type: String }) language: Language = "YAML";
   @property({ type: Number }) indentation = 2;
   @property({ type: Number }) blurDelay = 150;
-  @property({ type: Boolean }) required = true;
+  @property({ type: Boolean }) required = false;
   @property({ type: Boolean }) disabled = false;
+  @property({ type: String }) tooltip = "code";
 
   @state() elTextarea: HTMLTextAreaElement | null = null;
   @state() error = false;
@@ -37,7 +39,13 @@ export default class EccUtilsDesignCode extends LitElement {
   @state() lastTabPressTime = 0;
   @state() errorLanguage: Language = "Text";
 
-  private cssParts = {};
+  private cssParts = {
+    formControl: "form-control",
+    formControlLabel: "form-control-label",
+    formControlInput: "form-control-input",
+    base: "base",
+    textarea: "textarea",
+  };
 
   private _getTextAreaEle(): HTMLTextAreaElement {
     const slTextarea = this.shadowRoot?.querySelector("sl-textarea");
@@ -313,8 +321,15 @@ export default class EccUtilsDesignCode extends LitElement {
   }
 
   render() {
+    const { formControl, formControlLabel, formControlInput, base, textarea } =
+      this.cssParts;
     return html`
       <sl-textarea
+        exportparts="form-control: ${formControl},
+        form-control-label: ${formControlLabel},
+        form-control-input: ${formControlInput},
+        base: ${base},
+        textarea: ${textarea}"
         @keydown=${this._handleKeys}
         @input=${this._handleInput}
         value=${this.code}
@@ -322,19 +337,31 @@ export default class EccUtilsDesignCode extends LitElement {
         ?required=${this.required}
         ?disabled=${this.disabled}
       >
-        <div id="label" slot="label">
-          ${this.label}
-          <sl-badge variant=${this.error ? "danger" : "primary"}
-            >${this.language}</sl-badge
-          >
+        <label id="label" slot="label">
+          <sl-tooltip content=${this.tooltip}>
+            <label part="label">${this.label}</label>
+          </sl-tooltip>
+          <sl-tooltip content=${`Expecting ${this.language}`}>
+            <sl-badge
+              exportparts="base: ${base}"
+              variant=${this.error ? "danger" : "primary"}
+              >${this.language}</sl-badge
+            >
+          </sl-tooltip>
           ${this.error
-            ? html`<sl-badge variant="neutral">${this.errorLanguage}</sl-badge>`
+            ? html` <sl-tooltip
+                content=${`Unexpected ${this.errorLanguage} found`}
+              >
+                <sl-badge exportparts="base: ${base}" variant="neutral"
+                  >${this.errorLanguage}</sl-badge
+                >
+              </sl-tooltip>`
             : html``}
           <sl-copy-button
             value=${this.code}
             error-label="Nothing to copy"
           ></sl-copy-button>
-        </div>
+        </label>
       </sl-textarea>
     `;
   }
