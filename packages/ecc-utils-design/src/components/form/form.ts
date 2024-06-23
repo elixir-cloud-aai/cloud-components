@@ -11,6 +11,7 @@ import _ from "lodash-es";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import formStyles from "./form.styles.js";
+import { primitiveStylesheet } from "../../styles/primitive.styles.js";
 
 export interface Field {
   key: string;
@@ -65,6 +66,7 @@ export interface Field {
 
 export default class EccUtilsDesignForm extends LitElement {
   static styles = [
+    primitiveStylesheet,
     getShoelaceStyles(
       document.querySelector("html")?.classList.contains("dark")
     ),
@@ -171,25 +173,31 @@ export default class EccUtilsDesignForm extends LitElement {
       this.cssParts;
     if (field.type === "file") {
       return html`
-        <div part="${formControl}" class="row">
+        <div part="${formControl}" class="file-container">
           ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
             ? html`
                 <sl-tooltip
                   id=${field.key}
                   content=${field.fieldOptions?.tooltip}
                 >
-                  <label part="${label} ${formControlLabel}">
+                  <label
+                    part="${label} ${formControlLabel}"
+                    class="file-input-label"
+                  >
                     ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                   </label>
                 </sl-tooltip>
               `
             : html`
-                <label part="${label} ${formControlLabel}">
+                <label
+                  part="${label} ${formControlLabel}"
+                  class="file-input-label"
+                >
                   ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                 </label>
               `}
           <input
-            class="input"
+            class="file-input"
             part="${inputBase} ${input}"
             type="file"
             accept=${field.fieldOptions?.accept || "*"}
@@ -425,7 +433,7 @@ export default class EccUtilsDesignForm extends LitElement {
                     </label>
                   `}
             </div>
-            ${renderChildren()}
+            <div class="group-content">${renderChildren()}</div>
           `}
     </div>`;
   }
@@ -562,6 +570,8 @@ export default class EccUtilsDesignForm extends LitElement {
 
         <sl-button
           type="submit"
+          variant="primary"
+          class="submit-button"
           exportparts="base: ${button}, base: ${submitButton}"
           ?loading=${this.formState === "loading"}
           ?disabled=${this.submitDisabledByUser ||

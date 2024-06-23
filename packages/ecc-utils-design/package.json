@@ -7,7 +7,10 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./dist/custom-elements.json": "./dist/custom-elements.json",
     "./dist/index.js": "./dist/index.js",
     "./dist/components/*": "./dist/components/*",
@@ -40,10 +43,11 @@
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.8.4",
+    "@elixir-cloud/eslint-config": "*",
     "@lit/react": "*",
     "@open-wc/eslint-config": "*",
     "@open-wc/testing": "*",
-    "@types/js-yaml": "^4.0.9",
+    "@types/ace": "^0.0.52",
     "@types/lodash-es": "^4.17.10",
     "@web/dev-server": "*",
     "@web/dev-server-esbuild": "^0.4.3",
@@ -54,7 +58,6 @@
     "custom-element-vs-code-integration": "*",
     "esbuild": "0.18.20",
     "eslint": "*",
-    "@elixir-cloud/eslint-config": "*",
     "eslint-plugin-prettier": "^4.2.1",
     "globby": "^14.0.0",
     "react": "*",
@@ -64,7 +67,7 @@
   },
   "dependencies": {
     "@shoelace-style/shoelace": "^2.8.0",
-    "js-yaml": "^4.1.0",
+    "ace-builds": "^1.35.0",
     "lit": "^2.8.0",
     "lodash-es": "^4.17.21"
   }
