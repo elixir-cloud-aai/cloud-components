@@ -1,9 +1,11 @@
 ## Description
+
 <!-- Please include a summary of the change and the relevant issue(s) it resolves, if any (otherwise delete that line). -->
 
 Fixes #(issue)
 
 ## Checklist
+
 <!-- Please go through the following checklist to ensure that your change is ready for review. -->
 
 - [ ] My code follows the [contributing guidelines][contributing] of this project.
@@ -16,6 +18,7 @@ Fixes #(issue)
 - [ ] I have not reduced the existing code coverage.
 
 ## Comments
+
 <!-- If there are unchecked boxes in the list above, but you would still like your PR to be reviewed or considered for merging, please describe here why boxes were not checked. -->
 
 [contributing]: CONTRIBUTING.md
