@@ -1,5 +1,5 @@
 {
-    "rootDir": "./src",
-    "componentPath": "./components",
-    "componentPrefix": "fast"
+  "rootDir": "./src",
+  "componentPath": "./components",
+  "componentPrefix": "fast"
 }
