@@ -1,4 +1,4 @@
-import { html, css, LitElement } from "lit";
+import { html, LitElement } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { property, state } from "lit/decorators.js";
 import _, { toLower } from "lodash-es";
@@ -12,6 +12,8 @@ import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/tag/tag.js";
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import { hostStyles } from "../../styles/host.styles.js";
+import detailsStyles from "./details.styles.js";
+import { primitiveStylesheet } from "../../styles/primitive.styles.js";
 
 export interface Field {
   key: string;
@@ -65,72 +67,12 @@ export interface Action {
 
 export default class EccUtilsDesignDetails extends LitElement {
   static styles = [
+    primitiveStylesheet,
     getShoelaceStyles(
       document.querySelector("html")?.classList.contains("dark")
     ),
     hostStyles,
-    css`
-      :host {
-        display: block;
-        padding: 1rem;
-        width: auto;
-      }
-
-      .field {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        margin: 0.5rem 0;
-      }
-
-      .field .key {
-        font-weight: bold;
-        margin-right: 0.5rem;
-        flex: 1;
-      }
-
-      .field .value {
-        margin-left: 0.5rem;
-        flex: 1;
-      }
-
-      .field .value.tags {
-        display: flex;
-        gap: 0.5rem;
-      }
-
-      .actions {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 1rem;
-      }
-
-      .actions .left {
-        display: flex;
-        gap: 0.5rem;
-      }
-
-      .actions .right {
-        display: flex;
-        gap: 0.5rem;
-      }
-
-      .link::part(label) {
-        text-decoration: underline;
-        padding: 0;
-      }
-
-      .icon {
-        height: 1.25rem;
-        width: 1.25rem;
-      }
-
-      sl-copy-button::part(button) {
-        padding: 0;
-      }
-    `,
+    detailsStyles,
   ];
 
   @property({ type: Object, reflect: true }) data = {};
@@ -245,7 +187,7 @@ export default class EccUtilsDesignDetails extends LitElement {
           </sl-tooltip>
           ${field.copy
             ? html`<sl-copy-button
-                .value=${_.get(this.data, field.path)}
+                .value=${JSON.stringify(_.get(this.data, field.path))}
               ></sl-copy-button>`
             : ""}
         </div>
@@ -269,7 +211,8 @@ export default class EccUtilsDesignDetails extends LitElement {
           ${field.label}
           ${field.copy
             ? html`<sl-copy-button
-                .value=${_.get(this.data, field.path)}
+                style="background-color: #f5f5f5; border: 1px solid #e0e0e0; color: #333;"
+                .value=${JSON.stringify(_.get(this.data, field.path))}
               ></sl-copy-button>`
             : ""}
         </div>
@@ -298,7 +241,7 @@ export default class EccUtilsDesignDetails extends LitElement {
           ${field.label}
           ${field.copy
             ? html`<sl-copy-button
-                .value=${_.get(this.data, field.path)}
+                .value=${JSON.stringify(_.get(this.data, field.path))}
               ></sl-copy-button>`
             : ""}
         </div>
@@ -373,7 +316,7 @@ export default class EccUtilsDesignDetails extends LitElement {
         </sl-tooltip>
         ${fieldwithProps.copy
           ? html`<sl-copy-button
-              .value=${_.get(this.data, fieldwithProps.path)}
+              .value=${JSON.stringify(_.get(this.data, fieldwithProps.path))}
             ></sl-copy-button>`
           : ""}
       </div>
@@ -396,7 +339,7 @@ export default class EccUtilsDesignDetails extends LitElement {
   private _renderAction(action: Action) {
     if (action.type === "link") {
       return html`<sl-button
-        class="link"
+        class="action link"
         variant="text"
         size=${ifDefined(action.linkOptions?.size)}
         @click=${() => window.open(action.linkOptions?.url, "_blank")}
@@ -405,6 +348,7 @@ export default class EccUtilsDesignDetails extends LitElement {
       </sl-button>`;
     }
     return html`<sl-button
+      class="action button"
       @click=${() =>
         this.dispatchEvent(
           new CustomEvent("ecc-utils-button-click", {
