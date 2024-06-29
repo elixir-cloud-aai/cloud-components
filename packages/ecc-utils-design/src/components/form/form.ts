@@ -1,55 +1,18 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
-import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
-import "@shoelace-style/shoelace/dist/components/switch/switch.js";
-import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
-import "@shoelace-style/shoelace/dist/components/alert/alert.js";
-import "@shoelace-style/shoelace/dist/components/details/details.js";
-import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import _ from "lodash-es";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import formStyles from "./form.styles.js";
+import { Field } from "./types.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
-
-export interface Field {
-  key: string;
-  label: string;
-  type?:
-    | "text"
-    | "date"
-    | "number"
-    | "email"
-    | "password"
-    | "tel"
-    | "url"
-    | "search"
-    | "datetime-local"
-    | "time"
-    | "array"
-    | "switch"
-    | "file"
-    | "group";
-  fieldOptions?: {
-    required?: boolean;
-    default?: string | boolean;
-    multiple?: boolean;
-    accept?: string;
-    returnIfEmpty?: string;
-    tooltip?: string;
-  };
-  arrayOptions?: {
-    defaultInstances?: number;
-    max?: number;
-    min?: number;
-  };
-  groupOptions?: {
-    collapsible: boolean;
-  };
-  error?: string;
-  children?: Array<Field>;
-}
+import inputTemplate from "./templates/inputTemplate.js";
+import arrayTemplate from "./templates/arrayTemplate.js";
+import groupTemplate from "./templates/groupTemplate.js";
+import errorTemplate from "./templates/errorTemplate.js";
+import successTemplate from "./templates/successTemplate.js";
+import switchTemplate from "./templates/switchTemplate.js";
 
 /**
  * @summary This component is used to render a form with the given fields.
@@ -63,7 +26,6 @@ export interface Field {
  *
  * @event ecc-utils-submit - This event is fired when the form is submitted. The event detail contains the form data.
  */
-
 export default class EccUtilsDesignForm extends LitElement {
   static styles = [
     primitiveStylesheet,
@@ -129,39 +91,22 @@ export default class EccUtilsDesignForm extends LitElement {
 
     const { switchControl, switchThumb, label, switchLabel, formControl } =
       this.cssParts;
-    return html`
-      <div part="${formControl}" class="switch-container">
-        ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
-          ? html`
-              <sl-tooltip content=${field.fieldOptions?.tooltip}>
-                <label part="${label} ${switchLabel}" class="switch-label"
-                  >${field.label}
-                </label>
-              </sl-tooltip>
-            `
-          : html`
-              <label part="${label} ${switchLabel}" class="switch-label"
-                >${field.label}
-              </label>
-            `}
-        <sl-switch
-          exportparts="control: ${switchControl}, thumb: ${switchThumb}"
-          size="small"
-          class="switch"
-          label=${field.label}
-          ?required=${field.fieldOptions?.required}
-          ?checked=${_.get(this.form, path)}
-          @sl-change=${(e: Event) => {
-            _.set(this.form, path, (e.target as HTMLInputElement).checked);
-            this.requestUpdate();
-          }}
-        >
-        </sl-switch>
-      </div>
-    `;
+
+    const parts = [
+      formControl,
+      `${label} ${switchLabel}`,
+      `control: ${switchControl}, thumb: ${switchThumb}`,
+    ];
+
+    const changeAction = (e: Event) => {
+      _.set(this.form, path, (e.target as HTMLInputElement).checked);
+      this.requestUpdate();
+    };
+
+    return switchTemplate(field, parts, _.get(this.form, path), changeAction);
   }
 
-  renderInputTemplate(field: Field, path: string): TemplateResult {
+  private renderInputTemplate(field: Field, path: string): TemplateResult {
     if (
       field.type === "array" ||
       field.type === "switch" ||
@@ -171,94 +116,54 @@ export default class EccUtilsDesignForm extends LitElement {
 
     const { formControl, formControlLabel, input, inputBase, label } =
       this.cssParts;
-    if (field.type === "file") {
-      return html`
-        <div part="${formControl}" class="file-container">
-          ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
-            ? html`
-                <sl-tooltip
-                  id=${field.key}
-                  content=${field.fieldOptions?.tooltip}
-                >
-                  <label
-                    part="${label} ${formControlLabel}"
-                    class="file-input-label"
-                  >
-                    ${field.label} ${field.fieldOptions?.required ? "*" : ""}
-                  </label>
-                </sl-tooltip>
-              `
-            : html`
-                <label
-                  part="${label} ${formControlLabel}"
-                  class="file-input-label"
-                >
-                  ${field.label} ${field.fieldOptions?.required ? "*" : ""}
-                </label>
-              `}
-          <input
-            class="file-input"
-            part="${inputBase} ${input}"
-            type="file"
-            accept=${field.fieldOptions?.accept || "*"}
-            ?multiple=${field.fieldOptions?.multiple}
-            ?required=${field.fieldOptions?.required}
-            @change=${async (e: Event) => {
-              const { files } = e.target as HTMLInputElement;
-              _.set(this.form, path, files);
-              this.requestUpdate();
-            }}
-          />
-        </div>
-      `;
-    }
 
-    if (!_.get(this.form, path)) {
-      if (field.fieldOptions?.default && !this.hasUpdated) {
-        _.set(this.form, path, field.fieldOptions.default);
-      } else if (field.fieldOptions?.returnIfEmpty) {
-        _.set(this.form, path, "");
-      }
-    }
-
-    return html`
-      <sl-input
-        exportparts="form-control: ${formControl}, form-control-label: ${formControlLabel}, form-control-label: ${label}, input: ${input}, base: ${inputBase}"
-        class="input"
-        type=${field.type || "text"}
-        ?required=${field.fieldOptions?.required}
-        value=${_.get(this.form, path)}
-        ?password-toggle=${field.type === "password"}
-        @sl-input=${(e: Event) => {
-          const { value } = e.target as HTMLInputElement;
-          if (!value) {
-            _.unset(this.form, path);
-          } else {
-            _.set(this.form, path, value);
+    const changeAction =
+      field.type === "file"
+        ? (e: Event) => {
+            const { files } = e.target as HTMLInputElement;
+            _.set(this.form, path, files);
+            this.requestUpdate();
           }
+        : (e: Event) => {
+            const { value } = e.target as HTMLInputElement;
+            if (!value) {
+              _.unset(this.form, path);
+            } else {
+              _.set(this.form, path, value);
+            }
 
-          this.requestUpdate();
-        }}
-      >
-        <label slot="label">
-          ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
-            ? html`
-              <sl-tooltip content=${field.fieldOptions?.tooltip}>
-                <label> ${field.label} </label>
-              </sl-tooltip>
-            </label>
-            `
-            : html` <label> ${field.label} </label> `}
-        </label>
-      </sl-input>
-    `;
+            this.requestUpdate();
+          };
+
+    const emptyFieldAction = () => {
+      if (!_.get(this.form, path)) {
+        if (field.fieldOptions?.default && !this.hasUpdated) {
+          _.set(this.form, path, field.fieldOptions.default);
+        } else if (field.fieldOptions?.returnIfEmpty) {
+          _.set(this.form, path, "");
+        }
+      }
+    };
+
+    return inputTemplate(
+      field,
+      [
+        formControl,
+        `${label} ${formControlLabel}`,
+        `${inputBase} ${input}`,
+        `form-control: ${formControl}, form-control-label: ${formControlLabel}, form-control-label: ${label}, input: ${input}, base: ${inputBase}`,
+      ],
+      changeAction,
+      emptyFieldAction,
+      _.get(this.form, path)
+    );
   }
 
   private renderArrayTemplate(field: Field, path: string): TemplateResult {
     const { arrayOptions } = field;
 
     if (!_.get(this.form, path)) {
-      const defaultCount = field.arrayOptions?.defaultInstances;
+      const defaultCount = arrayOptions?.defaultInstances;
       if (defaultCount) {
         _.set(
           this.form,
@@ -293,95 +198,49 @@ export default class EccUtilsDesignForm extends LitElement {
       arrayItem,
       item,
     } = this.cssParts;
-    return html`
-      <div class="array-container" part="${container} ${arrayContainer}">
-        <div
-          part="header: ${arrayHeader}, header: ${header}"
-          class="array-header"
-        >
-          ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
-            ? html`
-                <sl-tooltip content=${field.fieldOptions?.tooltip}>
-                  <label part="${label} ${arrayLabel}" class="array-label">
-                    ${field.label} ${field.fieldOptions?.required ? "*" : ""}
-                  </label>
-                </sl-tooltip>
-              `
-            : html`
-                <label part="${label} ${arrayLabel}" class="array-label">
-                  ${field.label} ${field.fieldOptions?.required ? "*" : ""}
-                </label>
-              `}
-          <sl-button
-            variant="text"
-            size="small"
-            exportparts="base: ${button}, base: ${addButton}"
-            ?disabled=${!resolveAddButtonIsActive()}
-            class="add-button"
-            @click=${() => {
-              if (resolveAddButtonIsActive()) {
-                const instances: [] = _.get(this.form, path) || [];
-                _.set(this.form, path, [...instances, {}]);
-                this.requestUpdate();
-              }
-            }}
-          >
-            <svg
-              class="add-icon"
-              slot="prefix"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-            Add
-          </sl-button>
-        </div>
-        ${_.get(this.form, path)?.map(
-          (_item: any, index: number) => html`
-            <div part="${item} ${arrayItem}" class="array-item">
-              <sl-button
-                variant="text"
-                exportparts="base: ${button}, base: ${removeButton}"
-                ?disabled=${!resolveDeleteButtonIsActive()}
-                @click=${() => {
-                  resolveDeleteButtonIsActive() &&
-                    _.get(this.form, path).splice(index, 1) &&
-                    this.requestUpdate();
-                }}
-              >
-                <svg
-                  class="delete-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                  />
-                </svg>
-              </sl-button>
-              <div class="array-item-container">
-                ${field.children?.map((child) =>
-                  this.renderTemplate(child, `${path}[${index}]`)
-                )}
-              </div>
-            </div>
-          `
-        )}
-      </div>
-    `;
+
+    const parts = [
+      `${container} ${arrayContainer}`,
+      `header: ${arrayHeader}, header: ${header}`,
+      `${label} ${arrayLabel}`,
+      `base: ${button}, base: ${addButton}`,
+      `${item} ${arrayItem}`,
+      `base: ${button}, base: ${removeButton}`,
+    ];
+
+    const addAction = () => {
+      if (resolveAddButtonIsActive()) {
+        const instances: [] = _.get(this.form, path) || [];
+        _.set(this.form, path, [...instances, {}]);
+        this.requestUpdate();
+      }
+    };
+
+    const deleteAction = (index: number) => {
+      resolveDeleteButtonIsActive() &&
+        _.get(this.form, path).splice(index, 1) &&
+        this.requestUpdate();
+    };
+
+    const renderChildren = (index: number) => {
+      if (field.children?.length)
+        return html` ${field.children?.map((child) =>
+          this.renderTemplate(child, `${path}[${index}]`)
+        )}`;
+
+      return html``;
+    };
+
+    return arrayTemplate(
+      field,
+      parts,
+      resolveAddButtonIsActive(),
+      resolveDeleteButtonIsActive(),
+      addAction,
+      deleteAction,
+      renderChildren,
+      _.get(this.form, path)
+    );
   }
 
   private renderGroupTemplate(field: Field, path: string): TemplateResult {
@@ -398,6 +257,12 @@ export default class EccUtilsDesignForm extends LitElement {
       groupLabel,
       groupToggleIcon,
     } = this.cssParts;
+
+    const parts = [
+      `base: ${groupBase}, header: ${groupHeader}, header: ${header}, summary: ${label}, summary: ${groupLabel}, summary-icon: ${groupToggleIcon}, content: ${groupContent}`,
+      `${header} ${groupHeader}`,
+      `${label} ${groupLabel}`,
+    ];
     const renderChildren = () =>
       html`
         <div part="${item} ${groupItem}" class="group-item">
@@ -407,35 +272,7 @@ export default class EccUtilsDesignForm extends LitElement {
         </div>
       `;
 
-    return html` <div class="group-container">
-      ${field.groupOptions?.collapsible
-        ? html` <sl-details
-            summary=${`${field.label} ${
-              field.fieldOptions?.required ? "*" : ""
-            }`}
-            exportparts="base: ${groupBase}, header: ${groupHeader}, header: ${header}, summary: ${label}, summary: ${groupLabel}, summary-icon: ${groupToggleIcon}, content: ${groupContent}"
-          >
-            ${renderChildren()}
-          </sl-details>`
-        : html`
-            <div part="${header} ${groupHeader}" class="group-header">
-              ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
-                ? html`
-                    <sl-tooltip content=${field.fieldOptions?.tooltip}>
-                      <label part="${groupLabel} ${label}" class="group-label">
-                        ${field.groupOptions?.collapsible ? "" : field.label}
-                      </label>
-                    </sl-tooltip>
-                  `
-                : html`
-                    <label part="${groupLabel} ${label}" class="group-label">
-                      ${field.groupOptions?.collapsible ? "" : field.label}
-                    </label>
-                  `}
-            </div>
-            <div class="group-content">${renderChildren()}</div>
-          `}
-    </div>`;
+    return groupTemplate(field, parts, renderChildren);
   }
 
   private renderTemplate(field: Field, path: string): TemplateResult {
@@ -458,49 +295,13 @@ export default class EccUtilsDesignForm extends LitElement {
 
   private renderErrorTemplate(): TemplateResult {
     if (this.formState !== "error") return html``;
-    return html`<sl-alert variant="danger" open>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        slot="icon"
-        class="error-icon"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
-        />
-      </svg>
-      <strong>${this.errorMessage}</strong>
-    </sl-alert> `;
+    return errorTemplate(this.errorMessage);
   }
 
   private renderSuccessTemplate(): TemplateResult {
     if (this.formState !== "success") return html``;
-    return html`
-      <sl-alert variant="success" open>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          slot="icon"
-          class="success-icon"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
 
-        <strong>${this.successMessage}</strong>
-      </sl-alert>
-    `;
+    return successTemplate(this.successMessage);
   }
 
   public disableSubmit(disable = true) {
@@ -584,3 +385,5 @@ export default class EccUtilsDesignForm extends LitElement {
     `;
   }
 }
+
+export { Field };
