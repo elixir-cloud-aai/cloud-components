@@ -1,0 +1,40 @@
+{
+  "name": "ecc-client-elixir-drs-filer",
+  "description": "DRS Filer component",
+  "main": "index.js",
+  "type": "module",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/elixir-cloud-aai/cloud-components.git"
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"package.json",
+		"LICENSE"
+	],
+  "scripts": {
+    "analyze": "cem analyze --litelement",
+    "build": "node ../../scripts/build.js -p ecc-client-elixir-drs-filer-",
+    "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
+    "clean": "rm -rf dist node_modules custom-elements-manifest.config.js",
+    "test": "wtr --coverage",
+    "test:watch": "wtr --watch",
+    "lint": "npx eslint .",
+    "lint:fix": "npm run lint -- --fix",
+    "prepublish": "npm run build"
+  },
+  "devDependencies": {
+    "eslint": "^8.41.0",
+    "@elixir-cloud/eslint-config": "*",
+    "eslint-plugin-prettier": "^4.2.1",
+    "typescript": "*",
+    "@lit/react": "*",
+    "react": "*",
+    "commander": "*",
+    "custom-element-jet-brains-integration": "*",
+    "custom-element-vs-code-integration": "*"
+  }
+}
