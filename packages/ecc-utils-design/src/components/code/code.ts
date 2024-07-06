@@ -9,7 +9,7 @@ import { primitiveStylesheet } from "../../styles/primitive.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import getShoelaceStyles from "../../styles/shoelace.styles.js";
 
-export type Language = "yaml" | "json" | "xml" | "makefile";
+export type Language = "yaml" | "json" | "xml" | "makefile" | "sh";
 
 export default class EccUtilsDesignCode extends LitElement {
   static styles = [
@@ -35,16 +35,30 @@ export default class EccUtilsDesignCode extends LitElement {
   async initializeAceEditor() {
     const editorElement = this.shadowRoot?.getElementById("editor");
     if (editorElement) {
+      const { ace } = window as any;
+      ace.config.set(
+        "workerPath",
+        `https://cdn.jsdelivr.net/npm/ace-builds@${ace.version}/src-min-noconflict`
+      );
       this.editor = ace.edit(editorElement);
-      this.editor.setTheme("ace/theme/twilight");
+      this.editor.setTheme("ace/theme/github");
+      this.editor.session.setUseWorker(true);
       this.editor.renderer.attachToShadowRoot();
       this.editor.setValue(this.code);
 
-      await this.setEditorLanguage(this.language);
+      this.setEditorLanguage(this.language);
       if (this.disabled) this.editor.setReadOnly(true);
 
       this.editor.on("change", () => {
         this.code = this.editor.getValue();
+
+        this.dispatchEvent(
+          new CustomEvent("ecc-utils-code-change", {
+            detail: { code: this.code },
+            bubbles: true,
+            composed: true,
+          })
+        );
       });
     }
   }
