@@ -8,10 +8,10 @@ import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import _ from "lodash-es";
-import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import formStyles from "./form.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
+import sholelaceStyles from "../../styles/shoelace.styles.js";
 
 export interface Field {
   key: string;
@@ -67,9 +67,7 @@ export interface Field {
 export default class EccUtilsDesignForm extends LitElement {
   static styles = [
     primitiveStylesheet,
-    getShoelaceStyles(
-      document.querySelector("html")?.classList.contains("dark")
-    ),
+    sholelaceStyles,
     hostStyles,
     formStyles,
   ];
@@ -82,35 +80,6 @@ export default class EccUtilsDesignForm extends LitElement {
   @state() private errorMessage = "Something went wrong";
   @state() private successMessage = "Form submitted successfully";
   @state() private requiredButEmpty: string[] = [];
-
-  protected cssParts = {
-    switchControl: "switch",
-    switchThumb: "switch-thumb",
-    switchLabel: "switch-label",
-    formControl: "field",
-    formControlLabel: "input-label",
-    input: "input",
-    inputBase: "input-base",
-    button: "button",
-    addButton: "add-button",
-    removeButton: "remove-button",
-    submitButton: "submit-button",
-    header: "header",
-    label: "label",
-    arrayHeader: "array-header",
-    arrayContainer: "array-container",
-    arrayLabel: "array-label",
-    arrayItem: "array-item",
-    groupBase: "group",
-    groupHeader: "group-header",
-    groupItem: "group-item",
-    groupLabel: "group-label",
-    groupToggleIcon: "group-toggle-icon",
-    groupContent: "group-content",
-    container: "container",
-    item: "item",
-    form: "form",
-  };
 
   connectedCallback() {
     super.connectedCallback();
@@ -127,25 +96,16 @@ export default class EccUtilsDesignForm extends LitElement {
       _.set(this.form, path, field.fieldOptions?.default || false);
     }
 
-    const { switchControl, switchThumb, label, switchLabel, formControl } =
-      this.cssParts;
     return html`
-      <div part="${formControl}" class="switch-container">
+      <div class="switch-container">
         ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
           ? html`
               <sl-tooltip content=${field.fieldOptions?.tooltip}>
-                <label part="${label} ${switchLabel}" class="switch-label"
-                  >${field.label}
-                </label>
+                <label class="switch-label">${field.label} </label>
               </sl-tooltip>
             `
-          : html`
-              <label part="${label} ${switchLabel}" class="switch-label"
-                >${field.label}
-              </label>
-            `}
+          : html` <label class="switch-label">${field.label} </label> `}
         <sl-switch
-          exportparts="control: ${switchControl}, thumb: ${switchThumb}"
           size="small"
           class="switch"
           label=${field.label}
@@ -169,36 +129,27 @@ export default class EccUtilsDesignForm extends LitElement {
     )
       return html``;
 
-    const { formControl, formControlLabel, input, inputBase, label } =
-      this.cssParts;
     if (field.type === "file") {
       return html`
-        <div part="${formControl}" class="file-container">
+        <div class="file-container">
           ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
             ? html`
                 <sl-tooltip
                   id=${field.key}
                   content=${field.fieldOptions?.tooltip}
                 >
-                  <label
-                    part="${label} ${formControlLabel}"
-                    class="file-input-label"
-                  >
+                  <label class="file-input-label">
                     ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                   </label>
                 </sl-tooltip>
               `
             : html`
-                <label
-                  part="${label} ${formControlLabel}"
-                  class="file-input-label"
-                >
+                <label class="file-input-label">
                   ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                 </label>
               `}
           <input
             class="file-input"
-            part="${inputBase} ${input}"
             type="file"
             accept=${field.fieldOptions?.accept || "*"}
             ?multiple=${field.fieldOptions?.multiple}
@@ -223,7 +174,6 @@ export default class EccUtilsDesignForm extends LitElement {
 
     return html`
       <sl-input
-        exportparts="form-control: ${formControl}, form-control-label: ${formControlLabel}, form-control-label: ${label}, input: ${input}, base: ${inputBase}"
         class="input"
         type=${field.type || "text"}
         ?required=${field.fieldOptions?.required}
@@ -280,42 +230,25 @@ export default class EccUtilsDesignForm extends LitElement {
       return false;
     };
 
-    const {
-      button,
-      addButton,
-      removeButton,
-      label,
-      header,
-      arrayHeader,
-      arrayContainer,
-      container,
-      arrayLabel,
-      arrayItem,
-      item,
-    } = this.cssParts;
     return html`
-      <div class="array-container" part="${container} ${arrayContainer}">
-        <div
-          part="header: ${arrayHeader}, header: ${header}"
-          class="array-header"
-        >
+      <div class="array-container">
+        <div class="array-header">
           ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
             ? html`
                 <sl-tooltip content=${field.fieldOptions?.tooltip}>
-                  <label part="${label} ${arrayLabel}" class="array-label">
+                  <label class="array-label">
                     ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                   </label>
                 </sl-tooltip>
               `
             : html`
-                <label part="${label} ${arrayLabel}" class="array-label">
+                <label class="array-label">
                   ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                 </label>
               `}
           <sl-button
             variant="text"
             size="small"
-            exportparts="base: ${button}, base: ${addButton}"
             ?disabled=${!resolveAddButtonIsActive()}
             class="add-button"
             @click=${() => {
@@ -346,10 +279,9 @@ export default class EccUtilsDesignForm extends LitElement {
         </div>
         ${_.get(this.form, path)?.map(
           (_item: any, index: number) => html`
-            <div part="${item} ${arrayItem}" class="array-item">
+            <div class="array-item">
               <sl-button
                 variant="text"
-                exportparts="base: ${button}, base: ${removeButton}"
                 ?disabled=${!resolveDeleteButtonIsActive()}
                 @click=${() => {
                   resolveDeleteButtonIsActive() &&
@@ -387,20 +319,9 @@ export default class EccUtilsDesignForm extends LitElement {
   private renderGroupTemplate(field: Field, path: string): TemplateResult {
     if (!field.children) return html``;
 
-    const {
-      item,
-      header,
-      label,
-      groupItem,
-      groupBase,
-      groupContent,
-      groupHeader,
-      groupLabel,
-      groupToggleIcon,
-    } = this.cssParts;
     const renderChildren = () =>
       html`
-        <div part="${item} ${groupItem}" class="group-item">
+        <div class="group-item">
           ${field.children?.map((child) =>
             this.renderTemplate(child, `${path}`)
           )}
@@ -413,22 +334,21 @@ export default class EccUtilsDesignForm extends LitElement {
             summary=${`${field.label} ${
               field.fieldOptions?.required ? "*" : ""
             }`}
-            exportparts="base: ${groupBase}, header: ${groupHeader}, header: ${header}, summary: ${label}, summary: ${groupLabel}, summary-icon: ${groupToggleIcon}, content: ${groupContent}"
           >
             ${renderChildren()}
           </sl-details>`
         : html`
-            <div part="${header} ${groupHeader}" class="group-header">
+            <div class="group-header">
               ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
                 ? html`
                     <sl-tooltip content=${field.fieldOptions?.tooltip}>
-                      <label part="${groupLabel} ${label}" class="group-label">
+                      <label class="group-label">
                         ${field.groupOptions?.collapsible ? "" : field.label}
                       </label>
                     </sl-tooltip>
                   `
                 : html`
-                    <label part="${groupLabel} ${label}" class="group-label">
+                    <label class="group-label">
                       ${field.groupOptions?.collapsible ? "" : field.label}
                     </label>
                   `}
@@ -544,10 +464,8 @@ export default class EccUtilsDesignForm extends LitElement {
       return "";
     };
 
-    const { button, submitButton, form: csspartForm } = this.cssParts;
     return html`
       <form
-        part="${csspartForm}"
         @submit=${(e: Event) => {
           e.preventDefault();
           const form = this.shadowRoot?.querySelector("form");
@@ -572,7 +490,6 @@ export default class EccUtilsDesignForm extends LitElement {
           type="submit"
           variant="primary"
           class="submit-button"
-          exportparts="base: ${button}, base: ${submitButton}"
           ?loading=${this.formState === "loading"}
           ?disabled=${this.submitDisabledByUser ||
           !this.canSubmit ||

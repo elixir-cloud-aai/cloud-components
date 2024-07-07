@@ -1,6 +1,5 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
-import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/badge/badge.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
@@ -14,6 +13,7 @@ import { hostStyles } from "../../styles/host.styles.js";
 import collectionStyles from "./collection.styles.js";
 
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
+import sholelaceStyles from "../../styles/shoelace.styles.js";
 
 export interface ItemProp {
   index: number;
@@ -55,9 +55,7 @@ export interface FilterProp {
 export default class EccUtilsDesignCollection extends LitElement {
   static styles = [
     primitiveStylesheet,
-    getShoelaceStyles(
-      document.querySelector("html")?.classList.contains("dark")
-    ),
+    sholelaceStyles,
     hostStyles,
     collectionStyles,
   ];

@@ -7,16 +7,14 @@ import _ from "lodash-es";
 import codeStyles from "./code.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
-import getShoelaceStyles from "../../styles/shoelace.styles.js";
+import sholelaceStyles from "../../styles/shoelace.styles.js";
 
 export type Language = "yaml" | "json" | "xml" | "makefile" | "sh";
 
 export default class EccUtilsDesignCode extends LitElement {
   static styles = [
     primitiveStylesheet,
-    getShoelaceStyles(
-      document.querySelector("html")?.classList.contains("dark")
-    ),
+    sholelaceStyles,
     hostStyles,
     codeStyles,
   ];

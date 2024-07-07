@@ -2,7 +2,6 @@ import { html, LitElement } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { property, state } from "lit/decorators.js";
 import _, { toLower } from "lodash-es";
-import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
 import "@shoelace-style/shoelace/dist/components/tab/tab.js";
 import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
@@ -14,6 +13,7 @@ import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import detailsStyles from "./details.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
+import sholelaceStyles from "../../styles/shoelace.styles.js";
 
 export interface Field {
   key: string;
@@ -68,9 +68,7 @@ export interface Action {
 export default class EccUtilsDesignDetails extends LitElement {
   static styles = [
     primitiveStylesheet,
-    getShoelaceStyles(
-      document.querySelector("html")?.classList.contains("dark")
-    ),
+    sholelaceStyles,
     hostStyles,
     detailsStyles,
   ];
