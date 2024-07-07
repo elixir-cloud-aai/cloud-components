@@ -8,36 +8,34 @@ const appDir = path.resolve(__dirname, "./src");
 const outDir = path.resolve(__dirname, "./www");
 
 module.exports = {
-    name: "root",
-    entry: {
-        main: path.resolve(appDir, "index.ts"),
-    },
-    resolve: {
-        extensions: [".ts", ".js"],
-        plugins: [
-            new ResolveTypeScriptPlugin()
-        ]
-    },
-    output: {
-        path: outDir,
-        publicPath: "/",
-    },
-    module: {
-        rules: [
-            {
-                test: /.ts$/,
-                use: [
-                    {
-                        loader: "ts-loader",
-                    },
-                ],
-            },
+  name: "root",
+  entry: {
+    main: path.resolve(appDir, "index.ts"),
+  },
+  resolve: {
+    extensions: [".ts", ".js"],
+    plugins: [new ResolveTypeScriptPlugin()],
+  },
+  output: {
+    path: outDir,
+    publicPath: "/",
+  },
+  module: {
+    rules: [
+      {
+        test: /.ts$/,
+        use: [
+          {
+            loader: "ts-loader",
+          },
         ],
-    },
-    plugins: [
-        new HtmlWebpackPlugin({
-            title: "ecc-client-elixir-trs-filer",
-            template: path.resolve(appDir, "index.html"),
-        }),
+      },
     ],
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: "ecc-client-elixir-trs-filer",
+      template: path.resolve(appDir, "index.html"),
+    }),
+  ],
 };
