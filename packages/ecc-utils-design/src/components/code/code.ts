@@ -85,7 +85,8 @@ export default class EccUtilsDesignCode extends LitElement {
     return html`
       <div class="header">
         <div id="label">${this.label}</div>
-        <sl-tag size="small">${_.upperCase(this.language)}</div>
+        <sl-tag size="small">
+        ${_.upperCase(this.language)}</sl-tag></div>
       </div>
       <div id="code">
         <div
