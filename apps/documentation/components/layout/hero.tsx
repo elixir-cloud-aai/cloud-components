@@ -1,5 +1,4 @@
 'use client';
-import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { Link } from 'nextra-theme-docs';
 
@@ -397,48 +396,34 @@ export default function Globe() {
   return (
     <div className='flex flex-row items-center justify-center h-72 md:h-auto relative w-full'>
       <div className='max-w-7xl mx-auto w-full relative overflow-hidden h-full md:h-[40rem] px-4'>
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 1,
-          }}
-          className='div'
-        >
+        <div>
           <div className='absolute top-0 left-0 z-10'>
-            <h1 className='text-start text-[2rem] sm:text-[3rem] font-bold bg-gradient-to-r from-[#3692d6] to-[#32a8f2] inline-block text-transparent bg-clip-text'>
-              <div className='text-[3rem] lg:text-[6rem]'>ELIXIR Cloud</div>
-              <div> Components</div>
+            <h1 className='text-start text-[2rem] sm:text-[3rem] font-bold bg-gradient-to-r from-sky-600 to-sky-400 inline-block text-transparent bg-clip-text'>
+              <div className=''>ELIXIR Cloud<br />Components</div>
             </h1>
-            <p className='text text-start text-[#32a8f2] backdrop-blur-xs max-w-46'>
+            <p className='text text-start text-white backdrop-blur-xs max-w-46'>
               GUI for <i> your </i> federated cloud infrastructures.
             </p>
-            <div className='flex gap-2'>
+            <div className='flex gap-2 mt-4'>
               <Link
                 href='/components'
-                className='btn btn-primary mt-4 w-fit rounded-full bg-[#3692d6] hover:bg-[#32a8f2] text-white font-bold py-2 px-6 shadow-2xl transition duration-300 ease-in-out'
+                className='text-sm w-fit rounded-full bg-sky-600 hover:bg-sky-500 !text-white py-2 px-6 shadow-2xl transition duration-300 ease-in-out'
               >
                 <button>Get started</button>
               </Link>
               <Link
                 href='/ui'
-                className='btn btn-primary mt-4 w-fit rounded-full bg-[#3692d6] hover:bg-[#32a8f2] text-white font-bold py-2 px-6 shadow-md transition duration-300 ease-in-out'
+                className='text-sm w-fit rounded-full bg-zinc-800 hover:bg-zinc-700 !text-white py-2 px-6 shadow-md transition duration-300 ease-in-out'
               >
                 <button>Make your own?</button>
               </Link>
             </div>
           </div>
           <div className='absolute w-full top-0 right-0 bg-gradient-to-b pointer-events-none select-none' />
-          <div className='absolute -right-10 -top-8 md:-right-52 lg:left-40 md:w-[800px] h-72 md:h-full'>
+          <div className='absolute -right-10 -top-8 md:-right-52 lg:left-40 md:w-[800px] h-40 md:h-[26rem]'>
             <World data={sampleArcs} globeConfig={globeConfig} />
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

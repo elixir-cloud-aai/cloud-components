@@ -7,7 +7,8 @@
       "sidebar": true,
       "toc": false,
       "pagination": false
-    }
+    },
+    "type": "page"
   },
   "components": "Elixir components",
   "ui": "Make your own components!",
