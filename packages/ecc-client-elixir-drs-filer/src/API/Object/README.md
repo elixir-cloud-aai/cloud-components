@@ -16,6 +16,6 @@ Posts/Create a new object.
 |            |        | Modify the structure according to your task requirements.              |
 
 
-![Logo]('./../../../../images/logo-elixir.svg)
-![Logo]('./../../../../images/logo-elixir-cloud-aai.svg)
+![Logo]('./../../../../images/logo-elixir.svg')
+![Logo]('./../../../../images/logo-elixir-cloud-aai.svg')
 
