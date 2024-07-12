@@ -13,8 +13,6 @@ import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import collectionStyles from "./collection.styles.js";
 
-import { primitiveStylesheet } from "../../styles/primitive.styles.js";
-
 export interface ItemProp {
   index: number;
   name: string;
@@ -54,7 +52,6 @@ export interface FilterProp {
  */
 export default class EccUtilsDesignCollection extends LitElement {
   static styles = [
-    primitiveStylesheet,
     getShoelaceStyles(
       document.querySelector("html")?.classList.contains("dark")
     ),
@@ -145,7 +142,6 @@ export default class EccUtilsDesignCollection extends LitElement {
     return html` <div class="footer">
       <sl-button-group>
         <sl-button
-          class="page"
           @click=${() => {
             this._page -= 1;
             this.dispatchEvent(
@@ -166,7 +162,6 @@ export default class EccUtilsDesignCollection extends LitElement {
           ).keys(),
         ].map(
           (page) => html`<sl-button
-            class="page"
             @click=${() => {
               this._page = page + 1;
               this.dispatchEvent(
@@ -183,10 +178,9 @@ export default class EccUtilsDesignCollection extends LitElement {
           </sl-button>`
         )}
         ${this.totalItems === -1
-          ? html` <sl-button class="page" disabled> ... </sl-button> `
+          ? html` <sl-button disabled> ... </sl-button> `
           : ""}
         <sl-button
-          class="page"
           @click=${() => {
             if (this.totalItems === -1 && this._page === this._pagesRendered) {
               this._pagesRendered += 1;
@@ -243,7 +237,7 @@ export default class EccUtilsDesignCollection extends LitElement {
             </sl-badge>`
           : ""}
       </div>
-      <slot name="${item.key}" class="content">
+      <slot name="${item.key}">
         ${item.lazy
           ? html`<div class="lazy">
               <sl-skeleton class="skeleton-body" effect="sheen"></sl-skeleton

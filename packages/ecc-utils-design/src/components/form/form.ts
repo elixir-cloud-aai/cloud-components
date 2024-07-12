@@ -28,7 +28,6 @@ import switchTemplate from "./templates/switchTemplate.js";
  */
 export default class EccUtilsDesignForm extends LitElement {
   static styles = [
-    primitiveStylesheet,
     getShoelaceStyles(
       document.querySelector("html")?.classList.contains("dark")
     ),
@@ -371,8 +370,6 @@ export default class EccUtilsDesignForm extends LitElement {
 
         <sl-button
           type="submit"
-          variant="primary"
-          class="submit-button"
           exportparts="base: ${button}, base: ${submitButton}"
           ?loading=${this.formState === "loading"}
           ?disabled=${this.submitDisabledByUser ||

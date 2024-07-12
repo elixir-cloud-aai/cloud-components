@@ -222,249 +222,233 @@ const sholelaceLightStyles = css`
     --sl-color-rose-900: hsl(341.5 75.5% 30.4%);
     --sl-color-rose-950: hsl(341.3 70.1% 17.1%);
 
-    --sl-color-primary-50: var(--ecc-color-primary-50);
-    --sl-color-primary-100: var(--ecc-color-primary-100);
-    --sl-color-primary-200: var(--ecc-color-primary-200);
-    --sl-color-primary-300: var(--ecc-color-primary-300);
-    --sl-color-primary-400: var(--ecc-color-primary-400);
-    --sl-color-primary-500: var(--ecc-color-primary-500);
-    --sl-color-primary-600: var(--ecc-color-primary-600);
-    --sl-color-primary-700: var(--ecc-color-primary-700);
-    --sl-color-primary-800: var(--ecc-color-primary-800);
-    --sl-color-primary-900: var(--ecc-color-primary-900);
-    --sl-color-primary-950: var(--ecc-color-primary-950);
+    --sl-color-primary-50: var(--sl-color-sky-50);
+    --sl-color-primary-100: var(--sl-color-sky-100);
+    --sl-color-primary-200: var(--sl-color-sky-200);
+    --sl-color-primary-300: var(--sl-color-sky-300);
+    --sl-color-primary-400: var(--sl-color-sky-400);
+    --sl-color-primary-500: var(--sl-color-sky-500);
+    --sl-color-primary-600: var(--sl-color-sky-600);
+    --sl-color-primary-700: var(--sl-color-sky-700);
+    --sl-color-primary-800: var(--sl-color-sky-800);
+    --sl-color-primary-900: var(--sl-color-sky-900);
+    --sl-color-primary-950: var(--sl-color-sky-950);
 
-    --sl-color-success-50: var(--ecc-color-success-50);
-    --sl-color-success-100: var(--ecc-color-success-100);
-    --sl-color-success-200: var(--ecc-color-success-200);
-    --sl-color-success-300: var(--ecc-color-success-300);
-    --sl-color-success-400: var(--ecc-color-success-400);
-    --sl-color-success-500: var(--ecc-color-success-500);
-    --sl-color-success-600: var(--ecc-color-success-600);
-    --sl-color-success-700: var(--ecc-color-success-700);
-    --sl-color-success-800: var(--ecc-color-success-800);
-    --sl-color-success-900: var(--ecc-color-success-900);
-    --sl-color-success-950: var(--ecc-color-success-950);
+    --sl-color-success-50: var(--sl-color-green-50);
+    --sl-color-success-100: var(--sl-color-green-100);
+    --sl-color-success-200: var(--sl-color-green-200);
+    --sl-color-success-300: var(--sl-color-green-300);
+    --sl-color-success-400: var(--sl-color-green-400);
+    --sl-color-success-500: var(--sl-color-green-500);
+    --sl-color-success-600: var(--sl-color-green-600);
+    --sl-color-success-700: var(--sl-color-green-700);
+    --sl-color-success-800: var(--sl-color-green-800);
+    --sl-color-success-900: var(--sl-color-green-900);
+    --sl-color-success-950: var(--sl-color-green-950);
 
-    --sl-color-warning-50: var(--ecc-color-warning-50);
-    --sl-color-warning-100: var(--ecc-color-warning-100);
-    --sl-color-warning-200: var(--ecc-color-warning-200);
-    --sl-color-warning-300: var(--ecc-color-warning-300);
-    --sl-color-warning-400: var(--ecc-color-warning-400);
-    --sl-color-warning-500: var(--ecc-color-warning-500);
-    --sl-color-warning-600: var(--ecc-color-warning-600);
-    --sl-color-warning-700: var(--ecc-color-warning-700);
-    --sl-color-warning-800: var(--ecc-color-warning-800);
-    --sl-color-warning-900: var(--ecc-color-warning-900);
-    --sl-color-warning-950: var(--ecc-color-warning-950);
+    --sl-color-warning-50: var(--sl-color-amber-50);
+    --sl-color-warning-100: var(--sl-color-amber-100);
+    --sl-color-warning-200: var(--sl-color-amber-200);
+    --sl-color-warning-300: var(--sl-color-amber-300);
+    --sl-color-warning-400: var(--sl-color-amber-400);
+    --sl-color-warning-500: var(--sl-color-amber-500);
+    --sl-color-warning-600: var(--sl-color-amber-600);
+    --sl-color-warning-700: var(--sl-color-amber-700);
+    --sl-color-warning-800: var(--sl-color-amber-800);
+    --sl-color-warning-900: var(--sl-color-amber-900);
+    --sl-color-warning-950: var(--sl-color-amber-950);
 
-    --sl-color-danger-50: var(--ecc-color-danger-50);
-    --sl-color-danger-100: var(--ecc-color-danger-100);
-    --sl-color-danger-200: var(--ecc-color-danger-200);
-    --sl-color-danger-300: var(--ecc-color-danger-300);
-    --sl-color-danger-400: var(--ecc-color-danger-400);
-    --sl-color-danger-500: var(--ecc-color-danger-500);
-    --sl-color-danger-600: var(--ecc-color-danger-600);
-    --sl-color-danger-700: var(--ecc-color-danger-700);
-    --sl-color-danger-800: var(--ecc-color-danger-800);
-    --sl-color-danger-900: var(--ecc-color-danger-900);
-    --sl-color-danger-950: var(--ecc-color-danger-950);
+    --sl-color-danger-50: var(--sl-color-red-50);
+    --sl-color-danger-100: var(--sl-color-red-100);
+    --sl-color-danger-200: var(--sl-color-red-200);
+    --sl-color-danger-300: var(--sl-color-red-300);
+    --sl-color-danger-400: var(--sl-color-red-400);
+    --sl-color-danger-500: var(--sl-color-red-500);
+    --sl-color-danger-600: var(--sl-color-red-600);
+    --sl-color-danger-700: var(--sl-color-red-700);
+    --sl-color-danger-800: var(--sl-color-red-800);
+    --sl-color-danger-900: var(--sl-color-red-900);
+    --sl-color-danger-950: var(--sl-color-red-950);
 
-    --sl-color-neutral-50: var(--ecc-color-neutral-50);
-    --sl-color-neutral-100: var(--ecc-color-neutral-100);
-    --sl-color-neutral-200: var(--ecc-color-neutral-200);
-    --sl-color-neutral-300: var(--ecc-color-neutral-300);
-    --sl-color-neutral-400: var(--ecc-color-neutral-400);
-    --sl-color-neutral-500: var(--ecc-color-neutral-500);
-    --sl-color-neutral-600: var(--ecc-color-neutral-600);
-    --sl-color-neutral-700: var(--ecc-color-neutral-700);
-    --sl-color-neutral-800: var(--ecc-color-neutral-800);
-    --sl-color-neutral-900: var(--ecc-color-neutral-900);
-    --sl-color-neutral-950: var(--ecc-color-neutral-950);
+    --sl-color-neutral-50: var(--sl-color-gray-50);
+    --sl-color-neutral-100: var(--sl-color-gray-100);
+    --sl-color-neutral-200: var(--sl-color-gray-200);
+    --sl-color-neutral-300: var(--sl-color-gray-300);
+    --sl-color-neutral-400: var(--sl-color-gray-400);
+    --sl-color-neutral-500: var(--sl-color-gray-500);
+    --sl-color-neutral-600: var(--sl-color-gray-600);
+    --sl-color-neutral-700: var(--sl-color-gray-700);
+    --sl-color-neutral-800: var(--sl-color-gray-800);
+    --sl-color-neutral-900: var(--sl-color-gray-900);
+    --sl-color-neutral-950: var(--sl-color-gray-950);
 
-    --sl-color-neutral-0: var(--ecc-color-neutral-0);
-    --sl-color-neutral-1000: var(--ecc-color-neutral-1000);
+    --sl-color-neutral-0: hsl(0, 0%, 100%);
+    --sl-color-neutral-1000: hsl(0, 0%, 0%);
 
-    --sl-border-radius-small: var(--ecc-border-radius-small);
-    --sl-border-radius-medium: var(--ecc-border-radius-medium);
-    --sl-border-radius-large: var(--ecc-border-radius-large);
-    --sl-border-radius-x-large: var(--ecc-border-radius-x-large);
+    --sl-border-radius-small: 0.1875rem;
+    --sl-border-radius-medium: 0.25rem;
+    --sl-border-radius-large: 0.5rem;
+    --sl-border-radius-x-large: 1rem;
 
-    --sl-border-radius-circle: var(--ecc-radius-circle);
-    --sl-border-radius-pill: var(--ecc-radius-full);
+    --sl-border-radius-circle: 50%;
+    --sl-border-radius-pill: 9999px;
 
-    --sl-shadow-x-small: var(--ecc-shadow-x-small);
-    --sl-shadow-small: var(--ecc-shadow-small);
-    --sl-shadow-medium: var(--ecc-shadow-medium);
-    --sl-shadow-large: var(--ecc-shadow-large);
-    --sl-shadow-x-large: var(--ecc-shadow-x-large);
+    --sl-shadow-x-small: 0 1px 2px hsl(240 3.8% 46.1% / 6%);
+    --sl-shadow-small: 0 1px 2px hsl(240 3.8% 46.1% / 12%);
+    --sl-shadow-medium: 0 2px 4px hsl(240 3.8% 46.1% / 12%);
+    --sl-shadow-large: 0 2px 8px hsl(240 3.8% 46.1% / 12%);
+    --sl-shadow-x-large: 0 4px 16px hsl(240 3.8% 46.1% / 12%);
 
-    --sl-spacing-3x-small: var(--ecc-spacing-3x-small);
-    --sl-spacing-2x-small: var(--ecc-spacing-2x-small);
-    --sl-spacing-x-small: var(--ecc-spacing-x-small);
-    --sl-spacing-small: var(--ecc-spacing-small);
-    --sl-spacing-medium: var(--ecc-spacing-medium);
-    --sl-spacing-large: var(--ecc-spacing-large);
-    --sl-spacing-x-large: var(--ecc-spacing-x-large);
-    --sl-spacing-2x-large: var(--ecc-spacing-2x-large);
-    --sl-spacing-3x-large: var(--ecc-spacing-3x-large);
-    --sl-spacing-4x-large: var(--ecc-spacing-4x-large);
+    --sl-spacing-3x-small: 0.125rem;
+    --sl-spacing-2x-small: 0.25rem;
+    --sl-spacing-x-small: 0.5rem;
+    --sl-spacing-small: 0.75rem;
+    --sl-spacing-medium: 1rem;
+    --sl-spacing-large: 1.25rem;
+    --sl-spacing-x-large: 1.75rem;
+    --sl-spacing-2x-large: 2.25rem;
+    --sl-spacing-3x-large: 3rem;
+    --sl-spacing-4x-large: 4.5rem;
 
-    --sl-transition-x-slow: var(--ecc-transition-x-slow);
-    --sl-transition-slow: var(--ecc-transition-slow);
-    --sl-transition-medium: var(--ecc-transition-medium);
-    --sl-transition-fast: var(--ecc-transition-fast);
-    --sl-transition-x-fast: var(--ecc-transition-x-fast);
+    --sl-transition-x-slow: 1000ms;
+    --sl-transition-slow: 500ms;
+    --sl-transition-medium: 250ms;
+    --sl-transition-fast: 150ms;
+    --sl-transition-x-fast: 50ms;
 
-    --sl-font-mono: var(--ecc-font-mono);
-    --sl-font-sans: var(--ecc-font-sans);
-    --sl-font-serif: var(--ecc-font-serif);
+    --sl-font-mono: SFMono-Regular, Consolas, "Liberation Mono", Menlo,
+      monospace;
+    --sl-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+      "Segoe UI Symbol";
+    --sl-font-serif: Georgia, "Times New Roman", serif;
 
-    --sl-font-size-2x-small: var(--ecc-font-size-2x-small);
-    --sl-font-size-x-small: var(--ecc-font-size-x-small);
-    --sl-font-size-small: var(--ecc-font-size-small);
-    --sl-font-size-medium: var(--ecc-font-size-medium);
-    --sl-font-size-large: var(--ecc-font-size-large);
-    --sl-font-size-x-large: var(--ecc-font-size-x-large);
-    --sl-font-size-2x-large: var(--ecc-font-size-2x-large);
-    --sl-font-size-3x-large: var(--ecc-font-size-3x-large);
-    --sl-font-size-4x-large: var(--ecc-font-size-4x-large);
+    --sl-font-size-2x-small: 0.625rem;
+    --sl-font-size-x-small: 0.75rem;
+    --sl-font-size-small: 0.875rem;
+    --sl-font-size-medium: 1rem;
+    --sl-font-size-large: 1.25rem;
+    --sl-font-size-x-large: 1.5rem;
+    --sl-font-size-2x-large: 2.25rem;
+    --sl-font-size-3x-large: 3rem;
+    --sl-font-size-4x-large: 4.5rem;
 
-    --sl-font-weight-light: var(--ecc-font-weight-light);
-    --sl-font-weight-normal: var(--ecc-font-weight-normal);
-    --sl-font-weight-semibold: var(--ecc-font-weight-semibold);
-    --sl-font-weight-bold: var(--ecc-font-weight-bold);
+    --sl-font-weight-light: 300;
+    --sl-font-weight-normal: 400;
+    --sl-font-weight-semibold: 500;
+    --sl-font-weight-bold: 700;
 
-    --sl-letter-spacing-denser: var(--ecc-letter-spacing-denser);
-    --sl-letter-spacing-dense: var(--ecc-letter-spacing-dense);
-    --sl-letter-spacing-normal: var(--ecc-letter-spacing-normal);
-    --sl-letter-spacing-loose: var(--ecc-letter-spacing-loose);
-    --sl-letter-spacing-looser: var(--ecc-letter-spacing-looser);
+    --sl-letter-spacing-denser: -0.03em;
+    --sl-letter-spacing-dense: -0.015em;
+    --sl-letter-spacing-normal: normal;
+    --sl-letter-spacing-loose: 0.075em;
+    --sl-letter-spacing-looser: 0.15em;
 
-    --sl-line-height-denser: var(--ecc-line-height-denser);
-    --sl-line-height-dense: var(--ecc-line-height-dense);
-    --sl-line-height-normal: var(--ecc-line-height-normal);
-    --sl-line-height-loose: var(--ecc-line-height-loose);
-    --sl-line-height-looser: var(--ecc-line-height-looser);
+    --sl-line-height-denser: 1;
+    --sl-line-height-dense: 1.4;
+    --sl-line-height-normal: 1.8;
+    --sl-line-height-loose: 2.2;
+    --sl-line-height-looser: 2.6;
 
-    --sl-focus-ring-color: var(--ecc-focus-ring-color);
-    --sl-focus-ring-style: var(--ecc-focus-ring-style);
-    --sl-focus-ring-width: var(--ecc-focus-ring-width);
-    --sl-focus-ring: var(--ecc-focus-ring);
-    --sl-focus-ring-offset: var(--ecc-focus-ring-offset);
+    --sl-focus-ring-color: var(--sl-color-primary-600);
+    --sl-focus-ring-style: solid;
+    --sl-focus-ring-width: 3px;
+    --sl-focus-ring: var(--sl-focus-ring-style) var(--sl-focus-ring-width)
+      var(--sl-focus-ring-color);
+    --sl-focus-ring-offset: 1px;
 
-    --sl-button-font-size-small: var(--ecc-button-font-size-small);
-    --sl-button-font-size-medium: var(--ecc-button-font-size-medium);
-    --sl-button-font-size-large: var(--ecc-button-font-size-large);
+    --sl-button-font-size-small: var(--sl-font-size-x-small);
+    --sl-button-font-size-medium: var(--sl-font-size-small);
+    --sl-button-font-size-large: var(--sl-font-size-medium);
 
-    --sl-input-height-small: var(--ecc-input-height-small);
-    --sl-input-height-medium: var(--ecc-input-height-medium);
-    --sl-input-height-large: var(--ecc-input-height-large);
+    --sl-input-height-small: 1.875rem;
+    --sl-input-height-medium: 2.5rem;
+    --sl-input-height-large: 3.125rem;
 
-    --sl-input-background-color: var(--ecc-input-background-color);
-    --sl-input-background-color-hover: var(--ecc-input-background-color-hover);
-    --sl-input-background-color-focus: var(--ecc-input-background-color-focus);
-    --sl-input-background-color-disabled: var(
-      --ecc-input-background-color-disabled
-    );
-    --sl-input-border-color: var(--ecc-input-border-color);
-    --sl-input-border-color-hover: var(--ecc-input-border-color-hover);
-    --sl-input-border-color-focus: var(--ecc-input-border-color-focus);
-    --sl-input-border-color-disabled: var(--ecc-input-border-color-disabled);
-    --sl-input-border-width: var(--ecc-input-border-width);
-    --sl-input-required-content: var(--ecc-input-required-content);
-    --sl-input-required-content-offset: var(
-      --ecc-input-required-content-offset
-    );
-    --sl-input-required-content-color: var(--ecc-input-required-content-color);
+    --sl-input-background-color: var(--sl-color-neutral-0);
+    --sl-input-background-color-hover: var(--sl-input-background-color);
+    --sl-input-background-color-focus: var(--sl-input-background-color);
+    --sl-input-background-color-disabled: var(--sl-color-neutral-100);
+    --sl-input-border-color: var(--sl-color-neutral-300);
+    --sl-input-border-color-hover: var(--sl-color-neutral-400);
+    --sl-input-border-color-focus: var(--sl-color-primary-500);
+    --sl-input-border-color-disabled: var(--sl-color-neutral-300);
+    --sl-input-border-width: 1px;
+    --sl-input-required-content: "*";
+    --sl-input-required-content-offset: -2px;
+    --sl-input-required-content-color: var(--sl-input-label-color);
 
-    --sl-input-border-radius-small: var(--ecc-input-border-radius-small);
-    --sl-input-border-radius-medium: var(--ecc-input-border-radius-medium);
-    --sl-input-border-radius-large: var(--ecc-input-border-radius-large);
+    --sl-input-border-radius-small: var(--sl-border-radius-medium);
+    --sl-input-border-radius-medium: var(--sl-border-radius-medium);
+    --sl-input-border-radius-large: var(--sl-border-radius-medium);
 
-    --sl-input-font-family: var(--ecc-input-font-family);
-    --sl-input-font-weight: var(--ecc-input-font-weight);
-    --sl-input-font-size-small: var(--ecc-input-font-size-small);
-    --sl-input-font-size-medium: var(--ecc-input-font-size-medium);
-    --sl-input-font-size-large: var(--ecc-input-font-size-large);
-    --sl-input-letter-spacing: var(--ecc-input-letter-spacing);
+    --sl-input-font-family: var(--sl-font-sans);
+    --sl-input-font-weight: var(--sl-font-weight-normal);
+    --sl-input-font-size-small: var(--sl-font-size-small);
+    --sl-input-font-size-medium: var(--sl-font-size-medium);
+    --sl-input-font-size-large: var(--sl-font-size-large);
+    --sl-input-letter-spacing: var(--sl-letter-spacing-normal);
 
-    --sl-input-color: var(--ecc-input-color);
-    --sl-input-color-hover: var(--ecc-input-color-hover);
-    --sl-input-color-focus: var(--ecc-input-color-focus);
-    --sl-input-color-disabled: var(--ecc-input-color-disabled);
-    --sl-input-icon-color: var(--ecc-input-icon-color);
-    --sl-input-icon-color-hover: var(--ecc-input-icon-color-hover);
-    --sl-input-icon-color-focus: var(--ecc-input-icon-color-focus);
-    --sl-input-placeholder-color: var(--ecc-input-placeholder-color);
-    --sl-input-placeholder-color-disabled: var(
-      --ecc-input-placeholder-color-disabled
-    );
-    --sl-input-spacing-small: var(--ecc-input-spacing-small);
-    --sl-input-spacing-medium: var(--ecc-input-spacing-medium);
-    --sl-input-spacing-large: var(--ecc-input-spacing-large);
+    --sl-input-color: var(--sl-color-neutral-700);
+    --sl-input-color-hover: var(--sl-color-neutral-700);
+    --sl-input-color-focus: var(--sl-color-neutral-700);
+    --sl-input-color-disabled: var(--sl-color-neutral-900);
+    --sl-input-icon-color: var(--sl-color-neutral-500);
+    --sl-input-icon-color-hover: var(--sl-color-neutral-600);
+    --sl-input-icon-color-focus: var(--sl-color-neutral-600);
+    --sl-input-placeholder-color: var(--sl-color-neutral-500);
+    --sl-input-placeholder-color-disabled: var(--sl-color-neutral-600);
+    --sl-input-spacing-small: var(--sl-spacing-small);
+    --sl-input-spacing-medium: var(--sl-spacing-medium);
+    --sl-input-spacing-large: var(--sl-spacing-large);
 
-    --sl-input-focus-ring-color: var(--ecc-input-focus-ring-color);
-    --sl-input-focus-ring-offset: var(--ecc-input-focus-ring-offset);
+    --sl-input-focus-ring-color: hsl(198.6 88.7% 48.4% / 40%);
+    --sl-input-focus-ring-offset: 0;
 
-    --sl-input-filled-background-color: var(
-      --ecc-input-filled-background-color
-    );
-    --sl-input-filled-background-color-hover: var(
-      --ecc-input-filled-background-color-hover
-    );
-    --sl-input-filled-background-color-focus: var(
-      --ecc-input-filled-background-color-focus
-    );
-    --sl-input-filled-background-color-disabled: var(
-      --ecc-input-filled-background-color-disabled
-    );
-    --sl-input-filled-color: var(--ecc-input-filled-color);
-    --sl-input-filled-color-hover: var(--ecc-input-filled-color-hover);
-    --sl-input-filled-color-focus: var(--ecc-input-filled-color-focus);
-    --sl-input-filled-color-disabled: var(--ecc-input-filled-color-disabled);
+    --sl-input-filled-background-color: var(--sl-color-neutral-100);
+    --sl-input-filled-background-color-hover: var(--sl-color-neutral-100);
+    --sl-input-filled-background-color-focus: var(--sl-color-neutral-100);
+    --sl-input-filled-background-color-disabled: var(--sl-color-neutral-100);
+    --sl-input-filled-color: var(--sl-color-neutral-800);
+    --sl-input-filled-color-hover: var(--sl-color-neutral-800);
+    --sl-input-filled-color-focus: var(--sl-color-neutral-700);
+    --sl-input-filled-color-disabled: var(--sl-color-neutral-800);
 
-    --sl-input-label-font-size-small: var(--ecc-input-label-font-size-small);
-    --sl-input-label-font-size-medium: var(--ecc-input-label-font-size-medium);
-    --sl-input-label-font-size-large: var(--ecc-input-label-font-size-large);
-    --sl-input-label-color: var(--ecc-input-label-color);
+    --sl-input-label-font-size-small: var(--sl-font-size-small);
+    --sl-input-label-font-size-medium: var(--sl-font-size-medium);
+    --sl-input-label-font-size-large: var(--sl-font-size-large);
+    --sl-input-label-color: inherit;
 
-    --sl-input-help-text-font-size-small: var(
-      --ecc-input-help-text-font-size-small
-    );
-    --sl-input-help-text-font-size-medium: var(
-      --ecc-input-help-text-font-size-medium
-    );
-    --sl-input-help-text-font-size-large: var(
-      --ecc-input-help-text-font-size-large
-    );
-    --sl-input-help-text-color: var(--ecc-input-help-text-color);
+    --sl-input-help-text-font-size-small: var(--sl-font-size-x-small);
+    --sl-input-help-text-font-size-medium: var(--sl-font-size-small);
+    --sl-input-help-text-font-size-large: var(--sl-font-size-medium);
+    --sl-input-help-text-color: var(--sl-color-neutral-500);
 
-    --sl-toggle-size-small: var(--ecc-toggle-size-small);
-    --sl-toggle-size-medium: var(--ecc-toggle-size-medium);
-    --sl-toggle-size-large: var(--ecc-toggle-size-large);
+    --sl-toggle-size-small: 0.875rem;
+    --sl-toggle-size-medium: 1.125rem;
+    --sl-toggle-size-large: 1.375rem;
 
-    --sl-overlay-background-color: var(--ecc-overlay-background-color);
+    --sl-overlay-background-color: hsl(240 3.8% 46.1% / 33%);
 
-    --sl-panel-background-color: var(--ecc-panel-background-color);
-    --sl-panel-border-color: var(--ecc-panel-border-color);
-    --sl-panel-border-width: var(--ecc-panel-border-width);
+    --sl-panel-background-color: var(--sl-color-neutral-0);
+    --sl-panel-border-color: var(--sl-color-neutral-200);
+    --sl-panel-border-width: 1px;
 
-    --sl-tooltip-border-radius: var(--ecc-tooltip-border-radius);
-    --sl-tooltip-background-color: var(--ecc-tooltip-background-color);
-    --sl-tooltip-color: var(--ecc-tooltip-color);
-    --sl-tooltip-font-family: var(--ecc-tooltip-font-family);
-    --sl-tooltip-font-weight: var(--ecc-tooltip-font-weight);
-    --sl-tooltip-font-size: var(--ecc-tooltip-font-size);
-    --sl-tooltip-line-height: var(--ecc-tooltip-line-height);
-    --sl-tooltip-padding: var(--ecc-tooltip-padding);
-    --sl-tooltip-arrow-size: var(--ecc-tooltip-arrow-size);
+    --sl-tooltip-border-radius: var(--sl-border-radius-medium);
+    --sl-tooltip-background-color: var(--sl-color-neutral-800);
+    --sl-tooltip-color: var(--sl-color-neutral-0);
+    --sl-tooltip-font-family: var(--sl-font-sans);
+    --sl-tooltip-font-weight: var(--sl-font-weight-normal);
+    --sl-tooltip-font-size: var(--sl-font-size-small);
+    --sl-tooltip-line-height: var(--sl-line-height-dense);
+    --sl-tooltip-padding: var(--sl-spacing-2x-small) var(--sl-spacing-x-small);
+    --sl-tooltip-arrow-size: 6px;
 
-    --sl-z-index-drawer: var(--ecc-z-index-drawer);
-    --sl-z-index-dialog: var(--ecc-z-index-dialog);
-    --sl-z-index-dropdown: var(--ecc-z-index-dropdown);
-    --sl-z-index-toast: var(--ecc-z-index-toast);
-    --sl-z-index-tooltip: var(--ecc-z-index-tooltip);
+    --sl-z-index-drawer: 700;
+    --sl-z-index-dialog: 800;
+    --sl-z-index-dropdown: 900;
+    --sl-z-index-toast: 950;
+    --sl-z-index-tooltip: 1000;
   }
 
   .sl-scroll-lock {
