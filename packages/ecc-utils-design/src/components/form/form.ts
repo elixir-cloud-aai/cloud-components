@@ -1,17 +1,17 @@
-import { html, LitElement, TemplateResult } from "lit";
-import { property, state } from "lit/decorators.js";
-import "@shoelace-style/shoelace/dist/components/button/button.js";
-import _ from "lodash-es";
-import getShoelaceStyles from "../../styles/shoelace.styles.js";
-import { hostStyles } from "../../styles/host.styles.js";
-import formStyles from "./form.styles.js";
-import { Field } from "./types.js";
-import inputTemplate from "./templates/inputTemplate.js";
-import arrayTemplate from "./templates/arrayTemplate.js";
-import groupTemplate from "./templates/groupTemplate.js";
-import errorTemplate from "./templates/errorTemplate.js";
-import successTemplate from "./templates/successTemplate.js";
-import switchTemplate from "./templates/switchTemplate.js";
+import { html, LitElement, TemplateResult } from 'lit';
+import { property, state } from 'lit/decorators.js';
+import '@shoelace-style/shoelace/dist/components/button/button.js';
+import _ from 'lodash-es';
+import getShoelaceStyles from '../../styles/shoelace.styles.js';
+import { hostStyles } from '../../styles/host.styles.js';
+import formStyles from './form.styles.js';
+import { Field } from './types.js';
+import inputTemplate from './templates/inputTemplate.js';
+import arrayTemplate from './templates/arrayTemplate.js';
+import groupTemplate from './templates/groupTemplate.js';
+import errorTemplate from './templates/errorTemplate.js';
+import successTemplate from './templates/successTemplate.js';
+import switchTemplate from './templates/switchTemplate.js';
 
 /**
  * @summary This component is used to render a form with the given fields.
@@ -27,61 +27,59 @@ import switchTemplate from "./templates/switchTemplate.js";
  */
 export default class EccUtilsDesignForm extends LitElement {
   static styles = [
-    getShoelaceStyles(
-      document.querySelector("html")?.classList.contains("dark")
-    ),
+    getShoelaceStyles(document.querySelector('html')?.classList.contains('dark')),
     hostStyles,
     formStyles,
   ];
 
   @property({ type: Array, reflect: true }) fields: Array<Field> = [];
   @state() private form: object = {};
-  @state() private formState: "idle" | "loading" | "error" | "success" = "idle";
+  @state() private formState: 'idle' | 'loading' | 'error' | 'success' = 'idle';
   @state() private canSubmit = false;
   @state() private submitDisabledByUser = false;
-  @state() private errorMessage = "Something went wrong";
-  @state() private successMessage = "Form submitted successfully";
+  @state() private errorMessage = 'Something went wrong';
+  @state() private successMessage = 'Form submitted successfully';
   @state() private requiredButEmpty: string[] = [];
 
   protected cssParts = {
-    switchControl: "switch",
-    switchThumb: "switch-thumb",
-    switchLabel: "switch-label",
-    formControl: "field",
-    formControlLabel: "input-label",
-    input: "input",
-    inputBase: "input-base",
-    button: "button",
-    addButton: "add-button",
-    removeButton: "remove-button",
-    submitButton: "submit-button",
-    header: "header",
-    label: "label",
-    arrayHeader: "array-header",
-    arrayContainer: "array-container",
-    arrayLabel: "array-label",
-    arrayItem: "array-item",
-    groupBase: "group",
-    groupHeader: "group-header",
-    groupItem: "group-item",
-    groupLabel: "group-label",
-    groupToggleIcon: "group-toggle-icon",
-    groupContent: "group-content",
-    container: "container",
-    item: "item",
-    form: "form",
+    switchControl: 'switch',
+    switchThumb: 'switch-thumb',
+    switchLabel: 'switch-label',
+    formControl: 'field',
+    formControlLabel: 'input-label',
+    input: 'input',
+    inputBase: 'input-base',
+    button: 'button',
+    addButton: 'add-button',
+    removeButton: 'remove-button',
+    submitButton: 'submit-button',
+    header: 'header',
+    label: 'label',
+    arrayHeader: 'array-header',
+    arrayContainer: 'array-container',
+    arrayLabel: 'array-label',
+    arrayItem: 'array-item',
+    groupBase: 'group',
+    groupHeader: 'group-header',
+    groupItem: 'group-item',
+    groupLabel: 'group-label',
+    groupToggleIcon: 'group-toggle-icon',
+    groupContent: 'group-content',
+    container: 'container',
+    item: 'item',
+    form: 'form',
   };
 
   connectedCallback() {
     super.connectedCallback();
 
     if (!this.fields) {
-      throw new Error("Fields is required");
+      throw new Error('Fields is required');
     }
   }
 
   private renderSwitchTemplate(field: Field, path: string): TemplateResult {
-    if (field.type !== "switch") return html``;
+    if (field.type !== 'switch') return html``;
 
     if (!_.get(this.form, path) && !this.hasUpdated) {
       _.set(this.form, path, field.fieldOptions?.default || false);
@@ -105,18 +103,13 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   private renderInputTemplate(field: Field, path: string): TemplateResult {
-    if (
-      field.type === "array" ||
-      field.type === "switch" ||
-      field.type === "group"
-    )
+    if (field.type === 'array' || field.type === 'switch' || field.type === 'group')
       return html``;
 
-    const { formControl, formControlLabel, input, inputBase, label } =
-      this.cssParts;
+    const { formControl, formControlLabel, input, inputBase, label } = this.cssParts;
 
     const changeAction =
-      field.type === "file"
+      field.type === 'file'
         ? (e: Event) => {
             const { files } = e.target as HTMLInputElement;
             _.set(this.form, path, files);
@@ -138,7 +131,7 @@ export default class EccUtilsDesignForm extends LitElement {
         if (field.fieldOptions?.default && !this.hasUpdated) {
           _.set(this.form, path, field.fieldOptions.default);
         } else if (field.fieldOptions?.returnIfEmpty) {
-          _.set(this.form, path, "");
+          _.set(this.form, path, '');
         }
       }
     };
@@ -264,9 +257,7 @@ export default class EccUtilsDesignForm extends LitElement {
     const renderChildren = () =>
       html`
         <div part="${item} ${groupItem}" class="group-item">
-          ${field.children?.map((child) =>
-            this.renderTemplate(child, `${path}`)
-          )}
+          ${field.children?.map((child) => this.renderTemplate(child, `${path}`))}
         </div>
       `;
 
@@ -275,29 +266,29 @@ export default class EccUtilsDesignForm extends LitElement {
 
   private renderTemplate(field: Field, path: string): TemplateResult {
     const newPath = `${path}.${field.key}`;
-    if (field.type === "group") {
+    if (field.type === 'group') {
       return this.renderGroupTemplate(field, newPath);
     }
-    if (field.type === "array") {
+    if (field.type === 'array') {
       return this.renderArrayTemplate(field, newPath);
     }
 
     if (field.fieldOptions?.required && !_.get(this.form, newPath)) {
       this.requiredButEmpty.push(field.key);
     }
-    if (field.type === "switch") {
+    if (field.type === 'switch') {
       return this.renderSwitchTemplate(field, newPath);
     }
     return this.renderInputTemplate(field, newPath);
   }
 
   private renderErrorTemplate(): TemplateResult {
-    if (this.formState !== "error") return html``;
+    if (this.formState !== 'error') return html``;
     return errorTemplate(this.errorMessage);
   }
 
   private renderSuccessTemplate(): TemplateResult {
-    if (this.formState !== "success") return html``;
+    if (this.formState !== 'success') return html``;
 
     return successTemplate(this.successMessage);
   }
@@ -307,29 +298,29 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   public loading() {
-    this.formState = "loading";
+    this.formState = 'loading';
   }
 
   public success({ message }: { message?: string }) {
-    this.formState = "success";
-    this.successMessage = message || "Form submitted successfully";
+    this.formState = 'success';
+    this.successMessage = message || 'Form submitted successfully';
   }
 
   public error({ message }: { message?: string }) {
-    this.formState = "error";
-    this.errorMessage = message || "Something went wrong";
+    this.formState = 'error';
+    this.errorMessage = message || 'Something went wrong';
   }
 
   public idle() {
-    this.formState = "idle";
+    this.formState = 'idle';
   }
 
   render() {
     this.requiredButEmpty = [];
     if (!this.fields || this.fields.length === 0) {
-      throw new Error("Fields is required & should not be empty array");
+      throw new Error('Fields is required & should not be empty array');
     }
-    if (this.formState === "success") {
+    if (this.formState === 'success') {
       return html` ${this.renderSuccessTemplate()} `;
     }
 
@@ -340,7 +331,7 @@ export default class EccUtilsDesignForm extends LitElement {
         this.canSubmit = true;
       }
 
-      return "";
+      return '';
     };
 
     const { button, submitButton, form: csspartForm } = this.cssParts;
@@ -349,12 +340,12 @@ export default class EccUtilsDesignForm extends LitElement {
         part="${csspartForm}"
         @submit=${(e: Event) => {
           e.preventDefault();
-          const form = this.shadowRoot?.querySelector("form");
+          const form = this.shadowRoot?.querySelector('form');
           const isValid = form?.reportValidity();
           if (!isValid) {
             return;
           }
-          const event = new CustomEvent("ecc-utils-submit", {
+          const event = new CustomEvent('ecc-utils-submit', {
             detail: {
               form: this.form,
             },
@@ -364,16 +355,16 @@ export default class EccUtilsDesignForm extends LitElement {
           this.dispatchEvent(event);
         }}
       >
-        ${this.fields.map((field) => this.renderTemplate(field, "data"))}
+        ${this.fields.map((field) => this.renderTemplate(field, 'data'))}
         ${this.renderErrorTemplate()} ${toggleButtonState()}
 
         <sl-button
           type="submit"
           exportparts="base: ${button}, base: ${submitButton}"
-          ?loading=${this.formState === "loading"}
+          ?loading=${this.formState === 'loading'}
           ?disabled=${this.submitDisabledByUser ||
           !this.canSubmit ||
-          this.formState === "loading"}
+          this.formState === 'loading'}
         >
           Submit
         </sl-button>
