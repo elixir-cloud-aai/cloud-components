@@ -209,7 +209,6 @@ export default class EccUtilsDesignDetails extends LitElement {
           ${field.label}
           ${field.copy
             ? html`<sl-copy-button
-                style="background-color: #f5f5f5; border: 1px solid #e0e0e0; color: #333;"
                 .value=${JSON.stringify(_.get(this.data, field.path))}
               ></sl-copy-button>`
             : ""}

@@ -19,7 +19,7 @@ export default class EccUtilsDesignCode extends LitElement {
     codeStyles,
   ];
 
-  @property({ type: String }) code = "";
+  @property({ type: String }) value = "";
   @property({ type: String }) label = "Code block";
   @property({ type: String }) language: Language = "json";
   @property({ type: Boolean }) disabled = false;
@@ -42,17 +42,17 @@ export default class EccUtilsDesignCode extends LitElement {
       this.editor.setTheme("ace/theme/github");
       this.editor.session.setUseWorker(true);
       this.editor.renderer.attachToShadowRoot();
-      this.editor.setValue(this.code);
+      this.editor.setValue(this.value);
 
       this.setEditorLanguage(this.language);
       if (this.disabled) this.editor.setReadOnly(true);
 
       this.editor.on("change", () => {
-        this.code = this.editor.getValue();
+        this.value = this.editor.getValue();
 
         this.dispatchEvent(
-          new CustomEvent("ecc-utils-code-change", {
-            detail: { code: this.code },
+          new CustomEvent("ecc-utils-change", {
+            detail: { value: this.value },
             bubbles: true,
             composed: true,
           })
