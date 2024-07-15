@@ -1,0 +1,229 @@
+import ComponentName from '@/components/common/ComponentName';
+import { Tabs, Callout } from 'nextra/components';
+import Runs from '@/components/packages/tes/runs/runs.tsx';
+
+# TES Runs Component
+
+<ComponentName
+  tagName='ecc-client-ga4gh-tes-runs'
+  reactTagName='ECCClientGa4ghTesRuns'
+  version='0.1.1'
+  beta
+/>
+
+## Overview
+
+The TES Runs component is designed to browse and display task runs using the Task Execution Service (TES) API. It provides a user-friendly interface for viewing and managing task executions within a TES-compliant environment.
+
+## Preview
+
+<Runs />
+
+## Examples
+
+### Basic Usage
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ````ts showLineNumbers {2, 5} copy filename="ECCClientGa4ghTesRuns.tsx"
+    import React from 'react';
+    import ECCClientGa4ghTesRuns from '@elixir-cloud/tes/dist/react/runs/index';
+
+    export default function Runs() {
+      return <ECCClientGa4ghTesRuns />;
+    }
+    ````
+
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ````html showLineNumbers {4, 7} copy filename="index.html"
+    <html lang="en">
+      <head>
+        <title>TES Runs Example</title>
+        <script src="https://cdn.jsdelivr.net/npm/@elixir-cloud/tes/dist/index.min.js"></script>
+      </head>
+      <body>
+        <ecc-client-ga4gh-tes-runs></ecc-client-ga4gh-tes-runs>
+      </body>
+    </html>
+    `````
+
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property       | Required | Default                                             | Type           | Description                                 |
+| -------------- | -------- | --------------------------------------------------- | -------------- | ------------------------------------------- |
+| `baseURL`      | false    | `https://protes.rahtiapp.fi/ga4gh/tes/v1`           | `String`       | Base URL of the TES instance/gateway        |
+| `fields`       | false    | [See default config](#default-fields-configuration) | `Array<Field>` | Configuration for what fields to display    |
+| `pageSize`     | false    | 5                                                   | `Number`       | Number of runs per page                     |
+| `extendFields` | false    | `false`                                             | `Boolean`      | Extend default fields instead of overriding |
+
+### baseURL
+
+Specifies the base URL for the TES instance. This is used as the endpoint for API requests.
+
+### fields
+
+The `fields` property is an array of objects that define the fields to be displayed.
+
+#### Default Fields Configuration
+
+```json
+[
+  {
+    "key": "name",
+    "path": "name",
+    "tab": "Overview",
+    "label": "Name",
+    "copy": true
+  },
+  {
+    "key": "description",
+    "path": "description",
+    "tab": "Overview",
+    "label": "Description"
+  },
+  {
+    "key": "resources",
+    "path": "resources",
+    "tab": "Overview",
+    "label": "Resources"
+  },
+  {
+    "key": "tags",
+    "path": "tags",
+    "tab": "Overview",
+    "label": "Tags"
+  },
+  {
+    "key": "executors",
+    "path": "executors",
+    "tab": "Overview",
+    "label": "Executor"
+  },
+  {
+    "key": "executors*",
+    "path": "executors[*]",
+    "arrayOptions": {
+      "labelOptions": {
+        "path": "image"
+      }
+    }
+  },
+  {
+    "key": "executors*command",
+    "path": "executors[*].command",
+    "arrayOptions": {
+      "type": "tag"
+    }
+  },
+  {
+    "key": "volumes",
+    "path": "volumes",
+    "tab": "Overview",
+    "label": "Volumes"
+  },
+  {
+    "key": "creation_time",
+    "path": "creation_time",
+    "tab": "Overview",
+    "label": "Creation time"
+  },
+  {
+    "key": "logs",
+    "path": "logs",
+    "tab": "Logs",
+    "label": "Logs",
+    "copy": true
+  },
+  {
+    "key": "logs[*].logs[*].stderr",
+    "path": "logs[*].logs[*].stderr",
+    "label": "STDERR",
+    "copy": true
+  },
+  {
+    "key": "logs[*].logs[*].stdout",
+    "path": "logs[*].logs[*].stdout",
+    "label": "STDOUT",
+    "copy": true
+  },
+  {
+    "key": "logs[*]",
+    "path": "logs[*]",
+    "arrayOptions": {
+      "labelOptions": {
+        "path": "start_time",
+        "prefix": "Start time: "
+      }
+    },
+    "copy": true
+  },
+  {
+    "key": "logs[*].logs[*]",
+    "path": "logs[*].logs[*]",
+    "arrayOptions": {
+      "labelOptions": {
+        "path": "start_time",
+        "prefix": "Start time: "
+      }
+    },
+    "copy": true
+  },
+  {
+    "key": "outputs",
+    "path": "outputs",
+    "tab": "Output",
+    "label": "Output",
+    "copy": true
+  },
+  {
+    "key": "inputs",
+    "path": "inputs",
+    "tab": "Inputs",
+    "label": "Input",
+    "copy": true
+  },
+  {
+    "key": "inputs",
+    "path": "inputs[*]",
+    "arrayOptions": {
+      "labelOptions": {
+        "path": "path"
+      }
+    },
+    "copy": true
+  }
+]
+```
+
+### pageSize
+
+Defines the number of task runs to be displayed per pagination window.
+
+### extendFields
+
+When set to `true`, allows developers to pass additional fields that will extend the default fields rather than override them completely.
+
+## Known Limitations
+
+1. **Filtering**: The component currently does not support filtering based on the task state due to backend limitations.
+
+<Callout type='warning'>
+  <div className='text-sm'>
+    While the UI provides filtering options, the backend API does not support this functionality,
+    making client-side filtering impractical.
+  </div>
+</Callout>
+
+2. **Search**: The ability to search tasks by name prefix is not implemented.
+
+<Callout type='warning'>
+  <div className='text-sm'>
+    Although the TES specifications define filtering based on `name_prefix`, this feature has not
+    been implemented in the current version.
+  </div>
+</Callout>

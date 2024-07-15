@@ -1,19 +1,32 @@
 {
   "index": {
     "title": "Home",
+    "type": "page",
+    "display": "hidden",
     "theme": {
-      "breadcrumb": false,
-      "footer": true,
-      "sidebar": true,
-      "toc": false,
-      "pagination": false
+      "layout": "full"
     }
   },
-  "components": "Elixir components",
-  "ui": "Make your own components!",
-  "customization": "Customize our Components!",
-  "design": "Elixir's UI (design)",
-  "tes": "Task execution service (TES)",
-  "wes": "Workflow execution service (WES)",
-  "nerd": "Nerd docs 🤓"
+  "docs": {
+    "title": "Documentation",
+    "type": "page"
+  },
+  "api": {
+    "title": "API",
+    "type": "page"
+  },
+  "about": {
+    "title": "About",
+    "type": "menu",
+    "items": {
+      "contact": {
+        "title": "Contact",
+        "type": "page"
+      },
+      "contribute": {
+        "title": "Contribute",
+        "type": "page"
+      }
+    }
+  }
 }

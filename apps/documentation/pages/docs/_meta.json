@@ -1,0 +1,9 @@
+{
+  "introduction": "Introduction",
+  "installation": "Installation",
+  "usage": "Usage",
+  "customization": "Customization",
+  "tes": "Task Execution Service (TES)",
+  "wes": "Workflow Execution Service (WES)",
+  "design": "Elixir's UI (design)"
+}

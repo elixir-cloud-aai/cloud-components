@@ -1,0 +1,80 @@
+import { Tabs, Callout } from 'nextra/components';
+
+# Usage
+
+Elixir Cloud components are custom HTML elements designed for seamless integration and use, much like standard HTML elements. Each component is accompanied by detailed documentation that outlines its complete API, including properties, events, methods, and more.
+
+While ECC components are designed to be platform-agnostic which can be used in any web framework or platform that supports vanilla HTML/JavaScript by using HTML web components. It provides the out of box React components for easy integration with React applications.
+
+Here are basic examples of how to use ECC components in different environments:
+
+<Tabs items={['React', 'HTML', 'Vue']}>
+  <Tabs.Tab>
+    ```jsx {2, 8}
+    import React from 'react';
+    import { ECCClientGa4ghWesRuns } from '@elixir-cloud/wes/dist/react/runs/index';
+
+    function App() {
+      return (
+        <div>
+          <h1>WES Runs</h1>
+          <ECCClientGa4ghWesRuns baseURL="https://your-wes-endpoint.com" />
+        </div>
+      );
+    }
+
+    export default App;
+    ```
+
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```html {7, 11}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>WES Runs Example</title>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@elixir-cloud/wes/dist/index.min.js"></script>
+    </head>
+    <body>
+      <h1>WES Runs</h1>
+      <ecc-client-ga4gh-wes-runs baseURL="https://your-wes-endpoint.com"></ecc-client-ga4gh-wes-runs>
+    </body>
+    </html>
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```vue {4, 9}
+    <template>
+      <div>
+        <h1>WES Runs</h1>
+        <ecc-client-ga4gh-wes-runs :baseURL="baseURL"></ecc-client-ga4gh-wes-runs>
+      </div>
+    </template>
+
+    <script>
+    import '@elixir-cloud/wes/dist/components/runs/index.js';
+
+    export default {
+      data() {
+        return {
+          baseURL: 'https://your-wes-endpoint.com'
+        }
+      }
+    }
+    </script>
+    ```
+
+  </Tabs.Tab>
+</Tabs>
+
+<Callout type='info'>
+  <div class='text-sm'>
+    Note that this example uses the [`@elixir-cloud/wes`]() package. Refer to the specific service
+    documentation for the correct package name and usage. You can find the list of available
+    services in the [Supported Services](/docs/introduction#supported-services) section.
+  </div>
+</Callout>
