@@ -18,7 +18,7 @@ The TES Create Run component is used to create task runs using the Task Executio
 <Callout type='info'>
   <div className='text-sm'>
     For more details, refer to the [TES API POST endpoint
-    specification](https://github.com/ga4gh/workflow-execution-service-schemas/blob/3a832abeeaffc1cb8d79045ba0d42b790773d9/openapi/workflow_execution_service.openapi.yaml#L234C1-L320C24).
+    specification](https://github.com/elixir-cloud-aai/proTES/blob/dev/pro_tes/api/9e9c5aa.task_execution_service.openapi.yaml#L128).
   </div>
 </Callout>
 
@@ -69,10 +69,10 @@ The TES Create Run component is used to create task runs using the Task Executio
 
 ### baseURL
 
-The `baseURL` property specifies the base URL for the TES API. The component will append `/runs` to this URL to form the complete endpoint for creating a task run.
+The `baseURL` property specifies the base URL for the TES API. The component will append `/tasks` to this URL to form the complete endpoint for creating a task run.
 
 ## Usage Notes
 
-1. **API Endpoint**: The component uses the `baseURL` + `/runs` as the endpoint for creating a new task run via a POST request.
+1. **API Endpoint**: The component uses the `baseURL` + `/tasks` as the endpoint for creating a new task run via a POST request.
 2. **Data Validation**: While the component includes client-side data validation, it's important to ensure that the data you submit conforms to the TES API specifications.
 3. **Error Handling**: The component will display error messages if the task creation fails. Check the console for more detailed error information.
