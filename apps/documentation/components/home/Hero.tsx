@@ -6,15 +6,18 @@ export default function Hero() {
   return (
     <div className='w-full md:w-5/6 mx-auto relative h-96 md:h-[32rem] flex items-center justify-center'>
       <div className='flex flex-col items-center'>
-        <h1 className='text-4xl md:text-7xl font-extrabold bg-gradient-to-r from-sky-600 to-green-400 via-sky-400 text-transparent bg-clip-text text-center flex flex-col items-center gap-4'>
+        <h1 className='text-7xl font-extrabold bg-gradient-to-r from-sky-600 to-green-400 via-sky-400 text-transparent bg-clip-text text-center flex-col items-center gap-4 hidden md:flex'>
           <div>The Component Library</div>
           <div>for Federated Cloud Services</div>
         </h1>
-        <p className='mt-8 text-lg md:text-xl text-zinc-500 max-w-7xl text-center'>
+        <h1 className='text-4xl mt-32 font-extrabold bg-gradient-to-r from-sky-600 to-green-400 via-sky-400 text-transparent bg-clip-text text-center block md:hidden'>
+          The Component Library for Federated Cloud Services
+        </h1>
+        <p className='mt-6 md:mt-8 text-base md:text-xl text-zinc-500 max-w-7xl text-center'>
           Modular, composable, and customizable components for interacting with cloud
           infrastructure.
         </p>
-        <div className='flex gap-4 mt-12 text-sm md:text-base'>
+        <div className='flex flex-wrap gap-4 mt-10 md:mt-12 text-sm md:text-base items-center justify-center'>
           <Link
             href='/docs/introduction'
             className='rounded-xl bg-sky-600 hover:bg-sky-500 !text-white py-2 px-6 transition duration-300 ease-in-out flex items-center gap-1'

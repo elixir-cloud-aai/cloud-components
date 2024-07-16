@@ -21,7 +21,8 @@
     "items": {
       "contact": {
         "title": "Contact",
-        "type": "page"
+        "type": "page",
+        "href": "/about/contact"
       },
       "contribute": {
         "title": "Contribute",
