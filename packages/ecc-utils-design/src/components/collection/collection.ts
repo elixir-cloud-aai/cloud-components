@@ -1,6 +1,5 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
-import getShoelaceStyles from "../../styles/shoelace.styles.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/badge/badge.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
@@ -12,6 +11,9 @@ import "@shoelace-style/shoelace/dist/components/skeleton/skeleton.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import collectionStyles from "./collection.styles.js";
+
+import { primitiveStylesheet } from "../../styles/primitive.styles.js";
+import sholelaceStyles from "../../styles/shoelace.styles.js";
 
 export interface ItemProp {
   index: number;
@@ -52,9 +54,8 @@ export interface FilterProp {
  */
 export default class EccUtilsDesignCollection extends LitElement {
   static styles = [
-    getShoelaceStyles(
-      document.querySelector("html")?.classList.contains("dark")
-    ),
+    primitiveStylesheet,
+    sholelaceStyles,
     hostStyles,
     collectionStyles,
   ];
@@ -142,6 +143,7 @@ export default class EccUtilsDesignCollection extends LitElement {
     return html` <div class="footer">
       <sl-button-group>
         <sl-button
+          class="page"
           @click=${() => {
             this._page -= 1;
             this.dispatchEvent(
@@ -162,6 +164,7 @@ export default class EccUtilsDesignCollection extends LitElement {
           ).keys(),
         ].map(
           (page) => html`<sl-button
+            class="page"
             @click=${() => {
               this._page = page + 1;
               this.dispatchEvent(
@@ -178,9 +181,10 @@ export default class EccUtilsDesignCollection extends LitElement {
           </sl-button>`
         )}
         ${this.totalItems === -1
-          ? html` <sl-button disabled> ... </sl-button> `
+          ? html` <sl-button class="page" disabled> ... </sl-button> `
           : ""}
         <sl-button
+          class="page"
           @click=${() => {
             if (this.totalItems === -1 && this._page === this._pagesRendered) {
               this._pagesRendered += 1;
@@ -237,7 +241,7 @@ export default class EccUtilsDesignCollection extends LitElement {
             </sl-badge>`
           : ""}
       </div>
-      <slot name="${item.key}">
+      <slot name="${item.key}" class="content">
         ${item.lazy
           ? html`<div class="lazy">
               <sl-skeleton class="skeleton-body" effect="sheen"></sl-skeleton
