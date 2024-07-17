@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="./logo-elixir-cloud-aai.svg" type="image/x-icon" />
-    <style>
+    <!-- <style>
       body {
         background: #f5f5f5;
       }
@@ -84,7 +84,7 @@
         color: #4caf50;
         font-weight: bold;
       }
-    </style>
+    </style> -->
     <title>ecc-utils-design</title>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
@@ -116,6 +116,23 @@
           type: "email",
           fieldOptions: {
             tooltip: "Your email address",
+          },
+        },
+        {
+          key: "18+",
+          label: "18+",
+          type: "switch",
+          fieldOptions: {
+            tooltip: "Are you over 18 years old?",
+          },
+        },
+        {
+          key: "id",
+          label: "ID",
+          type: "file",
+          fieldOptions: {
+            required: true,
+            tooltip: "Your ID document",
           },
         },
         {
@@ -186,24 +203,16 @@
                 },
               ],
             },
+            {
+              key: "country",
+              label: "Country",
+              type: "text",
+              fieldOptions: {
+                required: true,
+                tooltip: "Your country name",
+              },
+            },
           ],
-        },
-        {
-          key: "18+",
-          label: "18+",
-          type: "switch",
-          fieldOptions: {
-            tooltip: "Are you over 18 years old?",
-          },
-        },
-        {
-          key: "id",
-          label: "ID",
-          type: "file",
-          fieldOptions: {
-            required: true,
-            tooltip: "Your ID document",
-          },
         },
       ];
 
