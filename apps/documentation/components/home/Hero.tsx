@@ -28,15 +28,15 @@ export default function Hero() {
           </Link>
           <Link
             href='/docs/installation'
-            className='rounded-xl dark:bg-zinc-600 dark:hover:bg-zinc-500 bg-zinc-300 hover:bg-zinc-200 dark:!text-white !text-zinc-900 py-2 px-6 transition duration-300 ease-in-out flex items-center justify-center'
+            className='rounded-xl dark:bg-zinc-700 dark:hover:bg-zinc-600 bg-zinc-300 hover:bg-zinc-200 dark:!text-white !text-zinc-900 py-2 px-6 transition duration-300 ease-in-out flex items-center justify-center'
             style={{ textDecoration: 'none' }}
           >
             Install
           </Link>
-          <div className='p-0.5 bg-gradient-to-r from-sky-600 to-green-400 via-sky-400 rounded-xl flex items-center justify-center'>
+          <div className='p-0.5 rounded-xl flex items-center justify-center bg-gradient-to-r from-sky-600 to-green-400 via-sky-400'>
             <Link
               href='/docs/customization'
-              className='rounded-xl dark:bg-zinc-600 dark:hover:bg-zinc-500 bg-zinc-300 hover:bg-zinc-200 dark:!text-white !text-zinc-900 py-2 px-6 transition duration-300 ease-in-out w-full'
+              className='rounded-xl dark:bg-zinc-700 dark:hover:bg-zinc-600 bg-zinc-300 hover:bg-zinc-200 dark:!text-white !text-zinc-900 py-2 px-6 transition duration-300 ease-in-out w-full'
               style={{ textDecoration: 'none' }}
             >
               Make your own?

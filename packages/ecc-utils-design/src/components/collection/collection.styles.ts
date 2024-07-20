@@ -33,6 +33,9 @@ const styles = css`
     width: var(--ecc-input-height-medium);
   }
   /* Items */
+  sl-details::part(base) {
+    background-color: transparent;
+  }
   sl-details {
     margin-bottom: var(--ecc-spacing-medium);
     margin-top: var(--ecc-spacing-medium);

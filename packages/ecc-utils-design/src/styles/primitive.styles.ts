@@ -1,5 +1,56 @@
 import { css } from "lit";
 
+/* TODO: Need to be translated to new tokens:
+
+--ecc-color-brand-faint: var(--ecc-color-blue-50);
+--ecc-color-brand-muted: var(--ecc-color-blue-100);
+--ecc-color-brand-subtle: var(--ecc-color-blue-300);
+--ecc-color-brand-primary: var(--ecc-color-blue-500);
+--ecc-color-brand-emphasis: var(--ecc-color-blue-700);
+--ecc-color-brand-strong: var(--ecc-color-blue-900);
+
+--ecc-color-background-subtle: var(--ecc-color-neutral-50);
+--ecc-color-background-base: var(--ecc-color-neutral-100);
+--ecc-color-background-emphasis: var(--ecc-color-neutral-200);
+
+--ecc-color-border-base: var(--ecc-color-neutral-300);
+
+--ecc-color-status-success: var(--ecc-color-green-500);
+--ecc-color-status-danger: var(--ecc-color-red-500);
+--ecc-color-status-warning: var(--ecc-color-yellow-500);
+--ecc-color-status-neutral: var(--ecc-color-neutral-500);
+
+--ecc-color-content-subtle: var(--ecc-color-neutral-700);
+--ecc-color-content-base: var(--ecc-color-neutral-800);
+--ecc-color-content-emphasis: var(--ecc-color-neutral-900);
+--ecc-color-content-strong: var(--ecc-color-black);
+
+--ecc-spacing-4xs: 0.125rem;
+--ecc-spacing-3xs: 0.25rem;
+--ecc-spacing-2xs: 0.5rem;
+--ecc-spacing-xs: 0.75rem;
+--ecc-spacing-s: 1rem;
+--ecc-spacing-m: 1.5rem;
+--ecc-spacing-l: 2rem;
+--ecc-spacing-xl: 3rem;
+--ecc-spacing-2xl: 4rem;
+--ecc-spacing-3xl: 6rem;
+--ecc-spacing-4xl: 8rem;
+
+--ecc-elevation-sunken: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+--ecc-elevation-default: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+--ecc-elevation-raised: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+--ecc-elevation-overlay: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
+--ecc-elevation-overflow: 0 8px 16px 0 rgba(0, 0, 0, 0.1);
+
+--ecc-radius-small: 0.125rem;
+--ecc-radius-medium: 0.25rem;
+--ecc-radius-large: 0.5rem;
+--ecc-radius-circle: 50%;
+--ecc-radius-full: 9999px;
+
+*/
+
 const primitiveStylesheet = css`
   :root,
   :host,
@@ -284,57 +335,6 @@ const primitiveStylesheet = css`
     --ecc-z-index-dropdown: 900;
     --ecc-z-index-toast: 950;
     --ecc-z-index-tooltip: 1000;
-
-    /* TODO: Need to be translated to new tokens:
-
-    --ecc-color-brand-faint: var(--ecc-color-blue-50);
-    --ecc-color-brand-muted: var(--ecc-color-blue-100);
-    --ecc-color-brand-subtle: var(--ecc-color-blue-300);
-    --ecc-color-brand-primary: var(--ecc-color-blue-500);
-    --ecc-color-brand-emphasis: var(--ecc-color-blue-700);
-    --ecc-color-brand-strong: var(--ecc-color-blue-900);
-
-    --ecc-color-background-subtle: var(--ecc-color-neutral-50);
-    --ecc-color-background-base: var(--ecc-color-neutral-100);
-    --ecc-color-background-emphasis: var(--ecc-color-neutral-200);
-
-    --ecc-color-border-base: var(--ecc-color-neutral-300);
-
-    --ecc-color-status-success: var(--ecc-color-green-500);
-    --ecc-color-status-danger: var(--ecc-color-red-500);
-    --ecc-color-status-warning: var(--ecc-color-yellow-500);
-    --ecc-color-status-neutral: var(--ecc-color-neutral-500);
-
-    --ecc-color-content-subtle: var(--ecc-color-neutral-700);
-    --ecc-color-content-base: var(--ecc-color-neutral-800);
-    --ecc-color-content-emphasis: var(--ecc-color-neutral-900);
-    --ecc-color-content-strong: var(--ecc-color-black);
-
-    --ecc-spacing-4xs: 0.125rem;
-    --ecc-spacing-3xs: 0.25rem;
-    --ecc-spacing-2xs: 0.5rem;
-    --ecc-spacing-xs: 0.75rem;
-    --ecc-spacing-s: 1rem;
-    --ecc-spacing-m: 1.5rem;
-    --ecc-spacing-l: 2rem;
-    --ecc-spacing-xl: 3rem;
-    --ecc-spacing-2xl: 4rem;
-    --ecc-spacing-3xl: 6rem;
-    --ecc-spacing-4xl: 8rem;
-
-    --ecc-elevation-sunken: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --ecc-elevation-default: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    --ecc-elevation-raised: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-    --ecc-elevation-overlay: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
-    --ecc-elevation-overflow: 0 8px 16px 0 rgba(0, 0, 0, 0.1);
-
-    --ecc-radius-small: 0.125rem;
-    --ecc-radius-medium: 0.25rem;
-    --ecc-radius-large: 0.5rem;
-    --ecc-radius-circle: 50%;
-    --ecc-radius-full: 9999px;
-
-    */
 
     /* High Level Tokens */
 
