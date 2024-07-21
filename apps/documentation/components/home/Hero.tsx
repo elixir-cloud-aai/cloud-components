@@ -2,10 +2,12 @@
 import { RiArrowRightLine } from '@remixicon/react';
 import { Link } from 'nextra-theme-docs';
 
+
 export default function Hero() {
+
   return (
-    <div className='w-full md:w-5/6 mx-auto relative h-96 md:h-[32rem] flex items-center justify-center'>
-      <div className='flex flex-col items-center'>
+    <div className='mx-auto static mt-0 md:mt-[7rem] flex flex-col items-center'>
+      <div className='flex flex-col items-center w-full md:w-5/6'>
         <h1 className='text-7xl font-extrabold bg-gradient-to-r from-sky-600 to-green-400 via-sky-400 text-transparent bg-clip-text text-center flex-col items-center gap-4 hidden md:flex'>
           <div>The Component Library</div>
           <div>for Federated Cloud Services</div>
@@ -14,7 +16,7 @@ export default function Hero() {
           The Component Library for Federated Cloud Services
         </h1>
         <p className='mt-6 md:mt-8 text-base md:text-xl text-zinc-500 max-w-7xl text-center'>
-          Modular, composable, and customizable components for interacting with cloud
+          Modular, customizable, and extensible components for interacting with cloud
           infrastructure.
         </p>
         <div className='flex flex-wrap gap-4 mt-10 md:mt-12 text-sm md:text-base items-center justify-center'>
@@ -36,7 +38,7 @@ export default function Hero() {
           <div className='p-0.5 rounded-xl flex items-center justify-center bg-gradient-to-r from-sky-600 to-green-400 via-sky-400'>
             <Link
               href='/docs/customization'
-              className='rounded-xl dark:bg-zinc-700 dark:hover:bg-zinc-600 bg-zinc-300 hover:bg-zinc-200 dark:!text-white !text-zinc-900 py-2 px-6 transition duration-300 ease-in-out w-full'
+              className='rounded-xl dark:bg-zinc-700 dark:hover:bg-zinc-600 bg-zinc-300 hover:bg-zinc-200 dark:!text-white !text-zinc-900 py-1.5 px-6 transition duration-300 ease-in-out w-full'
               style={{ textDecoration: 'none' }}
             >
               Make your own?
@@ -44,6 +46,6 @@ export default function Hero() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

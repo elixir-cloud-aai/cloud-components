@@ -1,58 +1,86 @@
 import Hero from '@/components/home/Hero';
-import { Cards, Card } from 'nextra/components';
+import CrossPlatform from '@/components/home/CrossPlatform';
+import Customizable from '@/components/home/Customizable';
+import { Tabs, Cards, Card } from 'nextra/components';
+import Runs from '@/components/packages/wes/runs/runs.tsx';
 
 <Hero />
 
-[//]: # (## Contribute)
+<CrossPlatform />
 
-[//]: # ()
-[//]: # (This project is a community effort and lives off your contributions,)
+<div className='flex flex-row items-start justify-center w-full gap-10'>
 
-[//]: # (be it in the form of bug reports, feature requests, discussions, fixes or)
+<div className='flex flex-col w-[40%]'>
+<Tabs items={['React', 'HTML', 'Vue']}>
+  <Tabs.Tab>
+    ```jsx {2, 8}
+    import React from 'react';
+    import { ECCClientGa4ghWesRuns } from '@elixir-cloud/wes/dist/react/runs/index';
 
-[//]: # (any other form of contribution!)
+    function App() {
+      return (
+        <div>
+          <h1>WES Runs</h1>
+          <ECCClientGa4ghWesRuns baseURL="https://your-wes-endpoint.com" />
+        </div>
+      );
+    }
 
-[//]: # ()
-[//]: # (<Cards>)
+    export default App;
+    ```
 
-[//]: # (  <Card)
+  </Tabs.Tab>
 
-[//]: # (    title='Contributor Guide')
+  <Tabs.Tab>
+    ```html {7, 11}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>WES Runs Example</title>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@elixir-cloud/wes/dist/index.min.js"></script>
+    </head>
+    <body>
+      <h1>WES Runs</h1>
+      <ecc-client-ga4gh-wes-runs baseURL="https://your-wes-endpoint.com"></ecc-client-ga4gh-wes-runs>
+    </body>
+    </html>
+    ```
+  </Tabs.Tab>
 
-[//]: # (    href='https://elixir-cloud-aai.github.io/guides/guide-contributor/')
+  <Tabs.Tab>
+    ```vue {4, 9}
+    <template>
+      <div>
+        <h1>WES Runs</h1>
+        <ecc-client-ga4gh-wes-runs :baseURL="baseURL" ></ecc-client-ga4gh-wes-runs>
+      </div>
+    </template>
 
-[//]: # (  />)
+    <script>
+    import '@elixir-cloud/wes/dist/components/runs/index.js';
+    
+    export default {
+      data() {
+        return {
+          baseURL: 'https://your-wes-endpoint.com'
+        }
+      }
+    }
+    </script>
+    ```
 
-[//]: # (  <Card title='Developer Guide' href='/nerd/review' />)
+  </Tabs.Tab>
+</Tabs>
 
-[//]: # (  <Card title='Documentation Guide' href='/nerd/documentation' />)
 
-[//]: # (</Cards>)
+</div>
 
-[//]: # ()
-[//]: # (## Contact)
+<div className='w-[40%] mt-5'>
+  <Runs />
+</div>
+</div>
 
-[//]: # ()
-[//]: # (The project is maintained by [ELIXIR Cloud & AAI]&#40;https://elixir-cloud.dcc.sib.swiss/&#41;, a Driver)
 
-[//]: # (Project of the [Global Alliance for Genomics and Health &#40;GA4GH&#41;]&#40;https://ga4gh.org/&#41;, under)
-
-[//]: # (the umbrella of the [ELIXIR]&#40;https://elixir-europe.org/&#41; [Compute Platform]&#40;https://elixir-europe.org/platforms/compute&#41;.)
-
-[//]: # ()
-[//]: # (To get in touch with use, please use one of the following routes:)
-
-[//]: # ()
-[//]: # (- For filing bug reports, feature requests or other code-related issues, please)
-
-[//]: # (  make use of the project's [issue tracker]&#40;https://github.com/elixir-cloud-aai/cloud-components/issues&#41;.)
-
-[//]: # (- For private/personal issues, more involved communication, or if you would)
-
-[//]: # (  like to join our team as a regular contributor, you can either join our)
-
-[//]: # (  [chat board]&#40;https://join.slack.com/t/elixir-cloud/shared_invite/zt-1uvebyx1e-NcC0Hof2guT9df~haBdQaw&#41;)
-
-[//]: # (  or send an <a href="mailto:alexander.kanitz@alumni.ethz.ch" className='underline'>email</a> to the community)
-
-[//]: # (  leaders.)
+<Customizable />

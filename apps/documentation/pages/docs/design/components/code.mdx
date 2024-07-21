@@ -1,131 +1,110 @@
-import ComponentName from '@/components/common/ComponentName';
-import Code from '@/components/packages/design/code/code.tsx';
-import CodeJSON from '@/components/packages/design/code/codeJSON.tsx';
-import CodeIndentation from '@/components/packages/design/code/codeIndentation.tsx';
-import { Tabs, Callout } from 'nextra/components';
+import { Callout, Tabs } from 'nextra/components';
+import ComponentName from '@/components/common/ComponentName.tsx';
+import EccUtilsDesignCode from '@/components/packages/design/code/code.tsx';
 
-# Code Component
+# EccUtilsDesignCode Component
 
 <ComponentName
   tagName='ecc-utils-design-code'
   reactTagName='EccUtilsDesignCode'
-  version='0.1.1'
+  version='0.1.0'
   beta
 />
 
-Simple code editor to handle `YAML`, `JSON` and `multiline text` input.
+## Overview
+
+The EccUtilsDesignCode component is a customizable code editor built using the Ace editor. It provides a user-friendly interface for displaying and editing code in various languages, with syntax highlighting and theme support.
+
+<Callout type='info'>
+  <div className='text-sm'>
+    This component uses the Ace editor library. For more details, refer to the [Ace editor documentation](https://ace.c9.io/).
+  </div>
+</Callout>
 
 ## Preview
 
-<Code />
+<EccUtilsDesignCode value='{"example": "json"}' language="json" label="JSON Example" />
 
-## Imports
+## Examples
 
-<Tabs items={['React', 'HTML/Lit']}>
+### Basic Usage
+
+<Tabs items={['React', 'HTML']}>
   <Tabs.Tab>
-    ```ts copy
-    import EccUtilDesignCode from '@elixir-cloud/design/dist/react/code/index';
-    ```
-  
-    ### Example
-  
-    ````ts showLineNumbers {2, 5} copy filename="EccUtilsDesignCode"
+    ```tsx showLineNumbers {2, 5-10} copy filename="EccUtilsDesignCodeExample.tsx"
     import React from 'react';
-    import EccUtilDesignCode from '@elixir-cloud/design/dist/react/code/index';
+    import EccUtilsDesignCode from '@elixir-cloud/utils/dist/react/design/code';
 
-    export default function Code() {
-      return <EccUtilDesignCode />
+    export default function CodeEditor() {
+      return <EccUtilsDesignCode 
+        value="echo 'Hello, World!';"
+        label="Shell Script Example"
+        language="sh"
+        disabled={false}
+      />;
     }
-    ````
-
+    ```
   </Tabs.Tab>
+  
   <Tabs.Tab>
-  ```ts copy
-    import "@elixir-cloud/design/dist/components/code/index.js";
-  ```
-  
-  ### Example
-  
-  ````html showLineNumbers {6, 20-26} copy filename="ecc-utils-design-code"
-    <body>
-        <div id="demo"></div>
-    </div>
-    <script type="module">
-      import { html, render } from "lit";
-      import "@elixir-cloud/design/dist/components/code/index.js";
-
-      render(
-        html`<ecc-utils-design-code/> `,
-        document.querySelector("#demo")
-      );
-    </script>
-    ````
-
-</Tabs.Tab>
+    ```html showLineNumbers {4, 7-12} copy filename="index.html"
+    <html lang="en">
+      <head>
+        <title>EccUtilsDesignCode Example</title>
+        <script src="https://cdn.jsdelivr.net/npm/@elixir-cloud/utils/dist/index.min.js"></script>
+      </head>
+      <body>
+        <ecc-utils-design-code
+          value="echo 'Hello, World!';"
+          label="Shell Script Example"
+          language="sh"
+          disabled="false"
+        ></ecc-utils-design-code>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
 </Tabs>
 
 ## Properties
 
-| Property      | Required | Default | Type      | Description                                                            |
-| ------------- | -------- | ------- | --------- | ---------------------------------------------------------------------- |
-| `code`        | `false`  |         | `String`  | Specifies the code to be rendered in the editor during initialization. |
-| `label`       | `Code`   |         | `String`  | Label for code editor input field.                                     |
-| `language`    | `false`  |         | `String`  | Specifies the language interpreter for syntax highlighting.            |
-| `indentation` | `false`  | `2`     | `Number`  | Specifies number of spaces that should be considered for 1 Tab space.  |
-| `blurDelay`   | `false`  | `150`   | `Number`  | Time in ms between 2 Tab key presses that should move the focus.       |
-| `required`    | `false`  | `true`  | `Boolean` | Makes the code area a required field.                                  |
-| `disabled`    | `false`  | `false` | `Boolean` | Disables the code area.                                                |
+| Property   | Required | Default      | Type      | Description                                   |
+|------------|----------|--------------|-----------|-----------------------------------------------|
+| `value`    | false    | `""`         | `String`  | The initial code content                      |
+| `label`    | false    | `"Code block"` | `String`  | Label displayed above the code editor         |
+| `language` | false    | `"json"`     | [`Language`](#language)| The programming language for syntax highlighting |
+| `disabled` | false    | `false`      | `Boolean` | Whether the editor is read-only               |
+
+### value
+
+The `value` property sets the initial content of the code editor.
+
+### label
+
+The `label` property specifies the text displayed above the code editor.
+
+### language
+
+The `language` property determines the syntax highlighting. Supported values are:
+- `"yaml"`
+- `"json"`
+- `"xml"`
+- `"makefile"`
+- `"sh"`
+
+<Callout type='info'>
+  <div className='text-sm'>
+    While we maintain & provide support for the above languages, the Ace editor supports many more.
+    For a full list of supported languages, refer to the [Ace editor documentation](https://ace.c9.io/).
+  </div>
+</Callout>
+
+### disabled
+
+When `true`, the `disabled` property makes the code editor read-only.
 
 ## Events
 
-| Event Name         | React Event Name      | Description                                                                                                                                                                                                                                                             |
-| ------------------ | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ecc-utils-change` | `EccUtilsChangeEvent` | This event is triggered when there is a change in the code within the editor. The event details include the language set by the package author, the code as value, and an error attribute indicating whether the entered code is valid based on the specified language. |
-
-## Methods
-
-| Method Name | Arguments | Description        |
-| ----------- | --------- | ------------------ |
-| `getCode()` |           | Returns the input. |
-
-## Slots
-
-<Callout emoji='👷‍♀️'>Come back soon, huh!</Callout>
-
-## Parts
-
-<Callout emoji='👩‍🏭'>Hold on! We are working here.</Callout>
-
-## Examples
-
-### JSON
-
-Control the language, the first tag shows the language the `app-author` defaulted for this
-component, so this means `users` are supposed to input `JSON` (in this case), but if they put something else
-the first badge will turn red.
-
-<CodeJSON />
-
-<Callout emoji='😎' type='info'>
-  Try, putting valid `YAML`!
-</Callout>
-
-```ts filename="codeWithJson" copy showLineNumbers {3}
-import React from 'react';
-export default function CodeWithJson() {
-  return <EccUtilsDesignCode language='JSON' />;
-}
-```
-
-### Indentation
-
-This has a default indentation of 8 spaces.
-
-<CodeIndentation />
-
-```ts filename="codeWithIndents" copy showLineNumbers {3}
-import React from 'react';
-export default function CodeWithIndents() {
-  return <EccUtilsDesignCode indentation={8} />;
-}
-```
+| Event Name        | Detail                   | Description                         |
+|-------------------|--------------------------|-------------------------------------|
+| `ecc-utils-change`| `{ value: string }`      | Fired when the editor content changes |
