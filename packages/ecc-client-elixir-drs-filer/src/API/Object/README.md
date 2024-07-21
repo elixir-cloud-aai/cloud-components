@@ -2,7 +2,7 @@
 
 See the human-readable [Reference Documentation](https://ga4gh.github.io/data-repository-service-schemas/docs/).
 
-## postTask
+## postDrsObject
 
 Posts/Create a new object.
 
