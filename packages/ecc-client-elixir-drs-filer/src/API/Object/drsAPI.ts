@@ -1,5 +1,5 @@
 const postObject = async (baseURL: string, objectData: object) => {
-  const url = `${baseURL}/object`;
+  const url = `${baseURL}/objects`;
 
   try {
     const response = await fetch(url, {
