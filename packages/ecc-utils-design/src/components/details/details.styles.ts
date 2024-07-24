@@ -61,6 +61,7 @@ const styles = css`
   }
   sl-details::part(base) {
     border: 0px;
+    background-color: transparent;
   }
   sl-details::part(header) {
     padding-left: 0px;

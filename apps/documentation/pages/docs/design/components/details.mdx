@@ -1,0 +1,160 @@
+import ComponentName from '@/components/common/ComponentName';
+import Details from '@/components/packages/design/details/details';
+import { Tabs, Callout } from 'nextra/components';
+
+# Details Component
+
+<ComponentName
+  tagName='ecc-utils-design-details'
+  reactTagName='EccUtilsDesignDetails'
+  version='0.1.1'
+  beta
+/>
+
+This component is used to render a detailed view of items.
+
+## Preview
+
+<Details />
+
+## Imports
+
+<Tabs items={['React', 'HTML/Lit']}>
+  <Tabs.Tab>
+    ```ts copy
+    import EccUtilDesignDetails from '@elixir-cloud/design/dist/react/details/index';
+    ```
+  
+    ### Example
+  
+    ````ts showLineNumbers {2, 3, 10} copy filename="EccUtilsDesignDetails"
+    import React from 'react';
+    import EccUtilDesignDetails from '@elixir-cloud/design/dist/react/details/index';
+    import { Action, Field } from '@elixir-cloud/design/dist/components/details/details';
+
+    const data: Object ={...}
+    const actions: Action[]=[...]
+    const fields: Field[]=[...]
+
+    export default function details() {
+      return <EccUtilsDesignDetails data={data} fields={fields} actions={actions} />;
+    }
+    ````
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```ts copy
+    import "@elixir-cloud/design/dist/components/details/index.js";
+    ```
+  
+    ### Example
+  
+    ````html showLineNumbers {6, 13-16} copy filename="ecc-utils-design-details"
+    <body>
+        <div id="demo"></div>
+    </div>
+    <script type="module">
+      import { html, render } from "lit";
+      import "@elixir-cloud/design/dist/components/details/index.js";
+
+      const data = {...}
+      const actions = [...]
+      const fields = [...]
+
+      render(
+        html`<ecc-utils-design-details
+              data={data}
+              fields={fields}
+              actions={actions}/> `,
+        document.querySelector("#demo")
+      );
+
+    </script>
+    ````
+
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property              | Required | Default | Type     | Description                               |
+| --------------------- | -------- | ------- | -------- | ----------------------------------------- |
+| `data`                | `true`   |         | `Object` | Data to be rendered                       |
+| [`fields`](#fields)   | `true`   |         | `Array`  | An array of fields to render              |
+| [`actions`](#actions) | `false`  |         | `Array`  | An array of buttons and its configuration |
+
+### fields\*
+
+The `fields` property allows you to define an array of fields along with their configuration. Fields can be used to render specific data from the `data` object.
+
+| Property                           | Required | Default  | Type                | Description                                                                                 |
+| ---------------------------------- | -------- | -------- | ------------------- | ------------------------------------------------------------------------------------------- |
+| `key`                              | `true`   |          | `string`            | A unique identifier for the field, used to distinguish between fields in the configuration. |
+| `path`                             | `true`   |          | `string`            | The path to the data to be rendered.                                                        |
+| `tab`                              | `false`  |          | `string`            | The tab group to which the field belongs.                                                   |
+| `parentKey`                        | `false`  |          | `string`            | The parent key of the field. Recommended if tab is not provided.                            |
+| `label`                            | `false`  |          | `string`            | The display name or label for the field.                                                    |
+| `tooltip`                          | `false`  |          | `string`            | The tooltip to be displayed on hover.                                                       |
+| `copy`                             | `false`  | `false`  | `boolean`           | A flag to indicate if the field should be copied.                                           |
+| `arrayOptions.type`                | `false`  | `detail` | `'detail' \| 'tag'` | The type of array to be rendered. Prefer `tag` for smaller values.                          |
+| `arrayOptions.labelOptions.path`   | `false`  |          | `string`            | The path in the child object to be used as the label.                                       |
+| `arrayOptions.labelOptions.prefix` | `false`  |          | `string`            | The prefix to be added to the label.                                                        |
+| `arrayOptions.labelOptions.suffix` | `false`  |          | `string`            | The suffix to be added to the label.                                                        |
+
+### Actions
+
+The `actions` property allows you to define an array of actions along with their configuration. Actions can be used to render buttons or links.
+
+| Property        | Required | Default  | Type             | Description                                                                                   |
+| --------------- | -------- | -------- | ---------------- | --------------------------------------------------------------------------------------------- |
+| `key`           | `true`   |          | `string`         | A unique identifier for the action, used to distinguish between actions in the configuration. |
+| `label`         | `true`   |          | `string`         | The display name or label for the action.                                                     |
+| `type`          | `false`  | `button` | `button \| link` | The type of action to be rendered.                                                            |
+| `position`      | `false`  | `right`  | `left \| right`  | The position of the action.                                                                   |
+| `buttonOptions` | `false`  |          | `Object`         | The configuration for the button. Can be used if `type` is `button`.                          |
+| `linkOptions`   | `false`  |          | `Object`         | The configuration for the link. Can be used if `type` is `link`.                              |
+
+#### Button Options
+
+| Property        | Required | Default   | Type                                                         | Description                                                    |
+| --------------- | -------- | --------- | ------------------------------------------------------------ | -------------------------------------------------------------- |
+| `variant`       | `false`  | `primary` | `primary \| success \| neutral \| warning \| danger \| text` | The variant of the button.                                     |
+| `loading`       | `false`  | `false`   | `boolean`                                                    | A flag to indicate if the button should be in a loading state. |
+| `disabled`      | `false`  | `false`   | `boolean`                                                    | A flag to indicate if the button should be disabled.           |
+| `size`          | `false`  | `medium`  | `small \| medium \| large`                                   | The size of the button.                                        |
+| `icon.url`      | `false`  |           | `string`                                                     | The URL of the icon to be displayed.                           |
+| `icon.position` | `false`  | `prefix`  | `prefix \| suffix`                                           | The position of the icon.                                      |
+
+#### Link Options
+
+| Property | Required | Default  | Type                       | Description                 |
+| -------- | -------- | -------- | -------------------------- | --------------------------- |
+| `url`    | `true`   |          | `string`                   | The URL to be navigated to. |
+| `size`   | `false`  | `medium` | `small \| medium \| large` | The size of the link.       |
+
+## Events
+
+The component triggers a custom event, named `ecc-utils-button-click`, upon clicking a button with a specific `key`. This event conveys details about the clicked button, including its `key` and `index`. The app-author is expected to fire the event based on the key provided in the `buttons` prop to the element. This action is intended to activate the corresponding button associated with the specified key.
+
+| Event Name               | React Event Name           | Description                                                                                                                                                                                                                                                                                          |
+| ------------------------ | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ecc-utils-button-click` | `EccUtilsButtonClickEvent` | This event conveys details about the clicked button, including its `key` and `index`. The `app-author` is expected to fire the event based on the key provided in the `buttons` prop to the element. This action is intended to activate the corresponding button associated with the specified key. |
+
+#### Event Payload
+
+| Property | Type     | Description                                           |
+| -------- | -------- | ----------------------------------------------------- |
+| `key`    | `string` | The unique identifier of the clicked button.          |
+| `index`  | `number` | The index of the button in reference to other buttons |
+
+## Slots
+
+<Callout emoji='🤠'> Aye! Partner, hold on your horses! We're working here!</Callout>
+
+## Parts
+
+<Callout emoji='🔫'> Bro! We are working!</Callout>
+
+## CSS Variables
+
+<Callout emoji='💣'> Under construction.</Callout>

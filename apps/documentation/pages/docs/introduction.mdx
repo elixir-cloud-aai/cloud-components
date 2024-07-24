@@ -1,0 +1,42 @@
+import { Callout } from 'nextra/components';
+import { Steps } from 'nextra/components';
+import Card from '@/components/common/Card';
+
+# Introduction
+
+The ELIXIR Cloud Components (ECC) are a suite of web components designed for integration with federated cloud infrastructures, specifically those implementing [Global Alliance for Genomics and Health (GA4GH)](https://www.ga4gh.org/) standards. This documentation provides a comprehensive overview of the ECC architecture, components, and implementation guidelines.
+
+## Supported Services
+
+While we are continuously expanding the ECC suite, the current version includes components for the following services:
+
+<div className='flex gap-4 mt-4'>
+  <Card title='Task Execution Service (TES)' href='/docs/tes/introduction' />
+  <Card title='Workflow Execution Service (WES)' href='/docs/wes/introduction' />
+</div>
+
+## Technical Overview
+
+ECC is built on [web components](https://www.webcomponents.org/introduction), ensuring broad compatibility and platform independence. The components are designed to be modular, reusable, and interoperable with various cloud infrastructures adhering to GA4GH specifications.
+
+<Steps>
+### Standards Compliance
+Implements GA4GH standards for compatibility with federated cloud infrastructures.
+
+### Modular Architecture
+
+Each component is self-contained, facilitating easy integration and maintenance.
+
+### Extensibility
+
+Loosely coupled features allow for customization and support of non-standard implementations.
+
+### Platform Agnostic
+
+Compatible with any web framework or platform that supports vanilla HTML/JavaScript.
+
+### Headless Design
+
+Utilizes CSS parts and variables for non-programmatic styling customization.
+
+</Steps>

@@ -16,8 +16,7 @@ export default function collection() {
 
   const fetchDummyData = async (page, limit, searchString, tags) => {
     const res = await fetch(
-      `https://jsonplaceholder.typicode.com/todos?_page=${page}&_limit=${limit}${
-        searchString ? `&title_like=${searchString}` : ''
+      `https://jsonplaceholder.typicode.com/todos?_page=${page}&_limit=${limit}${searchString ? `&title_like=${searchString}` : ''
       }${tags ? `&completed=${tags === 'SUCCESS'}` : ''}`,
     );
     const data = await res.json();

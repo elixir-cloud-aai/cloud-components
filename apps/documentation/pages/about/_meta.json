@@ -1,0 +1,10 @@
+{
+  "contact": {
+    "title": "Contact",
+    "type": "page"
+  },
+  "contribute": {
+    "title": "Contribute",
+    "type": "page"
+  }
+}
