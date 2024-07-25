@@ -30,7 +30,8 @@ export interface Field {
     | "array"
     | "switch"
     | "file"
-    | "group";
+    | "group"
+    | "select";
   fieldOptions?: {
     required?: boolean;
     default?: string | boolean;
@@ -38,6 +39,7 @@ export interface Field {
     accept?: string;
     returnIfEmpty?: string;
     tooltip?: string;
+    options?: Array<{ label: string; value: string }>; 
   };
   arrayOptions?: {
     defaultInstances?: number;
@@ -121,6 +123,89 @@ export default class EccUtilsDesignForm extends LitElement {
     `;
   }
 
+  // renderInputTemplate(field: Field, path: string): TemplateResult {
+  //   if (
+  //     field.type === "array" ||
+  //     field.type === "switch" ||
+  //     field.type === "group"
+  //   )
+  //     return html``;
+
+  //   if (field.type === "file") {
+  //     return html`
+  //       <div class="file-container">
+  //         ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
+  //           ? html`
+  //               <sl-tooltip
+  //                 id=${field.key}
+  //                 content=${field.fieldOptions?.tooltip}
+  //               >
+  //                 <label class="file-input-label">
+  //                   ${field.label} ${field.fieldOptions?.required ? "*" : ""}
+  //                 </label>
+  //               </sl-tooltip>
+  //             `
+  //           : html`
+  //               <label class="file-input-label">
+  //                 ${field.label} ${field.fieldOptions?.required ? "*" : ""}
+  //               </label>
+  //             `}
+  //         <input
+  //           class="file-input"
+  //           type="file"
+  //           accept=${field.fieldOptions?.accept || "*"}
+  //           ?multiple=${field.fieldOptions?.multiple}
+  //           ?required=${field.fieldOptions?.required}
+  //           @change=${async (e: Event) => {
+  //             const { files } = e.target as HTMLInputElement;
+  //             _.set(this.form, path, files);
+  //             this.requestUpdate();
+  //           }}
+  //         />
+  //       </div>
+  //     `;
+  //   }
+
+  //   if (!_.get(this.form, path)) {
+  //     if (field.fieldOptions?.default && !this.hasUpdated) {
+  //       _.set(this.form, path, field.fieldOptions.default);
+  //     } else if (field.fieldOptions?.returnIfEmpty) {
+  //       _.set(this.form, path, "");
+  //     }
+  //   }
+
+  //   return html`
+  //     <sl-input
+  //       class="input"
+  //       type=${field.type || "text"}
+  //       ?required=${field.fieldOptions?.required}
+  //       value=${_.get(this.form, path)}
+  //       ?password-toggle=${field.type === "password"}
+  //       @sl-input=${(e: Event) => {
+  //         const { value } = e.target as HTMLInputElement;
+  //         if (!value) {
+  //           _.unset(this.form, path);
+  //         } else {
+  //           _.set(this.form, path, value);
+  //         }
+
+  //         this.requestUpdate();
+  //       }}
+  //     >
+  //       <label slot="label">
+  //         ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
+  //           ? html`
+  //             <sl-tooltip content=${field.fieldOptions?.tooltip}>
+  //               <label> ${field.label} </label>
+  //             </sl-tooltip>
+  //           </label>
+  //           `
+  //           : html` <label> ${field.label} </label> `}
+  //       </label>
+  //     </sl-input>
+  //   `;
+  // }
+
   renderInputTemplate(field: Field, path: string): TemplateResult {
     if (
       field.type === "array" ||
@@ -128,7 +213,7 @@ export default class EccUtilsDesignForm extends LitElement {
       field.type === "group"
     )
       return html``;
-
+  
     if (field.type === "file") {
       return html`
         <div class="file-container">
@@ -163,7 +248,48 @@ export default class EccUtilsDesignForm extends LitElement {
         </div>
       `;
     }
-
+  
+    if (field.type === "select") {
+      return html`
+        <div class="select-container">
+          ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
+            ? html`
+                <sl-tooltip
+                  id=${field.key}
+                  content=${field.fieldOptions?.tooltip}
+                >
+                  <label class="select-label">
+                    ${field.label} ${field.fieldOptions?.required ? "*" : ""}
+                  </label>
+                </sl-tooltip>
+              `
+            : html`
+                <label class="select-label">
+                  ${field.label} ${field.fieldOptions?.required ? "*" : ""}
+                </label>
+              `}
+          <sl-select
+            class="select"
+            ?required=${field.fieldOptions?.required}
+            value=${_.get(this.form, path)}
+            @sl-change=${(e: Event) => {
+              const { value } = e.target as HTMLSelectElement;
+              _.set(this.form, path, value);
+              this.requestUpdate();
+            }}
+          >
+            ${field.fieldOptions?.options?.map(
+              (option) => html`
+                <sl-option value=${option.value}>
+                  ${option.label}
+                </sl-option>
+              `
+            )}
+          </sl-select>
+        </div>
+      `;
+    }
+  
     if (!_.get(this.form, path)) {
       if (field.fieldOptions?.default && !this.hasUpdated) {
         _.set(this.form, path, field.fieldOptions.default);
@@ -171,7 +297,7 @@ export default class EccUtilsDesignForm extends LitElement {
         _.set(this.form, path, "");
       }
     }
-
+  
     return html`
       <sl-input
         class="input"
@@ -186,7 +312,7 @@ export default class EccUtilsDesignForm extends LitElement {
           } else {
             _.set(this.form, path, value);
           }
-
+  
           this.requestUpdate();
         }}
       >
@@ -202,7 +328,7 @@ export default class EccUtilsDesignForm extends LitElement {
         </label>
       </sl-input>
     `;
-  }
+  }  
 
   private renderArrayTemplate(field: Field, path: string): TemplateResult {
     const { arrayOptions } = field;
