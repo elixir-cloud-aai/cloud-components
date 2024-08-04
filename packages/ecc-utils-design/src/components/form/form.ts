@@ -39,9 +39,7 @@ export interface Field {
     accept?: string;
     returnIfEmpty?: string;
     tooltip?: string;
-  };
-  searchOptions?: {
-    options?: Array<{ label: string; value: string }>;
+    selectOptions?: Array<{ label: string; value: string }>;
   };
   arrayOptions?: {
     defaultInstances?: number;
@@ -190,14 +188,16 @@ export default class EccUtilsDesignForm extends LitElement {
           <sl-select
             class="select"
             ?required=${field.fieldOptions?.required}
-            value=${_.get(this.form, path)}
+            value=${_.get(this.form, path)?.value || ""}
             @sl-change=${(e: Event) => {
-              const { value } = e.target as HTMLSelectElement;
-              _.set(this.form, path, value);
+              const selectElement = e.target as HTMLSelectElement;
+              const { value } = selectElement;
+              const label = selectElement.selectedOptions[0].textContent;
+              _.set(this.form, path, { value, label });
               this.requestUpdate();
             }}
           >
-            ${field.searchOptions?.options?.map(
+            ${field.fieldOptions?.selectOptions?.map(
               (option) => html`
                 <sl-option value=${option.value}> ${option.label} </sl-option>
               `
@@ -524,6 +524,7 @@ export default class EccUtilsDesignForm extends LitElement {
             composed: true,
           });
           this.dispatchEvent(event);
+          console.log(this.form);
         }}
       >
         ${this.fields.map((field) => this.renderTemplate(field, "data"))}
