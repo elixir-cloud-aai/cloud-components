@@ -166,6 +166,14 @@ export default class EccUtilsDesignForm extends LitElement {
       `;
     }
 
+    if (!_.get(this.form, path)) {
+      if (field.fieldOptions?.default && !this.hasUpdated) {
+        _.set(this.form, path, field.fieldOptions.default);
+      } else if (field.fieldOptions?.returnIfEmpty) {
+        _.set(this.form, path, "");
+      }
+    }
+
     if (field.type === "select") {
       return html`
         <div class="select-container">
@@ -205,14 +213,6 @@ export default class EccUtilsDesignForm extends LitElement {
           </sl-select>
         </div>
       `;
-    }
-
-    if (!_.get(this.form, path)) {
-      if (field.fieldOptions?.default && !this.hasUpdated) {
-        _.set(this.form, path, field.fieldOptions.default);
-      } else if (field.fieldOptions?.returnIfEmpty) {
-        _.set(this.form, path, "");
-      }
     }
 
     return html`
