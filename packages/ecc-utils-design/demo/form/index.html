@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en-GB">
-
-<head>
-  <meta charset="utf-8" />
-  <link rel="icon" href="./logo-elixir-cloud-aai.svg" type="image/x-icon" />
-  <!-- <style>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./logo-elixir-cloud-aai.svg" type="image/x-icon" />
+    <!-- <style>
       body {
         background: #f5f5f5;
       }
@@ -86,178 +85,177 @@
         font-weight: bold;
       }
     </style> -->
-  <title>ecc-utils-design</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
+    <title>ecc-utils-design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
 
-<body>
-  <div class="p-10">
-    <div id="demo"></div>
-  </div>
-  <!-- <button id="button">HTML Button</button> -->
+  <body>
+    <div class="p-10">
+      <div id="demo"></div>
+    </div>
+    <!-- <button id="button">HTML Button</button> -->
 
-  <script type="module">
-    import { html, render } from "lit";
-    import { getComponentCssParts } from "../dist/utilities/index.js";
-    import { EccUtilsDesignForm } from "../dist/components/index.js";
-    import "../../dist/components/form/index.js";
+    <script type="module">
+      import { html, render } from "lit";
+      import { getComponentCssParts } from "../dist/utilities/index.js";
+      import { EccUtilsDesignForm } from "../dist/components/index.js";
+      import "../../dist/components/form/index.js";
 
-    const fields = [
-      {
-        key: "name",
-        label: "Name",
-        type: "text",
-        fieldOptions: {
-          required: true,
-          tooltip: "Your name",
+      const fields = [
+        {
+          key: "name",
+          label: "Name",
+          type: "text",
+          fieldOptions: {
+            required: true,
+            tooltip: "Your name",
+          },
         },
-      },
-      {
-        key: "email",
-        label: "Email",
-        type: "email",
-        fieldOptions: {
-          tooltip: "Your email address",
+        {
+          key: "email",
+          label: "Email",
+          type: "email",
+          fieldOptions: {
+            tooltip: "Your email address",
+          },
         },
-      },
-      {
-        key: "18+",
-        label: "18+",
-        type: "switch",
-        fieldOptions: {
-          tooltip: "Are you over 18 years old?",
+        {
+          key: "18+",
+          label: "18+",
+          type: "switch",
+          fieldOptions: {
+            tooltip: "Are you over 18 years old?",
+          },
         },
-      },
-      {
-        key: "id",
-        label: "ID",
-        type: "file",
-        fieldOptions: {
-          required: true,
-          tooltip: "Your ID document",
+        {
+          key: "id",
+          label: "ID",
+          type: "file",
+          fieldOptions: {
+            required: true,
+            tooltip: "Your ID document",
+          },
         },
-      },
-      {
-        key: "gender",
-        label: "Gender",
-        type: "select",
-        fieldOptions: {
-          required: true,
-          selectOptions: [
-            { label: "Male", value: "1" },
-            { label: "Female", value: "2" },
-            { label: "Don't want to disclose", value: "3" },
-          ],
-        },
-      },
-      {
-        key: "address",
-        label: "Address",
-        type: "group",
-        groupOptions: {
-          collapsible: true,
-          tooltip: "Your address",
-        },
-        fieldOptions: {
-          tooltip: "Group for address",
-        },
-        arrayOptions: {
-          defaultInstances: 1,
-          max: 4,
-          min: 1,
-        },
-        children: [
-          {
-            key: "Details",
-            label: "Details",
-            type: "array",
-            fieldOptions: {
-              tooltip: "Details for address",
-            },
-            arrayOptions: {
-              defaultInstances: 0,
-              max: 2,
-            },
-            children: [
-              {
-                key: "houseNumber",
-                label: "House Number",
-                type: "text",
-                fieldOptions: {
-                  required: true,
-                  tooltip: "Your house number",
-                },
-              },
-              {
-                key: "street",
-                label: "Street",
-                type: "text",
-                fieldOptions: {
-                  default: "1601 Harrier Ln",
-                  required: false,
-                  tooltip: "Your street name",
-                },
-              },
-              {
-                key: "city",
-                label: "City",
-                type: "text",
-                fieldOptions: {
-                  required: true,
-                  tooltip: "Your city name",
-                },
-              },
-              {
-                key: "isPrimary",
-                label: "Primary",
-                type: "switch",
-                fieldOptions: {
-                  default: true,
-                  tooltip: "Is this your primary residence?",
-                },
-              },
+        {
+          key: "gender",
+          label: "Gender",
+          type: "select",
+          fieldOptions: {
+            required: true,
+            selectOptions: [
+              { label: "Male", value: "1" },
+              { label: "Female", value: "2" },
+              { label: "Don't want to disclose", value: "3" },
             ],
           },
-          {
-            key: "country",
-            label: "Country",
-            type: "text",
-            fieldOptions: {
-              required: true,
-              tooltip: "Your country name",
-            },
+        },
+        {
+          key: "address",
+          label: "Address",
+          type: "group",
+          groupOptions: {
+            collapsible: true,
+            tooltip: "Your address",
           },
-        ],
-      },
-    ];
+          fieldOptions: {
+            tooltip: "Group for address",
+          },
+          arrayOptions: {
+            defaultInstances: 1,
+            max: 4,
+            min: 1,
+          },
+          children: [
+            {
+              key: "Details",
+              label: "Details",
+              type: "array",
+              fieldOptions: {
+                tooltip: "Details for address",
+              },
+              arrayOptions: {
+                defaultInstances: 0,
+                max: 2,
+              },
+              children: [
+                {
+                  key: "houseNumber",
+                  label: "House Number",
+                  type: "text",
+                  fieldOptions: {
+                    required: true,
+                    tooltip: "Your house number",
+                  },
+                },
+                {
+                  key: "street",
+                  label: "Street",
+                  type: "text",
+                  fieldOptions: {
+                    default: "1601 Harrier Ln",
+                    required: false,
+                    tooltip: "Your street name",
+                  },
+                },
+                {
+                  key: "city",
+                  label: "City",
+                  type: "text",
+                  fieldOptions: {
+                    required: true,
+                    tooltip: "Your city name",
+                  },
+                },
+                {
+                  key: "isPrimary",
+                  label: "Primary",
+                  type: "switch",
+                  fieldOptions: {
+                    default: true,
+                    tooltip: "Is this your primary residence?",
+                  },
+                },
+              ],
+            },
+            {
+              key: "country",
+              label: "Country",
+              type: "text",
+              fieldOptions: {
+                required: true,
+                tooltip: "Your country name",
+              },
+            },
+          ],
+        },
+      ];
 
-    render(
-      html`<ecc-utils-design-form
-        .fields=${fields}
-        @ecc-utils-submit=${async (e) => {
-          console.log(getComponentCssParts(EccUtilsDesignForm));
-          try {
-            console.log("form - submitted", e.detail);
-            document.querySelector("ecc-utils-design-form").loading();
-            await fetch("https://jsonplaceholder.typicode.com/posts");
-            document
-              .querySelector("ecc-utils-design-form")
-              .success({ message: "Data fetched successfully" });
-          } catch (error) {
-            document
-              .querySelector("ecc-utils-design-form")
-              .error({ message: "Error fetching data" });
-          }
-        }}
-      >
-      </ecc-utils-design-form> `,
-      document.querySelector("#demo")
-    );
+      render(
+        html`<ecc-utils-design-form
+          .fields=${fields}
+          @ecc-utils-submit=${async (e) => {
+            console.log(getComponentCssParts(EccUtilsDesignForm));
+            try {
+              console.log("form - submitted", e.detail);
+              document.querySelector("ecc-utils-design-form").loading();
+              await fetch("https://jsonplaceholder.typicode.com/posts");
+              document
+                .querySelector("ecc-utils-design-form")
+                .success({ message: "Data fetched successfully" });
+            } catch (error) {
+              document
+                .querySelector("ecc-utils-design-form")
+                .error({ message: "Error fetching data" });
+            }
+          }}
+        >
+        </ecc-utils-design-form> `,
+        document.querySelector("#demo")
+      );
 
-    console.log(
-      getComponentCssParts(document.querySelector("ecc-utils-design-form"))
-    );
-  </script>
-</body>
-
+      console.log(
+        getComponentCssParts(document.querySelector("ecc-utils-design-form"))
+      );
+    </script>
+  </body>
 </html>

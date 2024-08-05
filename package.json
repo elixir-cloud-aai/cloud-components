@@ -6,6 +6,11 @@
     "type": "git",
     "url": "git+https://github.com/elixir-cloud-aai/cloud-components.git"
   },
+  "prettier": {
+    "singleQuote": false,
+    "printWidth": 80,
+    "tabWidth": 2
+  },
   "bugs": {
     "url": "https://github.com/elixir-cloud-aai/cloud-components/issues"
   },
