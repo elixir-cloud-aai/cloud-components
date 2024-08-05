@@ -45,6 +45,6 @@ module.exports = {
   npmDir,
   getAllComponents,
   pascalCase,
-  reactDir: path.join(cwd(), "./src/react"),
+  reactDir: path.join(cwd(), ".", "src", "react"),
   normalizePath,
 };
