@@ -6,16 +6,16 @@
   "version": "0.1.0",
   "private": true,
   "license": "Apache-2.0",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/elixir-cloud-aai/cloud-components.git"
-	},
-	"files": [
-		"dist",
-		"README.md",
-		"package.json",
-		"LICENSE"
-	],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elixir-cloud-aai/cloud-components.git"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "package.json",
+    "LICENSE"
+  ],
   "scripts": {
     "analyze": "cem analyze --litelement",
     "build": "node ../../scripts/build.js -p ecc-client-elixir-drs-filer-",
@@ -24,7 +24,7 @@
     "test": "wtr --coverage",
     "test:watch": "wtr --watch",
     "lint": "npx eslint .",
-    "lint:fix": "npm run lint -- --fix",
+    "lint:fix": "npm run lint -- --fix && prettier .",
     "prepublish": "npm run build"
   },
   "devDependencies": {
