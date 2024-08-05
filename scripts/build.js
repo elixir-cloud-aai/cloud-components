@@ -121,9 +121,9 @@ nextTask("Building source", async () => {
     target: "es2017",
     entry: [
       normalizePath(path.join(sourceDir, "index.ts")),
-      ...(await fg(`${sourceDir}/components/**/!(*.(test)).ts`)),
-      ...(await fg(`${sourceDir}/react/**/*.ts`)),
-      ...(await fg(`${sourceDir}/utilities/**/*.ts`)),
+      ...(await fg(normalizePath(`${sourceDir}/components/**/!(*.(test)).ts`))),
+      ...(await fg(normalizePath(`${sourceDir}/react/**/*.ts`))),
+      ...(await fg(normalizePath(`${sourceDir}/utilities/**/*.ts`))),
     ],
     splitting: true,
     treeshake: true,
