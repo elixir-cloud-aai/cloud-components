@@ -120,7 +120,7 @@ nextTask("Building source", async () => {
     format: "esm",
     target: "es2017",
     entry: [
-      normalizePath(path.join(sourceDir, "index.ts")),
+      normalizePath(`${sourceDir}/index.ts`),
       ...(await fg(normalizePath(`${sourceDir}/components/**/!(*.(test)).ts`))),
       ...(await fg(normalizePath(`${sourceDir}/react/**/*.ts`))),
       ...(await fg(normalizePath(`${sourceDir}/utilities/**/*.ts`))),
