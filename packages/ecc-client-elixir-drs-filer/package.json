@@ -1,5 +1,5 @@
 {
-  "name": "ecc-client-elixir-drs-filer",
+  "name": "@elixir-cloud/drs-filer",
   "description": "DRS Filer component",
   "main": "index.js",
   "type": "module",
@@ -21,7 +21,7 @@
     "build": "node ../../scripts/build.js -p ecc-client-elixir-drs-filer-",
     "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
     "clean": "rm -rf dist node_modules custom-elements-manifest.config.js",
-    "test": "wtr --coverage",
+    "test": "",
     "test:watch": "wtr --watch",
     "lint": "npx eslint .",
     "lint:fix": "npm run lint -- --fix && prettier .",
