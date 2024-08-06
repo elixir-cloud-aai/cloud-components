@@ -196,12 +196,11 @@ export default class EccUtilsDesignForm extends LitElement {
           <sl-select
             class="select"
             ?required=${field.fieldOptions?.required}
-            value=${_.get(this.form, path)?.value || ""}
+            value=${_.get(this.form, path)?.label || ""}
             @sl-change=${(e: Event) => {
               const selectElement = e.target as HTMLSelectElement;
-              const { value } = selectElement;
               const label = selectElement.selectedOptions[0].textContent;
-              _.set(this.form, path, { value, label });
+              _.set(this.form, path, label);
               this.requestUpdate();
             }}
           >
