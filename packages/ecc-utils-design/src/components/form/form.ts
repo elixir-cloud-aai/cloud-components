@@ -39,8 +39,8 @@ export interface Field {
     accept?: string;
     returnIfEmpty?: string;
     tooltip?: string;
-    selectOptions?: Array<{ label: string; value: string }>;
   };
+  selectOptions?: Array<{ label: string; value: string }>;
   arrayOptions?: {
     defaultInstances?: number;
     max?: number;
@@ -204,7 +204,7 @@ export default class EccUtilsDesignForm extends LitElement {
               this.requestUpdate();
             }}
           >
-            ${field.fieldOptions?.selectOptions?.map(
+            ${field.selectOptions?.map(
               (option) => html`
                 <sl-option value=${option.value}> ${option.label} </sl-option>
               `

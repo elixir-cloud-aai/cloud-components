@@ -97,8 +97,6 @@
 
     <script type="module">
       import { html, render } from "lit";
-      import { getComponentCssParts } from "../dist/utilities/index.js";
-      import { EccUtilsDesignForm } from "../dist/components/index.js";
       import "../../dist/components/form/index.js";
 
       const fields = [
@@ -142,12 +140,12 @@
           type: "select",
           fieldOptions: {
             required: true,
-            selectOptions: [
-              { label: "Male", value: "1" },
-              { label: "Female", value: "2" },
-              { label: "Don't want to disclose", value: "3" },
-            ],
           },
+          selectOptions: [
+            { label: "Male", value: "1" },
+            { label: "Female", value: "2" },
+            { label: "Don't want to disclose", value: "3" },
+          ],
         },
         {
           key: "address",
@@ -234,7 +232,6 @@
         html`<ecc-utils-design-form
           .fields=${fields}
           @ecc-utils-submit=${async (e) => {
-            console.log(getComponentCssParts(EccUtilsDesignForm));
             try {
               console.log("form - submitted", e.detail);
               document.querySelector("ecc-utils-design-form").loading();
@@ -251,10 +248,6 @@
         >
         </ecc-utils-design-form> `,
         document.querySelector("#demo")
-      );
-
-      console.log(
-        getComponentCssParts(document.querySelector("ecc-utils-design-form"))
       );
     </script>
   </body>
