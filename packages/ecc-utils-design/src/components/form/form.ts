@@ -30,7 +30,8 @@ export interface Field {
     | "array"
     | "switch"
     | "file"
-    | "group";
+    | "group"
+    | "select";
   fieldOptions?: {
     required?: boolean;
     default?: string | boolean;
@@ -39,6 +40,7 @@ export interface Field {
     returnIfEmpty?: string;
     tooltip?: string;
   };
+  selectOptions?: Array<{ label: string; value: string }>;
   arrayOptions?: {
     defaultInstances?: number;
     max?: number;
@@ -170,6 +172,46 @@ export default class EccUtilsDesignForm extends LitElement {
       } else if (field.fieldOptions?.returnIfEmpty) {
         _.set(this.form, path, "");
       }
+    }
+
+    if (field.type === "select") {
+      return html`
+        <div class="select-container">
+          ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
+            ? html`
+                <sl-tooltip
+                  id=${field.key}
+                  content=${field.fieldOptions?.tooltip}
+                >
+                  <label class="select-label">
+                    ${field.label} ${field.fieldOptions?.required ? "*" : ""}
+                  </label>
+                </sl-tooltip>
+              `
+            : html`
+                <label class="select-label">
+                  ${field.label} ${field.fieldOptions?.required ? "*" : ""}
+                </label>
+              `}
+          <sl-select
+            class="select"
+            ?required=${field.fieldOptions?.required}
+            value=${_.get(this.form, path)?.label || ""}
+            @sl-change=${(e: Event) => {
+              const selectElement = e.target as HTMLSelectElement;
+              const label = selectElement.selectedOptions[0].textContent;
+              _.set(this.form, path, label);
+              this.requestUpdate();
+            }}
+          >
+            ${field.selectOptions?.map(
+              (option) => html`
+                <sl-option value=${option.value}> ${option.label} </sl-option>
+              `
+            )}
+          </sl-select>
+        </div>
+      `;
     }
 
     return html`
@@ -481,6 +523,7 @@ export default class EccUtilsDesignForm extends LitElement {
             composed: true,
           });
           this.dispatchEvent(event);
+          console.log(this.form);
         }}
       >
         ${this.fields.map((field) => this.renderTemplate(field, "data"))}
