@@ -1,7 +1,7 @@
 /**
  * Posts a new drs object.
  * @param {string} baseURL - The base URL for posting the drs object.
- * @param {object} taskData - The data of the drs object to be posted.
+ * @param {object} objectData - The data of the drs object to be posted.
  *                           This should be an object containing the necessary fields for the drs object.
  *                           Modify the structure according to your object requirements.
  * @returns {string} - A string that denotes the object id
