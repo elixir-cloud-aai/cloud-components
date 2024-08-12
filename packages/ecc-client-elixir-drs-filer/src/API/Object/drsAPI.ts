@@ -37,7 +37,7 @@ const postObject = async (baseURL: string, objectData: object) => {
 };
 
 /**
- *This mathod deletes a specific object
+ *This method deletes a specific object
  * @param id ID of the drs obeject to be deleted
  */
 const deleteObject = async (baseURL: string, id: string) => {
@@ -46,7 +46,16 @@ const deleteObject = async (baseURL: string, id: string) => {
     const response = await fetch(url, {
       method: "DELETE",
     });
-    return response;
+
+    if (!response) {
+      return {
+        isError: true,
+        breakpoint: "deleteObject",
+        error: "No response from server",
+      };
+    }
+
+    return await response.json();
   } catch (error) {
     return {
       isError: true,
