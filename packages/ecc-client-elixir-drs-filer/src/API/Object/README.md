@@ -16,7 +16,7 @@ Posts/Create a new object.
 
 ## deleteObject
 
-Deletes a specific drs object.
+Deletes a specific DRS object.
 
 **API Request Body**
 
