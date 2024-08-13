@@ -36,10 +36,15 @@ function pascalCase(str) {
     .join("");
 }
 
+function normalizePath(filename) {
+  return filename.split(path.sep).join(path.posix.sep);
+}
+
 module.exports = {
   componentsPrefix,
   npmDir,
   getAllComponents,
   pascalCase,
-  reactDir: path.join(cwd(), "./src/react"),
+  reactDir: path.join(cwd(), ".", "src", "react"),
+  normalizePath,
 };
