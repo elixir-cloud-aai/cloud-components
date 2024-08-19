@@ -7,6 +7,8 @@ import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
+import "@shoelace-style/shoelace/dist/components/select/select.js";
+import "@shoelace-style/shoelace/dist/components/option/option.js";
 import _ from "lodash-es";
 import { hostStyles } from "../../styles/host.styles.js";
 import formStyles from "./form.styles.js";
