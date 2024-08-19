@@ -1,0 +1,1 @@
+export { default as ECCCLientElixirDrsCreateObject } from './ecc-client-elixir-drs-create-object/index.js';
