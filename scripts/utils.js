@@ -37,7 +37,7 @@ function pascalCase(str) {
 }
 
 function normalizePath(filename) {
-  return filename.split(path.sep).join(path.posix.sep);
+  return filename.split(path.win32.sep).join(path.posix.sep);
 }
 
 module.exports = {
