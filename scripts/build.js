@@ -10,7 +10,7 @@ const tsup = require("tsup");
 const { program } = require("commander");
 const { execSync } = require("child_process");
 const fs = require("fs");
-const { npmDir } = require("./utils.js");
+const { npmDir, normalizePath } = require("./utils.js");
 const path = require("path");
 const { reactDir } = require("./utils.js");
 
@@ -115,12 +115,12 @@ nextTask("Building source", async () => {
     format: "esm",
     target: "es2017",
     entry: [
-      `${sourceDir}/index.ts`,
-      ...(await fg(`${sourceDir}/components/**/!(*.(test)).ts`, {
+      normalizePath(`${sourceDir}/index.ts`),
+      ...(await fg(normalizePath(`${sourceDir}/components/**/!(*.(test)).ts`), {
         ignore: ["**/tests/**"],
       })),
-      ...(await fg(`${sourceDir}/react/**/*.ts`)),
-      ...(await fg(`${sourceDir}/utilities/**/*.ts`)),
+      ...(await fg(normalizePath(`${sourceDir}/react/**/*.ts`))),
+      ...(await fg(normalizePath(`${sourceDir}/utilities/**/*.ts`))),
     ],
     splitting: true,
     treeshake: true,

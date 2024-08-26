@@ -4,54 +4,89 @@ const styles = css`
   :host {
     display: block;
   }
-  .collection {
-    position: relative;
+  /* Header */
+  .header {
+    margin-bottom: var(--ecc-spacing-x-large);
+  }
+  .filters {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--ecc-spacing-medium);
+  }
+  /* Error Popup */
+  .error {
+    width: 100%;
+    position: absolute;
+    top: var(--ecc-spacing-x-large);
+    display: flex;
+    justify-content: center;
+    z-index: var(--ecc-z-index-tooltip);
+  }
+  /* Footer */
+  .footer {
+    margin-top: var(--ecc-spacing-x-large);
+    display: flex;
+    justify-content: center;
+  }
+  .page {
+    height: var(--ecc-input-height-medium);
+    width: var(--ecc-input-height-medium);
+  }
+  /* Items */
+  sl-details {
+    margin-bottom: var(--ecc-spacing-medium);
+    margin-top: var(--ecc-spacing-medium);
   }
   .title {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    margin-right: 1rem;
     align-items: center;
-  }
-  .filters {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-  }
-  .header {
-    margin-bottom: 1rem;
-  }
-  .footer {
-    margin-top: 1rem;
-    display: flex;
-    justify-content: center;
+    margin-right: var(--ecc-spacing-medium);
+    height: var(--ecc-input-height-small);
+    font-size: var(--ecc-font-size-medium);
+    font-family: var(--ecc-input-font-family);
+    font-weight: var(--ecc-input-font-weight);
+    letter-spacing: var(--ecc-input-letter-spacing);
   }
   .skeleton-title {
     width: 30%;
-    height: 1.5rem;
+    height: var(--ecc-font-size-medium);
   }
-  .skeleton-body {
-    width: 100%;
-    height: 1rem;
+  .badge {
+    height: var(--ecc-input-height-small);
+  }
+  .badge::part(base) {
+    font-size: var(--ecc-font-size-small);
+    font-family: var(--ecc-input-font-family);
+    font-weight: var(--ecc-input-font-weight);
+    letter-spacing: var(--ecc-input-letter-spacing);
+    border-radius: var(--ecc-input-border-radius-small);
   }
   .lazy {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--ecc-spacing-medium);
   }
-  .badge {
-    height: 1.5rem;
+  .skeleton-body {
+    width: 100%;
+    height: var(--ecc-font-size-medium);
+  }
+  sl-skeleton::part(base) {
+    border-radius: var(--ecc-input-border-radius-medium);
+    overflow: hidden;
+  }
+  .content {
+    font-size: var(--ecc-font-size-medium);
+    font-family: var(--ecc-input-font-family);
+    font-weight: var(--ecc-input-font-weight);
+    letter-spacing: var(--ecc-input-letter-spacing);
   }
   .hidden {
     visibility: hidden;
   }
-  .error {
-    width: 100%;
-    position: absolute;
-    top: 1rem;
-    display: flex;
-    justify-content: center;
+  .collection {
+    position: relative;
   }
 `;
 

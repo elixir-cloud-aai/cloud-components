@@ -2,8 +2,8 @@
 <html lang="en-GB">
   <head>
     <meta charset="utf-8" />
-		<link rel="icon" href="./logo-elixir-cloud-aai.svg" type="image/x-icon">
-    <style>
+    <link rel="icon" href="./logo-elixir-cloud-aai.svg" type="image/x-icon" />
+    <!-- <style>
       body {
         background: #f5f5f5;
       }
@@ -84,10 +84,11 @@
         color: #4caf50;
         font-weight: bold;
       }
-    </style>
+    </style> -->
     <title>ecc-utils-design</title>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
+
   <body>
     <div class="p-10">
       <div id="demo"></div>
@@ -96,8 +97,6 @@
 
     <script type="module">
       import { html, render } from "lit";
-      import { getComponentCssParts } from "../dist/utilities/index.js";
-      import { EccUtilsDesignForm } from "../dist/components/index.js";
       import "../../dist/components/form/index.js";
 
       const fields = [
@@ -117,6 +116,36 @@
           fieldOptions: {
             tooltip: "Your email address",
           },
+        },
+        {
+          key: "18+",
+          label: "18+",
+          type: "switch",
+          fieldOptions: {
+            tooltip: "Are you over 18 years old?",
+          },
+        },
+        {
+          key: "id",
+          label: "ID",
+          type: "file",
+          fieldOptions: {
+            required: true,
+            tooltip: "Your ID document",
+          },
+        },
+        {
+          key: "gender",
+          label: "Gender",
+          type: "select",
+          fieldOptions: {
+            required: true,
+          },
+          selectOptions: [
+            { label: "Male", value: "1" },
+            { label: "Female", value: "2" },
+            { label: "Don't want to disclose", value: "3" },
+          ],
         },
         {
           key: "address",
@@ -186,24 +215,16 @@
                 },
               ],
             },
+            {
+              key: "country",
+              label: "Country",
+              type: "text",
+              fieldOptions: {
+                required: true,
+                tooltip: "Your country name",
+              },
+            },
           ],
-        },
-        {
-          key: "18+",
-          label: "18+",
-          type: "switch",
-          fieldOptions: {
-            tooltip: "Are you over 18 years old?",
-          },
-        },
-        {
-          key: "id",
-          label: "ID",
-          type: "file",
-          fieldOptions: {
-            required: true,
-            tooltip: "Your ID document",
-          },
         },
       ];
 
@@ -211,7 +232,6 @@
         html`<ecc-utils-design-form
           .fields=${fields}
           @ecc-utils-submit=${async (e) => {
-            console.log(getComponentCssParts(EccUtilsDesignForm));
             try {
               console.log("form - submitted", e.detail);
               document.querySelector("ecc-utils-design-form").loading();
@@ -228,10 +248,6 @@
         >
         </ecc-utils-design-form> `,
         document.querySelector("#demo")
-      );
-
-      console.log(
-        getComponentCssParts(document.querySelector("ecc-utils-design-form"))
       );
     </script>
   </body>

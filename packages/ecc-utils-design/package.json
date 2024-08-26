@@ -39,15 +39,16 @@
     "test:component": "web-test-runner --watch --config ../../web-test.runner-config.mjs --group",
     "test:watch": "npm run test:component default",
     "lint": "npx eslint .",
-    "lint:fix": "npm run lint -- --fix",
+    "lint:fix": "npm run lint -- --fix && prettier .",
     "prepublish": "npm run build"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.8.4",
+    "@elixir-cloud/eslint-config": "*",
     "@lit/react": "*",
     "@open-wc/eslint-config": "*",
     "@open-wc/testing": "*",
-    "@types/js-yaml": "^4.0.9",
+    "@types/ace": "^0.0.52",
     "@types/lodash-es": "^4.17.10",
     "@web/dev-server": "*",
     "@web/dev-server-esbuild": "^0.4.3",
@@ -58,7 +59,6 @@
     "custom-element-vs-code-integration": "*",
     "esbuild": "0.18.20",
     "eslint": "*",
-    "@elixir-cloud/eslint-config": "*",
     "eslint-plugin-prettier": "^4.2.1",
     "globby": "^14.0.0",
     "react": "*",
@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "@shoelace-style/shoelace": "^2.8.0",
-    "js-yaml": "^4.1.0",
+    "ace-builds": "^1.35.0",
     "lit": "^2.8.0",
     "lodash-es": "^4.17.21"
   }

@@ -29,11 +29,7 @@ import {
 
 export default class ECCClientGa4ghWesRuns extends LitElement {
   static styles = css``;
-  @property({ type: Number }) private pageSize = 5;
-  @property({ type: String }) private baseURL =
-    "`https://prowes.rahtiapp.fi/ga4gh/wes/v1`";
-
-  @property({ type: Array }) private fields: Field[] = [
+  static defaultFields: Field[] = [
     {
       label: "Tags",
       tab: "Overview",
@@ -162,6 +158,13 @@ export default class ECCClientGa4ghWesRuns extends LitElement {
     },
   ];
 
+  @property({ type: Number }) private pageSize = 5;
+  @property({ type: String }) private baseURL =
+    "https://prowes.rahtiapp.fi/ga4gh/wes/v1";
+
+  @property({ type: Array }) private fields: Field[] = [];
+  @property({ type: Boolean }) private extendFields = false;
+
   @state() private filters: FilterProp[] = [
     {
       key: "tag",
@@ -224,6 +227,15 @@ export default class ECCClientGa4ghWesRuns extends LitElement {
     }
     if (changedProperties.has("filter") && this.filter === false) {
       this.filters = [];
+    }
+
+    if (changedProperties.has("extendFields")) {
+      if (this.extendFields) {
+        const fields = ECCClientGa4ghWesRuns.defaultFields;
+        this.fields = [...this.fields, ...fields];
+      } else if (this.fields.length === 0 && this.extendFields === false) {
+        this.fields = ECCClientGa4ghWesRuns.defaultFields;
+      }
     }
   }
 

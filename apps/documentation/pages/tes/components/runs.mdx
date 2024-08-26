@@ -66,13 +66,14 @@ This component is used to browse task runs using TES API.
 
 ## Properties
 
-| Property                | Required | Default                                   | Type            | Description                                                   |
-| ----------------------- | -------- | ----------------------------------------- | --------------- | ------------------------------------------------------------- |
-| [`baseURL`](#baseURL)   | `false`  | `https://protes.rahtiapp.fi/ga4gh/tes/v1` | `String`        | Base URL of the TES instance/gateway.                         |
-| [`pageSize`](#pageSize) | `false`  | 5                                         | `Number`        | Number of runs per page.                                      |
-| [`fields`](#filter)     | `false`  | [`default`](#default)                     | `Array<Fields>` | Configuration based on which data will be rendered in groups. |
-| ~[`filter`](#filter)~   | `false`  | `true`                                    | `Boolean`       | ~Defines if filter by state should be rendered.~              |
-| ~[`search`](#search)~   | `false`  | `true`                                    | `Boolean`       | ~Defines if search by prefix should be rendered.~             |
+| Property                | Required | Default                                   | Type            | Description                                                                              |
+| ----------------------- | -------- | ----------------------------------------- | --------------- | ---------------------------------------------------------------------------------------- |
+| [`baseURL`](#baseURL)   | `false`  | `https://protes.rahtiapp.fi/ga4gh/tes/v1` | `String`        | Base URL of the TES instance/gateway.                                                    |
+| [`pageSize`](#pageSize) | `false`  | 5                                         | `Number`        | Number of runs per page.                                                                 |
+| [`fields`](#filter)     | `false`  | [`default`](#default)                     | `Array<Fields>` | Configuration based on which data will be rendered in groups.                            |
+| `extendFields`          | `false`  | `false`                                   | `boolean`       | Allow `app-author` to pass fields that will extend the default fields not override them. |
+| ~[`filter`](#filter)~   | `false`  | `true`                                    | `Boolean`       | ~Defines if filter by state should be rendered.~                                         |
+| ~[`search`](#search)~   | `false`  | `true`                                    | `Boolean`       | ~Defines if search by prefix should be rendered.~                                        |
 
 ### baseURL
 
