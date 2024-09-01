@@ -39,7 +39,7 @@ export interface Field {
     default?: string | boolean;
     multiple?: boolean;
     accept?: string;
-    returnIfEmpty?: string;
+    returnIfEmpty?: boolean;
     tooltip?: string;
   };
   selectOptions?: Array<{ label: string; value: string }>;
@@ -101,17 +101,28 @@ export default class EccUtilsDesignForm extends LitElement {
     }
 
     return html`
-      <div class="switch-container">
+      <div class="switch-container" data-testid="form-switch-parent">
         ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
           ? html`
-              <sl-tooltip content=${field.fieldOptions?.tooltip}>
-                <label class="switch-label">${field.label} </label>
+              <sl-tooltip
+                content=${field.fieldOptions?.tooltip}
+                data-testid="form-tooltip"
+              >
+                <label class="switch-label" data-testid="form-label"
+                  >${field.label}
+                </label>
               </sl-tooltip>
             `
-          : html` <label class="switch-label">${field.label} </label> `}
+          : html`
+              <label class="switch-label" data-testid="form-label"
+                >${field.label}
+              </label>
+            `}
         <sl-switch
           size="small"
           class="switch"
+          data-label=${field.label}
+          data-testid="form-switch"
           label=${field.label}
           ?required=${field.fieldOptions?.required}
           ?checked=${_.get(this.form, path)}
@@ -135,26 +146,29 @@ export default class EccUtilsDesignForm extends LitElement {
 
     if (field.type === "file") {
       return html`
-        <div class="file-container">
+        <div class="file-container" data-testid="form-input-file-parent">
           ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
             ? html`
                 <sl-tooltip
                   id=${field.key}
                   content=${field.fieldOptions?.tooltip}
+                  data-testid="form-tooltip"
                 >
-                  <label class="file-input-label">
+                  <label class="file-input-label" data-testid="form-label">
                     ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                   </label>
                 </sl-tooltip>
               `
             : html`
-                <label class="file-input-label">
+                <label class="file-input-label" data-testid="form-label">
                   ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                 </label>
               `}
           <input
             class="file-input"
             type="file"
+            data-label=${field.label}
+            data-testid="form-input-file"
             accept=${field.fieldOptions?.accept || "*"}
             ?multiple=${field.fieldOptions?.multiple}
             ?required=${field.fieldOptions?.required}
@@ -168,6 +182,7 @@ export default class EccUtilsDesignForm extends LitElement {
       `;
     }
 
+    // if the field is empty and has a default value, set the default value on first render
     if (!_.get(this.form, path)) {
       if (field.fieldOptions?.default && !this.hasUpdated) {
         _.set(this.form, path, field.fieldOptions.default);
@@ -219,6 +234,8 @@ export default class EccUtilsDesignForm extends LitElement {
     return html`
       <sl-input
         class="input"
+        data-label=${field.label}
+        data-testid="form-input"
         type=${field.type || "text"}
         ?required=${field.fieldOptions?.required}
         value=${_.get(this.form, path)}
@@ -237,12 +254,12 @@ export default class EccUtilsDesignForm extends LitElement {
         <label slot="label">
           ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
             ? html`
-              <sl-tooltip content=${field.fieldOptions?.tooltip}>
-                <label> ${field.label} </label>
+              <sl-tooltip content=${field.fieldOptions?.tooltip} data-testid="form-tooltip" >
+                <label data-testid="form-label" > ${field.label} </label>
               </sl-tooltip>
             </label>
             `
-            : html` <label> ${field.label} </label> `}
+            : html` <label data-testid="form-label"> ${field.label} </label> `}
         </label>
       </sl-input>
     `;
@@ -279,20 +296,24 @@ export default class EccUtilsDesignForm extends LitElement {
         <div class="array-header">
           ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
             ? html`
-                <sl-tooltip content=${field.fieldOptions?.tooltip}>
-                  <label class="array-label">
+                <sl-tooltip
+                  content=${field.fieldOptions?.tooltip}
+                  data-testid="form-tooltip"
+                >
+                  <label data-testid="form-label" class="array-label">
                     ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                   </label>
                 </sl-tooltip>
               `
             : html`
-                <label class="array-label">
+                <label data-testid="form-label" class="array-label">
                   ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                 </label>
               `}
           <sl-button
             variant="text"
             size="small"
+            data-testid="form-array-add"
             ?disabled=${!resolveAddButtonIsActive()}
             class="add-button"
             @click=${() => {
@@ -323,14 +344,18 @@ export default class EccUtilsDesignForm extends LitElement {
         </div>
         ${_.get(this.form, path)?.map(
           (_item: any, index: number) => html`
-            <div class="array-item">
+            <div class="array-item" data-testid="form-array-item">
               <sl-button
                 variant="text"
+                data-testid="form-array-delete"
                 ?disabled=${!resolveDeleteButtonIsActive()}
                 @click=${() => {
-                  resolveDeleteButtonIsActive() &&
-                    _.get(this.form, path).splice(index, 1) &&
+                  if (resolveDeleteButtonIsActive()) {
+                    const newInstance = [..._.get(this.form, path)];
+                    newInstance.splice(index, 1);
+                    _.set(this.form, path, newInstance);
                     this.requestUpdate();
+                  }
                 }}
               >
                 <svg
@@ -365,16 +390,17 @@ export default class EccUtilsDesignForm extends LitElement {
 
     const renderChildren = () =>
       html`
-        <div class="group-item">
+        <div class="group-item" data-testid="form-group-item">
           ${field.children?.map((child) =>
             this.renderTemplate(child, `${path}`)
           )}
         </div>
       `;
 
-    return html` <div class="group-container">
+    return html` <div class="group-container" data-testid="form-group">
       ${field.groupOptions?.collapsible
         ? html` <sl-details
+            data-testid="form-group-collapsible"
             summary=${`${field.label} ${
               field.fieldOptions?.required ? "*" : ""
             }`}
@@ -382,11 +408,14 @@ export default class EccUtilsDesignForm extends LitElement {
             ${renderChildren()}
           </sl-details>`
         : html`
-            <div class="group-header">
+            <div data-testid="form-group-non-collapsible" class="group-header">
               ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
                 ? html`
-                    <sl-tooltip content=${field.fieldOptions?.tooltip}>
-                      <label class="group-label">
+                    <sl-tooltip
+                      content=${field.fieldOptions?.tooltip}
+                      data-testid="form-tooltip"
+                    >
+                      <label data-testid="form-label" class="group-label">
                         ${field.groupOptions?.collapsible ? "" : field.label}
                       </label>
                     </sl-tooltip>
@@ -422,7 +451,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
   private renderErrorTemplate(): TemplateResult {
     if (this.formState !== "error") return html``;
-    return html`<sl-alert variant="danger" open>
+    return html`<sl-alert data-testid="form-error" variant="danger" open>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         slot="icon"
@@ -445,7 +474,7 @@ export default class EccUtilsDesignForm extends LitElement {
   private renderSuccessTemplate(): TemplateResult {
     if (this.formState !== "success") return html``;
     return html`
-      <sl-alert variant="success" open>
+      <sl-alert data-testid="form-success" variant="success" open>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           slot="icon"
@@ -489,6 +518,27 @@ export default class EccUtilsDesignForm extends LitElement {
     this.formState = "idle";
   }
 
+  private handleSubmit(e: Event) {
+    e.preventDefault();
+    const form = this.shadowRoot?.querySelector("form");
+    const isValid = form?.reportValidity();
+    if (!isValid) {
+      return;
+    }
+    if (Object.keys(this.form).length === 0) {
+      this.error({ message: "Form is empty" });
+      return;
+    }
+    const event = new CustomEvent("ecc-utils-submit", {
+      detail: {
+        form: this.form,
+      },
+      bubbles: true,
+      composed: true,
+    });
+    this.dispatchEvent(event);
+  }
+
   render() {
     this.requiredButEmpty = [];
     if (!this.fields || this.fields.length === 0) {
@@ -509,30 +559,13 @@ export default class EccUtilsDesignForm extends LitElement {
     };
 
     return html`
-      <form
-        @submit=${(e: Event) => {
-          e.preventDefault();
-          const form = this.shadowRoot?.querySelector("form");
-          const isValid = form?.reportValidity();
-          if (!isValid) {
-            return;
-          }
-          const event = new CustomEvent("ecc-utils-submit", {
-            detail: {
-              form: this.form,
-            },
-            bubbles: true,
-            composed: true,
-          });
-          this.dispatchEvent(event);
-          console.log(this.form);
-        }}
-      >
+      <form data-testid="form" @submit=${this.handleSubmit}>
         ${this.fields.map((field) => this.renderTemplate(field, "data"))}
         ${this.renderErrorTemplate()} ${toggleButtonState()}
 
         <sl-button
           type="submit"
+          data-testid="form-submit"
           variant="primary"
           class="submit-button"
           ?loading=${this.formState === "loading"}
