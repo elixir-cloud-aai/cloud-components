@@ -15,23 +15,21 @@ import { Tabs, Callout } from 'nextra/components';
   beta
 />
 
+## Overview
+
 This component is used to render a form with the given fields.
 
 ## Preview
 
 <DesignForm />
 
-## Imports
+## Examples
 
-<Tabs items={['React', 'HTML/Lit']}>
+### Basic Usage
+
+<Tabs items={['React', 'HTML']}>
   <Tabs.Tab>
-    ```ts copy
-    import EccUtilDesignForm from '@elixir-cloud/design/dist/react/form/index';
-    ```
-  
-    ### Example
-  
-    ````ts showLineNumbers {3, 17} copy filename="EccUtilsDesignForm"
+    ```tsx showLineNumbers {2, 17} copy filename="EccUtilsDesignFormExample.tsx"
     import React from 'react';
     import { Field } from '@elixir-cloud/design/dist/components/form/form';
     import EccUtilDesignForm from '@elixir-cloud/design/dist/react/form/index';
@@ -50,76 +48,53 @@ This component is used to render a form with the given fields.
     
     return <EccUtilDesignForm fields={fields} />
     }
-    ````
-  </Tabs.Tab>
-    
-  <Tabs.Tab>
-    ```ts copy
-    import "@elixir-cloud/design/dist/components/form/index.js";
     ```
+
+  </Tabs.Tab>
   
-    ### Example
-  
-    ````html showLineNumbers {6, 20-26} copy filename="ecc-utils-design-form"
+  <Tabs.Tab>
+    ```html showLineNumbers {4, 7-9} copy filename="index.html"
+    <html lang="en">
+      <head>
+        <title>EccUtilsDesignForm Example</title>
+        <script src="https://esm.sh/@elixir-cloud/design/dist/index.js"></script>
+      </head>
       <body>
-          <div id="demo"></div>
-      </div>
-      <script type="module">
-        import { html, render } from "lit";
-        import "@elixir-cloud/design/dist/components/form/index.js";
-
-        const fields = [
-          {
-            key: "service-name",
-            label: "Service name",
-            type: "text",
-            fieldOptions: {
-              required: true,
-            },
-          },
-        ];
-
-        render(
-          html`<ecc-utils-design-form
-            .fields=${fields}
-            @ecc-utils-submit=${(e) => {
-              console.log(e.detail);
-            }}
-          >
-          </ecc-utils-design-form> `,
-          document.querySelector("#demo")
-        );
-      </script>
-    ````
-
+        <ecc-utils-design-form
+          fields="[...]"
+        ></ecc-utils-design-form>
+      </body>
+    </html>
+    ```
   </Tabs.Tab>
 </Tabs>
+
 ## Properties
 
-| Property            | Required | Default | Type    | Description                                 |
-| ------------------- | -------- | ------- | ------- | ------------------------------------------- |
-| [`fields`](#fields) | `true`   | `[]`    | `Array` | Array of fields to be rendered in the form. |
+| Property | Required | Default | Type                | Description                                 |
+| -------- | -------- | ------- | ------------------- | ------------------------------------------- |
+| `fields` | `true`   |         | [`fields`](#fields) | Array of fields to be rendered in the form. |
 
 ### fields
 
 This property is used to render the fields in the form. Fields can be passed as the array of objects. Each object represents a field. The object can have the following properties.
 
-|           Property            | Required | Default | Type                                                                                                                                | Description                                                                                                                                                                                                               |
-| :---------------------------: | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|              key              | `true`   | `null`  | `string`                                                                                                                            | Unique key for the field.                                                                                                                                                                                                 |
-|             label             | `true`   | `null`  | `string`                                                                                                                            | Label for the field.                                                                                                                                                                                                      |
-|             type              | `false`  | `text`  | `text`, `date`, `number`, `email`, `password`, `tel`, `url`, `search`, `datetime-local`, `time`, `file`, `switch`, `array`, `group` | Type of the field.                                                                                                                                                                                                        |
-|           children            | `false`  | `null`  | `array`                                                                                                                             | Children fields for the field if type is array. This allows fields to be added dynamically                                                                                                                                |
-|     fieldOptions.required     | `false`  | `false` | `boolean`                                                                                                                           | Whether the field is required or not.                                                                                                                                                                                     |
-|     fieldOptions.default      | `false`  | `null`  | `string, boolean`                                                                                                                   | Value of the field                                                                                                                                                                                                        |
-|     fieldOptions.multiple     | `false`  | `false` | `boolean`                                                                                                                           | Whether fields of type `file` accept multiple values. Only applies to fields of type `file`                                                                                                                               |
-|     fieldOptions.tooltip      | `false`  | `null`  | `string`                                                                                                                            | Tooltip or help-text that will render a popup when hovered over label of form field.                                                                                                                                      |
-|      fieldOptions.accept      | `false`  | `null`  | `string`                                                                                                                            | A comma separated string that determines the types of files that fields of type `file` will accept. [Example](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept). Only applies to fields of type `file` |
-|  fieldOptions.returnIfEmpty   | `false`  | `false` | `boolean`                                                                                                                           | Determines if the data from an empty input field will be returned in the form data when empty.                                                                                                                            |
+| Property                      | Required | Default | Type                                                                                                                                | Description                                                                                                                                                                                                               |
+| ----------------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| key                           | `true`   | `null`  | `string`                                                                                                                            | Unique key for the field.                                                                                                                                                                                                 |
+| label                         | `true`   | `null`  | `string`                                                                                                                            | Label for the field.                                                                                                                                                                                                      |
+| type                          | `false`  | `text`  | `text`, `date`, `number`, `email`, `password`, `tel`, `url`, `search`, `datetime-local`, `time`, `file`, `switch`, `array`, `group` | Type of the field.                                                                                                                                                                                                        |
+| children                      | `false`  | `null`  | `array`                                                                                                                             | Children fields for the field if type is array. This allows fields to be added dynamically                                                                                                                                |
+| fieldOptions.required         | `false`  | `false` | `boolean`                                                                                                                           | Whether the field is required or not.                                                                                                                                                                                     |
+| fieldOptions.default          | `false`  | `null`  | `string, boolean`                                                                                                                   | Value of the field                                                                                                                                                                                                        |
+| fieldOptions.multiple         | `false`  | `false` | `boolean`                                                                                                                           | Whether fields of type `file` accept multiple values. Only applies to fields of type `file`                                                                                                                               |
+| fieldOptions.tooltip          | `false`  | `null`  | `string`                                                                                                                            | Tooltip or help-text that will render a popup when hovered over label of form field.                                                                                                                                      |
+| fieldOptions.accept           | `false`  | `null`  | `string`                                                                                                                            | A comma separated string that determines the types of files that fields of type `file` will accept. [Example](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept). Only applies to fields of type `file` |
+| fieldOptions.returnIfEmpty    | `false`  | `false` | `boolean`                                                                                                                           | Determines if the data from an empty input field will be returned in the form data when empty.                                                                                                                            |
 | arrayOptions.defaultInstances | `false`  | `null`  | `number`                                                                                                                            | Sets a default number of instances for fields of type `array` Only applies to fields of type `array`                                                                                                                      |
-|       arrayOptions.max        | `false`  | `null`  | `number`                                                                                                                            | Sets a maximum number of instances for fields of type `array` Only applies to fields of type `array`                                                                                                                      |
-|       arrayOptions.min        | `false`  | `null`  | `number`                                                                                                                            | Sets a minimum number of instances for fields of type `array` Only applies to fields of type `array` arrayOptions.defaultInstances must also be set and must be a number greater than arrayOptions.min                    |
-|   groupOptions.collapsible    | `false`  | `null`  | `number`                                                                                                                            | Determines if a field of type `group` will be collapsible                                                                                                                                                                 |
+| arrayOptions.max              | `false`  | `null`  | `number`                                                                                                                            | Sets a maximum number of instances for fields of type `array` Only applies to fields of type `array`                                                                                                                      |
+| arrayOptions.min              | `false`  | `null`  | `number`                                                                                                                            | Sets a minimum number of instances for fields of type `array` Only applies to fields of type `array` arrayOptions.defaultInstances must also be set and must be a number greater than arrayOptions.min                    |
+| groupOptions.collapsible      | `false`  | `null`  | `number`                                                                                                                            | Determines if a field of type `group` will be collapsible                                                                                                                                                                 |
 
 ## Events
 
@@ -136,6 +111,8 @@ This property is used to render the fields in the form. Fields can be passed as 
 | `success()`       |           | Set the form state to success. Show the success message.      |
 | `error()`         |           | Set the form state to error. Show the error message at end.   |
 | `disableSubmit()` | `boolean` | Toggled the disable state on the form submit button           |
+
+{/*
 
 ## Parts
 
@@ -165,13 +142,6 @@ This property is used to render the fields in the form. Fields can be passed as 
 | `group-label`       | Component's label for group type field                                                                                 |
 | `group-toggle-icon` | Component's toggle icon for group type field                                                                           |
 | `group-content`     | Content area for group type field, where the children are rendered                                                     |
-
-## CSS Variables
-
-<Callout emoji='👨‍🏭' type='warning'>
-  {' '}
-  Under construction
-</Callout>
 
 ## Examples
 
@@ -286,13 +256,13 @@ const fields: Fields[] = [
     },
   },
 ];
-```
+``
 
 ### Styled Form
 
 <StyledForm />
 
-```css filename="form.css" copy
+````css filename="form.css" copy
 .styled-form-example::part(form) {
   display: flex;
   flex-direction: column;
@@ -380,4 +350,4 @@ const fields: Fields[] = [
   color: #4caf50;
   font-weight: bold;
 }
-```
+``` */}

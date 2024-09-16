@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic';
 import SlSkeleton from '@shoelace-style/shoelace/dist/react/skeleton';
 
-const ECCClientGa4ghTesRuns = dynamic(() => import('@elixir-cloud/tes/dist/react/runs/index'), {
+const ECCClientGa4ghTesRuns = dynamic(() => import('@elixir-cloud/tes/dist/react/runs'), {
   ssr: false,
   loading: () => (
     <div className='flex flex-col gap-4'>

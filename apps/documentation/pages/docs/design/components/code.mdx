@@ -1,6 +1,6 @@
 import { Callout, Tabs } from 'nextra/components';
 import ComponentName from '@/components/common/ComponentName.tsx';
-import EccUtilsDesignCode from '@/components/packages/design/code/code.tsx';
+import Code from '@/components/packages/design/code/code.tsx';
 
 # EccUtilsDesignCode Component
 
@@ -17,13 +17,13 @@ The EccUtilsDesignCode component is a customizable code editor built using the A
 
 <Callout type='info'>
   <div className='text-sm'>
-    This component uses the Ace editor library. For more details, refer to the [Ace editor documentation](https://ace.c9.io/).
+    This component uses the Ace editor. For more details, refer to the [Ace editor documentation](https://ace.c9.io/).
   </div>
 </Callout>
 
 ## Preview
 
-<EccUtilsDesignCode value='{"example": "json"}' language="json" label="JSON Example" />
+<Code />
 
 ## Examples
 
@@ -33,7 +33,7 @@ The EccUtilsDesignCode component is a customizable code editor built using the A
   <Tabs.Tab>
     ```tsx showLineNumbers {2, 5-10} copy filename="EccUtilsDesignCodeExample.tsx"
     import React from 'react';
-    import EccUtilsDesignCode from '@elixir-cloud/utils/dist/react/design/code';
+    import EccUtilsDesignCode from '@elixir-cloud/design/dist/react/code';
 
     export default function CodeEditor() {
       return <EccUtilsDesignCode 
@@ -51,7 +51,7 @@ The EccUtilsDesignCode component is a customizable code editor built using the A
     <html lang="en">
       <head>
         <title>EccUtilsDesignCode Example</title>
-        <script src="https://cdn.jsdelivr.net/npm/@elixir-cloud/utils/dist/index.min.js"></script>
+        <script src="https://esm.sh/@elixir-cloud/design/dist/index.js"></script>
       </head>
       <body>
         <ecc-utils-design-code
