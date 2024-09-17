@@ -1,15 +1,15 @@
-import ECCCLientRoCrateAbout from "./about.js";
+import ECCClientRoCrateAbout from "./about.js";
 
 export * from "./about.js";
-export default ECCCLientRoCrateAbout;
+export default ECCClientRoCrateAbout;
 
 window.customElements.define(
   "ecc-client-elixir-ro-crate-about",
-  ECCCLientRoCrateAbout
+  ECCClientRoCrateAbout
 );
 
 declare global {
   interface HTMLElementTagNameMap {
-    "ecc-client-elixir-ro-crate-about": ECCCLientRoCrateAbout;
+    "ecc-client-elixir-ro-crate-about": ECCClientRoCrateAbout;
   }
 }
