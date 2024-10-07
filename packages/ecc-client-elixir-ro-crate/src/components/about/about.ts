@@ -21,12 +21,13 @@ export default class ECCClientRoCrateAbout extends LitElement {
         tooltip:
           "Persistent, managed unique ID in URL format (if available), for example a DOI for a collection or an ORCID, personal home page URL or email address for a person",
         default: "./",
+        required: true,
       },
     },
 
     {
       key: "@type",
-      label: "Type",
+      label: "@type",
       type: "array",
       fieldOptions: {
         tooltip: "The type of the entity.",
@@ -54,6 +55,7 @@ export default class ECCClientRoCrateAbout extends LitElement {
       type: "text",
       fieldOptions: {
         tooltip: "The name of the item.",
+        required: true,
       },
     },
     {
@@ -62,6 +64,7 @@ export default class ECCClientRoCrateAbout extends LitElement {
       type: "text",
       fieldOptions: {
         tooltip: "A description of the item.",
+        required: true,
       },
     },
     {
@@ -70,93 +73,19 @@ export default class ECCClientRoCrateAbout extends LitElement {
       type: "date",
       fieldOptions: {
         tooltip: "Date of first broadcast or publication.",
+        required: true,
       },
     },
     {
-      key: "about",
-      label: "About Dataset",
-      type: "array",
+      key: "licence",
+      label: "Licence",
+      type: "select",
       fieldOptions: {
         required: true,
-        default: "",
       },
-      arrayOptions: {
-        defaultInstances: 0,
-      },
-
-      children: [
-        {
-          key: "datasetInput",
-          label: "Dataset",
-          type: "group",
-          fieldOptions: {
-            tooltip: "Enter Text",
-          },
-          groupOptions: {
-            collapsible: true,
-          },
-          children: [
-            {
-              key: "@id",
-              label: "@id",
-              type: "text",
-              fieldOptions: {
-                tooltip:
-                  "Persistent, managed unique ID in URL format (if available), for example a DOI for a collection or an ORCID, personal home page URL or email address for a person",
-                default: "./",
-              },
-            },
-
-            {
-              key: "@type",
-              label: "Type",
-              type: "array",
-              fieldOptions: {
-                tooltip: "The type of the entity.",
-              },
-              arrayOptions: {
-                defaultInstances: 1,
-                max: 3,
-              },
-              children: [
-                {
-                  key: "Type",
-                  label: "Select",
-                  type: "text",
-                  fieldOptions: {
-                    required: true,
-                    default: "Dataset",
-                  },
-                },
-              ],
-            },
-
-            {
-              key: "name",
-              label: "Name",
-              type: "text",
-              fieldOptions: {
-                tooltip: "The name of the item.",
-              },
-            },
-            {
-              key: "description",
-              label: "Description",
-              type: "text",
-              fieldOptions: {
-                tooltip: "A description of the item.",
-              },
-            },
-            {
-              key: "datePublished",
-              label: "Date Published",
-              type: "date",
-              fieldOptions: {
-                tooltip: "Date of first broadcast or publication.",
-              },
-            },
-          ],
-        },
+      selectOptions: [
+        { label: "URL", value: "URL" },
+        { label: "Creative Work", value: "Creative Work" },
       ],
     },
   ];
