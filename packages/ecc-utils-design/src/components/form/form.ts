@@ -129,6 +129,16 @@ export default class EccUtilsDesignForm extends LitElement {
           @sl-change=${(e: Event) => {
             _.set(this.form, path, (e.target as HTMLInputElement).checked);
             this.requestUpdate();
+            this.dispatchEvent(
+              new CustomEvent("ecc-utils-change", {
+                detail: {
+                  key: field.key,
+                  value: (e.target as HTMLInputElement).checked,
+                },
+                bubbles: true,
+                composed: true,
+              })
+            );
           }}
         >
         </sl-switch>
@@ -176,6 +186,16 @@ export default class EccUtilsDesignForm extends LitElement {
               const { files } = e.target as HTMLInputElement;
               _.set(this.form, path, files);
               this.requestUpdate();
+              this.dispatchEvent(
+                new CustomEvent("ecc-utils-change", {
+                  detail: {
+                    key: field.key,
+                    value: files,
+                  },
+                  bubbles: true,
+                  composed: true,
+                })
+              );
             }}
           />
         </div>
@@ -219,6 +239,16 @@ export default class EccUtilsDesignForm extends LitElement {
               const label = selectElement.selectedOptions[0].textContent;
               _.set(this.form, path, label);
               this.requestUpdate();
+              this.dispatchEvent(
+                new CustomEvent("ecc-utils-change", {
+                  detail: {
+                    key: field.key,
+                    value: selectElement.value,
+                  },
+                  bubbles: true,
+                  composed: true,
+                })
+              );
             }}
           >
             ${field.selectOptions?.map(
@@ -247,8 +277,17 @@ export default class EccUtilsDesignForm extends LitElement {
           } else {
             _.set(this.form, path, value);
           }
-
           this.requestUpdate();
+          this.dispatchEvent(
+            new CustomEvent("ecc-utils-change", {
+              detail: {
+                key: field.key,
+                value,
+              },
+              bubbles: true,
+              composed: true,
+            })
+          );
         }}
       >
         <label slot="label">

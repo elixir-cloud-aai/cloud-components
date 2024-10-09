@@ -245,6 +245,9 @@
                 .error({ message: "Error fetching data" });
             }
           }}
+          @ecc-utils-change=${(e) => {
+            console.log("form - changed", e.detail);
+          }}
         >
         </ecc-utils-design-form> `,
         document.querySelector("#demo")
