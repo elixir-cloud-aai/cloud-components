@@ -135,6 +135,17 @@
           },
         },
         {
+          key: "id2",
+          label: "ID",
+          type: "file",
+          fileOptions: {
+            protocol: "tus",
+            tusOptions: {
+              endpoint: "https://tusd.tusdemo.net/files/",
+            },
+          },
+        },
+        {
           key: "gender",
           label: "Gender",
           type: "select",
