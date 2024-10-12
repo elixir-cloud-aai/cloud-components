@@ -6,11 +6,6 @@
     "type": "git",
     "url": "git+https://github.com/elixir-cloud-aai/cloud-components.git"
   },
-  "prettier": {
-    "singleQuote": false,
-    "printWidth": 80,
-    "tabWidth": 2
-  },
   "bugs": {
     "url": "https://github.com/elixir-cloud-aai/cloud-components/issues"
   },
@@ -20,7 +15,7 @@
     "clean": "turbo run clean && rm -rf node_modules",
     "dev": "turbo run dev",
     "lint": "eslint . && turbo run lint",
-    "lint:fix": "eslint . --fix && turbo run lint:fix  && prettier .",
+    "lint:fix": "eslint . --fix && turbo run lint:fix",
     "new": "turbo gen",
     "prepare": "husky install",
     "release": "changeset publish",

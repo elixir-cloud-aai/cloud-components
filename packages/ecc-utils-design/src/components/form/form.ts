@@ -7,8 +7,6 @@ import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
-import "@shoelace-style/shoelace/dist/components/select/select.js";
-import "@shoelace-style/shoelace/dist/components/option/option.js";
 import _ from "lodash-es";
 import { hostStyles } from "../../styles/host.styles.js";
 import formStyles from "./form.styles.js";
@@ -32,8 +30,7 @@ export interface Field {
     | "array"
     | "switch"
     | "file"
-    | "group"
-    | "select";
+    | "group";
   fieldOptions?: {
     required?: boolean;
     default?: string | boolean;
@@ -42,7 +39,6 @@ export interface Field {
     returnIfEmpty?: string;
     tooltip?: string;
   };
-  selectOptions?: Array<{ label: string; value: string }>;
   arrayOptions?: {
     defaultInstances?: number;
     max?: number;
@@ -174,46 +170,6 @@ export default class EccUtilsDesignForm extends LitElement {
       } else if (field.fieldOptions?.returnIfEmpty) {
         _.set(this.form, path, "");
       }
-    }
-
-    if (field.type === "select") {
-      return html`
-        <div class="select-container">
-          ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
-            ? html`
-                <sl-tooltip
-                  id=${field.key}
-                  content=${field.fieldOptions?.tooltip}
-                >
-                  <label class="select-label">
-                    ${field.label} ${field.fieldOptions?.required ? "*" : ""}
-                  </label>
-                </sl-tooltip>
-              `
-            : html`
-                <label class="select-label">
-                  ${field.label} ${field.fieldOptions?.required ? "*" : ""}
-                </label>
-              `}
-          <sl-select
-            class="select"
-            ?required=${field.fieldOptions?.required}
-            value=${_.get(this.form, path)?.label || ""}
-            @sl-change=${(e: Event) => {
-              const selectElement = e.target as HTMLSelectElement;
-              const label = selectElement.selectedOptions[0].textContent;
-              _.set(this.form, path, label);
-              this.requestUpdate();
-            }}
-          >
-            ${field.selectOptions?.map(
-              (option) => html`
-                <sl-option value=${option.value}> ${option.label} </sl-option>
-              `
-            )}
-          </sl-select>
-        </div>
-      `;
     }
 
     return html`
@@ -525,7 +481,6 @@ export default class EccUtilsDesignForm extends LitElement {
             composed: true,
           });
           this.dispatchEvent(event);
-          console.log(this.form);
         }}
       >
         ${this.fields.map((field) => this.renderTemplate(field, "data"))}

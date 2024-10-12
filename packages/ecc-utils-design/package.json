@@ -38,7 +38,7 @@
     "test": "wtr --coverage",
     "test:watch": "wtr --watch",
     "lint": "npx eslint .",
-    "lint:fix": "npm run lint -- --fix && prettier .",
+    "lint:fix": "npm run lint -- --fix",
     "prepublish": "npm run build"
   },
   "devDependencies": {

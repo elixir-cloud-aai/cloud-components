@@ -35,3 +35,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# prettier
+.prettierrc
+
+# Don't ignore prettier in apps/documentation
+!apps/documentation/.prettierrc
