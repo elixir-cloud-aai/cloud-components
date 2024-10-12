@@ -93,6 +93,19 @@ export default class EccUtilsDesignForm extends LitElement {
     }
   }
 
+  private alertFieldChange(key: string, value: any) {
+    this.dispatchEvent(
+      new CustomEvent("ecc-utils-change", {
+        detail: {
+          key,
+          value,
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
   private renderSwitchTemplate(field: Field, path: string): TemplateResult {
     if (field.type !== "switch") return html``;
 
@@ -127,18 +140,10 @@ export default class EccUtilsDesignForm extends LitElement {
           ?required=${field.fieldOptions?.required}
           ?checked=${_.get(this.form, path)}
           @sl-change=${(e: Event) => {
-            _.set(this.form, path, (e.target as HTMLInputElement).checked);
+            const value = (e.target as HTMLInputElement).checked;
+            _.set(this.form, path, value);
             this.requestUpdate();
-            this.dispatchEvent(
-              new CustomEvent("ecc-utils-change", {
-                detail: {
-                  key: field.key,
-                  value: (e.target as HTMLInputElement).checked,
-                },
-                bubbles: true,
-                composed: true,
-              })
-            );
+            this.alertFieldChange(field.key, value);
           }}
         >
         </sl-switch>
@@ -186,16 +191,7 @@ export default class EccUtilsDesignForm extends LitElement {
               const { files } = e.target as HTMLInputElement;
               _.set(this.form, path, files);
               this.requestUpdate();
-              this.dispatchEvent(
-                new CustomEvent("ecc-utils-change", {
-                  detail: {
-                    key: field.key,
-                    value: files,
-                  },
-                  bubbles: true,
-                  composed: true,
-                })
-              );
+              this.alertFieldChange(field.key, files);
             }}
           />
         </div>
@@ -236,19 +232,11 @@ export default class EccUtilsDesignForm extends LitElement {
             value=${_.get(this.form, path)?.label || ""}
             @sl-change=${(e: Event) => {
               const selectElement = e.target as HTMLSelectElement;
-              const label = selectElement.selectedOptions[0].textContent;
+              const label =
+                selectElement.selectedOptions[0].textContent?.trim();
               _.set(this.form, path, label);
               this.requestUpdate();
-              this.dispatchEvent(
-                new CustomEvent("ecc-utils-change", {
-                  detail: {
-                    key: field.key,
-                    value: selectElement.value,
-                  },
-                  bubbles: true,
-                  composed: true,
-                })
-              );
+              this.alertFieldChange(field.key, label);
             }}
           >
             ${field.selectOptions?.map(
@@ -278,16 +266,7 @@ export default class EccUtilsDesignForm extends LitElement {
             _.set(this.form, path, value);
           }
           this.requestUpdate();
-          this.dispatchEvent(
-            new CustomEvent("ecc-utils-change", {
-              detail: {
-                key: field.key,
-                value,
-              },
-              bubbles: true,
-              composed: true,
-            })
-          );
+          this.alertFieldChange(field.key, value);
         }}
       >
         <label slot="label">
