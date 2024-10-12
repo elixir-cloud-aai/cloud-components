@@ -15,8 +15,7 @@
     "./dist/index.js": "./dist/index.js",
     "./dist/components/*": "./dist/components/*",
     "./dist/react": "./dist/react/index.js",
-    "./dist/react/*": "./dist/react/*",
-    "./dist/utilities/*": "./dist/utilities/*"
+    "./dist/react/*": "./dist/react/*"
   },
   "type": "module",
   "repository": {

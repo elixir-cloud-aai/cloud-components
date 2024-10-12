@@ -120,7 +120,6 @@ nextTask("Building source", async () => {
         ignore: ["**/tests/**"],
       })),
       ...(await fg(normalizePath(`${sourceDir}/react/**/*.ts`))),
-      ...(await fg(normalizePath(`${sourceDir}/utilities/**/*.ts`))),
     ],
     splitting: true,
     treeshake: true,
