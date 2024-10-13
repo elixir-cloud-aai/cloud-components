@@ -55,7 +55,6 @@ const primitiveStylesheet = css`
   :root,
   :host,
   .light {
-
     /* Low Level Tokens */
 
     --ecc-color-primary-50: hsl(from var(--ecc-color-brand-internal) h s 95%);
@@ -134,11 +133,21 @@ const primitiveStylesheet = css`
       from var(--ecc-color-warning-internal) h s calc(l / 1.9)
     );
 
-    --ecc-color-danger-50: hsl(from var(--ecc-color-danger-internal) h s calc(l / 0.1));
-    --ecc-color-danger-100: hsl(from var(--ecc-color-danger-internal) h s calc(l / 0.2));
-    --ecc-color-danger-200: hsl(from var(--ecc-color-danger-internal) h s calc(l / 0.4));
-    --ecc-color-danger-300: hsl(from var(--ecc-color-danger-internal) h s calc(l / 0.6));
-    --ecc-color-danger-400: hsl(from var(--ecc-color-danger-internal) h s calc(l / 0.8));
+    --ecc-color-danger-50: hsl(
+      from var(--ecc-color-danger-internal) h s calc(l / 0.1)
+    );
+    --ecc-color-danger-100: hsl(
+      from var(--ecc-color-danger-internal) h s calc(l / 0.2)
+    );
+    --ecc-color-danger-200: hsl(
+      from var(--ecc-color-danger-internal) h s calc(l / 0.4)
+    );
+    --ecc-color-danger-300: hsl(
+      from var(--ecc-color-danger-internal) h s calc(l / 0.6)
+    );
+    --ecc-color-danger-400: hsl(
+      from var(--ecc-color-danger-internal) h s calc(l / 0.8)
+    );
     --ecc-color-danger-500: var(--ecc-color-danger-internal);
     --ecc-color-danger-600: hsl(
       from var(--ecc-color-danger-internal) h s calc(l / 1.2)
@@ -157,15 +166,33 @@ const primitiveStylesheet = css`
     );
 
     --ecc-color-neutral-50: hsl(from var(--ecc-color-neutral-internal) h s 95%);
-    --ecc-color-neutral-100: hsl(from var(--ecc-color-neutral-internal) h s 90%);
-    --ecc-color-neutral-200: hsl(from var(--ecc-color-neutral-internal) h s 80%);
-    --ecc-color-neutral-300: hsl(from var(--ecc-color-neutral-internal) h s 70%);
-    --ecc-color-neutral-400: hsl(from var(--ecc-color-neutral-internal) h s 60%);
-    --ecc-color-neutral-500: hsl(from var(--ecc-color-neutral-internal) h s 50%);
-    --ecc-color-neutral-600: hsl(from var(--ecc-color-neutral-internal) h s 40%);
-    --ecc-color-neutral-700: hsl(from var(--ecc-color-neutral-internal) h s 30%);
-    --ecc-color-neutral-800: hsl(from var(--ecc-color-neutral-internal) h s 20%);
-    --ecc-color-neutral-900: hsl(from var(--ecc-color-neutral-internal) h s 10%);
+    --ecc-color-neutral-100: hsl(
+      from var(--ecc-color-neutral-internal) h s 90%
+    );
+    --ecc-color-neutral-200: hsl(
+      from var(--ecc-color-neutral-internal) h s 80%
+    );
+    --ecc-color-neutral-300: hsl(
+      from var(--ecc-color-neutral-internal) h s 70%
+    );
+    --ecc-color-neutral-400: hsl(
+      from var(--ecc-color-neutral-internal) h s 60%
+    );
+    --ecc-color-neutral-500: hsl(
+      from var(--ecc-color-neutral-internal) h s 50%
+    );
+    --ecc-color-neutral-600: hsl(
+      from var(--ecc-color-neutral-internal) h s 40%
+    );
+    --ecc-color-neutral-700: hsl(
+      from var(--ecc-color-neutral-internal) h s 30%
+    );
+    --ecc-color-neutral-800: hsl(
+      from var(--ecc-color-neutral-internal) h s 20%
+    );
+    --ecc-color-neutral-900: hsl(
+      from var(--ecc-color-neutral-internal) h s 10%
+    );
     --ecc-color-neutral-950: hsl(from var(--ecc-color-neutral-internal) h s 5%);
 
     --ecc-color-neutral-0: hsl(0, 0%, 100%);

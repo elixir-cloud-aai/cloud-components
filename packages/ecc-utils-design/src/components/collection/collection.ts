@@ -189,7 +189,10 @@ export default class EccUtilsDesignCollection extends LitElement {
             ? "page disabled"
             : "page"}
           @click=${() => {
-            if (this.totalItems > 0 && this._page === Math.ceil(this.totalItems / this.pageSize)) {
+            if (
+              this.totalItems > 0 &&
+              this._page === Math.ceil(this.totalItems / this.pageSize)
+            ) {
               return;
             }
             if (this.totalItems === -1 && this._page === this._pagesRendered) {
