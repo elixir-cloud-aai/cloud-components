@@ -32,6 +32,15 @@ const styles = css`
     height: var(--ecc-input-height-medium);
     width: var(--ecc-input-height-medium);
   }
+  .page::part(base) {
+    background-color: var(--ecc-color-neutral-0);
+  }
+  .page.disabled::part(base) {
+    cursor: not-allowed;
+  }
+  .page.active::part(base) {
+    background-color: var(--ecc-color-primary-500);
+  }
   /* Items */
   sl-details::part(base) {
     background-color: transparent;

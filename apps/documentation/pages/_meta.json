@@ -11,10 +11,6 @@
     "title": "Documentation",
     "type": "page"
   },
-  "api": {
-    "title": "API",
-    "type": "page"
-  },
   "about": {
     "title": "About",
     "type": "menu",

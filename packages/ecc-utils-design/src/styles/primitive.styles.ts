@@ -55,151 +55,162 @@ const primitiveStylesheet = css`
   :root,
   :host,
   .light {
+
     /* Low Level Tokens */
 
-    --ecc-color-primary-50: hsl(from var(--ecc-color-brand) h s 95%);
-    --ecc-color-primary-100: hsl(from var(--ecc-color-brand) h s 90%);
-    --ecc-color-primary-200: hsl(from var(--ecc-color-brand) h s 80%);
-    --ecc-color-primary-300: hsl(from var(--ecc-color-brand) h s 70%);
-    --ecc-color-primary-400: hsl(from var(--ecc-color-brand) h s 60%);
-    --ecc-color-primary-500: hsl(from var(--ecc-color-brand) h s 50%);
-    --ecc-color-primary-600: hsl(from var(--ecc-color-brand) h s 40%);
-    --ecc-color-primary-700: hsl(from var(--ecc-color-brand) h s 30%);
-    --ecc-color-primary-800: hsl(from var(--ecc-color-brand) h s 20%);
-    --ecc-color-primary-900: hsl(from var(--ecc-color-brand) h s 10%);
-    --ecc-color-primary-950: hsl(from var(--ecc-color-brand) h s 5%);
+    --ecc-color-primary-50: hsl(from var(--ecc-color-brand-internal) h s 95%);
+    --ecc-color-primary-100: hsl(from var(--ecc-color-brand-internal) h s 90%);
+    --ecc-color-primary-200: hsl(from var(--ecc-color-brand-internal) h s 80%);
+    --ecc-color-primary-300: hsl(from var(--ecc-color-brand-internal) h s 70%);
+    --ecc-color-primary-400: hsl(from var(--ecc-color-brand-internal) h s 60%);
+    --ecc-color-primary-500: hsl(from var(--ecc-color-brand-internal) h s 50%);
+    --ecc-color-primary-600: hsl(from var(--ecc-color-brand-internal) h s 40%);
+    --ecc-color-primary-700: hsl(from var(--ecc-color-brand-internal) h s 30%);
+    --ecc-color-primary-800: hsl(from var(--ecc-color-brand-internal) h s 20%);
+    --ecc-color-primary-900: hsl(from var(--ecc-color-brand-internal) h s 10%);
+    --ecc-color-primary-950: hsl(from var(--ecc-color-brand-internal) h s 5%);
 
     --ecc-color-success-50: hsl(
-      from var(--ecc-color-success) h s calc(l / 0.1)
+      from var(--ecc-color-success-internal) h s calc(l / 0.1)
     );
     --ecc-color-success-100: hsl(
-      from var(--ecc-color-success) h s calc(l / 0.2)
+      from var(--ecc-color-success-internal) h s calc(l / 0.2)
     );
     --ecc-color-success-200: hsl(
-      from var(--ecc-color-success) h s calc(l / 0.4)
+      from var(--ecc-color-success-internal) h s calc(l / 0.4)
     );
     --ecc-color-success-300: hsl(
-      from var(--ecc-color-success) h s calc(l / 0.6)
+      from var(--ecc-color-success-internal) h s calc(l / 0.6)
     );
     --ecc-color-success-400: hsl(
-      from var(--ecc-color-success) h s calc(l / 0.8)
+      from var(--ecc-color-success-internal) h s calc(l / 0.8)
     );
-    --ecc-color-success-500: var(--ecc-color-success);
+    --ecc-color-success-500: var(--ecc-color-success-internal);
     --ecc-color-success-600: hsl(
-      from var(--ecc-color-success) h s calc(l / 1.2)
+      from var(--ecc-color-success-internal) h s calc(l / 1.2)
     );
     --ecc-color-success-700: hsl(
-      from var(--ecc-color-success) h s calc(l / 1.4)
+      from var(--ecc-color-success-internal) h s calc(l / 1.4)
     );
     --ecc-color-success-800: hsl(
-      from var(--ecc-color-success) h s calc(l / 1.6)
+      from var(--ecc-color-success-internal) h s calc(l / 1.6)
     );
     --ecc-color-success-900: hsl(
-      from var(--ecc-color-success) h s calc(l / 1.8)
+      from var(--ecc-color-success-internal) h s calc(l / 1.8)
     );
     --ecc-color-success-950: hsl(
-      from var(--ecc-color-success) h s calc(l / 1.9)
+      from var(--ecc-color-success-internal) h s calc(l / 1.9)
     );
 
     --ecc-color-warning-50: hsl(
-      from var(--ecc-color-warning) h s calc(l / 0.1)
+      from var(--ecc-color-warning-internal) h s calc(l / 0.1)
     );
     --ecc-color-warning-100: hsl(
-      from var(--ecc-color-warning) h s calc(l / 0.2)
+      from var(--ecc-color-warning-internal) h s calc(l / 0.2)
     );
     --ecc-color-warning-200: hsl(
-      from var(--ecc-color-warning) h s calc(l / 0.4)
+      from var(--ecc-color-warning-internal) h s calc(l / 0.4)
     );
     --ecc-color-warning-300: hsl(
-      from var(--ecc-color-warning) h s calc(l / 0.6)
+      from var(--ecc-color-warning-internal) h s calc(l / 0.6)
     );
     --ecc-color-warning-400: hsl(
-      from var(--ecc-color-warning) h s calc(l / 0.8)
+      from var(--ecc-color-warning-internal) h s calc(l / 0.8)
     );
-    --ecc-color-warning-500: var(--ecc-color-warning);
+    --ecc-color-warning-500: var(--ecc-color-warning-internal);
     --ecc-color-warning-600: hsl(
-      from var(--ecc-color-warning) h s calc(l / 1.2)
+      from var(--ecc-color-warning-internal) h s calc(l / 1.2)
     );
     --ecc-color-warning-700: hsl(
-      from var(--ecc-color-warning) h s calc(l / 1.4)
+      from var(--ecc-color-warning-internal) h s calc(l / 1.4)
     );
     --ecc-color-warning-800: hsl(
-      from var(--ecc-color-warning) h s calc(l / 1.6)
+      from var(--ecc-color-warning-internal) h s calc(l / 1.6)
     );
     --ecc-color-warning-900: hsl(
-      from var(--ecc-color-warning) h s calc(l / 1.8)
+      from var(--ecc-color-warning-internal) h s calc(l / 1.8)
     );
     --ecc-color-warning-950: hsl(
-      from var(--ecc-color-warning) h s calc(l / 1.9)
+      from var(--ecc-color-warning-internal) h s calc(l / 1.9)
     );
 
-    --ecc-color-danger-50: hsl(from var(--ecc-color-danger) h s calc(l / 0.1));
-    --ecc-color-danger-100: hsl(from var(--ecc-color-danger) h s calc(l / 0.2));
-    --ecc-color-danger-200: hsl(from var(--ecc-color-danger) h s calc(l / 0.4));
-    --ecc-color-danger-300: hsl(from var(--ecc-color-danger) h s calc(l / 0.6));
-    --ecc-color-danger-400: hsl(from var(--ecc-color-danger) h s calc(l / 0.8));
-    --ecc-color-danger-500: var(--ecc-color-danger);
-    --ecc-color-danger-600: hsl(from var(--ecc-color-danger) h s calc(l / 1.2));
-    --ecc-color-danger-700: hsl(from var(--ecc-color-danger) h s calc(l / 1.4));
-    --ecc-color-danger-800: hsl(from var(--ecc-color-danger) h s calc(l / 1.6));
-    --ecc-color-danger-900: hsl(from var(--ecc-color-danger) h s calc(l / 1.8));
-    --ecc-color-danger-950: hsl(from var(--ecc-color-danger) h s calc(l / 1.9));
+    --ecc-color-danger-50: hsl(from var(--ecc-color-danger-internal) h s calc(l / 0.1));
+    --ecc-color-danger-100: hsl(from var(--ecc-color-danger-internal) h s calc(l / 0.2));
+    --ecc-color-danger-200: hsl(from var(--ecc-color-danger-internal) h s calc(l / 0.4));
+    --ecc-color-danger-300: hsl(from var(--ecc-color-danger-internal) h s calc(l / 0.6));
+    --ecc-color-danger-400: hsl(from var(--ecc-color-danger-internal) h s calc(l / 0.8));
+    --ecc-color-danger-500: var(--ecc-color-danger-internal);
+    --ecc-color-danger-600: hsl(
+      from var(--ecc-color-danger-internal) h s calc(l / 1.2)
+    );
+    --ecc-color-danger-700: hsl(
+      from var(--ecc-color-danger-internal) h s calc(l / 1.4)
+    );
+    --ecc-color-danger-800: hsl(
+      from var(--ecc-color-danger-internal) h s calc(l / 1.6)
+    );
+    --ecc-color-danger-900: hsl(
+      from var(--ecc-color-danger-internal) h s calc(l / 1.8)
+    );
+    --ecc-color-danger-950: hsl(
+      from var(--ecc-color-danger-internal) h s calc(l / 1.9)
+    );
 
-    --ecc-color-neutral-50: hsl(from var(--ecc-color-neutral) h s 95%);
-    --ecc-color-neutral-100: hsl(from var(--ecc-color-neutral) h s 90%);
-    --ecc-color-neutral-200: hsl(from var(--ecc-color-neutral) h s 80%);
-    --ecc-color-neutral-300: hsl(from var(--ecc-color-neutral) h s 70%);
-    --ecc-color-neutral-400: hsl(from var(--ecc-color-neutral) h s 60%);
-    --ecc-color-neutral-500: hsl(from var(--ecc-color-neutral) h s 50%);
-    --ecc-color-neutral-600: hsl(from var(--ecc-color-neutral) h s 40%);
-    --ecc-color-neutral-700: hsl(from var(--ecc-color-neutral) h s 30%);
-    --ecc-color-neutral-800: hsl(from var(--ecc-color-neutral) h s 20%);
-    --ecc-color-neutral-900: hsl(from var(--ecc-color-neutral) h s 10%);
-    --ecc-color-neutral-950: hsl(from var(--ecc-color-neutral) h s 5%);
+    --ecc-color-neutral-50: hsl(from var(--ecc-color-neutral-internal) h s 95%);
+    --ecc-color-neutral-100: hsl(from var(--ecc-color-neutral-internal) h s 90%);
+    --ecc-color-neutral-200: hsl(from var(--ecc-color-neutral-internal) h s 80%);
+    --ecc-color-neutral-300: hsl(from var(--ecc-color-neutral-internal) h s 70%);
+    --ecc-color-neutral-400: hsl(from var(--ecc-color-neutral-internal) h s 60%);
+    --ecc-color-neutral-500: hsl(from var(--ecc-color-neutral-internal) h s 50%);
+    --ecc-color-neutral-600: hsl(from var(--ecc-color-neutral-internal) h s 40%);
+    --ecc-color-neutral-700: hsl(from var(--ecc-color-neutral-internal) h s 30%);
+    --ecc-color-neutral-800: hsl(from var(--ecc-color-neutral-internal) h s 20%);
+    --ecc-color-neutral-900: hsl(from var(--ecc-color-neutral-internal) h s 10%);
+    --ecc-color-neutral-950: hsl(from var(--ecc-color-neutral-internal) h s 5%);
 
     --ecc-color-neutral-0: hsl(0, 0%, 100%);
     --ecc-color-neutral-1000: hsl(0, 0%, 0%);
 
-    --ecc-border-radius-small: calc(var(--ecc-corner) / 2);
-    --ecc-border-radius-medium: var(--ecc-corner);
-    --ecc-border-radius-large: calc(var(--ecc-corner) * 2);
-    --ecc-border-radius-x-large: calc(var(--ecc-corner) * 4);
+    --ecc-border-radius-small: calc(var(--ecc-corner-internal) / 2);
+    --ecc-border-radius-medium: var(--ecc-corner-internal);
+    --ecc-border-radius-large: calc(var(--ecc-corner-internal) * 2);
+    --ecc-border-radius-x-large: calc(var(--ecc-corner-internal) * 4);
 
     --ecc-border-radius-circle: 50%;
     --ecc-border-radius-pill: 9999px;
 
-    --ecc-shadow-x-small: 0 1px calc(var(--ecc-corner) / 4)
-      calc(0.25px * var(--ecc-depth))
+    --ecc-shadow-x-small: 0 1px calc(var(--ecc-corner-internal) / 4)
+      calc(0.25px * var(--ecc-depth-internal))
       hsl(from var(--ecc-color-neutral) h s l / 10%);
-    --ecc-shadow-small: 0 1px calc(var(--ecc-corner) / 2)
-      calc(0.5px * var(--ecc-depth))
+    --ecc-shadow-small: 0 1px calc(var(--ecc-corner-internal) / 2)
+      calc(0.5px * var(--ecc-depth-internal))
       hsl(from var(--ecc-color-neutral) h s l / 20%);
-    --ecc-shadow-medium: 0 2px calc(var(--ecc-corner))
-      calc(1px * var(--ecc-depth))
+    --ecc-shadow-medium: 0 2px calc(var(--ecc-corner-internal))
+      calc(1px * var(--ecc-depth-internal))
       hsl(from var(--ecc-color-neutral) h s l / 20%);
-    --ecc-shadow-large: 0 2px calc(var(--ecc-corner) * 2)
-      calc(2px * var(--ecc-depth))
+    --ecc-shadow-large: 0 2px calc(var(--ecc-corner-internal) * 2)
+      calc(2px * var(--ecc-depth-internal))
       hsl(from var(--ecc-color-neutral) h s l / 20%);
-    --ecc-shadow-x-large: 0 4px calc(var(--ecc-corner) * 4)
-      calc(4px * var(--ecc-depth))
+    --ecc-shadow-x-large: 0 4px calc(var(--ecc-corner-internal) * 4)
+      calc(4px * var(--ecc-depth-internal))
       hsl(from var(--ecc-color-neutral) h s l / 20%);
 
-    --ecc-spacing-3x-small: calc(var(--ecc-density) * 0.125);
-    --ecc-spacing-2x-small: calc(var(--ecc-density) * 0.25);
-    --ecc-spacing-x-small: calc(var(--ecc-density) * 0.5);
-    --ecc-spacing-small: calc(var(--ecc-density) * 0.75);
-    --ecc-spacing-medium: calc(var(--ecc-density) * 1);
-    --ecc-spacing-large: calc(var(--ecc-density) * 1.25);
-    --ecc-spacing-x-large: calc(var(--ecc-density) * 1.75);
-    --ecc-spacing-2x-large: calc(var(--ecc-density) * 2.25);
-    --ecc-spacing-3x-large: calc(var(--ecc-density) * 3);
-    --ecc-spacing-4x-large: calc(var(--ecc-density) * 4);
+    --ecc-spacing-3x-small: calc(var(--ecc-density-internal) * 0.125);
+    --ecc-spacing-2x-small: calc(var(--ecc-density-internal) * 0.25);
+    --ecc-spacing-x-small: calc(var(--ecc-density-internal) * 0.5);
+    --ecc-spacing-small: calc(var(--ecc-density-internal) * 0.75);
+    --ecc-spacing-medium: calc(var(--ecc-density-internal) * 1);
+    --ecc-spacing-large: calc(var(--ecc-density-internal) * 1.25);
+    --ecc-spacing-x-large: calc(var(--ecc-density-internal) * 1.75);
+    --ecc-spacing-2x-large: calc(var(--ecc-density-internal) * 2.25);
+    --ecc-spacing-3x-large: calc(var(--ecc-density-internal) * 3);
+    --ecc-spacing-4x-large: calc(var(--ecc-density-internal) * 4);
 
-    --ecc-transition-x-slow: calc(var(--ecc-motion) * 4);
-    --ecc-transition-slow: calc(var(--ecc-motion) * 2);
-    --ecc-transition-medium: var(--ecc-motion);
-    --ecc-transition-fast: calc(var(--ecc-motion) / 2);
-    --ecc-transition-x-fast: calc(var(--ecc-motion) / 4);
+    --ecc-transition-x-slow: calc(var(--ecc-motion-internal) * 4);
+    --ecc-transition-slow: calc(var(--ecc-motion-internal) * 2);
+    --ecc-transition-medium: var(--ecc-motion-internal);
+    --ecc-transition-fast: calc(var(--ecc-motion-internal) / 2);
+    --ecc-transition-x-fast: calc(var(--ecc-motion-internal) / 4);
 
     --ecc-font-mono: SFMono-Regular, Consolas, "Liberation Mono", Menlo,
       monospace;
@@ -208,15 +219,15 @@ const primitiveStylesheet = css`
       "Segoe UI Symbol";
     --ecc-font-serif: Georgia, "Times New Roman", serif;
 
-    --ecc-font-size-2x-small: calc(var(--ecc-font-size) * 0.625);
-    --ecc-font-size-x-small: calc(var(--ecc-font-size) * 0.75);
-    --ecc-font-size-small: calc(var(--ecc-font-size) * 0.875);
-    --ecc-font-size-medium: var(--ecc-font-size);
-    --ecc-font-size-large: calc(var(--ecc-font-size) * 1.25);
-    --ecc-font-size-x-large: calc(var(--ecc-font-size) * 1.5);
-    --ecc-font-size-2x-large: calc(var(--ecc-font-size) * 2.25);
-    --ecc-font-size-3x-large: calc(var(--ecc-font-size) * 3);
-    --ecc-font-size-4x-large: calc(var(--ecc-font-size) * 4.5);
+    --ecc-font-size-2x-small: calc(var(--ecc-motion-internal) * 0.625);
+    --ecc-font-size-x-small: calc(var(--ecc-motion-internal) * 0.75);
+    --ecc-font-size-small: calc(var(--ecc-font-size-internal) * 0.875);
+    --ecc-font-size-medium: var(--ecc-font-size-internal);
+    --ecc-font-size-large: calc(var(--ecc-font-size-internal) * 1.25);
+    --ecc-font-size-x-large: calc(var(--ecc-font-size-internal) * 1.5);
+    --ecc-font-size-2x-large: calc(var(--ecc-font-size-internal) * 2.25);
+    --ecc-font-size-3x-large: calc(var(--ecc-font-size-internal) * 3);
+    --ecc-font-size-4x-large: calc(var(--ecc-font-size-internal) * 4.5);
 
     --ecc-font-weight-light: 300;
     --ecc-font-weight-normal: 400;
@@ -246,9 +257,9 @@ const primitiveStylesheet = css`
     --ecc-button-font-size-medium: var(--ecc-font-size-small);
     --ecc-button-font-size-large: var(--ecc-font-size-medium);
 
-    --ecc-input-height-small: calc(var(--ecc-sizing) * 1.875);
-    --ecc-input-height-medium: calc(var(--ecc-sizing) * 2.5);
-    --ecc-input-height-large: calc(var(--ecc-sizing) * 3.125);
+    --ecc-input-height-small: calc(var(--ecc-sizing-internal) * 1.875);
+    --ecc-input-height-medium: calc(var(--ecc-sizing-internal) * 2.5);
+    --ecc-input-height-large: calc(var(--ecc-sizing-internal) * 3.125);
 
     --ecc-input-background-color: var(--ecc-color-neutral-0);
     --ecc-input-background-color-hover: var(--ecc-input-background-color);
@@ -309,9 +320,9 @@ const primitiveStylesheet = css`
     --ecc-input-help-text-font-size-large: var(--ecc-font-size-medium);
     --ecc-input-help-text-color: var(--ecc-color-neutral-500);
 
-    --ecc-toggle-size-small: calc(var(--ecc-sizing) * 0.875);
-    --ecc-toggle-size-medium: calc(var(--ecc-sizing) * 1.125);
-    --ecc-toggle-size-large: calc(var(--ecc-sizing) * 1.375);
+    --ecc-toggle-size-small: calc(var(--ecc-sizing-internal) * 0.875);
+    --ecc-toggle-size-medium: calc(var(--ecc-sizing-internal) * 1.125);
+    --ecc-toggle-size-large: calc(var(--ecc-sizing-internal) * 1.375);
 
     --ecc-overlay-background-color: hsl(240 3.8% 46.1% / 33%);
 
@@ -338,23 +349,23 @@ const primitiveStylesheet = css`
 
     /* High Level Tokens */
 
-    --ecc-color-brand: hsl(217, 91%, 60%);
-    --ecc-color-warning: hsl(38, 92%, 50%);
-    --ecc-color-danger: hsl(0, 84%, 60%);
-    --ecc-color-success: hsl(142, 71%, 45%);
-    --ecc-color-neutral: hsl(240, 4%, 46%);
+    --ecc-color-brand-internal: var(--ecc-color-brand, hsl(217, 91%, 60%));
+    --ecc-color-warning-internal: var(--ecc-color-warning, hsl(38, 92%, 50%));
+    --ecc-color-danger-internal: var(--ecc-color-danger, hsl(0, 84%, 60%));
+    --ecc-color-success-internal: var(--ecc-color-success, hsl(142, 71%, 45%));
+    --ecc-color-neutral-internal: var(--ecc-color-neutral, hsl(240, 4%, 46%));
 
-    --ecc-corner: 0.5rem;
+    --ecc-corner-internal: var(--ecc-corner, 0.5rem);
 
-    --ecc-depth: 1;
+    --ecc-depth-internal: var(--ecc-depth, 1);
 
-    --ecc-density: 0.5rem;
+    --ecc-density-internal: var(--ecc-density, 0.5rem);
 
-    --ecc-sizing: 0.9rem;
+    --ecc-sizing-internal: var(--ecc-sizing, 0.9rem);
 
-    --ecc-motion: 250ms;
+    --ecc-motion-internal: var(--ecc-motion, 250ms);
 
-    --ecc-font-size: 0.9rem;
+    --ecc-font-size-internal: var(--ecc-font-size, 0.9rem);
   }
 `;
 

@@ -130,6 +130,7 @@ const styles = css`
     cursor: pointer;
     height: 100%;
     background-color: var(--ecc-color-neutral-0);
+    color: var(--ecc-input-color);
     font-size: var(--ecc-input-font-size-medium);
     font-family: var(--ecc-input-font-family);
     font-weight: var(--ecc-input-font-weight);
@@ -148,6 +149,7 @@ const styles = css`
     font-family: var(--ecc-input-font-family);
     font-weight: var(--ecc-input-font-weight);
     letter-spacing: var(--ecc-input-letter-spacing);
+    color: var(--ecc-input-color);
     border: solid var(--ecc-input-border-width) var(--ecc-input-border-color);
     height: var(--ecc-input-height-medium);
     margin-top: var(--ecc-spacing-medium);

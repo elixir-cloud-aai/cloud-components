@@ -2,9 +2,7 @@
 import { RiArrowRightLine } from '@remixicon/react';
 import { Link } from 'nextra-theme-docs';
 
-
 export default function Hero() {
-
   return (
     <div className='mx-auto static mt-0 md:mt-[7rem] flex flex-col items-center'>
       <div className='flex flex-col items-center w-full md:w-5/6'>
@@ -46,6 +44,6 @@ export default function Hero() {
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 }
