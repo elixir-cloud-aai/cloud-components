@@ -1,10 +1,9 @@
 {
-  "name": "@elixir-cloud/drs-filer",
-  "description": "DRS Filer component",
+  "name": "ecc-client-elixir-ro-crate",
+  "description": "Web components for interacting with ro-crates",
   "main": "index.js",
   "type": "module",
   "version": "0.1.0",
-  "private": true,
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -24,18 +23,24 @@
     "test": "",
     "test:watch": "wtr --watch",
     "lint": "npx eslint .",
-    "lint:fix": "npm run lint -- --fix && prettier .",
+    "lint:fix": "npm run lint -- --fix",
     "prepublish": "npm run build"
   },
   "devDependencies": {
-    "eslint": "^8.41.0",
     "@elixir-cloud/eslint-config": "*",
-    "eslint-plugin-prettier": "^4.2.1",
-    "typescript": "*",
     "@lit/react": "*",
-    "react": "*",
+    "@web/dev-server": "^0.4.6",
+    "@web/test-runner": "^0.18.3",
     "commander": "*",
     "custom-element-jet-brains-integration": "*",
-    "custom-element-vs-code-integration": "*"
+    "custom-element-vs-code-integration": "*",
+    "eslint": "^8.41.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "react": "*",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "@elixir-cloud/design": "^0.1.1",
+    "lit": "^3.2.0"
   }
 }

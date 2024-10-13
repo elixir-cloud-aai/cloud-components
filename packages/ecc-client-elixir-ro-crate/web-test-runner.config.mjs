@@ -1,6 +1,4 @@
 // import { playwrightLauncher } from '@web/test-runner-playwright';
-/* eslint-disable import/no-extraneous-dependencies */
-
 import { esbuildPlugin } from "@web/dev-server-esbuild";
 
 const filteredLogs = ["Running in dev mode", "lit-html is in dev mode"];

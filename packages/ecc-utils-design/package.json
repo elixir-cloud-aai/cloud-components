@@ -15,8 +15,7 @@
     "./dist/index.js": "./dist/index.js",
     "./dist/components/*": "./dist/components/*",
     "./dist/react": "./dist/react/index.js",
-    "./dist/react/*": "./dist/react/*",
-    "./dist/utilities/*": "./dist/utilities/*"
+    "./dist/react/*": "./dist/react/*"
   },
   "type": "module",
   "repository": {
@@ -35,10 +34,11 @@
     "build": "node ../../scripts/build.js -p ecc-utils-design-",
     "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
     "clean": "rm -rf dist node_modules custom-elements-manifest.config.js",
-    "test": "wtr --coverage",
-    "test:watch": "wtr --watch",
+    "test": "web-test-runner --group default --config ../../web-test.runner-config.mjs",
+    "test:component": "web-test-runner --watch --config ../../web-test.runner-config.mjs --group",
+    "test:watch": "npm run test:component default",
     "lint": "npx eslint .",
-    "lint:fix": "npm run lint -- --fix",
+    "lint:fix": "npm run lint -- --fix && prettier .",
     "prepublish": "npm run build"
   },
   "devDependencies": {
@@ -51,7 +51,7 @@
     "@types/lodash-es": "^4.17.10",
     "@web/dev-server": "*",
     "@web/dev-server-esbuild": "^0.4.3",
-    "@web/test-runner": "^0.17.0",
+    "@web/test-runner": "^0.19.0",
     "commander": "*",
     "concurrently": "*",
     "custom-element-jet-brains-integration": "*",

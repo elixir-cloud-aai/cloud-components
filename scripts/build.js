@@ -10,7 +10,7 @@ const tsup = require("tsup");
 const { program } = require("commander");
 const { execSync } = require("child_process");
 const fs = require("fs");
-const { npmDir } = require("./utils.js");
+const { npmDir, normalizePath } = require("./utils.js");
 const path = require("path");
 const { reactDir } = require("./utils.js");
 
@@ -47,11 +47,6 @@ nextTask("Cleaning up previous build", () => {
   );
 });
 
-// TODO:
-// force installing dependencies is not ideal
-// rewrite to ask for permission for each dependency that isnr present or just throw error
-// add option for user to add prettier config
-// reading from package json for some reason does not block other processes
 nextTask("verifying dependencies", async () => {
   const packageJson = JSON.parse(fs.readFileSync(packageJsonDir, "utf-8"));
 
@@ -120,10 +115,11 @@ nextTask("Building source", async () => {
     format: "esm",
     target: "es2017",
     entry: [
-      `${sourceDir}/index.ts`,
-      ...(await fg(`${sourceDir}/components/**/!(*.(test)).ts`)),
-      ...(await fg(`${sourceDir}/react/**/*.ts`)),
-      ...(await fg(`${sourceDir}/utilities/**/*.ts`)),
+      normalizePath(`${sourceDir}/index.ts`),
+      ...(await fg(normalizePath(`${sourceDir}/components/**/!(*.(test)).ts`), {
+        ignore: ["**/tests/**"],
+      })),
+      ...(await fg(normalizePath(`${sourceDir}/react/**/*.ts`))),
     ],
     splitting: true,
     treeshake: true,
