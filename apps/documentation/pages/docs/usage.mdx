@@ -1,16 +1,13 @@
-import Hero from '@/components/home/Hero';
-import CrossPlatform from '@/components/home/CrossPlatform';
-import Customizable from '@/components/home/Customizable';
-import { Tabs, Cards, Card } from 'nextra/components';
-import Runs from '@/components/packages/wes/runs/runs.tsx';
+import { Tabs, Callout } from 'nextra/components';
 
-<Hero />
+# Usage
 
-<CrossPlatform />
+Elixir Cloud components are custom HTML elements designed for seamless integration and use, much like standard HTML elements. Each component is accompanied by detailed documentation that outlines its complete API, including properties, events, methods, and more.
 
-<div className='flex flex-row items-start justify-center w-full gap-10'>
+While ECC components are designed to be platform-agnostic which can be used in any web framework or platform that supports vanilla HTML/JavaScript by using HTML web components. It provides the out of box React components for easy integration with React applications.
 
-<div className='flex flex-col w-[40%] h-[32rem]'>
+Here are basic examples of how to use ECC components in different environments:
+
 <Tabs items={['React', 'HTML', 'Vue']}>
   <Tabs.Tab>
     ```jsx {2, 8}
@@ -54,13 +51,13 @@ import Runs from '@/components/packages/wes/runs/runs.tsx';
     <template>
       <div>
         <h1>WES Runs</h1>
-        <ecc-client-ga4gh-wes-runs :baseURL="baseURL" ></ecc-client-ga4gh-wes-runs>
+        <ecc-client-ga4gh-wes-runs :baseURL="baseURL"></ecc-client-ga4gh-wes-runs>
       </div>
     </template>
 
     <script>
     import '@elixir-cloud/wes/dist/components/runs/index.js';
-    
+
     export default {
       data() {
         return {
@@ -73,12 +70,11 @@ import Runs from '@/components/packages/wes/runs/runs.tsx';
 
   </Tabs.Tab>
 </Tabs>
-</div>
 
-<div className='w-[40%] mt-5'>
-<Runs />
-</div>
-
-</div>
-
-<Customizable />
+<Callout type='info'>
+  <div class='text-sm'>
+    Note that this example uses the [`@elixir-cloud/wes`]() package. Refer to the specific service
+    documentation for the correct package name and usage. You can find the list of available
+    services in the [Supported Services](/docs/introduction#supported-services) section.
+  </div>
+</Callout>

@@ -1,0 +1,227 @@
+import ComponentName from '@/components/common/ComponentName';
+import { Tabs, Callout } from 'nextra/components';
+import Runs from '@/components/packages/wes/runs/runs.tsx';
+
+# WES Runs Component
+
+<ComponentName
+  tagName='ecc-client-ga4gh-wes-runs'
+  reactTagName='ECCClientGa4ghWesRuns'
+  version='0.1.1'
+  beta
+/>
+
+## Overview
+
+The WES Runs Component facilitates browsing workflow runs via the GA4GH Workflow Execution Service (WES) API.
+
+<Callout type='info'>
+  <div className='text-sm'>
+    For more details, refer to the [WES API GET endpoint
+    specification](https://github.com/ga4gh/workflow-execution-service-schemas/blob/master/openapi/workflow_execution_service.openapi.yaml#L178).
+  </div>
+</Callout>
+
+## Preview
+
+<div className='mt-4'>
+  <Runs />
+</div>
+
+## Examples
+
+### Basic Usage
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+
+    ````ts showLineNumbers {2, 5} copy filename="ECCClientGa4ghWesRuns.tsx"
+    import ECCClientGa4ghWesRuns from '@elixir-cloud/wes/dist/react/runs/index';
+
+    export default function Runs() {
+      return <ECCClientGa4ghWesRuns />;
+    }
+    ````
+
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+
+    ````html showLineNumbers {6, 8-10} copy filename="ecc-client-ga4gh-wes-runs"
+    <body>
+      <div id="demo"></div>
+    </div>
+    <script type="module">
+    import { html, render } from "lit";
+    import "@elixir-cloud/wes/dist/components/runs/index";
+
+    render(
+      html`<ecc-client-ga4gh-wes-runs />`,
+      document.querySelector("#demo")
+    );
+
+    </script>
+    `````
+
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property     | Required | Default                                 | Type           | Description                                                   |
+| ------------ | -------- | --------------------------------------- | -------------- | ------------------------------------------------------------- |
+| baseURL      | false    | https://prowes.rahtiapp.fi/ga4gh/wes/v1 | `String`       | Base URL for the WES API                                      |
+| pageSize     | false    | 5                                       | `Number`       | Number of runs per page                                       |
+| fields       | false    | [Default Fields](#default-fields)       | `Array<Field>` | Configuration for data rendering in groups                    |
+| extendFields | false    | false                                   | `Boolean`      | Extends default fields instead of overriding when set to true |
+
+### baseURL
+
+The baseURL property specifies the endpoint for WES API requests. The component appends /runs to this URL for run-related operations.
+
+### pageSize
+
+Defines the number of workflow runs displayed per pagination window.
+
+### fields
+
+An array of Field objects that determine how data is structured and rendered.
+
+#### default
+
+The default value of `fields` property.
+
+```json
+[
+  {
+    "label": "Tags",
+    "tab": "Overview",
+    "key": "request.tags",
+    "path": "request.tags"
+  },
+  {
+    "label": "Engine parameters",
+    "tab": "Parameter",
+    "key": "request.workflow_engine_parameters",
+    "path": "request.workflow_engine_parameters",
+    "copy": true
+  },
+  {
+    "label": "Parameters",
+    "tab": "Parameter",
+    "key": "request.workflow_params",
+    "path": "request.workflow_params",
+    "copy": true
+  },
+  {
+    "label": "Type",
+    "tab": "Parameter",
+    "key": "request.workflow_type",
+    "path": "request.workflow_type"
+  },
+  {
+    "label": "Version",
+    "tab": "Parameter",
+    "key": "request.workflow_type_version",
+    "path": "request.workflow_type_version"
+  },
+  {
+    "label": "Url",
+    "tab": "Overview",
+    "key": "request.workflow_url",
+    "path": "request.workflow_url",
+    "copy": true
+  },
+  {
+    "label": "Run Logs",
+    "key": "run_log",
+    "path": "run_log",
+    "tab": "Run logs",
+    "copy": true
+  },
+  {
+    "key": "run_log.max_retries",
+    "path": "run_log.max_retries",
+    "label": "Max retries"
+  },
+  {
+    "key": "run_log.max_retries",
+    "path": "run_log.max_retries",
+    "label": "Max retries"
+  },
+  {
+    "key": "run_log.stderr",
+    "path": "run_log.stderr",
+    "label": "STDERR"
+  },
+  {
+    "key": "run_log.stdout",
+    "path": "run_log.stdout",
+    "label": "STDOUT"
+  },
+  {
+    "key": "run_log.task_finished",
+    "path": "run_log.task_finished",
+    "label": "Finished at"
+  },
+  {
+    "key": "run_log.task_received",
+    "path": "run_log.task_received",
+    "label": "Received at"
+  },
+  {
+    "key": "run_log.task_received",
+    "path": "run_log.task_received",
+    "label": "Received at"
+  },
+  {
+    "key": "run_log.time_execution",
+    "path": "run_log.time_execution",
+    "label": "Execution time"
+  },
+  {
+    "key": "run_log.time_queue",
+    "path": "run_log.time_queue",
+    "label": "Queue time"
+  },
+  {
+    "key": "run_log.time_total",
+    "path": "run_log.time_total",
+    "label": "Total time"
+  },
+  {
+    "key": "run_log.utc_offset",
+    "path": "run_log.utc_offset",
+    "label": "UTC offset"
+  },
+  {
+    "label": "Task Logs",
+    "key": "task_logs",
+    "path": "task_logs",
+    "tab": "Task logs",
+    "copy": true
+  },
+  {
+    "key": "task_logs[*]",
+    "path": "task_logs[*]",
+    "arrayOptions": {
+      "labelOptions": {
+        "prefix": "Creation time: ",
+        "path": "creation_time"
+      }
+    },
+    "copy": true
+  },
+  {
+    "key": "output",
+    "tab": "Output",
+    "label": "Output",
+    "path": "outputs",
+    "copy": true
+  }
+]
+```
+
+### extendFields
+
+When set to `true`, the `extendFields` property extends the default fields instead of overriding them.

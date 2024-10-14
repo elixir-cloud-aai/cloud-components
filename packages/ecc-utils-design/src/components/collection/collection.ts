@@ -143,8 +143,9 @@ export default class EccUtilsDesignCollection extends LitElement {
     return html` <div class="footer">
       <sl-button-group>
         <sl-button
-          class="page"
+          class=${this._page === 1 ? "page disabled" : "page"}
           @click=${() => {
+            if (this._page === 1) return;
             this._page -= 1;
             this.dispatchEvent(
               new CustomEvent("ecc-utils-page-change", {
@@ -154,7 +155,6 @@ export default class EccUtilsDesignCollection extends LitElement {
               })
             );
           }}
-          ?disabled=${this._page === 1}
         >
           &lt;&lt;
         </sl-button>
@@ -164,7 +164,7 @@ export default class EccUtilsDesignCollection extends LitElement {
           ).keys(),
         ].map(
           (page) => html`<sl-button
-            class="page"
+            class=${this._page === page + 1 ? "page active" : "page"}
             @click=${() => {
               this._page = page + 1;
               this.dispatchEvent(
@@ -181,11 +181,20 @@ export default class EccUtilsDesignCollection extends LitElement {
           </sl-button>`
         )}
         ${this.totalItems === -1
-          ? html` <sl-button class="page" disabled> ... </sl-button> `
+          ? html` <sl-button class="page disabled"> ... </sl-button> `
           : ""}
         <sl-button
-          class="page"
+          class=${this.totalItems > 0 &&
+          this._page === Math.ceil(this.totalItems / this.pageSize)
+            ? "page disabled"
+            : "page"}
           @click=${() => {
+            if (
+              this.totalItems > 0 &&
+              this._page === Math.ceil(this.totalItems / this.pageSize)
+            ) {
+              return;
+            }
             if (this.totalItems === -1 && this._page === this._pagesRendered) {
               this._pagesRendered += 1;
             }
@@ -198,8 +207,6 @@ export default class EccUtilsDesignCollection extends LitElement {
               })
             );
           }}
-          ?disabled=${this.totalItems > 0 &&
-          this._page === Math.ceil(this.totalItems / this.pageSize)}
         >
           &gt;&gt;
         </sl-button>

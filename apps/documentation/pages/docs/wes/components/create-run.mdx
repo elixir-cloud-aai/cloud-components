@@ -1,0 +1,70 @@
+import { Callout, Tabs } from 'nextra/components';
+import ComponentName from '@/components/common/ComponentName.tsx';
+import ECCClientGa4ghWesCreateRun from '@/components/packages/wes/createRun/createRun';
+
+# WES Create Run Component
+
+<ComponentName
+  tagName='ecc-client-ga4gh-wes-create-run'
+  reactTagName='ECCClientGa4ghWesCreateRun'
+  version='0.1.1'
+  beta
+/>
+
+## Overview
+
+The WES Create Run component is designed to create workflow runs using the Workflow Execution Service (WES) API. It provides a user-friendly interface for submitting new workflow executions within a WES-compliant environment.
+
+<Callout type='info'>
+  <div className='text-sm'>
+    For more details, refer to the [WES API POST endpoint
+    specification](https://github.com/ga4gh/workflow-execution-service-schemas/blob/master/openapi/workflow_execution_service.openapi.yaml#L234).
+  </div>
+</Callout>
+
+## Preview
+
+<ECCClientGa4ghWesCreateRun />
+
+## Examples
+
+### Basic Usage
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ````ts showLineNumbers {2, 5} copy filename="ECCClientGa4ghWesCreateRun.tsx"
+    import React from 'react';
+    import ECCClientGa4ghWesCreateRun from '@elixir-cloud/wes/dist/react/create-run/index';
+
+    export default function Runs() {
+      return <ECCClientGa4ghWesCreateRun />;
+    }
+    ````
+
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers {4, 7} copy filename="index.html"
+    <html lang="en">
+      <head>
+        <title>WES Create Run Example</title>
+        <script src="https://esm.sh/@elixir-cloud/wes/dist/index.min.js"></script>
+      </head>
+      <body>
+        <ecc-client-ga4gh-wes-create-run></ecc-client-ga4gh-wes-create-run>
+      </body>
+    </html>
+    ```
+
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property  | Required | Default                                   | Type     | Description              |
+| --------- | -------- | ----------------------------------------- | -------- | ------------------------ |
+| `baseURL` | false    | `https://prowes.rahtiapp.fi/ga4gh/wes/v1` | `String` | Base URL for the WES API |
+
+### baseURL
+
+The `baseURL` property specifies the base URL for the WES API. The component will append `/runs` to this URL to form the complete endpoint for creating a workflow run.

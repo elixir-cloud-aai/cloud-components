@@ -1,0 +1,48 @@
+import { Tabs, Callout } from 'nextra/components';
+
+# Installation
+
+You can install the ELIXIR Cloud Components (ECC) package via your favorite package manager or use the CDN installation method.
+
+<Callout type='info'>
+  <div class='text-sm'>
+    The following examples uses `service-name` as a placeholder. Replace it with the desired service
+    name of your use case. You can find the list of available services in the [Supported
+    Services](/docs/introduction#supported-services) section.
+  </div>
+</Callout>
+
+## Package Manager
+
+To integrate ECC into your project, install the desired package using your preferred package manager. This is the recommended method for most projects.
+
+<Tabs items={['npm', 'yarn', 'pnpm']}>
+  <Tabs.Tab>
+    ```bash copy /(service-name)/
+    npm i @elixir-cloud/(service-name)
+    ```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash copy /(service-name)/
+    yarn add @elixir-cloud/(service-name)
+    ```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash copy /(service-name)/
+    pnpm i @elixir-cloud/(service-name)
+    ```
+
+  </Tabs.Tab>
+</Tabs>
+
+## CDN
+
+If you prefer not to use a package manager, you can include the ECC components directly in your HTML file using a CDN. This method is suitable when you don't want to manage dependencies or while using vanilla HTML/JavaScript.
+
+Paste the following script tag into your HTML file to include the ECC components:
+
+```html copy /(service-name)/
+<script src="https://esm.sh/@elixir-cloud/(service-name)/dist/index.min.js"></script>
+```
