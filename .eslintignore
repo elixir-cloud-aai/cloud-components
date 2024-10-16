@@ -5,6 +5,7 @@ node_modules
 dist
 build
 www
+out
 
 /.github/*
 CONTRIBUTING.md
