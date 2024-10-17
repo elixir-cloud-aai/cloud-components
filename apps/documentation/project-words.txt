@@ -6,3 +6,5 @@ turborepo
 shadowdom
 exportpart
 drei
+remixicon
+selectconfig
