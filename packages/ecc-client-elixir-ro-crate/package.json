@@ -40,7 +40,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@elixir-cloud/design": "^0.1.1",
+    "@elixir-cloud/design": "^1.0.0",
     "lit": "^3.2.0"
   }
 }

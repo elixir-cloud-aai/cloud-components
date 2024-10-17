@@ -1,5 +1,17 @@
 # @elixir-cloud/tes
 
+## 1.0.0
+
+### Major Changes
+
+- a137eb4: - Introducing CSS Variables
+  - Completed WES/TES integration with Design Package.
+
+### Patch Changes
+
+- Updated dependencies [a137eb4]
+  - @elixir-cloud/design@1.0.0
+
 ## 0.1.1
 
 ### Patch Changes
