@@ -1,5 +1,5 @@
 {
-  "name": "ecc-client-elixir-ro-crate",
+  "name": "@elixir-cloud/ro-crate",
   "description": "Web components for interacting with ro-crates",
   "main": "index.js",
   "type": "module",

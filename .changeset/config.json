@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@elixir-cloud/trs-filer", "@elixir-cloud/trs"]
+  "ignore": ["@elixir-cloud/trs-filer", "@elixir-cloud/trs", "ecc-docs", "@elixir-cloud/drs-filer", "@elixir-cloud/ro-crate"]
 }
