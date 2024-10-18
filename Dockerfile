@@ -40,8 +40,16 @@ COPY --from=installer /app/apps/documentation/out /usr/share/nginx/html
 # Copy the Nginx configuration file
 COPY --from=builder /app/apps/documentation/nginx.conf /etc/nginx/conf.d/default.conf
 
+# support running as arbitrary user which belogs to the root group
+RUN chmod g+rwx /var/cache/nginx /var/run /var/log/nginx && \
+    chown nginx.root /var/cache/nginx /var/run /var/log/nginx && \
+    # comment user directive as master process is run as user in OpenShift anyhow
+    sed -i.bak 's/^user/#user/' /etc/nginx/nginx.conf && \
+    # Make /etc/nginx/html/ available to use
+    mkdir -p /etc/nginx/html/ && chmod 777 /etc/nginx/html/
+
 # Expose port 80
-EXPOSE 80
+EXPOSE 8080
 
 # Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
