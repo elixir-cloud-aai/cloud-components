@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router'
 import { DocsThemeConfig } from 'nextra-theme-docs';
 import Image from 'next/image';
 import { RiSlackFill, RiGithubFill } from '@remixicon/react';
@@ -26,8 +27,10 @@ const config: DocsThemeConfig = {
   },
   gitTimestamp: false,
   useNextSeoProps() {
+    const { asPath } = useRouter()
+    
     return {
-      titleTemplate: '%s – Elixir Cloud Components',
+      titleTemplate: `${asPath === '/' ? '' : `%s – `}Elixir Cloud Components`,
     };
   },
 };
