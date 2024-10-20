@@ -51,6 +51,12 @@ export interface Field {
   groupOptions?: {
     collapsible: boolean;
   };
+  fileOptions?: {
+    protocol?: "native" | "tus";
+    tusOptions?: {
+      endpoint: string;
+    };
+  };
   error?: string;
   children?: Array<Field>;
 }
@@ -151,6 +157,60 @@ export default class EccUtilsDesignForm extends LitElement {
     `;
   }
 
+  private uploadPercentage = 0;
+
+  private handleTusFileUpload = async (
+    e: Event,
+    field: Field
+  ): Promise<void> => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+
+    if (!file) {
+      console.error("No file selected for upload.");
+      return;
+    }
+
+    try {
+      const { Upload } = await import("@anurag_gupta/tus-js-client");
+
+      const upload = new Upload(file, {
+        endpoint: field.fileOptions?.tusOptions?.endpoint,
+        retryDelays: [0, 3000, 5000, 10000, 20000],
+        metadata: {
+          filename: file.name,
+          filetype: file.type,
+        },
+        onError: (error) => {
+          console.error(`Upload failed because: ${error.message}`);
+        },
+        onProgress: (bytesUploaded, bytesTotal) => {
+          const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
+          this.uploadPercentage = Number(percentage);
+          console.log(
+            `Uploaded: ${bytesUploaded} bytes of ${bytesTotal} bytes (${percentage}%)`
+          );
+          this.requestUpdate();
+        },
+        onSuccess: () => {
+          if ("name" in upload.file) {
+            console.log("Download %s from %s", upload.file.name, upload.url);
+          } else {
+            console.log("Download file from %s", upload.url);
+          }
+        },
+      });
+
+      const previousUploads = await upload.findPreviousUploads();
+      if (previousUploads.length > 0) {
+        upload.resumeFromPreviousUpload(previousUploads[0]);
+      }
+
+      upload.start();
+    } catch (error) {
+      console.error("An error occurred while initializing the upload:", error);
+    }
+  };
+
   renderInputTemplate(field: Field, path: string): TemplateResult {
     if (
       field.type === "array" ||
@@ -179,21 +239,43 @@ export default class EccUtilsDesignForm extends LitElement {
                   ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                 </label>
               `}
-          <input
-            class="file-input"
-            type="file"
-            data-label=${field.label}
-            data-testid="form-input-file"
-            accept=${field.fieldOptions?.accept || "*"}
-            ?multiple=${field.fieldOptions?.multiple}
-            ?required=${field.fieldOptions?.required}
-            @change=${async (e: Event) => {
-              const { files } = e.target as HTMLInputElement;
-              _.set(this.form, path, files);
-              this.requestUpdate();
-              this.alertFieldChange(field.key, files);
-            }}
-          />
+          ${field.fileOptions?.protocol === "tus" &&
+          html`
+            <input
+              type="file"
+              class="file-input"
+              @change=${async (e: Event) => {
+                await this.handleTusFileUpload(e, field);
+              }}
+            />
+            <div class="progress-bar-container">
+              <div
+                class="progress-bar"
+                style="width: ${this.uploadPercentage}%;"
+              ></div>
+            </div>
+            <div class="upload-percentage">
+              ${this.uploadPercentage.toFixed(2)}%
+            </div>
+          `}
+          ${(!field.fileOptions?.protocol ||
+            field.fileOptions?.protocol === "native") &&
+          html`
+            <input
+              class="file-input"
+              type="file"
+              data-label=${field.label}
+              data-testid="form-input-file"
+              accept=${field.fieldOptions?.accept || "*"}
+              ?multiple=${field.fieldOptions?.multiple}
+              ?required=${field.fieldOptions?.required}
+              @change=${async (e: Event) => {
+                const { files } = e.target as HTMLInputElement;
+                _.set(this.form, path, files);
+                this.requestUpdate();
+              }}
+            />
+          `}
         </div>
       `;
     }
