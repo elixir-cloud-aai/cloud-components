@@ -228,6 +228,7 @@ export default class EccUtilsDesignForm extends LitElement {
             <div class="tus-upload-container">
               <input
                 type="file"
+                class="file-input"
                 @change=${async (e: Event) => {
                   await this.handleTusFileUpload(e, field);
                 }}
