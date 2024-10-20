@@ -157,42 +157,58 @@ export default class EccUtilsDesignForm extends LitElement {
     `;
   }
 
-  private handleTusFileUpload = async (e: Event, field: Field) => {
+  private uploadPercentage = 0;
+
+  private handleTusFileUpload = async (
+    e: Event,
+    field: Field
+  ): Promise<void> => {
     const file = (e.target as HTMLInputElement).files?.[0];
 
-    if (!file) return;
-
-    const { Upload } = await import("@anurag_gupta/tus-js-client");
-
-    const upload = new Upload(file, {
-      endpoint: field.fileOptions?.tusOptions?.endpoint,
-      retryDelays: [0, 3000, 5000, 10000, 20000],
-      metadata: {
-        filename: file.name,
-        filetype: file.type,
-      },
-      onError: (error) => {
-        console.log(`Failed because: ${error}`);
-      },
-      onProgress: (bytesUploaded, bytesTotal) => {
-        const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
-        console.log(bytesUploaded, bytesTotal, `${percentage}%`);
-      },
-      onSuccess: () => {
-        if ("name" in upload.file) {
-          console.log("Download %s from %s", upload.file.name, upload.url);
-        } else {
-          console.log("Download file from %s", upload.url);
-        }
-      },
-    });
-
-    const previousUploads = await upload.findPreviousUploads();
-    if (previousUploads.length) {
-      upload.resumeFromPreviousUpload(previousUploads[0]);
+    if (!file) {
+      console.error("No file selected for upload.");
+      return;
     }
 
-    upload.start();
+    try {
+      const { Upload } = await import("@anurag_gupta/tus-js-client");
+
+      const upload = new Upload(file, {
+        endpoint: field.fileOptions?.tusOptions?.endpoint,
+        retryDelays: [0, 3000, 5000, 10000, 20000],
+        metadata: {
+          filename: file.name,
+          filetype: file.type,
+        },
+        onError: (error) => {
+          console.error(`Upload failed because: ${error.message}`);
+        },
+        onProgress: (bytesUploaded, bytesTotal) => {
+          const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
+          this.uploadPercentage = Number(percentage);
+          console.log(
+            `Uploaded: ${bytesUploaded} bytes of ${bytesTotal} bytes (${percentage}%)`
+          );
+          this.requestUpdate();
+        },
+        onSuccess: () => {
+          if ("name" in upload.file) {
+            console.log("Download %s from %s", upload.file.name, upload.url);
+          } else {
+            console.log("Download file from %s", upload.url);
+          }
+        },
+      });
+
+      const previousUploads = await upload.findPreviousUploads();
+      if (previousUploads.length > 0) {
+        upload.resumeFromPreviousUpload(previousUploads[0]);
+      }
+
+      upload.start();
+    } catch (error) {
+      console.error("An error occurred while initializing the upload:", error);
+    }
   };
 
   renderInputTemplate(field: Field, path: string): TemplateResult {
@@ -225,14 +241,21 @@ export default class EccUtilsDesignForm extends LitElement {
               `}
           ${field.fileOptions?.protocol === "tus" &&
           html`
-            <div class="tus-upload-container">
-              <input
-                type="file"
-                class="file-input"
-                @change=${async (e: Event) => {
-                  await this.handleTusFileUpload(e, field);
-                }}
-              />
+            <input
+              type="file"
+              class="file-input"
+              @change=${async (e: Event) => {
+                await this.handleTusFileUpload(e, field);
+              }}
+            />
+            <div class="progress-bar-container">
+              <div
+                class="progress-bar"
+                style="width: ${this.uploadPercentage}%;"
+              ></div>
+            </div>
+            <div class="upload-percentage">
+              ${this.uploadPercentage.toFixed(2)}%
             </div>
           `}
           ${(!field.fileOptions?.protocol ||
