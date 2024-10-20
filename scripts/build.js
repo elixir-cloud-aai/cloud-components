@@ -114,6 +114,7 @@ nextTask("Building source", async () => {
   const config = {
     format: "esm",
     target: "es2017",
+    platform: "browser",
     entry: [
       normalizePath(`${sourceDir}/index.ts`),
       ...(await fg(normalizePath(`${sourceDir}/components/**/!(*.(test)).ts`), {
@@ -134,6 +135,7 @@ nextTask("Building source", async () => {
       ...config,
       esbuildOptions(buildOptions) {
         buildOptions.chunkNames = "chunks/[name].[hash]";
+        buildOptions.platform = "browser";
       },
     })
     .catch((err) => {
