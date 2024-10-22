@@ -167,6 +167,21 @@ const styles = css`
     box-shadow: 0 0 0 var(--ecc-focus-ring-width)
       var(--ecc-input-focus-ring-color);
   }
+  .progress-bar-container {
+    width: 100%;
+    height: 20px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background-color: #76c7c0;
+    transition: width 0.2s ease;
+  }
+  .upload-percentage {
+    text-align: center;
+  }
   /* Submit Button */
   .submit-button {
     margin-top: var(--ecc-spacing-large);
