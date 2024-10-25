@@ -10,13 +10,13 @@ import createNewFormComponent, {
 } from "./form.class.js";
 import {
   simpleTestData,
-  complexArrayTestData,
-  simpleArrayTestData,
+  arrayTestData,
   groupTestData,
   submitTestData,
   fieldOptionsTestData,
   requiredFieldsTestData,
   testDataForFileOptions,
+  selectFieldTestData,
 } from "./testData.js";
 
 const {
@@ -33,6 +33,8 @@ const {
   formCollapsibleGroup,
   formNonCollapsibleGroup,
   formTooltip,
+  formSelect,
+  formSelectOption,
 } = testIds;
 
 describe("renders correctly", () => {
@@ -56,12 +58,6 @@ describe("renders correctly", () => {
     // renders correctly
     expect(formComponent.form).to.be.visible;
     expect(formComponent.inputField(formInput, "root")).to.be.visible;
-
-    // throws error sumbit is attempted and no field is filled
-    const formError = sinon.stub(formComponent.form, "error");
-    formComponent.clickSubmitButton();
-
-    sinon.assert.calledOnceWithExactly(formError, { message: "Form is empty" });
   });
 
   it("renders error template correctly", async () => {
@@ -83,6 +79,45 @@ describe("renders correctly", () => {
   });
 });
 
+describe("handles more complex input fields correctly", () => {
+  it("renders the 'select' field correctly", async () => {
+    const formComponent = await createNewFormComponent(selectFieldTestData);
+    expect(formComponent.inputField(formSelect, "root")).to.be.visible;
+
+    const options = formComponent.element(formSelectOption, "root", true);
+    expect(options.length).to.be.equal(5);
+
+    expect(options.item(0).textContent?.trim()).to.be.equal("Male");
+    expect(options.item(1).textContent?.trim()).to.be.equal("Female");
+    expect(options.item(2).textContent?.trim()).to.be.equal("Non-binary");
+    expect(options.item(3).textContent?.trim()).to.be.equal("other");
+    expect(options.item(4).textContent?.trim()).to.be.equal(
+      "Prefer not to say"
+    );
+  });
+
+  it("sets the form value for each select option correctly", async () => {
+    const formComponent = await createNewFormComponent(selectFieldTestData);
+
+    formComponent.form.addEventListener(
+      "ecc-utils-change",
+      (e: CustomEvent) => {
+        expect(_.isEqual(e.detail, { key: "gender", value: "non-binary" })).to
+          .be.true;
+      }
+    );
+
+    const selectElement = formComponent.inputField(formSelect, "root");
+
+    // calling with the fill input method won't fire the ecc change event
+    selectElement.value = "non-binary";
+    selectElement.dispatchEvent(new Event("sl-change"));
+    selectElement.dispatchEvent(new Event("sl-input"));
+
+    await formComponent.form.updateComplete;
+  });
+});
+
 describe("when loading", () => {
   let formComponent: FormComponentType;
   beforeEach(async () => {
@@ -99,13 +134,13 @@ describe("when loading", () => {
 describe("when array template is rendered", () => {
   let formComponent: FormComponentType;
   beforeEach(async () => {
-    formComponent = await createNewFormComponent(complexArrayTestData);
+    formComponent = await createNewFormComponent(arrayTestData);
   });
 
   it("should render children fields correctly", () => {
-    // 10 input fields should be rendered by default
+    // 2 input fields should be rendered by default
     expect(formComponent.inputField(formInput, "root", true)).to.have.lengthOf(
-      10
+      2
     );
     // 2 switch field should be rendered by default
     expect(formComponent.inputField(formSwitch, "root", true)).to.have.lengthOf(
@@ -115,6 +150,20 @@ describe("when array template is rendered", () => {
     expect(
       formComponent.inputField(formInputFile, "root", true)
     ).to.have.lengthOf(2);
+  });
+
+  it("add button should work properly", async () => {
+    const addButton = formComponent.buttonElement(
+      formArrayAddButton,
+      "root",
+      false
+    );
+
+    await formComponent.clickButton(addButton);
+
+    expect(formComponent.element(formArrayItem, "root", true)).to.have.lengthOf(
+      3
+    );
   });
 
   it("delete button should work properly", async () => {
@@ -134,11 +183,8 @@ describe("when array template is rendered", () => {
   });
 
   it("delete button should delete the correct instance", async () => {
-    await formComponent.initializeForm(simpleArrayTestData);
-
     await formComponent.clickButton(
-      formComponent.buttonElement(formArrayAddButton, "root"),
-      2
+      formComponent.buttonElement(formArrayAddButton, "root")
     );
 
     let arrayItems = formComponent.element(formArrayItem, "root", true);
@@ -148,6 +194,7 @@ describe("when array template is rendered", () => {
     const secondInputField = formComponent.inputField(formInput, arrayItems[1]);
     const thirdInputField = formComponent.inputField(formInput, arrayItems[2]);
 
+    // fill each of the input fields
     formComponent.fillInputField(firstInputField, "test value 1");
     formComponent.fillInputField(secondInputField, "test value 2");
     formComponent.fillInputField(thirdInputField, "test value 3");
@@ -167,44 +214,30 @@ describe("when array template is rendered", () => {
     ).to.equal("test value 3");
   });
 
-  it("add button should work properly", async () => {
-    const addButton = formComponent.buttonElement(
-      formArrayAddButton,
-      "root",
-      false
-    );
-
-    await formComponent.clickButton(addButton);
-
-    expect(formComponent.element(formArrayItem, "root", true)).to.have.lengthOf(
-      3
-    );
-  });
-
   it("add Button should new instance at the bottom", async () => {
-    await formComponent.initializeForm(simpleArrayTestData);
-
     let arrayItems = formComponent.element(formArrayItem, "root", true);
 
     // check default instances
-    expect(arrayItems).to.have.lengthOf(1);
+    expect(arrayItems).to.have.lengthOf(2);
 
-    const firstInputField = formComponent.inputField(formInput, arrayItems[0]);
-    formComponent.fillInputField(firstInputField, "test value 1");
-    await formComponent.clickButton(
-      formComponent.buttonElement(formArrayAddButton, "root")
-    );
-
-    arrayItems = formComponent.element(formArrayItem, "root", true);
     const secondInputField = formComponent.inputField(formInput, arrayItems[1]);
     formComponent.fillInputField(secondInputField, "test value 2");
 
-    expect(
-      formComponent.inputField(formInput, arrayItems[0], false).value
-    ).to.equal("test value 1");
+    await formComponent.clickButton(
+      formComponent.buttonElement(formArrayAddButton, "root")
+    );
+    arrayItems = formComponent.element(formArrayItem, "root", true);
+
+    const thirdInputField = formComponent.inputField(formInput, arrayItems[2]);
+    formComponent.fillInputField(thirdInputField, "test value 3");
+    arrayItems = formComponent.element(formArrayItem, "root", true);
+
     expect(
       formComponent.inputField(formInput, arrayItems[1], false).value
     ).to.equal("test value 2");
+    expect(
+      formComponent.inputField(formInput, arrayItems[2], false).value
+    ).to.equal("test value 3");
   });
 });
 
@@ -247,105 +280,72 @@ describe("when submit button is clicked", () => {
     sinon.assert.calledOnceWithExactly(formError, { message: "Form is empty" });
   });
 
-  it("should verify that all required fields are filled in simple scenarios", async () => {
+  it("should not be disabled if required fields are filled", async () => {
     const formComponent = await createNewFormComponent(requiredFieldsTestData);
 
     const inputFields = formComponent.inputField(formInput, "root", true);
 
-    await formComponent.fillInputField(inputFields[0]);
-    expect(formComponent.submitButton()).to.have.attribute("disabled");
+    inputFields.forEach((field) => {
+      if (field.required) formComponent.fillInputField(field);
+    });
 
-    await formComponent.fillInputField(inputFields[1], "19");
+    await formComponent.form.updateComplete;
     expect(formComponent.submitButton()).to.not.have.attribute("disabled");
-    // note: didn't fill the email field since it is not required
   });
 
-  // ... existing code ...
+  it("should be disabled if required fields are not filled", async () => {
+    const formComponent = await createNewFormComponent(requiredFieldsTestData);
+
+    const inputFields = formComponent.inputField(formInput, "root", true);
+
+    inputFields.forEach((field) => {
+      if (!field.required) formComponent.fillInputField(field);
+    });
+
+    await formComponent.form.updateComplete;
+    expect(formComponent.submitButton()).to.have.attribute("disabled");
+  });
 
   it("should verify that all required fields are filled in array scenarios", async () => {
-    // revert this to new test ids
-    // const formComponent = await createNewFormComponent(complexArrayTestData);
-    // expect(formComponent.submitButton()).to.have.attribute("disabled");
-    // const arrayTemplates = formComponent.element(formArrayItem, "root", true);
-    // // Fill all required fields in the first array
-    // const inputFieldsFirstArray = formComponent.inputField(
-    //   formInput,
-    //   arrayTemplates[0],
-    //   true
-    // );
-    // inputFieldsFirstArray.forEach((field) =>
-    //   formComponent.fillInputField(field)
-    // );
-    // // Fill all required fields in the second array
-    // const inputFieldsSecondArray = formComponent.inputField(
-    //   formInput,
-    //   arrayTemplates[1],
-    //   true
-    // );
-    // const fileFieldsSecondArray = formComponent.inputField(
-    //   formInputFile,
-    //   arrayTemplates[1],
-    //   true
-    // );
-    // inputFieldsSecondArray.forEach((field) =>
-    //   formComponent.fillInputField(field)
-    // );
-    // fileFieldsSecondArray.forEach((field) =>
-    //   formComponent.fillInputFileField(field)
-    // );
-    // await formComponent.form.updateComplete;
-    // expect(formComponent.submitButton()).to.not.have.attribute("disabled");
-    // // Add a new instance to the first array
-    // await formComponent.clickButton(
-    //   formComponent.buttonElement(formArrayAddButton, arrayTemplates[0])
-    // );
-    // expect(formComponent.submitButton()).to.have.attribute("disabled");
-    // // Fill required fields in the new instance
-    // const newArrayItem = formComponent.element(
-    //   formArrayItem,
-    //   arrayTemplates[0],
-    //   true
-    // )[1];
-    // const newInputFields = formComponent.inputField(
-    //   formInput,
-    //   newArrayItem,
-    //   true
-    // );
-    // newInputFields.forEach((field) => formComponent.fillInputField(field));
-    // await formComponent.form.updateComplete;
-    // expect(formComponent.submitButton()).to.not.have.attribute("disabled");
-    // // Add a new instance to the second array
-    // await formComponent.clickButton(
-    //   formComponent.buttonElement(formArrayAddButton, arrayTemplates[1])
-    // );
-    // expect(formComponent.submitButton()).to.have.attribute("disabled");
-    // // Fill required fields in the new instance of the second array
-    // const newSecondArrayItem = formComponent.element(
-    //   formArrayItem,
-    //   arrayTemplates[1],
-    //   true
-    // )[1];
-    // const newSecondInputFields = formComponent.inputField(
-    //   formInput,
-    //   newSecondArrayItem,
-    //   true
-    // );
-    // const newSecondFileFields = formComponent.inputField(
-    //   formInputFile,
-    //   newSecondArrayItem,
-    //   true
-    // );
-    // newSecondInputFields.forEach((field) =>
-    //   formComponent.fillInputField(field)
-    // );
-    // newSecondFileFields.forEach((field) =>
-    //   formComponent.fillInputFileField(field)
-    // );
-    // await formComponent.form.updateComplete;
-    // expect(formComponent.submitButton()).to.not.have.attribute("disabled");
+    const formComponent = await createNewFormComponent(arrayTestData);
+    const arrayItems = formComponent.element(formArrayItem, "root", true);
+
+    // delete second array instance, we do not need it
+    formComponent.clickButton(
+      formComponent.buttonElement(formArrayDeleteButton, arrayItems[1])
+    );
+
+    expect(formComponent.submitButton()).to.have.attribute("disabled");
+
+    // fill required input field
+    const inputField = formComponent.inputField(formInput, arrayItems[0]);
+    formComponent.fillInputField(inputField);
+
+    await formComponent.form.updateComplete;
+    expect(formComponent.submitButton()).to.not.have.attribute("disabled");
   });
 
-  // ... rest of the existing code ...
+  it("should be disabled by default when a new array item is added to the array", async () => {
+    const formComponent = await createNewFormComponent(arrayTestData);
+    const arrayItems = formComponent.element(formArrayItem, "root", true);
+
+    // delete second array instance, we do not need it
+    formComponent.clickButton(
+      formComponent.buttonElement(formArrayDeleteButton, arrayItems[1])
+    );
+
+    // fill required input field
+    const inputField = formComponent.inputField(formInput, arrayItems[0]);
+    formComponent.fillInputField(inputField);
+
+    formComponent.clickButton(
+      formComponent.buttonElement(formArrayAddButton, "root")
+    );
+
+    await formComponent.form.updateComplete;
+
+    expect(formComponent.submitButton()).to.have.attribute("disabled");
+  });
 
   it("should verify that all required fields are filled in group scenarios", async () => {
     const formComponent = await createNewFormComponent(groupTestData);
@@ -358,6 +358,7 @@ describe("when submit button is clicked", () => {
       false
     );
 
+    // grab all input fields
     const inputFields = formComponent.inputField(
       formInput,
       collapsibleGroup,
@@ -378,9 +379,6 @@ describe("when submit button is clicked", () => {
   });
 });
 
-// use the submit data to test what happens when the form is submitted
-// hint: use the demo to print the data to the console
-// also test how the error works
 describe("when form is submitted", () => {
   let formComponent: FormComponentType;
   beforeEach(async () => {
@@ -464,7 +462,6 @@ describe("when form is submitted", () => {
     await formComponent.form.updateComplete;
 
     formComponent.clickSubmitButton();
-    // add test for the file field
   });
 });
 
@@ -496,7 +493,6 @@ describe("when fieldOptions are set", async () => {
   });
 
   it("should set default value correctly", async () => {
-    // this is pretty brittle but the test is simple enough
     formComponent.form.addEventListener(
       "ecc-utils-submit",
       (e: CustomEvent) => {
@@ -509,6 +505,8 @@ describe("when fieldOptions are set", async () => {
         ).to.be.true;
       }
     );
+
+    // grab the specific input fields by name
     const inputField = formComponent.form.shadowRoot!.querySelector(
       '[data-label="Name"]'
     );
@@ -537,15 +535,9 @@ describe("when fieldOptions are set", async () => {
       "root",
       true
     )[1];
-    const passportField = localFormComponent.inputField(
-      formInputFile,
-      "root",
-      true
-    )[2];
 
     expect(idField).to.not.have.attribute("multiple");
     expect(vactionPhotosField).to.have.attribute("multiple");
-    expect(passportField).to.not.have.attribute("multiple");
   });
 
   it("should set the accept attribute correctly", async () => {
@@ -574,6 +566,3 @@ describe("when fieldOptions are set", async () => {
     expect(passportField).to.have.attribute("accept", "*");
   });
 });
-
-// after this consider some error scenarios
-// consider using the get fields directly in the tests

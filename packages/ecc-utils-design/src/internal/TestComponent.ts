@@ -76,6 +76,7 @@ export default class TestComponent {
   ) {
     // eslint-disable-next-line no-param-reassign
     inputField.value = text;
+    inputField.dispatchEvent(new Event("sl-select"));
     inputField.dispatchEvent(new Event("sl-input"));
     await this.component.updateComplete;
   }

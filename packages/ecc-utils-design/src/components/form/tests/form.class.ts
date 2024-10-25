@@ -63,4 +63,6 @@ export const testIds = {
   formCollapsibleGroup: "form-group-collapsible",
   formNonCollapsibleGroup: "form-group-non-collapsible",
   formTooltip: "form-tooltip",
+  formSelect: "form-select",
+  formSelectOption: "form-select-option",
 };
