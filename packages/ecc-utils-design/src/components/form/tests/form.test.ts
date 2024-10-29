@@ -18,6 +18,7 @@ import {
   testDataForFileOptions,
   selectFieldTestData,
 } from "./testData.js";
+import { Field } from "../form.js";
 
 const {
   formInput,
@@ -138,18 +139,78 @@ describe("when array template is rendered", () => {
   });
 
   it("should render children fields correctly", () => {
+    const arrayComponent = formComponent.element(formArray, "root");
+
     // 2 input fields should be rendered by default
-    expect(formComponent.inputField(formInput, "root", true)).to.have.lengthOf(
-      2
-    );
+    expect(
+      formComponent.inputField(formInput, arrayComponent, true)
+    ).to.have.lengthOf(2);
+
     // 2 switch field should be rendered by default
-    expect(formComponent.inputField(formSwitch, "root", true)).to.have.lengthOf(
-      2
-    );
+    expect(
+      formComponent.inputField(formSwitch, arrayComponent, true)
+    ).to.have.lengthOf(2);
+
     // 2 file fields should be rendered by default
     expect(
-      formComponent.inputField(formInputFile, "root", true)
+      formComponent.inputField(formInputFile, arrayComponent, true)
     ).to.have.lengthOf(2);
+  });
+
+  it("should render group component correctly", async () => {
+    const groupComponent: Field = {
+      key: "dependents",
+      label: "Dependents",
+      type: "group",
+      groupOptions: { collapsible: true },
+      children: [{ key: "name", label: "Name", type: "text" }],
+    };
+
+    const localFormComponent = await createNewFormComponent([
+      {
+        ...arrayTestData[0],
+        children: [...arrayTestData[0].children!, groupComponent],
+      },
+    ]);
+
+    const arrayComponent = localFormComponent.element(formArray, "root");
+
+    // 4 input fields should be rendered by default
+    expect(
+      localFormComponent.inputField(formInput, arrayComponent, true)
+    ).to.have.lengthOf(4);
+
+    // 2 group component should be rendered by default
+    expect(
+      localFormComponent.element(formCollapsibleGroup, arrayComponent, true)
+    ).to.have.length(2);
+  });
+
+  it("should render nested arrays correctly", async () => {
+    const nestedArray: Field = {
+      key: "dependents",
+      label: "Dependents",
+      type: "array",
+      fieldOptions: { tooltip: "go away bro" },
+      arrayOptions: { defaultInstances: 1, max: 3 },
+      children: [{ key: "name", label: "Name", type: "text" }],
+    };
+
+    const localFormComponent = await createNewFormComponent([
+      {
+        ...arrayTestData[0],
+        children: [...arrayTestData[0].children!, nestedArray],
+      },
+    ]);
+
+    expect(
+      localFormComponent.inputField(formInput, "root", true)
+    ).to.have.lengthOf(3);
+
+    // 3 array components should be rendered by default
+    expect(localFormComponent.element(formArray, "root", true)).to.have.length(
+      3
+    );
   });
 
   it("add button should work properly", async () => {
@@ -161,9 +222,10 @@ describe("when array template is rendered", () => {
 
     await formComponent.clickButton(addButton);
 
-    expect(formComponent.element(formArrayItem, "root", true)).to.have.lengthOf(
-      3
-    );
+    const arrayComponent = formComponent.element(formArray, "root");
+    expect(
+      formComponent.element(formArrayItem, arrayComponent, true)
+    ).to.have.lengthOf(3);
   });
 
   it("delete button should work properly", async () => {
@@ -177,9 +239,10 @@ describe("when array template is rendered", () => {
     );
 
     await formComponent.clickButton(deleteButtons);
-    expect(formComponent.element(formArrayItem, "root", true)).to.have.lengthOf(
-      1
-    );
+    const arrayComponent = formComponent.element(formArray, "root");
+    expect(
+      formComponent.element(formArrayItem, arrayComponent, true)
+    ).to.have.lengthOf(1);
   });
 
   it("delete button should delete the correct instance", async () => {
@@ -204,6 +267,7 @@ describe("when array template is rendered", () => {
       formComponent.buttonElement(formArrayDeleteButton, arrayItems[1], false)
     );
 
+    // check to make sure the middle instance was actually deleted
     arrayItems = formComponent.element(formArrayItem, "root", true);
     expect(arrayItems).to.have.lengthOf(2);
     expect(
@@ -214,30 +278,30 @@ describe("when array template is rendered", () => {
     ).to.equal("test value 3");
   });
 
-  it("add Button should new instance at the bottom", async () => {
+  it("add Button should new instance at the end", async () => {
     let arrayItems = formComponent.element(formArrayItem, "root", true);
 
     // check default instances
     expect(arrayItems).to.have.lengthOf(2);
 
-    const secondInputField = formComponent.inputField(formInput, arrayItems[1]);
+    let firstInputField = formComponent.inputField(formInput, arrayItems[0]);
+    let secondInputField = formComponent.inputField(formInput, arrayItems[1]);
+    formComponent.fillInputField(firstInputField, "test value 1");
     formComponent.fillInputField(secondInputField, "test value 2");
 
     await formComponent.clickButton(
       formComponent.buttonElement(formArrayAddButton, "root")
     );
-    arrayItems = formComponent.element(formArrayItem, "root", true);
 
+    // reload items after update
+    arrayItems = formComponent.element(formArrayItem, "root", true);
+    firstInputField = formComponent.inputField(formInput, arrayItems[0]);
+    secondInputField = formComponent.inputField(formInput, arrayItems[1]);
     const thirdInputField = formComponent.inputField(formInput, arrayItems[2]);
-    formComponent.fillInputField(thirdInputField, "test value 3");
-    arrayItems = formComponent.element(formArrayItem, "root", true);
 
-    expect(
-      formComponent.inputField(formInput, arrayItems[1], false).value
-    ).to.equal("test value 2");
-    expect(
-      formComponent.inputField(formInput, arrayItems[2], false).value
-    ).to.equal("test value 3");
+    expect(firstInputField.value).to.equal("test value 1");
+    expect(secondInputField.value).to.equal("test value 2");
+    expect(thirdInputField.value).to.equal("");
   });
 });
 
@@ -247,7 +311,7 @@ describe("when group template is rendered", () => {
     formComponent = await createNewFormComponent(groupTestData);
   });
 
-  it("should render children fields correctly", async () => {
+  it("should render children fields correctly", () => {
     const groupTemplate = formComponent.element(formGroup, "root");
     const collapsibleGroup = formComponent.element(
       formCollapsibleGroup,
@@ -269,6 +333,74 @@ describe("when group template is rendered", () => {
       formComponent.inputField(formInputFile, collapsibleGroup, true)
     ).to.have.lengthOf(1);
   });
+
+  it("should render nested groups correctly", async () => {
+    const groupData: Field = {
+      key: "dependents",
+      label: "Dependents",
+      type: "group",
+      groupOptions: { collapsible: true },
+      children: [{ key: "name", label: "Name", type: "text" }],
+    };
+
+    const localFormComponent = await createNewFormComponent([
+      {
+        ...groupTestData[0],
+        children: [...groupTestData[0].children!, groupData],
+      },
+    ]);
+
+    const groupComponent = localFormComponent.element(
+      formCollapsibleGroup,
+      "root"
+    );
+
+    // 4 input fields should be rendered by default
+    expect(
+      localFormComponent.inputField(formInput, groupComponent, true)
+    ).to.have.lengthOf(4);
+
+    // 1 nested group component should be rendered by default
+    expect(
+      localFormComponent.element(formCollapsibleGroup, groupComponent, true)
+    ).to.have.length(1);
+  });
+
+  it("should render nested arrays correctly", async () => {
+    const nestedArray: Field = {
+      key: "dependents",
+      label: "Dependents",
+      type: "array",
+      arrayOptions: { defaultInstances: 1, max: 3 },
+      children: [{ key: "name", label: "Name" }],
+    };
+
+    const localFormComponent = await createNewFormComponent([
+      {
+        ...groupTestData[0],
+        children: [...groupTestData[0].children!, nestedArray],
+      },
+    ]);
+
+    const groupComponent = localFormComponent.element(
+      formCollapsibleGroup,
+      "root"
+    );
+
+    ("FIX TEST");
+
+    // 4 input fields should be rendered by default
+    expect(
+      localFormComponent.inputField(formInput, groupComponent, true)
+    ).to.have.lengthOf(4);
+
+    // 1 nested array components should be rendered by default
+    expect(
+      localFormComponent.element(formArray, groupComponent, true)
+    ).to.have.length(1);
+  });
+
+  it("should render collapsible and non-collapsible groups as needed");
 });
 
 describe("when submit button is clicked", () => {
@@ -334,9 +466,11 @@ describe("when submit button is clicked", () => {
       formComponent.buttonElement(formArrayDeleteButton, arrayItems[1])
     );
 
-    // fill required input field
+    // fill required input field, and make sure it is not disabled
     const inputField = formComponent.inputField(formInput, arrayItems[0]);
     formComponent.fillInputField(inputField);
+    await formComponent.form.updateComplete;
+    expect(formComponent.submitButton()).to.not.have.attribute("disabled");
 
     formComponent.clickButton(
       formComponent.buttonElement(formArrayAddButton, "root")
@@ -371,8 +505,12 @@ describe("when submit button is clicked", () => {
     );
 
     // fill all required fields
-    inputFields.forEach((field) => formComponent.fillInputField(field));
-    fileFields.forEach((field) => formComponent.fillInputFileField(field));
+    inputFields.forEach((field) => {
+      if (field.required) formComponent.fillInputField(field);
+    });
+    fileFields.forEach((field) => {
+      if (field.required) formComponent.fillInputFileField(field);
+    });
 
     await formComponent.form.updateComplete;
     expect(formComponent.submitButton()).to.not.have.attribute("disabled");
@@ -434,6 +572,7 @@ describe("when form is submitted", () => {
       }
     );
 
+    // grab all input fields, file fields, and switch fields
     const inputFields = formComponent.inputField(formInput, "root", true);
     const switchFields = formComponent.inputField(formSwitch, "root", true);
     const fileFields = formComponent.inputField(formInputFile, "root", true);
@@ -460,7 +599,6 @@ describe("when form is submitted", () => {
     });
 
     await formComponent.form.updateComplete;
-
     formComponent.clickSubmitButton();
   });
 });

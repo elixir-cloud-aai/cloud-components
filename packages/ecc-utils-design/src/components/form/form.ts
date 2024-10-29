@@ -9,7 +9,7 @@ import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/components/select/select.js";
 import "@shoelace-style/shoelace/dist/components/option/option.js";
-import _ from "lodash-es";
+import * as _ from "lodash-es";
 import { hostStyles } from "../../styles/host.styles.js";
 import formStyles from "./form.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
@@ -400,7 +400,7 @@ export default class EccUtilsDesignForm extends LitElement {
     };
 
     return html`
-      <div class="array-container">
+      <div class="array-container" data-testid="form-array">
         <div class="array-header">
           ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
             ? html`
