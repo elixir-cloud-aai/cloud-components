@@ -7,92 +7,12 @@ export default class ECCClientRoCrateAbout extends LitElement {
   @state()
   private activeTab = 0;
 
-  private _switchTab(index: number): void {
+  // Method to switch tabs
+  private _switchTab(index: number) {
     this.activeTab = index;
   }
-  private _handleDataset(e: CustomEvent): void {
-    const licenceFieldIndex = this.AboutFields.findIndex(
-      (field) => field.key === "licence"
-    );
-    const licenceChildren = this.AboutFields[licenceFieldIndex].children ?? [];
-    if (licenceFieldIndex === -1) return;
-    let updatedChildren: Array<Field> = [];
 
-    if (e.detail.key === "licence" && e.detail.value === "URL") {
-      updatedChildren = licenceChildren
-        .filter((child) => child.key !== "@id")
-        .filter((child) => child.key !== "@type")
-        .filter((child) => child.key !== "name")
-        .filter((child) => child.key !== "desc");
-
-      const hasUrl = updatedChildren.some((child) => child.key === "url");
-      if (!hasUrl) {
-        updatedChildren.push({
-          key: "url",
-          label: "URL",
-          type: "url",
-          fieldOptions: {
-            required: true,
-          },
-        });
-      }
-    } else if (
-      e.detail.key === "licence" &&
-      e.detail.value === "CreativeWork"
-    ) {
-      updatedChildren = licenceChildren.filter((child) => child.key !== "url");
-
-      updatedChildren.push(
-        {
-          key: "@id",
-          label: "@id",
-          type: "text",
-          fieldOptions: {
-            required: true,
-            tooltip: "Persistent, managed unique ID in URL format",
-          },
-        },
-        {
-          key: "@type",
-          label: "@type",
-          type: "text",
-          fieldOptions: {
-            default: "CreativeWork",
-            required: true,
-            tooltip: "The type of the entity.",
-          },
-        },
-        {
-          key: "name",
-          label: "Name",
-          type: "text",
-          fieldOptions: {
-            required: true,
-            tooltip: "The name of the item.",
-          },
-        },
-        {
-          key: "desc",
-          label: "Description",
-          type: "text",
-          fieldOptions: {
-            required: true,
-            tooltip: "A description of the item.",
-          },
-        }
-      );
-    }
-    this.AboutFields = [
-      ...this.AboutFields.slice(0, licenceFieldIndex),
-      {
-        ...this.AboutFields[licenceFieldIndex],
-        children: updatedChildren,
-      },
-      ...this.AboutFields.slice(licenceFieldIndex + 1),
-    ];
-  }
-  @state()
-  AboutFields: Field[] = [
+  static AboutFields: Field[] = [
     {
       key: "@id",
       label: "@id",
@@ -101,13 +21,12 @@ export default class ECCClientRoCrateAbout extends LitElement {
         tooltip:
           "Persistent, managed unique ID in URL format (if available), for example a DOI for a collection or an ORCID, personal home page URL or email address for a person",
         default: "./",
-        required: true,
       },
     },
 
     {
       key: "@type",
-      label: "@type",
+      label: "Type",
       type: "array",
       fieldOptions: {
         tooltip: "The type of the entity.",
@@ -135,7 +54,6 @@ export default class ECCClientRoCrateAbout extends LitElement {
       type: "text",
       fieldOptions: {
         tooltip: "The name of the item.",
-        required: true,
       },
     },
     {
@@ -144,7 +62,6 @@ export default class ECCClientRoCrateAbout extends LitElement {
       type: "text",
       fieldOptions: {
         tooltip: "A description of the item.",
-        required: true,
       },
     },
     {
@@ -153,30 +70,91 @@ export default class ECCClientRoCrateAbout extends LitElement {
       type: "date",
       fieldOptions: {
         tooltip: "Date of first broadcast or publication.",
-        required: true,
       },
     },
     {
-      key: "licence",
-      label: "Licence",
-      type: "group",
+      key: "about",
+      label: "About Dataset",
+      type: "array",
       fieldOptions: {
         required: true,
+        default: "",
       },
-      groupOptions: {
-        collapsible: true,
+      arrayOptions: {
+        defaultInstances: 0,
       },
+
       children: [
         {
-          key: "licence",
-          label: "Licence Type",
-          type: "select",
+          key: "datasetInput",
+          label: "Dataset",
+          type: "group",
           fieldOptions: {
-            required: true,
+            tooltip: "Enter Text",
           },
-          selectOptions: [
-            { label: "URL", value: "URL" },
-            { label: "CreativeWork", value: "CreativeWork" },
+          groupOptions: {
+            collapsible: true,
+          },
+          children: [
+            {
+              key: "@id",
+              label: "@id",
+              type: "text",
+              fieldOptions: {
+                tooltip:
+                  "Persistent, managed unique ID in URL format (if available), for example a DOI for a collection or an ORCID, personal home page URL or email address for a person",
+                default: "./",
+              },
+            },
+
+            {
+              key: "@type",
+              label: "Type",
+              type: "array",
+              fieldOptions: {
+                tooltip: "The type of the entity.",
+              },
+              arrayOptions: {
+                defaultInstances: 1,
+                max: 3,
+              },
+              children: [
+                {
+                  key: "Type",
+                  label: "Select",
+                  type: "text",
+                  fieldOptions: {
+                    required: true,
+                    default: "Dataset",
+                  },
+                },
+              ],
+            },
+
+            {
+              key: "name",
+              label: "Name",
+              type: "text",
+              fieldOptions: {
+                tooltip: "The name of the item.",
+              },
+            },
+            {
+              key: "description",
+              label: "Description",
+              type: "text",
+              fieldOptions: {
+                tooltip: "A description of the item.",
+              },
+            },
+            {
+              key: "datePublished",
+              label: "Date Published",
+              type: "date",
+              fieldOptions: {
+                tooltip: "Date of first broadcast or publication.",
+              },
+            },
           ],
         },
       ],
@@ -191,62 +169,44 @@ export default class ECCClientRoCrateAbout extends LitElement {
       fieldOptions: {
         required: false,
         default: "",
+        tooltip: "The author of this content.",
       },
       groupOptions: {
         collapsible: true,
       },
       children: [
         {
-          key: "text",
-          label: "Text",
+          key: "person",
+          label: "Person",
           type: "array",
           arrayOptions: {
             defaultInstances: 0,
-            max: 1,
           },
           children: [
             {
-              key: "textInput",
-              label: "Text",
+              key: "personID",
+              label: "@id",
+              type: "url",
+              fieldOptions: {
+                required: true,
+              },
+            },
+            {
+              key: "personType",
+              label: "@type",
               type: "text",
               fieldOptions: {
-                tooltip: "Enter Text",
+                default: "Person",
+                required: true,
               },
             },
-          ],
-        },
-        {
-          key: "number",
-          label: "Number",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 0,
-            max: 1,
-          },
-          children: [
             {
-              key: "numberInput",
-              label: "Number",
-              type: "number",
+              key: "personName",
+              label: "Name",
+              type: "text",
               fieldOptions: {
-                tooltip: "Enter Number",
+                required: true,
               },
-            },
-          ],
-        },
-        {
-          key: "entity",
-          label: "Entity",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 0,
-            max: 1,
-          },
-          children: [
-            {
-              key: "entityInput",
-              label: "Entity",
-              type: "number",
             },
           ],
         },
@@ -259,62 +219,52 @@ export default class ECCClientRoCrateAbout extends LitElement {
       fieldOptions: {
         required: false,
         default: "",
+        tooltip: "The publisher of the creative work.",
       },
       groupOptions: {
         collapsible: true,
       },
       children: [
         {
-          key: "text",
-          label: "Text",
+          key: "org",
+          label: "Organisation",
           type: "array",
           arrayOptions: {
             defaultInstances: 0,
-            max: 1,
           },
           children: [
             {
-              key: "textInput",
-              label: "Text",
+              key: "orgID",
+              label: "@id",
+              type: "url",
+              fieldOptions: {
+                required: true,
+              },
+            },
+            {
+              key: "orgType",
+              label: "@type",
               type: "text",
               fieldOptions: {
-                tooltip: "Enter Text",
+                default: "Person",
+                required: true,
               },
             },
-          ],
-        },
-        {
-          key: "number",
-          label: "Number",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 0,
-            max: 1,
-          },
-          children: [
             {
-              key: "numberInput",
-              label: "Number",
-              type: "number",
+              key: "orgName",
+              label: "Name",
+              type: "text",
               fieldOptions: {
-                tooltip: "Enter Number",
+                required: true,
               },
             },
-          ],
-        },
-        {
-          key: "entity",
-          label: "Entity",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 0,
-            max: 1,
-          },
-          children: [
             {
-              key: "entityInput",
-              label: "Entity",
-              type: "number",
+              key: "orgURL",
+              label: "URL",
+              type: "url",
+              fieldOptions: {
+                required: true,
+              },
             },
           ],
         },
@@ -327,62 +277,53 @@ export default class ECCClientRoCrateAbout extends LitElement {
       fieldOptions: {
         required: false,
         default: "",
+        tooltip:
+          "person or organization that supports (sponsors) something through some kind of financial contribution.",
       },
       groupOptions: {
         collapsible: true,
       },
       children: [
         {
-          key: "text",
-          label: "Text",
+          key: "org",
+          label: "Organisation",
           type: "array",
           arrayOptions: {
             defaultInstances: 0,
-            max: 1,
           },
           children: [
             {
-              key: "textInput",
-              label: "Text",
+              key: "orgID",
+              label: "@id",
+              type: "url",
+              fieldOptions: {
+                required: true,
+              },
+            },
+            {
+              key: "orgType",
+              label: "@type",
               type: "text",
               fieldOptions: {
-                tooltip: "Enter Text",
+                default: "Person",
+                required: true,
               },
             },
-          ],
-        },
-        {
-          key: "number",
-          label: "Number",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 0,
-            max: 1,
-          },
-          children: [
             {
-              key: "numberInput",
-              label: "Number",
-              type: "number",
+              key: "orgName",
+              label: "Name",
+              type: "text",
               fieldOptions: {
-                tooltip: "Enter Number",
+                required: true,
               },
             },
-          ],
-        },
-        {
-          key: "entity",
-          label: "Entity",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 0,
-            max: 1,
-          },
-          children: [
             {
-              key: "entityInput",
-              label: "Entity",
-              type: "number",
+              key: "orgURL",
+              label: "URL",
+              type: "url",
+              fieldOptions: {
+                required: true,
+              },
             },
           ],
         },
@@ -460,10 +401,7 @@ export default class ECCClientRoCrateAbout extends LitElement {
       <div class="content">
         ${this.activeTab === 0
           ? html`<ecc-utils-design-form
-              @ecc-utils-change=${(e: CustomEvent) => {
-                this._handleDataset(e);
-              }}
-              .fields=${this.AboutFields}
+              .fields=${ECCClientRoCrateAbout.AboutFields}
             />`
           : ""}
         ${this.activeTab === 1
@@ -479,4 +417,4 @@ export default class ECCClientRoCrateAbout extends LitElement {
       </div>
     `;
   }
-}   
+}
