@@ -191,62 +191,44 @@ export default class ECCClientRoCrateAbout extends LitElement {
       fieldOptions: {
         required: false,
         default: "",
+        tooltip: "The author of this content.",
       },
       groupOptions: {
         collapsible: true,
       },
       children: [
         {
-          key: "text",
-          label: "Text",
+          key: "person",
+          label: "Person",
           type: "array",
           arrayOptions: {
             defaultInstances: 0,
-            max: 1,
           },
           children: [
             {
-              key: "textInput",
-              label: "Text",
+              key: "personID",
+              label: "@id",
+              type: "url",
+              fieldOptions: {
+                required: true,
+              },
+            },
+            {
+              key: "personType",
+              label: "@type",
               type: "text",
               fieldOptions: {
-                tooltip: "Enter Text",
+                default: "Person",
+                required: true,
               },
             },
-          ],
-        },
-        {
-          key: "number",
-          label: "Number",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 0,
-            max: 1,
-          },
-          children: [
             {
-              key: "numberInput",
-              label: "Number",
-              type: "number",
+              key: "personName",
+              label: "Name",
+              type: "text",
               fieldOptions: {
-                tooltip: "Enter Number",
+                required: true,
               },
-            },
-          ],
-        },
-        {
-          key: "entity",
-          label: "Entity",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 0,
-            max: 1,
-          },
-          children: [
-            {
-              key: "entityInput",
-              label: "Entity",
-              type: "number",
             },
           ],
         },
@@ -259,62 +241,52 @@ export default class ECCClientRoCrateAbout extends LitElement {
       fieldOptions: {
         required: false,
         default: "",
+        tooltip: "The publisher of the creative work.",
       },
       groupOptions: {
         collapsible: true,
       },
       children: [
         {
-          key: "text",
-          label: "Text",
+          key: "org",
+          label: "Organisation",
           type: "array",
           arrayOptions: {
             defaultInstances: 0,
-            max: 1,
           },
           children: [
             {
-              key: "textInput",
-              label: "Text",
+              key: "orgID",
+              label: "@id",
+              type: "url",
+              fieldOptions: {
+                required: true,
+              },
+            },
+            {
+              key: "orgType",
+              label: "@type",
               type: "text",
               fieldOptions: {
-                tooltip: "Enter Text",
+                default: "Person",
+                required: true,
               },
             },
-          ],
-        },
-        {
-          key: "number",
-          label: "Number",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 0,
-            max: 1,
-          },
-          children: [
             {
-              key: "numberInput",
-              label: "Number",
-              type: "number",
+              key: "orgName",
+              label: "Name",
+              type: "text",
               fieldOptions: {
-                tooltip: "Enter Number",
+                required: true,
               },
             },
-          ],
-        },
-        {
-          key: "entity",
-          label: "Entity",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 0,
-            max: 1,
-          },
-          children: [
             {
-              key: "entityInput",
-              label: "Entity",
-              type: "number",
+              key: "orgURL",
+              label: "URL",
+              type: "url",
+              fieldOptions: {
+                required: true,
+              },
             },
           ],
         },
@@ -327,62 +299,53 @@ export default class ECCClientRoCrateAbout extends LitElement {
       fieldOptions: {
         required: false,
         default: "",
+        tooltip:
+          "person or organization that supports (sponsors) something through some kind of financial contribution.",
       },
       groupOptions: {
         collapsible: true,
       },
       children: [
         {
-          key: "text",
-          label: "Text",
+          key: "org",
+          label: "Organisation",
           type: "array",
           arrayOptions: {
             defaultInstances: 0,
-            max: 1,
           },
           children: [
             {
-              key: "textInput",
-              label: "Text",
+              key: "orgID",
+              label: "@id",
+              type: "url",
+              fieldOptions: {
+                required: true,
+              },
+            },
+            {
+              key: "orgType",
+              label: "@type",
               type: "text",
               fieldOptions: {
-                tooltip: "Enter Text",
+                default: "Person",
+                required: true,
               },
             },
-          ],
-        },
-        {
-          key: "number",
-          label: "Number",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 0,
-            max: 1,
-          },
-          children: [
             {
-              key: "numberInput",
-              label: "Number",
-              type: "number",
+              key: "orgName",
+              label: "Name",
+              type: "text",
               fieldOptions: {
-                tooltip: "Enter Number",
+                required: true,
               },
             },
-          ],
-        },
-        {
-          key: "entity",
-          label: "Entity",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 0,
-            max: 1,
-          },
-          children: [
             {
-              key: "entityInput",
-              label: "Entity",
-              type: "number",
+              key: "orgURL",
+              label: "URL",
+              type: "url",
+              fieldOptions: {
+                required: true,
+              },
             },
           ],
         },
