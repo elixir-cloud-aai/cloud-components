@@ -193,7 +193,7 @@ describe("when array template is rendered", () => {
       type: "array",
       fieldOptions: { tooltip: "go away bro" },
       arrayOptions: { defaultInstances: 1, max: 3 },
-      children: [{ key: "name", label: "Name", type: "text" }],
+      children: [{ key: "name", label: "Nameers", type: "text" }],
     };
 
     const localFormComponent = await createNewFormComponent([
@@ -205,7 +205,7 @@ describe("when array template is rendered", () => {
 
     expect(
       localFormComponent.inputField(formInput, "root", true)
-    ).to.have.lengthOf(3);
+    ).to.have.lengthOf(4);
 
     // 3 array components should be rendered by default
     expect(localFormComponent.element(formArray, "root", true)).to.have.length(
