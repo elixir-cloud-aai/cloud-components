@@ -11,10 +11,10 @@ export default class ECCClientRoCrateAbout extends LitElement {
     this.activeTab = index;
   }
   private _handleDataset(e: CustomEvent): void {
-    const licenceFieldIndex = this.AboutFields.findIndex(
+    const licenceFieldIndex = this.DatasetFields.findIndex(
       (field) => field.key === "licence"
     );
-    const licenceChildren = this.AboutFields[licenceFieldIndex].children ?? [];
+    const licenceChildren = this.DatasetFields[licenceFieldIndex].children ?? [];
     if (licenceFieldIndex === -1) return;
     let updatedChildren: Array<Field> = [];
 
@@ -82,17 +82,17 @@ export default class ECCClientRoCrateAbout extends LitElement {
         }
       );
     }
-    this.AboutFields = [
-      ...this.AboutFields.slice(0, licenceFieldIndex),
+    this.DatasetFields = [
+      ...this.DatasetFields.slice(0, licenceFieldIndex),
       {
-        ...this.AboutFields[licenceFieldIndex],
+        ...this.DatasetFields[licenceFieldIndex],
         children: updatedChildren,
       },
-      ...this.AboutFields.slice(licenceFieldIndex + 1),
+      ...this.DatasetFields.slice(licenceFieldIndex + 1),
     ];
   }
   @state()
-  AboutFields: Field[] = [
+  DatasetFields: Field[] = [
     {
       key: "@id",
       label: "@id",
@@ -103,30 +103,6 @@ export default class ECCClientRoCrateAbout extends LitElement {
         default: "./",
         required: true,
       },
-    },
-
-    {
-      key: "@type",
-      label: "@type",
-      type: "array",
-      fieldOptions: {
-        tooltip: "The type of the entity.",
-      },
-      arrayOptions: {
-        defaultInstances: 1,
-        max: 3,
-      },
-      children: [
-        {
-          key: "Type",
-          label: "Select",
-          type: "text",
-          fieldOptions: {
-            required: true,
-            default: "Dataset",
-          },
-        },
-      ],
     },
 
     {
@@ -442,7 +418,7 @@ export default class ECCClientRoCrateAbout extends LitElement {
           class="tab ${this.activeTab === 0 ? "active" : ""}"
           @click="${() => this._switchTab(0)}"
         >
-          About
+          Dataset Entity
         </div>
         <div
           class="tab ${this.activeTab === 1 ? "active" : ""}"
@@ -463,7 +439,7 @@ export default class ECCClientRoCrateAbout extends LitElement {
               @ecc-utils-change=${(e: CustomEvent) => {
                 this._handleDataset(e);
               }}
-              .fields=${this.AboutFields}
+              .fields=${this.DatasetFields}
             />`
           : ""}
         ${this.activeTab === 1
@@ -479,4 +455,4 @@ export default class ECCClientRoCrateAbout extends LitElement {
       </div>
     `;
   }
-}   
+}
