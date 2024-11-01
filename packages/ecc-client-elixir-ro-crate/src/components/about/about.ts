@@ -10,39 +10,42 @@ export default class ECCClientRoCrateAbout extends LitElement {
   private _switchTab(index: number): void {
     this.activeTab = index;
   }
-  private _handleDataset(e: CustomEvent): void {
-    const licenceFieldIndex = this.AboutFields.findIndex(
-      (field) => field.key === "licence"
-    );
-    const licenceChildren = this.AboutFields[licenceFieldIndex].children ?? [];
-    if (licenceFieldIndex === -1) return;
-    let updatedChildren: Array<Field> = [];
 
-    if (e.detail.key === "licence" && e.detail.value === "URL") {
-      updatedChildren = licenceChildren
-        .filter((child) => child.key !== "@id")
-        .filter((child) => child.key !== "@type")
-        .filter((child) => child.key !== "name")
-        .filter((child) => child.key !== "desc");
+  private _handleChangeLicenseType(e: CustomEvent): void {
+    if (e.detail.key !== "license") return;
 
-      const hasUrl = updatedChildren.some((child) => child.key === "url");
-      if (!hasUrl) {
-        updatedChildren.push({
-          key: "url",
-          label: "URL",
-          type: "url",
+    const licenseField: Field = {
+      key: "license",
+      label: "license",
+      type: "group",
+      fieldOptions: {
+        required: true,
+      },
+      groupOptions: {
+        collapsible: true,
+      },
+      children: [
+        {
+          key: "license",
+          label: "license Type",
+          type: "select",
           fieldOptions: {
             required: true,
           },
-        });
-      }
-    } else if (
-      e.detail.key === "licence" &&
-      e.detail.value === "CreativeWork"
-    ) {
-      updatedChildren = licenceChildren.filter((child) => child.key !== "url");
+          selectOptions: [
+            { label: "URL", value: "URL" },
+            { label: "CreativeWork", value: "CreativeWork" },
+          ],
+        },
+      ],
+    };
 
-      updatedChildren.push(
+    const updatedAboutFields = this.AboutFields.filter(
+      (f) => f.key !== "license"
+    );
+
+    if (e.detail.value === "CreativeWork") {
+      const creativeWorkFields: Field[] = [
         {
           key: "@id",
           label: "@id",
@@ -79,18 +82,27 @@ export default class ECCClientRoCrateAbout extends LitElement {
             required: true,
             tooltip: "A description of the item.",
           },
-        }
-      );
+        },
+      ];
+
+      licenseField.children?.push(...creativeWorkFields);
+    } else if (e.detail.value === "URL") {
+      const urlField: Field = {
+        key: "url",
+        label: "URL",
+        type: "url",
+        fieldOptions: {
+          required: true,
+        },
+      };
+
+      licenseField.children?.push(urlField);
     }
-    this.AboutFields = [
-      ...this.AboutFields.slice(0, licenceFieldIndex),
-      {
-        ...this.AboutFields[licenceFieldIndex],
-        children: updatedChildren,
-      },
-      ...this.AboutFields.slice(licenceFieldIndex + 1),
-    ];
+
+    updatedAboutFields.push(licenseField);
+    this.AboutFields = updatedAboutFields;
   }
+
   @state()
   AboutFields: Field[] = [
     {
@@ -157,8 +169,8 @@ export default class ECCClientRoCrateAbout extends LitElement {
       },
     },
     {
-      key: "licence",
-      label: "Licence",
+      key: "license",
+      label: "license",
       type: "group",
       fieldOptions: {
         required: true,
@@ -168,8 +180,8 @@ export default class ECCClientRoCrateAbout extends LitElement {
       },
       children: [
         {
-          key: "licence",
-          label: "Licence Type",
+          key: "license",
+          label: "license Type",
           type: "select",
           fieldOptions: {
             required: true,
@@ -460,8 +472,11 @@ export default class ECCClientRoCrateAbout extends LitElement {
       <div class="content">
         ${this.activeTab === 0
           ? html`<ecc-utils-design-form
+              @ecc-utils-submit=${(e: CustomEvent) => {
+                console.log(e.detail);
+              }}
               @ecc-utils-change=${(e: CustomEvent) => {
-                this._handleDataset(e);
+                this._handleChangeLicenseType(e);
               }}
               .fields=${this.AboutFields}
             />`
@@ -479,4 +494,4 @@ export default class ECCClientRoCrateAbout extends LitElement {
       </div>
     `;
   }
-}   
+}
