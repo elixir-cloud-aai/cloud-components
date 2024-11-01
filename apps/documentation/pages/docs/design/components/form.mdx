@@ -94,7 +94,9 @@ This property is used to render the fields in the form. Fields can be passed as 
 | arrayOptions.defaultInstances | `false`  | `null`  | `number`                                                                                                                            | Sets a default number of instances for fields of type `array` Only applies to fields of type `array`                                                                                                                      |
 | arrayOptions.max              | `false`  | `null`  | `number`                                                                                                                            | Sets a maximum number of instances for fields of type `array` Only applies to fields of type `array`                                                                                                                      |
 | arrayOptions.min              | `false`  | `null`  | `number`                                                                                                                            | Sets a minimum number of instances for fields of type `array` Only applies to fields of type `array` arrayOptions.defaultInstances must also be set and must be a number greater than arrayOptions.min                    |
-| groupOptions.collapsible      | `false`  | `null`  | `number`                                                                                                                            | Determines if a field of type `group` will be collapsible                                                                                                                                                                 |
+| groupOptions.collapsible      | `false`  | `null`  | `number`   
+| fileOptions.protocol          | `false`  | `native`| `string`                                                                                                                            | Sets a minimum number of instances for fields of type `array` Only applies to fields of type `array` arrayOptions.defaultInstances must also be set and must be a number greater than arrayOptions.min                    |
+| fileOptions.tusOptions        | `false`  | `null`  | `Object ({ endpoint: string })`                                                                                                                            | Determines if a field of type `group` will be collapsible                                                                                                                                                                 |
 
 ## Events
 
@@ -254,6 +256,17 @@ const fields: Fields[] = [
       required: true,
       tooltip: 'Your ID document',
     },
+  },
+  {
+    key: "id2",
+    label: "ID",
+    type: "file",
+    fileOptions: {
+      protocol: "tus",
+      tusOptions: {
+        endpoint: "https://tusd.tusdemo.net/files/",
+      },
+    }
   },
 ];
 ``

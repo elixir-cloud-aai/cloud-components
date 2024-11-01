@@ -40,7 +40,7 @@ export default class ECCClientRoCrateAbout extends LitElement {
       ],
     };
 
-    const updatedAboutFields = this.AboutFields.filter(
+    const updatedAboutFields = this.DatasetFields.filter(
       (f) => f.key !== "license"
     );
 
@@ -100,11 +100,11 @@ export default class ECCClientRoCrateAbout extends LitElement {
     }
 
     updatedAboutFields.push(licenseField);
-    this.AboutFields = updatedAboutFields;
+    this.DatasetFields = updatedAboutFields;
   }
 
   @state()
-  AboutFields: Field[] = [
+  DatasetFields: Field[] = [
     {
       key: "@id",
       label: "@id",
@@ -115,30 +115,6 @@ export default class ECCClientRoCrateAbout extends LitElement {
         default: "./",
         required: true,
       },
-    },
-
-    {
-      key: "@type",
-      label: "@type",
-      type: "array",
-      fieldOptions: {
-        tooltip: "The type of the entity.",
-      },
-      arrayOptions: {
-        defaultInstances: 1,
-        max: 3,
-      },
-      children: [
-        {
-          key: "Type",
-          label: "Select",
-          type: "text",
-          fieldOptions: {
-            required: true,
-            default: "Dataset",
-          },
-        },
-      ],
     },
 
     {
@@ -454,7 +430,7 @@ export default class ECCClientRoCrateAbout extends LitElement {
           class="tab ${this.activeTab === 0 ? "active" : ""}"
           @click="${() => this._switchTab(0)}"
         >
-          About
+          Dataset Entity
         </div>
         <div
           class="tab ${this.activeTab === 1 ? "active" : ""}"
@@ -478,7 +454,7 @@ export default class ECCClientRoCrateAbout extends LitElement {
               @ecc-utils-change=${(e: CustomEvent) => {
                 this._handleChangeLicenseType(e);
               }}
-              .fields=${this.AboutFields}
+              .fields=${this.DatasetFields}
             />`
           : ""}
         ${this.activeTab === 1
