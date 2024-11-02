@@ -287,6 +287,9 @@ const primitiveStylesheet = css`
     --ecc-input-height-small: calc(var(--ecc-sizing-internal) * 1.875);
     --ecc-input-height-medium: calc(var(--ecc-sizing-internal) * 2.5);
     --ecc-input-height-large: calc(var(--ecc-sizing-internal) * 3.125);
+    --ecc-input-height-xlarge: calc(var(--ecc-sizing-internal) * 4);
+    --ecc-input-height-2xlarge: calc(var(--ecc-sizing-internal) * 6);
+    --ecc-input-height-3xlarge: calc(var(--ecc-sizing-internal) * 8);
 
     --ecc-input-background-color: var(--ecc-color-neutral-0);
     --ecc-input-background-color-hover: var(--ecc-input-background-color);

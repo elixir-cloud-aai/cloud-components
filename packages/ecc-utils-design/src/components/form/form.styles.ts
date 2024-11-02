@@ -68,6 +68,9 @@ const styles = css`
   .group-content {
     padding-top: var(--ecc-spacing-medium);
   }
+  .group-item {
+    min-height: var(--ecc-input-height-3xlarge);
+  }
   /* Array Styles */
   .array-label {
     font-size: var(--ecc-input-label-font-size-medium);
