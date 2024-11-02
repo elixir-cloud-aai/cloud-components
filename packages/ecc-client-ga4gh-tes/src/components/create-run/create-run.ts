@@ -57,7 +57,7 @@ export interface postTaskForm {
  * @summary This component is used to create task runs using TES API.
  * @since 1.0.0
  *
- * @property {string} baseURL - Base URL
+ * @property {string} baseURL - Base URL of the TES instance/gateway
  *
  */
 
