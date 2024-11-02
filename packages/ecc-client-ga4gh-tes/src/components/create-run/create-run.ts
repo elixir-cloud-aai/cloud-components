@@ -62,7 +62,7 @@ export interface postTaskForm {
  */
 
 export default class ECCCLientGa4ghTesCreateRun extends LitElement {
-  @property({ type: String }) private baseURL =
+  @property({ type: String, reflect: true }) baseURL =
     "https://protes.rahtiapp.fi/ga4gh/tes/v1";
 
   @state() form: postTaskForm = {
