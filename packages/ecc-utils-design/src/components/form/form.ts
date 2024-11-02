@@ -121,7 +121,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
     return html`
       <div class="switch-container" data-testid="form-switch-parent">
-        ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
+        ${field.fieldOptions?.tooltip?.trim()
           ? html`
               <sl-tooltip
                 content=${field.fieldOptions?.tooltip}
@@ -222,7 +222,7 @@ export default class EccUtilsDesignForm extends LitElement {
     if (field.type === "file") {
       return html`
         <div class="file-container" data-testid="form-input-file-parent">
-          ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
+          ${field.fieldOptions?.tooltip?.trim()
             ? html`
                 <sl-tooltip
                   id=${field.key}
@@ -239,43 +239,45 @@ export default class EccUtilsDesignForm extends LitElement {
                   ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                 </label>
               `}
-          ${field.fileOptions?.protocol === "tus" &&
-          html`
-            <input
-              type="file"
-              class="file-input"
-              @change=${async (e: Event) => {
-                await this.handleTusFileUpload(e, field);
-              }}
-            />
-            <div class="progress-bar-container">
-              <div
-                class="progress-bar"
-                style="width: ${this.uploadPercentage}%;"
-              ></div>
-            </div>
-            <div class="upload-percentage">
-              ${this.uploadPercentage.toFixed(2)}%
-            </div>
-          `}
-          ${(!field.fileOptions?.protocol ||
-            field.fileOptions?.protocol === "native") &&
-          html`
-            <input
-              class="file-input"
-              type="file"
-              data-label=${field.label}
-              data-testid="form-input-file"
-              accept=${field.fieldOptions?.accept || "*"}
-              ?multiple=${field.fieldOptions?.multiple}
-              ?required=${field.fieldOptions?.required}
-              @change=${async (e: Event) => {
-                const { files } = e.target as HTMLInputElement;
-                _.set(this.form, path, files);
-                this.requestUpdate();
-              }}
-            />
-          `}
+          ${field.fileOptions?.protocol === "tus"
+            ? html`
+                <input
+                  type="file"
+                  class="file-input"
+                  @change=${async (e: Event) => {
+                    await this.handleTusFileUpload(e, field);
+                  }}
+                />
+                <div class="progress-bar-container">
+                  <div
+                    class="progress-bar"
+                    style="width: ${this.uploadPercentage}%;"
+                  ></div>
+                </div>
+                <div class="upload-percentage">
+                  ${this.uploadPercentage.toFixed(2)}%
+                </div>
+              `
+            : ""}
+          ${!field.fileOptions?.protocol ||
+          field.fileOptions?.protocol === "native"
+            ? html`
+                <input
+                  class="file-input"
+                  type="file"
+                  data-label=${field.label}
+                  data-testid="form-input-file"
+                  accept=${field.fieldOptions?.accept || "*"}
+                  ?multiple=${field.fieldOptions?.multiple}
+                  ?required=${field.fieldOptions?.required}
+                  @change=${async (e: Event) => {
+                    const { files } = e.target as HTMLInputElement;
+                    _.set(this.form, path, files);
+                    this.requestUpdate();
+                  }}
+                />
+              `
+            : ""}
         </div>
       `;
     }
@@ -292,7 +294,7 @@ export default class EccUtilsDesignForm extends LitElement {
     if (field.type === "select") {
       return html`
         <div class="select-container">
-          ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
+          ${field.fieldOptions?.tooltip?.trim()
             ? html`
                 <sl-tooltip
                   id=${field.key}
@@ -352,7 +354,7 @@ export default class EccUtilsDesignForm extends LitElement {
         }}
       >
         <label slot="label">
-          ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
+          ${field.fieldOptions?.tooltip?.trim()
             ? html`
               <sl-tooltip content=${field.fieldOptions?.tooltip} data-testid="form-tooltip" >
                 <label data-testid="form-label" > ${field.label} </label>
@@ -394,7 +396,7 @@ export default class EccUtilsDesignForm extends LitElement {
     return html`
       <div class="array-container">
         <div class="array-header">
-          ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
+          ${field.fieldOptions?.tooltip?.trim()
             ? html`
                 <sl-tooltip
                   content=${field.fieldOptions?.tooltip}
@@ -509,7 +511,7 @@ export default class EccUtilsDesignForm extends LitElement {
           </sl-details>`
         : html`
             <div data-testid="form-group-non-collapsible" class="group-header">
-              ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
+              ${field.fieldOptions?.tooltip?.trim()
                 ? html`
                     <sl-tooltip
                       content=${field.fieldOptions?.tooltip}
