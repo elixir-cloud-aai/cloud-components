@@ -10,13 +10,13 @@ import { postWorkflow } from "../../API/Workflow/wesGet.js";
  * @summary This component is used to create task runs using WES API.
  * @since 1.0.0
  *
- * @property {string} baseURL - Base URL
+ * @property {string} baseURL - Base URL of the WES instance/gateway
  *
  */
 
 export default class ECCClientGa4ghWesCreateRuns extends LitElement {
   @state() private form: FormData = new FormData();
-  @property({ type: String }) private baseURL =
+  @property({ type: String, reflect: true }) baseURL =
     "https://prowes.rahtiapp.fi/ga4gh/wes/v1";
 
   @state() fields: Field[] = [
