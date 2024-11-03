@@ -20,10 +20,11 @@ import {
  * @summary This component facilitates browsing workflow runs via WES API.
  * @since 1.0.0
  *
- * @property {string} baseURL - Base URL
+ * @property {string} baseURL - Base URL of the WES instance/gateway
  * @property {number} pageSize - Number of runs per page
- * @property {array} fields - Configuration based on which data will be rendered in groups
- * @property {boolean} filter - Defines the rendering of the filter-by-state bar.
+ * @property {array} fields - Configuration for what fields to display
+ * @property {boolean} filter - Determines if the runs filter field should be rendered
+ * @property {boolean} extendFields - Extend default fields instead of overriding
  *
  */
 
@@ -158,12 +159,12 @@ export default class ECCClientGa4ghWesRuns extends LitElement {
     },
   ];
 
-  @property({ type: Number }) private pageSize = 5;
-  @property({ type: String }) private baseURL =
+  @property({ type: Number, reflect: true }) pageSize = 5;
+  @property({ type: String, reflect: true }) baseURL =
     "https://prowes.rahtiapp.fi/ga4gh/wes/v1";
 
-  @property({ type: Array }) private fields: Field[] = [];
-  @property({ type: Boolean }) private extendFields = false;
+  @property({ type: Array, reflect: true }) fields: Field[] = [];
+  @property({ type: Boolean, reflect: true }) extendFields = false;
 
   @state() private filters: FilterProp[] = [
     {

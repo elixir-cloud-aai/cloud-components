@@ -12,6 +12,18 @@ import EccUtilsDesignDetails, {
 } from "@elixir-cloud/design/dist/components/details";
 import { deleteTask, fetchTask, fetchTasks } from "../../API/Task/tesGet.js";
 
+/**
+ * @summary This component is used to display data from task runs using TES API.
+ * @since 1.0.0
+ *
+ * @property {number} pageSize - Number of runs per page
+ * @property {string} baseUrl - Base URL of the TES instance/gateway
+ * @property {boolean} filter - Determines if the runs filter field should be rendered
+ * @property {boolean} search - Determines if the search field should be rendered
+ * @property {array} fields - Configuration for what fields to display
+ * @property {boolean} extendFields - Extend default fields instead of overriding
+ *
+ */
 export default class ECCClientGa4ghTesRuns extends LitElement {
   static styles = css``;
   static defaultFields: Field[] = [
@@ -141,14 +153,14 @@ export default class ECCClientGa4ghTesRuns extends LitElement {
     },
   ];
 
-  @property({ type: Number }) private pageSize = 5;
-  @property({ type: String }) private baseURL =
+  @property({ type: Number, reflect: true }) pageSize = 5;
+  @property({ type: String, reflect: true }) baseURL =
     "https://protes.rahtiapp.fi/ga4gh/tes/v1";
 
-  @property({ type: Boolean }) private filter = true;
-  @property({ type: Boolean }) private search = true;
-  @property({ type: Array }) private fields: Field[] = [];
-  @property({ type: Boolean }) private extendFields = false;
+  @property({ type: Boolean, reflect: true }) filter = true;
+  @property({ type: Boolean, reflect: true }) search = true;
+  @property({ type: Array, reflect: true }) fields: Field[] = [];
+  @property({ type: Boolean, reflect: true }) extendFields = false;
 
   @state() private filters: FilterProp[] = [
     {
