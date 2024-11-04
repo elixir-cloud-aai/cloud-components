@@ -41,7 +41,7 @@ export interface Field {
     accept?: string;
     returnIfEmpty?: boolean;
     tooltip?: string;
-    readonly?: string;
+    readonly?: boolean;
   };
   selectOptions?: Array<{ label: string; value: string }>;
   arrayOptions?: {
