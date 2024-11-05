@@ -9,7 +9,7 @@ import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/components/select/select.js";
 import "@shoelace-style/shoelace/dist/components/option/option.js";
-import _ from "lodash-es";
+import * as _ from "lodash-es";
 import { hostStyles } from "../../styles/host.styles.js";
 import formStyles from "./form.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
@@ -41,6 +41,7 @@ export interface Field {
     accept?: string;
     returnIfEmpty?: boolean;
     tooltip?: string;
+    readonly?: boolean;
   };
   selectOptions?: Array<{ label: string; value: string }>;
   arrayOptions?: {
@@ -144,6 +145,7 @@ export default class EccUtilsDesignForm extends LitElement {
           data-testid="form-switch"
           label=${field.label}
           ?required=${field.fieldOptions?.required}
+          ?disabled=${field.fieldOptions?.readonly}
           ?checked=${_.get(this.form, path)}
           @sl-change=${(e: Event) => {
             const value = (e.target as HTMLInputElement).checked;
@@ -244,6 +246,7 @@ export default class EccUtilsDesignForm extends LitElement {
                 <input
                   type="file"
                   class="file-input"
+                  ?disabled=${field.fieldOptions?.readonly}
                   @change=${async (e: Event) => {
                     await this.handleTusFileUpload(e, field);
                   }}
@@ -268,6 +271,7 @@ export default class EccUtilsDesignForm extends LitElement {
                   data-label=${field.label}
                   data-testid="form-input-file"
                   accept=${field.fieldOptions?.accept || "*"}
+                  ?disabled=${field.fieldOptions?.readonly}
                   ?multiple=${field.fieldOptions?.multiple}
                   ?required=${field.fieldOptions?.required}
                   @change=${async (e: Event) => {
@@ -313,6 +317,7 @@ export default class EccUtilsDesignForm extends LitElement {
           <sl-select
             class="select"
             ?required=${field.fieldOptions?.required}
+            ?disabled=${field.fieldOptions?.readonly}
             value=${_.get(this.form, path)?.label || ""}
             @sl-change=${(e: Event) => {
               const selectElement = e.target as HTMLSelectElement;
@@ -342,6 +347,7 @@ export default class EccUtilsDesignForm extends LitElement {
         ?required=${field.fieldOptions?.required}
         value=${_.get(this.form, path)}
         ?password-toggle=${field.type === "password"}
+        ?disabled=${field.fieldOptions?.readonly}
         @sl-input=${(e: Event) => {
           const { value } = e.target as HTMLInputElement;
           if (!value) {
