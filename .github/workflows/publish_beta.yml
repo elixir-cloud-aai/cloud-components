@@ -109,4 +109,4 @@ jobs:
         run: npm run build
 
       - name: Publish beta to npm
-        run: npm run release -- --tag beta
+        run: npm run release -- --tag beta --force
