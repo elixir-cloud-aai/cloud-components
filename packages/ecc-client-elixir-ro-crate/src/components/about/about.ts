@@ -120,29 +120,13 @@ export default class ECCClientRoCrateAbout extends LitElement {
     {
       key: "@type",
       label: "@type",
-      type: "array",
+      type: "text",
       fieldOptions: {
         tooltip: "The type of the entity.",
+        default: "Dataset",
+        readonly: true,
       },
-      arrayOptions: {
-        defaultInstances: 1,
-        max: 1,
-      },
-      children: [
-        {
-          key: "Type",
-          label: "Select",
-          type: "text",
-          fieldOptions: {
-            required: true,
-            default: "Dataset",
-            readonly:true
-            
-          },
-        },
-      ],
     },
-
     {
       key: "name",
       label: "Name",
