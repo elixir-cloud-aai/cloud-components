@@ -352,8 +352,9 @@ export default class EccUtilsDesignForm extends LitElement {
           const { value } = e.target as HTMLInputElement;
           if (!value) {
             _.unset(this.form, path);
+            if (field.fieldOptions?.returnIfEmpty) _.set(this.form, path, null);
           } else {
-            _.set(this.form, path, value);
+            _.set(this.form, path, value.trim());
           }
           this.requestUpdate();
           this.alertFieldChange(field.key, value);
