@@ -120,20 +120,20 @@ export default class EccUtilsDesignForm extends LitElement {
     }
 
     return html`
-      <div class="switch-container" data-testid="form-switch-parent">
+      <div class="switch-container" data-testid="switch-container">
         ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
           ? html`
               <sl-tooltip
                 content=${field.fieldOptions?.tooltip}
-                data-testid="form-tooltip"
+                data-testid="tooltip"
               >
-                <label class="switch-label" data-testid="form-label"
+                <label class="switch-label" data-testid="label"
                   >${field.label}
                 </label>
               </sl-tooltip>
             `
           : html`
-              <label class="switch-label" data-testid="form-label"
+              <label class="switch-label" data-testid="label"
                 >${field.label}
               </label>
             `}
@@ -162,12 +162,12 @@ export default class EccUtilsDesignForm extends LitElement {
   private handleTusFileUpload = async (
     e: Event,
     field: Field
-  ): Promise<void> => {
+  ): Promise<Record<string, string> | null> => {
     const file = (e.target as HTMLInputElement).files?.[0];
 
     if (!file) {
       console.error("No file selected for upload.");
-      return;
+      return null;
     }
 
     try {
@@ -192,11 +192,20 @@ export default class EccUtilsDesignForm extends LitElement {
           this.requestUpdate();
         },
         onSuccess: () => {
+          const data: any = {
+            url: upload.url,
+            file,
+            name: "",
+          };
+
           if ("name" in upload.file) {
             console.log("Download %s from %s", upload.file.name, upload.url);
+            data.name = upload.file.name;
           } else {
             console.log("Download file from %s", upload.url);
           }
+
+          return data;
         },
       });
 
@@ -209,6 +218,8 @@ export default class EccUtilsDesignForm extends LitElement {
     } catch (error) {
       console.error("An error occurred while initializing the upload:", error);
     }
+
+    return null;
   };
 
   renderInputTemplate(field: Field, path: string): TemplateResult {
@@ -221,7 +232,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
     if (field.type === "file") {
       return html`
-        <div class="file-container" data-testid="form-input-file-parent">
+        <div class="file-container" data-testid="input-file-container">
           ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
             ? html`
                 <sl-tooltip
@@ -229,13 +240,13 @@ export default class EccUtilsDesignForm extends LitElement {
                   content=${field.fieldOptions?.tooltip}
                   data-testid="form-tooltip"
                 >
-                  <label class="file-input-label" data-testid="form-label">
+                  <label class="file-input-label" data-testid="label">
                     ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                   </label>
                 </sl-tooltip>
               `
             : html`
-                <label class="file-input-label" data-testid="form-label">
+                <label class="file-input-label" data-testid="label">
                   ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                 </label>
               `}
@@ -244,17 +255,34 @@ export default class EccUtilsDesignForm extends LitElement {
                 <input
                   type="file"
                   class="file-input"
+                  data-type="tus"
+                  data-testid="form-input-file"
+                  data-label=${field.label}
+                  accept=${field.fieldOptions?.accept || "*"}
+                  ?multiple=${field.fieldOptions?.multiple}
+                  ?required=${field.fieldOptions?.required}
                   @change=${async (e: Event) => {
-                    await this.handleTusFileUpload(e, field);
+                    if (!field.fileOptions?.tusOptions?.endpoint) return;
+
+                    const data = await this.handleTusFileUpload(e, field);
+
+                    if (data) {
+                      _.set(this.form, path, data);
+                      this.alertFieldChange(field.key, data);
+                    }
                   }}
                 />
                 <div class="progress-bar-container">
                   <div
+                    data-testid="form-file-upload-bar"
                     class="progress-bar"
                     style="width: ${this.uploadPercentage}%;"
                   ></div>
                 </div>
-                <div class="upload-percentage">
+                <div
+                  class="upload-percentage"
+                  data-testid="form-file-upload-percentage"
+                >
                   ${this.uploadPercentage.toFixed(2)}%
                 </div>
               `
@@ -266,6 +294,7 @@ export default class EccUtilsDesignForm extends LitElement {
                   class="file-input"
                   type="file"
                   data-label=${field.label}
+                  data-type="native"
                   data-testid="form-input-file"
                   accept=${field.fieldOptions?.accept || "*"}
                   ?multiple=${field.fieldOptions?.multiple}
@@ -273,6 +302,7 @@ export default class EccUtilsDesignForm extends LitElement {
                   @change=${async (e: Event) => {
                     const { files } = e.target as HTMLInputElement;
                     _.set(this.form, path, files);
+                    this.alertFieldChange(field.key, files);
                     this.requestUpdate();
                   }}
                 />
@@ -287,27 +317,27 @@ export default class EccUtilsDesignForm extends LitElement {
       if (field.fieldOptions?.default && !this.hasUpdated) {
         _.set(this.form, path, field.fieldOptions.default);
       } else if (field.fieldOptions?.returnIfEmpty) {
-        _.set(this.form, path, "");
+        _.set(this.form, path, null);
       }
     }
 
     if (field.type === "select") {
       return html`
-        <div class="select-container">
+        <div class="select-container" data-testid="select-container">
           ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
             ? html`
                 <sl-tooltip
-                  data-testid="form-tooltip"
+                  data-testid="tooltip"
                   id=${field.key}
                   content=${field.fieldOptions?.tooltip}
                 >
-                  <label class="select-label" data-testid="form-label">
+                  <label class="select-label" data-testid="label">
                     ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                   </label>
                 </sl-tooltip>
               `
             : html`
-                <label class="select-label" data-testid="form-label">
+                <label class="select-label" data-testid="label">
                   ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                 </label>
               `}
@@ -316,6 +346,7 @@ export default class EccUtilsDesignForm extends LitElement {
             ?required=${field.fieldOptions?.required}
             value=${_.get(this.form, path)?.label || ""}
             data-testid="form-select"
+            data-label=${field.label}
             @sl-change=${(e: Event) => {
               const label = (e.target as HTMLSelectElement).value;
 
@@ -328,6 +359,7 @@ export default class EccUtilsDesignForm extends LitElement {
               (option) => html`
                 <sl-option
                   data-testid="form-select-option"
+                  data-label=${option.label}
                   value=${option.value}
                 >
                   ${option.label}
@@ -352,6 +384,7 @@ export default class EccUtilsDesignForm extends LitElement {
           const { value } = e.target as HTMLInputElement;
           if (!value) {
             _.unset(this.form, path);
+            if (field.fieldOptions?.returnIfEmpty) _.set(this.form, path, null);
           } else {
             _.set(this.form, path, value.trim());
           }
@@ -362,18 +395,20 @@ export default class EccUtilsDesignForm extends LitElement {
         <label slot="label">
           ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
             ? html`
-              <sl-tooltip content=${field.fieldOptions?.tooltip} data-testid="form-tooltip" >
-                <label data-testid="form-label" > ${field.label} </label>
+              <sl-tooltip content=${field.fieldOptions?.tooltip} data-testid="tooltip" >
+                <label data-testid="label" > ${field.label} </label>
               </sl-tooltip>
             </label>
             `
-            : html` <label data-testid="form-label"> ${field.label} </label> `}
+            : html` <label data-testid="label"> ${field.label} </label> `}
         </label>
       </sl-input>
     `;
   }
 
   private renderArrayTemplate(field: Field, path: string): TemplateResult {
+    if (!field.children?.length) return html``;
+
     const { arrayOptions } = field;
 
     if (!_.get(this.form, path)) {
@@ -400,28 +435,33 @@ export default class EccUtilsDesignForm extends LitElement {
     };
 
     return html`
-      <div class="array-container" data-testid="form-array">
+      <div
+        class="array-container"
+        data-testid="form-array"
+        data-label="${field.label}"
+      >
         <div class="array-header">
           ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
             ? html`
                 <sl-tooltip
                   content=${field.fieldOptions?.tooltip}
-                  data-testid="form-tooltip"
+                  data-testid="tooltip"
                 >
-                  <label data-testid="form-label" class="array-label">
+                  <label data-testid="label" class="label">
                     ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                   </label>
                 </sl-tooltip>
               `
             : html`
-                <label data-testid="form-label" class="array-label">
+                <label data-testid="label" class="array-label">
                   ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                 </label>
               `}
           <sl-button
             variant="text"
             size="small"
-            data-testid="form-array-add"
+            data-label="${field.key}-add"
+            data-testid="array-add"
             ?disabled=${!resolveAddButtonIsActive()}
             class="add-button"
             @click=${() => {
@@ -452,10 +492,15 @@ export default class EccUtilsDesignForm extends LitElement {
         </div>
         ${_.get(this.form, path)?.map(
           (_item: any, index: number) => html`
-            <div class="array-item" data-testid="form-array-item">
+            <div
+              class="array-item"
+              data-testid="array-item"
+              data-label=${`${field.label}-${index}`}
+            >
               <sl-button
                 variant="text"
-                data-testid="form-array-delete"
+                data-label="${field.key}-delete"
+                data-testid="array-delete"
                 ?disabled=${!resolveDeleteButtonIsActive()}
                 @click=${() => {
                   if (resolveDeleteButtonIsActive()) {
@@ -494,21 +539,22 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   private renderGroupTemplate(field: Field, path: string): TemplateResult {
-    if (!field.children) return html``;
+    if (!field.children?.length) return html``;
 
     const renderChildren = () =>
       html`
-        <div class="group-item" data-testid="form-group-item">
+        <div class="group-item" data-testid="group-item">
           ${field.children?.map((child) =>
             this.renderTemplate(child, `${path}`)
           )}
         </div>
       `;
 
-    return html` <div class="group-container" data-testid="form-group">
+    return html` <div class="group-container" data-testid="group">
       ${field.groupOptions?.collapsible
         ? html` <sl-details
-            data-testid="form-group-collapsible"
+            data-testid="group-collapsible"
+            data-label="${field.label}"
             summary=${`${field.label} ${
               field.fieldOptions?.required ? "*" : ""
             }`}
@@ -516,21 +562,26 @@ export default class EccUtilsDesignForm extends LitElement {
             ${renderChildren()}
           </sl-details>`
         : html`
-            <div data-testid="form-group-non-collapsible" class="group-header">
+            <div
+              data-testid="group-non-collapsible"
+              class="group-header"
+              data-label="${field.label}"
+            >
               ${field.fieldOptions?.tooltip && field.fieldOptions.tooltip !== ""
                 ? html`
                     <sl-tooltip
                       content=${field.fieldOptions?.tooltip}
-                      data-testid="form-tooltip"
+                      data-testid="tooltip"
                     >
-                      <label data-testid="form-label" class="group-label">
-                        ${field.groupOptions?.collapsible ? "" : field.label}
+                      <label data-testid="label" class="group-label">
+                        ${field.label}
+                        ${field.fieldOptions?.required ? "*" : ""}
                       </label>
                     </sl-tooltip>
                   `
                 : html`
-                    <label class="group-label">
-                      ${field.groupOptions?.collapsible ? "" : field.label}
+                    <label class="group-label" data-testid="label">
+                      ${field.label} ${field.fieldOptions?.required ? "*" : ""}
                     </label>
                   `}
             </div>
@@ -551,9 +602,23 @@ export default class EccUtilsDesignForm extends LitElement {
       return this.renderSwitchTemplate(field, newPath);
     }
 
-    if (field.fieldOptions?.required && !_.get(this.form, newPath)) {
-      this.requiredButEmpty.push(field.key);
+    if (field.fieldOptions?.required) {
+      if (
+        !_.get(this.form, newPath) &&
+        !this.requiredButEmpty.includes(field.key)
+      ) {
+        // add to requiredButEmpty
+        if (this.hasUpdated || !field.fieldOptions.default) {
+          this.requiredButEmpty.push(field.key);
+        }
+      } else if (_.get(this.form, newPath)) {
+        // remove from requiredButEmpty
+        this.requiredButEmpty = this.requiredButEmpty.filter(
+          (key) => key !== field.key
+        );
+      }
     }
+
     return this.renderInputTemplate(field, newPath);
   }
 
@@ -648,7 +713,6 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   render() {
-    this.requiredButEmpty = [];
     if (!this.fields || this.fields.length === 0) {
       throw new Error("Fields is required & should not be empty array");
     }
