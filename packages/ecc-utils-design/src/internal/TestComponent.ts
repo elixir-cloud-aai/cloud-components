@@ -1,67 +1,145 @@
+// eslint-disable-next-line max-classes-per-file
 import { LitElement } from "lit";
 
-type ParentElement = Document | Element | ShadowRoot | "root";
-type ComponentType = LitElement;
+type ParentElement = Document | Element | ShadowRoot;
+type InstanceType = "litElement" | "element";
+type ComponentType = LitElement | null;
 
-export default class TestComponent {
-  component: ComponentType;
-  constructor(component: ComponentType) {
-    this.component = component;
+export default class Field {
+  component: ComponentType = null;
+  instance: InstanceType;
+  el: ParentElement;
+
+  constructor(el: Element | LitElement, instance: InstanceType = "element") {
+    this.instance = instance;
+
+    if (instance === "litElement") {
+      this.component = el as LitElement;
+      this.el = el.shadowRoot!;
+    } else {
+      this.el = el;
+    }
   }
 
-  private getFields = (
-    id: string,
-    parentElement: ParentElement,
-    retrieveAll = false
-  ) => {
-    if (parentElement === "root") {
-      // eslint-disable-next-line no-param-reassign
-      parentElement = this.component.shadowRoot!;
+  _getFields = (label?: string, id?: string, retrieveAll = false) => {
+    if (!id && !label) return null;
+    if (label && !id) {
+      if (retrieveAll) {
+        return this.el.querySelectorAll(`[data-label="${label}"]`);
+      }
+      return this.el.querySelector(`[data-label="${label}"]`);
     }
+
+    if (!label && id) {
+      if (retrieveAll) {
+        return this.el.querySelectorAll(`[data-testid="${id}"]`);
+      }
+      return this.el.querySelector(`[data-testid="${id}"]`);
+    }
+
     if (retrieveAll) {
-      return parentElement.querySelectorAll(`[data-testid="${id}"]`);
+      return this.el.querySelectorAll(
+        `[data-testid="${id}"][data-label="${label}"]`
+      );
     }
-    return parentElement.querySelector(`[data-testid="${id}"]`);
+    return this.el.querySelector(
+      `[data-testid="${id}"][data-label="${label}"]`
+    );
   };
 
+  setEl(el: Element) {
+    if (this.instance === "litElement") {
+      this.component = el as LitElement;
+      this.el = el.shadowRoot!;
+    } else {
+      this.el = el;
+    }
+  }
+
+  disable() {
+    if (this.instance === "element") {
+      (this.el as HTMLElement).setAttribute("disable", "");
+    }
+  }
+
   // locators
-  element(testId: string, p: ParentElement): HTMLElement;
-  element(testId: string, p: ParentElement, all: true): NodeListOf<HTMLElement>;
-  element(testId: string, p: ParentElement, all: false): HTMLElement;
-  element(testId: string, p: ParentElement, all = false) {
-    return this.getFields(testId, p, all);
+  getElement(label?: string, testId?: string): GenericElement;
+  getElement(label?: string, testId?: string, all?: false): GenericElement;
+  getElement(label?: string, testId?: string, all?: true): GenericElement[];
+  getElement(label?: string, testId?: string, all = false) {
+    const fields = this._getFields(label, testId, all) as
+      | HTMLElement
+      | NodeListOf<HTMLElement>;
+
+    if (!fields) return null;
+    if (fields instanceof NodeList) {
+      return Array.from(fields).map((f) => new GenericElement(f));
+    }
+
+    return new GenericElement(fields);
   }
 
-  inputField(testId: string, p: ParentElement): HTMLInputElement;
-  inputField(
-    testId: string,
-    p: ParentElement,
-    all: true
-  ): NodeListOf<HTMLInputElement>;
+  getInputField(label?: string, testId?: string): InputField;
+  getInputField(label?: string, testId?: string, all?: false): InputField;
+  getInputField(label?: string, testId?: string, all?: true): InputField[];
+  getInputField(label?: string, testId?: string, all = false) {
+    const fields = this._getFields(label, testId, all) as
+      | HTMLInputElement
+      | NodeListOf<HTMLInputElement>;
 
-  inputField(testId: string, p: ParentElement, all: false): HTMLInputElement;
-  inputField(testId: string, p: ParentElement, all = false) {
-    return this.getFields(testId, p, all);
+    if (!fields) return null;
+    if (fields instanceof NodeList) {
+      return Array.from(fields).map((f) => new InputField(f));
+    }
+
+    return new InputField(fields);
   }
 
-  buttonElement(testId: string, p: ParentElement): HTMLButtonElement;
-  buttonElement(
-    testId: string,
-    P: ParentElement,
-    all: true
-  ): NodeListOf<HTMLButtonElement>;
+  getSelectField(label?: string, testId?: string): SelectField;
+  getSelectField(label?: string, testId?: string, all?: false): SelectField;
+  getSelectField(label?: string, testId?: string, all?: true): SelectField[];
+  getSelectField(label?: string, testId?: string, all = false) {
+    const fields = this._getFields(label, testId, all) as
+      | HTMLSelectElement
+      | NodeListOf<HTMLSelectElement>;
 
-  buttonElement(
-    testId: string,
-    p: ParentElement,
-    all: false
-  ): HTMLButtonElement;
+    if (!fields) return null;
+    if (fields instanceof NodeList) {
+      return Array.from(fields).map((f) => new SelectField(f));
+    }
 
-  buttonElement(testId: string, p: ParentElement, all = false) {
-    return this.getFields(testId, p, all);
+    return new SelectField(fields);
   }
 
-  // methods
+  getButtonElement(label?: string, testId?: string): ButtonElement;
+  getButtonElement(label?: string, testId?: string, all?: false): ButtonElement;
+  getButtonElement(
+    label?: string,
+    testId?: string,
+    all?: true
+  ): ButtonElement[];
+
+  getButtonElement(label?: string, testId?: string, all = false) {
+    const fields = this._getFields(label, testId, all) as
+      | HTMLButtonElement
+      | NodeListOf<HTMLButtonElement>;
+
+    if (!fields) return null;
+    if (fields instanceof NodeList) {
+      return Array.from(fields).map((f) => new ButtonElement(f));
+    }
+
+    return new ButtonElement(fields);
+  }
+}
+
+export class InputField extends Field {
+  el: HTMLInputElement;
+
+  constructor(el: HTMLInputElement) {
+    super(el);
+    this.el = el;
+  }
 
   /**
    * Fills an input file field with an optional specified file text.
@@ -70,27 +148,25 @@ export default class TestComponent {
    * @param fileText - The text content of the file.
    * @note You do not need to await this method, you can await the form updateComplete as an alternative
    */
-  public async fillInputField(
-    inputField: HTMLInputElement,
-    text = "test value"
-  ) {
+  public async fill(text = "test value") {
+    if (this.el.getAttribute("disable")) return;
+
     // eslint-disable-next-line no-param-reassign
-    inputField.value = text;
-    inputField.dispatchEvent(new Event("sl-select"));
-    inputField.dispatchEvent(new Event("sl-input"));
-    await this.component.updateComplete;
+    this.el.value = text;
+    this.el.dispatchEvent(new Event("sl-input"));
+
+    await this.component?.updateComplete;
   }
 
-  public async fillInputFileField(
-    inputField: HTMLInputElement,
-    fileText = "test value"
-  ) {
-    if (inputField.type !== "file") {
-      throw new Error("inputField is not a valid file element");
+  public async upload(dataText = "test value") {
+    if (this.el.getAttribute("disable")) return;
+
+    if (this.el.type !== "file") {
+      throw new Error("this field is not a valid file element");
     }
 
     const files = [
-      new File([fileText], "test-file.txt", { type: "text/plain" }),
+      new File([dataText], "test-file.txt", { type: "text/plain" }),
     ];
     const dataTransfer = new DataTransfer();
     files.forEach((file) => {
@@ -98,24 +174,80 @@ export default class TestComponent {
     });
 
     // eslint-disable-next-line no-param-reassign
-    inputField.files = dataTransfer.files;
-    inputField.dispatchEvent(new Event("change"));
+    this.el.files = dataTransfer.files;
+    this.el.dispatchEvent(new Event("change"));
 
-    await this.component.updateComplete;
+    await this.component?.updateComplete;
   }
 
-  public async toggleSwitch(switchField: HTMLInputElement) {
-    switchField.click();
-    await this.component.updateComplete;
+  public async toggle() {
+    if (this.el.getAttribute("disable")) return;
+
+    this.el.click();
+    await this.component?.updateComplete;
+  }
+}
+
+export class SelectField extends Field {
+  el: HTMLSelectElement;
+
+  constructor(el: HTMLSelectElement) {
+    super(el);
+    this.el = el;
   }
 
-  // actions
-  public clickButton = async (
-    button: HTMLButtonElement,
-    numberOfClicks = 1
-  ) => {
-    // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < numberOfClicks; i++) button.click();
-    await this.component.updateComplete;
+  public select = async (label: number | string) => {
+    if (this.el.getAttribute("disable")) return;
+    let option: HTMLOptionElement | null = null;
+
+    if (typeof label === "string") {
+      const children = Array.from(this.el.children);
+
+      const el = children.find(
+        (opt) => opt.textContent?.trim() === label
+      ) as HTMLOptionElement;
+
+      option = el || null;
+    } else if (typeof label === "number") {
+      option = this.el.children.item(label) as HTMLOptionElement;
+    }
+
+    if (option?.value) {
+      this.el.value = option.value;
+      this.el.dispatchEvent(new Event("sl-change"));
+      this.el.dispatchEvent(new Event("sl-input"));
+      await this.component?.updateComplete;
+    }
   };
 }
+
+export class ButtonElement extends Field {
+  el: HTMLButtonElement;
+
+  constructor(el: HTMLButtonElement) {
+    super(el);
+    this.el = el;
+  }
+
+  public click = async (numberOfClicks = 1) => {
+    if (this.el.getAttribute("disable")) return;
+
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < numberOfClicks; i++) this.el.click();
+    await this.component?.updateComplete;
+  };
+}
+
+export class GenericElement extends Field {
+  el: HTMLElement;
+
+  constructor(el: HTMLElement) {
+    super(el);
+    this.el = el;
+  }
+}
+
+export const elementIsVisible = (element: HTMLElement) => {
+  if (!element) return false;
+  return element.offsetHeight > 0 && element.offsetWidth > 0;
+};
