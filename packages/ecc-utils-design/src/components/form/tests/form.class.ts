@@ -16,32 +16,38 @@ class FormComponent extends TestComponent {
 
   public initializeForm = async (fields: Field[]) => {
     this.fields = fields;
-    this.component = await fixture<EccUtilsDesignForm>(
+    const el = await fixture<EccUtilsDesignForm>(
       html`<ecc-utils-design-form
         .fields="${this.fields}"
       ></ecc-utils-design-form>`
     );
 
+    this.setEl(el);
+
     // need to make the component available as more specific EccUtilsDesign type so we can access its methods for stubbing and spying, while maintaining type safety
-    this.form = this.component as EccUtilsDesignForm;
+    this.form = el as EccUtilsDesignForm;
   };
 
-  formElement = () => this.element("form", "root");
+  formElement = () => this.getElement("", "form").el;
 
-  submitButton = () => this.buttonElement("form-submit", "root");
+  submitButton = () => this.getButtonElement("", "form-submit");
 
-  errorTemplate = () => this.element("form-error", "root");
+  errorTemplate = () => this.getElement("", "form-error").el;
 
-  successTemplate = () => this.element("form-success", "root");
+  successTemplate = () => this.getElement("", "form-success").el;
 
   // actions
-  public clickSubmitButton() {
-    this.clickButton(this.submitButton());
+  public async clickSubmitButton() {
+    this.submitButton().click();
+    await this.component?.updateComplete;
   }
 }
 
 export default async function createNewFormComponent(fields: Field[]) {
-  const formComponent = new FormComponent(new EccUtilsDesignForm());
+  const formComponent = new FormComponent(
+    new EccUtilsDesignForm(), // this is just a placeholder
+    "litElement"
+  );
   // any other call of initializeForm will reinitialize with new fields;
   await formComponent.initializeForm(fields);
   return formComponent;
@@ -65,4 +71,6 @@ export const testIds = {
   formTooltip: "form-tooltip",
   formSelect: "form-select",
   formSelectOption: "form-select-option",
+  formFileUploadBar: "form-file-upload-bar",
+  formFileUploadPercentage: "form-file-upload-percentage",
 };
