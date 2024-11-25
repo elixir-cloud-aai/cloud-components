@@ -563,6 +563,9 @@ export default class EccUtilsDesignForm extends LitElement {
     if (field.type === "array") {
       return this.renderArrayTemplate(field, newPath);
     }
+    if (field.type === "switch") {
+      return this.renderSwitchTemplate(field, newPath);
+    }
 
     if (field.fieldOptions?.required) {
       if (
@@ -570,10 +573,9 @@ export default class EccUtilsDesignForm extends LitElement {
         !this.requiredButEmpty.includes(field.key)
       ) {
         // add to requiredButEmpty
-
-        // eslint-disable-next-line no-empty
-        if (!this.hasUpdated && field.fieldOptions.default) {
-        } else this.requiredButEmpty.push(field.key);
+        if (this.hasUpdated || !field.fieldOptions.default) {
+          this.requiredButEmpty.push(field.key);
+        }
       } else if (_.get(this.form, newPath)) {
         // remove from requiredButEmpty
         this.requiredButEmpty = this.requiredButEmpty.filter(
@@ -582,9 +584,6 @@ export default class EccUtilsDesignForm extends LitElement {
       }
     }
 
-    if (field.type === "switch") {
-      return this.renderSwitchTemplate(field, newPath);
-    }
     return this.renderInputTemplate(field, newPath);
   }
 
