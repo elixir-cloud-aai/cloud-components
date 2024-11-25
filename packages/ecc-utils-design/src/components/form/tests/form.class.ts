@@ -30,11 +30,11 @@ class FormComponent extends TestComponent {
 
   formElement = () => this.getElement("", "form").el;
 
-  submitButton = () => this.getButtonElement("", "form-submit");
+  submitButton = () => this.getButtonElement("", "submit-button");
 
-  errorTemplate = () => this.getElement("", "form-error").el;
+  errorTemplate = () => this.getElement("", "error-alert").el;
 
-  successTemplate = () => this.getElement("", "form-success").el;
+  successTemplate = () => this.getElement("", "success-alert").el;
 
   // actions
   public async clickSubmitButton() {
@@ -54,23 +54,3 @@ export default async function createNewFormComponent(fields: Field[]) {
 }
 
 export type FormComponentType = FormComponent;
-export const testIds = {
-  formInput: "form-input",
-  formInputFile: "form-input-file",
-  formInputParent: "form-input-file-parent",
-  formSwitch: "form-switch",
-  formSwitchParent: "form-switch-parent",
-  formArrayAddButton: "form-array-add",
-  formArrayDeleteButton: "form-array-delete",
-  formArrayItem: "form-array-item",
-  formArray: "form-array",
-  formGroup: "form-group",
-  formGroupItem: "form-group-item",
-  formCollapsibleGroup: "form-group-collapsible",
-  formNonCollapsibleGroup: "form-group-non-collapsible",
-  formTooltip: "form-tooltip",
-  formSelect: "form-select",
-  formSelectOption: "form-select-option",
-  formFileUploadBar: "form-file-upload-bar",
-  formFileUploadPercentage: "form-file-upload-percentage",
-};

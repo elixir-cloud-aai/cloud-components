@@ -2,39 +2,14 @@
 /* eslint-disable no-unused-expressions */
 
 import { expect } from "@open-wc/testing";
-import * as _ from "lodash-es";
 import sinon from "sinon";
-import createNewFormComponent, {
-  FormComponentType,
-  testIds,
-} from "./form.class.js";
-import {
-  simpleTestData,
-  arrayTestData,
-  groupTestData,
-  submitTestData,
-  requiredFieldsTestData,
-} from "./testData.js";
+import createNewFormComponent, { FormComponentType } from "./form.class.js";
 import { Field } from "../form.js";
 import {
   GenericElement,
   InputField,
   SelectField,
 } from "../../../internal/TestComponent.js";
-
-const {
-  formInput,
-  formInputFile,
-  formSwitch,
-  formArrayAddButton,
-  formArrayDeleteButton,
-  formArrayItem,
-  formGroup,
-  formCollapsibleGroup,
-  formTooltip,
-  formFileUploadBar,
-  formFileUploadPercentage,
-} = testIds;
 
 describe("renders correctly", () => {
   let formComponent: FormComponentType;
@@ -602,7 +577,7 @@ describe("file fields", () => {
     expect(el.getAttribute("required")).equal(null);
     expect(label.textContent?.trim()).equal("ID");
 
-    const tooltip = formComponent.getElement("", formTooltip);
+    const tooltip = formComponent.getElement("", "tooltip");
     expect(tooltip).to.be.null;
   });
 
@@ -647,19 +622,20 @@ describe("file fields", () => {
       const label = fileContainer.getElement("", "label").el;
 
       expect(el).is.visible; // is visible
-      expect(label.textContent?.trim).equal("ID");
+
+      expect(label.textContent?.trim()).equal("ID");
       expect(el.getAttribute("accept")).equal("*"); // accepts all file types
       expect(el.getAttribute("data-type")).equal("tus"); // data-type is tus
       expect(el.getAttribute("multiple")).equal(null); // no multiple attribute
       expect(el.getAttribute("required")).equal(null); // not required
 
-      const tooltip = fileContainer.getElement("root", formTooltip);
+      const tooltip = fileContainer.getElement("root", "tooltip");
       expect(tooltip).to.be.null; // no tooltip
 
-      const uploadBar = fileContainer.getElement("", formFileUploadBar).el;
+      const uploadBar = fileContainer.getElement("", "file-upload-bar").el;
       const uploadPercentage = fileContainer.getElement(
         "",
-        formFileUploadPercentage
+        "file-upload-percentage"
       ).el;
 
       expect(uploadBar).is.visible; // progress bar is empty
@@ -755,7 +731,7 @@ describe("file fields", () => {
       });
 
       it("should set tooltip correctly", () => {
-        const tooltip = formComponent.getElement("", formTooltip).el;
+        const tooltip = formComponent.getElement("", "tooltip").el;
 
         expect(tooltip).is.visible;
         expect(tooltip.getAttribute("content")).equal("your ID document");
@@ -796,7 +772,7 @@ describe("file fields", () => {
       expect(el.getAttribute("multiple")).equal(null);
       expect(el.getAttribute("required")).equal(null);
 
-      const tooltip = fileContainer.getElement("", formTooltip);
+      const tooltip = fileContainer.getElement("", "tooltip");
       expect(tooltip).to.be.null;
     });
 
@@ -874,7 +850,7 @@ describe("file fields", () => {
         "",
         "input-file-container"
       );
-      const tooltip = fileContainer.getElement("", formTooltip).el;
+      const tooltip = fileContainer.getElement("", "tooltip").el;
 
       expect(tooltip).is.visible;
       expect(tooltip.getAttribute("content")).equal("your ID document");
@@ -908,7 +884,7 @@ describe("array component", () => {
             selectOptions: [
               {
                 label: "Non-Binary",
-                value: "nonBinary",
+                value: "nonbinary",
               },
               {
                 label: "Other",
@@ -983,7 +959,7 @@ describe("array component", () => {
     });
   });
 
-  describe("array buttons", () => {
+  describe("array functionality", () => {
     let formComponent: FormComponentType;
     let arrayComponent: GenericElement;
 
@@ -992,6 +968,9 @@ describe("array component", () => {
 
     const getNameField = (idx: number) =>
       getItem(idx)?.getInputField("Name") || null;
+
+    const getGenderField = (idx: number) =>
+      getItem(idx)?.getSelectField("Gender") || null;
 
     beforeEach(async () => {
       formComponent = await createNewFormComponent([
@@ -1046,6 +1025,36 @@ describe("array component", () => {
       expect(getNameField(0).el.value).equal("test string 0");
       expect(getNameField(1).el.value).equal("test string 1");
       expect(getNameField(2)).to.be.null;
+    });
+
+    it("should set the content correctly in the form object", async () => {
+      const spy = sinon.spy();
+      formComponent.form.addEventListener("ecc-utils-submit", spy);
+
+      // Fill in the array items
+      await getNameField(0).fill("John Doe");
+      await getNameField(1).fill("Jane Smith");
+
+      await getGenderField(0).select("Non-Binary");
+      await getGenderField(1).select("Other");
+
+      // Submit the form
+      formComponent.clickSubmitButton();
+
+      // Assert that the spy was called with the correct data
+      sinon.assert.calledOnce(spy);
+      const { detail } = spy.getCall(0).args[0];
+      expect(detail).to.deep.equal({
+        form: {
+          data: {
+            dependents: [
+              { name: "John Doe", gender: "nonbinary", "18+": false },
+              { name: "Jane Smith", gender: "other", "18+": false },
+              { name: "test string 2", "18+": false },
+            ],
+          },
+        },
+      });
     });
   });
 
@@ -1194,10 +1203,8 @@ describe("group component", () => {
       expect(groupComponent).is.null;
     });
 
-    it("should render correctly and in defualt state when children are set", async () => {
-      const formComponent = await createNewFormComponent([
-        { ...defaultData[0] },
-      ]);
+    it("should render correctly and in default state when children are set", async () => {
+      const formComponent = await createNewFormComponent(defaultData);
       const groupComponent = formComponent.getElement(
         "",
         "group-non-collapsible"
@@ -1207,6 +1214,11 @@ describe("group component", () => {
       expect(groupComponent.el).is.visible;
       expect(groupComponent.getElement("", "tooltip")).is.null;
       expect(label.textContent?.trim()).to.equal("Dependents");
+
+      const groupContainer = formComponent.getElement("", "group-container");
+      expect(groupContainer.getInputField("Name").el).is.visible;
+      expect(groupContainer.getInputField("18+").el).is.visible;
+      expect(groupContainer.getSelectField("Gender").el).is.visible;
     });
 
     it("should render correctly when collapsible is true", async () => {
@@ -1237,270 +1249,293 @@ describe("group component", () => {
       expect(groupComponent.getElement("", "tooltip")).is.null;
       expect(label.textContent?.trim()).to.equal("Dependents");
     });
+  });
 
-    describe("field options", () => {
-      it("should set tooltip correctly on non-collapsible groups", async () => {
-        const formComponent = await createNewFormComponent([
-          {
-            ...defaultData[0],
-            fieldOptions: { required: true },
-            groupOptions: { collapsible: false },
+  describe("field options", () => {
+    it("should set tooltip correctly on non-collapsible groups", async () => {
+      const formComponent = await createNewFormComponent([
+        {
+          ...defaultData[0],
+          fieldOptions: { required: true },
+          groupOptions: { collapsible: false },
+        },
+      ]);
+
+      const label = formComponent
+        .getElement("Dependents")
+        .getElement("", "label").el;
+
+      expect(label.textContent?.trim()).equal("Dependents *");
+    });
+
+    it("should set tooltip correctly on collapsible groups", async () => {
+      const formComponent = await createNewFormComponent([
+        {
+          ...defaultData[0],
+          fieldOptions: { required: true },
+          groupOptions: { collapsible: true },
+        },
+      ]);
+
+      const label = formComponent
+        .getElement("Dependents")
+        .el.getAttribute("summary");
+
+      expect(label?.trim()).equal("Dependents *");
+    });
+
+    it("should set required correctly", async () => {
+      const formComponent = await createNewFormComponent([
+        {
+          ...defaultData[0],
+          fieldOptions: { tooltip: "fill dependents data" },
+        },
+      ]);
+
+      const tooltip = formComponent
+        .getElement("Dependents")
+        .getElement("", "tooltip").el;
+
+      expect(tooltip).to.have.attribute("content", "fill dependents data");
+    });
+  });
+
+  describe("group functionality", () => {
+    it('should set the content correctly inthe form object when "collapsible" is true', async () => {
+      const formComponent = await createNewFormComponent([
+        { ...defaultData[0], groupOptions: { collapsible: false } },
+      ]);
+
+      const groupContainer = formComponent.getElement("", "group-container");
+
+      const spy = sinon.spy();
+      formComponent.form.addEventListener("ecc-utils-submit", spy);
+
+      // Fill in the group fields
+      await groupContainer.getInputField("Name").fill("John Doe");
+      await groupContainer.getSelectField("Gender").select("Non-Binary");
+      await groupContainer.getInputField("18+").toggle();
+
+      // Submit the form
+      formComponent.clickSubmitButton();
+
+      // Assert that the spy was called with the correct data
+      sinon.assert.calledOnce(spy);
+      const { detail } = spy.getCall(0).args[0];
+      expect(detail).to.deep.equal({
+        form: {
+          data: {
+            dependents: {
+              "18+": true,
+              name: "John Doe",
+              gender: "nonBinary",
+            },
           },
-        ]);
-
-        const label = formComponent
-          .getElement("Dependents")
-          .getElement("", "label").el;
-
-        expect(label.textContent?.trim()).equal("Dependents *");
-      });
-
-      it("should set tooltip correctly on collapsible groups", async () => {
-        const formComponent = await createNewFormComponent([
-          {
-            ...defaultData[0],
-            fieldOptions: { required: true },
-            groupOptions: { collapsible: true },
-          },
-        ]);
-
-        const label = formComponent
-          .getElement("Dependents")
-          .el.getAttribute("summary");
-
-        expect(label?.trim()).equal("Dependents *");
-      });
-
-      it("should set required correctly", async () => {
-        const formComponent = await createNewFormComponent([
-          {
-            ...defaultData[0],
-            fieldOptions: { tooltip: "fill dependents data" },
-          },
-        ]);
-
-        const tooltip = formComponent
-          .getElement("Dependents")
-          .getElement("", "tooltip").el;
-
-        expect(tooltip).to.have.attribute("content", "fill dependents data");
+        },
       });
     });
 
-    // check how data is set in the submit object
-    // do the same for array component
+    it('should set the content correctly inthe form object when "collapsible" is true', async () => {
+      const formComponent = await createNewFormComponent([
+        { ...defaultData[0], groupOptions: { collapsible: true } },
+      ]);
+
+      const groupContainer = formComponent.getElement("", "group-container");
+
+      const spy = sinon.spy();
+      formComponent.form.addEventListener("ecc-utils-submit", spy);
+
+      // Fill in the group fields
+      await groupContainer.getInputField("Name").fill("John Doe");
+      await groupContainer.getSelectField("Gender").select("Non-Binary");
+      await groupContainer.getInputField("18+").toggle();
+
+      // Submit the form
+      formComponent.clickSubmitButton();
+
+      // Assert that the spy was called with the correct data
+      sinon.assert.calledOnce(spy);
+      const { detail } = spy.getCall(0).args[0];
+      expect(detail).to.deep.equal({
+        form: {
+          data: {
+            dependents: {
+              "18+": true,
+              name: "John Doe",
+              gender: "nonBinary",
+            },
+          },
+        },
+      });
+    });
   });
 });
 
 describe("when loading", () => {
   let formComponent: FormComponentType;
   beforeEach(async () => {
-    formComponent = await createNewFormComponent(simpleTestData);
+    formComponent = await createNewFormComponent([
+      {
+        label: "Name",
+        key: "name",
+      },
+    ]);
+
     formComponent.form.loading();
     await formComponent.form.updateComplete;
   });
 
   it("should disable the submit button", async () => {
-    expect(formComponent.submitButton()).has.attribute("disabled");
+    expect(formComponent.submitButton().el).has.attribute("disabled");
   });
 });
 
-describe("when submit button is clicked", () => {
-  it("should verify that the form is not empty", async () => {
-    const formComponent = await createNewFormComponent(simpleTestData);
-    const formError = sinon.stub(formComponent.form, "error");
-    formComponent.clickSubmitButton();
+describe("submit button", () => {
+  let defaultData: Field[];
 
-    sinon.assert.calledOnceWithExactly(formError, { message: "Form is empty" });
+  beforeEach(() => {
+    defaultData = [
+      {
+        label: "First Name",
+        key: "firstname",
+        fieldOptions: {
+          required: true,
+        },
+      },
+      {
+        label: "Last Name",
+        key: "lastname",
+      },
+      {
+        label: "Age",
+        key: "age",
+        type: "number",
+        fieldOptions: {
+          required: true,
+        },
+      },
+    ];
   });
 
-  it("should not be disabled if required fields are filled", async () => {
-    const formComponent = await createNewFormComponent(requiredFieldsTestData);
+  describe("when submit button is clicked", async () => {
+    it("should throw an error if the form is empty", async () => {
+      const formComponent = await createNewFormComponent([
+        {
+          label: "Name",
+          key: "name",
+        },
+      ]);
 
-    const inputFields = formComponent.inputField(formInput, "root", true);
+      const formError = sinon.stub(formComponent.form, "error");
+      formComponent.clickSubmitButton();
 
-    inputFields.forEach((field) => {
-      if (field.required) formComponent.fillInputField(field);
+      sinon.assert.calledOnceWithExactly(formError, {
+        message: "Form is empty",
+      });
+    });
+  });
+
+  describe("when there are required fields", () => {
+    it("should not be disabled if required fields are filled", async () => {
+      const formComponent = await createNewFormComponent(defaultData);
+
+      // only filling required fields
+      await formComponent.getInputField("First Name").fill();
+      await formComponent.getInputField("Age").fill("45");
+
+      expect(formComponent.submitButton().el).to.not.have.attribute("disabled");
     });
 
-    await formComponent.form.updateComplete;
-    expect(formComponent.submitButton()).to.not.have.attribute("disabled");
-  });
+    it("should be disabled if even 1 required field is not filled", async () => {
+      const formComponent = await createNewFormComponent(defaultData);
 
-  it("should be disabled if required fields are not filled", async () => {
-    const formComponent = await createNewFormComponent(requiredFieldsTestData);
+      // only filling required fields
+      await formComponent.getInputField("Last Name").fill();
+      await formComponent.getInputField("Age").fill("45");
 
-    const inputFields = formComponent.inputField(formInput, "root", true);
-
-    inputFields.forEach((field) => {
-      if (!field.required) formComponent.fillInputField(field);
+      expect(formComponent.submitButton().el).to.have.attribute("disabled");
     });
 
-    await formComponent.form.updateComplete;
-    expect(formComponent.submitButton()).to.have.attribute("disabled");
-  });
+    it("should be disabled if a required field is filled then cleared", async () => {
+      const formComponent = await createNewFormComponent(defaultData);
 
-  it("should verify that all required fields are filled in array scenarios", async () => {
-    const formComponent = await createNewFormComponent(arrayTestData);
-    const arrayItems = formComponent.element(formArrayItem, "root", true);
+      // only filling required fields
+      await formComponent.getInputField("First Name").fill();
+      await formComponent.getInputField("Age").fill("45");
+      await formComponent.getInputField("First Name").fill("");
 
-    // delete second array instance, we do not need it
-    formComponent.clickButton(
-      formComponent.buttonElement(formArrayDeleteButton, arrayItems[1])
-    );
-
-    expect(formComponent.submitButton()).to.have.attribute("disabled");
-
-    // fill required input field
-    const inputField = formComponent.inputField(formInput, arrayItems[0]);
-    formComponent.fillInputField(inputField);
-
-    await formComponent.form.updateComplete;
-    expect(formComponent.submitButton()).to.not.have.attribute("disabled");
-  });
-
-  it("should be disabled by default when a new array item is added to the array", async () => {
-    const formComponent = await createNewFormComponent(arrayTestData);
-    const arrayItems = formComponent.element(formArrayItem, "root", true);
-
-    // delete second array instance, we do not need it
-    formComponent.clickButton(
-      formComponent.buttonElement(formArrayDeleteButton, arrayItems[1])
-    );
-
-    // fill required input field, and make sure it is not disabled
-    const inputField = formComponent.inputField(formInput, arrayItems[0]);
-    formComponent.fillInputField(inputField);
-    await formComponent.form.updateComplete;
-    expect(formComponent.submitButton()).to.not.have.attribute("disabled");
-
-    formComponent.clickButton(
-      formComponent.buttonElement(formArrayAddButton, "root")
-    );
-
-    await formComponent.form.updateComplete;
-
-    expect(formComponent.submitButton()).to.have.attribute("disabled");
-  });
-
-  it("should verify that all required fields are filled in group scenarios", async () => {
-    const formComponent = await createNewFormComponent(groupTestData);
-    expect(formComponent.submitButton()).to.have.attribute("disabled");
-
-    const groupTemplate = formComponent.element(formGroup, "root");
-    const collapsibleGroup = formComponent.element(
-      formCollapsibleGroup,
-      groupTemplate,
-      false
-    );
-
-    // grab all input fields
-    const inputFields = formComponent.inputField(
-      formInput,
-      collapsibleGroup,
-      true
-    );
-    const fileFields = formComponent.inputField(
-      formInputFile,
-      collapsibleGroup,
-      true
-    );
-
-    // fill all required fields
-    inputFields.forEach((field) => {
-      if (field.required) formComponent.fillInputField(field);
-    });
-    fileFields.forEach((field) => {
-      if (field.required) formComponent.fillInputFileField(field);
+      expect(formComponent.submitButton().el).to.have.attribute("disabled");
     });
 
-    await formComponent.form.updateComplete;
-    expect(formComponent.submitButton()).to.not.have.attribute("disabled");
+    describe("when there is an array", () => {
+      let formComponent: FormComponentType;
+
+      beforeEach(async () => {
+        formComponent = await createNewFormComponent([
+          ...defaultData,
+          {
+            label: "Other Sinatoriaries",
+            key: "signatories",
+            type: "array",
+            children: defaultData,
+            arrayOptions: {
+              defaultInstances: 1,
+            },
+          },
+        ]);
+      });
+
+      it("should be disabled if required fields are filled and then a new array is added", async () => {
+        const inputFields = formComponent.getInputField("", "input", true);
+
+        inputFields.forEach((field) => {
+          if (field.el.required) field.fill();
+        });
+
+        await formComponent.form.updateComplete;
+        expect(formComponent.submitButton().el).not.to.have.attribute(
+          "disabled"
+        );
+
+        // Adding new array instance
+        await formComponent.getButtonElement("", "array-add").click();
+        expect(formComponent.submitButton().el).to.have.attribute("disabled");
+      });
+    });
+
+    // describe('when there is a coll')
   });
 });
 
 describe("when form is submitted", () => {
-  let formComponent: FormComponentType;
+  let defaultData: Field[];
+
   beforeEach(async () => {
-    formComponent = await createNewFormComponent(submitTestData);
+    defaultData = [
+      {
+        label: "Name",
+        key: "name",
+      },
+    ];
   });
 
   it("should call the submit function with the correct data", async () => {
-    formComponent.form.addEventListener(
-      "ecc-utils-submit",
-      (e: CustomEvent) => {
-        expect(
-          _.isEqual(e.detail, {
-            form: {
-              data: {
-                isMarried: true,
-                address: {
-                  street: "test value",
-                  phoneNumbers: [
-                    {
-                      phoneNumber: "test value",
-                    },
-                    {
-                      phoneNumber: "test value",
-                    },
-                  ],
-                  houseNumber: "test value",
-                  city: "test value",
-                },
-                bankAccounts: [
-                  {
-                    accountBalance: "",
-                    isPrimary: false,
-                    bankName: "test value",
-                    branchCode: "test value",
-                    accountNumber: "test value",
-                    beneficiaryName: "test value",
-                  },
-                  {
-                    accountBalance: "",
-                    isPrimary: false,
-                    bankName: "test value",
-                    branchCode: "test value",
-                    accountNumber: "test value",
-                    beneficiaryName: "test value",
-                  },
-                ],
-                name: "test value",
-                age: "test value",
-              },
-            },
-          })
-        ).to.be.true;
-      }
-    );
+    const spy = sinon.spy();
+    const formComponent = await createNewFormComponent(defaultData);
+    formComponent.form.addEventListener("ecc-utils-submit", spy);
 
-    // grab all input fields, file fields, and switch fields
-    const inputFields = formComponent.inputField(formInput, "root", true);
-    const switchFields = formComponent.inputField(formSwitch, "root", true);
-    const fileFields = formComponent.inputField(formInputFile, "root", true);
+    formComponent.getInputField("Name").fill("David");
+    await formComponent.clickSubmitButton();
 
-    // fill all input fields
-    inputFields.forEach((field) => {
-      // skip the account balance field
-      // to test for test the returnIfEmpty flag
-      if (!(field.getAttribute("data-label") === "Account Balance")) {
-        formComponent.fillInputField(field);
-      }
+    // Assert that the spy was called with the correct data
+    sinon.assert.calledOnce(spy);
+    const { detail } = spy.getCall(0).args[0];
+    expect(detail).to.deep.equal({
+      form: {
+        data: {
+          name: "David",
+        },
+      },
     });
-    // fill all file fields
-    fileFields.forEach((field) => {
-      formComponent.fillInputFileField(field);
-    });
-    // toggle switch fields
-    switchFields.forEach((field) => {
-      // toggle the switch field for the married field
-      // to test if the switch field sets correctly
-      if (field.getAttribute("data-label") === "Married") {
-        formComponent.toggleSwitch(field);
-      }
-    });
-
-    await formComponent.form.updateComplete;
-    formComponent.clickSubmitButton();
   });
 });
