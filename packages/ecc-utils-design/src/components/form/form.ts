@@ -352,8 +352,9 @@ export default class EccUtilsDesignForm extends LitElement {
           const { value } = e.target as HTMLInputElement;
           if (!value) {
             _.unset(this.form, path);
+            if (field.fieldOptions?.returnIfEmpty) _.set(this.form, path, null);
           } else {
-            _.set(this.form, path, value);
+            _.set(this.form, path, value.trim());
           }
           this.requestUpdate();
           this.alertFieldChange(field.key, value);
@@ -548,9 +549,24 @@ export default class EccUtilsDesignForm extends LitElement {
       return this.renderArrayTemplate(field, newPath);
     }
 
-    if (field.fieldOptions?.required && !_.get(this.form, newPath)) {
-      this.requiredButEmpty.push(field.key);
+    if (field.fieldOptions?.required) {
+      if (
+        !_.get(this.form, newPath) &&
+        !this.requiredButEmpty.includes(field.key)
+      ) {
+        // add to requiredButEmpty
+
+        // eslint-disable-next-line no-empty
+        if (!this.hasUpdated && field.fieldOptions.default) {
+        } else this.requiredButEmpty.push(field.key);
+      } else if (_.get(this.form, newPath)) {
+        // remove from requiredButEmpty
+        this.requiredButEmpty = this.requiredButEmpty.filter(
+          (key) => key !== field.key
+        );
+      }
     }
+
     if (field.type === "switch") {
       return this.renderSwitchTemplate(field, newPath);
     }
@@ -648,7 +664,6 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   render() {
-    this.requiredButEmpty = [];
     if (!this.fields || this.fields.length === 0) {
       throw new Error("Fields is required & should not be empty array");
     }
