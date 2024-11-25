@@ -141,7 +141,7 @@ export default class EccUtilsDesignForm extends LitElement {
           size="small"
           class="switch"
           data-label=${field.label}
-          data-testid="form-switch"
+          data-testid="switch"
           label=${field.label}
           ?required=${field.fieldOptions?.required}
           ?checked=${_.get(this.form, path)}
@@ -238,7 +238,7 @@ export default class EccUtilsDesignForm extends LitElement {
                 <sl-tooltip
                   id=${field.key}
                   content=${field.fieldOptions?.tooltip}
-                  data-testid="form-tooltip"
+                  data-testid="tooltip"
                 >
                   <label class="file-input-label" data-testid="label">
                     ${field.label} ${field.fieldOptions?.required ? "*" : ""}
@@ -256,7 +256,7 @@ export default class EccUtilsDesignForm extends LitElement {
                   type="file"
                   class="file-input"
                   data-type="tus"
-                  data-testid="form-input-file"
+                  data-testid="input-file"
                   data-label=${field.label}
                   accept=${field.fieldOptions?.accept || "*"}
                   ?multiple=${field.fieldOptions?.multiple}
@@ -274,14 +274,14 @@ export default class EccUtilsDesignForm extends LitElement {
                 />
                 <div class="progress-bar-container">
                   <div
-                    data-testid="form-file-upload-bar"
+                    data-testid="file-upload-bar"
                     class="progress-bar"
                     style="width: ${this.uploadPercentage}%;"
                   ></div>
                 </div>
                 <div
                   class="upload-percentage"
-                  data-testid="form-file-upload-percentage"
+                  data-testid="file-upload-percentage"
                 >
                   ${this.uploadPercentage.toFixed(2)}%
                 </div>
@@ -295,7 +295,7 @@ export default class EccUtilsDesignForm extends LitElement {
                   type="file"
                   data-label=${field.label}
                   data-type="native"
-                  data-testid="form-input-file"
+                  data-testid="input-file"
                   accept=${field.fieldOptions?.accept || "*"}
                   ?multiple=${field.fieldOptions?.multiple}
                   ?required=${field.fieldOptions?.required}
@@ -345,7 +345,7 @@ export default class EccUtilsDesignForm extends LitElement {
             class="select"
             ?required=${field.fieldOptions?.required}
             value=${_.get(this.form, path)?.label || ""}
-            data-testid="form-select"
+            data-testid="select"
             data-label=${field.label}
             @sl-change=${(e: Event) => {
               const label = (e.target as HTMLSelectElement).value;
@@ -358,7 +358,7 @@ export default class EccUtilsDesignForm extends LitElement {
             ${field.selectOptions?.map(
               (option) => html`
                 <sl-option
-                  data-testid="form-select-option"
+                  data-testid="select-option"
                   data-label=${option.label}
                   value=${option.value}
                 >
@@ -375,7 +375,7 @@ export default class EccUtilsDesignForm extends LitElement {
       <sl-input
         class="input"
         data-label=${field.label}
-        data-testid="form-input"
+        data-testid="input"
         type=${field.type || "text"}
         ?required=${field.fieldOptions?.required}
         value=${_.get(this.form, path)}
@@ -437,7 +437,7 @@ export default class EccUtilsDesignForm extends LitElement {
     return html`
       <div
         class="array-container"
-        data-testid="form-array"
+        data-testid="array-container"
         data-label="${field.label}"
       >
         <div class="array-header">
@@ -550,7 +550,7 @@ export default class EccUtilsDesignForm extends LitElement {
         </div>
       `;
 
-    return html` <div class="group-container" data-testid="group">
+    return html` <div class="group-container" data-testid="group-container">
       ${field.groupOptions?.collapsible
         ? html` <sl-details
             data-testid="group-collapsible"
@@ -624,7 +624,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
   private renderErrorTemplate(): TemplateResult {
     if (this.formState !== "error") return html``;
-    return html`<sl-alert data-testid="form-error" variant="danger" open>
+    return html`<sl-alert data-testid="error-alert" variant="danger" open>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         slot="icon"
@@ -647,7 +647,7 @@ export default class EccUtilsDesignForm extends LitElement {
   private renderSuccessTemplate(): TemplateResult {
     if (this.formState !== "success") return html``;
     return html`
-      <sl-alert data-testid="form-success" variant="success" open>
+      <sl-alert data-testid="success-alert" variant="success" open>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           slot="icon"
@@ -737,7 +737,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
         <sl-button
           type="submit"
-          data-testid="form-submit"
+          data-testid="submit-button"
           variant="primary"
           class="submit-button"
           ?loading=${this.formState === "loading"}
