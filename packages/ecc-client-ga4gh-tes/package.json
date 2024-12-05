@@ -2,7 +2,7 @@
   "name": "@elixir-cloud/tes",
   "description": "Web Component for interacting with TES API",
   "license": "Apache-2.0",
-  "version": "v1.0.0-beta.2",
+  "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
