@@ -2,6 +2,15 @@
 
 ## 1.0.0
 
+### Patch Changes
+
+- Updated dependencies [7c05dee]
+- Updated dependencies [05261a1]
+- Updated dependencies [a52ceab]
+  - @elixir-cloud/design@1.0.0
+
+## 1.0.0
+
 ### Major Changes
 
 - a137eb4: - Introducing CSS Variables
