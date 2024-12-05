@@ -164,12 +164,12 @@ export default class EccUtilsDesignForm extends LitElement {
   private handleTusFileUpload = async (
     e: Event,
     field: Field
-  ): Promise<void> => {
+  ): Promise<Record<string, string> | null> => {
     const file = (e.target as HTMLInputElement).files?.[0];
 
     if (!file) {
       console.error("No file selected for upload.");
-      return;
+      return null;
     }
 
     try {
@@ -194,11 +194,20 @@ export default class EccUtilsDesignForm extends LitElement {
           this.requestUpdate();
         },
         onSuccess: () => {
+          const data: any = {
+            url: upload.url,
+            file,
+            name: "",
+          };
+
           if ("name" in upload.file) {
             console.log("Download %s from %s", upload.file.name, upload.url);
+            data.name = upload.file.name;
           } else {
             console.log("Download file from %s", upload.url);
           }
+
+          return data;
         },
       });
 
@@ -211,6 +220,8 @@ export default class EccUtilsDesignForm extends LitElement {
     } catch (error) {
       console.error("An error occurred while initializing the upload:", error);
     }
+
+    return null;
   };
 
   renderInputTemplate(field: Field, path: string): TemplateResult {
@@ -248,7 +259,12 @@ export default class EccUtilsDesignForm extends LitElement {
                   class="file-input"
                   ?disabled=${field.fieldOptions?.readonly}
                   @change=${async (e: Event) => {
-                    await this.handleTusFileUpload(e, field);
+                    const data = await this.handleTusFileUpload(e, field);
+
+                    if (data) {
+                      _.set(this.form, path, data);
+                      this.alertFieldChange(field.key, data);
+                    }
                   }}
                 />
                 <div class="progress-bar-container">
@@ -548,6 +564,9 @@ export default class EccUtilsDesignForm extends LitElement {
     if (field.type === "array") {
       return this.renderArrayTemplate(field, newPath);
     }
+    if (field.type === "switch") {
+      return this.renderSwitchTemplate(field, newPath);
+    }
 
     if (field.fieldOptions?.required) {
       if (
@@ -555,10 +574,9 @@ export default class EccUtilsDesignForm extends LitElement {
         !this.requiredButEmpty.includes(field.key)
       ) {
         // add to requiredButEmpty
-
-        // eslint-disable-next-line no-empty
-        if (!this.hasUpdated && field.fieldOptions.default) {
-        } else this.requiredButEmpty.push(field.key);
+        if (this.hasUpdated || !field.fieldOptions.default) {
+          this.requiredButEmpty.push(field.key);
+        }
       } else if (_.get(this.form, newPath)) {
         // remove from requiredButEmpty
         this.requiredButEmpty = this.requiredButEmpty.filter(
@@ -567,9 +585,6 @@ export default class EccUtilsDesignForm extends LitElement {
       }
     }
 
-    if (field.type === "switch") {
-      return this.renderSwitchTemplate(field, newPath);
-    }
     return this.renderInputTemplate(field, newPath);
   }
 
