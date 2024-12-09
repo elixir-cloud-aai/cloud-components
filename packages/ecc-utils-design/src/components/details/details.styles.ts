@@ -1,6 +1,6 @@
 import { css } from "lit";
 
-const styles = css`
+export const detailsStyles = css`
   :host {
     display: block;
     padding: 1rem;
@@ -26,12 +26,43 @@ const styles = css`
     text-decoration: underline;
     padding: 0;
   }
+  .action-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: var(--ecc-input-border-width) solid black;
+    gap: var(--ecc-spacing-large);
+    background-color: var(--ecc-color-background-primary);
+    padding: var(--ecc-spacing-medium);
+    border-radius: var(--ecc-border-radius-medium);
+    outline: none;
+    cursor: pointer;
+    font-family: var(--ecc-input-font-family);
+    font-weight: var(--ecc-input-font-weight);
+    user-select: none;
+    white-space: nowrap;
+    font-size: var(--ecc-input-font-size-medium);
+  }
+  .action-button:active {
+    scale: 0.98;
+  }
+  .action-button.primary {
+    color: white;
+    background-color: var(--ecc-color-primary-600);
+    border: none;
+  }
+  .action-button.danger {
+    color: white;
+    background-color: var(--sl-color-danger-600);
+    border: none;
+  }
   .icon {
     height: var(--ecc-input-font-size-large);
     width: var(--ecc-input-font-size-large);
   }
+`;
 
-  /* Details */
+export const dataItemStyles = css`
   .key,
   .value {
     font-size: var(--ecc-input-label-font-size-medium);
@@ -92,5 +123,3 @@ const styles = css`
     height: var(--ecc-input-font-size-small);
   }
 `;
-
-export default styles;

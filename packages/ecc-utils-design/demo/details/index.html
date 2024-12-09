@@ -16,280 +16,228 @@
       import { html, render } from "lit";
       import "../../dist/components/details/index.js";
 
-      const data = {
-        company: {
-          name: "TechCorp",
-          industry: "Technology",
-          employees: [
+      const employees = [
+        {
+          id: 101,
+          name: "Alice Johnson",
+          position: "Software Engineer",
+          skills: ["Java", "JavaScript", "SQL"],
+          projects: [
             {
-              id: 101,
-              name: "Alice Johnson",
-              position: "Software Engineer",
-              skills: ["Java", "JavaScript", "SQL"],
-              projects: [
-                {
-                  projectId: "P123",
-                  projectName: "SmartApp",
-                  startDate: "2022-05-01",
-                  endDate: "2023-01-15",
-                  status: "Completed",
-                  team: ["Alice Johnson", "Bob Smith"],
-                },
-                {
-                  projectId: "P124",
-                  projectName: "DataAnalyzer",
-                  startDate: "2023-02-01",
-                  endDate: null,
-                  status: "In Progress",
-                  team: ["Alice Johnson", "Charlie Brown"],
-                },
-              ],
-              address: {
-                street: "123 Tech Street",
-                city: "Techville",
-                zipCode: "T12345",
-                country: "Techland",
-              },
+              projectId: "P123",
+              projectName: "SmartApp",
+              startDate: "2022-05-01",
+              endDate: "2023-01-15",
+              status: "Completed",
+              team: ["Alice Johnson", "Bob Smith"],
             },
             {
-              id: 102,
-              name: "Bob Smith",
-              position: "UI/UX Designer",
-              skills: ["UI Design", "CSS", "Adobe XD"],
-              projects: [
-                {
-                  projectId: "P123",
-                  projectName: "SmartApp",
-                  startDate: "2022-05-01",
-                  endDate: "2023-01-15",
-                  status: "Completed",
-                  team: ["Alice Johnson", "Bob Smith"],
-                },
-                {
-                  projectId: "P125",
-                  projectName: "MobileApp",
-                  startDate: "2023-03-01",
-                  endDate: null,
-                  status: "In Progress",
-                  team: ["Bob Smith", "Eve White"],
-                },
-              ],
-              address: {
-                street: "456 Design Avenue",
-                city: "DesignCity",
-                zipCode: "D67890",
-                country: "Designland",
-              },
+              copy: true,
+              projectId: "P124",
+              projectName: "DataAnalyzer",
+              startDate: "2023-02-01",
+              endDate: null,
+              status: "In Progress",
+              team: ["Alice Johnson", "Charlie Brown"],
             },
           ],
+          address: {
+            street: "123 Tech Street",
+            city: "Techville",
+            zipCode: "T12345",
+            country: "Techland",
+          },
         },
-        clients: [
-          {
-            clientId: "C001",
-            clientName: "GlobalTech Solutions",
-            contactPerson: "John Johnson",
-            email: "john.johnson@globaltech.com",
-            projects: ["SmartApp", "DataAnalyzer"],
+        {
+          id: 102,
+          name: "Bob Smith",
+          position: "UI/UX Designer",
+          skills: ["UI Design", "CSS", "Adobe XD"],
+          projects: [
+            {
+              projectId: "P123",
+              projectName: "SmartApp",
+              startDate: "2022-05-01",
+              endDate: "2023-01-15",
+              status: "Completed",
+              team: ["Alice Johnson", "Bob Smith"],
+            },
+            {
+              projectId: "P125",
+              projectName: "MobileApp",
+              startDate: "2023-03-01",
+              endDate: null,
+              status: "In Progress",
+              team: ["Bob Smith", "Eve White"],
+            },
+          ],
+          address: {
+            street: "456 Design Avenue",
+            city: "DesignCity",
+            zipCode: "D67890",
+            country: "Designland",
           },
-          {
-            clientId: "C002",
-            clientName: "DesignMaster Co.",
-            contactPerson: "Eva Designer",
-            email: "eva.designer@designmaster.com",
-            projects: ["MobileApp"],
-          },
-        ],
-        financials: {
-          revenue: 1500000.5,
-          expenses: {
-            operating: 500000.25,
-            marketing: 200000.75,
-            research: 100000.5,
-          },
-          profit: 696969,
         },
-        marketSegments: ["Enterprise", "Startups", "Government"],
-        partners: [
-          {
-            partnerId: "P001",
-            partnerName: "InnoTech Innovations",
-            contactPerson: "Mark Innovator",
-            email: "mark@innotech.com",
-            projects: ["SmartApp"],
-          },
-          {
-            partnerId: "P002",
-            partnerName: "CreatiDesign Solutions",
-            contactPerson: "Lisa Designer",
-            email: "lisa@creatidesign.com",
-            projects: ["MobileApp"],
-          },
-        ],
-        debt: {
-          partnerId: "P001",
-          partnerName: "InnoTech Innovations",
-          contactPerson: "Mark Innovator",
-          email: "mark@innotech.com",
-          projects: ["SmartApp"],
+      ];
+
+      const clients = [
+        {
+          clientId: "C001",
+          clientName: "GlobalTech Solutions",
+          contactPerson: "John Johnson",
+          email: "john.johnson@globaltech.com",
+          projects: ["SmartApp", "DataAnalyzer"],
         },
+        {
+          clientId: "C002",
+          clientName: "DesignMaster Co.",
+          contactPerson: "Eva Designer",
+          email: "eva.designer@designmaster.com",
+          projects: ["MobileApp"],
+        },
+      ];
+
+      const financials = {
+        revenue: 1500000.5,
+        expenses: {
+          operating: 500000.25,
+          marketing: 200000.75,
+          research: 100000.5,
+        },
+        profit: 696969,
       };
 
-      const fields = [
-        {
-          key: "company.name",
-          path: "company.name",
-          tab: "Company Info",
-        },
-        {
-          key: "company.industry",
-          path: "company.industry",
-          tab: "Company Info",
-        },
-        {
-          key: "company.employees",
-          path: "company.employees[*]",
-          tab: "Employees",
-          arrayOptions: {
-            labelOptions: {
-              path: ".id",
-              prefix: "Employee ",
-            },
-          },
-        },
-        {
-          key: "company.employees.skills",
-          parentKey: "company.employees",
-          path: "company.employees[*].skills",
-          copy: true,
-          arrayOptions: {
-            type: "tag",
-          },
-        },
-        {
-          key: "company.employees.projects.team",
-          parentKey: "company.employees",
-          path: "company.employees[*].projects[*].team",
-          arrayOptions: {
-            type: "tag",
-          },
-        },
-        {
-          key: "company.employees.projects",
-          parentKey: "company.employees",
-          path: "company.employees[*].projects[*]",
-          arrayOptions: {
-            labelOptions: {
-              path: ".projectName",
-            },
-          },
-        },
-        {
-          key: "company.employees.projects",
-          parentKey: "company.employees",
-          path: "company.employees[0].projects[1]",
-          copy: true,
-        },
-        {
-          key: "clients",
-          path: "clients[*]",
-          tab: "Clients",
-          arrayOptions: {
-            labelOptions: {
-              path: ".clientName",
-            },
-          },
-        },
-        {
-          key: "clients.projects",
-          parentKey: "clients",
-          path: "clients[*].projects",
-          arrayOptions: {
-            type: "tag",
-          },
-        },
-        {
-          key: "financials",
-          path: "financials.*",
-          tab: "Financials",
-        },
-        {
-          key: "financials.expenses",
-          parentKey: "financials",
-          path: "financials.expenses",
-          tooltip: "Different fields of expenses",
-        },
-        {
-          key: "hypothetical",
-          path: "hypothetical",
-          tab: "Hypothetical",
-        },
-      ];
-
-      const actions = [
-        {
-          key: "3",
-          label: "View More",
-          type: "link",
-          linkOptions: {
-            url: "https://www.google.com",
-          },
-          position: "left",
-        },
-        {
-          key: "2",
-          label: "Cancel",
-          type: "button",
-          buttonOptions: {
-            variant: "danger",
-          },
-        },
-        {
-          key: "1",
-          label: "Save",
-          type: "button",
-          buttonOptions: {
-            variant: "primary",
-            icon: {
-              url: "https://img.icons8.com/ios/50/ffffff/save--v1.png",
-            },
-          },
-        },
-      ];
+      const saveIcon =
+        '<img src="https://img.icons8.com/ios/50/ffffff/save--v1.png"/>';
 
       render(
-        html`<ecc-utils-design-details
-          .data=${data}
-          .fields=${fields}
-          .actions=${actions}
-        ></ecc-utils-design-details>`,
+        html`
+          <ecc-d-details>
+            <ecc-d-data-item
+              copy
+              label="Company Info"
+              type="tab"
+              tabs='["Company Info", "Employees", "Clients", "Financials"]'
+            >
+              <div slot="Company Info">
+                <ecc-d-data-item label="name" value="TechCorp"> </ecc-d-data-item>
+
+                <ecc-d-data-item label="industry" value="Technology">
+                </ecc-d-data-item>
+              </div>
+
+              <div slot="Employees">
+                ${employees.map(
+                  (e) => html`
+                    <ecc-d-data-item copy label="Employee${e.id}" type="detail">
+                      ${Object.keys(e).map((key) =>
+                        key !== "address" && key !== "projects"
+                          ? html`
+                              <ecc-d-data-item
+                                label="${key}"
+                                type="${key === "skills" ? "list" : null}"
+                                value="${e[key]}"
+                              ></ecc-d-data-item>
+                            `
+                          : html``
+                      )}
+
+                      <ecc-d-data-item type="detail" label="Projects">
+                        ${e.projects.map(
+                          (p) =>
+                            html`
+                              <ecc-d-data-item
+                                ?copy=${p.copy}
+                                label="${p.projectName}"
+                                type="detail"
+                              >
+                                ${Object.keys(p).map(
+                                  (pKey) =>
+                                    html`
+                                      <ecc-d-data-item
+                                        label="${pKey}"
+                                        type="${pKey === "team" ? "list" : null}"
+                                        value="${p[pKey]}"
+                                      ></ecc-d-data-item>
+                                    `
+                                )}
+                              </ecc-d-data-item>
+                            `
+                        )}
+                      </ecc-d-data-item>
+
+                      <ecc-d-data-item type="detail" label="Address">
+                        ${Object.keys(e.address).map(
+                          (aKey) =>
+                            html`
+                              <ecc-d-data-item
+                                label=${aKey}
+                                value=${e.address[aKey]}
+                              ></ecc-d-data-item>
+                            `
+                        )}
+                      </ecc-d-data-item>
+                    </ecc-d-data-item>
+                  `
+                )}
+              </div>
+
+              <div slot="Clients">
+                ${clients.map(
+                  (c) => html` <ecc-d-data-item type="detail" label="${c.clientName}">
+                    ${Object.keys(c).map(
+                      (cKey) => html`
+                        <ecc-d-data-item
+                          type="${cKey === "projects" ? "list" : null}"
+                          label=${cKey}
+                          value="${c[cKey]}"
+                        ></ecc-d-data-item>
+                      `
+                    )}
+                  </ecc-d-data-item>`
+                )}
+              </div>
+
+              <div slot="Financials">
+                ${Object.keys(financials).map((fKey) =>
+                  fKey === "expenses"
+                    ? html`
+                        <ecc-d-data-item type="detail" label="${fKey}">
+                          ${Object.keys(financials[fKey]).map(
+                            (k) => html`
+                              <ecc-d-data-item
+                                label="${k}"
+                                value="${financials[fKey][k]}"
+                              ></ecc-d-data-item>
+                            `
+                          )}
+                        </ecc-d-data-item>
+                      `
+                    : html`
+                        <ecc-d-data-item
+                          slot="Financials"
+                          label=${fKey}
+                          value="${financials[fKey]}"
+                        ></ecc-d-data-item>
+                      `
+                )}
+              </div>
+            </ecc-d-data-item>
+
+            <a href="#" type="action" position="left">text</a>
+            <button type="action" class="action-button danger">Cancel</button>
+            <button
+              type="action"
+              position="right"
+              class="action-button primary"
+              end-icon="${saveIcon}"
+            >
+              Save
+            </button>
+          </ecc-d-details>
+        `,
         document.querySelector("#demo")
       );
-
-      const detailsElement = document.querySelector("ecc-utils-design-details");
-
-      detailsElement.addEventListener("ecc-utils-button-click", async (event) => {
-        const { index, key } = event.detail;
-        if (key === "1") {
-          detailsElement.setButtonLoading(index, true);
-
-          await new Promise((resolve) => {
-            setTimeout(() => {
-              resolve();
-            }, 2000);
-          });
-
-          detailsElement.setButtonLoading(index, false);
-        }
-      });
-
-      detailsElement.addEventListener("ecc-utils-button-click", (event) => {
-        const { key } = event.detail;
-        if (key === "2") {
-          console.log(`Button ${key} clicked!`);
-        }
-      });
-
-      // fix details component docs
     </script>
   </body>
 </html>

@@ -90,16 +90,16 @@ nextTask("Generating component metadata", () => {
   );
 });
 
-nextTask("Wrapping components for React", async () => {
-  execSync(
-    `node  ${path.join(__dirname, "make-react.js")} -p "${
-      commanderOpts.prefix
-    }"`,
-    {
-      stdio: "inherit",
-    }
-  );
-});
+// nextTask("Wrapping components for React", async () => {
+//   execSync(
+//     `node  ${path.join(__dirname, "make-react.js")} -p "${
+//       commanderOpts.prefix
+//     }"`,
+//     {
+//       stdio: "inherit",
+//     }
+//   );
+// });
 
 nextTask("Running the TypeScript compiler", () => {
   execSync(`tsc --project ./tsconfig.prod.json --outdir "${npmDir}"`, {
