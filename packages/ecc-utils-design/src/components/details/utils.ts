@@ -1,5 +1,7 @@
 /* eslint-disable no-param-reassign */
-import _ from "lodash";
+import { html } from "lit";
+import * as _ from "lodash-es";
+import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 
 export const getListData = (input: string) => {
   if (input.trim().startsWith("[") && input.trim().endsWith("]")) {
@@ -61,4 +63,26 @@ export const formatBtn = (btn: Element) => {
     `;
 
   return btn;
+};
+
+export const renderLabel = (
+  label: string,
+  value: any,
+  copy = false,
+  tooltip = ""
+) => {
+  const getHTML = () => html`
+    <span> ${formatLabel(label)} </span>
+    ${copy
+      ? html`<sl-copy-button .value=${JSON.stringify(value)}></sl-copy-button>`
+      : ""}
+  `;
+
+  return html`
+    <div class="key">
+      ${tooltip.trim()
+        ? html` <sl-tooltip content="${tooltip}">${getHTML()}</sl-tooltip> `
+        : getHTML()}
+    </div>
+  `;
 };

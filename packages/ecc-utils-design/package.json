@@ -38,7 +38,7 @@
     "test:component": "web-test-runner --watch --config ../../web-test.runner-config.mjs --group",
     "test:watch": "npm run test:component default",
     "lint": "npx eslint .",
-    "lint:fix": "npm run lint -- --fix && prettier .",
+    "lint:fix": "npm run lint -- --fix && prettier --loglevel silent --write '**/*.{ts,js,mjs,html,json}'",
     "prepublish": "npm run build"
   },
   "devDependencies": {

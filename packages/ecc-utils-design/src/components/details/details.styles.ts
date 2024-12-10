@@ -63,12 +63,15 @@ export const detailsStyles = css`
 `;
 
 export const dataItemStyles = css`
+  .tab-container {
+  }
   .key,
   .value {
     font-size: var(--ecc-input-label-font-size-medium);
     font-family: var(--ecc-input-font-family);
     font-weight: var(--ecc-input-font-weight);
     letter-spacing: var(--ecc-input-letter-spacing);
+    position: relative;
   }
   .field {
     display: flex;
