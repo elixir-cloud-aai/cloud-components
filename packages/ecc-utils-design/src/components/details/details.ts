@@ -1,6 +1,5 @@
 import { html, LitElement } from "lit";
-import { property } from "lit/decorators.js";
-import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js"; // For tooltips if needed
+import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/components/copy-button/copy-button.js";
 import "@shoelace-style/shoelace/dist/components/tab/tab.js";
 import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
@@ -21,8 +20,6 @@ export class EccUtilsDesignDetails extends LitElement {
     hostStyles,
     detailsStyles,
   ];
-
-  @property({ type: Object }) data: Record<string, any> = {}; // Holds the data
 
   render() {
     const getLeftActionButtons = () =>

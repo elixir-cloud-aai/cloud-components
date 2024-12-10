@@ -120,7 +120,12 @@
               tabs='["Company Info", "Employees", "Clients", "Financials"]'
             >
               <div slot="Company Info">
-                <ecc-d-data-item label="name" value="TechCorp"> </ecc-d-data-item>
+                <ecc-d-data-item
+                  tooltip="Company Name"
+                  label="name"
+                  value="TechCorp"
+                >
+                </ecc-d-data-item>
 
                 <ecc-d-data-item label="industry" value="Technology">
                 </ecc-d-data-item>
@@ -129,7 +134,12 @@
               <div slot="Employees">
                 ${employees.map(
                   (e) => html`
-                    <ecc-d-data-item copy label="Employee${e.id}" type="detail">
+                    <ecc-d-data-item
+                      copy
+                      label="Employee${e.id}"
+                      type="detail"
+                      tooltip=""
+                    >
                       ${Object.keys(e).map((key) =>
                         key !== "address" && key !== "projects"
                           ? html`
@@ -156,7 +166,9 @@
                                     html`
                                       <ecc-d-data-item
                                         label="${pKey}"
-                                        type="${pKey === "team" ? "list" : null}"
+                                        type="${pKey === "team"
+                                          ? "list"
+                                          : null}"
                                         value="${p[pKey]}"
                                       ></ecc-d-data-item>
                                     `
@@ -184,7 +196,11 @@
 
               <div slot="Clients">
                 ${clients.map(
-                  (c) => html` <ecc-d-data-item type="detail" label="${c.clientName}">
+                  (c) => html` <ecc-d-data-item
+                    type="detail"
+                    tooltip="client name"
+                    label="${c.clientName}"
+                  >
                     ${Object.keys(c).map(
                       (cKey) => html`
                         <ecc-d-data-item

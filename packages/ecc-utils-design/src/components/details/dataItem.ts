@@ -1,6 +1,6 @@
 import { html, LitElement } from "lit";
 import { property } from "lit/decorators.js";
-import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js"; // For tooltips if needed
+import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/components/copy-button/copy-button.js";
 import "@shoelace-style/shoelace/dist/components/tab/tab.js";
 import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
@@ -10,7 +10,7 @@ import "@shoelace-style/shoelace/dist/components/tag/tag.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
 import sholelaceStyles from "../../styles/shoelace.styles.js";
-import { getNestedCopyValue, getListData, formatLabel } from "./utils.js";
+import { getNestedCopyValue, getListData, renderLabel } from "./utils.js";
 import { dataItemStyles } from "./details.styles.js";
 
 export class EccUtilsDesignDataItem extends LitElement {
@@ -24,9 +24,9 @@ export class EccUtilsDesignDataItem extends LitElement {
   @property({ type: Array, reflect: true }) tabs = [];
   @property({ type: Boolean }) copy = false;
   @property({ type: String }) type = "";
-  @property() tooltip = "";
-  @property() label = "";
   @property({ type: String }) value = "";
+  @property({ type: String }) label = "";
+  @property() tooltip = "";
 
   render() {
     const tabs = () => html`
@@ -47,12 +47,12 @@ export class EccUtilsDesignDataItem extends LitElement {
     const detail = () => html`
       <sl-details>
         <div slot="summary">
-          ${formatLabel(this.label)}
-          ${this.copy
-            ? html`<sl-copy-button
-                value=${JSON.stringify(getNestedCopyValue(this))}
-              ></sl-copy-button>`
-            : ""}
+          ${renderLabel(
+            this.label,
+            getNestedCopyValue(this),
+            this.copy,
+            this.tooltip
+          )}
         </div>
         <div>
           <slot></slot>
@@ -65,17 +65,7 @@ export class EccUtilsDesignDataItem extends LitElement {
 
       return html`
         <div class="field">
-          <div class="key">
-            <sl-tooltip hoist trigger=${this.tooltip ? "hover" : "manual"}>
-              <div slot="content">${this.tooltip}</div>
-              ${formatLabel(this.label)}
-            </sl-tooltip>
-            ${this.copy
-              ? html`<sl-copy-button
-                  .value=${JSON.stringify(data)}
-                ></sl-copy-button>`
-              : ""}
-          </div>
+          ${renderLabel(this.label, data, this.copy, this.tooltip)}
           <div class="value tags">
             ${data.map(
               (item: string) => html`<sl-tag type="primary">${item}</sl-tag>`
@@ -96,14 +86,7 @@ export class EccUtilsDesignDataItem extends LitElement {
     }
     return html`
       <div class="field">
-        <span class="key">
-          <sl-tooltip content=${this.tooltip} hoist>
-            ${formatLabel(this.label)}
-          </sl-tooltip>
-          ${this.copy
-            ? html`<sl-copy-button value=${this.textContent}></sl-copy-button>`
-            : ""}
-        </span>
+        ${renderLabel(this.label, this.value, this.copy, this.tooltip)}
         <span class="value">${this.value || "_"} </span>
       </div>
     `;
