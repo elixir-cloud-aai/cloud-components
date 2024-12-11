@@ -1,5 +1,5 @@
 import { html, LitElement } from "lit";
-import { property } from "lit/decorators.js";
+import { property, state } from "lit/decorators.js";
 import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/components/copy-button/copy-button.js";
 import "@shoelace-style/shoelace/dist/components/tab/tab.js";
@@ -21,12 +21,32 @@ export class EccUtilsDesignDataItem extends LitElement {
     dataItemStyles,
   ];
 
-  @property({ type: Array, reflect: true }) tabs = [];
-  @property({ type: Boolean }) copy = false;
-  @property({ type: String }) type = "";
-  @property({ type: String }) value = "";
-  @property({ type: String }) label = "";
-  @property() tooltip = "";
+  @property({ type: Array, reflect: true }) tabs: string[] = [];
+  @property({ type: Boolean, reflect: true }) copy = false;
+  @property({ type: String, reflect: true }) type = "";
+  @property({ type: String, reflect: true }) value = "";
+  @property({ type: String, reflect: true }) label = "";
+  @property({ type: String, reflect: true }) tooltip = "";
+  @state() forceStateUpdate = 0;
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === "childList") {
+          // React does not handle custom elements very well
+          // So we have to force a state update whenever the childList changes
+          // so we can have access to its updated attributes
+          this.forceStateUpdate += 1;
+        }
+      });
+    });
+
+    observer.observe(this.shadowRoot!, {
+      childList: true,
+    });
+  }
 
   render() {
     const tabs = () => html`
