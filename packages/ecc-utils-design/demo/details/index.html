@@ -114,8 +114,6 @@
         html`
           <ecc-d-details>
             <ecc-d-data-item
-              copy
-              label="Company Info"
               type="tab"
               tabs='["Company Info", "Employees", "Clients", "Financials"]'
             >
@@ -240,13 +238,15 @@
               </div>
             </ecc-d-data-item>
 
-            <a href="#" type="action" position="left">text</a>
-            <button type="action" class="action-button danger">Cancel</button>
+            <a href="#" ecc-type="action" ecc-position="left">text</a>
+            <button ecc-type="action" class="ecc-action-button ecc-danger">
+              Cancel
+            </button>
             <button
-              type="action"
-              position="right"
-              class="action-button primary"
-              end-icon="${saveIcon}"
+              ecc-type="action"
+              ecc-position="right"
+              class="ecc-action-button ecc-primary"
+              ecc-end-icon="${saveIcon}"
             >
               Save
             </button>

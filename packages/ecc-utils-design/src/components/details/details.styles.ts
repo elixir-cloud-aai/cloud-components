@@ -26,7 +26,7 @@ export const detailsStyles = css`
     text-decoration: underline;
     padding: 0;
   }
-  .action-button {
+  .ecc-action-button {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -43,20 +43,20 @@ export const detailsStyles = css`
     white-space: nowrap;
     font-size: var(--ecc-input-font-size-medium);
   }
-  .action-button:active {
+  .ecc-action-button:active {
     scale: 0.98;
   }
-  .action-button.primary {
+  .ecc-action-button.ecc-primary {
     color: white;
     background-color: var(--ecc-color-primary-600);
     border: none;
   }
-  .action-button.danger {
+  .ecc-action-button.ecc-danger {
     color: white;
     background-color: var(--sl-color-danger-600);
     border: none;
   }
-  .icon {
+  .ecc-icon {
     height: var(--ecc-input-font-size-large);
     width: var(--ecc-input-font-size-large);
   }

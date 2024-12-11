@@ -23,11 +23,13 @@ export class EccUtilsDesignDetails extends LitElement {
 
   render() {
     const getLeftActionButtons = () =>
-      Array.from(this.querySelectorAll('[type="action"][position="left"]'));
+      Array.from(
+        this.querySelectorAll('[ecc-type="action"][ecc-position="left"]')
+      );
 
     const getRightActionButtons = () =>
       Array.from(
-        this.querySelectorAll('[type="action"]:not([position="left"])')
+        this.querySelectorAll('[ecc-type="action"]:not([ecc-position="left"])')
       );
 
     return html`
