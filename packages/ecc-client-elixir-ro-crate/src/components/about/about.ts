@@ -91,6 +91,77 @@ export default class ECCClientRoCrateAbout extends LitElement {
       ...this.AboutFields.slice(licenceFieldIndex + 1),
     ];
   }
+  private _handleChangeContextualType(e: CustomEvent): void {
+    const entityField: Field = {
+      key: "entity",
+      label: "Entity",
+      type: "array",
+      arrayOptions: {
+        defaultInstances: 0,
+      },
+      children: [
+        {
+          key: "entityID",
+          label: "@id",
+          type: "url",
+          fieldOptions: {
+            required: true,
+          },
+        },
+        {
+          key: "entityType",
+          label: "@type",
+          type: "select",
+          selectOptions: [
+            { label: "Person", value: "Person" },
+            { label: "Organisation", value: "Organisation" },
+          ],
+        },
+        {
+          key: "entityName",
+          label: "Name",
+          type: "text",
+          fieldOptions: {
+            required: true,
+          },
+        },
+      ],
+    };
+    const updatedField = this.RelatedPeopleFields.map((f) =>
+      f.key === "author-entities" ? { ...f, children: [] } : f
+    );
+    if (e.detail.value === "Person") {
+      const personFields: Field[] = [
+        {
+          key: "orgURL",
+          label: "URL",
+          type: "url",
+          fieldOptions: {
+            required: false,
+          },
+        },
+      ];
+      entityField.children?.push(...personFields);
+    } else if (e.detail.value === "Organisation") {
+      const orgFields: Field[] = [
+        {
+          key: "orgURL",
+          label: "URL",
+          type: "url",
+          fieldOptions: {
+            required: true,
+          },
+        },
+      ];
+      entityField.children?.push(...orgFields);
+    }
+    updatedField.forEach((f) => {
+      if (f.key === "author-entities") {
+        f.children?.push(entityField);
+      }
+    });
+    this.RelatedPeopleFields = updatedField;
+  }
   @state()
   AboutFields: Field[] = [
     {
@@ -182,11 +253,11 @@ export default class ECCClientRoCrateAbout extends LitElement {
       ],
     },
   ];
-
-  static RelatedPeopleFields: Field[] = [
+  @state()
+  RelatedPeopleFields: Field[] = [
     {
-      key: "author",
-      label: "Author",
+      key: "author-entities",
+      label: "Author Entities",
       type: "group",
       fieldOptions: {
         required: false,
@@ -198,15 +269,15 @@ export default class ECCClientRoCrateAbout extends LitElement {
       },
       children: [
         {
-          key: "person",
-          label: "Person",
+          key: "entity",
+          label: "Entity",
           type: "array",
           arrayOptions: {
             defaultInstances: 0,
           },
           children: [
             {
-              key: "personID",
+              key: "entityID",
               label: "@id",
               type: "url",
               fieldOptions: {
@@ -214,66 +285,16 @@ export default class ECCClientRoCrateAbout extends LitElement {
               },
             },
             {
-              key: "personType",
+              key: "entityType",
               label: "@type",
-              type: "text",
-              fieldOptions: {
-                default: "Person",
-                required: true,
-              },
+              type: "select",
+              selectOptions: [
+                { label: "Person", value: "Person" },
+                { label: "Organisation", value: "Organisation" },
+              ],
             },
             {
-              key: "personName",
-              label: "Name",
-              type: "text",
-              fieldOptions: {
-                required: true,
-              },
-            },
-          ],
-        },
-      ],
-    },
-    {
-      key: "publisher",
-      label: "Publisher",
-      type: "group",
-      fieldOptions: {
-        required: false,
-        default: "",
-        tooltip: "The publisher of the creative work.",
-      },
-      groupOptions: {
-        collapsible: true,
-      },
-      children: [
-        {
-          key: "org",
-          label: "Organisation",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 0,
-          },
-          children: [
-            {
-              key: "orgID",
-              label: "@id",
-              type: "url",
-              fieldOptions: {
-                required: true,
-              },
-            },
-            {
-              key: "orgType",
-              label: "@type",
-              type: "text",
-              fieldOptions: {
-                default: "Person",
-                required: true,
-              },
-            },
-            {
-              key: "orgName",
+              key: "entityName",
               label: "Name",
               type: "text",
               fieldOptions: {
@@ -285,66 +306,7 @@ export default class ECCClientRoCrateAbout extends LitElement {
               label: "URL",
               type: "url",
               fieldOptions: {
-                required: true,
-              },
-            },
-          ],
-        },
-      ],
-    },
-    {
-      key: "funder",
-      label: "Funder",
-      type: "group",
-      fieldOptions: {
-        required: false,
-        default: "",
-        tooltip:
-          "person or organization that supports (sponsors) something through some kind of financial contribution.",
-      },
-      groupOptions: {
-        collapsible: true,
-      },
-      children: [
-        {
-          key: "org",
-          label: "Organisation",
-          type: "array",
-          arrayOptions: {
-            defaultInstances: 0,
-          },
-          children: [
-            {
-              key: "orgID",
-              label: "@id",
-              type: "url",
-              fieldOptions: {
-                required: true,
-              },
-            },
-            {
-              key: "orgType",
-              label: "@type",
-              type: "text",
-              fieldOptions: {
-                default: "Person",
-                required: true,
-              },
-            },
-            {
-              key: "orgName",
-              label: "Name",
-              type: "text",
-              fieldOptions: {
-                required: true,
-              },
-            },
-            {
-              key: "orgURL",
-              label: "URL",
-              type: "url",
-              fieldOptions: {
-                required: true,
+                required: false,
               },
             },
           ],
@@ -431,7 +393,10 @@ export default class ECCClientRoCrateAbout extends LitElement {
           : ""}
         ${this.activeTab === 1
           ? html`<ecc-utils-design-form
-              .fields=${ECCClientRoCrateAbout.RelatedPeopleFields}
+              .fields=${this.RelatedPeopleFields}
+              @ecc-utils-change=${(e: CustomEvent) => {
+                this._handleChangeContextualType(e);
+              }}
             />`
           : ""}
         ${this.activeTab === 2
@@ -442,4 +407,4 @@ export default class ECCClientRoCrateAbout extends LitElement {
       </div>
     `;
   }
-}   
+}
