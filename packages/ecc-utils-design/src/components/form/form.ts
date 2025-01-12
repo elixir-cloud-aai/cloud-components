@@ -508,7 +508,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
     return html` <div class="group-container" data-testid="form-group">
       ${field.groupOptions?.collapsible
-        ? html` <sl-details
+        ? html`<sl-details
             data-testid="form-group-collapsible"
             summary=${`${field.label} ${
               field.fieldOptions?.required ? "*" : ""
@@ -664,6 +664,7 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   render() {
+    return html`<slot></slot>`;
     if (!this.fields || this.fields.length === 0) {
       throw new Error("Fields is required & should not be empty array");
     }
