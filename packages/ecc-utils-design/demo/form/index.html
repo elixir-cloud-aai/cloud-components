@@ -240,7 +240,7 @@
       ];
 
       render(
-        html`<ecc-utils-design-form
+        html`<ecc-d-form
           .fields=${fields}
           @ecc-utils-submit=${async (e) => {
             try {
@@ -260,7 +260,62 @@
             console.log("form - changed", e.detail);
           }}
         >
-        </ecc-utils-design-form> `,
+          <ecc-d-form-input
+            required
+            label="On"
+            type="switch"
+          ></ecc-d-form-input>
+
+          <ecc-d-form-input
+            required
+            type="text"
+            label="name"
+            placeholder="enter a name"
+          ></ecc-d-form-input>
+
+          <ecc-d-form-input
+            multiple
+            type="file"
+            label="file"
+            protocol="tus"
+            tooltip="select a file"
+            placeholder="enter a name"
+            tus-endpoint="https://tusd.tusdemo.net/files/"
+          ></ecc-d-form-input>
+
+          <ecc-d-form-group
+            type="array"
+            label="first group"
+            instances="2"
+            max-instances="3"
+          >
+            <ecc-d-form-input
+              multiple
+              type="select"
+              required="true"
+              label="Binary Gender"
+              tooltip="Do not select"
+              placeholder="enter a name"
+            >
+              <option ecc-option label="male">Male</option>
+              <option ecc-option label="female">Female</option>
+            </ecc-d-form-input>
+
+            <ecc-d-form-input
+              multiple
+              type="select"
+              required="true"
+              label="Binary Gender"
+              tooltip="Do not select"
+              placeholder="enter a name"
+            >
+              <option ecc-option label="male">Male</option>
+              <option ecc-option label="female">Female</option>
+            </ecc-d-form-input>
+
+            <div>work</div>
+          </ecc-d-form-group>
+        </ecc-d-form> `,
         document.querySelector("#demo")
       );
     </script>

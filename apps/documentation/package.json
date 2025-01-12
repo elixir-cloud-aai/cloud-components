@@ -4,7 +4,7 @@
   "description": "ECC Cloud Component documentation",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "",
     "start": "next start",
     "format:check": "prettier --check ./**/*.{md,mdx,ts,tsx,js,jsx}",
     "format": "prettier --write ./**/*.{md,mdx,ts,tsx,js,jsx}",
