@@ -1,6 +1,11 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
-import { renderInTooltip } from "./utils.js";
+import {
+  renderInTooltip,
+  toCamelCase,
+  noKeyWarning,
+  // findNearestFormGroup
+} from "./utils.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import "@shoelace-style/shoelace/dist/components/icon/icon.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
@@ -48,12 +53,50 @@ export default class EccUtilsDesignFormInput extends LitElement {
   @property({ type: String, reflect: true }) protocol: "native" | "tus" =
     "native";
 
-  @property({ type: String, reflect: true }) value: any =
-    this.default || this.checked;
+  @property({ type: String, reflect: true }) value: any;
 
   @state() private alertText = "Something went wrong";
   @state() private alertType: AlertType = "info";
   @state() private showAlert = false;
+  @state() path = "";
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    if (!this.key) {
+      noKeyWarning("ecc-d-form-group", this.label);
+      this.key = toCamelCase(this.label);
+    }
+
+    this.findNearestFormGroup();
+    if (this.value) {
+      this.handleFireChangeEvent();
+    }
+  }
+
+  private findNearestFormGroup(element: HTMLElement | null = this): void {
+    if (!element) return;
+
+    if (element.matches("ecc-d-form") || element.matches("ecc-d-form-group")) {
+      return;
+    }
+
+    const { parentElement } = element;
+    if (!parentElement) return;
+
+    const specialAttributes = [
+      "ecc-array-item",
+      "ecc-group-item",
+      "ecc-form-item",
+    ];
+    const hasSpecialAttribute = specialAttributes.some((attr) =>
+      parentElement.hasAttribute(attr)
+    );
+
+    if (hasSpecialAttribute) {
+      const parentPath = parentElement.getAttribute("path");
+      this.path = parentPath ? `${parentPath}.${this.key}` : this.key;
+    }
+  }
 
   private handleDismissAlert() {
     this.alertText = ""; // reset error text
@@ -68,11 +111,13 @@ export default class EccUtilsDesignFormInput extends LitElement {
     this.requestUpdate();
   }
 
-  private handleFireChangeEvent(event: Event) {
+  private handleFireChangeEvent() {
     this.dispatchEvent(
       new CustomEvent("ecc-utils-change", {
         detail: {
-          event,
+          key: this.key,
+          value: this.value,
+          path: this.path,
         },
         bubbles: true,
         composed: true,
@@ -85,7 +130,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
     this.value = this.type === "switch" ? target.checked : target.value;
 
     // fire change event
-    this.handleFireChangeEvent(e);
+    this.handleFireChangeEvent();
 
     // update
     this.requestUpdate();
@@ -100,7 +145,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
     }
 
     // fire change event
-    this.handleFireChangeEvent(e);
+    this.handleFireChangeEvent();
 
     if (this.protocol === "native") {
       this.value = files;
@@ -156,6 +201,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
           upload.start();
         })
         .catch((error) => {
+          // TO-DO: better error message display
           this.handleShowAlert(
             "error",
             `An error occurred while initializing the upload: ${error.message}`

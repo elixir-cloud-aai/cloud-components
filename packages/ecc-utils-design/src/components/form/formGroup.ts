@@ -1,8 +1,8 @@
 import { LitElement, html, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
-import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { repeat } from "lit/directives/repeat.js";
-import { renderInTooltip } from "./utils.js";
+import * as _ from "lodash-es";
+import { noKeyWarning, renderInTooltip, toCamelCase } from "./utils.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import formStyles from "./form.styles.js";
@@ -35,46 +35,102 @@ export default class EccUtilsDesignFormGroup extends LitElement {
   // group item options
   @property({ type: Boolean, reflect: true }) collapsible = false;
 
-  @state() private arrayItems: Array<{ id: number; items: Element[] }> = [];
-  @state() private originalInstance: Element[] = [];
+  @state() private arrayItems: Array<{
+    id: number;
+    items: Element[];
+  }> = [];
 
+  @state() private originalInstance: Element[] = [];
+  @state() private items: Array<Element> = [];
+  @state() private path = "";
+
+  declare setHTMLUnsafe: (htmlString: string) => void;
   protected firstUpdated(): void {
     if (this.type === "array") {
       this.originalInstance = Array.from(this.querySelectorAll(":scope > *"));
-      this.arrayItems = Array.from({ length: this.instances }, (_, index) => ({
+      this.arrayItems = Array.from({ length: this.instances }, (__, index) => ({
         id: index,
         items: this.originalInstance,
       }));
+    } else {
+      this.items = Array.from(this.querySelectorAll(":scope > *"));
     }
+
+    this.setHTMLUnsafe("");
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    if (!this.key) {
+      noKeyWarning("ecc-d-form-group", this.label);
+      this.key = toCamelCase(this.label);
+    }
+
+    this.findNearestFormGroup();
+  }
+
+  private findNearestFormGroup(element: HTMLElement | null = this): void {
+    if (!element) return;
+
+    if (element.matches("ecc-d-form")) {
+      return;
+    }
+
+    const { parentElement } = element;
+    if (!parentElement) return;
+
+    const specialAttributes = [
+      "ecc-array-item",
+      "ecc-group-item",
+      "ecc-form-item",
+    ];
+    const hasSpecialAttribute = specialAttributes.some((attr) =>
+      parentElement.hasAttribute(attr)
+    );
+
+    if (hasSpecialAttribute) {
+      const parentPath = parentElement.getAttribute("path");
+      this.path = parentPath ? `${parentPath}.${this.key}` : this.key;
+    }
+
+    this.findNearestFormGroup(parentElement);
   }
 
   private renderGroupTemplate(): TemplateResult {
-    return this.collapsible
-      ? html`
-          <sl-details
-            data-testid="group-collapsible"
-            summary=${`${this.label} ${this.required ? "*" : ""}`}
-          >
-            <slot></slot>
-          </sl-details>
-        `
-      : html`
-          <div
-            data-testid="group-non-collapsible"
-            class="group-header"
-            data-label="${this.label}"
-          >
-            ${renderInTooltip(
-              html`
-                <label class="group-label" data-testid="label">
-                  ${this.label} ${this.required ? "*" : ""}
-                </label>
-              `,
-              this.tooltip
-            )}
-          </div>
-          <div class="group-content"><slot></slot></div>
-        `;
+    return html`${this.collapsible
+      ? repeat(
+          this.items,
+          () => _.uniqueId("ecc-group-item-"),
+          (item) => html`
+            <sl-details
+              data-testid="group-collapsible"
+              summary=${`${this.label} ${this.required ? "*" : ""}`}
+            >
+              <div
+                class="group-content"
+                ecc-group-item
+                ecc-group-key="${this.key}"
+                path="${this.path}"
+              >
+                ${item}
+              </div>
+            </sl-details>
+          `
+        )
+      : repeat(
+          this.items,
+          () => _.uniqueId("group-item-"),
+          (item) => html`
+            <div
+              class="group-content"
+              ecc-group-item
+              ecc-group-key="${this.key}"
+              path="${this.path}"
+            >
+              ${item}
+            </div>
+          `
+        )}`;
   }
 
   private renderArrayTemplate(): TemplateResult {
@@ -127,6 +183,14 @@ export default class EccUtilsDesignFormGroup extends LitElement {
       }
     };
 
+    const arrayDiv = (item: Element, index: number) => {
+      const div = document.createElement("div");
+      div.setAttribute("ecc-array-key", `${this.key}[${index}]`);
+      div.innerHTML = item.outerHTML;
+
+      return div;
+    };
+
     return html`
       <div
         class="array-container"
@@ -174,6 +238,8 @@ export default class EccUtilsDesignFormGroup extends LitElement {
           (item) => item.id,
           (items, index) => html`
             <div
+              path="${this.path}[${index}]"
+              ecc-array-item
               class="array-item"
               data-testid="array-item"
               data-label=${`${this.label}-${index}`}
@@ -206,7 +272,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
                 ${repeat(
                   items.items,
                   (item) => item.id,
-                  (item) => html`${unsafeHTML(item.outerHTML)}`
+                  (item) => arrayDiv(item, index)
                 )}
               </div>
             </div>
