@@ -1,5 +1,6 @@
 {
   "name": "ecc-docs",
+  "private": true,
   "description": "ECC Cloud Component documentation",
   "scripts": {
     "dev": "next dev",
