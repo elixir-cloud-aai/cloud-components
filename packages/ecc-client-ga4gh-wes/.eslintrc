@@ -2,6 +2,7 @@
   "extends": ["@open-wc", "@elixir-cloud", "prettier"],
   "plugins": ["prettier"],
   "rules": {
+    "lit/no-classfield-shadowing": "warn",
     "camelcase": "warn",
     "prettier/prettier": "error",
     "no-console": ["error", { "allow": ["warn", "error"] }]

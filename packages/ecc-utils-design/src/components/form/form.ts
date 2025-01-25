@@ -1,4 +1,4 @@
-import { html, LitElement, TemplateResult } from "lit";
+import { html, LitElement, PropertyValues, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
@@ -10,6 +10,7 @@ import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/components/select/select.js";
 import "@shoelace-style/shoelace/dist/components/option/option.js";
 import * as _ from "lodash-es";
+import { repeat } from "lit/directives/repeat.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import formStyles from "./form.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
@@ -91,486 +92,20 @@ export default class EccUtilsDesignForm extends LitElement {
   @state() private errorMessage = "Something went wrong";
   @state() private successMessage = "Form submitted successfully";
   @state() private requiredButEmpty: string[] = [];
+  @state() private items: Array<Element> = [];
 
-  connectedCallback() {
-    super.connectedCallback();
+  declare setHTMLUnsafe: (htmlString: string) => void;
+  protected firstUpdated(_changedProperties: PropertyValues): void {
+    super.firstUpdated(_changedProperties);
 
-    if (!this.fields) {
-      throw new Error("Fields is required");
-    }
-  }
+    this.items = Array.from(this.querySelectorAll(":scope > *"));
+    this.setHTMLUnsafe("");
 
-  private alertFieldChange(key: string, value: any) {
-    this.dispatchEvent(
-      new CustomEvent("ecc-utils-change", {
-        detail: {
-          key,
-          value,
-        },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
-
-  private renderSwitchTemplate(field: Field, path: string): TemplateResult {
-    if (field.type !== "switch") return html``;
-
-    if (!_.get(this.form, path) && !this.hasUpdated) {
-      _.set(this.form, path, field.fieldOptions?.default || false);
-    }
-
-    return html`
-      <div class="switch-container" data-testid="form-switch-parent">
-        ${field.fieldOptions?.tooltip?.trim()
-          ? html`
-              <sl-tooltip
-                content=${field.fieldOptions?.tooltip}
-                data-testid="form-tooltip"
-              >
-                <label class="switch-label" data-testid="form-label"
-                  >${field.label}
-                </label>
-              </sl-tooltip>
-            `
-          : html`
-              <label class="switch-label" data-testid="form-label"
-                >${field.label}
-              </label>
-            `}
-        <sl-switch
-          size="small"
-          class="switch"
-          data-label=${field.label}
-          data-testid="form-switch"
-          label=${field.label}
-          ?required=${field.fieldOptions?.required}
-          ?disabled=${field.fieldOptions?.readonly}
-          ?checked=${_.get(this.form, path)}
-          @sl-change=${(e: Event) => {
-            const value = (e.target as HTMLInputElement).checked;
-            _.set(this.form, path, value);
-            this.requestUpdate();
-            this.alertFieldChange(field.key, value);
-          }}
-        >
-        </sl-switch>
-      </div>
-    `;
-  }
-
-  private uploadPercentage = 0;
-
-  private handleTusFileUpload = async (
-    e: Event,
-    field: Field
-  ): Promise<void> => {
-    const file = (e.target as HTMLInputElement).files?.[0];
-
-    if (!file) {
-      console.error("No file selected for upload.");
-      return;
-    }
-
-    try {
-      const { Upload } = await import("@anurag_gupta/tus-js-client");
-
-      const upload = new Upload(file, {
-        endpoint: field.fileOptions?.tusOptions?.endpoint,
-        retryDelays: [0, 3000, 5000, 10000, 20000],
-        metadata: {
-          filename: file.name,
-          filetype: file.type,
-        },
-        onError: (error) => {
-          console.error(`Upload failed because: ${error.message}`);
-        },
-        onProgress: (bytesUploaded, bytesTotal) => {
-          const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
-          this.uploadPercentage = Number(percentage);
-          console.log(
-            `Uploaded: ${bytesUploaded} bytes of ${bytesTotal} bytes (${percentage}%)`
-          );
-          this.requestUpdate();
-        },
-        onSuccess: () => {
-          if ("name" in upload.file) {
-            console.log("Download %s from %s", upload.file.name, upload.url);
-          } else {
-            console.log("Download file from %s", upload.url);
-          }
-        },
-      });
-
-      const previousUploads = await upload.findPreviousUploads();
-      if (previousUploads.length > 0) {
-        upload.resumeFromPreviousUpload(previousUploads[0]);
+    this.addEventListener("ecc-utils-change", (e) => {
+      if (e.detail.path) {
+        _.set(this.form, e.detail.path, e.detail.value);
       }
-
-      upload.start();
-    } catch (error) {
-      console.error("An error occurred while initializing the upload:", error);
-    }
-  };
-
-  renderInputTemplate(field: Field, path: string): TemplateResult {
-    if (
-      field.type === "array" ||
-      field.type === "switch" ||
-      field.type === "group"
-    )
-      return html``;
-
-    if (field.type === "file") {
-      return html`
-        <div class="file-container" data-testid="form-input-file-parent">
-          ${field.fieldOptions?.tooltip?.trim()
-            ? html`
-                <sl-tooltip
-                  id=${field.key}
-                  content=${field.fieldOptions?.tooltip}
-                  data-testid="form-tooltip"
-                >
-                  <label class="file-input-label" data-testid="form-label">
-                    ${field.label} ${field.fieldOptions?.required ? "*" : ""}
-                  </label>
-                </sl-tooltip>
-              `
-            : html`
-                <label class="file-input-label" data-testid="form-label">
-                  ${field.label} ${field.fieldOptions?.required ? "*" : ""}
-                </label>
-              `}
-          ${field.fileOptions?.protocol === "tus"
-            ? html`
-                <input
-                  type="file"
-                  class="file-input"
-                  ?disabled=${field.fieldOptions?.readonly}
-                  @change=${async (e: Event) => {
-                    await this.handleTusFileUpload(e, field);
-                  }}
-                />
-                <div class="progress-bar-container">
-                  <div
-                    class="progress-bar"
-                    style="width: ${this.uploadPercentage}%;"
-                  ></div>
-                </div>
-                <div class="upload-percentage">
-                  ${this.uploadPercentage.toFixed(2)}%
-                </div>
-              `
-            : ""}
-          ${!field.fileOptions?.protocol ||
-          field.fileOptions?.protocol === "native"
-            ? html`
-                <input
-                  class="file-input"
-                  type="file"
-                  data-label=${field.label}
-                  data-testid="form-input-file"
-                  accept=${field.fieldOptions?.accept || "*"}
-                  ?disabled=${field.fieldOptions?.readonly}
-                  ?multiple=${field.fieldOptions?.multiple}
-                  ?required=${field.fieldOptions?.required}
-                  @change=${async (e: Event) => {
-                    const { files } = e.target as HTMLInputElement;
-                    _.set(this.form, path, files);
-                    this.requestUpdate();
-                  }}
-                />
-              `
-            : ""}
-        </div>
-      `;
-    }
-
-    // if the field is empty and has a default value, set the default value on first render
-    if (!_.get(this.form, path)) {
-      if (field.fieldOptions?.default && !this.hasUpdated) {
-        _.set(this.form, path, field.fieldOptions.default);
-      } else if (field.fieldOptions?.returnIfEmpty) {
-        _.set(this.form, path, "");
-      }
-    }
-
-    if (field.type === "select") {
-      return html`
-        <div class="select-container">
-          ${field.fieldOptions?.tooltip?.trim()
-            ? html`
-                <sl-tooltip
-                  id=${field.key}
-                  content=${field.fieldOptions?.tooltip}
-                >
-                  <label class="select-label">
-                    ${field.label} ${field.fieldOptions?.required ? "*" : ""}
-                  </label>
-                </sl-tooltip>
-              `
-            : html`
-                <label class="select-label">
-                  ${field.label} ${field.fieldOptions?.required ? "*" : ""}
-                </label>
-              `}
-          <sl-select
-            class="select"
-            ?required=${field.fieldOptions?.required}
-            ?disabled=${field.fieldOptions?.readonly}
-            value=${_.get(this.form, path)?.label || ""}
-            @sl-change=${(e: Event) => {
-              const selectElement = e.target as HTMLSelectElement;
-              const label =
-                selectElement.selectedOptions[0].textContent?.trim();
-              _.set(this.form, path, label);
-              this.requestUpdate();
-              this.alertFieldChange(field.key, label);
-            }}
-          >
-            ${field.selectOptions?.map(
-              (option) => html`
-                <sl-option value=${option.value}> ${option.label} </sl-option>
-              `
-            )}
-          </sl-select>
-        </div>
-      `;
-    }
-
-    return html`
-      <sl-input
-        class="input"
-        data-label=${field.label}
-        data-testid="form-input"
-        type=${field.type || "text"}
-        ?required=${field.fieldOptions?.required}
-        value=${_.get(this.form, path)}
-        ?password-toggle=${field.type === "password"}
-        ?disabled=${field.fieldOptions?.readonly}
-        @sl-input=${(e: Event) => {
-          const { value } = e.target as HTMLInputElement;
-          if (!value) {
-            _.unset(this.form, path);
-            if (field.fieldOptions?.returnIfEmpty) _.set(this.form, path, null);
-          } else {
-            _.set(this.form, path, value.trim());
-          }
-          this.requestUpdate();
-          this.alertFieldChange(field.key, value);
-        }}
-      >
-        <label slot="label">
-          ${field.fieldOptions?.tooltip?.trim()
-            ? html`
-              <sl-tooltip content=${field.fieldOptions?.tooltip} data-testid="form-tooltip" >
-                <label data-testid="form-label" > ${field.label} </label>
-              </sl-tooltip>
-            </label>
-            `
-            : html` <label data-testid="form-label"> ${field.label} </label> `}
-        </label>
-      </sl-input>
-    `;
-  }
-
-  private renderArrayTemplate(field: Field, path: string): TemplateResult {
-    const { arrayOptions } = field;
-
-    if (!_.get(this.form, path)) {
-      const defaultCount = field.arrayOptions?.defaultInstances;
-      if (defaultCount) {
-        _.set(
-          this.form,
-          path,
-          Array.from({ length: defaultCount }, () => ({}))
-        );
-      }
-    }
-
-    const resolveAddButtonIsActive = () => {
-      if (!arrayOptions?.max) return true;
-      if (arrayOptions.max > (_.get(this.form, path)?.length || 0)) return true;
-      return false;
-    };
-
-    const resolveDeleteButtonIsActive = () => {
-      if (!arrayOptions?.defaultInstances || !arrayOptions?.min) return true;
-      if (_.get(this.form, path).length > arrayOptions.min) return true;
-      return false;
-    };
-
-    return html`
-      <div class="array-container">
-        <div class="array-header">
-          ${field.fieldOptions?.tooltip?.trim()
-            ? html`
-                <sl-tooltip
-                  content=${field.fieldOptions?.tooltip}
-                  data-testid="form-tooltip"
-                >
-                  <label data-testid="form-label" class="array-label">
-                    ${field.label} ${field.fieldOptions?.required ? "*" : ""}
-                  </label>
-                </sl-tooltip>
-              `
-            : html`
-                <label data-testid="form-label" class="array-label">
-                  ${field.label} ${field.fieldOptions?.required ? "*" : ""}
-                </label>
-              `}
-          <sl-button
-            variant="text"
-            size="small"
-            data-testid="form-array-add"
-            ?disabled=${!resolveAddButtonIsActive()}
-            class="add-button"
-            @click=${() => {
-              if (resolveAddButtonIsActive()) {
-                const instances: [] = _.get(this.form, path) || [];
-                _.set(this.form, path, [...instances, {}]);
-                this.requestUpdate();
-              }
-            }}
-          >
-            <svg
-              class="add-icon"
-              slot="prefix"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-            Add
-          </sl-button>
-        </div>
-        ${_.get(this.form, path)?.map(
-          (_item: any, index: number) => html`
-            <div class="array-item" data-testid="form-array-item">
-              <sl-button
-                variant="text"
-                data-testid="form-array-delete"
-                ?disabled=${!resolveDeleteButtonIsActive()}
-                @click=${() => {
-                  if (resolveDeleteButtonIsActive()) {
-                    const newInstance = [..._.get(this.form, path)];
-                    newInstance.splice(index, 1);
-                    _.set(this.form, path, newInstance);
-                    this.requestUpdate();
-                  }
-                }}
-              >
-                <svg
-                  class="delete-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                  />
-                </svg>
-              </sl-button>
-              <div class="array-item-container">
-                ${field.children?.map((child) =>
-                  this.renderTemplate(child, `${path}[${index}]`)
-                )}
-              </div>
-            </div>
-          `
-        )}
-      </div>
-    `;
-  }
-
-  private renderGroupTemplate(field: Field, path: string): TemplateResult {
-    if (!field.children) return html``;
-
-    const renderChildren = () =>
-      html`
-        <div class="group-item" data-testid="form-group-item">
-          ${field.children?.map((child) =>
-            this.renderTemplate(child, `${path}`)
-          )}
-        </div>
-      `;
-
-    return html` <div class="group-container" data-testid="form-group">
-      ${field.groupOptions?.collapsible
-        ? html`<sl-details
-            data-testid="form-group-collapsible"
-            summary=${`${field.label} ${
-              field.fieldOptions?.required ? "*" : ""
-            }`}
-          >
-            ${renderChildren()}
-          </sl-details>`
-        : html`
-            <div data-testid="form-group-non-collapsible" class="group-header">
-              ${field.fieldOptions?.tooltip?.trim()
-                ? html`
-                    <sl-tooltip
-                      content=${field.fieldOptions?.tooltip}
-                      data-testid="form-tooltip"
-                    >
-                      <label data-testid="form-label" class="group-label">
-                        ${field.groupOptions?.collapsible ? "" : field.label}
-                      </label>
-                    </sl-tooltip>
-                  `
-                : html`
-                    <label class="group-label">
-                      ${field.groupOptions?.collapsible ? "" : field.label}
-                    </label>
-                  `}
-            </div>
-            <div class="group-content">${renderChildren()}</div>
-          `}
-    </div>`;
-  }
-
-  private renderTemplate(field: Field, path: string): TemplateResult {
-    const newPath = `${path}.${field.key}`;
-    if (field.type === "group") {
-      return this.renderGroupTemplate(field, newPath);
-    }
-    if (field.type === "array") {
-      return this.renderArrayTemplate(field, newPath);
-    }
-
-    if (field.fieldOptions?.required) {
-      if (
-        !_.get(this.form, newPath) &&
-        !this.requiredButEmpty.includes(field.key)
-      ) {
-        // add to requiredButEmpty
-
-        // eslint-disable-next-line no-empty
-        if (!this.hasUpdated && field.fieldOptions.default) {
-        } else this.requiredButEmpty.push(field.key);
-      } else if (_.get(this.form, newPath)) {
-        // remove from requiredButEmpty
-        this.requiredButEmpty = this.requiredButEmpty.filter(
-          (key) => key !== field.key
-        );
-      }
-    }
-
-    if (field.type === "switch") {
-      return this.renderSwitchTemplate(field, newPath);
-    }
-    return this.renderInputTemplate(field, newPath);
+    });
   }
 
   private renderErrorTemplate(): TemplateResult {
@@ -664,42 +199,50 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   render() {
-    return html`<slot></slot>`;
-    if (!this.fields || this.fields.length === 0) {
-      throw new Error("Fields is required & should not be empty array");
-    }
-    if (this.formState === "success") {
-      return html` ${this.renderSuccessTemplate()} `;
-    }
-
-    const toggleButtonState = () => {
-      if (this.requiredButEmpty.length > 0) {
-        this.canSubmit = false;
-      } else {
-        this.canSubmit = true;
-      }
-
-      return "";
-    };
-
     return html`
-      <form data-testid="form" @submit=${this.handleSubmit}>
-        ${this.fields.map((field) => this.renderTemplate(field, "data"))}
-        ${this.renderErrorTemplate()} ${toggleButtonState()}
-
-        <sl-button
-          type="submit"
-          data-testid="form-submit"
-          variant="primary"
-          class="submit-button"
-          ?loading=${this.formState === "loading"}
-          ?disabled=${this.submitDisabledByUser ||
-          !this.canSubmit ||
-          this.formState === "loading"}
-        >
-          Submit
-        </sl-button>
-      </form>
+      <div ecc-form-item>
+        ${repeat(
+          this.items,
+          () => _.uniqueId("ecc-form-item-"),
+          (item) => html`${item}`
+        )}
+      </div>
     `;
+    // if (!this.fields || this.fields.length === 0) {
+    //   throw new Error("Fields is required & should not be empty array");
+    // }
+    // if (this.formState === "success") {
+    //   return html` ${this.renderSuccessTemplate()} `;
+    // }
+
+    // const toggleButtonState = () => {
+    //   if (this.requiredButEmpty.length > 0) {
+    //     this.canSubmit = false;
+    //   } else {
+    //     this.canSubmit = true;
+    //   }
+
+    //   return "";
+    // };
+
+    // return html`
+    //   <form data-testid="form" @submit=${this.handleSubmit}>
+    //     ${this.fields.map((field) => this.renderTemplate(field, "data"))}
+    //     ${this.renderErrorTemplate()} ${toggleButtonState()}
+
+    //     <sl-button
+    //       type="submit"
+    //       data-testid="form-submit"
+    //       variant="primary"
+    //       class="submit-button"
+    //       ?loading=${this.formState === "loading"}
+    //       ?disabled=${this.submitDisabledByUser ||
+    //       !this.canSubmit ||
+    //       this.formState === "loading"}
+    //     >
+    //       Submit
+    //     </sl-button>
+    //   </form>
+    // `;
   }
 }
