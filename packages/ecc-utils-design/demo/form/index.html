@@ -18,149 +18,8 @@
       import { html, render } from "lit";
       import "../../dist/components/form/index.js";
 
-      const fields = [
-        {
-          key: "name",
-          label: "Name",
-          type: "text",
-          fieldOptions: {
-            required: true,
-            tooltip: "Your name",
-          },
-        },
-        {
-          key: "email",
-          label: "Email",
-          type: "email",
-          fieldOptions: {
-            tooltip: "Your email address",
-          },
-        },
-        {
-          key: "18+",
-          label: "18+",
-          type: "switch",
-          fieldOptions: {
-            tooltip: "Are you over 18 years old?",
-          },
-        },
-        {
-          key: "id",
-          label: "ID",
-          type: "file",
-          fieldOptions: {
-            required: true,
-            tooltip: "Your ID document",
-          },
-        },
-        {
-          key: "id2",
-          label: "ID",
-          type: "file",
-          fileOptions: {
-            protocol: "tus",
-            tusOptions: {
-              endpoint: "https://tusd.tusdemo.net/files/",
-            },
-          },
-        },
-        {
-          key: "gender",
-          label: "Gender",
-          type: "select",
-          fieldOptions: {
-            required: true,
-          },
-          selectOptions: [
-            { label: "Male", value: "1" },
-            { label: "Female", value: "2" },
-            { label: "Don't want to disclose", value: "3" },
-          ],
-        },
-        {
-          key: "address",
-          label: "Address",
-          type: "group",
-          groupOptions: {
-            collapsible: true,
-            tooltip: "Your address",
-          },
-          fieldOptions: {
-            tooltip: "Group for address",
-          },
-          arrayOptions: {
-            defaultInstances: 1,
-            max: 4,
-            min: 1,
-          },
-          children: [
-            {
-              key: "Details",
-              label: "Details",
-              type: "array",
-              fieldOptions: {
-                tooltip: "Details for address",
-              },
-              arrayOptions: {
-                defaultInstances: 0,
-                max: 2,
-              },
-              children: [
-                {
-                  key: "houseNumber",
-                  label: "House Number",
-                  type: "text",
-                  fieldOptions: {
-                    required: true,
-                    tooltip: "Your house number",
-                  },
-                },
-                {
-                  key: "street",
-                  label: "Street",
-                  type: "text",
-                  fieldOptions: {
-                    default: "1601 Harrier Ln",
-                    required: false,
-                    tooltip: "Your street name",
-                  },
-                },
-                {
-                  key: "city",
-                  label: "City",
-                  type: "text",
-                  fieldOptions: {
-                    required: true,
-                    tooltip: "Your city name",
-                  },
-                },
-                {
-                  key: "isPrimary",
-                  label: "Primary",
-                  type: "switch",
-                  fieldOptions: {
-                    default: true,
-                    tooltip: "Is this your primary residence?",
-                  },
-                },
-              ],
-            },
-            {
-              key: "country",
-              label: "Country",
-              type: "text",
-              fieldOptions: {
-                required: true,
-                tooltip: "Your country name",
-              },
-            },
-          ],
-        },
-      ];
-
       render(
         html`<ecc-d-form
-          .fields=${fields}
           @ecc-utils-submit=${async (e) => {
             try {
               console.log("form - submitted", e.detail);
@@ -177,87 +36,77 @@
           }}
         >
           <ecc-d-form-input
-            required
-            label="On"
-            type="switch"
-          ></ecc-d-form-input>
-
-          <ecc-d-form-input
-            required
-            type="text"
-            label="name"
             key="name"
-            value="different"
-            placeholder="enter a name"
+            label="Name"
+            required
+            tooltip="Enter name"
           ></ecc-d-form-input>
 
           <ecc-d-form-input
-            multiple
-            type="file"
-            label="file"
-            protocol="tus"
-            tooltip="select a file"
-            placeholder="enter a name"
-            tus-endpoint="https://tusd.tusdemo.net/files/"
+            key="email"
+            label="Email"
+            tooltip="Enter your email address"
           ></ecc-d-form-input>
 
-          <ecc-d-form-group
-            type="array"
-            label="first group"
-            instances="2"
-            max-instances="3"
-          >
-            <ecc-d-form-input
-              multiple
-              type="select"
-              required="true"
-              label="Binary Gender"
-              tooltip="Do not select"
-              placeholder="enter a name"
-            >
-              <option ecc-option label="male">Male</option>
-              <option ecc-option label="female">Female</option>
-            </ecc-d-form-input>
+          <ecc-d-form-input
+            key="18+"
+            label="18+"
+            type="switch"
+            tooltip="Are you over 18 years old?"
+          ></ecc-d-form-input>
 
-            <ecc-d-form-input
-              required
-              type="text"
-              label="name"
-              value="John doe"
-              placeholder="enter a name"
-            ></ecc-d-form-input>
+          <ecc-d-form-input
+            key="id"
+            label="ID"
+            type="file"
+            required
+            tooltip="Your ID document"
+          ></ecc-d-form-input>
 
+          <ecc-d-form-input
+            key="id2"
+            label="TUS ID"
+            type="file"
+            protocol="tus"
+            endpoint="https://tusd.tusdemo.net/files/"
+            tooltip="Your ID document"
+          ></ecc-d-form-input>
+
+          <ecc-d-form-input required type="select" label="Gender">
+            <option ecc-option value="female">Female</option>
+            <option ecc-option value="male">Male</option>
+            <option ecc-option value="none">Do not want to Disclose</option>
+          </ecc-d-form-input>
+
+          <ecc-d-form-group type="group" label="Address" key="address">
             <ecc-d-form-group
+              required
               type="array"
+              label="Details"
               instances="1"
-              label="nested group"
-              max-instances="3"
-              collapsible="true"
+              max="2"
+              min="1"
             >
               <ecc-d-form-input
-                required
-                type="text"
-                label="name"
-                value="John star"
-                placeholder="enter a name"
-              ></ecc-d-form-input>
-            </ecc-d-form-group>
-          </ecc-d-form-group>
+                type="switch"
+                key="isPrimary"
+                label="Primary Address"
+              >
+              </ecc-d-form-input>
+              <ecc-d-form-input
+                key="houseNumber"
+                label="House Number"
+                tooltip="Your house number"
+              >
+              </ecc-d-form-input>
+              <ecc-d-form-input required key="street" label="Street">
+              </ecc-d-form-input>
+              <ecc-d-form-input required key="city" label="City">
+              </ecc-d-form-input>
 
-          <ecc-d-form-group
-            type="group"
-            label="second group"
-            max-instances="3"
-            collapsible="true"
-          >
-            <ecc-d-form-input
-              required
-              type="text"
-              key="username"
-              label="username"
-              value="John star"
-              placeholder="enter a name"
-            ></ecc-d-form-input>
+              <ecc-d-form-input required key="country" label="Country">
+              </ecc-d-form-input>
+            </ecc-d-form-group>
           </ecc-d-form-group>
         </ecc-d-form> `,
         document.querySelector("#demo")

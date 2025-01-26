@@ -29,8 +29,8 @@ export default class EccUtilsDesignFormGroup extends LitElement {
   @property({ type: Number, reflect: true })
   instances = 0;
 
-  @property({ type: Number, attribute: "max-instances" }) maxInstances = "";
-  @property({ type: Number, attribute: "min-instances" }) minInstances = "";
+  @property({ type: Number, attribute: "max" }) maxInstances = "";
+  @property({ type: Number, attribute: "min" }) minInstances = "";
 
   // group item options
   @property({ type: Boolean, reflect: true }) collapsible = false;
@@ -121,6 +121,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
           this.items,
           () => _.uniqueId("group-item-"),
           (item) => html`
+            <span>${this.label} ${this.required ? "*" : ""} </span>
             <div
               class="group-content"
               ecc-group-item

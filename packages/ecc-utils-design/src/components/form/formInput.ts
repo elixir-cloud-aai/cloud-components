@@ -1,11 +1,7 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
-import {
-  renderInTooltip,
-  toCamelCase,
-  noKeyWarning,
-  // findNearestFormGroup
-} from "./utils.js";
+import { repeat } from "lit/directives/repeat.js";
+import { renderInTooltip, toCamelCase, noKeyWarning } from "./utils.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import "@shoelace-style/shoelace/dist/components/icon/icon.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
@@ -285,8 +281,8 @@ export default class EccUtilsDesignFormInput extends LitElement {
     const optionsEl = Array.from(this.querySelectorAll("[ecc-option]"));
 
     const options = optionsEl.map((opt) => ({
-      label: opt.getAttribute("label"),
-      value: opt.textContent,
+      label: opt.getAttribute("label") || opt.textContent,
+      value: opt.getAttribute("value"),
     }));
 
     const label = html`
@@ -307,14 +303,16 @@ export default class EccUtilsDesignFormInput extends LitElement {
           data-label=${this.label}
           @sl-change=${this.handleValueUpdate}
         >
-          ${options?.map(
-            (option) => html`
+          ${repeat(
+            options,
+            (opt) => opt.value,
+            (opt) => html`
               <sl-option
                 data-testid="select-option"
-                data-label=${option.label}
-                value=${option.value}
+                data-label=${opt.label}
+                value=${opt.value}
               >
-                ${option.label}
+                ${opt.label}
               </sl-option>
             `
           )}
