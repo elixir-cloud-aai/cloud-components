@@ -17,8 +17,6 @@ export default class EccUtilsDesignFormGroup extends LitElement {
 
   // TODO
   // build required but empty functionality
-  // add functionality to collect all ecc-input fields in the group
-  // same for the form
   @property({ type: String, reflect: true }) label = "";
   @property({ type: String, reflect: true }) key = "";
   @property({ type: String, reflect: true }) type: "array" | "group" = "group";
@@ -35,7 +33,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
   // group item options
   @property({ type: Boolean, reflect: true }) collapsible = false;
 
-  @state() private arrayItems: Array<{
+  @state() private arrayInstances: Array<{
     id: number;
     items: Element[];
   }> = [];
@@ -48,10 +46,13 @@ export default class EccUtilsDesignFormGroup extends LitElement {
   protected firstUpdated(): void {
     if (this.type === "array") {
       this.originalInstance = Array.from(this.querySelectorAll(":scope > *"));
-      this.arrayItems = Array.from({ length: this.instances }, (__, index) => ({
-        id: index,
-        items: this.originalInstance,
-      }));
+      this.arrayInstances = Array.from(
+        { length: this.instances },
+        (__, index) => ({
+          id: index,
+          items: this.originalInstance,
+        })
+      );
     } else {
       this.items = Array.from(this.querySelectorAll(":scope > *"));
     }
@@ -79,11 +80,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
     const { parentElement } = element;
     if (!parentElement) return;
 
-    const specialAttributes = [
-      "ecc-array-item",
-      "ecc-group-item",
-      "ecc-form-item",
-    ];
+    const specialAttributes = ["ecc-array", "ecc-group", "ecc-form"];
     const hasSpecialAttribute = specialAttributes.some((attr) =>
       parentElement.hasAttribute(attr)
     );
@@ -100,7 +97,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
     return html`${this.collapsible
       ? repeat(
           this.items,
-          () => _.uniqueId("ecc-group-item-"),
+          () => _.uniqueId("ecc-group-"),
           (item) => html`
             <sl-details
               data-testid="group-collapsible"
@@ -108,7 +105,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
             >
               <div
                 class="group-content"
-                ecc-group-item
+                ecc-group
                 ecc-group-key="${this.key}"
                 path="${this.path}"
               >
@@ -119,12 +116,12 @@ export default class EccUtilsDesignFormGroup extends LitElement {
         )
       : repeat(
           this.items,
-          () => _.uniqueId("group-item-"),
+          () => _.uniqueId("ecc-group-"),
           (item) => html`
             <span>${this.label} ${this.required ? "*" : ""} </span>
             <div
               class="group-content"
-              ecc-group-item
+              ecc-group
               ecc-group-key="${this.key}"
               path="${this.path}"
             >
@@ -137,16 +134,22 @@ export default class EccUtilsDesignFormGroup extends LitElement {
   private renderArrayTemplate(): TemplateResult {
     const resolveAddButtonIsActive = () => {
       if (!this.maxInstances) return true;
-      if (Number(this.maxInstances) > this.arrayItems.length || 0) return true;
+      if (Number(this.maxInstances) > this.arrayInstances.length || 0)
+        return true;
       return false;
     };
 
-    const resolveDeleteButtonIsActive = () => true;
+    const resolveDeleteButtonIsActive = () => {
+      if (!this.minInstances) return true;
+      if (Number(this.minInstances) >= this.arrayInstances.length || 0)
+        return false;
+      return true;
+    };
 
     const addItem = () => {
       if (resolveAddButtonIsActive()) {
-        this.arrayItems.push({
-          id: this.arrayItems.length,
+        this.arrayInstances.push({
+          id: this.arrayInstances.length,
           items: this.originalInstance,
         });
 
@@ -155,7 +158,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
           new CustomEvent("ecc-utils-array-add", {
             detail: {
               key: this.key,
-              instances: this.arrayItems.length,
+              instances: this.arrayInstances.length,
             },
             bubbles: true,
             composed: true,
@@ -166,16 +169,16 @@ export default class EccUtilsDesignFormGroup extends LitElement {
 
     const deleteItem = (index: number) => {
       if (resolveDeleteButtonIsActive()) {
-        const newItems = [...this.arrayItems];
+        const newItems = [...this.arrayInstances];
         newItems.splice(index, 1);
 
-        this.arrayItems = newItems;
+        this.arrayInstances = newItems;
         this.requestUpdate();
         this.dispatchEvent(
           new CustomEvent("ecc-utils-array-delete", {
             detail: {
               key: this.key,
-              instances: this.arrayItems.length,
+              instances: this.arrayInstances.length,
             },
             bubbles: true,
             composed: true,
@@ -235,14 +238,14 @@ export default class EccUtilsDesignFormGroup extends LitElement {
           </sl-button>
         </div>
         ${repeat(
-          this.arrayItems,
-          (item) => item.id,
-          (items, index) => html`
+          this.arrayInstances,
+          (instance) => instance.id,
+          (instance, index) => html`
             <div
               path="${this.path}[${index}]"
-              ecc-array-item
-              class="array-item"
-              data-testid="array-item"
+              ecc-array
+              class="array"
+              data-testid="array"
               data-label=${`${this.label}-${index}`}
             >
               <sl-button
@@ -271,7 +274,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
               </sl-button>
               <div class="array-item-container">
                 ${repeat(
-                  items.items,
+                  instance.items,
                   (item) => item.id,
                   (item) => arrayDiv(item, index)
                 )}

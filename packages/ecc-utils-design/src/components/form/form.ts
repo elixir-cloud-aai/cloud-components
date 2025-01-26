@@ -199,7 +199,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
   render() {
     return html`
-      <div ecc-form-item>
+      <div ecc-form>
         ${repeat(
           this.items,
           () => _.uniqueId("ecc-form-item-"),

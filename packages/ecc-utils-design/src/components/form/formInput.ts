@@ -79,11 +79,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
     const { parentElement } = element;
     if (!parentElement) return;
 
-    const specialAttributes = [
-      "ecc-array-item",
-      "ecc-group-item",
-      "ecc-form-item",
-    ];
+    const specialAttributes = ["ecc-array", "ecc-group", "ecc-form"];
     const hasSpecialAttribute = specialAttributes.some((attr) =>
       parentElement.hasAttribute(attr)
     );
@@ -132,29 +128,25 @@ export default class EccUtilsDesignFormInput extends LitElement {
     this.requestUpdate();
   }
 
-  // eslint-disable-next-line  consistent-return
   private handleFileUpload(e: Event) {
     const { files } = e.target as HTMLInputElement;
 
     if (!files?.length) {
-      return this.handleShowAlert("error", "No file selected for upload.");
+      this.handleShowAlert("error", "No file selected for upload.");
+      return;
     }
 
-    // fire change event
     this.handleFireChangeEvent();
 
     if (this.protocol === "native") {
       this.value = files;
       this.requestUpdate();
-      // eslint-disable-next-line  consistent-return
       return;
     }
 
     if (!this.tusEndpoint) {
-      return this.handleShowAlert(
-        "error",
-        "No tus endpoint provided for tus uploads"
-      );
+      this.handleShowAlert("error", "No tus endpoint provided for tus uploads");
+      return;
     }
 
     Array.from(files).forEach((file) => {
