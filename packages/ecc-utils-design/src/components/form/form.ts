@@ -1,5 +1,5 @@
 import { html, LitElement, PropertyValues, TemplateResult } from "lit";
-import { property, state } from "lit/decorators.js";
+import { state } from "lit/decorators.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/switch/switch.js";
@@ -84,7 +84,6 @@ export default class EccUtilsDesignForm extends LitElement {
     formStyles,
   ];
 
-  @property({ type: Array, reflect: true }) fields: Array<Field> = [];
   @state() private form: object = {};
   @state() private formState: "idle" | "loading" | "error" | "success" = "idle";
   @state() private canSubmit = false;
@@ -110,7 +109,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
   private renderErrorTemplate(): TemplateResult {
     if (this.formState !== "error") return html``;
-    return html`<sl-alert data-testid="form-error" variant="danger" open>
+    return html`<sl-alert data-testid="error" variant="danger" open>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         slot="icon"
@@ -133,7 +132,7 @@ export default class EccUtilsDesignForm extends LitElement {
   private renderSuccessTemplate(): TemplateResult {
     if (this.formState !== "success") return html``;
     return html`
-      <sl-alert data-testid="form-success" variant="success" open>
+      <sl-alert data-testid="success" variant="success" open>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           slot="icon"
@@ -206,6 +205,19 @@ export default class EccUtilsDesignForm extends LitElement {
           () => _.uniqueId("ecc-form-item-"),
           (item) => html`${item}`
         )}
+
+        <sl-button
+          type="submit"
+          data-testid="submit"
+          variant="primary"
+          class="submit-button"
+          ?loading=${this.formState === "loading"}
+          ?disabled=${this.submitDisabledByUser ||
+          !this.canSubmit ||
+          this.formState === "loading"}
+        >
+          Submit
+        </sl-button>
       </div>
     `;
     // if (!this.fields || this.fields.length === 0) {
