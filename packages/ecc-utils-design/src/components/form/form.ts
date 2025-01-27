@@ -86,7 +86,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
   @state() private form: object = {};
   @state() private formState: "idle" | "loading" | "error" | "success" = "idle";
-  @state() private canSubmit = false;
+  @state() private canSubmit = true;
   @state() private submitDisabledByUser = false;
   @state() private errorMessage = "Something went wrong";
   @state() private successMessage = "Form submitted successfully";
@@ -178,6 +178,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
   private handleSubmit(e: Event) {
     e.preventDefault();
+
     const form = this.shadowRoot?.querySelector("form");
     const isValid = form?.reportValidity();
     if (!isValid) {
@@ -198,8 +199,26 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   render() {
+    // const toggleButtonState = () => {
+    //   if (this.requiredButEmpty.length > 0) {
+    //     this.canSubmit = false;
+    //   } else {
+    //     this.canSubmit = true;
+    //   }
+
+    //   return "";
+    // };
+
+    if (this.formState === "success") {
+      return html` ${this.renderSuccessTemplate()} `;
+    }
+
+    if (this.formState === "error") {
+      return html` ${this.renderErrorTemplate()} `;
+    }
+
     return html`
-      <div ecc-form>
+      <form ecc-form @submit=${this.handleSubmit}>
         ${repeat(
           this.items,
           () => _.uniqueId("ecc-form-item-"),
@@ -218,43 +237,7 @@ export default class EccUtilsDesignForm extends LitElement {
         >
           Submit
         </sl-button>
-      </div>
+      </form>
     `;
-    // if (!this.fields || this.fields.length === 0) {
-    //   throw new Error("Fields is required & should not be empty array");
-    // }
-    // if (this.formState === "success") {
-    //   return html` ${this.renderSuccessTemplate()} `;
-    // }
-
-    // const toggleButtonState = () => {
-    //   if (this.requiredButEmpty.length > 0) {
-    //     this.canSubmit = false;
-    //   } else {
-    //     this.canSubmit = true;
-    //   }
-
-    //   return "";
-    // };
-
-    // return html`
-    //   <form data-testid="form" @submit=${this.handleSubmit}>
-    //     ${this.fields.map((field) => this.renderTemplate(field, "data"))}
-    //     ${this.renderErrorTemplate()} ${toggleButtonState()}
-
-    //     <sl-button
-    //       type="submit"
-    //       data-testid="form-submit"
-    //       variant="primary"
-    //       class="submit-button"
-    //       ?loading=${this.formState === "loading"}
-    //       ?disabled=${this.submitDisabledByUser ||
-    //       !this.canSubmit ||
-    //       this.formState === "loading"}
-    //     >
-    //       Submit
-    //     </sl-button>
-    //   </form>
-    // `;
   }
 }

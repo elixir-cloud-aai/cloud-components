@@ -68,7 +68,7 @@ const styles = css`
   .group-content {
     padding-top: var(--ecc-spacing-medium);
   }
-  .group-item {
+  .group {
     min-height: var(--ecc-input-height-3xlarge);
   }
   /* Array Styles */
@@ -78,12 +78,12 @@ const styles = css`
     font-weight: var(--ecc-input-font-weight);
     letter-spacing: var(--ecc-input-letter-spacing);
   }
-  .array-item {
+  .array {
     border-style: solid;
     border-width: 0px 0px var(--ecc-input-border-width) 0px;
     border-color: var(--ecc-input-border-color-disabled);
   }
-  .array-item {
+  .array {
     display: flex;
     flex-direction: row;
     align-items: center;
