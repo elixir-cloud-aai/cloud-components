@@ -1,7 +1,8 @@
+import * as _ from "lodash-es";
 import { html, LitElement, TemplateResult } from "lit";
-import { property, state } from "lit/decorators.js";
+import { property, state, query } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
-import { renderInTooltip, toCamelCase, noKeyWarning } from "./utils.js";
+import { renderInTooltip, noKeyWarning } from "./utils.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import "@shoelace-style/shoelace/dist/components/icon/icon.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
@@ -44,23 +45,24 @@ export default class EccUtilsDesignFormInput extends LitElement {
   @property({ type: String, reflect: true }) default = "";
   @property({ type: Boolean, reflect: true }) checked = false;
   @property({ type: Boolean, reflect: true }) multiple = false;
+  @property({ type: String, reflect: true }) value: any;
   @property({ type: String, reflect: true }) accept = "*";
-  @property({ type: String, attribute: "tus-endpoint" }) tusEndpoint = "";
+  @property({ type: String, attribute: "endpoint" }) tusEndpoint = "";
   @property({ type: String, reflect: true }) protocol: "native" | "tus" =
     "native";
-
-  @property({ type: String, reflect: true }) value: any;
 
   @state() private alertText = "Something went wrong";
   @state() private alertType: AlertType = "info";
   @state() private showAlert = false;
   @state() path = "";
 
+  @query("sl-input") input!: HTMLInputElement;
+
   connectedCallback(): void {
     super.connectedCallback();
     if (!this.key) {
       noKeyWarning("ecc-d-form-group", this.label);
-      this.key = toCamelCase(this.label);
+      this.key = _.camelCase(this.label);
     }
 
     this.findNearestFormGroup();
@@ -88,10 +90,12 @@ export default class EccUtilsDesignFormInput extends LitElement {
       const parentPath = parentElement.getAttribute("path");
       this.path = parentPath ? `${parentPath}.${this.key}` : this.key;
     }
+
+    this.findNearestFormGroup(parentElement);
   }
 
   private handleDismissAlert() {
-    this.alertText = ""; // reset error text
+    this.alertText = "";
     this.showAlert = false;
     this.requestUpdate();
   }
@@ -101,6 +105,18 @@ export default class EccUtilsDesignFormInput extends LitElement {
     this.alertType = alertType;
     this.showAlert = true;
     this.requestUpdate();
+  }
+
+  validity() {
+    return this.input.validity;
+  }
+
+  checkValidity() {
+    return this.input.checkValidity();
+  }
+
+  reportValidity() {
+    return this.input.reportValidity();
   }
 
   private handleFireChangeEvent() {
@@ -121,10 +137,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
     const target = e.target as HTMLInputElement;
     this.value = this.type === "switch" ? target.checked : target.value;
 
-    // fire change event
     this.handleFireChangeEvent();
-
-    // update
     this.requestUpdate();
   }
 

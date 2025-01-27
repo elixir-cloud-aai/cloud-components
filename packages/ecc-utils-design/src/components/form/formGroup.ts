@@ -2,18 +2,13 @@ import { LitElement, html, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
 import * as _ from "lodash-es";
-import { noKeyWarning, renderInTooltip, toCamelCase } from "./utils.js";
+import { noKeyWarning, renderInTooltip } from "./utils.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import formStyles from "./form.styles.js";
 
 export default class EccUtilsDesignFormGroup extends LitElement {
-  static styles = [
-    // primitiveStylesheet,
-    // sholelaceStyles,
-    // hostStyles,
-    formStyles,
-  ];
+  static styles = [formStyles];
 
   // TODO
   // build required but empty functionality
@@ -23,14 +18,14 @@ export default class EccUtilsDesignFormGroup extends LitElement {
   @property({ type: Boolean, reflect: true }) required = "";
   @property({ type: String, reflect: true }) tooltip = "";
 
-  // array item options
+  // array options
   @property({ type: Number, reflect: true })
   instances = 0;
 
   @property({ type: Number, attribute: "max" }) maxInstances = "";
   @property({ type: Number, attribute: "min" }) minInstances = "";
 
-  // group item options
+  // group options
   @property({ type: Boolean, reflect: true }) collapsible = false;
 
   @state() private arrayInstances: Array<{
@@ -64,7 +59,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
     super.connectedCallback();
     if (!this.key) {
       noKeyWarning("ecc-d-form-group", this.label);
-      this.key = toCamelCase(this.label);
+      this.key = _.camelCase(this.label);
     }
 
     this.findNearestFormGroup();

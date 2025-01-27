@@ -23,14 +23,14 @@
           @ecc-utils-submit=${async (e) => {
             try {
               console.log("form - submitted", e.detail);
-              document.querySelector("ecc-utils-design-form").loading();
+              document.querySelector("ecc-d-form").loading();
               await fetch("https://jsonplaceholder.typicode.com/posts");
               document
-                .querySelector("ecc-utils-design-form")
+                .querySelector("ecc-d-form")
                 .success({ message: "Data fetched successfully" });
             } catch (error) {
               document
-                .querySelector("ecc-utils-design-form")
+                .querySelector("ecc-d-form")
                 .error({ message: "Error fetching data" });
             }
           }}
