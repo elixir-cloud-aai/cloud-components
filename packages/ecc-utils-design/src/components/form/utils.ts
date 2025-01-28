@@ -27,6 +27,6 @@ export function noKeyWarning(Element: string, label: string): void {
   );
 }
 
-export function isShadowElement(element: Element): boolean {
-  return element.getRootNode() instanceof ShadowRoot;
+export function generateUniqueKey() {
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 }
