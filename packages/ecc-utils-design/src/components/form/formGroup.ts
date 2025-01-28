@@ -1,8 +1,9 @@
 import { LitElement, html, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
+import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import * as _ from "lodash-es";
-import { noKeyWarning, renderInTooltip } from "./utils.js";
+import { noKeyWarning, renderInTooltip, generateUniqueKey } from "./utils.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import formStyles from "./form.styles.js";
@@ -29,27 +30,22 @@ export default class EccUtilsDesignFormGroup extends LitElement {
   @property({ type: Boolean, reflect: true }) collapsible = false;
 
   @state() private arrayInstances: Array<{
-    id: number;
-    items: Element[];
+    id: string;
+    content: string;
   }> = [];
 
-  @state() private originalInstance: Element[] = [];
-  @state() private items: Array<Element> = [];
+  @state() private content = "";
   @state() private path = "";
 
   declare setHTMLUnsafe: (htmlString: string) => void;
   protected firstUpdated(): void {
+    this.content = this.innerHTML;
+
     if (this.type === "array") {
-      this.originalInstance = Array.from(this.querySelectorAll(":scope > *"));
-      this.arrayInstances = Array.from(
-        { length: this.instances },
-        (__, index) => ({
-          id: index,
-          items: this.originalInstance,
-        })
-      );
-    } else {
-      this.items = Array.from(this.querySelectorAll(":scope > *"));
+      this.arrayInstances = Array.from({ length: this.instances }, () => ({
+        id: generateUniqueKey(),
+        content: this.content,
+      }));
     }
 
     this.setHTMLUnsafe("");
@@ -89,41 +85,33 @@ export default class EccUtilsDesignFormGroup extends LitElement {
   }
 
   private renderGroupTemplate(): TemplateResult {
-    return html`${this.collapsible
-      ? repeat(
-          this.items,
-          () => _.uniqueId("ecc-group-"),
-          (item) => html`
-            <sl-details
-              data-testid="group-collapsible"
-              summary=${`${this.label} ${this.required ? "*" : ""}`}
-            >
-              <div
-                class="group-content"
-                ecc-group
-                ecc-group-key="${this.key}"
-                path="${this.path}"
-              >
-                ${item}
-              </div>
-            </sl-details>
-          `
-        )
-      : repeat(
-          this.items,
-          () => _.uniqueId("ecc-group-"),
-          (item) => html`
-            <span>${this.label} ${this.required ? "*" : ""} </span>
+    return this.collapsible
+      ? html`
+          <sl-details
+            data-testid="group-collapsible"
+            summary=${`${this.label} ${this.required ? "*" : ""}`}
+          >
             <div
               class="group-content"
               ecc-group
               ecc-group-key="${this.key}"
               path="${this.path}"
             >
-              ${item}
+              ${unsafeHTML(this.content)}
             </div>
-          `
-        )}`;
+          </sl-details>
+        `
+      : html`
+          <span>${this.label} ${this.required ? "*" : ""} </span>
+          <div
+            class="group-content"
+            ecc-group
+            ecc-group-key="${this.key}"
+            path="${this.path}"
+          >
+            ${unsafeHTML(this.content)}
+          </div>
+        `;
   }
 
   private renderArrayTemplate(): TemplateResult {
@@ -143,12 +131,13 @@ export default class EccUtilsDesignFormGroup extends LitElement {
 
     const addItem = () => {
       if (resolveAddButtonIsActive()) {
-        this.arrayInstances.push({
-          id: this.arrayInstances.length,
-          items: this.originalInstance,
-        });
+        const newInstance = {
+          id: generateUniqueKey(),
+          content: this.content,
+        };
 
-        this.requestUpdate();
+        this.arrayInstances = [...this.arrayInstances, newInstance];
+
         this.dispatchEvent(
           new CustomEvent("ecc-utils-array-add", {
             detail: {
@@ -168,7 +157,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
         newItems.splice(index, 1);
 
         this.arrayInstances = newItems;
-        this.requestUpdate();
+
         this.dispatchEvent(
           new CustomEvent("ecc-utils-array-delete", {
             detail: {
@@ -180,14 +169,6 @@ export default class EccUtilsDesignFormGroup extends LitElement {
           })
         );
       }
-    };
-
-    const arrayDiv = (item: Element, index: number) => {
-      const div = document.createElement("div");
-      div.setAttribute("ecc-array-key", `${this.key}[${index}]`);
-      div.innerHTML = item.outerHTML;
-
-      return div;
     };
 
     return html`
@@ -268,11 +249,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
                 </svg>
               </sl-button>
               <div class="array-item-container">
-                ${repeat(
-                  instance.items,
-                  (item) => item.id,
-                  (item) => arrayDiv(item, index)
-                )}
+                ${unsafeHTML(instance.content)}
               </div>
             </div>
           `

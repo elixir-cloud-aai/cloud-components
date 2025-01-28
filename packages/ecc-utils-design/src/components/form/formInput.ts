@@ -66,9 +66,12 @@ export default class EccUtilsDesignFormInput extends LitElement {
     }
 
     this.findNearestFormGroup();
+
     if (this.value) {
       this.handleFireChangeEvent();
     }
+
+    // console.log("just connected");
   }
 
   private findNearestFormGroup(element: HTMLElement | null = this): void {
@@ -136,6 +139,8 @@ export default class EccUtilsDesignFormInput extends LitElement {
   private handleValueUpdate(e: Event) {
     const target = e.target as HTMLInputElement;
     this.value = this.type === "switch" ? target.checked : target.value;
+
+    console.log("this.value", this.value, target);
 
     this.handleFireChangeEvent();
     this.requestUpdate();

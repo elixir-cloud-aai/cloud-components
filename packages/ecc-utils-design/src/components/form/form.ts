@@ -10,7 +10,7 @@ import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/components/select/select.js";
 import "@shoelace-style/shoelace/dist/components/option/option.js";
 import * as _ from "lodash-es";
-import { repeat } from "lit/directives/repeat.js";
+import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import formStyles from "./form.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
@@ -91,13 +91,13 @@ export default class EccUtilsDesignForm extends LitElement {
   @state() private errorMessage = "Something went wrong";
   @state() private successMessage = "Form submitted successfully";
   @state() private requiredButEmpty: string[] = [];
-  @state() private items: Array<Element> = [];
+  @state() private content = "";
 
   declare setHTMLUnsafe: (htmlString: string) => void;
   protected firstUpdated(_changedProperties: PropertyValues): void {
     super.firstUpdated(_changedProperties);
 
-    this.items = Array.from(this.querySelectorAll(":scope > *"));
+    this.content = this.innerHTML;
     this.setHTMLUnsafe("");
 
     this.addEventListener("ecc-utils-change", (e) => {
@@ -219,11 +219,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
     return html`
       <form ecc-form @submit=${this.handleSubmit}>
-        ${repeat(
-          this.items,
-          () => _.uniqueId("ecc-form-item-"),
-          (item) => html`${item}`
-        )}
+        ${unsafeHTML(this.content)}
 
         <sl-button
           type="submit"
