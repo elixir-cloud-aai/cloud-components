@@ -2,7 +2,11 @@ import * as _ from "lodash-es";
 import { html, LitElement, TemplateResult } from "lit";
 import { property, state, query } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
-import { renderInTooltip, noKeyWarning } from "./utils.js";
+import {
+  renderInTooltip,
+  noKeyWarning,
+  findNearestFormGroup,
+} from "./utils.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import "@shoelace-style/shoelace/dist/components/icon/icon.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
@@ -54,7 +58,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
   @state() private alertText = "Something went wrong";
   @state() private alertType: AlertType = "info";
   @state() private showAlert = false;
-  @state() path = "";
+  @state() path: string | null = "";
 
   @query("sl-input") input!: HTMLInputElement;
 
@@ -63,38 +67,14 @@ export default class EccUtilsDesignFormInput extends LitElement {
     if (!this.key) {
       noKeyWarning("ecc-d-form-group", this.label);
       this.key = _.camelCase(this.label);
+      this.setAttribute("key", this.key);
     }
 
-    this.findNearestFormGroup();
+    this.path = findNearestFormGroup(this.key, this);
 
     if (this.value) {
       this.handleFireChangeEvent();
     }
-
-    // console.log("just connected");
-  }
-
-  private findNearestFormGroup(element: HTMLElement | null = this): void {
-    if (!element) return;
-
-    if (element.matches("ecc-d-form") || element.matches("ecc-d-form-group")) {
-      return;
-    }
-
-    const { parentElement } = element;
-    if (!parentElement) return;
-
-    const specialAttributes = ["ecc-array", "ecc-group", "ecc-form"];
-    const hasSpecialAttribute = specialAttributes.some((attr) =>
-      parentElement.hasAttribute(attr)
-    );
-
-    if (hasSpecialAttribute) {
-      const parentPath = parentElement.getAttribute("path");
-      this.path = parentPath ? `${parentPath}.${this.key}` : this.key;
-    }
-
-    this.findNearestFormGroup(parentElement);
   }
 
   private handleDismissAlert() {
@@ -139,8 +119,6 @@ export default class EccUtilsDesignFormInput extends LitElement {
   private handleValueUpdate(e: Event) {
     const target = e.target as HTMLInputElement;
     this.value = this.type === "switch" ? target.checked : target.value;
-
-    console.log("this.value", this.value, target);
 
     this.handleFireChangeEvent();
     this.requestUpdate();

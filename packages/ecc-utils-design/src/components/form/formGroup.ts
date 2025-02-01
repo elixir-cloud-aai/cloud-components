@@ -3,7 +3,12 @@ import { property, state } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import * as _ from "lodash-es";
-import { noKeyWarning, renderInTooltip, generateUniqueKey } from "./utils.js";
+import {
+  noKeyWarning,
+  renderInTooltip,
+  generateUniqueKey,
+  findNearestFormGroup,
+} from "./utils.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import formStyles from "./form.styles.js";
@@ -35,7 +40,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
   }> = [];
 
   @state() private content = "";
-  @state() private path = "";
+  @state() private path: string | null = "";
 
   declare setHTMLUnsafe: (htmlString: string) => void;
   protected firstUpdated(): void {
@@ -58,30 +63,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
       this.key = _.camelCase(this.label);
     }
 
-    this.findNearestFormGroup();
-  }
-
-  private findNearestFormGroup(element: HTMLElement | null = this): void {
-    if (!element) return;
-
-    if (element.matches("ecc-d-form")) {
-      return;
-    }
-
-    const { parentElement } = element;
-    if (!parentElement) return;
-
-    const specialAttributes = ["ecc-array", "ecc-group", "ecc-form"];
-    const hasSpecialAttribute = specialAttributes.some((attr) =>
-      parentElement.hasAttribute(attr)
-    );
-
-    if (hasSpecialAttribute) {
-      const parentPath = parentElement.getAttribute("path");
-      this.path = parentPath ? `${parentPath}.${this.key}` : this.key;
-    }
-
-    this.findNearestFormGroup(parentElement);
+    this.path = findNearestFormGroup(this.key, this, true);
   }
 
   private renderGroupTemplate(): TemplateResult {
