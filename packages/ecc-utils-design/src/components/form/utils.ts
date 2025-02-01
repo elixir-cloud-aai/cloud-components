@@ -30,3 +30,37 @@ export function noKeyWarning(Element: string, label: string): void {
 export function generateUniqueKey() {
   return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 }
+
+export const findNearestFormGroup = (
+  key: string,
+  element: HTMLElement | null,
+  isGroup = false
+): string | null => {
+  if (!element) return null;
+
+  if (
+    element.matches("ecc-d-form") ||
+    (!isGroup && element.matches("ecc-d-form-group"))
+  ) {
+    return null;
+  }
+
+  const { parentElement } = element;
+  if (!parentElement) return null;
+
+  const specialAttributes = ["ecc-array", "ecc-group", "ecc-form"];
+  const hasSpecialAttribute = specialAttributes.some((attr) =>
+    parentElement.hasAttribute(attr)
+  );
+
+  if (hasSpecialAttribute) {
+    const parentPath = parentElement.getAttribute("path");
+    const path = parentPath ? `${parentPath}.${key}` : key;
+
+    console.log("the key", key);
+
+    return path;
+  }
+
+  return findNearestFormGroup(key, parentElement, isGroup);
+};
