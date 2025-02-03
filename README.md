@@ -16,12 +16,49 @@ ELIXIR Cloud Components (ECC) are lightweight, fast and reusable Web Components 
 
 | Name                       | Description                                                                                            |
 |----------------------------|--------------------------------------------------------------------------------------------------------|
-| ecc-utils-design           | Encapsulation & Utility components to manage the headless yet constitent design accross ecc components |
-| ecc-client-ga4gh-tes       | Collection of Web Components for interacting with TES (Task Execution Service)                         |
-| ecc-client-ga4gh-wes       | Collection of Web Components for interacting with WES (Workflow Execution Service)                     |
-| ecc-client-ga4gh-trs       | Collection of Web Components for interacting with TRS (Tool Registry Service)                          |
-| ecc-client-ga4gh-trs-filer | Collection of Web Components for interacting with Elixir TRS Filer                                     |
-| eslint-config              | Custom & common eslint configuration for elixir packages                                               |
+| @elixir-cloud/design           | Encapsulation & Utility components to manage the headless yet constitent design accross ecc components |
+| @elixir-cloud/tes       | Collection of Web Components for interacting with TES (Task Execution Service)                         |
+| @elixir-cloud/wes       | Collection of Web Components for interacting with WES (Workflow Execution Service)                     |
+
+## Development Setup
+
+### Prerequisites
+
+- Node.js (v16 or higher)
+- npm or yarn
+
+### Getting Started
+
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/elixir-cloud-aai/cloud-components.git
+    ```
+
+2. Install dependencies:
+
+    ```bash
+    npm install
+    ```
+
+3. Start the development server:
+
+    - Run the design package first as it is required by all other packages as dependency:
+      ```bash
+      npm run dev --workspace=@elixir-cloud/design
+      ```
+    - Run the specific package of choice from [here](#packages):
+    
+      ```bash
+      npm run dev --workspace=@elixir-cloud/<package-name>
+      ```
+
+      e.g.
+      ```bash
+      npm run dev --workspace=@elixir-cloud/tes
+      ```
+
+
 
 ## Contributing
 
