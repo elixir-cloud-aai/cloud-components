@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        background: #fafafa;
+      }
+    </style>
+  </head>
+  <title>ecc-client-ga4gh-service-registry-services</title>
+  <body>
+    <div id="demo"></div>
+
+    <script type="module">
+      import { html, render } from "lit";
+      import "../../dist/components/services/index.js";
+
+      render(
+        html`<ecc-client-ga4gh-service-registry-services
+          baseURL="https://cloud-registry.2.rahtiapp.fi/ga4gh/registry/v1"
+          authToken="eyJraWQiOiJyc2ExIiwidHlwIjoiYXQrand0IiwiYWxnIjoiUlMyNTYifQ.eyJhdWQiOiI1ZmM2NjAxMC1hNTk2LTQ4ZTQtOGMwOS04OWE3NjdlZjEzNmMiLCJzdWIiOiJhMTE0YmJiMGRiMDNkN2JiYzVjOTM5ODZmNTk1ZGMxZTBlYmNkODlmQGVsaXhpci1ldXJvcGUub3JnIiwiYWNyIjoiaHR0cHM6Ly9yZWZlZHMub3JnL3Byb2ZpbGUvc2ZhIiwic2NvcGUiOiJlZHVwZXJzb25fZW50aXRsZW1lbnQgZW1haWwgZ2E0Z2hfcGFzc3BvcnRfdjEgb3BlbmlkIHByb2ZpbGUiLCJhdXRoX3RpbWUiOjE3Mzg4NzcwNzgsImlzcyI6Imh0dHBzOi8vbG9naW4uZWxpeGlyLWN6ZWNoLm9yZy9vaWRjLyIsImV4cCI6MTczODg5MTQ4MywiaWF0IjoxNzM4ODc3MDgzLCJjbGllbnRfaWQiOiI1ZmM2NjAxMC1hNTk2LTQ4ZTQtOGMwOS04OWE3NjdlZjEzNmMiLCJqdGkiOiI0NWUwMmYzYy04NDdhLTQ4ZjQtOTZkMC0wOGRlYzNjZGJlMWQifQ.rNoFlHqwToFM0Y77Mbhe2bwFFtOmHWwVZh-IrcuyfXX1FkhWY8RyX9tSxUwfem8ns7q40wxKfcrFq-LDK17IunnJT0JAB-_1_U-lfkhsKOO9eAY0UUJtRdoKI1qgp5teEb54EBpkX2twPlaPCI0DLQFRE46EZKWZUeRvOpuGEnwObO34iW0aNPXEUDw_gzG-_rdUNpb0MRlMwIbHUUba-9tHS33-TeuSpjxAJ_EMEt3TJfaYYEYHENhqzJxNtzK8DYwDENR82L9kwEzO497zMcsA99wlfXOtSCauwa5GbzV5rPgNVchiDkb-c877U0nQCIBs3gWsZHbCckRiegOvAA"
+          @ecc-utils-filter=${(e) => {
+            // console.log("Filter:", e.detail);
+          }}
+        />`,
+        document.querySelector("#demo")
+      );
+    </script>
+  </body>
+</html> 

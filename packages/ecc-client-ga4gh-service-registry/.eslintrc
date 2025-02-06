@@ -1,0 +1,9 @@
+{
+  "extends": ["@open-wc", "@elixir-cloud", "prettier"],
+  "plugins": ["prettier"],
+  "rules": {
+    "camelcase": "warn",
+    "prettier/prettier": "error",
+    "no-console": ["error", { "allow": ["warn", "error"] }]
+  }
+}
