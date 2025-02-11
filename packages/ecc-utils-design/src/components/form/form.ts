@@ -1,5 +1,5 @@
 import { html, LitElement, PropertyValues, TemplateResult } from "lit";
-import { state } from "lit/decorators.js";
+import { property, state } from "lit/decorators.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/switch/switch.js";
@@ -10,7 +10,6 @@ import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/components/select/select.js";
 import "@shoelace-style/shoelace/dist/components/option/option.js";
 import * as _ from "lodash-es";
-import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import formStyles from "./form.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
@@ -73,7 +72,7 @@ export interface Field {
  * @method loading - Set the form state to loading. Disables the submit button.
  * @method success - Set the form state to success. Show the success message.
  *
- * @event ecc-utils-submit - This event is fired when the form is submitted. The event detail contains the form data.
+ * @event ecc-submit - This event is fired when the form is submitted. The event detail contains the form data.
  */
 
 export default class EccUtilsDesignForm extends LitElement {
@@ -84,25 +83,30 @@ export default class EccUtilsDesignForm extends LitElement {
     formStyles,
   ];
 
-  @state() private form: object = {};
+  @property({ type: Boolean, attribute: "no-submit" }) noSubmit = false;
+
+  @state()
+  private form: object = {};
+
   @state() private formState: "idle" | "loading" | "error" | "success" = "idle";
   @state() private canSubmit = true;
   @state() private submitDisabledByUser = false;
   @state() private errorMessage = "Something went wrong";
   @state() private successMessage = "Form submitted successfully";
   @state() private requiredButEmpty: string[] = [];
-  @state() private content = "";
+  @state() private content: Element[] = [];
 
   declare setHTMLUnsafe: (htmlString: string) => void;
   protected firstUpdated(_changedProperties: PropertyValues): void {
     super.firstUpdated(_changedProperties);
 
-    this.content = this.innerHTML;
+    this.content = Array.from(this.querySelectorAll(":scope > *"));
     this.setHTMLUnsafe("");
 
-    this.addEventListener("ecc-utils-change", (e) => {
-      if (e.detail.path) {
+    this.addEventListener("ecc-input", (e) => {
+      if (e.detail.path && !e.detail.groupType) {
         _.set(this.form, e.detail.path, e.detail.value);
+        console.log(this.form);
       }
     });
   }
@@ -188,7 +192,7 @@ export default class EccUtilsDesignForm extends LitElement {
       this.error({ message: "Form is empty" });
       return;
     }
-    const event = new CustomEvent("ecc-utils-submit", {
+    const event = new CustomEvent("ecc-submit", {
       detail: {
         form: this.form,
       },
@@ -209,6 +213,9 @@ export default class EccUtilsDesignForm extends LitElement {
     //   return "";
     // };
 
+    const contentDiv = document.createElement("div");
+    contentDiv.append(...this.content);
+
     if (this.formState === "success") {
       return html` ${this.renderSuccessTemplate()} `;
     }
@@ -219,20 +226,23 @@ export default class EccUtilsDesignForm extends LitElement {
 
     return html`
       <form ecc-form @submit=${this.handleSubmit}>
-        ${unsafeHTML(this.content)}
-
-        <sl-button
-          type="submit"
-          data-testid="submit"
-          variant="primary"
-          class="submit-button"
-          ?loading=${this.formState === "loading"}
-          ?disabled=${this.submitDisabledByUser ||
-          !this.canSubmit ||
-          this.formState === "loading"}
-        >
-          Submit
-        </sl-button>
+        ${contentDiv}
+        ${!this.noSubmit
+          ? html`
+              <sl-button
+                type="submit"
+                data-testid="submit"
+                variant="primary"
+                class="submit-button"
+                ?loading=${this.formState === "loading"}
+                ?disabled=${this.submitDisabledByUser ||
+                !this.canSubmit ||
+                this.formState === "loading"}
+              >
+                Submit
+              </sl-button>
+            `
+          : html``}
       </form>
     `;
   }

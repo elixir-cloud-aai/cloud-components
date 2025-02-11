@@ -19,7 +19,7 @@
 
       render(
         html`<ecc-d-form
-          @ecc-utils-submit=${async (e) => {
+          @ecc-submit=${async (e) => {
             try {
               console.log("form - submitted", e.detail);
               document.querySelector("ecc-d-form").loading();
@@ -39,6 +39,18 @@
             label="Name"
             required
             tooltip="Enter name"
+            @change=${() => {
+              console.log("chenaged");
+            }}
+            @ecc-input=${(e) => {
+              console.log("name", e);
+            }}
+            @keydown=${(e) => {
+              console.log("keydown", e);
+            }}
+            @blur=${() => {
+              console.log("clicked");
+            }}
           ></ecc-d-form-input>
 
           <ecc-d-form-input
@@ -60,6 +72,12 @@
             type="file"
             required
             tooltip="Your ID document"
+            @dragover=${() => {
+              console.log("dragged to");
+            }}
+            @input=${() => {
+              console.log("drag leave");
+            }}
           ></ecc-d-form-input>
 
           <ecc-d-form-input
@@ -71,10 +89,22 @@
             tooltip="Your ID document"
           ></ecc-d-form-input>
 
-          <ecc-d-form-input required type="select" label="Gender">
-            <option ecc-option value="female">Female</option>
-            <option ecc-option value="male">Male</option>
-            <option ecc-option value="none">Do not want to Disclose</option>
+          // continue from modifying how options are sent
+          <ecc-d-form-input
+            required
+            multiple
+            type="select"
+            label="Gender"
+            options='["Female", "Male", "Do not want to Disclose-none"]'
+            options-prefix-icons
+            options-suffix-icons
+            @change=${() => {
+              console.log("changed");
+            }}
+            @ecc-input=${() => {
+              console.log("changes");
+            }}
+          >
           </ecc-d-form-input>
 
           <ecc-d-form-group type="group" label="Address" key="address">
@@ -96,6 +126,9 @@
                 key="houseNumber"
                 label="House Number"
                 tooltip="Your house number"
+                @ecc-input=${() => {
+                  console.log("house number changed");
+                }}
               >
               </ecc-d-form-input>
               <ecc-d-form-input required key="street" label="Street">
@@ -105,6 +138,38 @@
 
               <ecc-d-form-input required key="country" label="Country">
               </ecc-d-form-input>
+
+              <ecc-d-form-group
+                required
+                type="array"
+                label="Details"
+                instances="1"
+                max="2"
+                min="1"
+              >
+                <ecc-d-form-input
+                  type="switch"
+                  key="isPrimary"
+                  label="Primary Address"
+                >
+                </ecc-d-form-input>
+                <ecc-d-form-input
+                  key="houseNumber"
+                  label="House Number"
+                  tooltip="Your house number"
+                  @ecc-input=${() => {
+                    console.log("house number changed");
+                  }}
+                >
+                </ecc-d-form-input>
+                <ecc-d-form-input required key="street" label="Street">
+                </ecc-d-form-input>
+                <ecc-d-form-input required key="city" label="City">
+                </ecc-d-form-input>
+
+                <ecc-d-form-input required key="country" label="Country">
+                </ecc-d-form-input>
+              </ecc-d-form-group>
             </ecc-d-form-group>
           </ecc-d-form-group>
         </ecc-d-form> `,

@@ -36,14 +36,11 @@ export type FormItemType =
 type AlertType = "info" | "success" | "warning" | "error";
 
 export default class EccUtilsDesignFormInput extends LitElement {
-  // general options
   @property({ type: String }) label = "";
   @property({ type: String }) key = "";
   @property({ type: String, reflect: true }) type: FormItemType = "text";
   @property({ type: Boolean, reflect: true }) disabled = false;
   @property({ type: String, reflect: true }) tooltip = "";
-
-  // input item options
   @property({ type: Boolean, reflect: true }) required = false;
   @property({ type: String, reflect: true }) placeholder = "";
   @property({ type: String, reflect: true }) default = "";
@@ -52,6 +49,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
   @property({ type: String, reflect: true }) value: any;
   @property({ type: String, reflect: true }) accept = "*";
   @property({ type: String, attribute: "endpoint" }) tusEndpoint = "";
+  @property({ type: Array, reflect: true }) options = [];
   @property({ type: String, reflect: true }) protocol: "native" | "tus" =
     "native";
 
@@ -67,14 +65,34 @@ export default class EccUtilsDesignFormInput extends LitElement {
     if (!this.key) {
       noKeyWarning("ecc-d-form-group", this.label);
       this.key = _.camelCase(this.label);
-      this.setAttribute("key", this.key);
     }
 
     this.path = findNearestFormGroup(this.key, this);
 
-    if (this.value) {
-      this.handleFireChangeEvent();
+    if (this.type === "switch") {
+      this.value = !!this.value;
+      this.dispatchEvent(new CustomEvent("ecc-input", this.eventData()));
     }
+
+    if (this.value || this.type === "switch") {
+      if (this.type === "switch") {
+        this.value = !!this.value;
+      }
+
+      this.dispatchEvent(new CustomEvent("ecc-input", this.eventData()));
+    }
+  }
+
+  private eventData() {
+    return {
+      detail: {
+        inputKey: this.key,
+        value: this.value,
+        path: this.path,
+      },
+      bubbles: true,
+      composed: true,
+    };
   }
 
   private handleDismissAlert() {
@@ -102,25 +120,25 @@ export default class EccUtilsDesignFormInput extends LitElement {
     return this.input.reportValidity();
   }
 
-  private handleFireChangeEvent() {
-    this.dispatchEvent(
-      new CustomEvent("ecc-utils-change", {
-        detail: {
-          key: this.key,
-          value: this.value,
-          path: this.path,
-        },
-        bubbles: true,
-        composed: true,
-      })
-    );
+  // private handleFireChangeEvent() {
+  //   this.dispatchEvent(new CustomEvent("ecc-change", this.eventData()));
+  // }
+
+  // private handleInputEvent() {
+  //   this.dispatchEvent(new CustomEvent("ecc-input", this.eventData()));
+  // }
+
+  private handleClear() {
+    this.dispatchEvent(new CustomEvent("ecc-input", this.eventData()));
+    this.dispatchEvent(new CustomEvent("ecc-clear", this.eventData()));
+    this.dispatchEvent(new CustomEvent("ecc-change", this.eventData()));
   }
 
   private handleValueUpdate(e: Event) {
     const target = e.target as HTMLInputElement;
     this.value = this.type === "switch" ? target.checked : target.value;
 
-    this.handleFireChangeEvent();
+    this.dispatchEvent(new CustomEvent("ecc-input", this.eventData()));
     this.requestUpdate();
   }
 
@@ -132,7 +150,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
       return;
     }
 
-    this.handleFireChangeEvent();
+    this.dispatchEvent(new CustomEvent("ecc-input", this.eventData()));
 
     if (this.protocol === "native") {
       this.value = files;
@@ -205,7 +223,11 @@ export default class EccUtilsDesignFormInput extends LitElement {
         ?required=${this.required}
         ?disabled=${this.disabled}
         ?checked=${this.value}
-        @sl-change=${this.handleValueUpdate}
+        @sl-input=${this.handleValueUpdate}
+        @sl-change=${() =>
+          this.dispatchEvent(new CustomEvent("ecc-change", this.eventData()))}
+        @sl-invalid=${() =>
+          this.dispatchEvent(new CustomEvent("ecc-invalid", this.eventData()))}
       >
         ${this.label}
       </sl-switch>
@@ -223,6 +245,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
 
     return html`
       <sl-input
+        clearable
         class="input"
         data-label=${this.label}
         data-testid="input"
@@ -232,6 +255,11 @@ export default class EccUtilsDesignFormInput extends LitElement {
         placeholder=${this.placeholder}
         ?password-toggle=${this.type === "password"}
         @sl-input=${this.handleValueUpdate}
+        @sl-clear=${this.handleClear}
+        @sl-change=${() =>
+          this.dispatchEvent(new CustomEvent("ecc-change", this.eventData()))}
+        @sl-invalid=${() =>
+          this.dispatchEvent(new CustomEvent("ecc-invalid", this.eventData()))}
       >
         <span slot="label"> ${renderInTooltip(label, this.tooltip)} </span>
       </sl-input>
@@ -266,41 +294,71 @@ export default class EccUtilsDesignFormInput extends LitElement {
   }
 
   private renderSelectTemplate(): TemplateResult {
-    const optionsEl = Array.from(this.querySelectorAll("[ecc-option]"));
-
-    const options = optionsEl.map((opt) => ({
-      label: opt.getAttribute("label") || opt.textContent,
-      value: opt.getAttribute("value"),
-    }));
-
     const label = html`
       <label for=${this.label} class="select-label" data-testid="label">
         ${this.label} ${this.required ? "*" : ""}
       </label>
     `;
 
+    const getSelectValue = () =>
+      this.multiple && this.value && Array.isArray(this.value)
+        ? this.value.join(" ")
+        : this.value;
+
+    const getOptionLabelAndValue = (str: string, labelAttr = true) => {
+      const values = str.split(/(?<!\/)-/);
+      if (values.length > 1) {
+        return labelAttr ? values[0] : _.kebabCase(values[1]);
+      }
+
+      return labelAttr ? values[0] : _.kebabCase(values[0]);
+    };
+
     return html`
       <div class="select-container" data-testid="select-container">
         ${renderInTooltip(label, this.tooltip)}
         <sl-select
+          clearable
           class="select"
           name=${this.label}
           ?required=${this.required}
-          value=${this.value}
+          ?multiple=${this.multiple}
+          value=${getSelectValue()}
           data-testid="select"
           data-label=${this.label}
-          @sl-change=${this.handleValueUpdate}
+          placeholder="${this.placeholder || "Select"}"
+          @sl-input=${this.handleValueUpdate}
+          @sl-clear=${this.handleClear}
+          @sl-change=${() =>
+            this.dispatchEvent(new CustomEvent("ecc-change", this.eventData()))}
+          @sl-invalid=${() =>
+            this.dispatchEvent(
+              new CustomEvent("ecc-invalid", this.eventData())
+            )}
+          @sl-show=${() =>
+            this.dispatchEvent(new CustomEvent("ecc-show", this.eventData()))}
+          @sl-after-show=${() =>
+            this.dispatchEvent(
+              new CustomEvent("ecc-after-show", this.eventData())
+            )}
+          @sl-hide=${() =>
+            this.dispatchEvent(
+              new CustomEvent("ecc-after-show", this.eventData())
+            )}
+          @sl-after-hide=${() =>
+            this.dispatchEvent(
+              new CustomEvent("ecc-after-show", this.eventData())
+            )}
         >
           ${repeat(
-            options,
-            (opt) => opt.value,
+            this.options,
             (opt) => html`
               <sl-option
                 data-testid="select-option"
-                data-label=${opt.label}
-                value=${opt.value}
+                data-label=${_.kebabCase(getOptionLabelAndValue(opt))}
+                value=${getOptionLabelAndValue(opt, false)}
               >
-                ${opt.label}
+                ${getOptionLabelAndValue(opt)}
               </sl-option>
             `
           )}

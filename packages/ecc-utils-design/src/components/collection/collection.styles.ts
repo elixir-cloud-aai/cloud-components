@@ -7,6 +7,8 @@ const styles = css`
   /* Header */
   .header {
     margin-bottom: var(--ecc-spacing-x-large);
+    display: flex;
+    justify-content: flex-end;
   }
   .filters {
     display: flex;

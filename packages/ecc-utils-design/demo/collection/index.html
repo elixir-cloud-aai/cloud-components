@@ -20,7 +20,7 @@
       import { html, render } from "lit";
       import "../../dist/components/collection/index.js";
 
-      let items = [];
+      // const items = [];
       let search = "";
       let tag = "";
 
@@ -34,40 +34,41 @@
         return data;
       };
 
-      const dataInitial = await fetchDummyData(1, 5);
+      // const dataInitial = await fetchDummyData(1, 5);
 
-      items = dataInitial.map((item, index) => ({
-        index: index + 1,
-        name: item.title,
-        key: `item-${item.id}`,
-        lazy: true,
-        tag: {
-          name: item.completed ? "SUCCESS" : "ERROR",
-          type: item.completed ? "success" : "danger",
-        },
-      }));
+      // items = dataInitial.map((item, index) => ({
+      //   index: index + 1,
+      //   name: item.title,
+      //   key: `item-${item.id}`,
+      //   lazy: true,
+      //   tag: {
+      //     name: item.completed ? "SUCCESS" : "ERROR",
+      //     type: item.completed ? "success" : "danger",
+      //   },
+      // }));
 
-      const filters = [
-        {
-          key: "title",
-          type: "search",
-          placeholder: "Search",
-        },
-        {
-          key: "tag",
-          type: "select",
-          options: ["SUCCESS", "WARNING", "ERROR", "DEFAULT", "PRIMARY"],
-          placeholder: "Filter by tag",
-          selectConfig: {
-            // multiple: true,
-          },
-        },
-      ];
+      // const filters = [
+      //   {
+      //     key: "title",
+      //     type: "search",
+      //     placeholder: "Search",
+      //   },
+      //   {
+      //     key: "tag",
+      //     type: "select",
+      //     options: ["SUCCESS", "WARNING", "ERROR", "DEFAULT", "PRIMARY"],
+      //     placeholder: "Filter by tag",
+      //     selectConfig: {
+      //       // multiple: true,
+      //     },
+      //   },
+      // ];
 
       render(
-        html`<ecc-utils-design-collection
-          .items=${items}
-          .filters=${filters}
+        html`<ecc-d-collection
+          filter
+          search
+          page-length="2"
           @ecc-utils-expand=${async (e) => {
             // Check if child already exists
             const children = e.target.querySelectorAll(
@@ -87,6 +88,7 @@
               e.target.appendChild(child);
             }
           }}
+          // inspect how this filter works and implement the fnuctionality
           @ecc-utils-filter=${async (e) => {
             if (e.detail.key === "title") {
               search = e.detail.value;
@@ -140,28 +142,28 @@
             }
             const data = await fetchDummyData(e.detail.page, 5, search, tag);
             for (let i = 0; i < data.length; i += 1) {
-              const element = data[i];
-              const existingItem = e.target.items.find(
-                (item) => item.key === `item-${element.id}`
-              );
-              if (existingItem) {
-                e.target.items = e.target.items.filter(
-                  (item) => item.key !== `item-${element.id}`
-                );
-              }
-              e.target.items = [
-                ...e.target.items,
-                {
-                  index: (e.detail.page - 1) * 5 + i + 1,
-                  name: element.title,
-                  key: `item-${element.id}`,
-                  lazy: true,
-                  tag: {
-                    name: element.completed ? "SUCCESS" : "ERROR",
-                    type: element.completed ? "success" : "danger",
-                  },
-                },
-              ];
+              // const element = data[i];
+              // const existingItem = e.target.items.find(
+              //   (item) => item.key === `item-${element.id}`
+              // );
+              // if (existingItem) {
+              //   e.target.items = e.target.items.filter(
+              //     (item) => item.key !== `item-${element.id}`
+              //   );
+              // }
+              // e.target.items = [
+              //   ...e.target.items,
+              //   {
+              //     index: (e.detail.page - 1) * 5 + i + 1,
+              //     name: element.title,
+              //     key: `item-${element.id}`,
+              //     lazy: true,
+              //     tag: {
+              //       name: element.completed ? "SUCCESS" : "ERROR",
+              //       type: element.completed ? "success" : "danger",
+              //     },
+              //   },
+              // ];
             }
             if (data.length < 5) {
               e.target.totalItems = (e.detail.page - 1) * 5 + data.length;
@@ -169,7 +171,49 @@
           }}
         >
           <div slot="item-5">Child item-5 without lazy loading</div>
-        </ecc-utils-design-collection>`,
+          <ecc-d-collection-header>
+            <ecc-d-collection-filter
+              multiple
+              type="select"
+              options='["item", "work"]'
+              @ecc-input=${(e) => {
+                console.log("changing from the top", e);
+              }}
+            ></ecc-d-collection-filter>
+          </ecc-d-collection-header>
+
+          <div ecc-collection-body>
+            <ecc-d-collection-item
+              lazy
+              key="item"
+              name="item"
+              tag="ERROR"
+              @ecc-expand=${(e) => {
+                e.target.renderContent();
+              }}
+            >
+              Title: Item content written here
+            </ecc-d-collection-item>
+            <ecc-d-collection-item
+              lazy
+              key="work"
+              name="work"
+              tag="DANGER"
+            ></ecc-d-collection-item>
+            <ecc-d-collection-item
+              lazy
+              key="work-item"
+              name="work-item"
+              tag="DANGER"
+            ></ecc-d-collection-item>
+          </div>
+          <ecc-d-collection-footer
+            page="2"
+            @ecc-utils-page-change=${() => {
+              console.log("page changed");
+            }}
+          ></ecc-d-collection-footer>
+        </ecc-d-collection>`,
         document.querySelector("#demo")
       );
     </script>

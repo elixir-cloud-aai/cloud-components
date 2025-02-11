@@ -66,6 +66,20 @@ export default class EccUtilsDesignFormGroup extends LitElement {
     this.path = findNearestFormGroup(this.key, this, true);
   }
 
+  private fireChangeEvent(key: string, value: string, index?: number) {
+    this.dispatchEvent(
+      new CustomEvent("ecc-input", {
+        detail: {
+          key,
+          value,
+          index,
+          groupType: this.type,
+          groupKey: this.key,
+        },
+      })
+    );
+  }
+
   private renderGroupTemplate(): TemplateResult {
     return this.collapsible
       ? html`
@@ -78,6 +92,9 @@ export default class EccUtilsDesignFormGroup extends LitElement {
               ecc-group
               ecc-group-key="${this.key}"
               path="${this.path}"
+              @ecc-input=${(e: CustomEvent) => {
+                this.fireChangeEvent(e.detail.key, e.detail.value);
+              }}
             >
               ${unsafeHTML(this.content)}
             </div>
@@ -90,6 +107,9 @@ export default class EccUtilsDesignFormGroup extends LitElement {
             ecc-group
             ecc-group-key="${this.key}"
             path="${this.path}"
+            @ecc-input=${(e: CustomEvent) => {
+              this.fireChangeEvent(e.detail.key, e.detail.value);
+            }}
           >
             ${unsafeHTML(this.content)}
           </div>
@@ -121,7 +141,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
         this.arrayInstances = [...this.arrayInstances, newInstance];
 
         this.dispatchEvent(
-          new CustomEvent("ecc-utils-array-add", {
+          new CustomEvent("ecc-array-add", {
             detail: {
               key: this.key,
               instances: this.arrayInstances.length,
@@ -141,7 +161,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
         this.arrayInstances = newItems;
 
         this.dispatchEvent(
-          new CustomEvent("ecc-utils-array-delete", {
+          new CustomEvent("ecc-array-delete", {
             detail: {
               key: this.key,
               instances: this.arrayInstances.length,
@@ -205,6 +225,9 @@ export default class EccUtilsDesignFormGroup extends LitElement {
               class="array"
               data-testid="array"
               data-label=${`${this.label}-${index}`}
+              @ecc-input=${(e: CustomEvent) => {
+                this.fireChangeEvent(e.detail.key, e.detail.value, index);
+              }}
             >
               <sl-button
                 variant="text"

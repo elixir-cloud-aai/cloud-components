@@ -38,29 +38,24 @@ export const findNearestFormGroup = (
 ): string | null => {
   if (!element) return null;
 
+  const topLevelElement = element.closest("ecc-d-form, ecc-d-form-group");
   if (
-    element.matches("ecc-d-form") ||
-    (!isGroup && element.matches("ecc-d-form-group"))
+    topLevelElement &&
+    (topLevelElement.matches("ecc-d-form") ||
+      (!isGroup && topLevelElement.matches("ecc-d-form-group")))
   ) {
     return null;
   }
 
-  const { parentElement } = element;
-  if (!parentElement) return null;
-
-  const specialAttributes = ["ecc-array", "ecc-group", "ecc-form"];
-  const hasSpecialAttribute = specialAttributes.some((attr) =>
-    parentElement.hasAttribute(attr)
+  const specialElement = element.closest(
+    "[ecc-array], [ecc-group], [ecc-form]"
   );
-
-  if (hasSpecialAttribute) {
-    const parentPath = parentElement.getAttribute("path");
-    const path = parentPath ? `${parentPath}.${key}` : key;
-
-    console.log("the key", key);
-
-    return path;
+  if (specialElement) {
+    const parentPath = specialElement.getAttribute("path");
+    return parentPath ? `${parentPath}.${key}` : key;
   }
 
-  return findNearestFormGroup(key, parentElement, isGroup);
+  return element.parentElement
+    ? findNearestFormGroup(key, element.parentElement, isGroup)
+    : null;
 };
