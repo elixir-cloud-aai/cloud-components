@@ -31,7 +31,7 @@
   ],
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "node ../../scripts/build.js -p ecc-utils-design-",
+    "build": "node ../../scripts/build.js -p ecc-d-",
     "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
     "clean": "rm -rf dist node_modules custom-elements-manifest.config.js",
     "test": "web-test-runner --group default --config ../../web-test.runner-config.mjs",

@@ -5,6 +5,7 @@ import { repeat } from "lit/directives/repeat.js";
 import {
   renderInTooltip,
   noKeyWarning,
+  removeDuplicates,
   findNearestFormGroup,
 } from "./utils.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
@@ -119,14 +120,6 @@ export default class EccUtilsDesignFormInput extends LitElement {
   reportValidity() {
     return this.input.reportValidity();
   }
-
-  // private handleFireChangeEvent() {
-  //   this.dispatchEvent(new CustomEvent("ecc-change", this.eventData()));
-  // }
-
-  // private handleInputEvent() {
-  //   this.dispatchEvent(new CustomEvent("ecc-input", this.eventData()));
-  // }
 
   private handleClear() {
     this.dispatchEvent(new CustomEvent("ecc-input", this.eventData()));
@@ -351,7 +344,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
             )}
         >
           ${repeat(
-            this.options,
+            removeDuplicates(this.options),
             (opt) => html`
               <sl-option
                 data-testid="select-option"

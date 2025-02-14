@@ -14,6 +14,8 @@ import { hostStyles } from "../../styles/host.styles.js";
 import collectionStyles from "./collection.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
 import sholelaceStyles from "../../styles/shoelace.styles.js";
+import EccUtilsDesignCollectionItem from "./collectionItem.js";
+import { itemMatchesFilter } from "./utils.js";
 
 export interface ItemProp {
   index: number;
@@ -36,22 +38,6 @@ export interface FilterProp {
   placeholder?: string;
 }
 
-/**
- * @summary This component is used to render a collection of items. It can be used to render a filters & pagination component for a list of items.
- * @since 1.0.0
- *
- * @property {array} items - An array of items to render
- * @property {array} filters - An array of filters to render
- * @property {number} totalItems - The total number of items in the collection. If not provided, the collection will render pagination without fixed page numbers.
- * @property {number} pageSize - The number of items per pagination.
- *
- * @method setPage - Can be used to set the page of the collection.
- * @method error - Can be used to display error alert to the user.
- *
- * @event ecc-page-change - Fired when the page is changed.
- * @event ecc-expand - Fired when an item is expanded.
- * @event ecc-filter - Fired when a filter is applied.
- */
 export default class EccUtilsDesignCollection extends LitElement {
   static styles = [
     primitiveStylesheet,
@@ -65,173 +51,157 @@ export default class EccUtilsDesignCollection extends LitElement {
   @property({ type: Number, reflect: true, attribute: "page-length" })
   pageLength?: number;
 
-  @state() itemCount = -1;
-  @state() body: Array<Element> = [];
-  @state() filteredBody: Array<Element> = [];
-  @state() currentPage = 1;
-  @state() headerEl: Element | null = null;
-  @state() footerEl: Element | null = null;
-  @state() searchEl: Element | null = null;
-  @state() filterEl: Element | null = null;
-  @state() searchContent: string | null = "";
-
-  @property({ type: Array, reflect: true }) items: ItemProp[] = [];
-  @property({ type: Array, reflect: true }) filters: FilterProp[] = [];
-  @property({ type: Number, reflect: true }) totalItems = -1;
-  @property({ type: Number, reflect: true }) pageSize = 5;
-
+  @state() private itemCount = 0;
+  @state() private body: Element[] = [];
+  @state() private filteredBody: Element[] = [];
+  @state() private currentPage = 1;
+  @state() private headerEl: Element | null = null;
+  @state() private footerEl: Element | null = null;
+  @state() private searchEl: Element | null = null;
+  @state() private filterEl: Element | null = null;
+  @state() private searchContent = "";
   @state() private _errors: string[] = [];
 
-  private eventListeners: Record<string, any> = {};
+  private eventListeners: Record<string, EventListener> = {};
 
   connectedCallback(): void {
     super.connectedCallback();
-
-    this.footerEl = this.querySelector("ecc-d-collection-footer");
-    this.headerEl = this.querySelector("ecc-d-collection-header");
-
-    if (this.headerEl) {
-      this.headerEl.setAttribute("slot", "none");
-
-      this.searchEl = this.headerEl.querySelector(
-        "ecc-d-collection-filter[type='search']"
-      );
-      this.filterEl = this.headerEl.querySelector(
-        "ecc-d-collection-filter[type='select']"
-      );
-
-      if ((this.searchEl && this.search) || (this.filterEl && this.filter)) {
-        this.eventListeners.filter = this.filterItems.bind(this);
-
-        this.searchEl?.addEventListener(
-          "ecc-input",
-          this.eventListeners.filter
-        );
-        this.filterEl?.addEventListener(
-          "ecc-input",
-          this.eventListeners.filter
-        );
-      }
-    }
-
-    if (this.footerEl) {
-      this.eventListeners.footer = (e: CustomEvent) => {
-        this.currentPage = e.detail.page;
-      };
-
-      this.footerEl.addEventListener(
-        "ecc-page-change",
-        this.eventListeners.footer
-      );
-      this.footerEl.setAttribute("slot", "none");
-    }
-
-    if (this.pageLength) {
-      this.setAttribute("page-length", this.pageLength.toString());
-    }
-
-    const content = this.querySelector("[ecc-collection-body]");
-
-    if (content) {
-      content.setAttribute("slot", "none");
-      this.body = Array.from(content.querySelectorAll(":scope > *"));
-      this.itemCount = content.querySelectorAll(":scope > *").length || -1;
-      this.setAttribute("item-count", this.itemCount.toString());
-    }
+    this.setupElements();
   }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
+    this.removeEventListeners();
+  }
+
+  protected updated(changedProperties: PropertyValues): void {
+    if (changedProperties.has("body")) {
+      this.filteredBody = this.body;
+    }
+
+    if (changedProperties.has("filteredBody")) {
+      this.updateFilteredBody();
+    }
+
+    if (changedProperties.has("itemCount")) {
+      this.setAttribute("item-count", this.itemCount.toString());
+    }
+  }
+
+  private setupElements(): void {
+    this.setupHeaderElements();
+    this.setupFooterElement();
+    this.setupPageLength();
+    this.setupCollectionBody();
+  }
+
+  private setupHeaderElements(): void {
+    const addFilterEventListeners = () => {
+      [this.searchEl, this.filterEl].forEach((el) =>
+        el?.addEventListener("ecc-input", this.eventListeners.filter)
+      );
+    };
+
+    this.headerEl = this.querySelector("ecc-d-collection-header");
+    if (!this.headerEl) return;
+
+    this.headerEl.setAttribute("slot", "none");
+    this.searchEl = this.headerEl.querySelector(
+      "ecc-d-collection-filter[type='search']"
+    );
+    this.filterEl = this.headerEl.querySelector(
+      "ecc-d-collection-filter[type='select']"
+    );
+
+    if ((this.searchEl && this.search) || (this.filterEl && this.filter)) {
+      this.eventListeners.filter = this.filterItems.bind(this);
+      addFilterEventListeners();
+    }
+  }
+
+  private setupFooterElement(): void {
+    this.footerEl = this.querySelector("ecc-d-collection-footer");
+    if (!this.footerEl) return;
+
+    this.eventListeners.footer = ((e: CustomEvent) => {
+      this.currentPage = e.detail.page;
+    }) as EventListener;
+
+    this.footerEl.addEventListener(
+      "ecc-page-change",
+      this.eventListeners.footer
+    );
+    this.footerEl.setAttribute("slot", "none");
+  }
+
+  private setupPageLength(): void {
+    if (this.pageLength) {
+      this.setAttribute("page-length", this.pageLength.toString());
+    }
+  }
+
+  private setupCollectionBody(): void {
+    const content = this.querySelector("[ecc-collection-body]");
+    if (!content) return;
+
+    content.setAttribute("slot", "none");
+    this.body = Array.from(content.querySelectorAll(":scope > *"));
+    this.itemCount = this.body.length;
+    this.setAttribute("item-count", this.itemCount.toString());
+  }
+
+  private removeEventListeners(): void {
     this.searchEl?.removeEventListener("ecc-input", this.eventListeners.filter);
     this.filterEl?.removeEventListener("ecc-input", this.eventListeners.filter);
-
     this.footerEl?.removeEventListener(
       "ecc-page-change",
       this.eventListeners.footer
     );
   }
 
-  protected updated(_changedProperties: PropertyValues): void {
-    if (_changedProperties.has("itemCount")) {
-      this.setAttribute("item-count", this.itemCount.toString());
-    }
+  private updateFilteredBody(): void {
+    this.currentPage = 1;
+    this.footerEl?.setAttribute("page", "1");
+    this.itemCount = this.filteredBody.length;
 
-    if (_changedProperties.has("body")) {
-      this.filteredBody = this.body;
-    }
-
-    if (_changedProperties.has("filteredBody")) {
-      this.currentPage = 1;
-      this.footerEl?.setAttribute("page", "1");
-      this.itemCount = this.filteredBody.length;
-
-      this.dispatchEvent(
-        new CustomEvent("ecc-filter", {
-          detail: {
-            value: this.searchContent,
-            itemCount: this.filteredBody.length,
-          },
-          bubbles: true,
-          composed: true,
-        })
-      );
-    }
-
-    if (_changedProperties.has("itemCount")) {
-      this.setAttribute("item-count", this.itemCount.toString());
-    }
+    this.dispatchEvent(
+      new CustomEvent("ecc-filter", {
+        detail: {
+          value: this.searchContent,
+          itemCount: this.filteredBody.length,
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
-  public error(message: string) {
-    this._errors = [...this._errors, message || "Something went wrong"];
-  }
-
-  private paginateItems() {
+  private paginateItems(): Element[] {
     const pageLength = this.pageLength || 1;
-
-    const currentPage = Math.max(1, this.currentPage);
-
-    const startIndex = (currentPage - 1) * pageLength;
-    const endIndex = startIndex + pageLength;
-
-    return this.filteredBody.slice(startIndex, endIndex);
+    const startIndex = (this.currentPage - 1) * pageLength;
+    return this.filteredBody.slice(startIndex, startIndex + pageLength);
   }
 
-  private filterItems(e: KeyboardEvent) {
+  private filterItems(e: Event): void {
     const target = e.target as HTMLElement;
-    this.searchContent = target.getAttribute("search-content");
+    this.searchContent = target.getAttribute("search-content") || "";
 
     if (!this.searchContent) {
       this.filteredBody = this.body;
       return;
     }
 
-    if (target.getAttribute("type") === "search") {
-      this.filteredBody = this.body.filter((item) => {
-        const searchRegex = new RegExp(this.searchContent!, "i");
+    const filters =
+      target.getAttribute("type") === "search"
+        ? [this.searchContent]
+        : this.searchContent.split(",");
 
-        return (
-          searchRegex.test(item.textContent || "") ||
-          searchRegex.test(item.getAttribute("name") || "")
-        );
-      });
-    } else {
-      const filters = this.searchContent.split(",");
-
-      this.filteredBody = this.body.filter((item) =>
-        filters.some((filter) => {
-          const searchRegex = new RegExp(filter, "i");
-
-          return (
-            searchRegex.test(item.textContent || "") ||
-            searchRegex.test(item.getAttribute("name") || "")
-          );
-        })
-      );
-    }
+    this.filteredBody = this.body.filter((item) =>
+      filters.some((filter) => itemMatchesFilter(item, filter))
+    );
   }
 
-  private _renderErrors(): TemplateResult {
+  private renderErrors(): TemplateResult {
     return html`${this._errors.map(
       (error) => html`
         <div class="error">
@@ -243,15 +213,30 @@ export default class EccUtilsDesignCollection extends LitElement {
     )}`;
   }
 
-  render() {
-    return html`<div class="collection">
-      ${this.headerEl}
-      ${repeat(
-        this.paginateItems(),
-        (item) => item.getAttribute("key"),
-        (item) => item
-      )}
-      ${this._renderErrors()} ${this.footerEl}
-    </div> `;
+  public renderContent(key: string, content?: string): void {
+    const item = this.shadowRoot?.querySelector(
+      `ecc-d-collection-item[key='${key}']`
+    );
+    if (item instanceof EccUtilsDesignCollectionItem) {
+      item.renderContent(content);
+    }
+  }
+
+  public error(message: string): void {
+    this._errors = [...this._errors, message || "Something went wrong"];
+  }
+
+  render(): TemplateResult {
+    return html`
+      <div class="collection">
+        ${this.headerEl} ${this.renderErrors()}
+        ${repeat(
+          this.paginateItems(),
+          (item) => item.getAttribute("key"),
+          (item) => item
+        )}
+        ${this.footerEl}
+      </div>
+    `;
   }
 }

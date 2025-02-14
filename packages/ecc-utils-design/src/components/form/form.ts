@@ -15,53 +15,6 @@ import formStyles from "./form.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
 import sholelaceStyles from "../../styles/shoelace.styles.js";
 
-export interface Field {
-  key: string;
-  label: string;
-  type?:
-    | "text"
-    | "date"
-    | "number"
-    | "email"
-    | "password"
-    | "tel"
-    | "url"
-    | "search"
-    | "datetime-local"
-    | "time"
-    | "array"
-    | "switch"
-    | "file"
-    | "group"
-    | "select";
-  fieldOptions?: {
-    required?: boolean;
-    default?: string | boolean;
-    multiple?: boolean;
-    accept?: string;
-    returnIfEmpty?: boolean;
-    tooltip?: string;
-    readonly?: boolean;
-  };
-  selectOptions?: Array<{ label: string; value: string }>;
-  arrayOptions?: {
-    defaultInstances?: number;
-    max?: number;
-    min?: number;
-  };
-  groupOptions?: {
-    collapsible: boolean;
-  };
-  fileOptions?: {
-    protocol?: "native" | "tus";
-    tusOptions?: {
-      endpoint: string;
-    };
-  };
-  error?: string;
-  children?: Array<Field>;
-}
-
 /**
  * @summary This component is used to render a form with the given fields.
  * @since 1.0.0
@@ -85,9 +38,7 @@ export default class EccUtilsDesignForm extends LitElement {
 
   @property({ type: Boolean, attribute: "no-submit" }) noSubmit = false;
 
-  @state()
-  private form: object = {};
-
+  @state() private form: object = {};
   @state() private formState: "idle" | "loading" | "error" | "success" = "idle";
   @state() private canSubmit = true;
   @state() private submitDisabledByUser = false;
@@ -106,7 +57,6 @@ export default class EccUtilsDesignForm extends LitElement {
     this.addEventListener("ecc-input", (e) => {
       if (e.detail.path && !e.detail.groupType) {
         _.set(this.form, e.detail.path, e.detail.value);
-        console.log(this.form);
       }
     });
   }

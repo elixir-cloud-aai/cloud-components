@@ -3,6 +3,7 @@ import { hostStyles } from "../../styles/host.styles.js";
 import collectionStyles from "./collection.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
 import sholelaceStyles from "../../styles/shoelace.styles.js";
+import { errorAlert } from "./utils.js";
 
 export default class EccUtilsDesignCollectionHeader extends LitElement {
   static styles = [
@@ -11,6 +12,8 @@ export default class EccUtilsDesignCollectionHeader extends LitElement {
     hostStyles,
     collectionStyles,
   ];
+
+  public error = (message: string) => errorAlert(this, message);
 
   protected render(): TemplateResult {
     return html` <div class="header">

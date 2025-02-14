@@ -1,7 +1,6 @@
 import { LitElement, html } from "lit";
 import { state } from "lit/decorators.js";
 import "@elixir-cloud/design/dist/components/form/index.js";
-import { Field } from "@elixir-cloud/design/dist/components/form/form";
 
 export default class ECCClientRoCrateAbout extends LitElement {
   @state()
@@ -14,7 +13,7 @@ export default class ECCClientRoCrateAbout extends LitElement {
   private _handleChangeLicenseType(e: CustomEvent): void {
     if (e.detail.key !== "license") return;
 
-    const licenseField: Field = {
+    const licenseField: any = {
       key: "license",
       label: "license",
       type: "group",
@@ -45,7 +44,7 @@ export default class ECCClientRoCrateAbout extends LitElement {
     );
 
     if (e.detail.value === "CreativeWork") {
-      const creativeWorkFields: Field[] = [
+      const creativeWorkFields: any[] = [
         {
           key: "@id",
           label: "@id",
@@ -87,7 +86,7 @@ export default class ECCClientRoCrateAbout extends LitElement {
 
       licenseField.children?.push(...creativeWorkFields);
     } else if (e.detail.value === "URL") {
-      const urlField: Field = {
+      const urlField: any = {
         key: "url",
         label: "URL",
         type: "url",
@@ -104,7 +103,7 @@ export default class ECCClientRoCrateAbout extends LitElement {
   }
 
   @state()
-  DatasetFields: Field[] = [
+  DatasetFields: any[] = [
     {
       key: "@id",
       label: "@id",
@@ -181,7 +180,7 @@ export default class ECCClientRoCrateAbout extends LitElement {
     },
   ];
 
-  static RelatedPeopleFields: Field[] = [
+  static RelatedPeopleFields: any[] = [
     {
       key: "author",
       label: "Author",
@@ -388,7 +387,7 @@ export default class ECCClientRoCrateAbout extends LitElement {
     },
   ];
 
-  static StructureFields: Field[] = [
+  static StructureFields: any[] = [
     {
       key: "hasPart",
       label: "Has Part",

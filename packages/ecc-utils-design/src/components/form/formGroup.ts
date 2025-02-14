@@ -116,19 +116,83 @@ export default class EccUtilsDesignFormGroup extends LitElement {
         `;
   }
 
+  private renderArrayItem(
+    instance: { content: string },
+    index: number
+  ): TemplateResult {
+    const resolveDeleteButtonIsActive = () => {
+      if (!this.minInstances) return true;
+      if (Number(this.minInstances) >= this.arrayInstances.length || 0)
+        return false;
+      return true;
+    };
+
+    const deleteItem = (itemIndex: number) => {
+      if (resolveDeleteButtonIsActive()) {
+        const newItems = [...this.arrayInstances];
+        newItems.splice(itemIndex, 1);
+
+        this.arrayInstances = newItems;
+
+        this.dispatchEvent(
+          new CustomEvent("ecc-array-delete", {
+            detail: {
+              key: this.key,
+              instances: this.arrayInstances.length,
+            },
+            bubbles: true,
+            composed: true,
+          })
+        );
+      }
+    };
+
+    return html`
+      <div
+        path="${this.path}[${index}]"
+        ecc-array
+        class="array"
+        data-testid="array"
+        data-label=${`${this.label}-${index}`}
+        @ecc-input=${(e: CustomEvent) => {
+          this.fireChangeEvent(e.detail.key, e.detail.value, index);
+        }}
+      >
+        <sl-button
+          variant="text"
+          data-testid="array-delete"
+          data-label="${this.key}-delete-${index}"
+          ?disabled=${!resolveDeleteButtonIsActive()}
+          @click=${() => {
+            deleteItem(index);
+          }}
+        >
+          <svg
+            class="delete-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+            />
+          </svg>
+        </sl-button>
+        <div class="array-item-container">${unsafeHTML(instance.content)}</div>
+      </div>
+    `;
+  }
+
   private renderArrayTemplate(): TemplateResult {
     const resolveAddButtonIsActive = () => {
       if (!this.maxInstances) return true;
       if (Number(this.maxInstances) > this.arrayInstances.length || 0)
         return true;
       return false;
-    };
-
-    const resolveDeleteButtonIsActive = () => {
-      if (!this.minInstances) return true;
-      if (Number(this.minInstances) >= this.arrayInstances.length || 0)
-        return false;
-      return true;
     };
 
     const addItem = () => {
@@ -142,26 +206,6 @@ export default class EccUtilsDesignFormGroup extends LitElement {
 
         this.dispatchEvent(
           new CustomEvent("ecc-array-add", {
-            detail: {
-              key: this.key,
-              instances: this.arrayInstances.length,
-            },
-            bubbles: true,
-            composed: true,
-          })
-        );
-      }
-    };
-
-    const deleteItem = (index: number) => {
-      if (resolveDeleteButtonIsActive()) {
-        const newItems = [...this.arrayInstances];
-        newItems.splice(index, 1);
-
-        this.arrayInstances = newItems;
-
-        this.dispatchEvent(
-          new CustomEvent("ecc-array-delete", {
             detail: {
               key: this.key,
               instances: this.arrayInstances.length,
@@ -218,46 +262,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
         ${repeat(
           this.arrayInstances,
           (instance) => instance.id,
-          (instance, index) => html`
-            <div
-              path="${this.path}[${index}]"
-              ecc-array
-              class="array"
-              data-testid="array"
-              data-label=${`${this.label}-${index}`}
-              @ecc-input=${(e: CustomEvent) => {
-                this.fireChangeEvent(e.detail.key, e.detail.value, index);
-              }}
-            >
-              <sl-button
-                variant="text"
-                data-testid="array-delete"
-                data-label="${this.key}-delete-${index}"
-                ?disabled=${!resolveDeleteButtonIsActive()}
-                @click=${() => {
-                  deleteItem(index);
-                }}
-              >
-                <svg
-                  class="delete-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                  />
-                </svg>
-              </sl-button>
-              <div class="array-item-container">
-                ${unsafeHTML(instance.content)}
-              </div>
-            </div>
-          `
+          this.renderArrayItem.bind(this)
         )}
       </div>
     `;
