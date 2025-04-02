@@ -36,6 +36,44 @@ export type FormItemType =
 
 type AlertType = "info" | "success" | "warning" | "error";
 
+/**
+ * @element ecc-d-form-group
+ * @summary A versatile form group component that can render as either a standard group or an array of form elements.
+ * @description
+ * The `ecc-d-form-group` component provides two main functionalities:
+ * 1. Group mode: Organizes form elements into logical groups, with optional collapsible sections
+ * 2. Array mode: Creates repeatable sets of form elements with add/remove capabilities
+ *
+ * @property {String} label - The display label for the form group
+ * @property {String} key - Unique identifier for the form group, used in form data structure
+ * @property {"array"|"group"} type - The type of form group, defaults to "group"
+ * @property {Boolean} required - Whether the form group is required
+ * @property {String} tooltip - Tooltip text to display additional information about the form group
+ * @property {Number} instances - Initial number of instances for array type
+ * @property {Number} maxInstances - Maximum number of instances allowed for array type
+ * @property {Number} minInstances - Minimum number of instances required for array type
+ * @property {Boolean} collapsible - Whether the group is collapsible (only applies to group type)
+ *
+ * @state {Array<{id: string, content: string}>} arrayInstances - Internal state for array instances
+ * @state {String} content - Internal state for content
+ * @state {String|null} path - Internal state for path
+ *
+ * @method connectedCallback - Public lifecycle method called when element is connected to DOM
+ * @method firstUpdated - Protected lifecycle method called after first update
+ *
+ * @private {method} fireChangeEvent - Fires a change event when input values change
+ * @private {method} renderGroupTemplate - Renders the group template
+ * @private {method} renderArrayItem - Renders an individual array item
+ * @private {method} renderArrayTemplate - Renders the array template
+ *
+ * @event ecc-input - Fired when any child input element changes value. Detail contains: {key, value, index, groupType, groupKey}
+ * @event ecc-array-add - Fired when a new array item is added. Detail contains: {key, instances}
+ * @event ecc-array-delete - Fired when an array item is deleted. Detail contains: {key, instances}
+ *
+ * @slot - Default slot for child form elements
+ *
+ * @dependency @shoelace-style/shoelace - Uses Shoelace components for UI elements
+ */
 export default class EccUtilsDesignFormInput extends LitElement {
   @property({ type: String }) label = "";
   @property({ type: String }) key = "";
@@ -380,5 +418,13 @@ export default class EccUtilsDesignFormInput extends LitElement {
 
       ${this.renderTemplate()}
     `;
+  }
+}
+
+window.customElements.define("ecc-d-form-input", EccUtilsDesignFormInput);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "ecc-d-form-input": EccUtilsDesignFormInput;
   }
 }

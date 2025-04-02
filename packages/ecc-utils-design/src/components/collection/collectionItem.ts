@@ -9,7 +9,35 @@ import { primitiveStylesheet } from "../../styles/primitive.styles.js";
 import sholelaceStyles from "../../styles/shoelace.styles.js";
 import { errorAlert, renderSkeletons } from "./utils.js";
 
-export default class EccUtilsDesignCollectionItem extends LitElement {
+/**
+ * @element ecc-d-collection-item
+ * @summary A collapsible item component for collections with support for lazy loading.
+ * @description
+ * The `ecc-d-collection-item` component represents an individual item within a collection.
+ * It provides a collapsible interface with a title and content area, and supports lazy loading
+ * of both title and content for improved performance with large collections.
+ *
+ * @property {String} key - Unique identifier for the collection item
+ * @property {String} name - Display name for the collection item
+ * @property {String} tag - Optional tag text to display alongside the name
+ * @property {String} tagType - Type of tag styling: "primary", "success", "neutral", "warning", or "danger"
+ * @property {Number} skeletonCount - Number of skeleton lines to display during lazy loading
+ * @property {Boolean} lazyTitle - Whether to lazy load the title
+ * @property {Boolean} lazyContent - Whether to lazy load the content
+ *
+ * @method renderContent - Public method that renders content into the item
+ * @method renderTitle - Public method that renders the title
+ * @method error - Public method that displays an error message
+ *
+ * @private {method} _renderTitle - Renders the title with optional tag
+ *
+ * @event ecc-expand - Fired when the item is expanded. Detail contains: {key}
+ *
+ * @slot - Default slot for item content
+ *
+ * @dependency @shoelace-style/shoelace - Uses Shoelace components for UI elements
+ */
+class EccDCollectionItem extends LitElement {
   static styles = [
     primitiveStylesheet,
     sholelaceStyles,
@@ -84,3 +112,13 @@ export default class EccUtilsDesignCollectionItem extends LitElement {
     `;
   }
 }
+
+window.customElements.define("ecc-d-collection-item", EccDCollectionItem);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "ecc-d-collection-item": EccDCollectionItem;
+  }
+}
+
+export default EccDCollectionItem;

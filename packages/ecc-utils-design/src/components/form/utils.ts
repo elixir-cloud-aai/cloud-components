@@ -63,6 +63,7 @@ export const findNearestFormGroup = (
 export const removeDuplicates = (arr: string[]) => {
   const lowercaseMap = new Map<string, string>();
   arr.forEach((item) => {
+    if (!item) return;
     lowercaseMap.set(item.toLowerCase(), item);
   });
 

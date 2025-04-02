@@ -16,18 +16,36 @@ import { primitiveStylesheet } from "../../styles/primitive.styles.js";
 import sholelaceStyles from "../../styles/shoelace.styles.js";
 
 /**
+ * @element ecc-d-form
  * @summary This component is used to render a form with the given fields.
- * @since 1.0.0
+ * @description A customizable form component that handles form state, validation, and submission.
  *
- * @property {array} fields - Array of fields to be rendered on the form
+ * @property {Boolean} noSubmit - When true, hides the submit button
  *
- * @method idle - Reset the form state to idle. Doesn't affect the form values.
- * @method loading - Set the form state to loading. Disables the submit button.
- * @method success - Set the form state to success. Show the success message.
+ * @state {Object} form - The form data object
+ * @state {String} formState - Current state of the form: "idle" | "loading" | "error" | "success"
+ * @state {Boolean} canSubmit - Whether the form can be submitted
+ * @state {Boolean} submitDisabledByUser - Whether the submit button is disabled by the user
+ * @state {String} errorMessage - Error message to display when form is in error state
+ * @state {String} successMessage - Success message to display when form is in success state
+ * @state {Array<String>} requiredButEmpty - Array of required fields that are empty
+ * @state {Array<Element>} content - Array of form content elements
  *
- * @event ecc-submit - This event is fired when the form is submitted. The event detail contains the form data.
+ * @method disableSubmit - Public method that disables the submit button
+ * @method loading - Public method that sets the form state to loading
+ * @method success - Public method that sets the form state to success and displays a success message
+ * @method error - Public method that sets the form state to error and displays an error message
+ * @method idle - Public method that resets the form state to idle
+ *
+ * @private {method} renderErrorTemplate - Renders the error message template
+ * @private {method} renderSuccessTemplate - Renders the success message template
+ * @private {method} handleSubmit - Handles form submission events
+ *
+ * @event ecc-submit - Fired when the form is submitted. Detail contains: {form: Object}
+ * @event ecc-input - Listens for this event from child components to update form data
+ *
+ * @dependency @shoelace-style/shoelace - Uses Shoelace components for UI elements
  */
-
 export default class EccUtilsDesignForm extends LitElement {
   static styles = [
     primitiveStylesheet,
@@ -153,16 +171,6 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   render() {
-    // const toggleButtonState = () => {
-    //   if (this.requiredButEmpty.length > 0) {
-    //     this.canSubmit = false;
-    //   } else {
-    //     this.canSubmit = true;
-    //   }
-
-    //   return "";
-    // };
-
     const contentDiv = document.createElement("div");
     contentDiv.append(...this.content);
 
@@ -195,5 +203,13 @@ export default class EccUtilsDesignForm extends LitElement {
           : html``}
       </form>
     `;
+  }
+}
+
+window.customElements.define("ecc-d-form", EccUtilsDesignForm);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "ecc-d-form": EccUtilsDesignForm;
   }
 }

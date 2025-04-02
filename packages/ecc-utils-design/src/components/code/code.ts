@@ -3,7 +3,7 @@ import { property, state } from "lit/decorators.js";
 import "ace-builds/src-noconflict/ace.js";
 import "ace-builds/src-noconflict/theme-github.js";
 import "@shoelace-style/shoelace/dist/components/tag/tag.js";
-import _ from "lodash-es";
+import * as _ from "lodash-es";
 import codeStyles from "./code.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
 import { hostStyles } from "../../styles/host.styles.js";
@@ -11,7 +11,33 @@ import sholelaceStyles from "../../styles/shoelace.styles.js";
 
 export type Language = "yaml" | "json" | "xml" | "makefile" | "sh";
 
-export default class EccUtilsDesignCode extends LitElement {
+/**
+ * @element ecc-d-code
+ * @summary A code editor component with syntax highlighting and language support.
+ * @description
+ * The `ecc-d-code` component provides a code editor with syntax highlighting using Ace Editor.
+ * It supports multiple programming languages and can be configured as read-only.
+ * The component displays a header with a label and language tag above the editor.
+ *
+ * @property {String} value - The code content to display and edit
+ * @property {String} label - The label displayed in the header (defaults to "Code block")
+ * @property {Language} language - The programming language for syntax highlighting (defaults to "json")
+ * @property {Boolean} disabled - Whether the editor is read-only
+ *
+ * @state {Object} editor - Reference to the Ace editor instance
+ *
+ * @method firstUpdated - Lifecycle method called after first update
+ * @method updated - Lifecycle method called after the component updates
+ *
+ * @private {method} initializeAceEditor - Sets up the Ace editor instance
+ * @private {method} setEditorLanguage - Sets the language mode for the editor
+ *
+ * @event ecc-change - Fired when the code content changes. Detail contains: {value}
+ *
+ * @dependency ace-builds - Uses Ace Editor for code editing and syntax highlighting
+ * @dependency @shoelace-style/shoelace - Uses Shoelace components for UI elements
+ */
+export default class EccDCode extends LitElement {
   static styles = [
     primitiveStylesheet,
     sholelaceStyles,
@@ -95,5 +121,13 @@ export default class EccUtilsDesignCode extends LitElement {
         ></div>
       </div>
     `;
+  }
+}
+
+window.customElements.define("ecc-d-code", EccDCode);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "ecc-d-code": EccDCode;
   }
 }

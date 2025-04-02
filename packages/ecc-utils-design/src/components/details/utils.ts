@@ -8,6 +8,7 @@ export const getListData = (input: string) => {
   if (input.trim().startsWith("[") && input.trim().endsWith("]")) {
     return JSON.parse(input);
   }
+
   return input.split(",");
 };
 
@@ -31,16 +32,6 @@ export const getNestedCopyValue = (el: Element) => {
   });
 
   return data;
-};
-
-export const formatLabel = (str: string) => {
-  let label = str;
-
-  label = label.replace(/_([a-z])/g, (match, p1) => p1.toUpperCase());
-  label = label.replace(/([A-Z])/g, " $1");
-  label = label.charAt(0).toUpperCase() + label.slice(1);
-
-  return label;
 };
 
 export const formatBtn = (btn: Element) => {
@@ -74,7 +65,7 @@ export const renderLabel = (
   tooltip = ""
 ) => {
   const getHTML = () => html`
-    <span> ${formatLabel(label)} </span>
+    <span> ${label} </span>
     ${copy
       ? html`<sl-copy-button .value=${JSON.stringify(value)}></sl-copy-button>`
       : ""}
@@ -87,4 +78,17 @@ export const renderLabel = (
         : getHTML()}
     </div>
   `;
+};
+
+export const cleanupString = (input: string): string => {
+  // Trim the string and replace multiple spaces with a single space
+  let cleaned = input.trim().replace(/\s+/g, " ");
+
+  // Remove any non-alphanumeric characters (except spaces)
+  cleaned = cleaned.replace(/[^a-zA-Z0-9 \-_]/g, "");
+
+  // Capitalize the first letter and make the rest lowercase
+  cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase();
+
+  return cleaned;
 };

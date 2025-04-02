@@ -15,8 +15,57 @@ import collectionStyles from "./collection.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
 import sholelaceStyles from "../../styles/shoelace.styles.js";
 import EccUtilsDesignCollectionItem from "./collectionItem.js";
-import { itemMatchesFilter } from "./utils.js";
+import { itemMatchesFilter, templateToString } from "./utils.js";
+import EccDCollectionFooter from "./collectionFooter.js";
 
+/**
+ * @element ecc-d-collection
+ * @summary A collection component that supports filtering, searching, and pagination.
+ * @description
+ * The `ecc-d-collection` component provides a structured way to display collections of items
+ * with support for filtering, searching, and pagination. It manages the display of items
+ * and handles user interactions for filtering and page navigation.
+ *
+ * @property {Boolean} filter - Whether to enable filtering functionality
+ * @property {Boolean} search - Whether to enable search functionality
+ * @property {Number} pageLength - Number of items to display per page
+ *
+ * @state {Number} itemCount - Total number of items in the collection
+ * @state {Array<Element>} body - Array of all collection item elements
+ * @state {Array<Element>} filteredBody - Array of filtered collection item elements
+ * @state {Number} currentPage - Current page number
+ * @state {Element|null} headerEl - Reference to the collection header element
+ * @state {EccDCollectionFooter|null} footerEl - Reference to the collection footer element
+ * @state {Element|null} searchEl - Reference to the search filter element
+ * @state {Element|null} filterEl - Reference to the select filter element
+ * @state {String} searchContent - Current search/filter content
+ * @state {Array<String>} _errors - Array of error messages
+ *
+ * @method connectedCallback - Lifecycle method called when element is connected to DOM
+ * @method disconnectedCallback - Lifecycle method called when element is disconnected from DOM
+ * @method updated - Lifecycle method called after the component updates
+ * @method renderBody - Public method that renders content into the collection body
+ * @method renderContent - Public method that renders content into a specific collection item
+ * @method error - Public method that adds an error message to be displayed
+ *
+ * @private {method} setupElements - Sets up all child elements
+ * @private {method} setupHeaderElements - Sets up header elements and event listeners
+ * @private {method} setupFooterElement - Sets up footer element and event listeners
+ * @private {method} setupPageLength - Sets up page length attribute
+ * @private {method} setupCollectionBody - Sets up collection body elements
+ * @private {method} removeEventListeners - Removes all event listeners
+ * @private {method} updateFilteredBody - Updates the filtered body and dispatches events
+ * @private {method} paginateItems - Returns the items for the current page
+ * @private {method} filterItems - Filters items based on search/filter criteria
+ * @private {method} renderErrors - Renders error messages
+ *
+ * @event ecc-filter - Fired when items are filtered. Detail contains: {value, itemCount}
+ * @event ecc-page-change - Listens for this event from the footer to change pages
+ *
+ * @slot - Default slot for collection items
+ *
+ * @dependency @shoelace-style/shoelace - Uses Shoelace components for UI elements
+ */
 export interface ItemProp {
   index: number;
   name: string;
@@ -38,7 +87,7 @@ export interface FilterProp {
   placeholder?: string;
 }
 
-export default class EccUtilsDesignCollection extends LitElement {
+export default class EccDCollection extends LitElement {
   static styles = [
     primitiveStylesheet,
     sholelaceStyles,
@@ -56,7 +105,7 @@ export default class EccUtilsDesignCollection extends LitElement {
   @state() private filteredBody: Element[] = [];
   @state() private currentPage = 1;
   @state() private headerEl: Element | null = null;
-  @state() private footerEl: Element | null = null;
+  @state() private footerEl: EccDCollectionFooter | null = null;
   @state() private searchEl: Element | null = null;
   @state() private filterEl: Element | null = null;
   @state() private searchContent = "";
@@ -77,14 +126,14 @@ export default class EccUtilsDesignCollection extends LitElement {
   protected updated(changedProperties: PropertyValues): void {
     if (changedProperties.has("body")) {
       this.filteredBody = this.body;
-    }
-
-    if (changedProperties.has("filteredBody")) {
-      this.updateFilteredBody();
+      this.footerEl?.setInitialState();
     }
 
     if (changedProperties.has("itemCount")) {
+      this.footerEl!.itemCount = this.itemCount;
+      this.footerEl!.pageLength = this.pageLength || 1;
       this.setAttribute("item-count", this.itemCount.toString());
+      this.footerEl?.setInitialState();
     }
   }
 
@@ -144,7 +193,7 @@ export default class EccUtilsDesignCollection extends LitElement {
     const content = this.querySelector("[ecc-collection-body]");
     if (!content) return;
 
-    content.setAttribute("slot", "none");
+    // content.setAttribute("slot", "none");
     this.body = Array.from(content.querySelectorAll(":scope > *"));
     this.itemCount = this.body.length;
     this.setAttribute("item-count", this.itemCount.toString());
@@ -161,7 +210,8 @@ export default class EccUtilsDesignCollection extends LitElement {
 
   private updateFilteredBody(): void {
     this.currentPage = 1;
-    this.footerEl?.setAttribute("page", "1");
+
+    if (this.footerEl) this.footerEl.page = 1;
     this.itemCount = this.filteredBody.length;
 
     this.dispatchEvent(
@@ -179,6 +229,7 @@ export default class EccUtilsDesignCollection extends LitElement {
   private paginateItems(): Element[] {
     const pageLength = this.pageLength || 1;
     const startIndex = (this.currentPage - 1) * pageLength;
+
     return this.filteredBody.slice(startIndex, startIndex + pageLength);
   }
 
@@ -188,6 +239,7 @@ export default class EccUtilsDesignCollection extends LitElement {
 
     if (!this.searchContent) {
       this.filteredBody = this.body;
+      this.updateFilteredBody();
       return;
     }
 
@@ -199,6 +251,7 @@ export default class EccUtilsDesignCollection extends LitElement {
     this.filteredBody = this.body.filter((item) =>
       filters.some((filter) => itemMatchesFilter(item, filter))
     );
+    this.updateFilteredBody();
   }
 
   private renderErrors(): TemplateResult {
@@ -211,6 +264,21 @@ export default class EccUtilsDesignCollection extends LitElement {
         </div>
       `
     )}`;
+  }
+
+  public renderBody(content: TemplateResult): void {
+    // const collectionBody = this.shadowRoot?.querySelector(
+    //   ".collection-body",
+    // ) as HTMLElement;
+
+    // render(content, collectionBody);
+
+    this.body = Array.from(
+      templateToString(content).querySelectorAll(":scope > *")
+    );
+    console.log("the string", templateToString(content));
+
+    // this.setupElements();
   }
 
   public renderContent(key: string, content?: string): void {
@@ -230,13 +298,23 @@ export default class EccUtilsDesignCollection extends LitElement {
     return html`
       <div class="collection">
         ${this.headerEl} ${this.renderErrors()}
-        ${repeat(
-          this.paginateItems(),
-          (item) => item.getAttribute("key"),
-          (item) => item
-        )}
+        <div class="collection-body">
+          ${repeat(
+            this.paginateItems(),
+            (item) => item.getAttribute("key"),
+            (item) => item
+          )}
+        </div>
         ${this.footerEl}
       </div>
     `;
+  }
+}
+
+window.customElements.define("ecc-d-collection", EccDCollection);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "ecc-d-collection": EccDCollection;
   }
 }

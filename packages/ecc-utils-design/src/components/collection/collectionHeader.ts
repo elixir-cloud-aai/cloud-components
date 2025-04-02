@@ -5,7 +5,20 @@ import { primitiveStylesheet } from "../../styles/primitive.styles.js";
 import sholelaceStyles from "../../styles/shoelace.styles.js";
 import { errorAlert } from "./utils.js";
 
-export default class EccUtilsDesignCollectionHeader extends LitElement {
+/**
+ * @element ecc-d-collection-header
+ * @summary A header component for collections that provides a container for header content.
+ * @description
+ * The `ecc-d-collection-header` component serves as a container for collection headers.
+ * It provides a consistent layout and styling for header content in collection components.
+ *
+ * @method error - Public method that displays an error message
+ *
+ * @slot - Default slot for header content
+ *
+ * @dependency @shoelace-style/shoelace - Uses Shoelace components for UI elements
+ */
+export default class EccDCollectionHeader extends LitElement {
   static styles = [
     primitiveStylesheet,
     sholelaceStyles,
@@ -19,5 +32,13 @@ export default class EccUtilsDesignCollectionHeader extends LitElement {
     return html` <div class="header">
       <slot></slot>
     </div>`;
+  }
+}
+
+window.customElements.define("ecc-d-collection-header", EccDCollectionHeader);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "ecc-d-collection-header": EccDCollectionHeader;
   }
 }
