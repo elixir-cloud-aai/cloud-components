@@ -1,5 +1,5 @@
 import { html, LitElement, PropertyValues, TemplateResult } from "lit";
-import { state } from "lit/decorators.js";
+import { property, state } from "lit/decorators.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/switch/switch.js";
@@ -10,72 +10,42 @@ import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
 import "@shoelace-style/shoelace/dist/components/select/select.js";
 import "@shoelace-style/shoelace/dist/components/option/option.js";
 import * as _ from "lodash-es";
-import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { hostStyles } from "../../styles/host.styles.js";
 import formStyles from "./form.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
 import sholelaceStyles from "../../styles/shoelace.styles.js";
 
-export interface Field {
-  key: string;
-  label: string;
-  type?:
-    | "text"
-    | "date"
-    | "number"
-    | "email"
-    | "password"
-    | "tel"
-    | "url"
-    | "search"
-    | "datetime-local"
-    | "time"
-    | "array"
-    | "switch"
-    | "file"
-    | "group"
-    | "select";
-  fieldOptions?: {
-    required?: boolean;
-    default?: string | boolean;
-    multiple?: boolean;
-    accept?: string;
-    returnIfEmpty?: boolean;
-    tooltip?: string;
-    readonly?: boolean;
-  };
-  selectOptions?: Array<{ label: string; value: string }>;
-  arrayOptions?: {
-    defaultInstances?: number;
-    max?: number;
-    min?: number;
-  };
-  groupOptions?: {
-    collapsible: boolean;
-  };
-  fileOptions?: {
-    protocol?: "native" | "tus";
-    tusOptions?: {
-      endpoint: string;
-    };
-  };
-  error?: string;
-  children?: Array<Field>;
-}
-
 /**
+ * @element ecc-d-form
  * @summary This component is used to render a form with the given fields.
- * @since 1.0.0
+ * @description A customizable form component that handles form state, validation, and submission.
  *
- * @property {array} fields - Array of fields to be rendered on the form
+ * @property {Boolean} noSubmit - When true, hides the submit button
  *
- * @method idle - Reset the form state to idle. Doesn't affect the form values.
- * @method loading - Set the form state to loading. Disables the submit button.
- * @method success - Set the form state to success. Show the success message.
+ * @state {Object} form - The form data object
+ * @state {String} formState - Current state of the form: "idle" | "loading" | "error" | "success"
+ * @state {Boolean} canSubmit - Whether the form can be submitted
+ * @state {Boolean} submitDisabledByUser - Whether the submit button is disabled by the user
+ * @state {String} errorMessage - Error message to display when form is in error state
+ * @state {String} successMessage - Success message to display when form is in success state
+ * @state {Array<String>} requiredButEmpty - Array of required fields that are empty
+ * @state {Array<Element>} content - Array of form content elements
  *
- * @event ecc-utils-submit - This event is fired when the form is submitted. The event detail contains the form data.
+ * @method disableSubmit - Public method that disables the submit button
+ * @method loading - Public method that sets the form state to loading
+ * @method success - Public method that sets the form state to success and displays a success message
+ * @method error - Public method that sets the form state to error and displays an error message
+ * @method idle - Public method that resets the form state to idle
+ *
+ * @private {method} renderErrorTemplate - Renders the error message template
+ * @private {method} renderSuccessTemplate - Renders the success message template
+ * @private {method} handleSubmit - Handles form submission events
+ *
+ * @event ecc-submit - Fired when the form is submitted. Detail contains: {form: Object}
+ * @event ecc-input - Listens for this event from child components to update form data
+ *
+ * @dependency @shoelace-style/shoelace - Uses Shoelace components for UI elements
  */
-
 export default class EccUtilsDesignForm extends LitElement {
   static styles = [
     primitiveStylesheet,
@@ -84,6 +54,8 @@ export default class EccUtilsDesignForm extends LitElement {
     formStyles,
   ];
 
+  @property({ type: Boolean, attribute: "no-submit" }) noSubmit = false;
+
   @state() private form: object = {};
   @state() private formState: "idle" | "loading" | "error" | "success" = "idle";
   @state() private canSubmit = true;
@@ -91,17 +63,17 @@ export default class EccUtilsDesignForm extends LitElement {
   @state() private errorMessage = "Something went wrong";
   @state() private successMessage = "Form submitted successfully";
   @state() private requiredButEmpty: string[] = [];
-  @state() private content = "";
+  @state() private content: Element[] = [];
 
   declare setHTMLUnsafe: (htmlString: string) => void;
   protected firstUpdated(_changedProperties: PropertyValues): void {
     super.firstUpdated(_changedProperties);
 
-    this.content = this.innerHTML;
+    this.content = Array.from(this.querySelectorAll(":scope > *"));
     this.setHTMLUnsafe("");
 
-    this.addEventListener("ecc-utils-change", (e) => {
-      if (e.detail.path) {
+    this.addEventListener("ecc-input", (e) => {
+      if (e.detail.path && !e.detail.groupType) {
         _.set(this.form, e.detail.path, e.detail.value);
       }
     });
@@ -188,7 +160,7 @@ export default class EccUtilsDesignForm extends LitElement {
       this.error({ message: "Form is empty" });
       return;
     }
-    const event = new CustomEvent("ecc-utils-submit", {
+    const event = new CustomEvent("ecc-submit", {
       detail: {
         form: this.form,
       },
@@ -209,6 +181,9 @@ export default class EccUtilsDesignForm extends LitElement {
     //   return "";
     // };
 
+    const contentDiv = document.createElement("div");
+    contentDiv.append(...this.content);
+
     if (this.formState === "success") {
       return html` ${this.renderSuccessTemplate()} `;
     }
@@ -219,21 +194,32 @@ export default class EccUtilsDesignForm extends LitElement {
 
     return html`
       <form ecc-form @submit=${this.handleSubmit}>
-        ${unsafeHTML(this.content)}
-
-        <sl-button
-          type="submit"
-          data-testid="submit"
-          variant="primary"
-          class="submit-button"
-          ?loading=${this.formState === "loading"}
-          ?disabled=${this.submitDisabledByUser ||
-          !this.canSubmit ||
-          this.formState === "loading"}
-        >
-          Submit
-        </sl-button>
+        ${contentDiv}
+        ${!this.noSubmit
+          ? html`
+              <sl-button
+                type="submit"
+                data-testid="submit"
+                variant="primary"
+                class="submit-button"
+                ?loading=${this.formState === "loading"}
+                ?disabled=${this.submitDisabledByUser ||
+                !this.canSubmit ||
+                this.formState === "loading"}
+              >
+                Submit
+              </sl-button>
+            `
+          : html``}
       </form>
     `;
+  }
+}
+
+window.customElements.define("ecc-d-form", EccUtilsDesignForm);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "ecc-d-form": EccUtilsDesignForm;
   }
 }

@@ -13,6 +13,44 @@ import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import formStyles from "./form.styles.js";
 
+/**
+ * @element ecc-d-form-group
+ * @summary A versatile form group component that can render as either a standard group or an array of form elements.
+ * @description
+ * The `ecc-d-form-group` component provides two main functionalities:
+ * 1. Group mode: Organizes form elements into logical groups, with optional collapsible sections
+ * 2. Array mode: Creates repeatable sets of form elements with add/remove capabilities
+ *
+ * @property {String} label - The display label for the form group
+ * @property {String} key - Unique identifier for the form group, used in form data structure
+ * @property {"array"|"group"} type - The type of form group, defaults to "group"
+ * @property {Boolean} required - Whether the form group is required
+ * @property {String} tooltip - Tooltip text to display additional information about the form group
+ * @property {Number} instances - Initial number of instances for array type
+ * @property {Number} maxInstances - Maximum number of instances allowed for array type
+ * @property {Number} minInstances - Minimum number of instances required for array type
+ * @property {Boolean} collapsible - Whether the group is collapsible (only applies to group type)
+ *
+ * @state {Array<{id: string, content: string}>} arrayInstances - Internal state for array instances
+ * @state {String} content - Internal state for content
+ * @state {String|null} path - Internal state for path
+ *
+ * @method connectedCallback - Public lifecycle method called when element is connected to DOM
+ * @method firstUpdated - Protected lifecycle method called after first update
+ *
+ * @private {method} fireChangeEvent - Fires a change event when input values change
+ * @private {method} renderGroupTemplate - Renders the group template
+ * @private {method} renderArrayItem - Renders an individual array item
+ * @private {method} renderArrayTemplate - Renders the array template
+ *
+ * @event ecc-input - Fired when any child input element changes value. Detail contains: {key, value, index, groupType, groupKey}
+ * @event ecc-array-add - Fired when a new array item is added. Detail contains: {key, instances}
+ * @event ecc-array-delete - Fired when an array item is deleted. Detail contains: {key, instances}
+ *
+ * @slot - Default slot for child form elements
+ *
+ * @dependency @shoelace-style/shoelace - Uses Shoelace components for UI elements
+ */
 export default class EccUtilsDesignFormGroup extends LitElement {
   static styles = [formStyles];
 
@@ -66,6 +104,20 @@ export default class EccUtilsDesignFormGroup extends LitElement {
     this.path = findNearestFormGroup(this.key, this, true);
   }
 
+  private fireChangeEvent(key: string, value: string, index?: number) {
+    this.dispatchEvent(
+      new CustomEvent("ecc-input", {
+        detail: {
+          key,
+          value,
+          index,
+          groupType: this.type,
+          groupKey: this.key,
+        },
+      })
+    );
+  }
+
   private renderGroupTemplate(): TemplateResult {
     return this.collapsible
       ? html`
@@ -78,6 +130,9 @@ export default class EccUtilsDesignFormGroup extends LitElement {
               ecc-group
               ecc-group-key="${this.key}"
               path="${this.path}"
+              @ecc-input=${(e: CustomEvent) => {
+                this.fireChangeEvent(e.detail.key, e.detail.value);
+              }}
             >
               ${unsafeHTML(this.content)}
             </div>
@@ -90,10 +145,84 @@ export default class EccUtilsDesignFormGroup extends LitElement {
             ecc-group
             ecc-group-key="${this.key}"
             path="${this.path}"
+            @ecc-input=${(e: CustomEvent) => {
+              this.fireChangeEvent(e.detail.key, e.detail.value);
+            }}
           >
             ${unsafeHTML(this.content)}
           </div>
         `;
+  }
+
+  private renderArrayItem(
+    instance: { content: string },
+    index: number
+  ): TemplateResult {
+    const resolveDeleteButtonIsActive = () => {
+      if (!this.minInstances) return true;
+      if (Number(this.minInstances) >= this.arrayInstances.length || 0)
+        return false;
+      return true;
+    };
+
+    const deleteItem = (itemIndex: number) => {
+      if (resolveDeleteButtonIsActive()) {
+        const newItems = [...this.arrayInstances];
+        newItems.splice(itemIndex, 1);
+
+        this.arrayInstances = newItems;
+
+        this.dispatchEvent(
+          new CustomEvent("ecc-array-delete", {
+            detail: {
+              key: this.key,
+              instances: this.arrayInstances.length,
+            },
+            bubbles: true,
+            composed: true,
+          })
+        );
+      }
+    };
+
+    return html`
+      <div
+        path="${this.path}[${index}]"
+        ecc-array
+        class="array"
+        data-testid="array"
+        data-label=${`${this.label}-${index}`}
+        @ecc-input=${(e: CustomEvent) => {
+          this.fireChangeEvent(e.detail.key, e.detail.value, index);
+        }}
+      >
+        <sl-button
+          variant="text"
+          data-testid="array-delete"
+          data-label="${this.key}-delete-${index}"
+          ?disabled=${!resolveDeleteButtonIsActive()}
+          @click=${() => {
+            deleteItem(index);
+          }}
+        >
+          <svg
+            class="delete-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+            />
+          </svg>
+        </sl-button>
+        <div class="array-item-container">${unsafeHTML(instance.content)}</div>
+      </div>
+    `;
   }
 
   private renderArrayTemplate(): TemplateResult {
@@ -102,13 +231,6 @@ export default class EccUtilsDesignFormGroup extends LitElement {
       if (Number(this.maxInstances) > this.arrayInstances.length || 0)
         return true;
       return false;
-    };
-
-    const resolveDeleteButtonIsActive = () => {
-      if (!this.minInstances) return true;
-      if (Number(this.minInstances) >= this.arrayInstances.length || 0)
-        return false;
-      return true;
     };
 
     const addItem = () => {
@@ -121,27 +243,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
         this.arrayInstances = [...this.arrayInstances, newInstance];
 
         this.dispatchEvent(
-          new CustomEvent("ecc-utils-array-add", {
-            detail: {
-              key: this.key,
-              instances: this.arrayInstances.length,
-            },
-            bubbles: true,
-            composed: true,
-          })
-        );
-      }
-    };
-
-    const deleteItem = (index: number) => {
-      if (resolveDeleteButtonIsActive()) {
-        const newItems = [...this.arrayInstances];
-        newItems.splice(index, 1);
-
-        this.arrayInstances = newItems;
-
-        this.dispatchEvent(
-          new CustomEvent("ecc-utils-array-delete", {
+          new CustomEvent("ecc-array-add", {
             detail: {
               key: this.key,
               instances: this.arrayInstances.length,
@@ -198,43 +300,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
         ${repeat(
           this.arrayInstances,
           (instance) => instance.id,
-          (instance, index) => html`
-            <div
-              path="${this.path}[${index}]"
-              ecc-array
-              class="array"
-              data-testid="array"
-              data-label=${`${this.label}-${index}`}
-            >
-              <sl-button
-                variant="text"
-                data-testid="array-delete"
-                data-label="${this.key}-delete-${index}"
-                ?disabled=${!resolveDeleteButtonIsActive()}
-                @click=${() => {
-                  deleteItem(index);
-                }}
-              >
-                <svg
-                  class="delete-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                  />
-                </svg>
-              </sl-button>
-              <div class="array-item-container">
-                ${unsafeHTML(instance.content)}
-              </div>
-            </div>
-          `
+          this.renderArrayItem.bind(this)
         )}
       </div>
     `;
@@ -246,5 +312,13 @@ export default class EccUtilsDesignFormGroup extends LitElement {
     }
 
     return this.renderGroupTemplate();
+  }
+}
+
+window.customElements.define("ecc-d-form-group", EccUtilsDesignFormGroup);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "ecc-d-form-group": EccUtilsDesignFormGroup;
   }
 }

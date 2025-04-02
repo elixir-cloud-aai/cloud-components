@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "node ../../scripts/build.js -p ecc-client-elixir-drs-filer-",
+    "build": "",
     "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
     "clean": "rm -rf dist node_modules custom-elements-manifest.config.js",
     "test": "",
