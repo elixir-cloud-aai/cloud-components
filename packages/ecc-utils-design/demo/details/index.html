@@ -113,26 +113,26 @@
       render(
         html`
           <ecc-d-details>
-            <ecc-d-data-item
+            <ecc-d-details-item
               type="tab"
               tabs='["Company Info", "Employees", "Clients", "Financials"]'
             >
               <div slot="Company Info">
-                <ecc-d-data-item
+                <ecc-d-details-item
                   tooltip="Company Name"
                   label="name"
                   value="TechCorp"
                 >
-                </ecc-d-data-item>
+                </ecc-d-details-item>
 
-                <ecc-d-data-item label="industry" value="Technology">
-                </ecc-d-data-item>
+                <ecc-d-details-item label="industry" value="Technology">
+                </ecc-d-details-item>
               </div>
 
               <div slot="Employees">
                 ${employees.map(
                   (e) => html`
-                    <ecc-d-data-item
+                    <ecc-d-details-item
                       copy
                       label="Employee${e.id}"
                       type="detail"
@@ -141,20 +141,20 @@
                       ${Object.keys(e).map((key) =>
                         key !== "address" && key !== "projects"
                           ? html`
-                              <ecc-d-data-item
+                              <ecc-d-details-item
                                 label="${key}"
                                 type="${key === "skills" ? "list" : null}"
                                 value="${e[key]}"
-                              ></ecc-d-data-item>
+                              ></ecc-d-details-item>
                             `
                           : html``
                       )}
 
-                      <ecc-d-data-item type="detail" label="Projects">
+                      <ecc-d-details-item type="detail" label="Projects">
                         ${e.projects.map(
                           (p) =>
                             html`
-                              <ecc-d-data-item
+                              <ecc-d-details-item
                                 ?copy=${p.copy}
                                 label="${p.projectName}"
                                 type="detail"
@@ -162,53 +162,53 @@
                                 ${Object.keys(p).map(
                                   (pKey) =>
                                     html`
-                                      <ecc-d-data-item
+                                      <ecc-d-details-item
                                         label="${pKey}"
                                         type="${pKey === "team"
                                           ? "list"
                                           : null}"
                                         value="${p[pKey]}"
-                                      ></ecc-d-data-item>
+                                      ></ecc-d-details-item>
                                     `
                                 )}
-                              </ecc-d-data-item>
+                              </ecc-d-details-item>
                             `
                         )}
-                      </ecc-d-data-item>
+                      </ecc-d-details-item>
 
-                      <ecc-d-data-item type="detail" label="Address">
+                      <ecc-d-details-item type="detail" label="Address">
                         ${Object.keys(e.address).map(
                           (aKey) =>
                             html`
-                              <ecc-d-data-item
+                              <ecc-d-details-item
                                 label=${aKey}
                                 value=${e.address[aKey]}
-                              ></ecc-d-data-item>
+                              ></ecc-d-details-item>
                             `
                         )}
-                      </ecc-d-data-item>
-                    </ecc-d-data-item>
+                      </ecc-d-details-item>
+                    </ecc-d-details-item>
                   `
                 )}
               </div>
 
               <div slot="Clients">
                 ${clients.map(
-                  (c) => html` <ecc-d-data-item
+                  (c) => html` <ecc-d-details-item
                     type="detail"
                     tooltip="client name"
                     label="${c.clientName}"
                   >
                     ${Object.keys(c).map(
                       (cKey) => html`
-                        <ecc-d-data-item
+                        <ecc-d-details-item
                           type="${cKey === "projects" ? "list" : null}"
                           label=${cKey}
                           value="${c[cKey]}"
-                        ></ecc-d-data-item>
+                        ></ecc-d-details-item>
                       `
                     )}
-                  </ecc-d-data-item>`
+                  </ecc-d-details-item>`
                 )}
               </div>
 
@@ -216,27 +216,27 @@
                 ${Object.keys(financials).map((fKey) =>
                   fKey === "expenses"
                     ? html`
-                        <ecc-d-data-item type="detail" label="${fKey}">
+                        <ecc-d-details-item type="detail" label="${fKey}">
                           ${Object.keys(financials[fKey]).map(
                             (k) => html`
-                              <ecc-d-data-item
+                              <ecc-d-details-item
                                 label="${k}"
                                 value="${financials[fKey][k]}"
-                              ></ecc-d-data-item>
+                              ></ecc-d-details-item>
                             `
                           )}
-                        </ecc-d-data-item>
+                        </ecc-d-details-item>
                       `
                     : html`
-                        <ecc-d-data-item
+                        <ecc-d-details-item
                           slot="Financials"
                           label=${fKey}
                           value="${financials[fKey]}"
-                        ></ecc-d-data-item>
+                        ></ecc-d-details-item>
                       `
                 )}
               </div>
-            </ecc-d-data-item>
+            </ecc-d-details-item>
 
             <a href="#" ecc-type="action" ecc-position="left">text</a>
             <button ecc-type="action" class="ecc-action-button ecc-danger">

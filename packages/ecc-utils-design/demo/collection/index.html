@@ -2,7 +2,7 @@
 <html lang="en-GB">
   <head>
     <meta charset="utf-8" />
-		<link rel="icon" href="./logo-elixir-cloud-aai.svg" type="image/x-icon">
+    <link rel="icon" href="./logo-elixir-cloud-aai.svg" type="image/x-icon" />
     <title>ecc-utils-design</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -70,7 +70,9 @@
           .filters=${filters}
           @ecc-utils-expand=${async (e) => {
             // Check if child already exists
-            const children = e.target.querySelectorAll(`[slot="${e.detail.key}"]`);
+            const children = e.target.querySelectorAll(
+              `[slot="${e.detail.key}"]`
+            );
             if (children.length === 0) {
               // Add chlld to ecc-utils-design-collection
               const res = await fetch(

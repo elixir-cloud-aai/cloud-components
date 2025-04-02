@@ -1,4 +1,4 @@
-export { default as EccUtilsDesignForm } from "./form/index.js";
-export { default as EccUtilsDesignCollection } from "./collection/index.js";
-export { default as EccUtilsDesignDetails } from "./details/index.js";
-export { default as EccUtilsDesignCode } from "./code/index.js";
+export * from "./form/index.js";
+export * from "./code/index.js";
+export * from "./collection/index.js";
+export * from "./details/index.js";
