@@ -77,18 +77,20 @@ export default class EccUtilsDesignFormGroup extends LitElement {
     content: string;
   }> = [];
 
-  @state() private content = "";
+  @state() private content: NodeListOf<Element> | string | null = null;
   @state() private path: string | null = "";
 
   declare setHTMLUnsafe: (htmlString: string) => void;
   protected firstUpdated(): void {
-    this.content = this.innerHTML;
-
     if (this.type === "array") {
+      this.content = this.innerHTML;
+
       this.arrayInstances = Array.from({ length: this.instances }, () => ({
         id: generateUniqueKey(),
-        content: this.content,
+        content: this.content as string,
       }));
+    } else {
+      this.content = this.querySelectorAll(":scope > *");
     }
 
     this.setHTMLUnsafe("");
@@ -134,7 +136,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
                 this.fireChangeEvent(e.detail.key, e.detail.value);
               }}
             >
-              ${unsafeHTML(this.content)}
+              ${this.content}
             </div>
           </sl-details>
         `
@@ -149,7 +151,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
               this.fireChangeEvent(e.detail.key, e.detail.value);
             }}
           >
-            ${unsafeHTML(this.content)}
+            ${this.content}
           </div>
         `;
   }
@@ -237,7 +239,7 @@ export default class EccUtilsDesignFormGroup extends LitElement {
       if (resolveAddButtonIsActive()) {
         const newInstance = {
           id: generateUniqueKey(),
-          content: this.content,
+          content: this.content as string,
         };
 
         this.arrayInstances = [...this.arrayInstances, newInstance];

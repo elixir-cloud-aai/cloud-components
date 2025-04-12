@@ -171,16 +171,6 @@ export default class EccUtilsDesignForm extends LitElement {
   }
 
   render() {
-    // const toggleButtonState = () => {
-    //   if (this.requiredButEmpty.length > 0) {
-    //     this.canSubmit = false;
-    //   } else {
-    //     this.canSubmit = true;
-    //   }
-
-    //   return "";
-    // };
-
     const contentDiv = document.createElement("div");
     contentDiv.append(...this.content);
 
