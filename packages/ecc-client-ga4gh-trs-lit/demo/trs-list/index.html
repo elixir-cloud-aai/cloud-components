@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        background: #fafafa;
+      }
+    </style>
+  </head>
+  <title>ecc-client-ga4gh-trs</title>
+  <body>
+    <div id="demo"></div>
+
+    <script type="module">
+      import { html, render } from "lit";
+      import "../../dist/components/trs-list/index.js";
+
+      const baseUrl = "https://dockstore.org/api/api/ga4gh/v2";
+      const pageSize = 10;
+
+      render(
+        html`<ecc-client-ga4gh-trs 
+          .baseUrl="${baseUrl}"
+          .pageSize="${pageSize}"
+          .filter="${true}"
+          .search="${true}"
+        />`,
+        document.querySelector("#demo")
+      );
+    </script>
+  </body>
+</html> 

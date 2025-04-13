@@ -1,5 +1,5 @@
 {
-  "name": "@elixir-cloud/trs",
+  "name": "@elixir-cloud/trs-old",
   "main": "index.js",
   "description": "A TRS component",
   "type": "module",

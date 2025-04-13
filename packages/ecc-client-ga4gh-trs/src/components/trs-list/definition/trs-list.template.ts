@@ -184,7 +184,6 @@ const accordionTemplate = html<TRS>`
                     <tr class="active-row">
                       <td>${(x) => x.id}</td>
                       <td>${(x) => x.name}</td>
-                      <td>${(x) => x.author.join(", ")}</td>
                       <td>${(x) => x.meta_version}</td>
                       <td>${(x) => x.descriptor_type}</td>
                       <td>${(x) => x.is_production}</td>
