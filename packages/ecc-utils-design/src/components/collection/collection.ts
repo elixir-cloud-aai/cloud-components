@@ -160,7 +160,10 @@ export default class EccUtilsDesignCollection extends LitElement {
         </sl-button>
         ${[
           ...Array(
-            Math.max(this._pagesRendered, this.totalItems / this.pageSize)
+            Math.max(
+              this._pagesRendered,
+              Math.ceil(this.totalItems / this.pageSize)
+            )
           ).keys(),
         ].map(
           (page) => html`<sl-button
