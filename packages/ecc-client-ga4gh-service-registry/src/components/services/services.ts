@@ -158,10 +158,10 @@ export default class ECCClientGa4ghServiceRegistryServices extends LitElement {
       );
 
     if (!eccUtilsDesignCollection) {
-      // console.error({
-      //   error: "ecc-utils-design-collection not found",
-      //   breakPoint: "ECCClientGa4ghServiceRegistryServices.handleExpandItem",
-      // });
+      console.error({
+        error: "ecc-utils-design-collection not found",
+        breakPoint: "ECCClientGa4ghServiceRegistryServices.handleExpandItem",
+      });
       return;
     }
 
@@ -247,12 +247,10 @@ export default class ECCClientGa4ghServiceRegistryServices extends LitElement {
   }
 
   render() {
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    const pageItems = this.services.slice(startIndex, endIndex);
+    const total = this.services.length > 0 ? this.services.length : -1;
 
-    const items = pageItems.map((service, index) => ({
-      index: startIndex + index + 1,
+    const items = this.services.map((service, index) => ({
+      index: index + 1,
       key: service.id,
       name: service.name,
       lazy: true,
@@ -271,7 +269,12 @@ export default class ECCClientGa4ghServiceRegistryServices extends LitElement {
         .loading=${this.loading}
         .error=${this.error}
         .pageSize=${this.pageSize}
-        @ecc-utils-expand=${this._handleExpandItem}
+        .totalItems=${total}
+        @ecc-utils-expand=${(event: CustomEvent) => {
+          if (!this.cache.has(event.detail.key)) {
+            this._handleExpandItem(event);
+          }
+        }}
         @ecc-utils-page-change=${(e: CustomEvent) => {
           this.currentPage = e.detail.page;
         }}
