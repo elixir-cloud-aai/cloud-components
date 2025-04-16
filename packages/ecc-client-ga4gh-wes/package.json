@@ -31,7 +31,7 @@
   ],
   "scripts": {
     "analyze": "cem analyze --litelement",
-    "build": "node ../../scripts/build.js -p ecc-client-ga4gh-wes-",
+    "build": "",
     "dev": "concurrently -k -r \"npm run build -- --watch\" \"wds\"",
     "clean": "rm -rf dist node_modules src/react custom-elements-manifest.config.js",
     "test": "wtr --coverage",

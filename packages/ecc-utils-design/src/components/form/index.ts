@@ -1,12 +1,9 @@
 import EccUtilsDesignForm from "./form.js";
+import EccUtilsDesignFormInput from "./formInput.js";
+import EccUtilsDesignFormGroup from "./formGroup.js";
 
 export * from "./form.js";
-export default EccUtilsDesignForm;
+export * from "./formInput.js";
+export * from "./formGroup.js";
 
-window.customElements.define("ecc-utils-design-form", EccUtilsDesignForm);
-
-declare global {
-  interface HTMLElementTagNameMap {
-    "ecc-utils-design-form": EccUtilsDesignForm;
-  }
-}
+export { EccUtilsDesignFormInput, EccUtilsDesignFormGroup, EccUtilsDesignForm };

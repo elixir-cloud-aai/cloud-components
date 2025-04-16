@@ -1,6 +1,6 @@
 import { css } from "lit";
 
-const styles = css`
+export const detailsStyles = css`
   :host {
     display: block;
     padding: 1rem;
@@ -26,18 +26,52 @@ const styles = css`
     text-decoration: underline;
     padding: 0;
   }
-  .icon {
+  .ecc-action-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: var(--ecc-input-border-width) solid black;
+    gap: var(--ecc-spacing-large);
+    background-color: var(--ecc-color-background-primary);
+    padding: var(--ecc-spacing-medium);
+    border-radius: var(--ecc-border-radius-medium);
+    outline: none;
+    cursor: pointer;
+    font-family: var(--ecc-input-font-family);
+    font-weight: var(--ecc-input-font-weight);
+    user-select: none;
+    white-space: nowrap;
+    font-size: var(--ecc-input-font-size-medium);
+  }
+  .ecc-action-button:active {
+    scale: 0.98;
+  }
+  .ecc-action-button.ecc-primary {
+    color: white;
+    background-color: var(--ecc-color-primary-600);
+    border: none;
+  }
+  .ecc-action-button.ecc-danger {
+    color: white;
+    background-color: var(--sl-color-danger-600);
+    border: none;
+  }
+  .ecc-icon {
     height: var(--ecc-input-font-size-large);
     width: var(--ecc-input-font-size-large);
   }
+`;
 
-  /* Details */
+export const dataItemStyles = css`
+  .tab-container {
+  }
   .key,
   .value {
     font-size: var(--ecc-input-label-font-size-medium);
     font-family: var(--ecc-input-font-family);
     font-weight: var(--ecc-input-font-weight);
     letter-spacing: var(--ecc-input-letter-spacing);
+    position: relative;
   }
   .field {
     display: flex;
@@ -92,5 +126,3 @@ const styles = css`
     height: var(--ecc-input-font-size-small);
   }
 `;
-
-export default styles;

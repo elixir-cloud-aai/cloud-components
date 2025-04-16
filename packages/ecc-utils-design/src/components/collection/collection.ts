@@ -48,9 +48,9 @@ export interface FilterProp {
  * @method setPage - Can be used to set the page of the collection.
  * @method error - Can be used to display error alert to the user.
  *
- * @event ecc-utils-page-change - Fired when the page is changed.
- * @event ecc-utils-expand - Fired when an item is expanded.
- * @event ecc-utils-filter - Fired when a filter is applied.
+ * @event ecc-page-change - Fired when the page is changed.
+ * @event ecc-expand - Fired when an item is expanded.
+ * @event ecc-filter - Fired when a filter is applied.
  */
 export default class EccUtilsDesignCollection extends LitElement {
   static styles = [
@@ -86,7 +86,7 @@ export default class EccUtilsDesignCollection extends LitElement {
         this._page = 1;
         if (this.totalItems === -1) this._pagesRendered = 1;
         this.dispatchEvent(
-          new CustomEvent("ecc-utils-filter", {
+          new CustomEvent("ecc-filter", {
             detail: {
               key: filter.key,
               value: (e.target as HTMLInputElement)?.value,
@@ -106,7 +106,7 @@ export default class EccUtilsDesignCollection extends LitElement {
         this._page = 1;
         if (this.totalItems === -1) this._pagesRendered = 1;
         this.dispatchEvent(
-          new CustomEvent("ecc-utils-filter", {
+          new CustomEvent("ecc-filter", {
             detail: {
               key: filter.key,
               value: (e.target as HTMLInputElement)?.value,
@@ -148,7 +148,7 @@ export default class EccUtilsDesignCollection extends LitElement {
             if (this._page === 1) return;
             this._page -= 1;
             this.dispatchEvent(
-              new CustomEvent("ecc-utils-page-change", {
+              new CustomEvent("ecc-page-change", {
                 detail: {
                   page: this._page,
                 },
@@ -168,7 +168,7 @@ export default class EccUtilsDesignCollection extends LitElement {
             @click=${() => {
               this._page = page + 1;
               this.dispatchEvent(
-                new CustomEvent("ecc-utils-page-change", {
+                new CustomEvent("ecc-page-change", {
                   detail: {
                     page: this._page,
                   },
@@ -200,7 +200,7 @@ export default class EccUtilsDesignCollection extends LitElement {
             }
             this._page += 1;
             this.dispatchEvent(
-              new CustomEvent("ecc-utils-page-change", {
+              new CustomEvent("ecc-page-change", {
                 detail: {
                   page: this._page,
                 },
@@ -224,7 +224,7 @@ export default class EccUtilsDesignCollection extends LitElement {
       class="${hidden ? "hidden" : ""}"
       @sl-show=${() => {
         this.dispatchEvent(
-          new CustomEvent("ecc-utils-expand", {
+          new CustomEvent("ecc-expand", {
             detail: {
               key: item.key,
             },

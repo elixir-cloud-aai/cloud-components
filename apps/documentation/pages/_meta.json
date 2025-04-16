@@ -13,17 +13,6 @@
   },
   "about": {
     "title": "About",
-    "type": "menu",
-    "items": {
-      "contact": {
-        "title": "Contact",
-        "type": "page",
-        "href": "/about/contact"
-      },
-      "contribute": {
-        "title": "Contribute",
-        "type": "page"
-      }
-    }
+    "type": "page"
   }
 }
