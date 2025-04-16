@@ -6,7 +6,7 @@ import {
   renderInTooltip,
   noKeyWarning,
   removeDuplicates,
-  findNearestFormGroup,
+  findFieldPath,
 } from "./utils.js";
 import "@shoelace-style/shoelace/dist/components/alert/alert.js";
 import "@shoelace-style/shoelace/dist/components/icon/icon.js";
@@ -106,7 +106,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
       this.key = _.camelCase(this.label);
     }
 
-    this.path = findNearestFormGroup(this.key, this);
+    this.path = findFieldPath(this.key, this);
 
     if (this.type === "switch") {
       this.value = !!this.value;
@@ -125,9 +125,10 @@ export default class EccUtilsDesignFormInput extends LitElement {
   private eventData() {
     return {
       detail: {
-        inputKey: this.key,
+        key: this.key,
         value: this.value,
         path: this.path,
+        target: this,
       },
       bubbles: true,
       composed: true,

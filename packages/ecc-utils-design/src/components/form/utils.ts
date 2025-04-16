@@ -13,7 +13,6 @@ export function renderInTooltip(
     : content;
 }
 
-// write a function to console.warn a string that is sent as a param, only when app is in dev mode
 export function devWarn(message: string): void {
   // eslint-disable-next-line turbo/no-undeclared-env-vars
   if (process.env.NODE_ENV === "development") {
@@ -31,16 +30,29 @@ export function generateUniqueKey() {
   return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 }
 
-export const findNearestFormGroup = (
+export const findFieldPath = (
   key: string,
   element: HTMLElement | null,
   isGroup = false
 ): string | null => {
+  const gropEl = findNearestFormGroup(element, isGroup);
+
+  if (!gropEl) return null;
+
+  const parentPath = gropEl?.getAttribute("path");
+  return parentPath ? `${parentPath}.${key}` : key;
+};
+
+export const findNearestFormGroup = (
+  element: HTMLElement | null,
+  isGroup = false
+): Element | null => {
   if (!element) return null;
 
   const topLevelElement = element.closest("ecc-d-form, ecc-d-form-group");
   if (
     topLevelElement &&
+    element.shadowRoot &&
     (topLevelElement.matches("ecc-d-form") ||
       (!isGroup && topLevelElement.matches("ecc-d-form-group")))
   ) {
@@ -50,13 +62,13 @@ export const findNearestFormGroup = (
   const specialElement = element.closest(
     "[ecc-array], [ecc-group], [ecc-form]"
   );
+
   if (specialElement) {
-    const parentPath = specialElement.getAttribute("path");
-    return parentPath ? `${parentPath}.${key}` : key;
+    return specialElement;
   }
 
   return element.parentElement
-    ? findNearestFormGroup(key, element.parentElement, isGroup)
+    ? findNearestFormGroup(element.parentElement, isGroup)
     : null;
 };
 
@@ -68,4 +80,40 @@ export const removeDuplicates = (arr: string[]) => {
   });
 
   return Array.from(lowercaseMap.values());
+};
+
+export const setupCustomInputs = (
+  inputs: NodeListOf<HTMLInputElement> | undefined
+) => {
+  inputs?.forEach((input) => {
+    // if the path has already been set don't set it again
+    if (input.getAttribute("ecc-input-path")) return;
+    // if it has children then it's not an input but one or more of its children may be
+    if (input.hasChildNodes()) {
+      setupCustomInputs(input.childNodes as NodeListOf<HTMLInputElement>);
+    }
+    // if it is not an input return
+    if (typeof input.value === "undefined") return;
+
+    const key = input.getAttribute("ecc-key");
+    if (!key) return;
+
+    const path = findFieldPath(key, input as HTMLElement);
+    input.setAttribute("ecc-d-input-path", path || "");
+
+    input.addEventListener("input", () => {
+      input.dispatchEvent(
+        new CustomEvent("ecc-input", {
+          detail: {
+            key,
+            path,
+            target: input,
+            value: input.value,
+          },
+          bubbles: true,
+          composed: true,
+        })
+      );
+    });
+  });
 };

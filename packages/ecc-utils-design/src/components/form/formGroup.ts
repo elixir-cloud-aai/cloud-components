@@ -7,7 +7,8 @@ import {
   noKeyWarning,
   renderInTooltip,
   generateUniqueKey,
-  findNearestFormGroup,
+  findFieldPath,
+  setupCustomInputs,
 } from "./utils.js";
 import "@shoelace-style/shoelace/dist/components/details/details.js";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
@@ -103,18 +104,34 @@ export default class EccUtilsDesignFormGroup extends LitElement {
       this.key = _.camelCase(this.label);
     }
 
-    this.path = findNearestFormGroup(this.key, this, true);
+    this.path = findFieldPath(this.key, this, true);
   }
 
-  private fireChangeEvent(key: string, value: string, index?: number) {
+  protected updated(): void {
+    setupCustomInputs(
+      this.shadowRoot?.querySelectorAll("[ecc-key]:not([ecc-input-path])")
+    );
+  }
+
+  private fireChangeEvent(
+    key: string,
+    value: string,
+    index?: number,
+    e?: CustomEvent
+  ) {
+    // this event is fired for only users, we want the form to ignore these events instead of handling mulitple input events for one input.
     this.dispatchEvent(
       new CustomEvent("ecc-input", {
+        bubbles: true,
+        composed: true,
         detail: {
           key,
           value,
           index,
           groupType: this.type,
           groupKey: this.key,
+          target: this,
+          inputEvent: e,
         },
       })
     );
@@ -190,12 +207,14 @@ export default class EccUtilsDesignFormGroup extends LitElement {
     return html`
       <div
         path="${this.path}[${index}]"
+        index="${index}"
         ecc-array
         class="array"
         data-testid="array"
         data-label=${`${this.label}-${index}`}
         @ecc-input=${(e: CustomEvent) => {
-          this.fireChangeEvent(e.detail.key, e.detail.value, index);
+          e.stopPropagation();
+          this.fireChangeEvent(e.detail.key, e.detail.value, index, e);
         }}
       >
         <sl-button

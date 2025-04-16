@@ -14,6 +14,7 @@ import { hostStyles } from "../../styles/host.styles.js";
 import formStyles from "./form.styles.js";
 import { primitiveStylesheet } from "../../styles/primitive.styles.js";
 import sholelaceStyles from "../../styles/shoelace.styles.js";
+import { setupCustomInputs } from "./utils.js";
 
 /**
  * @element ecc-d-form
@@ -70,6 +71,8 @@ export default class EccUtilsDesignForm extends LitElement {
     super.firstUpdated(_changedProperties);
 
     this.content = Array.from(this.querySelectorAll(":scope > *"));
+    // we will have to do this from the individual group components
+
     this.setHTMLUnsafe("");
 
     this.addEventListener("ecc-input", (e) => {
@@ -77,6 +80,12 @@ export default class EccUtilsDesignForm extends LitElement {
         _.set(this.form, e.detail.path, e.detail.value);
       }
     });
+  }
+
+  protected updated(): void {
+    setupCustomInputs(
+      this.shadowRoot?.querySelectorAll("[ecc-key]:not([ecc-input-path])")
+    );
   }
 
   private renderErrorTemplate(): TemplateResult {
