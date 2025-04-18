@@ -14,13 +14,13 @@
 
     <script type="module">
       import { html, render } from "lit";
-      import "../../dist/components/trs-list/index.js";
+      import "../../dist/components/tools/index.js";
 
       const baseUrl = "https://dockstore.org/api/api/ga4gh/v2";
       const pageSize = 10;
 
       render(
-        html`<ecc-client-ga4gh-trs 
+        html`<ecc-client-ga4gh-trs-tools 
           .baseUrl="${baseUrl}"
           .pageSize="${pageSize}"
           .filter="${true}"

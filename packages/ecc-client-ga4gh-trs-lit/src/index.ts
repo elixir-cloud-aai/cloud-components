@@ -1,1 +1,1 @@
-import "./components/trs-list.js";
+import "./components/index.js";

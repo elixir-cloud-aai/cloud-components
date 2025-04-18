@@ -1,5 +1,5 @@
 import { LitElement, html, css } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { property, state } from "lit/decorators.js";
 import EccUtilsDesignCollection, {
   FilterProp,
   ItemProp,
@@ -25,8 +25,7 @@ interface ToolClass {
  * @property {boolean} filter - Determines if the tools filter field should be rendered
  * @property {boolean} search - Determines if the search field should be rendered
  */
-@customElement("ecc-client-ga4gh-trs")
-export default class ECCClientGa4ghTrs extends LitElement {
+export default class ECCClientGa4ghTrsTools extends LitElement {
   static styles = css`
     :host {
       display: block;
@@ -468,7 +467,7 @@ export default class ECCClientGa4ghTrs extends LitElement {
       detailsComponent.classList.add("details");
       detailsComponent.id = key;
       detailsComponent.data = toolData;
-      detailsComponent.fields = ECCClientGa4ghTrs.defaultFields;
+      detailsComponent.fields = ECCClientGa4ghTrsTools.defaultFields;
 
       // Add the details component to the child
       child.appendChild(detailsComponent);
