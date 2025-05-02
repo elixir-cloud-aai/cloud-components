@@ -22,6 +22,8 @@ coverage
 
 src/react
 custom-elements-manifest.config.js
+src/output.css
+src/tailwind.ts
 
 **/.git
 **/.svn

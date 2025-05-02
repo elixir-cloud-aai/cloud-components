@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="icon"
+      href="../assets/logo-elixir-cloud-aai.svg"
+      type="image/x-icon"
+    />
+    <title>ecc-utils-design Separator Demo</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+    />
+    <style>
+      .section {
+        margin-bottom: 2rem;
+      }
+      .example-container {
+        margin: 1rem 0;
+      }
+      .vertical-container {
+        height: 100px;
+        display: flex;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-utils-design Separator Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../../dist/components/separator/index.js";
+      import { html, render } from "lit";
+
+      render(
+        html`
+          <div class="flex flex-col gap-8">
+            <!-- Horizontal Separator Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Horizontal Separator</h2>
+              <p class="text-gray-600 mb-4">
+                The default separator is horizontal and spans the full width of its
+                container.
+              </p>
+              <div class="example-container">
+                <div class="space-y-2">
+                  <div>Content above the separator</div>
+                  <ecc-utils-design-separator></ecc-utils-design-separator>
+                  <div>Content below the separator</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Vertical Separator Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Vertical Separator</h2>
+              <p class="text-gray-600 mb-4">
+                A vertical separator that spans the full height of its container.
+              </p>
+              <div class="example-container">
+                <div class="vertical-container">
+                  <div class="p-2">Left content</div>
+                  <ecc-utils-design-separator
+                    orientation="vertical"
+                  ></ecc-utils-design-separator>
+                  <div class="p-2">Right content</div>
+                </div>
+              </div>
+
+              <!-- Semantic Separator Example -->
+              <div class="section">
+                <h2 class="text-xl font-semibold mb-2">Semantic Separator</h2>
+                <p class="text-gray-600 mb-4">
+                  Use a semantic separator when it represents an actual division in
+                  content.
+                </p>
+                <div class="example-container">
+                  <div class="space-y-2">
+                    <h3 class="text-lg font-medium">Section One</h3>
+                    <p>This is the content for section one.</p>
+                    <ecc-utils-design-separator
+                      decorative="false"
+                    ></ecc-utils-design-separator>
+                    <h3 class="text-lg font-medium">Section Two</h3>
+                    <p>This is the content for section two.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Custom Styled Separator Example -->
+              <div class="section">
+                <h2 class="text-xl font-semibold mb-2">Custom Styled Separator</h2>
+                <p class="text-gray-600 mb-4">
+                  Separators can be customized with additional classes.
+                </p>
+                <div class="example-container">
+                  <div class="space-y-4">
+                    <div>Standard separator</div>
+                    <ecc-utils-design-separator></ecc-utils-design-separator>
+
+                    <div>Thick colored separator</div>
+                    <ecc-utils-design-separator
+                      class="h-1 bg-primary"
+                    ></ecc-utils-design-separator>
+
+                    <div>Gradient separator</div>
+                    <ecc-utils-design-separator
+                      class="h-[2px] bg-gradient-to-r from-primary to-purple-500"
+                    ></ecc-utils-design-separator>
+
+                    <div>Dashed separator</div>
+                    <ecc-utils-design-separator
+                      class="border-t border-dashed border-primary bg-transparent h-0"
+                    ></ecc-utils-design-separator>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Separator in Layout Example -->
+              <div class="section">
+                <h2 class="text-xl font-semibold mb-2">Separator in Layout</h2>
+                <p class="text-gray-600 mb-4">
+                  Separators can be used to divide sections in various layouts.
+                </p>
+                <div class="example-container">
+                  <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-2">
+                      <div class="w-10 h-10 rounded-full bg-gray-200"></div>
+                      <div>User Name</div>
+                    </div>
+                    <ecc-utils-design-separator
+                      orientation="vertical"
+                      class="h-8"
+                    ></ecc-utils-design-separator>
+                    <div class="flex space-x-4">
+                      <div>Option 1</div>
+                      <div>Option 2</div>
+                      <div>Option 3</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        document.querySelector("#demo")
+      );
+    </script>
+  </body>
+</html>

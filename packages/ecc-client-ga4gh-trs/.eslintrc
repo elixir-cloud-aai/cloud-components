@@ -1,18 +1,7 @@
 {
-  "extends": [
-    "@elixir-cloud",
-    "plugin:import/typescript",
-    "prettier",
-    "turbo",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:import/typescript"
-  ],
-  "plugins": ["import", "prettier"],
+  "extends": ["@open-wc", "@elixir-cloud"],
   "rules": {
-    "no-unused-vars": "off",
-    "camelcase": "off"
-  },
-  "parserOptions": {
-    "project": ["./tsconfig.json"]
+    "lit/no-classfield-shadowing": "warn",
+    "max-classes-per-file": "off"
   }
 }

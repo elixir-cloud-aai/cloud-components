@@ -4,7 +4,6 @@ import fs from "fs";
 import { program } from "commander";
 import { customElementVsCodePlugin } from "custom-element-vs-code-integration";
 import { customElementJetBrainsPlugin } from "custom-element-jet-brains-integration";
-import packageJson from "./package.json" assert { type: "json" };
 
 const options = program
   .option("-o, --outdir <string>")
@@ -13,9 +12,9 @@ const options = program
   .parse()
   .opts();
 
+const packageJson = JSON.parse(fs.readFileSync("./package.json", "utf8"));
 const componentsPrefix = packageJson.componentsPrefix;
-const packageData = JSON.parse(fs.readFileSync("package.json", "utf8"));
-const { name, description, version, author, homepage, license } = packageData;
+const { name, description, version, author, homepage, license } = packageJson;
 
 const getComponentDocumentation = (tag) =>
   `https://elixir-cloud-components.vercel.app/design/components/${tag.replace(
@@ -50,7 +49,7 @@ export default {
       },
     },
     {
-      name: "shoelace-react-event-names",
+      name: "elixir-cloud-react-event-names",
       analyzePhase({ ts, node, moduleDoc }) {
         switch (node.kind) {
           case ts.SyntaxKind.ClassDeclaration: {
@@ -79,7 +78,7 @@ export default {
       },
     },
     {
-      name: "shoelace-translate-module-paths",
+      name: "elixir-cloud-translate-module-paths",
       packageLinkPhase({ customElementsManifest }) {
         customElementsManifest?.modules?.forEach((mod) => {
           //

@@ -1,4 +1,12 @@
-export { default as EccUtilsDesignForm } from "./form/index.js";
-export { default as EccUtilsDesignCollection } from "./collection/index.js";
-export { default as EccUtilsDesignDetails } from "./details/index.js";
+export { default as EccUtilsDesignBadge } from "./badge/index.js";
+export { default as EccUtilsDesignButton } from "./button/index.js";
+export { default as EccUtilsDesignInput } from "./input/index.js";
+export { default as EccUtilsDesignLabel } from "./label/index.js";
+export { default as EccUtilsDesignPagination } from "./pagination/index.js";
+export { default as EccUtilsDesignSelect } from "./select/index.js";
+export { default as EccUtilsDesignSkeleton } from "./skeleton/index.js";
+export { default as EccUtilsDesignTable } from "./table/index.js";
+export { default as EccUtilsDesignTabs } from "./tabs/index.js";
+export { default as EccUtilsDesignCard } from "./card/index.js";
+export { default as EccUtilsDesignSeparator } from "./separator/index.js";
 export { default as EccUtilsDesignCode } from "./code/index.js";

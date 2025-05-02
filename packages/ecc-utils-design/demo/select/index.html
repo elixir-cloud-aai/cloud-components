@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="icon"
+      href="../assets/logo-elixir-cloud-aai.svg"
+      type="image/x-icon"
+    />
+    <title>ecc-utils-design Select Demo</title>
+    <style>
+      .select-container {
+        margin: 1rem 0;
+        max-width: 300px;
+        position: relative;
+      }
+
+      .section {
+        margin-bottom: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-utils-design Select Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../../dist/components/select/index.js";
+      import { html, render } from "lit";
+
+      // Example data for select options
+      const fruits = [
+        { label: "Apple", value: "apple" },
+        { label: "Banana", value: "banana" },
+        { label: "Orange", value: "orange" },
+        { label: "Strawberry", value: "strawberry" },
+        { label: "Blueberry", value: "blueberry" },
+      ];
+
+      const sizes = [
+        { label: "Small", value: "sm" },
+        { label: "Medium", value: "md" },
+        { label: "Large", value: "lg" },
+        { label: "Extra Large", value: "xl" },
+      ];
+
+      const countries = [
+        { label: "United States", value: "us" },
+        { label: "United Kingdom", value: "uk" },
+        { label: "Canada", value: "ca" },
+        { label: "Australia", value: "au" },
+        { label: "Germany", value: "de" },
+        { label: "France", value: "fr" },
+        { label: "Japan", value: "jp" },
+        { label: "China", value: "cn" },
+        { label: "India", value: "in" },
+        { label: "Brazil", value: "br" },
+      ];
+
+      const renderOptions = (options, selectId) =>
+        options.map(
+          (option) => html`
+            <ecc-utils-design-select-item value=${option.value} selectId=${selectId}>
+              ${option.label}
+            </ecc-utils-design-select-item>
+          `
+        );
+
+      render(
+        html`
+          <div class="flex flex-col">
+            <!-- Basic Select -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Basic Select</h2>
+              <div class="select-container">
+                <ecc-utils-design-select
+                  id="fruits-select"
+                  @ecc-utils-change=${(e) =>
+                    console.log("Selected fruit:", e.detail.value)}
+                >
+                  <ecc-utils-design-select-trigger
+                    selectId="fruits-select"
+                    placeholder="Select a fruit"
+                  >
+                    <ecc-utils-design-select-value
+                      selectId="fruits-select"
+                      placeholder="Select a fruit"
+                    ></ecc-utils-design-select-value>
+                  </ecc-utils-design-select-trigger>
+
+                  <ecc-utils-design-select-content selectId="fruits-select">
+                    ${renderOptions(fruits, "fruits-select")}
+                  </ecc-utils-design-select-content>
+                </ecc-utils-design-select>
+              </div>
+            </div>
+
+            <!-- With Label -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">With Label</h2>
+              <div class="select-container">
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Size</label
+                >
+                <ecc-utils-design-select
+                  id="sizes-select"
+                  @ecc-utils-change=${(e) =>
+                    console.log("Selected size:", e.detail.value)}
+                >
+                  <ecc-utils-design-select-trigger
+                    selectId="sizes-select"
+                    placeholder="Select a size"
+                  >
+                    <ecc-utils-design-select-value
+                      selectId="sizes-select"
+                      placeholder="Select a size"
+                    ></ecc-utils-design-select-value>
+                  </ecc-utils-design-select-trigger>
+
+                  <ecc-utils-design-select-content selectId="sizes-select">
+                    ${renderOptions(sizes, "sizes-select")}
+                  </ecc-utils-design-select-content>
+                </ecc-utils-design-select>
+              </div>
+            </div>
+
+            <!-- With Preselected Value -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">With Preselected Value</h2>
+              <div class="select-container">
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Country</label
+                >
+                <ecc-utils-design-select
+                  id="countries-select"
+                  value="us"
+                  @ecc-utils-change=${(e) =>
+                    console.log("Selected country:", e.detail.value)}
+                >
+                  <ecc-utils-design-select-trigger selectId="countries-select">
+                    <ecc-utils-design-select-value
+                      selectId="countries-select"
+                      placeholder="Select a country"
+                    ></ecc-utils-design-select-value>
+                  </ecc-utils-design-select-trigger>
+
+                  <ecc-utils-design-select-content selectId="countries-select">
+                    ${renderOptions(countries, "countries-select")}
+                  </ecc-utils-design-select-content>
+                </ecc-utils-design-select>
+              </div>
+            </div>
+
+            <!-- Disabled Select -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Disabled Select</h2>
+              <div class="select-container">
+                <ecc-utils-design-select id="disabled-select" disabled>
+                  <ecc-utils-design-select-trigger
+                    selectId="disabled-select"
+                    placeholder="Disabled select"
+                    disabled
+                  >
+                    <ecc-utils-design-select-value
+                      selectId="disabled-select"
+                      placeholder="Disabled select"
+                    ></ecc-utils-design-select-value>
+                  </ecc-utils-design-select-trigger>
+
+                  <ecc-utils-design-select-content selectId="disabled-select">
+                    ${renderOptions(fruits, "disabled-select")}
+                  </ecc-utils-design-select-content>
+                </ecc-utils-design-select>
+              </div>
+            </div>
+            <!-- With Groups and Labels -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">With Groups and Labels</h2>
+              <div class="select-container">
+                <ecc-utils-design-select
+                  id="grouped-select"
+                  @ecc-utils-change=${(e) =>
+                    console.log("Selected item:", e.detail.value)}
+                >
+                  <ecc-utils-design-select-trigger
+                    selectId="grouped-select"
+                    placeholder="Select an option"
+                  >
+                    <ecc-utils-design-select-value
+                      selectId="grouped-select"
+                      placeholder="Select an option"
+                    ></ecc-utils-design-select-value>
+                  </ecc-utils-design-select-trigger>
+
+                  <ecc-utils-design-select-content selectId="grouped-select">
+                    <ecc-utils-design-select-group>
+                      <ecc-utils-design-select-label
+                        >Countries</ecc-utils-design-select-label
+                      >
+                      ${renderOptions(countries, "grouped-select")}
+                    </ecc-utils-design-select-group>
+
+                    <ecc-utils-design-select-separator></ecc-utils-design-select-separator>
+
+                    <ecc-utils-design-select-group>
+                      <ecc-utils-design-select-label
+                        >Fruits</ecc-utils-design-select-label
+                      >
+                      ${renderOptions(fruits, "grouped-select")}
+                    </ecc-utils-design-select-group>
+
+                    <ecc-utils-design-select-separator></ecc-utils-design-select-separator>
+
+                    <ecc-utils-design-select-group>
+                      <ecc-utils-design-select-label
+                        >Sizes</ecc-utils-design-select-label
+                      >
+                      ${renderOptions(sizes, "grouped-select")}
+                    </ecc-utils-design-select-group>
+                  </ecc-utils-design-select-content>
+                </ecc-utils-design-select>
+              </div>
+            </div>
+
+            <!-- Custom Styled Select -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Custom Styled Select</h2>
+              <div class="select-container">
+                <ecc-utils-design-select
+                  id="custom-select"
+                  @ecc-utils-change=${(e) =>
+                    console.log("Selected fruit:", e.detail.value)}
+                >
+                  <ecc-utils-design-select-trigger
+                    selectId="custom-select"
+                    class="bg-gray-50 hover:bg-gray-100 border-2 border-gray-300"
+                  >
+                    <ecc-utils-design-select-value
+                      selectId="custom-select"
+                      placeholder="Select a fruit"
+                    ></ecc-utils-design-select-value>
+                  </ecc-utils-design-select-trigger>
+
+                  <ecc-utils-design-select-content
+                    selectId="custom-select"
+                    class="bg-gray-50 border-2 border-gray-300"
+                  >
+                    <ecc-utils-design-select-label
+                      >Fruits</ecc-utils-design-select-label
+                    >
+                    <ecc-utils-design-select-separator></ecc-utils-design-select-separator>
+                    ${renderOptions(fruits, "custom-select")}
+                  </ecc-utils-design-select-content>
+                </ecc-utils-design-select>
+              </div>
+            </div>
+          </div>
+        `,
+        document.querySelector("#demo")
+      );
+    </script>
+  </body>
+</html>

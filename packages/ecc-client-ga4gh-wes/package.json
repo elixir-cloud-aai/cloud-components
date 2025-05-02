@@ -30,15 +30,15 @@
     "LICENSE"
   ],
   "scripts": {
-    "analyze": "cem analyze --litelement",
-    "build": "node ../../scripts/build.js -p ecc-client-ga4gh-wes-",
-    "dev": "concurrently -k -r \"npm run build -- --watch\" \"wds\"",
-    "clean": "rm -rf dist node_modules src/react custom-elements-manifest.config.js",
-    "test": "wtr --coverage",
-    "test:watch": "wtr --watch",
-    "lint": "npx eslint .",
-    "lint:fix": "npm run lint -- --fix && prettier .",
-    "prepublish": "npm run build"
+    "depricated-analyze": "cem analyze --litelement",
+    "depricated-build": "node ../../scripts/build.js -p ecc-client-ga4gh-wes-",
+    "depricated-dev": "concurrently -k -r \"npm run build -- --watch\" \"wds\"",
+    "depricated-clean": "rm -rf dist node_modules src/react custom-elements-manifest.config.js",
+    "depricated-test": "wtr --coverage",
+    "depricated-test:watch": "wtr --watch",
+    "depricated-lint": "npx eslint .",
+    "depricated-lint:fix": "npm run lint -- --fix && prettier .",
+    "depricated-prepublish": "npm run build"
   },
   "dependencies": {
     "@elixir-cloud/design": "*",

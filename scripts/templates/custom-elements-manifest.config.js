@@ -49,7 +49,7 @@ export default {
       },
     },
     {
-      name: "shoelace-react-event-names",
+      name: "elixir-cloud-react-event-names",
       analyzePhase({ ts, node, moduleDoc }) {
         switch (node.kind) {
           case ts.SyntaxKind.ClassDeclaration: {
@@ -78,7 +78,7 @@ export default {
       },
     },
     {
-      name: "shoelace-translate-module-paths",
+      name: "elixir-cloud-translate-module-paths",
       packageLinkPhase({ customElementsManifest }) {
         customElementsManifest?.modules?.forEach((mod) => {
           //

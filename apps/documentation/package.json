@@ -3,14 +3,14 @@
   "private": true,
   "description": "ECC Cloud Component documentation",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "format:check": "prettier --check ./**/*.{md,mdx,ts,tsx,js,jsx}",
-    "format": "prettier --write ./**/*.{md,mdx,ts,tsx,js,jsx}",
-    "lint": "npx eslint . && cspell **/*.{tsx,mdx}",
-    "lint:fix": "npx eslint --fix",
-    "clean": "rm -rf dist node_modules .next"
+    "depricated-dev": "next dev",
+    "depricated-build": "next build",
+    "depricated-start": "next start",
+    "depricated-format:check": "prettier --check ./**/*.{md,mdx,ts,tsx,js,jsx}",
+    "depricated-format": "prettier --write ./**/*.{md,mdx,ts,tsx,js,jsx}",
+    "depricated-lint": "npx eslint . && cspell **/*.{tsx,mdx}",
+    "depricated-lint:fix": "npx eslint --fix",
+    "depricated-clean": "rm -rf dist node_modules .next"
   },
   "dependencies": {
     "@elixir-cloud/design": "*",

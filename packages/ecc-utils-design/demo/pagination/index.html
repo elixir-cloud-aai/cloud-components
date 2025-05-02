@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./logo-elixir-cloud-aai.svg" type="image/x-icon" />
+    <title>ecc-utils-design Pagination Demo</title>
+    <style>
+      .demo-section {
+        margin-bottom: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-utils-design-pagination Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../../dist/components/pagination/index.js";
+      import { html, render } from "lit";
+
+      // Example state
+      let currentPage = 1;
+      const totalPages = 10;
+
+      function renderDemo() {
+        render(
+          html`
+            <div class="flex flex-col gap-6">
+              <div class="demo-section">
+                <h2 class="text-xl font-bold mb-2">Basic Pagination</h2>
+                <ecc-utils-design-pagination>
+                  <ecc-utils-design-pagination-content>
+                    <ecc-utils-design-pagination-item>
+                      <ecc-utils-design-pagination-previous
+                        ?disabled=${currentPage === 1}
+                        @ecc-utils-button-click=${(e) => {
+                          if (e.detail.variant === "previous" && currentPage > 1) {
+                            currentPage -= 1;
+                            renderDemo();
+                          }
+                        }}
+                      ></ecc-utils-design-pagination-previous>
+                    </ecc-utils-design-pagination-item>
+
+                    ${currentPage > 2
+                      ? html`
+                          <ecc-utils-design-pagination-item>
+                            <ecc-utils-design-pagination-link
+                              @ecc-utils-button-click=${(e) => {
+                                if (e.detail.variant === "link") {
+                                  currentPage = 1;
+                                  renderDemo();
+                                }
+                              }}
+                              >1</ecc-utils-design-pagination-link
+                            >
+                          </ecc-utils-design-pagination-item>
+                        `
+                      : ""}
+                    ${currentPage > 3
+                      ? html`
+                          <ecc-utils-design-pagination-item>
+                            <ecc-utils-design-pagination-ellipsis></ecc-utils-design-pagination-ellipsis>
+                          </ecc-utils-design-pagination-item>
+                        `
+                      : ""}
+                    ${currentPage > 1
+                      ? html`
+                          <ecc-utils-design-pagination-item>
+                            <ecc-utils-design-pagination-link
+                              @ecc-utils-button-click=${(e) => {
+                                if (e.detail.variant === "link") {
+                                  currentPage -= 1;
+                                  renderDemo();
+                                }
+                              }}
+                              >${currentPage - 1}</ecc-utils-design-pagination-link
+                            >
+                          </ecc-utils-design-pagination-item>
+                        `
+                      : ""}
+
+                    <ecc-utils-design-pagination-item>
+                      <ecc-utils-design-pagination-link isActive>
+                        ${currentPage}
+                      </ecc-utils-design-pagination-link>
+                    </ecc-utils-design-pagination-item>
+
+                    ${currentPage < totalPages
+                      ? html`
+                          <ecc-utils-design-pagination-item>
+                            <ecc-utils-design-pagination-link
+                              @ecc-utils-button-click=${(e) => {
+                                if (e.detail.variant === "link") {
+                                  currentPage += 1;
+                                  renderDemo();
+                                }
+                              }}
+                              >${currentPage + 1}</ecc-utils-design-pagination-link
+                            >
+                          </ecc-utils-design-pagination-item>
+                        `
+                      : ""}
+                    ${currentPage < totalPages - 2
+                      ? html`
+                          <ecc-utils-design-pagination-item>
+                            <ecc-utils-design-pagination-ellipsis></ecc-utils-design-pagination-ellipsis>
+                          </ecc-utils-design-pagination-item>
+                        `
+                      : ""}
+                    ${currentPage < totalPages - 1
+                      ? html`
+                          <ecc-utils-design-pagination-item>
+                            <ecc-utils-design-pagination-link
+                              @ecc-utils-button-click=${(e) => {
+                                if (e.detail.variant === "link") {
+                                  currentPage = totalPages;
+                                  renderDemo();
+                                }
+                              }}
+                              >${totalPages}</ecc-utils-design-pagination-link
+                            >
+                          </ecc-utils-design-pagination-item>
+                        `
+                      : ""}
+                    <ecc-utils-design-pagination-item>
+                      <ecc-utils-design-pagination-next
+                        ?disabled=${currentPage === totalPages}
+                        @ecc-utils-button-click=${(e) => {
+                          if (
+                            e.detail.variant === "next" &&
+                            currentPage < totalPages
+                          ) {
+                            currentPage += 1;
+                            renderDemo();
+                          }
+                        }}
+                      ></ecc-utils-design-pagination-next>
+                    </ecc-utils-design-pagination-item>
+                  </ecc-utils-design-pagination-content>
+                </ecc-utils-design-pagination>
+
+                <div class="mt-4">
+                  <p>Current page: ${currentPage} of ${totalPages}</p>
+                </div>
+              </div>
+
+              <div class="demo-section">
+                <h2 class="text-xl font-bold mb-2">Simple Pagination</h2>
+                <ecc-utils-design-pagination>
+                  <ecc-utils-design-pagination-content>
+                    <ecc-utils-design-pagination-item>
+                      <ecc-utils-design-pagination-previous
+                        ?disabled=${currentPage === 1}
+                        @ecc-utils-button-click=${(e) => {
+                          if (e.detail.variant === "previous" && currentPage > 1) {
+                            currentPage -= 1;
+                            renderDemo();
+                          }
+                        }}
+                      ></ecc-utils-design-pagination-previous>
+                    </ecc-utils-design-pagination-item>
+
+                    <ecc-utils-design-pagination-item>
+                      <span>Page ${currentPage} of ${totalPages}</span>
+                    </ecc-utils-design-pagination-item>
+
+                    <ecc-utils-design-pagination-item>
+                      <ecc-utils-design-pagination-next
+                        ?disabled=${currentPage === totalPages}
+                        @ecc-utils-button-click=${(e) => {
+                          if (
+                            e.detail.variant === "next" &&
+                            currentPage < totalPages
+                          ) {
+                            currentPage += 1;
+                            renderDemo();
+                          }
+                        }}
+                      ></ecc-utils-design-pagination-next>
+                    </ecc-utils-design-pagination-item>
+                  </ecc-utils-design-pagination-content>
+                </ecc-utils-design-pagination>
+              </div>
+            </div>
+          `,
+          document.querySelector("#demo")
+        );
+      }
+
+      renderDemo();
+    </script>
+  </body>
+</html>

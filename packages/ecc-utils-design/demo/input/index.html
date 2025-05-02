@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="../assets/logo-elixir-cloud-aai.svg" type="image/x-icon">
+    <title>ecc-utils-design Input Demo</title>
+    <style>
+      ecc-utils-design-input {
+        margin: 0.5rem;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-utils-design Input Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../../dist/components/input/index.js";
+      import { html, render } from "lit";
+
+      render(
+  html`
+          <div class="flex flex-col gap-4">
+            <div>
+              <h2 class="text-xl font-semibold mb-2">Standard Input Types</h2>
+              <ecc-utils-design-input
+                placeholder="Default text input"
+              ></ecc-utils-design-input>
+              <ecc-utils-design-input
+                type="email"
+                placeholder="Email input"
+              ></ecc-utils-design-input>
+              <ecc-utils-design-input
+                type="password"
+                placeholder="Password input"
+              ></ecc-utils-design-input>
+              <ecc-utils-design-input
+                type="number"
+                placeholder="Number input"
+              ></ecc-utils-design-input>
+              <ecc-utils-design-input
+                type="tel"
+                placeholder="Telephone input"
+              ></ecc-utils-design-input>
+            </div>
+
+            <div>
+              <h2 class="text-xl font-semibold mb-2">Date and Time</h2>
+              <ecc-utils-design-input
+                type="date"
+                placeholder="Date picker"
+              ></ecc-utils-design-input>
+              <ecc-utils-design-input
+                type="time"
+                placeholder="Time picker"
+              ></ecc-utils-design-input>
+              <ecc-utils-design-input
+                type="datetime-local"
+                placeholder="Date and time"
+              ></ecc-utils-design-input>
+            </div>
+      
+            <div>
+              <h2 class="text-xl font-semibold mb-2">Other Input Types</h2>
+              <ecc-utils-design-input type="color"></ecc-utils-design-input>
+              <ecc-utils-design-input type="range"></ecc-utils-design-input>
+              <ecc-utils-design-input type="file"></ecc-utils-design-input>
+            </div>
+      
+            <div>
+              <h2 class="text-xl font-semibold mb-2">States</h2>
+              <ecc-utils-design-input
+                value="Pre-filled value"
+              ></ecc-utils-design-input>
+              <ecc-utils-design-input
+                disabled
+                placeholder="Disabled input"
+              ></ecc-utils-design-input>
+            </div>
+          </div>
+        `,
+  document.querySelector("#demo")
+);
+    </script>
+  </body>
+</html> 

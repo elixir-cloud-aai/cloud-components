@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="../assets/logo-elixir-cloud-aai.svg" type="image/x-icon">
+    <title>ecc-utils-design Tabs Demo</title>
+    <style>
+      .section {
+        margin-bottom: 2rem;
+      }
+      .example-container {
+        margin: 1rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-utils-design Tabs Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../../dist/components/tabs/index.js";
+      import { html, render } from "lit";
+
+      render(
+  html`
+          <div class="flex flex-col gap-8">
+            <!-- Basic Tabs Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Basic Tabs</h2>
+              <div class="example-container">
+                <ecc-utils-design-tabs
+                  default-value="tab1"
+                  @ecc-utils-change=${(e) =>
+                    console.log("Tab changed to:", e.detail.value)}
+                >
+                  <ecc-utils-design-tabs-list>
+                    <ecc-utils-design-tabs-trigger value="tab1"
+                      >Account</ecc-utils-design-tabs-trigger
+                    >
+                    <ecc-utils-design-tabs-trigger value="tab2"
+                      >Password</ecc-utils-design-tabs-trigger
+                    >
+                    <ecc-utils-design-tabs-trigger value="tab3"
+                      >Settings</ecc-utils-design-tabs-trigger
+                    >
+                  </ecc-utils-design-tabs-list>
+                  <ecc-utils-design-tabs-content value="tab1">
+                    <div class="p-4 border rounded-md mt-4">
+                      <h3 class="text-lg font-medium mb-2">Account Settings</h3>
+                      <p>Manage your account settings and preferences.</p>
+                    </div>
+                  </ecc-utils-design-tabs-content>
+                  <ecc-utils-design-tabs-content value="tab2">
+                    <div class="p-4 border rounded-md mt-4">
+                      <h3 class="text-lg font-medium mb-2">Password Settings</h3>
+                      <p>Update your password and security preferences.</p>
+                    </div>
+                  </ecc-utils-design-tabs-content>
+                  <ecc-utils-design-tabs-content value="tab3">
+                    <div class="p-4 border rounded-md mt-4">
+                      <h3 class="text-lg font-medium mb-2">General Settings</h3>
+                      <p>Configure system settings and options.</p>
+                    </div>
+                  </ecc-utils-design-tabs-content>
+                </ecc-utils-design-tabs>
+              </div>
+            </div>
+      
+            <!-- Custom Styled Tabs -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Custom Styled Tabs</h2>
+              <div class="example-container">
+                <ecc-utils-design-tabs default-value="dashboard">
+                  <ecc-utils-design-tabs-list class="bg-background border-b">
+                    <ecc-utils-design-tabs-trigger
+                      value="dashboard"
+                      class="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none data-[state=active]:shadow-none"
+                    >
+                      Dashboard
+                    </ecc-utils-design-tabs-trigger>
+                    <ecc-utils-design-tabs-trigger
+                      value="analytics"
+                      class="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none data-[state=active]:shadow-none"
+                    >
+                      Analytics
+                    </ecc-utils-design-tabs-trigger>
+                    <ecc-utils-design-tabs-trigger
+                      value="reports"
+                      class="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none data-[state=active]:shadow-none"
+                    >
+                      Reports
+                    </ecc-utils-design-tabs-trigger>
+                  </ecc-utils-design-tabs-list>
+                  <ecc-utils-design-tabs-content value="dashboard">
+                    <div class="p-4">
+                      <h3 class="text-lg font-medium mb-2">Dashboard</h3>
+                      <p>This is your dashboard overview. Summary of key metrics.</p>
+                    </div>
+                  </ecc-utils-design-tabs-content>
+                  <ecc-utils-design-tabs-content value="analytics">
+                    <div class="p-4">
+                      <h3 class="text-lg font-medium mb-2">Analytics</h3>
+                      <p>Detailed analytics and trends visualization.</p>
+                    </div>
+                  </ecc-utils-design-tabs-content>
+                  <ecc-utils-design-tabs-content value="reports">
+                    <div class="p-4">
+                      <h3 class="text-lg font-medium mb-2">Reports</h3>
+                      <p>View and download various reports.</p>
+                    </div>
+                  </ecc-utils-design-tabs-content>
+                </ecc-utils-design-tabs>
+              </div>
+            </div>
+      
+            <!-- Disabled Tab Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Tabs with Disabled State</h2>
+              <div class="example-container">
+                <ecc-utils-design-tabs default-value="active1">
+                  <ecc-utils-design-tabs-list>
+                    <ecc-utils-design-tabs-trigger value="active1"
+                      >Active Tab</ecc-utils-design-tabs-trigger
+                    >
+                    <ecc-utils-design-tabs-trigger value="active2"
+                      >Another Active</ecc-utils-design-tabs-trigger
+                    >
+                    <ecc-utils-design-tabs-trigger value="disabled" disabled
+                      >Disabled Tab</ecc-utils-design-tabs-trigger
+                    >
+                  </ecc-utils-design-tabs-list>
+                  <ecc-utils-design-tabs-content value="active1">
+                    <div class="p-4 border rounded-md mt-4">
+                      <h3 class="text-lg font-medium mb-2">Active Content 1</h3>
+                      <p>This tab is active and accessible.</p>
+                    </div>
+                  </ecc-utils-design-tabs-content>
+                  <ecc-utils-design-tabs-content value="active2">
+                    <div class="p-4 border rounded-md mt-4">
+                      <h3 class="text-lg font-medium mb-2">Active Content 2</h3>
+                      <p>This tab is also active and accessible.</p>
+                    </div>
+                  </ecc-utils-design-tabs-content>
+                  <ecc-utils-design-tabs-content value="disabled">
+                    <div class="p-4 border rounded-md mt-4">
+                      <h3 class="text-lg font-medium mb-2">Disabled Content</h3>
+                      <p>
+                        This content should not be accessible via the disabled tab.
+                      </p>
+                    </div>
+                  </ecc-utils-design-tabs-content>
+                </ecc-utils-design-tabs>
+              </div>
+            </div>
+      
+            <!-- Vertical Tabs Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Vertical Tabs</h2>
+              <div class="example-container">
+                <ecc-utils-design-tabs default-value="music" class="flex gap-6">
+                  <ecc-utils-design-tabs-list
+                    class="flex-col h-auto bg-muted/30 p-2 rounded-md"
+                  >
+                    <ecc-utils-design-tabs-trigger
+                      value="music"
+                      class="justify-start w-full mb-1"
+                    >
+                      <svg
+                        class="w-4 h-4 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                        ></path>
+                      </svg>
+                      Music
+                    </ecc-utils-design-tabs-trigger>
+                    <ecc-utils-design-tabs-trigger
+                      value="photos"
+                      class="justify-start w-full mb-1"
+                    >
+                      <svg
+                        class="w-4 h-4 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        ></path>
+                      </svg>
+                      Photos
+                    </ecc-utils-design-tabs-trigger>
+                    <ecc-utils-design-tabs-trigger
+                      value="videos"
+                      class="justify-start w-full"
+                    >
+                      <svg
+                        class="w-4 h-4 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                        ></path>
+                      </svg>
+                      Videos
+                    </ecc-utils-design-tabs-trigger>
+                  </ecc-utils-design-tabs-list>
+                  <div class="flex-1">
+                    <ecc-utils-design-tabs-content value="music">
+                      <div class="p-4 border rounded-md">
+                        <h3 class="text-lg font-medium mb-2">Music</h3>
+                        <p>Your music collection and playlists.</p>
+                      </div>
+                    </ecc-utils-design-tabs-content>
+                    <ecc-utils-design-tabs-content value="photos">
+                      <div class="p-4 border rounded-md">
+                        <h3 class="text-lg font-medium mb-2">Photos</h3>
+                        <p>Your photo albums and galleries.</p>
+                      </div>
+                    </ecc-utils-design-tabs-content>
+                    <ecc-utils-design-tabs-content value="videos">
+                      <div class="p-4 border rounded-md">
+                        <h3 class="text-lg font-medium mb-2">Videos</h3>
+                        <p>Your video collection and playlists.</p>
+                      </div>
+                    </ecc-utils-design-tabs-content>
+                  </div>
+                </ecc-utils-design-tabs>
+              </div>
+            </div>
+          </div>
+        `,
+  document.querySelector("#demo")
+);
+    </script>
+  </body>
+</html> 

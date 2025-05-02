@@ -12,3 +12,33 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+## editors
+/.idea
+/.vscode
+
+## system files
+.DS_Store
+
+## npm
+/node_modules/
+/npm-debug.log
+
+## testing
+/coverage/
+
+## temp folders
+/.tmp/
+
+## build
+/_site/
+/dist/
+/out-tsc/
+
+## generated files
+/src/react
+/src/output.css
+/src/tailwind.ts
+custom-elements-manifest.config.js
+
+custom-elements.json

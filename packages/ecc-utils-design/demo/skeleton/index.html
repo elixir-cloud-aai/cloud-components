@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="../assets/logo-elixir-cloud-aai.svg" type="image/x-icon">
+    <title>ecc-utils-design Skeleton Demo</title>
+    <style>
+      .section {
+        margin-bottom: 2rem;
+      }
+      .example-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-utils-design Skeleton Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../../dist/components/skeleton/index.js";
+      import { html, render } from "lit";
+
+      render(
+  html`
+          <div class="flex flex-col">
+            <!-- Basic Skeleton Examples -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Basic Skeletons</h2>
+              <div class="example-container">
+                <ecc-utils-design-skeleton
+                  class="h-4 w-40 bg-amber-800"
+                ></ecc-utils-design-skeleton>
+                <ecc-utils-design-skeleton
+                  class="h-4 w-60"
+                ></ecc-utils-design-skeleton>
+                <ecc-utils-design-skeleton
+                  class="h-4 w-80"
+                ></ecc-utils-design-skeleton>
+              </div>
+            </div>
+            <!-- Card Skeleton Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Card Skeleton</h2>
+              <div class="example-container">
+                <div class="border rounded-lg p-4 max-w-md">
+                  <ecc-utils-design-skeleton
+                    class="h-32 w-full rounded-lg mb-4"
+                  ></ecc-utils-design-skeleton>
+                  <ecc-utils-design-skeleton
+                    class="h-4 w-3/4 mb-2"
+                  ></ecc-utils-design-skeleton>
+                  <ecc-utils-design-skeleton
+                    class="h-3 w-full mb-1"
+                  ></ecc-utils-design-skeleton>
+                  <ecc-utils-design-skeleton
+                    class="h-3 w-full mb-1"
+                  ></ecc-utils-design-skeleton>
+                  <ecc-utils-design-skeleton
+                    class="h-3 w-4/5 mb-4"
+                  ></ecc-utils-design-skeleton>
+                  <div class="flex justify-between">
+                    <ecc-utils-design-skeleton
+                      class="h-8 w-20 rounded"
+                    ></ecc-utils-design-skeleton>
+                    <ecc-utils-design-skeleton
+                      class="h-8 w-20 rounded"
+                    ></ecc-utils-design-skeleton>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Table Skeleton Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Table Skeleton</h2>
+              <div class="example-container">
+                <div class="border rounded-lg overflow-hidden">
+                  <!-- Table header -->
+                  <div class="bg-gray-100 p-3">
+                    <ecc-utils-design-skeleton
+                      class="h-6 w-full"
+                    ></ecc-utils-design-skeleton>
+                  </div>
+      
+                  <!-- Table rows -->
+                  <div class="p-3 border-t">
+                    <ecc-utils-design-skeleton
+                      class="h-5 w-full mb-3"
+                    ></ecc-utils-design-skeleton>
+                    <ecc-utils-design-skeleton
+                      class="h-5 w-full mb-3"
+                    ></ecc-utils-design-skeleton>
+                    <ecc-utils-design-skeleton
+                      class="h-5 w-full mb-3"
+                    ></ecc-utils-design-skeleton>
+                    <ecc-utils-design-skeleton
+                      class="h-5 w-full mb-3"
+                    ></ecc-utils-design-skeleton>
+                    <ecc-utils-design-skeleton
+                      class="h-5 w-full"
+                    ></ecc-utils-design-skeleton>
+                  </div>
+                </div>
+              </div>
+            </div>
+      
+            <!-- Profile Skeleton Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Profile Skeleton</h2>
+              <div class="example-container">
+                <div class="flex items-center gap-4 max-w-md">
+                  <ecc-utils-design-skeleton
+                    class="h-16 w-16 rounded-full"
+                  ></ecc-utils-design-skeleton>
+                  <div class="flex-1">
+                    <ecc-utils-design-skeleton
+                      class="h-5 w-32 mb-2"
+                    ></ecc-utils-design-skeleton>
+                    <ecc-utils-design-skeleton
+                      class="h-4 w-48"
+                    ></ecc-utils-design-skeleton>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Form Skeleton Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Form Skeleton</h2>
+              <div class="example-container max-w-md">
+                <ecc-utils-design-skeleton
+                  class="h-5 w-32 mb-1"
+                ></ecc-utils-design-skeleton>
+                <ecc-utils-design-skeleton
+                  class="h-10 w-full mb-4 rounded"
+                ></ecc-utils-design-skeleton>
+      
+                <ecc-utils-design-skeleton
+                  class="h-5 w-32 mb-1"
+                ></ecc-utils-design-skeleton>
+                <ecc-utils-design-skeleton
+                  class="h-10 w-full mb-4 rounded"
+                ></ecc-utils-design-skeleton>
+      
+                <ecc-utils-design-skeleton
+                  class="h-5 w-32 mb-1"
+                ></ecc-utils-design-skeleton>
+                <ecc-utils-design-skeleton
+                  class="h-24 w-full mb-4 rounded"
+                ></ecc-utils-design-skeleton>
+      
+                <ecc-utils-design-skeleton
+                  class="h-10 w-32 rounded"
+                ></ecc-utils-design-skeleton>
+              </div>
+            </div>
+            <!-- Custom Styled Skeletons -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Custom Styled Skeletons</h2>
+              <div class="example-container">
+                <ecc-utils-design-skeleton
+                  class="h-6 w-48 bg-blue-200"
+                ></ecc-utils-design-skeleton>
+                <ecc-utils-design-skeleton
+                  class="h-6 w-48 bg-green-200"
+                ></ecc-utils-design-skeleton>
+                <ecc-utils-design-skeleton
+                  class="h-6 w-48 bg-purple-200"
+                ></ecc-utils-design-skeleton>
+              </div>
+            </div>
+          </div>
+        `,
+  document.querySelector("#demo")
+);
+    </script>
+  </body>
+</html> 
