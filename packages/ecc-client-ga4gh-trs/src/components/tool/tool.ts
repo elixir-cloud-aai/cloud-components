@@ -402,75 +402,71 @@ export class ECCClientGa4ghTrsTool extends LitElement {
 
         <!-- Tab content skeleton -->
         <div class="mt-4">
-          <ecc-utils-design-card>
-            <ecc-utils-design-card-content class="mt-4">
-              <div class="flex flex-col gap-4">
-                <!-- Tool information section -->
-                <div>
+          <div class="flex flex-col gap-4">
+            <!-- Tool information section -->
+            <div>
+              <ecc-utils-design-skeleton
+                class="part:h-6 part:w-48 part:mb-3"
+              ></ecc-utils-design-skeleton>
+              <div class="flex flex-col gap-3">
+                <ecc-utils-design-skeleton
+                  class="part:h-4 part:w-full"
+                ></ecc-utils-design-skeleton>
+                <ecc-utils-design-skeleton
+                  class="part:h-4 part:w-full"
+                ></ecc-utils-design-skeleton>
+                <ecc-utils-design-skeleton
+                  class="part:h-4 part:w-3/4"
+                ></ecc-utils-design-skeleton>
+              </div>
+            </div>
+
+            <ecc-utils-design-separator></ecc-utils-design-separator>
+
+            <!-- Tool details section -->
+            <div>
+              <ecc-utils-design-skeleton
+                class="part:h-6 part:w-48 part:mb-3"
+              ></ecc-utils-design-skeleton>
+              <div class="flex flex-col gap-2">
+                <div class="flex justify-between">
                   <ecc-utils-design-skeleton
-                    class="part:h-6 part:w-48 part:mb-3"
+                    class="part:h-4 part:w-32"
                   ></ecc-utils-design-skeleton>
-                  <div class="flex flex-col gap-3">
-                    <ecc-utils-design-skeleton
-                      class="part:h-4 part:w-full"
-                    ></ecc-utils-design-skeleton>
-                    <ecc-utils-design-skeleton
-                      class="part:h-4 part:w-full"
-                    ></ecc-utils-design-skeleton>
-                    <ecc-utils-design-skeleton
-                      class="part:h-4 part:w-3/4"
-                    ></ecc-utils-design-skeleton>
-                  </div>
+                  <ecc-utils-design-skeleton
+                    class="part:h-4 part:w-48"
+                  ></ecc-utils-design-skeleton>
                 </div>
-
                 <ecc-utils-design-separator></ecc-utils-design-separator>
-
-                <!-- Tool details section -->
-                <div>
+                <div class="flex justify-between">
                   <ecc-utils-design-skeleton
-                    class="part:h-6 part:w-48 part:mb-3"
+                    class="part:h-4 part:w-32"
                   ></ecc-utils-design-skeleton>
-                  <div class="flex flex-col gap-2">
-                    <div class="flex justify-between">
-                      <ecc-utils-design-skeleton
-                        class="part:h-4 part:w-32"
-                      ></ecc-utils-design-skeleton>
-                      <ecc-utils-design-skeleton
-                        class="part:h-4 part:w-48"
-                      ></ecc-utils-design-skeleton>
-                    </div>
-                    <ecc-utils-design-separator></ecc-utils-design-separator>
-                    <div class="flex justify-between">
-                      <ecc-utils-design-skeleton
-                        class="part:h-4 part:w-32"
-                      ></ecc-utils-design-skeleton>
-                      <ecc-utils-design-skeleton
-                        class="part:h-4 part:w-40"
-                      ></ecc-utils-design-skeleton>
-                    </div>
-                    <ecc-utils-design-separator></ecc-utils-design-separator>
-                    <div class="flex justify-between">
-                      <ecc-utils-design-skeleton
-                        class="part:h-4 part:w-32"
-                      ></ecc-utils-design-skeleton>
-                      <ecc-utils-design-skeleton
-                        class="part:h-4 part:w-56"
-                      ></ecc-utils-design-skeleton>
-                    </div>
-                    <ecc-utils-design-separator></ecc-utils-design-separator>
-                    <div class="flex justify-between">
-                      <ecc-utils-design-skeleton
-                        class="part:h-4 part:w-32"
-                      ></ecc-utils-design-skeleton>
-                      <ecc-utils-design-skeleton
-                        class="part:h-4 part:w-36"
-                      ></ecc-utils-design-skeleton>
-                    </div>
-                  </div>
+                  <ecc-utils-design-skeleton
+                    class="part:h-4 part:w-40"
+                  ></ecc-utils-design-skeleton>
+                </div>
+                <ecc-utils-design-separator></ecc-utils-design-separator>
+                <div class="flex justify-between">
+                  <ecc-utils-design-skeleton
+                    class="part:h-4 part:w-32"
+                  ></ecc-utils-design-skeleton>
+                  <ecc-utils-design-skeleton
+                    class="part:h-4 part:w-56"
+                  ></ecc-utils-design-skeleton>
+                </div>
+                <ecc-utils-design-separator></ecc-utils-design-separator>
+                <div class="flex justify-between">
+                  <ecc-utils-design-skeleton
+                    class="part:h-4 part:w-32"
+                  ></ecc-utils-design-skeleton>
+                  <ecc-utils-design-skeleton
+                    class="part:h-4 part:w-36"
+                  ></ecc-utils-design-skeleton>
                 </div>
               </div>
-            </ecc-utils-design-card-content>
-          </ecc-utils-design-card>
+            </div>
+          </div>
         </div>
       </div>
     `;
@@ -601,7 +597,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                         <ecc-utils-design-separator></ecc-utils-design-separator>
 
                         <div class="flex flex-row gap-2 w-full justify-between">
-                          <dt class="text-muted-foreground">Authors</dt>
+                          <dt class="text-muted-foreground">Author(s)</dt>
                           ${version.author && version.author.length > 0
                             ? html` <dd>${version.author.join(", ")}</dd> `
                             : html`<dd class="text-muted-foreground">
@@ -726,7 +722,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
               (version) => html`
                 <ecc-utils-design-table-row
                   class="${version.id === this.selectedVersion
-                    ? "part:bg-primary/5"
+                    ? "part:bg-primary/20"
                     : "part:hover:bg-muted part:cursor-pointer"}"
                   @click=${() => this.handleSetActiveVersion(version.id)}
                 >
@@ -864,7 +860,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                         <button
                           class="w-full text-left px-3 py-1 rounded-md text-sm ${this
                             .activeFileIndex === index
-                            ? "bg-primary/10 text-primary"
+                            ? "bg-primary/30"
                             : "hover:bg-muted"}"
                           @click=${() => this.viewFileContent(index)}
                         >

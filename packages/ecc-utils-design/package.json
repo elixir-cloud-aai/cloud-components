@@ -69,7 +69,6 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@anurag_gupta/tus-js-client": "^4.2.10",
     "ace-builds": "^1.35.0",
     "lit": "^2.8.0"
   }
