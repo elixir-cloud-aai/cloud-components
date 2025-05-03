@@ -2,7 +2,7 @@
   "name": "@elixir-cloud/design",
   "description": "Abstraction layer that provides utility components to manage the headless yet constitent design across ecc component",
   "license": "Apache-2.0",
-  "version": "2.0.0-alpha",
+  "version": "2.0.0-alpha.2",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -15,7 +15,9 @@
     "./custom-elements.json": "./dist/custom-elements.json",
     "./components/*": "./dist/components/*",
     "./react": "./dist/react/index.js",
-    "./react/*": "./dist/react/*"
+    "./react/*": "./dist/react/*",
+    "./events": "./dist/events/index.js",
+    "./events/*": "./dist/events/*"
   },
   "repository": {
     "type": "git",
