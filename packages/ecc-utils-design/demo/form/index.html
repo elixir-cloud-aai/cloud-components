@@ -19,7 +19,7 @@
 
       render(
         html`<ecc-d-form
-          @ecc-utils-submit=${async (e) => {
+          @ecc-submit=${async (e) => {
             try {
               console.log("form - submitted", e.detail);
               document.querySelector("ecc-d-form").loading();
@@ -35,78 +35,10 @@
           }}
         >
           <ecc-d-form-input
-            key="name"
-            label="Name"
-            required
-            tooltip="Enter name"
+            type="date"
+            label="Date"
+            key="date"
           ></ecc-d-form-input>
-
-          <ecc-d-form-input
-            key="email"
-            label="Email"
-            tooltip="Enter your email address"
-          ></ecc-d-form-input>
-
-          <ecc-d-form-input
-            key="18+"
-            label="18+"
-            type="switch"
-            tooltip="Are you over 18 years old?"
-          ></ecc-d-form-input>
-
-          <ecc-d-form-input
-            key="id"
-            label="ID"
-            type="file"
-            required
-            tooltip="Your ID document"
-          ></ecc-d-form-input>
-
-          <ecc-d-form-input
-            key="id2"
-            label="TUS ID"
-            type="file"
-            protocol="tus"
-            endpoint="https://tusd.tusdemo.net/files/"
-            tooltip="Your ID document"
-          ></ecc-d-form-input>
-
-          <ecc-d-form-input required type="select" label="Gender">
-            <option ecc-option value="female">Female</option>
-            <option ecc-option value="male">Male</option>
-            <option ecc-option value="none">Do not want to Disclose</option>
-          </ecc-d-form-input>
-
-          <ecc-d-form-group type="group" label="Address" key="address">
-            <ecc-d-form-group
-              required
-              type="array"
-              label="Details"
-              instances="1"
-              max="2"
-              min="1"
-            >
-              <ecc-d-form-input
-                type="switch"
-                key="isPrimary"
-                label="Primary Address"
-              >
-              </ecc-d-form-input>
-              <ecc-d-form-input
-                key="houseNumber"
-                label="House Number"
-                tooltip="Your house number"
-              >
-              </ecc-d-form-input>
-              <ecc-d-form-input required key="street" label="Street">
-              </ecc-d-form-input>
-              <ecc-d-form-input required key="city" label="City">
-              </ecc-d-form-input>
-
-              <ecc-d-form-input required key="country" label="Country">
-              </ecc-d-form-input>
-            </ecc-d-form-group>
-          </ecc-d-form-group>
         </ecc-d-form> `,
         document.querySelector("#demo")
       );

@@ -28,10 +28,8 @@ export type FormItemType =
   | "search"
   | "datetime-local"
   | "time"
-  | "array"
   | "switch"
   | "file"
-  | "group"
   | "select";
 
 type AlertType = "info" | "success" | "warning" | "error";
@@ -62,9 +60,6 @@ type AlertType = "info" | "success" | "warning" | "error";
  * @method firstUpdated - Protected lifecycle method called after first update
  *
  * @private {method} fireChangeEvent - Fires a change event when input values change
- * @private {method} renderGroupTemplate - Renders the group template
- * @private {method} renderArrayItem - Renders an individual array item
- * @private {method} renderArrayTemplate - Renders the array template
  *
  * @event ecc-input - Fired when any child input element changes value. Detail contains: {key, value, index, groupType, groupKey}
  * @event ecc-array-add - Fired when a new array item is added. Detail contains: {key, instances}
@@ -72,7 +67,7 @@ type AlertType = "info" | "success" | "warning" | "error";
  *
  * @slot - Default slot for child form elements
  *
- * @dependency @shoelace-style/shoelace - Uses Shoelace components for UI elements
+ * @dependency  @shoelace-style/shoelace - Uses Shoelace components for UI elements
  */
 export default class EccUtilsDesignFormInput extends LitElement {
   @property({ type: String }) label = "";
@@ -82,7 +77,6 @@ export default class EccUtilsDesignFormInput extends LitElement {
   @property({ type: String, reflect: true }) tooltip = "";
   @property({ type: Boolean, reflect: true }) required = false;
   @property({ type: String, reflect: true }) placeholder = "";
-  @property({ type: String, reflect: true }) default = "";
   @property({ type: Boolean, reflect: true }) checked = false;
   @property({ type: Boolean, reflect: true }) multiple = false;
   @property({ type: String, reflect: true }) value: any;
@@ -97,25 +91,23 @@ export default class EccUtilsDesignFormInput extends LitElement {
   @state() private showAlert = false;
   @state() path: string | null = "";
 
-  @query("sl-input") input!: HTMLInputElement;
+  @query('[data-testid="input"]') input!: HTMLInputElement;
 
   connectedCallback(): void {
     super.connectedCallback();
     if (!this.key) {
-      noKeyWarning("ecc-d-form-group", this.label);
+      noKeyWarning("ecc-d-form-input", this.label);
       this.key = _.camelCase(this.label);
     }
 
-    this.path = findFieldPath(this.key, this);
-
-    if (this.type === "switch") {
-      this.value = !!this.value;
-      this.dispatchEvent(new CustomEvent("ecc-input", this.eventData()));
-    }
+    this.setAttribute("data-testid", "form-input");
+    this.path = findFieldPath(this.key, this) || this.key;
 
     if (this.value || this.type === "switch") {
       if (this.type === "switch") {
         this.value = !!this.value;
+      } else if (!this.value) {
+        this.value = "";
       }
 
       this.dispatchEvent(new CustomEvent("ecc-input", this.eventData()));
@@ -142,8 +134,8 @@ export default class EccUtilsDesignFormInput extends LitElement {
   }
 
   private handleShowAlert(alertType: AlertType, alertText: string) {
-    this.alertText = alertText;
-    this.alertType = alertType;
+    this.alertText = alertText || "Something went wrong";
+    this.alertType = alertType || "info";
     this.showAlert = true;
     this.requestUpdate();
   }
@@ -161,6 +153,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
   }
 
   private handleClear() {
+    this.value = "";
     this.dispatchEvent(new CustomEvent("ecc-input", this.eventData()));
     this.dispatchEvent(new CustomEvent("ecc-clear", this.eventData()));
     this.dispatchEvent(new CustomEvent("ecc-change", this.eventData()));
@@ -174,6 +167,10 @@ export default class EccUtilsDesignFormInput extends LitElement {
     this.requestUpdate();
   }
 
+  private async importClient() {
+    return await import("@anurag_gupta/tus-js-client");
+  }
+
   private handleFileUpload(e: Event) {
     const { files } = e.target as HTMLInputElement;
 
@@ -182,10 +179,9 @@ export default class EccUtilsDesignFormInput extends LitElement {
       return;
     }
 
-    this.dispatchEvent(new CustomEvent("ecc-input", this.eventData()));
-
     if (this.protocol === "native") {
       this.value = files;
+      this.dispatchEvent(new CustomEvent("ecc-input", this.eventData()));
       this.requestUpdate();
       return;
     }
@@ -196,7 +192,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
     }
 
     Array.from(files).forEach((file) => {
-      import("@anurag_gupta/tus-js-client")
+      this.importClient()
         .then(({ Upload }) => {
           this.handleDismissAlert();
           this.handleShowAlert("info", `Uploading ${file.name}: 0%`);
@@ -211,6 +207,8 @@ export default class EccUtilsDesignFormInput extends LitElement {
               this.handleShowAlert("error", `Upload failed: ${error.message}`);
             },
             onProgress: (bytesUploaded, bytesTotal) => {
+              console.log("some minor progress");
+
               const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(
                 2
               );
@@ -222,7 +220,13 @@ export default class EccUtilsDesignFormInput extends LitElement {
               this.requestUpdate();
             },
             onSuccess: () => {
+              this.dispatchEvent(
+                new CustomEvent("ecc-input", this.eventData())
+              );
+
               this.handleShowAlert("success", `File(s) Uploaded Successfully`);
+              this.value = [...(this.value ? this.value : []), file];
+              this.requestUpdate();
             },
           });
 
@@ -249,8 +253,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
       <sl-switch
         size="small"
         class="switch"
-        data-label=${this.label}
-        data-testid="form-switch"
+        data-testid="input"
         label=${this.label}
         ?required=${this.required}
         ?disabled=${this.disabled}
@@ -266,7 +269,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
     `;
 
     return html`
-      <div class="switch-container" data-testid="switch-container">
+      <div class="switch-container" data-testid="input-container">
         ${renderInTooltip(content, this.tooltip)}
       </div>
     `;
@@ -279,10 +282,10 @@ export default class EccUtilsDesignFormInput extends LitElement {
       <sl-input
         clearable
         class="input"
-        data-label=${this.label}
         data-testid="input"
         type=${this.type || "text"}
         ?required=${this.required}
+        ?disabled=${this.disabled}
         value=${this.value || ""}
         placeholder=${this.placeholder}
         ?password-toggle=${this.type === "password"}
@@ -299,26 +302,28 @@ export default class EccUtilsDesignFormInput extends LitElement {
   }
 
   private renderFileTemplate(): TemplateResult {
+    if (!this.protocol) this.protocol = "native";
+
     const label = html`
       <div>
-        <label class="file-input-label" data-testid="form-label">
+        <label class="file-input-label" data-testid="label">
           ${this.label} ${this.required ? "*" : ""}
         </label>
       </div>
     `;
 
     return html`
-      <div class="file-container" data-testid="file-container">
+      <div class="file-container" data-testid="input-container">
         ${renderInTooltip(label, this.tooltip)}
         <input
           type="file"
           class="file-input"
           data-type=${this.protocol}
-          data-testid="input-file"
-          data-label=${this.label}
+          data-testid="input"
           accept=${this.accept}
           ?multiple=${this.multiple}
           ?required=${this.required}
+          ?disabled=${this.disabled}
           @change=${this.handleFileUpload}
         />
       </div>
@@ -347,7 +352,7 @@ export default class EccUtilsDesignFormInput extends LitElement {
     };
 
     return html`
-      <div class="select-container" data-testid="select-container">
+      <div class="select-container" data-testid="input-container">
         ${renderInTooltip(label, this.tooltip)}
         <sl-select
           clearable
@@ -355,9 +360,10 @@ export default class EccUtilsDesignFormInput extends LitElement {
           name=${this.label}
           ?required=${this.required}
           ?multiple=${this.multiple}
+          ?disabled=${this.disabled}
           value=${getSelectValue()}
-          data-testid="select"
-          data-label=${this.label}
+          data-testid="input"
+          label=${this.label}
           placeholder="${this.placeholder || "Select"}"
           @sl-input=${this.handleValueUpdate}
           @sl-clear=${this.handleClear}
@@ -386,8 +392,8 @@ export default class EccUtilsDesignFormInput extends LitElement {
             removeDuplicates(this.options),
             (opt) => html`
               <sl-option
-                data-testid="select-option"
-                data-label=${_.kebabCase(getOptionLabelAndValue(opt))}
+                data-testid="option"
+                label=${_.kebabCase(getOptionLabelAndValue(opt))}
                 value=${getOptionLabelAndValue(opt, false)}
               >
                 ${getOptionLabelAndValue(opt)}
@@ -410,7 +416,11 @@ export default class EccUtilsDesignFormInput extends LitElement {
 
   render() {
     return html`
-      <sl-alert ?open=${this.showAlert} @click=${this.handleDismissAlert}>
+      <sl-alert
+        data-testid="alert"
+        ?open=${this.showAlert}
+        @click=${this.handleDismissAlert}
+      >
         ${this.alertType === "error"
           ? html`<sl-icon slot="icon" name="x-circle"></sl-icon>`
           : html` <sl-icon slot="icon" name="info-circle"></sl-icon>`}
