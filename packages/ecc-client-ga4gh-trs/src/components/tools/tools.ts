@@ -1,8 +1,14 @@
 import { LitElement, html, css } from "lit";
 import { property, state } from "lit/decorators.js";
-import { TrsAPI, DescriptorType, ToolClass, Tool } from "../../API/trs-api.js";
 import { TWStyles as TailwindStyles } from "../../tailwind.js";
 import { GlobalStyles } from "../../global.js";
+import {
+  TrsProvider,
+  Tool,
+  ToolClass,
+  DescriptorType,
+} from "../../providers/trs-provider.js";
+import { RestTrsProvider } from "../../API/rest-trs-provider.js";
 import "@elixir-cloud/design/components/table/index.js";
 import "@elixir-cloud/design/components/button/index.js";
 import "@elixir-cloud/design/components/input/index.js";
@@ -20,6 +26,7 @@ import "@elixir-cloud/design/components/skeleton/index.js";
  * @property {number} pageSize - Number of tools per page
  * @property {boolean} filter - Determines if the tools filter field should be rendered
  * @property {boolean} search - Determines if the search field should be rendered
+ * @property {TrsProvider} provider - Custom data provider (optional, overrides baseUrl)
  *
  * @fires ecc-tools-change - Fired when tools data changes
  * @fires ecc-tools-click - Fired when a tool is clicked
@@ -40,6 +47,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
   @property({ type: Number, reflect: true }) pageSize = 5;
   @property({ type: Boolean, reflect: true }) filter = true;
   @property({ type: Boolean, reflect: true }) search = true;
+  @property({ attribute: false, reflect: true }) provider?: TrsProvider;
 
   @state() private toolClasses: ToolClass[] = [];
   @state() private currentPage = 1;
@@ -67,33 +75,47 @@ export class ECCClientGa4ghTrsTools extends LitElement {
   @state() private searchTimeout: ReturnType<typeof setTimeout> | null = null;
   @state() private lastPage = -1;
 
-  private api: TrsAPI | null = null;
+  private _provider: TrsProvider | null = null;
 
   protected async firstUpdated(): Promise<void> {
-    if (this.baseUrl) {
-      this.api = new TrsAPI(this.baseUrl);
+    if (!this.baseUrl && !this.provider) {
+      this.error =
+        "Please provide either a base URL for the TRS API or a custom provider.";
+      return;
+    }
+
+    if (this.provider) {
+      this._provider = this.provider;
+    } else if (this.baseUrl) {
+      this._provider = new RestTrsProvider(this.baseUrl);
+    } else {
+      this._provider = null;
+    }
+
+    if (this._provider) {
       await this.loadData();
       await this.loadToolClasses();
     }
   }
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
+    console.log("changedProperties", changedProperties);
     if (changedProperties.has("pageSize")) {
       this.loadData();
     }
 
     if (changedProperties.has("baseUrl") && this.baseUrl) {
-      this.api = new TrsAPI(this.baseUrl);
+      this._provider = new RestTrsProvider(this.baseUrl);
       this.loadData();
       this.loadToolClasses();
     }
   }
 
   private async loadToolClasses(): Promise<void> {
-    if (!this.api) return;
+    if (!this._provider) return;
 
     try {
-      this.toolClasses = await this.api.getToolClasses();
+      this.toolClasses = await this._provider.getToolClasses();
 
       // Store a mapping of name to ID for lookup during filtering
       this.toolClassMap = Object.fromEntries(
@@ -105,7 +127,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
   }
 
   private async loadData(): Promise<void> {
-    if (!this.api) return;
+    if (!this._provider) return;
 
     this.loading = true;
     this.error = null;
@@ -123,7 +145,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
       // We want to send the tool class name directly to the API, not the ID
       // No conversion needed here, the name is already stored in filterParams.toolClass
 
-      const tools = await this.api.getToolsList(
+      const tools = await this._provider.getToolsList(
         this.pageSize,
         offset,
         apiFilterParams,
@@ -289,7 +311,6 @@ export class ECCClientGa4ghTrsTools extends LitElement {
   }
 
   private renderPagination() {
-    console.log("this.lastPage", this.lastPage, this.currentPage);
     return html`
       <ecc-utils-design-pagination>
         <ecc-utils-design-pagination-content>
@@ -536,12 +557,12 @@ export class ECCClientGa4ghTrsTools extends LitElement {
   }
 
   render() {
-    if (!this.baseUrl) {
+    if (!this.baseUrl && !this.provider) {
       return html`
         <div
           class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
         >
-          Please provide a base URL for the TRS API.
+          Please provide either a base URL for the TRS API or a custom provider.
         </div>
       `;
     }

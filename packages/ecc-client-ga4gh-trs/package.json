@@ -17,7 +17,9 @@
     "./react": "./dist/react/index.js",
     "./react/*": "./dist/react/*",
     "./events": "./dist/events/index.js",
-    "./events/*": "./dist/events/*"
+    "./events/*": "./dist/events/*",
+    "./providers": "./dist/providers/index.js",
+    "./providers/*": "./dist/providers/*"
   },
   "repository": {
     "type": "git",

@@ -1,9 +1,15 @@
 import { LitElement, html, css } from "lit";
 import { property, state } from "lit/decorators.js";
 import { ifDefined } from "lit/directives/if-defined.js";
-import { TrsAPI, Tool, ToolFile, DescriptorType } from "../../API/trs-api.js";
 import { TWStyles as TailwindStyles } from "../../tailwind.js";
 import { GlobalStyles } from "../../global.js";
+import {
+  TrsProvider,
+  Tool,
+  ToolFile,
+  DescriptorType,
+} from "../../providers/trs-provider.js";
+import { RestTrsProvider } from "../../API/rest-trs-provider.js";
 import "@elixir-cloud/design/components/table/index.js";
 import "@elixir-cloud/design/components/button/index.js";
 import "@elixir-cloud/design/components/input/index.js";
@@ -22,6 +28,7 @@ import "@elixir-cloud/design/components/code/index.js";
  *
  * @property {string} baseUrl - Base URL of the TRS instance/gateway
  * @property {string} toolId - ID of the tool to display
+ * @property {TrsProvider} provider - Custom data provider (optional, overrides baseUrl)
  */
 export class ECCClientGa4ghTrsTool extends LitElement {
   static styles = [
@@ -37,6 +44,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
 
   @property({ type: String, reflect: true }) baseUrl = "";
   @property({ type: String, reflect: true }) toolId = "";
+  @property({ attribute: false }) provider?: TrsProvider;
 
   @state() private tool: Tool | null = null;
   @state() private selectedVersion = "";
@@ -47,35 +55,84 @@ export class ECCClientGa4ghTrsTool extends LitElement {
   @state() private fileContents: { [key: string]: string } = {};
   @state() private activeFileIndex = -1;
 
-  private api: TrsAPI | null = null;
+  private _provider: TrsProvider | null = null;
 
   protected async firstUpdated(): Promise<void> {
-    if (this.baseUrl && this.toolId) {
-      this.api = new TrsAPI(this.baseUrl);
+    if (!this.baseUrl && !this.provider) {
+      this.error =
+        "Please provide either a base URL for the TRS API or a custom provider.";
+      return;
+    }
+
+    if (!this.toolId) {
+      this.error = "Please provide a tool ID.";
+      return;
+    }
+
+    if (this.provider) {
+      this._provider = this.provider;
+    } else if (this.baseUrl) {
+      this._provider = new RestTrsProvider(this.baseUrl);
+    } else {
+      this._provider = null;
+    }
+
+    if (this._provider && this.toolId) {
       await this.loadToolData();
     }
   }
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
-    if (
-      (changedProperties.has("baseUrl") || changedProperties.has("toolId")) &&
-      this.baseUrl &&
-      this.toolId
-    ) {
-      this.api = new TrsAPI(this.baseUrl);
+    // Handle provider changes
+    if (changedProperties.has("provider")) {
+      if (!this.provider && !this.baseUrl) {
+        this.error =
+          "Please provide either a base URL for the TRS API or a custom provider.";
+        return;
+      }
+      // Only update provider if it's actually different
+      if (this.provider !== this._provider) {
+        this._provider = this.provider || null;
+        if (this.toolId) {
+          this.loadToolData();
+        }
+      }
+      return;
+    }
+
+    // Handle baseUrl changes
+    if (changedProperties.has("baseUrl") && !this.provider) {
+      if (!this.baseUrl) {
+        this.error =
+          "Please provide either a base URL for the TRS API or a custom provider.";
+        return;
+      }
+      this._provider = new RestTrsProvider(this.baseUrl);
+      if (this.toolId) {
+        this.loadToolData();
+      }
+      return;
+    }
+
+    // Handle toolId changes
+    if (changedProperties.has("toolId") && this._provider) {
+      if (!this.toolId) {
+        this.error = "Please provide a tool ID.";
+        return;
+      }
       this.loadToolData();
     }
   }
 
   private async loadToolData(): Promise<void> {
-    if (!this.api || !this.toolId) return;
+    if (!this._provider || !this.toolId) return;
 
     this.loading = true;
     this.error = null;
 
     try {
       // Load tool details
-      const tool = await this.api.getTool(this.toolId);
+      const tool = await this._provider.getTool(this.toolId);
       this.tool = tool;
 
       // Select the first version by default if there are versions
@@ -103,7 +160,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
 
   private async loadToolFiles(): Promise<void> {
     if (
-      !this.api ||
+      !this._provider ||
       !this.toolId ||
       !this.selectedVersion ||
       !this.selectedDescriptorType
@@ -111,7 +168,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
       return;
 
     try {
-      const files = await this.api.getToolFiles(
+      const files = await this._provider.getToolFiles(
         this.toolId,
         this.selectedVersion,
         this.selectedDescriptorType
@@ -163,7 +220,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
 
   private async viewFileContent(index: number): Promise<void> {
     if (
-      !this.api ||
+      !this._provider ||
       !this.toolId ||
       !this.selectedVersion ||
       !this.toolFiles[index]
@@ -187,7 +244,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
 
     try {
       if (file.file_type === "PRIMARY_DESCRIPTOR") {
-        const fileWrapper = await this.api.getToolDescriptor(
+        const fileWrapper = await this._provider.getToolDescriptor(
           this.toolId,
           this.selectedVersion,
           this.selectedDescriptorType
@@ -216,7 +273,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
         }
       } else {
         // For secondary descriptors and other files, use the path-specific method
-        const fileWrapper = await this.api.getToolDescriptorByPath(
+        const fileWrapper = await this._provider.getToolDescriptorByPath(
           this.toolId,
           this.selectedVersion,
           this.selectedDescriptorType,
@@ -959,12 +1016,12 @@ export class ECCClientGa4ghTrsTool extends LitElement {
   }
 
   render() {
-    if (!this.baseUrl) {
+    if (!this.baseUrl && !this.provider) {
       return html`
         <div
           class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
         >
-          Please provide a base URL for the TRS API.
+          Please provide either a base URL for the TRS API or a custom provider.
         </div>
       `;
     }
