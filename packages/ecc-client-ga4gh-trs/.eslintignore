@@ -24,6 +24,7 @@ src/react
 custom-elements-manifest.config.js
 src/output.css
 src/tailwind.ts
+tw-styles.ts
 
 **/.git
 **/.svn

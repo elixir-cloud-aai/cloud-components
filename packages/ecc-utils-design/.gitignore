@@ -39,6 +39,8 @@ yarn-error.log*
 /src/react
 /src/output.css
 /src/tailwind.ts
+tw-styles.ts
+temp-tailwind/
 custom-elements-manifest.config.js
 
 custom-elements.json

@@ -1,5 +1,5 @@
 import { LitElement, html, css } from "lit";
-import { TWStyles as TailwindStyles } from "../../tailwind.js";
+import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 
 // Utility function to combine class names

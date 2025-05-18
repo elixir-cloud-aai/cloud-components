@@ -1,16 +1,17 @@
 #!/usr/bin/env node
 const fs = require("fs");
 const path = require("path");
-const { execSync } = require("child_process");
+const { execSync, spawn } = require("child_process");
+const glob = require("fast-glob");
 const yargs = require("yargs");
 
 try {
   const argv = yargs(process.argv.slice(2)).argv;
 
   const inputSource = argv.source ?? "./src/tailwind.css";
-  const inputProcessed = argv.input ?? "./src/output.css";
-  const output = argv.output ?? "./src/tailwind.ts";
   const watch = argv.watch ?? false;
+  // Declare watchProcesses at the global scope
+  const watchProcesses = [];
 
   // Ensure source directory exists
   const sourceDir = path.dirname(inputSource);
@@ -25,115 +26,181 @@ try {
     process.exit(1);
   }
 
-  // Ensure output directory exists
-  const outputDir = path.dirname(inputProcessed);
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
-    console.log(`Created directory: ${outputDir}`);
-  }
 
-  // Create empty output file if it doesn't exist
-  if (!fs.existsSync(inputProcessed)) {
-    fs.writeFileSync(inputProcessed, "/* Empty file for initial setup */");
-    console.log(`Created empty file: ${inputProcessed}`);
-  }
-
-  // Ensure tailwind.ts directory exists
-  const tailwindTsDir = path.dirname(output);
-  if (!fs.existsSync(tailwindTsDir)) {
-    fs.mkdirSync(tailwindTsDir, { recursive: true });
-    console.log(`Created directory: ${tailwindTsDir}`);
-  }
-
-  // Create empty tailwind.ts file if it doesn't exist
-  if (!fs.existsSync(output)) {
-    fs.writeFileSync(
-      output,
-      'import { css } from "lit";\nexport const TWStyles = css``;\n'
-    );
-    console.log(`Created empty file: ${output}`);
-  }
-
-  // Process function to convert CSS to Lit-compatible format
-  function processForLit() {
+  // Function to process component-specific styles
+  async function processComponentStyles() {
     try {
-      let contents;
-      try {
-        contents = fs.readFileSync(inputProcessed, "utf8");
-      } catch (e) {
-        console.log(
-          `Tailwind Watcher: Failed to read file ${inputProcessed}. Might just not be created yet? retrying..`
-        );
-        return;
+      console.log("Generating component-specific styles...");
+      
+      // Create temp directory for processing
+      const tempDir = path.join(process.cwd(), "temp-tailwind");
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { recursive: true });
       }
+      
+      // Find all component directories
+      const componentDirs = glob.sync("src/components/*/", {
+        cwd: process.cwd(),
+        onlyDirectories: true
+      });
+      
+      console.log(`Found ${componentDirs.length} component directories to process`);
+      
+      // Process each component directory
+      for (const dir of componentDirs) {
+        // Get the directory name correctly
+        const dirName = path.basename(dir.replace(/\/$/, '')); 
+        
+        const componentFiles = glob.sync(path.join(dir, "*.ts"), {
+          cwd: process.cwd(),
+          ignore: ["**/index.ts", "**/*styles.ts"],
+        });
+        
+        // Skip empty directories
+        if (componentFiles.length === 0) continue;
+        
+        // Create component config
+        const configPath = path.join(tempDir, `tailwind.${dirName}.css`);
+        fs.copyFileSync(inputSource, configPath);
 
-      let cleanContents = contents.replaceAll("`", "");
-      cleanContents = cleanContents.replaceAll("\\", "\\\\");
+        const fileContent = fs.readFileSync(configPath, 'utf-8');
+        const lines = fileContent.split('\n');
+        
+        const newContent = [
+          lines[0],
+          ...componentFiles.map(file => `@source "../${file}";`),
+          ...lines.slice(1)
+        ].join('\n');
+        
+        fs.writeFileSync(configPath, newContent);
+        
+        // Output paths
+        const componentCssPath = path.join(tempDir, `${dirName}.css`);
 
-      const litContents = `
+        console.log(`Processing ${dirName}...`);
+        
+        if (watch) {
+          // In watch mode, start the process and continue
+          const child = spawn('npx', ['@tailwindcss/cli', '-i', configPath, '-o', componentCssPath, '--watch'], {
+            stdio: "inherit"
+          });
+          watchProcesses.push(child);
+          
+          // Wait for output file to be created before setting up watcher
+          const setupWatcher = () => {
+            if (fs.existsSync(componentCssPath)) {
+              // Set up a watcher for the output CSS file
+              fs.watchFile(componentCssPath, { interval: 1000 }, () => {
+                try {
+                  // When CSS file changes, update the Lit template
+                  let cssContent = fs.readFileSync(componentCssPath, "utf8");
+                  cssContent = cssContent.replaceAll("`", "\\`");
+                  cssContent = cssContent.replaceAll("\\", "\\\\");
+                  
+                  const litTemplate = `
 import { css } from "lit";
-export const TWStyles = css\` ${cleanContents} \`
-      `;
-
-      fs.writeFileSync(output, litContents);
-      console.log(`Tailwind Watcher: Wrote to file ${output}`);
-    } catch (err) {
-      console.error(err);
+export const ComponentStyles = css\` ${cssContent} \`
+                  `;
+                  
+                  const stylesPath = path.join(process.cwd(), dir, `tw-styles.ts`);
+                  fs.writeFileSync(stylesPath, litTemplate);
+                  
+                  console.log(`✓ Updated styles for ${dirName}`);
+                } catch (err) {
+                  console.error(`Error updating styles for ${dirName}:`, err);
+                }
+              });
+              
+              // Initial file read once it exists
+              try {
+                let cssContent = fs.readFileSync(componentCssPath, "utf8");
+                cssContent = cssContent.replaceAll("`", "\\`");
+                cssContent = cssContent.replaceAll("\\", "\\\\");
+                
+                const litTemplate = `
+import { css } from "lit";
+export const ComponentStyles = css\` ${cssContent} \`
+                `;
+                
+                const stylesPath = path.join(process.cwd(), dir, `tw-styles.ts`);
+                fs.writeFileSync(stylesPath, litTemplate);
+                
+                console.log(`✓ Initial styles generated for ${dirName}`);
+              } catch (err) {
+                console.error(`Error generating initial styles for ${dirName}:`, err);
+              }
+            } else {
+              // Retry after a delay if file doesn't exist yet
+              console.log(`Waiting for ${componentCssPath} to be created...`);
+              setTimeout(setupWatcher, 1000);
+            }
+          };
+          
+          // Start checking for file after a short delay
+          setTimeout(setupWatcher, 2000);
+        } else {
+          // In non-watch mode, process synchronously
+          execSync(`npx @tailwindcss/cli -i ${configPath} -o ${componentCssPath}`, {
+            stdio: "inherit"
+          });
+          
+          // Convert to Lit template
+          let cssContent = fs.readFileSync(componentCssPath, "utf8");
+          cssContent = cssContent.replaceAll("`", "\\`");
+          cssContent = cssContent.replaceAll("\\", "\\\\");
+          
+          const litTemplate = `
+import { css } from "lit";
+export const ComponentStyles = css\` ${cssContent} \`
+          `;
+          
+          // Write component styles
+          const stylesPath = path.join(process.cwd(), dir, `tw-styles.ts`);
+          fs.writeFileSync(stylesPath, litTemplate);
+          
+          console.log(`✓ Generated styles for ${dirName}`);
+          
+          // Clean up temp files only in non-watch mode
+          fs.unlinkSync(configPath);
+          fs.unlinkSync(componentCssPath);
+        }
+      }
+      
+      // Clean up temp directory only in non-watch mode
+      if (!watch) {
+        fs.rmdirSync(tempDir, { recursive: true });
+        console.log("Component style generation complete!");
+      } else {
+        console.log("Watch mode active. Waiting for changes...");
+      }
+    } catch (error) {
+      console.error("Error generating component styles:", error);
     }
   }
 
   // Main function to process Tailwind
   function processTailwind() {
     try {
-      console.log(
-        `Processing Tailwind CSS: ${inputSource} -> ${inputProcessed}`
-      );
-
-      // Run Tailwind CLI to process the source file
-      const tailwindCmd = `npx @tailwindcss/cli -i ${inputSource} -o ${inputProcessed}${
-        watch ? " --watch" : ""
-      }`;
+      console.log(`Processing Tailwind CSS: ${inputSource}`);
 
       if (watch) {
-        // In watch mode, run the CLI in the background and set up a file watcher
-        const child = require("child_process").spawn(
-          "npx",
-          [
-            "@tailwindcss/cli",
-            "-i",
-            inputSource,
-            "-o",
-            inputProcessed,
-            "--watch",
-          ],
-          {
-            stdio: "inherit",
-            shell: true,
-          }
-        );
-
-        console.log("Tailwind watcher started in watch mode");
-
         // Set up a watcher for the processed file to convert to Lit format
-        fs.watch(inputProcessed, (eventType) => {
+        fs.watch(inputSource, (eventType) => {
           if (eventType === "change") {
-            processForLit();
+            processComponentStyles();
           }
         });
-
-        // Initial processing
-        processForLit();
+        processComponentStyles();
 
         // Handle process exit
         process.on("SIGINT", () => {
-          console.log("Terminating Tailwind watcher...");
-          child.kill();
+          console.log("Terminating Tailwind watchers...");
+          watchProcesses.forEach(child => child.kill());
           process.exit(0);
         });
       } else {
-        // In one-time mode, just run the CLI and process the output
-        execSync(tailwindCmd, { stdio: "inherit" });
-        processForLit();
+        // Also generate component styles
+        processComponentStyles();
       }
     } catch (error) {
       console.error("Error processing Tailwind CSS:", error);

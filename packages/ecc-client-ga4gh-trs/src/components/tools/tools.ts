@@ -1,6 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { property, state } from "lit/decorators.js";
-import { TWStyles as TailwindStyles } from "../../tailwind.js";
+import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 import {
   TrsProvider,

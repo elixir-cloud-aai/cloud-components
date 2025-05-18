@@ -40,5 +40,7 @@ yarn-error.log*
 /src/output.css
 /src/tailwind.ts
 custom-elements-manifest.config.js
+temp-tailwind/
+tw-styles.ts
 
 custom-elements.json
