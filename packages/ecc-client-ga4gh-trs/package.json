@@ -1,8 +1,8 @@
 {
   "name": "@elixir-cloud/trs",
-  "description": "Web Component for interacting with GA4GH TRS API",
+  "description": "Web Component for interacting with GA4GH TRS Standard",
   "license": "Apache-2.0",
-  "version": "2.0.0-alpha.6",
+  "version": "2.0.0-alpha.13",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "@lit/react": "^1.0.2",
-    "@elixir-cloud/design": "2.0.0-alpha.5",
+    "@elixir-cloud/design": "*",
     "lit": "^2.8.0"
   },
   "devDependencies": {

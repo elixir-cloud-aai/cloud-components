@@ -1,7 +1,10 @@
 export { default as EccUtilsDesignBadge } from "./badge/index.js";
 export { default as EccUtilsDesignButton } from "./button/index.js";
+export { default as EccUtilsDesignCheckbox } from "./checkbox/index.js";
+export { default as EccUtilsDesignCollapsible } from "./collapsible/index.js";
 export { default as EccUtilsDesignInput } from "./input/index.js";
 export { default as EccUtilsDesignLabel } from "./label/index.js";
+export { default as EccUtilsDesignMultiSelect } from "./multi-select/index.js";
 export { default as EccUtilsDesignPagination } from "./pagination/index.js";
 export { default as EccUtilsDesignSelect } from "./select/index.js";
 export { default as EccUtilsDesignSkeleton } from "./skeleton/index.js";
@@ -10,3 +13,4 @@ export { default as EccUtilsDesignTabs } from "./tabs/index.js";
 export { default as EccUtilsDesignCard } from "./card/index.js";
 export { default as EccUtilsDesignSeparator } from "./separator/index.js";
 export { default as EccUtilsDesignCode } from "./code/index.js";
+export { default as EccUtilsDesignTextarea } from "./textarea/index.js";

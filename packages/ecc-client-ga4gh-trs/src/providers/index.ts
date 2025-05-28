@@ -1,5 +1,6 @@
 // Export providers
 export { TrsProvider } from "./trs-provider.js";
+export { RestTrsProvider } from "./rest-trs-provider.js";
 
 // Export types
 export type {

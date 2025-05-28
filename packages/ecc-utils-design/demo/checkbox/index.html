@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="../assets/logo-elixir-cloud-aai.svg" type="image/x-icon">
+    <title>ecc-utils-design Checkbox Demo</title>
+    <style>
+      .demo-section {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+      }
+      .demo-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #1f2937;
+      }
+      .demo-description {
+        color: #6b7280;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+      }
+      .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .checkbox-label {
+        font-size: 0.875rem;
+        color: #374151;
+      }
+      .event-log {
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+        padding: 0.75rem;
+        font-family: monospace;
+        font-size: 0.75rem;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-checkbox Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../../dist/components/checkbox/index.js";
+      import { html, render } from "lit";
+
+      // Event logging
+      const eventLog = [];
+      function logEvent(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        eventLog.unshift(`[${timestamp}] ${message}`);
+        if (eventLog.length > 10) eventLog.pop();
+        updateEventLog();
+      }
+
+      function updateEventLog() {
+        const logElement = document.querySelector("#event-log");
+        if (logElement) {
+          logElement.textContent = eventLog.join("\n");
+        }
+      }
+
+      function handleCheckboxChange(e, label) {
+        logEvent(`${label}: checked=${e.detail.checked}, value="${e.detail.value}"`);
+      }
+
+      render(
+        html`
+          <div class="flex flex-col gap-6">
+            <!-- Basic States -->
+            <div class="demo-section">
+              <div class="demo-title">Basic States</div>
+              <div class="demo-description">
+                Basic checkbox states: default, checked, and disabled.
+              </div>
+              <div class="checkbox-group">
+                <div class="checkbox-item">
+                  <ecc-utils-design-checkbox
+                    @ecc-utils-change=${(e) => handleCheckboxChange(e, "Default")}
+                  ></ecc-utils-design-checkbox>
+                  <span class="checkbox-label">Default checkbox</span>
+                </div>
+                <div class="checkbox-item">
+                  <ecc-utils-design-checkbox
+                    checked
+                    @ecc-utils-change=${(e) => handleCheckboxChange(e, "Pre-checked")}
+                  ></ecc-utils-design-checkbox>
+                  <span class="checkbox-label">Pre-checked checkbox</span>
+                </div>
+                <div class="checkbox-item">
+                  <ecc-utils-design-checkbox disabled></ecc-utils-design-checkbox>
+                  <span class="checkbox-label">Disabled checkbox</span>
+                </div>
+                <div class="checkbox-item">
+                  <ecc-utils-design-checkbox
+                    checked
+                    disabled
+                  ></ecc-utils-design-checkbox>
+                  <span class="checkbox-label">Disabled checked checkbox</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Integration -->
+            <div class="demo-section">
+              <div class="demo-title">Form Integration</div>
+              <div class="demo-description">
+                Checkboxes with name and value attributes for form integration.
+              </div>
+              <div class="checkbox-group">
+                <div class="checkbox-item">
+                  <ecc-utils-design-checkbox
+                    name="preferences"
+                    value="newsletter"
+                    @ecc-utils-change=${(e) => handleCheckboxChange(e, "Newsletter")}
+                  ></ecc-utils-design-checkbox>
+                  <span class="checkbox-label">Subscribe to newsletter</span>
+                </div>
+                <div class="checkbox-item">
+                  <ecc-utils-design-checkbox
+                    name="preferences"
+                    value="notifications"
+                    @ecc-utils-change=${(e) =>
+                      handleCheckboxChange(e, "Notifications")}
+                  ></ecc-utils-design-checkbox>
+                  <span class="checkbox-label">Enable notifications</span>
+                </div>
+                <div class="checkbox-item">
+                  <ecc-utils-design-checkbox
+                    name="preferences"
+                    value="analytics"
+                    checked
+                    @ecc-utils-change=${(e) => handleCheckboxChange(e, "Analytics")}
+                  ></ecc-utils-design-checkbox>
+                  <span class="checkbox-label">Allow analytics tracking</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Example -->
+            <div class="demo-section">
+              <div class="demo-title">Interactive Example</div>
+              <div class="demo-description">
+                Try clicking the checkboxes and see the events in the log below.
+              </div>
+              <div class="checkbox-group">
+                <div class="checkbox-item">
+                  <ecc-utils-design-checkbox
+                    name="features"
+                    value="feature1"
+                    @ecc-utils-change=${(e) => handleCheckboxChange(e, "Feature 1")}
+                  ></ecc-utils-design-checkbox>
+                  <span class="checkbox-label">Enable feature 1</span>
+                </div>
+                <div class="checkbox-item">
+                  <ecc-utils-design-checkbox
+                    name="features"
+                    value="feature2"
+                    @ecc-utils-change=${(e) => handleCheckboxChange(e, "Feature 2")}
+                  ></ecc-utils-design-checkbox>
+                  <span class="checkbox-label">Enable feature 2</span>
+                </div>
+                <div class="checkbox-item">
+                  <ecc-utils-design-checkbox
+                    name="features"
+                    value="feature3"
+                    @ecc-utils-change=${(e) => handleCheckboxChange(e, "Feature 3")}
+                  ></ecc-utils-design-checkbox>
+                  <span class="checkbox-label">Enable feature 3</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Event Log -->
+            <div class="demo-section">
+              <div class="demo-title">Event Log</div>
+              <div class="demo-description">
+                Recent checkbox change events (showing last 10 events):
+              </div>
+              <pre id="event-log" class="event-log">
+No events yet. Try clicking some checkboxes above!</pre
+              >
+            </div>
+
+            <!-- Keyboard Navigation -->
+            <div class="demo-section">
+              <div class="demo-title">Keyboard Navigation</div>
+              <div class="demo-description">
+                Use Tab to navigate between checkboxes, Space or Enter to toggle them.
+              </div>
+              <div class="checkbox-group">
+                <div class="checkbox-item">
+                  <ecc-utils-design-checkbox
+                    name="keyboard"
+                    value="tab1"
+                    @ecc-utils-change=${(e) => handleCheckboxChange(e, "Tab 1")}
+                  ></ecc-utils-design-checkbox>
+                  <span class="checkbox-label">First checkbox (try Tab + Space)</span>
+                </div>
+                <div class="checkbox-item">
+                  <ecc-utils-design-checkbox
+                    name="keyboard"
+                    value="tab2"
+                    @ecc-utils-change=${(e) => handleCheckboxChange(e, "Tab 2")}
+                  ></ecc-utils-design-checkbox>
+                  <span class="checkbox-label">Second checkbox</span>
+                </div>
+                <div class="checkbox-item">
+                  <ecc-utils-design-checkbox
+                    name="keyboard"
+                    value="tab3"
+                    @ecc-utils-change=${(e) => handleCheckboxChange(e, "Tab 3")}
+                  ></ecc-utils-design-checkbox>
+                  <span class="checkbox-label">Third checkbox</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        document.querySelector("#demo")
+      );
+
+      // Initialize event log
+      setTimeout(updateEventLog, 100);
+    </script>
+  </body>
+</html> 

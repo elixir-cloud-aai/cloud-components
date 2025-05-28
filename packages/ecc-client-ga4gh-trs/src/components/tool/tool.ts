@@ -9,7 +9,7 @@ import {
   ToolFile,
   DescriptorType,
 } from "../../providers/trs-provider.js";
-import { RestTrsProvider } from "../../API/rest-trs-provider.js";
+import { RestTrsProvider } from "../../providers/rest-trs-provider.js";
 import "@elixir-cloud/design/components/table/index.js";
 import "@elixir-cloud/design/components/button/index.js";
 import "@elixir-cloud/design/components/input/index.js";
@@ -44,6 +44,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
 
   @property({ type: String, reflect: true }) baseUrl = "";
   @property({ type: String, reflect: true }) toolId = "";
+  @property({ type: String, reflect: true }) toolUrl = "";
   @property({ attribute: false }) provider?: TrsProvider;
 
   @state() private tool: Tool | null = null;
@@ -131,12 +132,12 @@ export class ECCClientGa4ghTrsTool extends LitElement {
     this.error = null;
 
     try {
-      // Load tool details
-      const tool = await this._provider.getTool(this.toolId);
+      const tool = await this._provider.getTool(this.toolUrl, this.toolId);
       this.tool = tool;
 
       // Select the first version by default if there are versions
       if (tool.versions && tool.versions.length > 0) {
+        const previousVersion = this.selectedVersion;
         this.selectedVersion = tool.versions[0].id;
 
         // Determine the first available descriptor type in the selected version
@@ -146,6 +147,20 @@ export class ECCClientGa4ghTrsTool extends LitElement {
           // Load tool files for the selected version and descriptor type
           await this.loadToolFiles();
         }
+
+        // Emit version change event for initial load
+        this.dispatchEvent(
+          new CustomEvent("ecc-tool-version-change", {
+            detail: {
+              previousVersion,
+              newVersion: this.selectedVersion,
+              version,
+              toolId: this.toolId,
+            },
+            bubbles: true,
+            composed: true,
+          })
+        );
       }
     } catch (err) {
       this.error = err instanceof Error ? err.message : "Failed to load tool";
@@ -161,6 +176,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
   private async loadToolFiles(): Promise<void> {
     if (
       !this._provider ||
+      !this.tool ||
       !this.toolId ||
       !this.selectedVersion ||
       !this.selectedDescriptorType
@@ -168,7 +184,15 @@ export class ECCClientGa4ghTrsTool extends LitElement {
       return;
 
     try {
+      // Find the selected version object to get its URL
+      const version = this.tool.versions.find(
+        (v) => v.id === this.selectedVersion
+      );
+      if (!version) return;
+
+      // Use version.url for version-specific operations
       const files = await this._provider.getToolFiles(
+        version.url, // Use version URL
         this.toolId,
         this.selectedVersion,
         this.selectedDescriptorType
@@ -189,7 +213,13 @@ export class ECCClientGa4ghTrsTool extends LitElement {
   }
 
   private async handleVersionChange(e: CustomEvent): Promise<void> {
-    this.selectedVersion = e.detail.value;
+    const previousVersion = this.selectedVersion;
+    const newVersion = e.detail.value;
+
+    // Don't emit event if version hasn't actually changed
+    if (previousVersion === newVersion) return;
+
+    this.selectedVersion = newVersion;
 
     // Find the selected version object
     const version = this.tool?.versions.find(
@@ -209,6 +239,20 @@ export class ECCClientGa4ghTrsTool extends LitElement {
     // Clear file content cache when changing versions
     this.fileContents = {};
 
+    // Emit version change event
+    this.dispatchEvent(
+      new CustomEvent("ecc-tool-version-change", {
+        detail: {
+          previousVersion,
+          newVersion,
+          version: version || null,
+          toolId: this.toolId,
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
+
     // Reload tool files
     await this.loadToolFiles();
   }
@@ -221,6 +265,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
   private async viewFileContent(index: number): Promise<void> {
     if (
       !this._provider ||
+      !this.tool ||
       !this.toolId ||
       !this.selectedVersion ||
       !this.toolFiles[index]
@@ -239,12 +284,19 @@ export class ECCClientGa4ghTrsTool extends LitElement {
       [file.path]: "Loading file content...",
     };
 
+    // Find the selected version to get its URL
+    const version = this.tool.versions.find(
+      (v) => v.id === this.selectedVersion
+    );
+    if (!version) return;
+
     // Ensure UI updates with loading message
     this.requestUpdate();
 
     try {
       if (file.file_type === "PRIMARY_DESCRIPTOR") {
         const fileWrapper = await this._provider.getToolDescriptor(
+          version.url, // Use version URL
           this.toolId,
           this.selectedVersion,
           this.selectedDescriptorType
@@ -274,6 +326,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
       } else {
         // For secondary descriptors and other files, use the path-specific method
         const fileWrapper = await this._provider.getToolDescriptorByPath(
+          version.url, // Use version URL
           this.toolId,
           this.selectedVersion,
           this.selectedDescriptorType,
@@ -988,8 +1041,10 @@ export class ECCClientGa4ghTrsTool extends LitElement {
   }
 
   private handleSetActiveVersion(versionId: string) {
+    const previousVersion = this.selectedVersion;
+
     // Don't do anything if it's already the selected version
-    if (versionId === this.selectedVersion) return;
+    if (versionId === previousVersion) return;
 
     this.selectedVersion = versionId;
 
@@ -1010,6 +1065,20 @@ export class ECCClientGa4ghTrsTool extends LitElement {
 
     // Clear file content cache when changing versions
     this.fileContents = {};
+
+    // Emit version change event
+    this.dispatchEvent(
+      new CustomEvent("ecc-tool-version-change", {
+        detail: {
+          previousVersion,
+          newVersion: versionId,
+          version: version || null,
+          toolId: this.toolId,
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
 
     // Reload tool files
     this.loadToolFiles();

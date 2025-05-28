@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="icon"
+      href="../assets/logo-elixir-cloud-aai.svg"
+      type="image/x-icon"
+    />
+    <title>ecc-utils-design Multi-Select Demo</title>
+    <style>
+      .multi-select-container {
+        margin: 1rem 0;
+        max-width: 400px;
+        position: relative;
+      }
+
+      .section {
+        margin-bottom: 2rem;
+      }
+
+      .demo-output {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #f3f4f6;
+        border-radius: 0.375rem;
+        font-family: monospace;
+        font-size: 0.875rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-utils-design Multi-Select Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../../dist/components/multi-select/index.js";
+      import { html, render } from "lit";
+
+      // Example data for multi-select options
+      const fruits = [
+        { label: "Apple", value: "apple" },
+        { label: "Banana", value: "banana" },
+        { label: "Orange", value: "orange" },
+        { label: "Strawberry", value: "strawberry" },
+        { label: "Blueberry", value: "blueberry" },
+        { label: "Mango", value: "mango" },
+        { label: "Pineapple", value: "pineapple" },
+        { label: "Grapes", value: "grapes" },
+      ];
+
+      const technologies = [
+        { label: "JavaScript", value: "javascript" },
+        { label: "TypeScript", value: "typescript" },
+        { label: "Python", value: "python" },
+        { label: "Java", value: "java" },
+        { label: "C++", value: "cpp" },
+        { label: "Rust", value: "rust" },
+        { label: "Go", value: "go" },
+        { label: "Swift", value: "swift" },
+        { label: "Kotlin", value: "kotlin" },
+        { label: "PHP", value: "php" },
+      ];
+
+      const countries = [
+        { label: "United States", value: "us" },
+        { label: "United Kingdom", value: "uk" },
+        { label: "Canada", value: "ca" },
+        { label: "Australia", value: "au" },
+        { label: "Germany", value: "de" },
+        { label: "France", value: "fr" },
+        { label: "Japan", value: "jp" },
+        { label: "China", value: "cn" },
+        { label: "India", value: "in" },
+        { label: "Brazil", value: "br" },
+        { label: "Mexico", value: "mx" },
+        { label: "Spain", value: "es" },
+        { label: "Italy", value: "it" },
+        { label: "Netherlands", value: "nl" },
+        { label: "Sweden", value: "se" },
+      ];
+
+      const renderOptions = (options) =>
+        options.map(
+          (option) => html`
+            <ecc-utils-design-multi-select-item value=${option.value}>
+              ${option.label}
+            </ecc-utils-design-multi-select-item>
+          `
+        );
+
+      // State for demo outputs
+      let selectedFruits = [];
+      let selectedTechnologies = [];
+      let selectedCountries = [];
+      let preselectedValues = ["javascript", "typescript", "python"];
+
+      const updateOutput = (id, values) => {
+        const outputElement = document.getElementById(id);
+        if (outputElement) {
+          outputElement.textContent = `Selected: [${values.join(", ")}]`;
+        }
+      };
+
+      render(
+        html`
+          <div class="flex flex-col">
+            <!-- Basic Multi-Select -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Basic Multi-Select</h2>
+              <div class="multi-select-container">
+                <ecc-utils-design-multi-select
+                  placeholder="Select fruits..."
+                  @ecc-utils-change=${(e) => {
+                    selectedFruits = e.detail.value;
+                    updateOutput("fruits-output", selectedFruits);
+                    console.log("Selected fruits:", selectedFruits);
+                  }}
+                >
+                  <ecc-utils-design-multi-select-trigger>
+                  </ecc-utils-design-multi-select-trigger>
+
+                  <ecc-utils-design-multi-select-content>
+                    ${renderOptions(fruits)}
+                  </ecc-utils-design-multi-select-content>
+                </ecc-utils-design-multi-select>
+                <div id="fruits-output" class="demo-output">Selected: []</div>
+              </div>
+            </div>
+
+            <!-- With Label and Search -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">With Label</h2>
+              <div class="multi-select-container">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Programming Languages
+                </label>
+                <ecc-utils-design-multi-select
+                  placeholder="Select technologies..."
+                  @ecc-utils-change=${(e) => {
+                    selectedTechnologies = e.detail.value;
+                    updateOutput("technologies-output", selectedTechnologies);
+                    console.log("Selected technologies:", selectedTechnologies);
+                  }}
+                >
+                  <ecc-utils-design-multi-select-trigger>
+                  </ecc-utils-design-multi-select-trigger>
+
+                  <ecc-utils-design-multi-select-content>
+                    ${renderOptions(technologies)}
+                  </ecc-utils-design-multi-select-content>
+                </ecc-utils-design-multi-select>
+                <div id="technologies-output" class="demo-output">Selected: []</div>
+              </div>
+            </div>
+
+            <!-- With Preselected Values -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">With Preselected Values</h2>
+              <div class="multi-select-container">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Favorite Languages (Preselected)
+                </label>
+                <ecc-utils-design-multi-select
+                  .value=${preselectedValues}
+                  placeholder="Select languages..."
+                  @ecc-utils-change=${(e) => {
+                    preselectedValues = e.detail.value;
+                    updateOutput("preselected-output", preselectedValues);
+                    console.log("Selected preselected:", preselectedValues);
+                  }}
+                >
+                  <ecc-utils-design-multi-select-trigger>
+                  </ecc-utils-design-multi-select-trigger>
+
+                  <ecc-utils-design-multi-select-content>
+                    ${renderOptions(technologies)}
+                  </ecc-utils-design-multi-select-content>
+                </ecc-utils-design-multi-select>
+                <div id="preselected-output" class="demo-output">
+                  Selected: [${preselectedValues.join(", ")}]
+                </div>
+              </div>
+            </div>
+
+            <!-- Large Dataset with Search -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Large Dataset</h2>
+              <div class="multi-select-container">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Countries
+                </label>
+                <ecc-utils-design-multi-select
+                  placeholder="Select countries..."
+                  @ecc-utils-change=${(e) => {
+                    selectedCountries = e.detail.value;
+                    updateOutput("countries-output", selectedCountries);
+                    console.log("Selected countries:", selectedCountries);
+                  }}
+                >
+                  <ecc-utils-design-multi-select-trigger>
+                  </ecc-utils-design-multi-select-trigger>
+
+                  <ecc-utils-design-multi-select-content>
+                    ${renderOptions(countries)}
+                  </ecc-utils-design-multi-select-content>
+                </ecc-utils-design-multi-select>
+                <div id="countries-output" class="demo-output">Selected: []</div>
+              </div>
+            </div>
+
+            <!-- Disabled Multi-Select -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Disabled Multi-Select</h2>
+              <div class="multi-select-container">
+                <ecc-utils-design-multi-select
+                  disabled
+                  placeholder="Disabled multi-select..."
+                >
+                  <ecc-utils-design-multi-select-trigger disabled>
+                  </ecc-utils-design-multi-select-trigger>
+
+                  <ecc-utils-design-multi-select-content>
+                    ${renderOptions(fruits)}
+                  </ecc-utils-design-multi-select-content>
+                </ecc-utils-design-multi-select>
+              </div>
+            </div>
+
+            <!-- Custom Styling Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Custom Styling</h2>
+              <div class="multi-select-container">
+                <ecc-utils-design-multi-select
+                  placeholder="Custom styled multi-select..."
+                  style="--border-color: #3b82f6; --focus-ring-color: #3b82f6;"
+                >
+                  <ecc-utils-design-multi-select-trigger>
+                  </ecc-utils-design-multi-select-trigger>
+
+                  <ecc-utils-design-multi-select-content>
+                    ${renderOptions(fruits)}
+                  </ecc-utils-design-multi-select-content>
+                </ecc-utils-design-multi-select>
+              </div>
+            </div>
+
+            <!-- Usage Instructions -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Usage Instructions</h2>
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 class="font-medium text-blue-900 mb-2">Features:</h3>
+                <ul class="text-blue-800 text-sm space-y-1">
+                  <li>• Click to open/close the dropdown</li>
+                  <li>• Multiple selection with checkboxes</li>
+                  <li>• Selected items displayed as badges</li>
+                  <li>• Individual item removal with × button</li>
+                  <li>• Clear all selections with the clear button</li>
+                  <li>• Keyboard navigation support</li>
+                  <li>• Disabled state support</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Code Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Code Example</h2>
+              <div class="bg-gray-100 border rounded-lg p-4">
+                <pre
+                  class="text-sm overflow-x-auto"
+                ><code>&lt;ecc-utils-design-multi-select
+  placeholder="Select options..."
+  @ecc-utils-change="\${(e) => console.log(e.detail.value)}"
+&gt;
+  &lt;ecc-utils-design-multi-select-trigger&gt;
+  &lt;/ecc-utils-design-multi-select-trigger&gt;
+
+  &lt;ecc-utils-design-multi-select-content&gt;
+    &lt;ecc-utils-design-multi-select-item value="option1"&gt;
+      Option 1
+    &lt;/ecc-utils-design-multi-select-item&gt;
+    &lt;ecc-utils-design-multi-select-item value="option2"&gt;
+      Option 2
+    &lt;/ecc-utils-design-multi-select-item&gt;
+  &lt;/ecc-utils-design-multi-select-content&gt;
+&lt;/ecc-utils-design-multi-select&gt;</code></pre>
+              </div>
+            </div>
+          </div>
+        `,
+        document.getElementById("demo")
+      );
+
+      // Initialize outputs after render
+      setTimeout(() => {
+        updateOutput("preselected-output", preselectedValues);
+      }, 100);
+    </script>
+  </body>
+</html> 

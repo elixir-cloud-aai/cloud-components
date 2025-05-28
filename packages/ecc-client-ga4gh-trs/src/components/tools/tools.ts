@@ -8,7 +8,7 @@ import {
   ToolClass,
   DescriptorType,
 } from "../../providers/trs-provider.js";
-import { RestTrsProvider } from "../../API/rest-trs-provider.js";
+import { RestTrsProvider } from "../../providers/rest-trs-provider.js";
 import "@elixir-cloud/design/components/table/index.js";
 import "@elixir-cloud/design/components/button/index.js";
 import "@elixir-cloud/design/components/input/index.js";
@@ -99,7 +99,6 @@ export class ECCClientGa4ghTrsTools extends LitElement {
   }
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
-    console.log("changedProperties", changedProperties);
     if (changedProperties.has("pageSize")) {
       this.loadData();
     }
@@ -146,8 +145,8 @@ export class ECCClientGa4ghTrsTools extends LitElement {
       // No conversion needed here, the name is already stored in filterParams.toolClass
 
       const tools = await this._provider.getToolsList(
-        this.pageSize,
-        offset,
+        this.pageSize < 0 ? 0 : this.pageSize,
+        offset < 0 ? 0 : offset,
         apiFilterParams,
         this.searchQuery
       );
@@ -172,7 +171,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
       // Update UI based on returned items
       if (this.tools.length === 0 && this.currentPage > 1) {
         // If we get no results and we're not on the first page, go back a page
-        this.currentPage -= this.currentPage;
+        this.currentPage -= 1;
         this.loadData();
       }
     } catch (err) {
@@ -646,7 +645,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
                         </ecc-utils-design-button>
                         ${tool.description
                           ? html`<div
-                              class="part:text-xs part:text-muted-foreground part:line-clamp-3 part:break-all part:whitespace-normal part:overflow-hidden part:max-w-full"
+                              class="text-xs text-muted-foreground line-clamp-3 break-all whitespace-normal overflow-hidden max-w-full"
                             >
                               ${tool.description}
                             </div>`

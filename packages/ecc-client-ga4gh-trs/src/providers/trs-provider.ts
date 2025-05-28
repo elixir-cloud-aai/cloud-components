@@ -118,28 +118,40 @@ export interface TrsProvider {
   ): Promise<Tool[]>;
 
   // Detail view methods
-  getTool(id: string): Promise<Tool>;
-  getToolVersions(id: string): Promise<ToolVersion[]>;
-  getToolVersion(id: string, versionId: string): Promise<ToolVersion>;
+  getTool(url: string, id: string): Promise<Tool>;
+  getToolVersions(url: string, id: string): Promise<ToolVersion[]>;
+  getToolVersion(
+    url: string,
+    id: string,
+    versionId: string
+  ): Promise<ToolVersion>;
   getToolFiles(
+    url: string,
     id: string,
     version: string,
     descriptorType: DescriptorType,
     format?: "zip"
   ): Promise<ToolFile[]>;
   getToolDescriptor(
+    url: string,
     id: string,
     version: string,
     descriptorType: DescriptorType
   ): Promise<FileWrapper>;
   getToolDescriptorByPath(
+    url: string,
     id: string,
     version: string,
     descriptorType: DescriptorType,
     path: string
   ): Promise<FileWrapper>;
-  getContainerfile(id: string, version: string): Promise<FileWrapper[]>;
+  getContainerfile(
+    url: string,
+    id: string,
+    version: string
+  ): Promise<FileWrapper[]>;
   getToolTests(
+    url: string,
     id: string,
     version: string,
     descriptorType: DescriptorType
