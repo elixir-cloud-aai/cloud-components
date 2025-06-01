@@ -6,7 +6,7 @@ import {
   ServiceRegistryProvider,
   ExternalService,
 } from "../../providers/sr-provider.js";
-import { RestServiceRegistryProvider } from "../../API/rest-sr-provider.js";
+import { RestServiceRegistryProvider } from "../../providers/rest-sr-provider.js";
 import "@elixir-cloud/design/components/table/index.js";
 import "@elixir-cloud/design/components/button/index.js";
 import "@elixir-cloud/design/components/badge/index.js";
@@ -45,7 +45,6 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
   @state() private service: ExternalService | null = null;
   @state() private loading = false;
   @state() private error: string | null = null;
-  @state() private activeTab = 0;
 
   private _provider: ServiceRegistryProvider | null = null;
 
@@ -53,6 +52,11 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
     if (!this.baseUrl && !this.provider) {
       this.error =
         "Please provide either a base URL for the Service Registry API or a custom provider.";
+      return;
+    }
+
+    if (!this.serviceId) {
+      this.error = "Please provide a service ID.";
       return;
     }
 
@@ -113,11 +117,7 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
     }
   }
 
-  private handleTabChange(index: number): void {
-    this.activeTab = index;
-  }
-
-  private formatDate(dateString?: string): string {
+  private static formatDate(dateString?: string): string {
     if (!dateString) return "Not specified";
     try {
       const date = new Date(dateString);
@@ -127,7 +127,7 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
     }
   }
 
-  private getTypeVariant(
+  private static getTypeVariant(
     group: string
   ): "default" | "secondary" | "destructive" | "outline" {
     if (group.includes("ga4gh") || group.includes("elixir")) {
@@ -136,238 +136,386 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
     return "default";
   }
 
-  private renderOverview() {
+  private renderServiceHeader() {
     if (!this.service) return html``;
 
-    const {
-      id,
-      name,
-      description,
-      version,
-      organization,
-      contactUrl,
-      documentationUrl,
-      createdAt,
-      updatedAt,
-      environment,
-    } = this.service;
-
     return html`
-      <div class="space-y-6">
-        <div>
-          <h2 class="text-xl font-semibold mb-2">Service Information</h2>
-          <ecc-card>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p class="text-sm font-medium text-gray-500">ID</p>
-                <p>${id}</p>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-500">Name</p>
-                <p>${name}</p>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-500">Version</p>
-                <p>${version}</p>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-500">Environment</p>
-                <p>${environment || "Not specified"}</p>
-              </div>
-              <div class="col-span-1 md:col-span-2">
-                <p class="text-sm font-medium text-gray-500">Description</p>
-                <p>${description || "No description provided"}</p>
-              </div>
-            </div>
-          </ecc-card>
-        </div>
-
-        <div>
-          <h2 class="text-xl font-semibold mb-2">Organization</h2>
-          <ecc-card>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p class="text-sm font-medium text-gray-500">Name</p>
-                <p>${organization.name}</p>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-500">Website</p>
-                <a
-                  href="${organization.url}"
-                  target="_blank"
-                  class="text-blue-600 hover:underline"
-                >
-                  ${organization.url}
-                </a>
-              </div>
-            </div>
-          </ecc-card>
-        </div>
-
-        <div>
-          <h2 class="text-xl font-semibold mb-2">Additional Information</h2>
-          <ecc-card>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              ${contactUrl
-                ? html`
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">Contact</p>
-                      <a
-                        href="${contactUrl}"
-                        target="_blank"
-                        class="text-blue-600 hover:underline"
-                      >
-                        ${contactUrl}
-                      </a>
-                    </div>
-                  `
+      <div class="mb-6">
+        <div class="w-full flex flex-col gap-2">
+          <div
+            class="flex flex-col md:flex-row md:items-center gap-2 justify-between"
+          >
+            <div class="flex flex-col md:flex-row md:items-center gap-2">
+              <h2 class="text-xl truncate">
+                ${this.service.name || this.service.id}
+              </h2>
+              ${this.service.version
+                ? html`<ecc-utils-design-badge variant="outline">
+                    v${this.service.version}
+                  </ecc-utils-design-badge>`
                 : ""}
-              ${documentationUrl
-                ? html`
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">
-                        Documentation
-                      </p>
-                      <a
-                        href="${documentationUrl}"
-                        target="_blank"
-                        class="text-blue-600 hover:underline"
-                      >
-                        ${documentationUrl}
-                      </a>
-                    </div>
-                  `
-                : ""}
-              <div>
-                <p class="text-sm font-medium text-gray-500">Created</p>
-                <p>${this.formatDate(createdAt)}</p>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-500">Last Updated</p>
-                <p>${this.formatDate(updatedAt)}</p>
-              </div>
             </div>
-          </ecc-card>
+            ${this.service.contactUrl
+              ? html`
+                  <a
+                    href="${this.service.contactUrl}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-primary hover:text-primary/80 flex items-center gap-1"
+                    title="Contact"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-mail-icon lucide-mail"
+                    >
+                      <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" />
+                      <rect x="2" y="4" width="20" height="16" rx="2" />
+                    </svg>
+                  </a>
+                `
+              : ""}
+          </div>
+
+          <div class="flex flex-wrap gap-2 items-center">
+            <ecc-utils-design-badge
+              variant=${ECCClientGa4ghServiceRegistryService.getTypeVariant(
+                this.service.type.group
+              )}
+            >
+              ${this.service.type.artifact}@${this.service.type.version}
+            </ecc-utils-design-badge>
+            ${this.service.environment
+              ? html`<ecc-utils-design-badge variant="outline">
+                  ${this.service.environment}
+                </ecc-utils-design-badge>`
+              : ""}
+          </div>
         </div>
       </div>
     `;
   }
 
-  private renderTypeInfo() {
-    if (!this.service || !this.service.type) return html``;
+  private renderServiceContent() {
+    if (!this.service) return html``;
 
     const { type } = this.service;
 
     return html`
-      <div class="space-y-6">
-        <div>
-          <h2 class="text-xl font-semibold mb-2">Service Type</h2>
-          <ecc-card>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="mt-4">
+        <div class="flex flex-col gap-4 text-sm">
+          <!-- Service Information Section -->
+          <div class="flex flex-col gap-2">
+            <div class="font-bold text-base">Service Information</div>
+            <div class="flex flex-col gap-3">
+              ${this.service.description
+                ? html`
+                    <div>
+                      ${this.service.description
+                        .split("\n")
+                        .map((line) => html`<p>${line}</p>`)}
+                    </div>
+                  `
+                : ""}
               <div>
-                <p class="text-sm font-medium text-gray-500">Group</p>
-                <p>
-                  <ecc-badge variant=${this.getTypeVariant(type.group)}>
-                    ${type.group}
-                  </ecc-badge>
-                </p>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-500">Artifact</p>
-                <p>${type.artifact}</p>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-gray-500">Version</p>
-                <p>${type.version}</p>
+                <dl class="flex flex-col gap-2">
+                  <div class="flex flex-row gap-2 w-full justify-between">
+                    <dt class="text-muted-foreground">ID</dt>
+                    <dd class="font-mono">${this.service.id}</dd>
+                  </div>
+                  <ecc-utils-design-separator></ecc-utils-design-separator>
+                  <div class="flex flex-row gap-2 w-full justify-between">
+                    <dt class="text-muted-foreground">Version</dt>
+                    <dd>${this.service.version || "Not specified"}</dd>
+                  </div>
+                  <ecc-utils-design-separator></ecc-utils-design-separator>
+                  <div class="flex flex-row gap-2 w-full justify-between">
+                    <dt class="text-muted-foreground">Organization</dt>
+                    <dd>
+                      ${this.service.organization.url
+                        ? html`
+                            <a
+                              href="${this.service.organization.url}"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="text-primary hover:underline flex items-center gap-1"
+                            >
+                              ${this.service.organization.name}
+                              <svg
+                                class="w-3.5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              >
+                                <path d="M13 5H19V11" />
+                                <path d="M19 5L5 19" />
+                              </svg>
+                            </a>
+                          `
+                        : html`${this.service.organization.name}`}
+                    </dd>
+                  </div>
+                  <ecc-utils-design-separator></ecc-utils-design-separator>
+                  <div class="flex flex-row gap-2 w-full justify-between">
+                    <dt class="text-muted-foreground">Environment</dt>
+                    <dd>${this.service.environment || "Not specified"}</dd>
+                  </div>
+                  <ecc-utils-design-separator></ecc-utils-design-separator>
+                  <div class="flex flex-row gap-2 w-full justify-between">
+                    <dt class="text-muted-foreground">Service URL</dt>
+                    <dd>
+                      <a
+                        href="${this.service.url}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-primary hover:underline break-all"
+                      >
+                        ${this.service.url}
+                      </a>
+                    </dd>
+                  </div>
+                </dl>
               </div>
             </div>
-          </ecc-card>
-        </div>
+          </div>
 
-        <div>
-          <h2 class="text-xl font-semibold mb-2">Service URL</h2>
-          <ecc-card>
-            <div>
-              <p class="text-sm font-medium text-gray-500">Endpoint URL</p>
-              <a
-                href="${this.service.url}"
-                target="_blank"
-                class="text-blue-600 hover:underline"
-              >
-                ${this.service.url}
-              </a>
-              <p class="text-sm text-gray-500 mt-2">
-                This is the base URL for all API endpoints of this service.
-              </p>
+          <ecc-utils-design-separator></ecc-utils-design-separator>
+
+          <!-- Service Type Section -->
+          <div class="flex flex-col gap-2">
+            <div class="font-bold text-base">Service Type</div>
+            <div class="flex flex-col gap-3">
+              <div>
+                <dl class="flex flex-col gap-2">
+                  <div class="flex flex-row gap-2 w-full justify-between">
+                    <dt class="text-muted-foreground">Group</dt>
+                    <dd>
+                      <ecc-utils-design-badge
+                        variant=${ECCClientGa4ghServiceRegistryService.getTypeVariant(
+                          type.group
+                        )}
+                      >
+                        ${type.group}
+                      </ecc-utils-design-badge>
+                    </dd>
+                  </div>
+                  <ecc-utils-design-separator></ecc-utils-design-separator>
+                  <div class="flex flex-row gap-2 w-full justify-between">
+                    <dt class="text-muted-foreground">Artifact</dt>
+                    <dd>${type.artifact}</dd>
+                  </div>
+                  <ecc-utils-design-separator></ecc-utils-design-separator>
+                  <div class="flex flex-row gap-2 w-full justify-between">
+                    <dt class="text-muted-foreground">Type Version</dt>
+                    <dd>${type.version}</dd>
+                  </div>
+                </dl>
+              </div>
             </div>
-          </ecc-card>
+          </div>
+
+          <ecc-utils-design-separator></ecc-utils-design-separator>
+
+          <!-- Additional Information Section -->
+          ${this.service.documentationUrl ||
+          this.service.createdAt ||
+          this.service.updatedAt
+            ? html`
+                <ecc-utils-design-separator></ecc-utils-design-separator>
+                <div class="flex flex-col gap-2">
+                  <div class="font-bold text-base">Additional Information</div>
+                  <div>
+                    <dl class="flex flex-col gap-2">
+                      ${this.service.documentationUrl
+                        ? html`
+                            <div
+                              class="flex flex-row gap-2 w-full justify-between"
+                            >
+                              <dt class="text-muted-foreground">
+                                Documentation
+                              </dt>
+                              <dd>
+                                <a
+                                  href="${this.service.documentationUrl}"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  class="text-primary hover:underline break-all"
+                                >
+                                  ${this.service.documentationUrl}
+                                </a>
+                              </dd>
+                            </div>
+                            <ecc-utils-design-separator></ecc-utils-design-separator>
+                          `
+                        : ""}
+                      ${this.service.createdAt
+                        ? html`
+                            <div
+                              class="flex flex-row gap-2 w-full justify-between"
+                            >
+                              <dt class="text-muted-foreground">Created</dt>
+                              <dd>
+                                ${ECCClientGa4ghServiceRegistryService.formatDate(
+                                  this.service.createdAt
+                                )}
+                              </dd>
+                            </div>
+                            <ecc-utils-design-separator></ecc-utils-design-separator>
+                          `
+                        : ""}
+                      ${this.service.updatedAt
+                        ? html`
+                            <div
+                              class="flex flex-row gap-2 w-full justify-between"
+                            >
+                              <dt class="text-muted-foreground">
+                                Last Updated
+                              </dt>
+                              <dd>
+                                ${ECCClientGa4ghServiceRegistryService.formatDate(
+                                  this.service.updatedAt
+                                )}
+                              </dd>
+                            </div>
+                          `
+                        : ""}
+                    </dl>
+                  </div>
+                </div>
+              `
+            : ""}
         </div>
       </div>
     `;
   }
 
-  private renderSkeleton() {
+  static renderLoading() {
     return html`
       <div class="space-y-6">
-        <ecc-skeleton-row style="height: 2rem;"></ecc-skeleton-row>
-        <ecc-skeleton-row style="height: 10rem;"></ecc-skeleton-row>
-        <ecc-skeleton-row style="height: 2rem;"></ecc-skeleton-row>
-        <ecc-skeleton-row style="height: 6rem;"></ecc-skeleton-row>
-        <ecc-skeleton-row style="height: 2rem;"></ecc-skeleton-row>
-        <ecc-skeleton-row style="height: 8rem;"></ecc-skeleton-row>
+        <!-- Service header skeleton -->
+        <div class="mb-6">
+          <div class="flex flex-col gap-2">
+            <div class="flex flex-col md:flex-row md:items-center gap-2">
+              <ecc-utils-design-skeleton
+                class="part:h-10 part:w-64"
+              ></ecc-utils-design-skeleton>
+              <ecc-utils-design-skeleton
+                class="part:h-6 part:w-20"
+              ></ecc-utils-design-skeleton>
+            </div>
+            <div class="flex flex-wrap gap-2 mt-2">
+              <ecc-utils-design-skeleton
+                class="part:h-6 part:w-32"
+              ></ecc-utils-design-skeleton>
+              <ecc-utils-design-skeleton
+                class="part:h-6 part:w-20"
+              ></ecc-utils-design-skeleton>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content skeleton -->
+        <div class="mt-4">
+          <div class="flex flex-col gap-4">
+            <div>
+              <ecc-utils-design-skeleton
+                class="part:h-6 part:w-48 part:mb-3"
+              ></ecc-utils-design-skeleton>
+              <div class="flex flex-col gap-3">
+                <ecc-utils-design-skeleton
+                  class="part:h-4 part:w-full"
+                ></ecc-utils-design-skeleton>
+                <ecc-utils-design-skeleton
+                  class="part:h-4 part:w-full"
+                ></ecc-utils-design-skeleton>
+                <ecc-utils-design-skeleton
+                  class="part:h-4 part:w-3/4"
+                ></ecc-utils-design-skeleton>
+              </div>
+            </div>
+
+            <ecc-utils-design-separator></ecc-utils-design-separator>
+
+            <div>
+              <ecc-utils-design-skeleton
+                class="part:h-6 part:w-32 part:mb-3"
+              ></ecc-utils-design-skeleton>
+              <div class="flex flex-col gap-2">
+                <div class="flex justify-between">
+                  <ecc-utils-design-skeleton
+                    class="part:h-4 part:w-24"
+                  ></ecc-utils-design-skeleton>
+                  <ecc-utils-design-skeleton
+                    class="part:h-4 part:w-32"
+                  ></ecc-utils-design-skeleton>
+                </div>
+                <ecc-utils-design-separator></ecc-utils-design-separator>
+                <div class="flex justify-between">
+                  <ecc-utils-design-skeleton
+                    class="part:h-4 part:w-20"
+                  ></ecc-utils-design-skeleton>
+                  <ecc-utils-design-skeleton
+                    class="part:h-4 part:w-40"
+                  ></ecc-utils-design-skeleton>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     `;
   }
 
   render() {
-    return html`
-      <div class="w-full">
-        ${this.error
-          ? html`<div class="p-4 mb-4 text-red-700 bg-red-100 rounded">
-              ${this.error}
-            </div>`
-          : ""}
-        ${this.loading
-          ? this.renderSkeleton()
-          : this.service
-          ? html`
-              <div class="mb-6">
-                <h1 class="text-2xl font-bold">${this.service.name}</h1>
-                <p class="text-gray-500">
-                  ${this.service.description || "No description provided"}
-                </p>
-              </div>
+    if (!this.baseUrl && !this.provider) {
+      return html`
+        <div
+          class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+        >
+          Please provide either a base URL for the Service Registry API or a
+          custom provider.
+        </div>
+      `;
+    }
 
-              <ecc-tabs>
-                <ecc-tabs-list>
-                  <ecc-tabs-trigger
-                    ?selected=${this.activeTab === 0}
-                    @click=${() => this.handleTabChange(0)}
-                  >
-                    Overview
-                  </ecc-tabs-trigger>
-                  <ecc-tabs-trigger
-                    ?selected=${this.activeTab === 1}
-                    @click=${() => this.handleTabChange(1)}
-                  >
-                    Type & URL
-                  </ecc-tabs-trigger>
-                </ecc-tabs-list>
-                <ecc-separator />
-                <div class="py-4">
-                  ${this.activeTab === 0
-                    ? this.renderOverview()
-                    : this.activeTab === 1
-                    ? this.renderTypeInfo()
-                    : ""}
-                </div>
-              </ecc-tabs>
-            `
-          : html`
-              <div class="p-4 text-center text-gray-600">
-                No service found with ID: ${this.serviceId}
-              </div>
-            `}
+    if (!this.serviceId) {
+      return html`
+        <div
+          class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+        >
+          Please provide a service ID.
+        </div>
+      `;
+    }
+
+    if (this.error) {
+      return html`
+        <div
+          class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+        >
+          ${this.error}
+        </div>
+      `;
+    }
+
+    if (this.loading || !this.service) {
+      return ECCClientGa4ghServiceRegistryService.renderLoading();
+    }
+
+    return html`
+      <div class="space-y-4">
+        ${this.renderServiceHeader()} ${this.renderServiceContent()}
       </div>
     `;
   }

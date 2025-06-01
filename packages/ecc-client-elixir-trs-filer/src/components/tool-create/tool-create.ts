@@ -33,6 +33,16 @@ type FileType =
   | "CONTAINERFILE"
   | "OTHER";
 
+// Add UI file type that includes container image types for better UX
+type UIFileType =
+  | "TEST_FILE"
+  | "PRIMARY_DESCRIPTOR"
+  | "SECONDARY_DESCRIPTOR"
+  | "Docker"
+  | "Singularity"
+  | "Conda"
+  | "OTHER";
+
 /**
  * @summary Component for creating new tools in TRS-Filer
  * @since 2.0.0
@@ -108,11 +118,13 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
     files: {
       path: string;
       fileType: FileType;
+      uiFileType: UIFileType;
       content?: string;
       file?: File;
       checksumType: string;
       checksumValue: string;
       descriptorType?: DescriptorType;
+      containerImageType?: ImageType;
     }[];
     images: ImageDataRegister[];
     customVersionId: string;
@@ -274,6 +286,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
     updatedVersions[versionIndex].files.push({
       path: "",
       fileType: "PRIMARY_DESCRIPTOR",
+      uiFileType: "PRIMARY_DESCRIPTOR",
       content: "",
       checksumType: "sha256",
       checksumValue: "",
@@ -345,14 +358,28 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
 
       // Process each file
       Array.from(files).forEach((file) => {
+        const defaultFileType = ECCClientElixirTrsToolCreate.getDefaultFileType(
+          file.name
+        );
+        const uiFileType = ECCClientElixirTrsToolCreate.getUIFileType(
+          file.name,
+          defaultFileType
+        );
+        const containerImageType =
+          defaultFileType === "CONTAINERFILE"
+            ? ECCClientElixirTrsToolCreate.getContainerImageType(file.name)
+            : undefined;
+
         const fileData = {
           path: file.name,
-          fileType: ECCClientElixirTrsToolCreate.getDefaultFileType(file.name),
+          fileType: defaultFileType,
+          uiFileType,
           content: "",
           file,
           checksumType: "sha256",
           checksumValue: "",
           descriptorType,
+          containerImageType,
         };
 
         // Add to files array
@@ -511,14 +538,27 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
         content = btoa(String.fromCharCode(...uint8Array));
       }
 
+      const defaultFileType =
+        ECCClientElixirTrsToolCreate.getDefaultFileType(relativePath);
+      const uiFileType = ECCClientElixirTrsToolCreate.getUIFileType(
+        relativePath,
+        defaultFileType
+      );
+      const containerImageType =
+        defaultFileType === "CONTAINERFILE"
+          ? ECCClientElixirTrsToolCreate.getContainerImageType(relativePath)
+          : undefined;
+
       const fileData = {
         path: relativePath,
-        fileType: ECCClientElixirTrsToolCreate.getDefaultFileType(relativePath),
+        fileType: defaultFileType,
+        uiFileType,
         content,
         file: undefined, // No actual File object for extracted files
         checksumType: "sha256",
         checksumValue: "",
         descriptorType: undefined, // Will be set by the calling method
+        containerImageType,
       };
 
       return fileData;
@@ -771,7 +811,8 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
                   },
                   type:
                     file.fileType === "CONTAINERFILE"
-                      ? ECCClientElixirTrsToolCreate.getContainerImageType(
+                      ? file.containerImageType ||
+                        ECCClientElixirTrsToolCreate.getContainerImageType(
                           file.path
                         )
                       : file.descriptorType ||
@@ -1537,9 +1578,9 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
                 >
                   <span class="truncate">
                     ${file.path || `File ${originalIndex + 1}`}
-                    ${file.descriptorType
+                    ${file.uiFileType
                       ? html`<span class="text-xs text-muted-foreground ml-1"
-                          >(${file.descriptorType})</span
+                          >(${file.uiFileType})</span
                         >`
                       : ""}
                   </span>
@@ -1591,13 +1632,14 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
       `;
     }
 
-    const fileTypes: { value: FileType; label: string }[] = [
-      { value: "PRIMARY_DESCRIPTOR", label: "Primary Descriptor" },
-      { value: "SECONDARY_DESCRIPTOR", label: "Secondary Descriptor" },
-      { value: "TEST_FILE", label: "Test File" },
-      { value: "CONTAINERFILE", label: "Container File" },
-      { value: "OTHER", label: "Other" },
-    ];
+    // Check if any other file in this version has PRIMARY_DESCRIPTOR selected
+    // but only for the same descriptor type (since different descriptor types can have their own PRIMARY_DESCRIPTOR)
+    const otherFileHasPrimaryDescriptor = files.some(
+      (file, index) =>
+        index !== activeIndex &&
+        file.uiFileType === "PRIMARY_DESCRIPTOR" &&
+        file.descriptorType === activeFile.descriptorType
+    );
 
     const checksumTypes = ["sha256", "sha1", "md5"];
 
@@ -1624,27 +1666,92 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
           <div>
             <ecc-utils-design-label>File Type</ecc-utils-design-label>
             <ecc-utils-design-select
-              .value=${activeFile.fileType}
+              .value=${activeFile.uiFileType}
               @ecc-utils-change=${(e: CustomEvent) => {
+                const newUIFileType = e.detail.value as UIFileType;
+                const newFileType =
+                  ECCClientElixirTrsToolCreate.convertUIFileTypeToFileType(
+                    newUIFileType
+                  );
+                const newContainerImageType =
+                  ECCClientElixirTrsToolCreate.convertUIFileTypeToImageType(
+                    newUIFileType
+                  );
+
+                // Update multiple fields at once
+                this.handleFileFieldChange(
+                  versionIndex,
+                  activeIndex,
+                  "uiFileType",
+                  newUIFileType
+                );
                 this.handleFileFieldChange(
                   versionIndex,
                   activeIndex,
                   "fileType",
-                  e.detail.value
+                  newFileType
                 );
+                if (newContainerImageType) {
+                  this.handleFileFieldChange(
+                    versionIndex,
+                    activeIndex,
+                    "containerImageType",
+                    newContainerImageType
+                  );
+                } else {
+                  this.handleFileFieldChange(
+                    versionIndex,
+                    activeIndex,
+                    "containerImageType",
+                    undefined
+                  );
+                }
               }}
             >
               <ecc-utils-design-select-trigger>
                 <ecc-utils-design-select-value></ecc-utils-design-select-value>
               </ecc-utils-design-select-trigger>
               <ecc-utils-design-select-content>
-                ${fileTypes.map(
-                  (type) => html`
-                    <ecc-utils-design-select-item value=${type.value}>
-                      ${type.label}
-                    </ecc-utils-design-select-item>
-                  `
-                )}
+                <!-- Source Files Group -->
+                <ecc-utils-design-select-group>
+                  <ecc-utils-design-select-label
+                    >Source file</ecc-utils-design-select-label
+                  >
+                  <ecc-utils-design-select-item
+                    value="PRIMARY_DESCRIPTOR"
+                    .disabled=${otherFileHasPrimaryDescriptor &&
+                    activeFile.uiFileType !== "PRIMARY_DESCRIPTOR"}
+                  >
+                    Primary Descriptor
+                  </ecc-utils-design-select-item>
+                  <ecc-utils-design-select-item value="SECONDARY_DESCRIPTOR">
+                    Secondary Descriptor
+                  </ecc-utils-design-select-item>
+                  <ecc-utils-design-select-item value="TEST_FILE">
+                    Test File
+                  </ecc-utils-design-select-item>
+                  <ecc-utils-design-select-item value="OTHER">
+                    Other
+                  </ecc-utils-design-select-item>
+                </ecc-utils-design-select-group>
+
+                <ecc-utils-design-select-separator></ecc-utils-design-select-separator>
+
+                <!-- Image Files Group -->
+                <ecc-utils-design-select-group>
+                  <ecc-utils-design-select-label
+                    >Image file</ecc-utils-design-select-label
+                  >
+                  <ecc-utils-design-select-item value="Docker">
+                    Docker
+                  </ecc-utils-design-select-item>
+                  <ecc-utils-design-select-item value="Singularity">
+                    Singularity
+                  </ecc-utils-design-select-item>
+                  <ecc-utils-design-select-item value="Conda">
+                    Conda
+                  </ecc-utils-design-select-item>
+                </ecc-utils-design-select-group>
               </ecc-utils-design-select-content>
             </ecc-utils-design-select>
           </div>
@@ -1748,6 +1855,37 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
       signed: tags.includes("signed"),
     };
     this.versions = updatedVersions;
+  }
+
+  static getUIFileType(filename: string, fileType: FileType): UIFileType {
+    if (fileType === "CONTAINERFILE") {
+      return ECCClientElixirTrsToolCreate.getContainerImageType(filename);
+    }
+    return fileType as UIFileType;
+  }
+
+  static convertUIFileTypeToFileType(uiFileType: UIFileType): FileType {
+    if (
+      uiFileType === "Docker" ||
+      uiFileType === "Singularity" ||
+      uiFileType === "Conda"
+    ) {
+      return "CONTAINERFILE";
+    }
+    return uiFileType as FileType;
+  }
+
+  static convertUIFileTypeToImageType(
+    uiFileType: UIFileType
+  ): ImageType | undefined {
+    if (
+      uiFileType === "Docker" ||
+      uiFileType === "Singularity" ||
+      uiFileType === "Conda"
+    ) {
+      return uiFileType as ImageType;
+    }
+    return undefined;
   }
 
   render() {

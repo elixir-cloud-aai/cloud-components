@@ -1,6 +1,6 @@
 {
-  "name": "@elixir-cloud/service-registry",
-  "description": "Web Component for interacting with GA4GH Service Registry Standard",
+  "name": "@elixir-cloud/cloud-registry",
+  "description": "Web Component for interacting with Elixir Cloud Registry",
   "license": "Apache-2.0",
   "version": "2.0.0-alpha.6",
   "type": "module",
@@ -35,8 +35,8 @@
   "scripts": {
     "analyze": "cem analyze --litelement",
     "build:tailwind": "node ../../scripts/tailwind/index.js",
-    "build": "node ../../scripts/tailwind/index.js && node ../../scripts/build.js -p ecc-client-ga4gh-service-registry-",
-    "dev": "concurrently -r \"node ../../scripts/tailwind/index.js --watch\" \"node ../../scripts/build.js -p ecc-client-ga4gh-service-registry- --watch\" \"wds\"",
+    "build": "node ../../scripts/tailwind/index.js && node ../../scripts/build.js -p ecc-client-elixir-cloud-registry-",
+    "dev": "concurrently -r \"node ../../scripts/tailwind/index.js --watch\" \"node ../../scripts/build.js -p ecc-client-elixir-cloud-registry- --watch\" \"wds\"",
     "clean": "rm -rf dist node_modules custom-elements-manifest.config.js src/output.css src/tailwind.ts",
     "test": "wtr --coverage",
     "test:watch": "wtr --watch",
@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "@lit/react": "^1.0.2",
+    "@elixir-cloud/service-registry": "*",
     "@elixir-cloud/design": "*",
     "lit": "^2.8.0"
   },

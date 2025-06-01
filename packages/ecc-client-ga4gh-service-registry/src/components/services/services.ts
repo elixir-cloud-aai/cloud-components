@@ -7,7 +7,7 @@ import {
   ExternalService,
   ServiceType,
 } from "../../providers/sr-provider.js";
-import { RestServiceRegistryProvider } from "../../API/rest-sr-provider.js";
+import { RestServiceRegistryProvider } from "../../providers/rest-sr-provider.js";
 import "@elixir-cloud/design/components/table/index.js";
 import "@elixir-cloud/design/components/button/index.js";
 import "@elixir-cloud/design/components/input/index.js";
@@ -183,17 +183,48 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     );
   }
 
-  private renderSkeletonRows() {
+  private static renderSkeletonRows() {
     return html`
-      <ecc-skeleton-row style="height: 2.5rem;"></ecc-skeleton-row>
-      <ecc-skeleton-row style="height: 2.5rem;"></ecc-skeleton-row>
-      <ecc-skeleton-row style="height: 2.5rem;"></ecc-skeleton-row>
-      <ecc-skeleton-row style="height: 2.5rem;"></ecc-skeleton-row>
-      <ecc-skeleton-row style="height: 2.5rem;"></ecc-skeleton-row>
+      ${Array(5)
+        .fill(0)
+        .map(
+          () => html`
+            <ecc-utils-design-table-row>
+              <ecc-utils-design-table-cell class="w-7/12">
+                <div class="flex flex-col w-full gap-2">
+                  <ecc-utils-design-skeleton
+                    class="part:h-5 part:w-40"
+                  ></ecc-utils-design-skeleton>
+                  <ecc-utils-design-skeleton
+                    class="part:h-3 part:w-full"
+                  ></ecc-utils-design-skeleton>
+                  <ecc-utils-design-skeleton
+                    class="part:h-3 part:w-4/5"
+                  ></ecc-utils-design-skeleton>
+                </div>
+              </ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-2/12">
+                <ecc-utils-design-skeleton
+                  class="part:h-6 part:w-24 part:rounded-full"
+                ></ecc-utils-design-skeleton>
+              </ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-2/12">
+                <ecc-utils-design-skeleton
+                  class="part:h-4 part:w-28"
+                ></ecc-utils-design-skeleton>
+              </ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-1/12">
+                <ecc-utils-design-skeleton
+                  class="part:h-8 part:w-8 part:rounded"
+                ></ecc-utils-design-skeleton>
+              </ecc-utils-design-table-cell>
+            </ecc-utils-design-table-row>
+          `
+        )}
     `;
   }
 
-  private getServiceTypeVariant(
+  private static getServiceTypeVariant(
     type: ServiceType
   ): "default" | "secondary" | "destructive" | "outline" {
     // Default variation based on service type
@@ -205,75 +236,126 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
 
   render() {
     return html`
-      <div class="w-full">
+      <div class="flex flex-col gap-4">
         ${this.error
-          ? html`<div class="p-4 mb-4 text-red-700 bg-red-100 rounded">
+          ? html`<div
+              class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+            >
               ${this.error}
             </div>`
           : ""}
         ${this.search
           ? html`
-              <div class="mb-4">
-                <ecc-input
-                  label="Search Services"
-                  placeholder="Search by name, id, type..."
-                  @ecc-input-change=${this.handleSearch}
-                  value=${this.searchQuery}
-                ></ecc-input>
+              <div class="flex flex-col gap-1">
+                <ecc-utils-design-label>Search Services</ecc-utils-design-label>
+                <ecc-utils-design-input
+                  class="part:w-full"
+                  placeholder="Search by name, type, organization..."
+                  @ecc-utils-change=${this.handleSearch}
+                ></ecc-utils-design-input>
               </div>
             `
           : ""}
 
-        <ecc-table>
-          <ecc-table-header>
-            <ecc-table-row>
-              <ecc-table-head>ID</ecc-table-head>
-              <ecc-table-head>Name</ecc-table-head>
-              <ecc-table-head>Type</ecc-table-head>
-              <ecc-table-head>Organization</ecc-table-head>
-              <ecc-table-head>Actions</ecc-table-head>
-            </ecc-table-row>
-          </ecc-table-header>
-          <ecc-table-body>
-            ${this.loading
-              ? this.renderSkeletonRows()
-              : this.services.length === 0
-              ? html`
-                  <ecc-table-row>
-                    <ecc-table-cell colspan="5" class="text-center py-4">
+        <ecc-utils-design-table>
+          <ecc-utils-design-table-header>
+            <ecc-utils-design-table-row>
+              <ecc-utils-design-table-head class="w-7/12"
+                >Service Info</ecc-utils-design-table-head
+              >
+              <ecc-utils-design-table-head class="w-2/12"
+                >Type</ecc-utils-design-table-head
+              >
+              <ecc-utils-design-table-head class="w-2/12"
+                >Organization</ecc-utils-design-table-head
+              >
+              <ecc-utils-design-table-head
+                class="w-1/12"
+              ></ecc-utils-design-table-head>
+            </ecc-utils-design-table-row>
+          </ecc-utils-design-table-header>
+          <ecc-utils-design-table-body>
+            ${(() => {
+              if (this.loading) {
+                return ECCClientGa4ghServiceRegistryServices.renderSkeletonRows();
+              }
+              if (this.services.length === 0) {
+                return html`
+                  <ecc-utils-design-table-row>
+                    <ecc-utils-design-table-cell
+                      colspan="4"
+                      class="part:text-center part:py-8 part:text-muted-foreground"
+                    >
                       No services found
-                    </ecc-table-cell>
-                  </ecc-table-row>
-                `
-              : this.services.map(
-                  (service) => html`
-                    <ecc-table-row>
-                      <ecc-table-cell> ${service.id} </ecc-table-cell>
-                      <ecc-table-cell> ${service.name} </ecc-table-cell>
-                      <ecc-table-cell>
-                        <ecc-badge
-                          variant=${this.getServiceTypeVariant(service.type)}
-                        >
-                          ${service.type.artifact}@${service.type.version}
-                        </ecc-badge>
-                      </ecc-table-cell>
-                      <ecc-table-cell>
-                        ${service.organization.name}
-                      </ecc-table-cell>
-                      <ecc-table-cell>
-                        <ecc-button
+                    </ecc-utils-design-table-cell>
+                  </ecc-utils-design-table-row>
+                `;
+              }
+              return this.services.map(
+                (service) => html`
+                  <ecc-utils-design-table-row>
+                    <ecc-utils-design-table-cell class="w-7/12">
+                      <div class="flex flex-col w-full">
+                        <div class="flex items-center gap-2">
+                          <ecc-utils-design-button
+                            class="part:font-medium part:text-primary part:w-fit part:cursor-pointer part:p-0"
+                            variant="link"
+                            @click=${() => this.handleViewDetails(service.id)}
+                          >
+                            ${service.name || "-"}
+                          </ecc-utils-design-button>
+                          ${service.version
+                            ? html`<ecc-utils-design-badge variant="outline">
+                                v${service.version}
+                              </ecc-utils-design-badge>`
+                            : ""}
+                        </div>
+                        ${service.description
+                          ? html`<div
+                              class="text-xs text-muted-foreground line-clamp-3 break-all whitespace-normal overflow-hidden max-w-full"
+                            >
+                              ${service.description}
+                            </div>`
+                          : ""}
+                      </div>
+                    </ecc-utils-design-table-cell>
+                    <ecc-utils-design-table-cell class="w-2/12">
+                      <ecc-utils-design-badge
+                        variant=${ECCClientGa4ghServiceRegistryServices.getServiceTypeVariant(
+                          service.type
+                        )}
+                      >
+                        ${service.type.artifact}@${service.type.version}
+                      </ecc-utils-design-badge>
+                    </ecc-utils-design-table-cell>
+                    <ecc-utils-design-table-cell class="w-2/12">
+                      ${service.organization.url
+                        ? html`<ecc-utils-design-button
+                            class="part:font-medium part:text-primary part:w-fit part:cursor-pointer part:p-0"
+                            variant="link"
+                            @click=${() =>
+                              window.open(service.organization.url, "_blank")}
+                          >
+                            ${service.organization.name}
+                          </ecc-utils-design-button>`
+                        : html`${service.organization.name}`}
+                    </ecc-utils-design-table-cell>
+                    <ecc-utils-design-table-cell class="w-1/12">
+                      <slot name=${`actions-${service.id}`}>
+                        <ecc-utils-design-button
                           size="sm"
-                          variant="outline"
                           @click=${() => this.handleViewDetails(service.id)}
                         >
                           View Details
-                        </ecc-button>
-                      </ecc-table-cell>
-                    </ecc-table-row>
-                  `
-                )}
-          </ecc-table-body>
-        </ecc-table>
+                        </ecc-utils-design-button>
+                      </slot>
+                    </ecc-utils-design-table-cell>
+                  </ecc-utils-design-table-row>
+                `
+              );
+            })()}
+          </ecc-utils-design-table-body>
+        </ecc-utils-design-table>
       </div>
     `;
   }

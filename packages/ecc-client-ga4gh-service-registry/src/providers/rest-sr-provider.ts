@@ -1,13 +1,15 @@
 import {
+  ServiceRegistryProvider,
   ExternalService,
   Service,
   ServiceType,
-} from "../providers/sr-provider.js";
+} from "./sr-provider.js";
 
 /**
- * API class for interacting with GA4GH Service Registry API
+ * Implementation of the ServiceRegistryProvider interface using direct REST API calls
+ * This class combines the functionality of ServiceRegistryAPI and RestServiceRegistryProvider
  */
-export class ServiceRegistryAPI {
+export class RestServiceRegistryProvider implements ServiceRegistryProvider {
   // eslint-disable-next-line no-useless-constructor
   constructor(public readonly baseUrl: string) {}
 

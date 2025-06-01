@@ -1,3 +1,4 @@
+/* eslint-disable import/named */
 /**
  * Types for the GA4GH Service Registry API based on OpenAPI specification v1.0.0
  */
@@ -46,7 +47,7 @@ export interface ExternalService extends Service {
 /**
  * Error interface for API errors
  */
-export interface ApiError {
+export interface Error {
   status: number;
   title: string;
   detail?: string;
