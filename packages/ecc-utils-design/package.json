@@ -53,7 +53,7 @@
     "@elixir-cloud/eslint-config": "*",
     "@open-wc/eslint-config": "*",
     "@open-wc/testing": "*",
-    "@tailwindcss/cli": "^4.1.4",
+    "@tailwindcss/cli": "4.1.4",
     "@types/ace": "^0.0.52",
     "@web/dev-server": "*",
     "@web/dev-server-esbuild": "^0.4.3",

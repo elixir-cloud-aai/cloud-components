@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WES Runs Demo</title>
+    <title>WES Run Demo</title>
     <link
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
@@ -14,11 +14,15 @@
     ></script>
   </head>
   <body class="p-8">
-    <h1 class="text-2xl font-bold mb-4">Workflow Runs</h1>
-    <ecc-client-ga4gh-wes-runs
-      baseUrl="http://localhost:1122"
-      pageSize="5"
-      filter
-    ></ecc-client-ga4gh-wes-runs>
+    <h1 class="text-2xl font-bold mb-4">Workflow Run Details</h1>
+    <ecc-client-ga4gh-wes-run
+
+baseUrl="http://localhost/ga4gh/wes/v1"
+runId="5c19edab-d5be-42bb-9623-d3a0ab67161c"
+    ></ecc-client-ga4gh-wes-run>
   </body>
 </html> 
+
+
+<!-- baseUrl="http://localhost:1122"
+runId="00d89c1b-4a5b-4ec8-b310-052b5764476a" -->

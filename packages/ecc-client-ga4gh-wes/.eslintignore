@@ -1,3 +1,11 @@
+# Never lint playwright config
+
+playwright.\*.ts
+
+# Never lint test files
+
+\*.spec.ts
+
 # Never lint node_modules
 
 node_modules
@@ -14,6 +22,9 @@ coverage
 
 src/react
 custom-elements-manifest.config.js
+src/output.css
+src/tailwind.ts
+tw-styles.ts
 
 **/.git
 **/.svn
@@ -26,4 +37,3 @@ LICENSE
 README.md
 CONTRIBUTORS.md
 CODE_OF_CONDUCT.md
-

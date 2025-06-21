@@ -1,412 +1,395 @@
-import { html, css, LitElement, render } from "lit";
+import { LitElement, html, css } from "lit";
 import { property, state } from "lit/decorators.js";
-import "@elixir-cloud/design/dist/components/collection/index.js";
-import "@elixir-cloud/design/dist/components/details/index.js";
-import EccUtilsDesignCollection, {
-  FilterProp,
-  ItemProp,
-} from "@elixir-cloud/design/dist/components/collection";
-import EccUtilsDesignDetails, {
-  Field,
-  Action,
-} from "@elixir-cloud/design/dist/components/details";
-import {
-  cancelWorkflow,
-  fetchWorkflow,
-  fetchWorkflows,
-} from "../../API/Workflow/wesGet.js";
+import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
+import { GlobalStyles } from "../../global.js";
+import { WesProvider, RunStatus, State } from "../../providers/wes-provider.js";
+import { RestWesProvider } from "../../providers/rest-wes-provider.js";
+import "@elixir-cloud/design/components/table/index.js";
+import "@elixir-cloud/design/components/button/index.js";
+import "@elixir-cloud/design/components/input/index.js";
+import "@elixir-cloud/design/components/select/index.js";
+import "@elixir-cloud/design/components/label/index.js";
+import "@elixir-cloud/design/components/pagination/index.js";
+import "@elixir-cloud/design/components/badge/index.js";
+import "@elixir-cloud/design/components/skeleton/index.js";
 
 /**
- * @summary This component facilitates browsing workflow runs via WES API.
- * @since 1.0.0
+ * @summary Component for listing workflow runs from a WES service
+ * @since 0.1.0
  *
- * @property {string} baseURL - Base URL of the WES instance/gateway
+ * @property {string} baseUrl - Base URL of the WES instance/gateway
  * @property {number} pageSize - Number of runs per page
- * @property {array} fields - Configuration for what fields to display
- * @property {boolean} filter - Determines if the runs filter field should be rendered
- * @property {boolean} extendFields - Extend default fields instead of overriding
+ * @property {WesProvider} provider - Custom data provider (optional, overrides baseUrl)
  *
+ * @fires ecc-runs-change - Fired when runs data changes
+ * @fires ecc-runs-click - Fired when a run is clicked
  */
-
-export default class ECCClientGa4ghWesRuns extends LitElement {
-  static styles = css``;
-  static defaultFields: Field[] = [
-    {
-      label: "Tags",
-      tab: "Overview",
-      key: "request.tags",
-      path: "request.tags",
-    },
-    {
-      label: "Engine parameters",
-      tab: "Parameter",
-      key: "request.workflow_engine_parameters",
-      path: "request.workflow_engine_parameters",
-      copy: true,
-    },
-    {
-      label: "Parameters",
-      tab: "Parameter",
-      key: "request.workflow_params",
-      path: "request.workflow_params",
-      copy: true,
-    },
-    {
-      label: "Type",
-      tab: "Parameter",
-      key: "request.workflow_type",
-      path: "request.workflow_type",
-    },
-    {
-      label: "Version",
-      tab: "Parameter",
-      key: "request.workflow_type_version",
-      path: "request.workflow_type_version",
-    },
-    {
-      label: "Url",
-      tab: "Overview",
-      key: "request.workflow_url",
-      path: "request.workflow_url",
-      copy: true,
-    },
-    {
-      label: "Run Logs",
-      key: "run_log",
-      path: "run_log",
-      tab: "Run logs",
-      copy: true,
-    },
-    {
-      key: "run_log.max_retries",
-      path: "run_log.max_retries",
-      label: "Max retries",
-    },
-    {
-      key: "run_log.max_retries",
-      path: "run_log.max_retries",
-      label: "Max retries",
-    },
-    {
-      key: "run_log.stderr",
-      path: "run_log.stderr",
-      label: "STDERR",
-    },
-    {
-      key: "run_log.stdout",
-      path: "run_log.stdout",
-      label: "STDOUT",
-    },
-    {
-      key: "run_log.task_finished",
-      path: "run_log.task_finished",
-      label: "Finished at",
-    },
-    {
-      key: "run_log.task_received",
-      path: "run_log.task_received",
-      label: "Received at",
-    },
-    {
-      key: "run_log.task_received",
-      path: "run_log.task_received",
-      label: "Received at",
-    },
-    {
-      key: "run_log.time_execution",
-      path: "run_log.time_execution",
-      label: "Execution time",
-    },
-    {
-      key: "run_log.time_queue",
-      path: "run_log.time_queue",
-      label: "Queue time",
-    },
-    {
-      key: "run_log.time_total",
-      path: "run_log.time_total",
-      label: "Total time",
-    },
-    {
-      key: "run_log.utc_offset",
-      path: "run_log.utc_offset",
-      label: "UTC offset",
-    },
-    {
-      label: "Task Logs",
-      key: "task_logs",
-      path: "task_logs",
-      tab: "Task logs",
-      copy: true,
-    },
-    {
-      key: "task_logs[*]",
-      path: "task_logs[*]",
-      arrayOptions: {
-        labelOptions: {
-          prefix: "Creation time: ",
-          path: "creation_time",
-        },
-      },
-      copy: true,
-    },
-    {
-      key: "output",
-      tab: "Output",
-      label: "Output",
-      path: "outputs",
-      copy: true,
-    },
+export class ECCClientGa4ghWesRuns extends LitElement {
+  static styles = [
+    TailwindStyles,
+    GlobalStyles,
+    css`
+      :host {
+        display: block;
+        width: 100%;
+      }
+    `,
   ];
 
-  @property({ type: Number, reflect: true }) pageSize = 5;
-  @property({ type: String, reflect: true }) baseURL =
-    "https://prowes.rahtiapp.fi/ga4gh/wes/v1";
+  @property({ type: String, reflect: true }) baseUrl = "";
+  @property({ type: Number, reflect: true }) pageSize = 10;
+  @property({ attribute: false, reflect: true }) provider?: WesProvider;
 
-  @property({ type: Array, reflect: true }) fields: Field[] = [];
-  @property({ type: Boolean, reflect: true }) extendFields = false;
+  @state() private currentPage = 1;
+  @state() private runs: RunStatus[] = [];
+  @state() private loading = false;
+  @state() private error: string | null = null;
+  @state() private nextPageToken: string | null = null;
+  @state() private hasMorePages = true;
 
-  @state() private filters: FilterProp[] = [
-    {
-      key: "tag",
-      type: "select",
-      options: [
-        "UNKNOWN",
-        "QUEUED",
-        "INITIALIZING",
-        "RUNNING",
-        "PAUSED",
-        "COMPLETE",
-        "EXECUTOR_ERROR",
-        "SYSTEM_ERROR",
-        "CANCELED",
-        "PREEMPTED",
-        "CANCELING",
-      ],
-      placeholder: "Filter by status",
-      selectConfig: {
-        multiple: true,
-      },
-    },
-  ];
+  private _provider: WesProvider | null = null;
 
-  @state() private filter = true;
-  @state() private items: ItemProp[] = [];
-  @state() private nextPageToken: string[] = [""];
-  @state() private cache = new Map();
+  protected async firstUpdated(): Promise<void> {
+    if (!this.baseUrl && !this.provider) {
+      this.error =
+        "Please provide either a base URL for the WES API or a custom provider.";
+      return;
+    }
 
-  private tagType: Record<string, string> = {
-    UNKNOWN: "neutral",
-    QUEUED: "warning",
-    INITIALIZING: "primary",
-    RUNNING: "primary",
-    PAUSED: "warning",
-    COMPLETE: "success",
-    EXECUTOR_ERROR: "danger",
-    SYSTEM_ERROR: "danger",
-    CANCELED: "danger",
-    PREEMPTED: "danger",
-    CANCELING: "danger",
-  };
+    if (this.provider) {
+      this._provider = this.provider;
+    } else if (this.baseUrl) {
+      this._provider = new RestWesProvider(this.baseUrl);
+    } else {
+      this._provider = null;
+    }
+
+    if (this._provider) {
+      await this.loadData();
+    }
+  }
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
-    const eccUtilsDesignCollection =
-      this.shadowRoot?.querySelector<EccUtilsDesignCollection>(
-        "ecc-utils-design-collection"
-      );
-    if (!eccUtilsDesignCollection) {
-      console.error({
-        error: "Failed to find ecc-utils-design-collection element",
-        breakPoint: "ECCClientGa4ghWesRuns.updated",
-      });
-      return;
-    }
-
-    eccUtilsDesignCollection.pageSize = this.pageSize;
     if (changedProperties.has("pageSize")) {
-      this._fetchData(1);
-    }
-    if (changedProperties.has("filter") && this.filter === false) {
-      this.filters = [];
+      this.loadData();
     }
 
-    if (changedProperties.has("extendFields")) {
-      if (this.extendFields) {
-        const fields = ECCClientGa4ghWesRuns.defaultFields;
-        this.fields = [...this.fields, ...fields];
-      } else if (this.fields.length === 0 && this.extendFields === false) {
-        this.fields = ECCClientGa4ghWesRuns.defaultFields;
-      }
+    if (changedProperties.has("baseUrl") && this.baseUrl) {
+      this._provider = new RestWesProvider(this.baseUrl);
+      this.loadData();
     }
   }
 
-  private async _fetchData(page = 1) {
-    try {
-      const data = await fetchWorkflows(
-        this.baseURL,
-        this.pageSize,
-        this.nextPageToken[page - 1]
-      );
+  private async loadData(): Promise<void> {
+    if (!this._provider) return;
 
-      const convertedData: ItemProp[] = data.runs.map(
-        (run: { run_id: string; state: string }, index: number) => ({
-          index: (page - 1) * this.pageSize + (index + 1),
-          name: run.run_id,
-          key: `${run.run_id}`,
-          lazy: true,
-          tag: {
-            name: run.state,
-            type: this.tagType[run.state] as
-              | "primary"
-              | "success"
-              | "neutral"
-              | "warning"
-              | "danger",
-          },
+    this.loading = true;
+    this.error = null;
+
+    try {
+      const pageToken =
+        this.currentPage === 1 ? undefined : this.nextPageToken || undefined;
+      const response = await this._provider.listRuns(this.pageSize, pageToken);
+
+      this.runs = response.runs;
+      this.nextPageToken = response.next_page_token || null;
+      this.hasMorePages = !!response.next_page_token;
+
+      // Emit an event with the updated runs
+      this.dispatchEvent(
+        new CustomEvent("ecc-runs-change", {
+          detail: { runs: this.runs },
+          bubbles: true,
+          composed: true,
         })
       );
-
-      // remove old items with the same index as the new items to be added
-      this.items = this.items.filter(
-        (item) => !convertedData.some((newItem) => newItem.index === item.index)
-      );
-
-      this.items = [...this.items, ...convertedData];
-
-      if (data.next_page_token === "" || data.runs.length < this.pageSize) {
-        const eccUtilsDesignCollection =
-          this.shadowRoot?.querySelector<EccUtilsDesignCollection>(
-            "ecc-utils-design-collection"
-          );
-
-        if (!eccUtilsDesignCollection) {
-          console.error({
-            error: "ecc-utils-design-collection not found",
-            breakPoint: "ECCClientGa4ghWesRuns.fetchData",
-          });
-          return;
-        }
-
-        eccUtilsDesignCollection.totalItems = this.items.length;
-      } else this.nextPageToken[page] = data.next_page_token;
-    } catch (error) {
+    } catch (err) {
+      this.error = err instanceof Error ? err.message : "Failed to load runs";
       console.error({
-        error,
-        breakPoint: "ECCClientGa4ghWesRuns.fetchData",
+        error: this.error,
+        breakPoint: "ECCClientGa4ghWesRuns.loadData",
       });
+    } finally {
+      this.loading = false;
     }
   }
 
-  private async _handleExpandItem(event: CustomEvent) {
-    const eccUtilsDesignCollection =
-      this.shadowRoot?.querySelector<EccUtilsDesignCollection>(
-        "ecc-utils-design-collection"
-      );
+  private handleViewDetails(runId: string): void {
+    const event = new CustomEvent("ecc-runs-click", {
+      detail: { runId },
+      bubbles: true,
+      composed: true,
+    });
+    this.dispatchEvent(event);
+  }
 
-    if (!eccUtilsDesignCollection) {
-      console.error({
-        error: "ecc-utils-design-collection not found",
-        breakPoint: "ECCClientGa4ghWesRuns.handleExpandItem",
-      });
-      return;
-    }
+  private goToPage(page: number): void {
+    if (page < 1) return;
+    if (page > this.currentPage && !this.hasMorePages) return;
 
-    const { target, detail } = event;
+    this.currentPage = page;
+    this.loadData();
+  }
 
-    if (!target || !(target instanceof HTMLElement)) {
-      eccUtilsDesignCollection.error("Target is null or not an HTMLElement");
-      return;
-    }
-
-    const { key } = detail;
-    const children = target!.shadowRoot?.querySelectorAll(
-      `slot[name='${key}']`
-    );
-    const runData = await fetchWorkflow(this.baseURL, detail.key);
-    this.cache.set(key, runData);
-
-    if (children?.length) {
-      try {
-        const child = document.createElement("div");
-        child.setAttribute("slot", key);
-
-        const button: Action[] = [
-          {
-            key,
-            label: "Delete",
-            type: "button",
-            buttonOptions: {
-              variant: "danger",
-              icon: {
-                url: "/assets/delete.svg",
-              },
-            },
-          },
-        ];
-
-        const detailsComponent = html`<ecc-utils-design-details
-          class="details"
-          id=${key}
-          .data=${runData}
-          .fields=${this.fields}
-          .actions=${button}
-        >
-        </ecc-utils-design-details>`;
-
-        // Render the details component using Lit's render function
-        // Append the child to the target
-        render(detailsComponent, child);
-        target.appendChild(child);
-
-        // Add button event
-        const detailsElement = child.querySelector<EccUtilsDesignDetails>(
-          "ecc-utils-design-details"
-        );
-        if (detailsElement) {
-          detailsElement.addEventListener(
-            "ecc-utils-button-click",
-            async (buttonEvent: Event) => {
-              const customEvent = buttonEvent as CustomEvent<{ key: string }>;
-              const { key: buttonKey } = customEvent.detail;
-              try {
-                if (buttonKey === key) {
-                  const resp = (await cancelWorkflow(this.baseURL, key)) as any;
-
-                  // If the response doesn't have run ID that means the run wasn't canceled.
-                  if (!resp.run_id) throw new Error();
+  private renderPagination() {
+    return html`
+      <ecc-utils-design-pagination>
+        <ecc-utils-design-pagination-content>
+          <ecc-utils-design-pagination-item>
+            <ecc-utils-design-pagination-previous
+              ?disabled=${this.currentPage === 1}
+              @ecc-utils-button-click=${(e: CustomEvent) => {
+                if (e.detail.variant === "previous") {
+                  this.goToPage(this.currentPage - 1);
                 }
-              } catch (error) {
-                eccUtilsDesignCollection.error(`Failed to cancel run: ${key}`);
-              }
-            }
-          );
-        } else {
-          eccUtilsDesignCollection.error(
-            `Failed to find ecc-utils-design-details element for run: ${key}`
-          );
-        }
-      } catch (error) {
-        eccUtilsDesignCollection.error(`Failed to fetch data for run: ${key}`);
+              }}
+            ></ecc-utils-design-pagination-previous>
+          </ecc-utils-design-pagination-item>
+
+          <ecc-utils-design-pagination-item>
+            <ecc-utils-design-pagination-link isActive>
+              ${this.currentPage}
+            </ecc-utils-design-pagination-link>
+          </ecc-utils-design-pagination-item>
+
+          ${this.hasMorePages
+            ? html`
+                <ecc-utils-design-pagination-item>
+                  <ecc-utils-design-pagination-link
+                    @ecc-utils-button-click=${(e: CustomEvent) => {
+                      if (e.detail.variant === "link") {
+                        this.goToPage(this.currentPage + 1);
+                      }
+                    }}
+                    >${this.currentPage + 1}
+                  </ecc-utils-design-pagination-link>
+                </ecc-utils-design-pagination-item>
+                <ecc-utils-design-pagination-item>
+                  <ecc-utils-design-pagination-ellipsis></ecc-utils-design-pagination-ellipsis>
+                </ecc-utils-design-pagination-item>
+              `
+            : ""}
+
+          <ecc-utils-design-pagination-item>
+            <ecc-utils-design-pagination-next
+              ?disabled=${!this.hasMorePages}
+              @ecc-utils-button-click=${(e: CustomEvent) => {
+                if (e.detail.variant === "next") {
+                  this.goToPage(this.currentPage + 1);
+                }
+              }}
+            ></ecc-utils-design-pagination-next>
+          </ecc-utils-design-pagination-item>
+        </ecc-utils-design-pagination-content>
+      </ecc-utils-design-pagination>
+    `;
+  }
+
+  /**
+   * Get badge variant and label for workflow run state
+   */
+  static getStateInfo(runState: State): {
+    variant: "default" | "secondary" | "destructive" | "outline";
+    label: string;
+  } {
+    const stateInfo: Record<
+      State,
+      {
+        variant: "default" | "secondary" | "destructive" | "outline";
+        label: string;
       }
+    > = {
+      UNKNOWN: { variant: "outline", label: "Unknown" },
+      QUEUED: { variant: "secondary", label: "Queued" },
+      INITIALIZING: { variant: "secondary", label: "Initializing" },
+      RUNNING: { variant: "default", label: "Running" },
+      PAUSED: { variant: "outline", label: "Paused" },
+      COMPLETE: { variant: "default", label: "Complete" },
+      EXECUTOR_ERROR: { variant: "destructive", label: "Executor Error" },
+      SYSTEM_ERROR: { variant: "destructive", label: "System Error" },
+      CANCELED: { variant: "outline", label: "Canceled" },
+      CANCELING: { variant: "outline", label: "Canceling" },
+    };
+
+    return stateInfo[runState] || { variant: "outline", label: runState };
+  }
+
+  private renderSkeletonRows() {
+    return html`
+      ${Array(this.pageSize)
+        .fill(0)
+        .map(
+          () => html`
+            <ecc-utils-design-table-row>
+              <ecc-utils-design-table-cell class="w-6/12">
+                <ecc-utils-design-skeleton
+                  class="part:h-5 part:w-64"
+                ></ecc-utils-design-skeleton>
+              </ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-2/12">
+                <ecc-utils-design-skeleton
+                  class="part:h-6 part:w-20 part:rounded-full"
+                ></ecc-utils-design-skeleton>
+              </ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-3/12">
+                <ecc-utils-design-skeleton
+                  class="part:h-4 part:w-32"
+                ></ecc-utils-design-skeleton>
+              </ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-1/12">
+                <ecc-utils-design-skeleton
+                  class="part:h-8 part:w-8 part:rounded"
+                ></ecc-utils-design-skeleton>
+              </ecc-utils-design-table-cell>
+            </ecc-utils-design-table-row>
+          `
+        )}
+    `;
+  }
+
+  /**
+   * Format run ID for display (truncate if too long)
+   */
+  static formatRunId(runId: string): string {
+    if (runId.length > 20) {
+      return `${runId.substring(0, 8)}...${runId.substring(runId.length - 8)}`;
     }
+    return runId;
   }
 
   render() {
+    if (!this.baseUrl && !this.provider) {
+      return html`
+        <div
+          class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+        >
+          Please provide either a base URL for the WES API or a custom provider.
+        </div>
+      `;
+    }
+
     return html`
-      <ecc-utils-design-collection
-        id="collection"
-        .filters=${this.filters}
-        .items=${this.items}
-        @ecc-utils-page-change=${(event: CustomEvent) => {
-          this._fetchData(event.detail.page);
-        }}
-        @ecc-utils-expand=${(event: CustomEvent) => {
-          if (!this.cache.has(event.detail.key)) {
-            this._handleExpandItem(event);
-          }
-        }}
-      >
-      </ecc-utils-design-collection>
+      <div class="flex flex-col gap-4">
+        ${this.error
+          ? html`
+              <div
+                class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10 my-4"
+              >
+                ${this.error}
+              </div>
+            `
+          : ""}
+
+        <ecc-utils-design-table>
+          <ecc-utils-design-table-header>
+            <ecc-utils-design-table-row>
+              <ecc-utils-design-table-head class="w-6/12"
+                >Run ID</ecc-utils-design-table-head
+              >
+              <ecc-utils-design-table-head class="w-2/12"
+                >State</ecc-utils-design-table-head
+              >
+              <ecc-utils-design-table-head class="w-3/12"
+                >Actions</ecc-utils-design-table-head
+              >
+              <ecc-utils-design-table-head
+                class="w-1/12"
+              ></ecc-utils-design-table-head>
+            </ecc-utils-design-table-row>
+          </ecc-utils-design-table-header>
+          <ecc-utils-design-table-body>
+            ${(() => {
+              if (this.loading) {
+                return this.renderSkeletonRows();
+              }
+              if (this.runs.length === 0) {
+                return html`
+                  <ecc-utils-design-table-row>
+                    <ecc-utils-design-table-cell
+                      colspan="4"
+                      class="part:text-center part:py-8 part:text-muted-foreground"
+                    >
+                      No workflow runs found
+                    </ecc-utils-design-table-cell>
+                  </ecc-utils-design-table-row>
+                `;
+              }
+              return this.runs.map(
+                (run) => html`
+                  <ecc-utils-design-table-row>
+                    <ecc-utils-design-table-cell class="w-6/12">
+                      <ecc-utils-design-button
+                        class="part:font-mono part:text-sm part:text-primary part:w-fit part:cursor-pointer part:p-0"
+                        variant="link"
+                        @click=${() => this.handleViewDetails(run.run_id)}
+                        title=${run.run_id}
+                      >
+                        ${ECCClientGa4ghWesRuns.formatRunId(run.run_id)}
+                      </ecc-utils-design-button>
+                    </ecc-utils-design-table-cell>
+                    <ecc-utils-design-table-cell class="w-2/12">
+                      ${(() => {
+                        const stateInfo = ECCClientGa4ghWesRuns.getStateInfo(
+                          run.state
+                        );
+                        return html`
+                          <ecc-utils-design-badge variant=${stateInfo.variant}>
+                            ${stateInfo.label}
+                          </ecc-utils-design-badge>
+                        `;
+                      })()}
+                    </ecc-utils-design-table-cell>
+                    <ecc-utils-design-table-cell class="w-3/12">
+                      <div class="flex gap-2">
+                        <ecc-utils-design-button
+                          size="sm"
+                          variant="outline"
+                          @click=${() => this.handleViewDetails(run.run_id)}
+                        >
+                          View Details
+                        </ecc-utils-design-button>
+                        ${run.state === "RUNNING" ||
+                        run.state === "QUEUED" ||
+                        run.state === "INITIALIZING"
+                          ? html`
+                              <ecc-utils-design-button
+                                size="sm"
+                                variant="destructive"
+                                @click=${() => this.handleCancelRun(run.run_id)}
+                              >
+                                Cancel
+                              </ecc-utils-design-button>
+                            `
+                          : ""}
+                      </div>
+                    </ecc-utils-design-table-cell>
+                    <ecc-utils-design-table-cell class="w-1/12">
+                      <slot name=${`actions-${run.run_id}`}> </slot>
+                    </ecc-utils-design-table-cell>
+                  </ecc-utils-design-table-row>
+                `
+              );
+            })()}
+          </ecc-utils-design-table-body>
+        </ecc-utils-design-table>
+
+        ${!this.loading && this.runs.length > 0 ? this.renderPagination() : ""}
+      </div>
     `;
   }
+
+  private async handleCancelRun(runId: string): Promise<void> {
+    if (!this._provider) return;
+
+    try {
+      await this._provider.cancelRun(runId);
+      // Reload data to refresh the state
+      await this.loadData();
+    } catch (err) {
+      console.error("Failed to cancel run:", err);
+      // You might want to emit an error event here
+    }
+  }
 }
+
+export default ECCClientGa4ghWesRuns;

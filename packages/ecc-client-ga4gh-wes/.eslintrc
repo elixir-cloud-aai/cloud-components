@@ -1,9 +1,7 @@
 {
-  "extends": ["@open-wc", "@elixir-cloud", "prettier"],
-  "plugins": ["prettier"],
+  "extends": ["@open-wc", "@elixir-cloud"],
   "rules": {
-    "camelcase": "warn",
-    "prettier/prettier": "error",
-    "no-console": ["error", { "allow": ["warn", "error"] }]
+    "lit/no-classfield-shadowing": "warn",
+    "max-classes-per-file": "off"
   }
 }
