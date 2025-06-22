@@ -1,0 +1,359 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import Table from '@elixir-cloud/design/react/table';
+import TableHeader from '@elixir-cloud/design/react/table-header';
+import TableBody from '@elixir-cloud/design/react/table-body';
+import TableFooter from '@elixir-cloud/design/react/table-footer';
+import TableRow from '@elixir-cloud/design/react/table-row';
+import TableHead from '@elixir-cloud/design/react/table-head';
+import TableCell from '@elixir-cloud/design/react/table-cell';
+import TableCaption from '@elixir-cloud/design/react/table-caption';
+import Button from '@elixir-cloud/design/react/button';
+
+# EccUtilsDesignTable Component
+
+<ComponentName
+  tagName='ecc-utils-design-table'
+  reactTagName='EccUtilsDesignTable'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-utils-design-table` component provides a flexible and accessible way to display tabular data. It consists of multiple compound components that work together to create a complete table structure with support for headers, body, footer, and captions.
+
+<Callout type='warning'>
+  **Important**: This table uses `<div>` elements instead of native HTML table elements because the HTML parser doesn't allow custom elements as direct children of `<table>`, `<tr>`, etc. The web standards community decided against fixing this parser limitation due to backward compatibility concerns. See [WebComponents issue #59](https://github.com/WICG/webcomponents/issues/59) for details.
+</Callout>
+
+<Callout type='info'>
+  This component is composed of `Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, and `TableCaption` to create a complete table interface. **You must specify width classes** on table cells to control column sizing (e.g., `className="w-4/12"`). Use regular Tailwind classes for widths, not the `part:` prefix.
+</Callout>
+
+## Usage
+
+### Basic Table
+
+This example shows a basic table with headers, body rows, and a footer.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-4/12">Name</TableHead>
+          <TableHead className="w-4/12">Email</TableHead>
+          <TableHead className="w-2/12">Status</TableHead>
+          <TableHead className="w-2/12">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell className="w-4/12">Alice Johnson</TableCell>
+          <TableCell className="w-4/12">alice@example.com</TableCell>
+          <TableCell className="w-2/12">Active</TableCell>
+          <TableCell className="w-2/12">
+            <Button size="sm" className="part:mr-2">Edit</Button>
+            <Button size="sm" variant="destructive">Delete</Button>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell className="w-4/12">Bob Smith</TableCell>
+          <TableCell className="w-4/12">bob@example.com</TableCell>
+          <TableCell className="w-2/12">Inactive</TableCell>
+          <TableCell className="w-2/12">
+            <Button size="sm" className="part:mr-2">Edit</Button>
+            <Button size="sm" variant="destructive">Delete</Button>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell className="w-4/12">Carol Davis</TableCell>
+          <TableCell className="w-4/12">carol@example.com</TableCell>
+          <TableCell className="w-2/12">Active</TableCell>
+          <TableCell className="w-2/12">
+            <Button size="sm" className="part:mr-2">Edit</Button>
+            <Button size="sm" variant="destructive">Delete</Button>
+          </TableCell>
+        </TableRow>
+      </TableBody>
+      <TableFooter>
+        <TableRow>
+          <TableCell className="w-full">
+            <div className="part:text-sm part:text-muted-foreground">
+              Total: 3 users
+            </div>
+          </TableCell>
+        </TableRow>
+      </TableFooter>
+    </Table>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="table-basic.tsx"
+    import React from 'react';
+    import {
+      EccUtilsDesignTable,
+      EccUtilsDesignTableHeader,
+      EccUtilsDesignTableBody,
+      EccUtilsDesignTableFooter,
+      EccUtilsDesignTableRow,
+      EccUtilsDesignTableHead,
+      EccUtilsDesignTableCell,
+    } from '@elixir-cloud/design/react/table';
+    import { EccUtilsDesignButton } from '@elixir-cloud/design/react/button';
+
+    export default function BasicTable() {
+      return (
+        <EccUtilsDesignTable>
+          <EccUtilsDesignTableHeader>
+            <EccUtilsDesignTableRow>
+              <EccUtilsDesignTableHead className="w-4/12">Name</EccUtilsDesignTableHead>
+              <EccUtilsDesignTableHead className="w-4/12">Email</EccUtilsDesignTableHead>
+              <EccUtilsDesignTableHead className="w-2/12">Status</EccUtilsDesignTableHead>
+              <EccUtilsDesignTableHead className="w-2/12">Actions</EccUtilsDesignTableHead>
+            </EccUtilsDesignTableRow>
+          </EccUtilsDesignTableHeader>
+          <EccUtilsDesignTableBody>
+            <EccUtilsDesignTableRow>
+              <EccUtilsDesignTableCell className="w-4/12">Alice Johnson</EccUtilsDesignTableCell>
+              <EccUtilsDesignTableCell className="w-4/12">alice@example.com</EccUtilsDesignTableCell>
+              <EccUtilsDesignTableCell className="w-2/12">Active</EccUtilsDesignTableCell>
+              <EccUtilsDesignTableCell className="w-2/12">
+                <EccUtilsDesignButton size="sm" className="part:mr-2">Edit</EccUtilsDesignButton>
+                <EccUtilsDesignButton size="sm" variant="destructive">Delete</EccUtilsDesignButton>
+              </EccUtilsDesignTableCell>
+            </EccUtilsDesignTableRow>
+            <EccUtilsDesignTableRow>
+              <EccUtilsDesignTableCell className="w-4/12">Bob Smith</EccUtilsDesignTableCell>
+              <EccUtilsDesignTableCell className="w-4/12">bob@example.com</EccUtilsDesignTableCell>
+              <EccUtilsDesignTableCell className="w-2/12">Inactive</EccUtilsDesignTableCell>
+              <EccUtilsDesignTableCell className="w-2/12">
+                <EccUtilsDesignButton size="sm" className="part:mr-2">Edit</EccUtilsDesignButton>
+                <EccUtilsDesignButton size="sm" variant="destructive">Delete</EccUtilsDesignButton>
+              </EccUtilsDesignTableCell>
+            </EccUtilsDesignTableRow>
+          </EccUtilsDesignTableBody>
+          <EccUtilsDesignTableFooter>
+            <EccUtilsDesignTableRow>
+              <EccUtilsDesignTableCell className="w-full">
+                <div className="part:text-sm part:text-muted-foreground">
+                  Total: 2 users
+                </div>
+              </EccUtilsDesignTableCell>
+            </EccUtilsDesignTableRow>
+          </EccUtilsDesignTableFooter>
+        </EccUtilsDesignTable>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="table-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/table"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/button"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <ecc-utils-design-table>
+          <ecc-utils-design-table-header>
+            <ecc-utils-design-table-row>
+              <ecc-utils-design-table-head class="w-4/12">Name</ecc-utils-design-table-head>
+              <ecc-utils-design-table-head class="w-4/12">Email</ecc-utils-design-table-head>
+              <ecc-utils-design-table-head class="w-2/12">Status</ecc-utils-design-table-head>
+              <ecc-utils-design-table-head class="w-2/12">Actions</ecc-utils-design-table-head>
+            </ecc-utils-design-table-row>
+          </ecc-utils-design-table-header>
+          <ecc-utils-design-table-body>
+            <ecc-utils-design-table-row>
+              <ecc-utils-design-table-cell class="w-4/12">Alice Johnson</ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-4/12">alice@example.com</ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-2/12">Active</ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-2/12">
+                <ecc-utils-design-button size="sm">Edit</ecc-utils-design-button>
+                <ecc-utils-design-button size="sm" variant="destructive">Delete</ecc-utils-design-button>
+              </ecc-utils-design-table-cell>
+            </ecc-utils-design-table-row>
+            <ecc-utils-design-table-row>
+              <ecc-utils-design-table-cell class="w-4/12">Bob Smith</ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-4/12">bob@example.com</ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-2/12">Inactive</ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-2/12">
+                <ecc-utils-design-button size="sm">Edit</ecc-utils-design-button>
+                <ecc-utils-design-button size="sm" variant="destructive">Delete</ecc-utils-design-button>
+              </ecc-utils-design-table-cell>
+            </ecc-utils-design-table-row>
+          </ecc-utils-design-table-body>
+          <ecc-utils-design-table-footer>
+            <ecc-utils-design-table-row>
+              <ecc-utils-design-table-cell class="w-full">
+                <div class="text-sm text-muted-foreground">Total: 2 users</div>
+              </ecc-utils-design-table-cell>
+            </ecc-utils-design-table-row>
+          </ecc-utils-design-table-footer>
+        </ecc-utils-design-table>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Table with Caption
+
+This example shows a table with a caption for additional context.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-3/12">Invoice</TableHead>
+          <TableHead className="w-3/12">Status</TableHead>
+          <TableHead className="w-3/12">Method</TableHead>
+          <TableHead className="w-3/12 part:text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell className="w-3/12">INV001</TableCell>
+          <TableCell className="w-3/12">Paid</TableCell>
+          <TableCell className="w-3/12">Credit Card</TableCell>
+          <TableCell className="w-3/12 part:text-right">$250.00</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell className="w-3/12">INV002</TableCell>
+          <TableCell className="w-3/12">Pending</TableCell>
+          <TableCell className="w-3/12">PayPal</TableCell>
+          <TableCell className="w-3/12 part:text-right">$150.00</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell className="w-3/12">INV003</TableCell>
+          <TableCell className="w-3/12">Unpaid</TableCell>
+          <TableCell className="w-3/12">Bank Transfer</TableCell>
+          <TableCell className="w-3/12 part:text-right">$350.00</TableCell>
+        </TableRow>
+      </TableBody>
+      <TableCaption>A list of recent invoices</TableCaption>
+    </Table>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="table-with-caption.tsx"
+    import React from 'react';
+    import {
+      EccUtilsDesignTable,
+      EccUtilsDesignTableHeader,
+      EccUtilsDesignTableBody,
+      EccUtilsDesignTableRow,
+      EccUtilsDesignTableHead,
+      EccUtilsDesignTableCell,
+      EccUtilsDesignTableCaption,
+    } from '@elixir-cloud/design/react/table';
+
+    export default function TableWithCaption() {
+      return (
+        <EccUtilsDesignTable>
+          <EccUtilsDesignTableCaption>A list of recent invoices</EccUtilsDesignTableCaption>
+          <EccUtilsDesignTableHeader>
+            <EccUtilsDesignTableRow>
+              <EccUtilsDesignTableHead className="w-3/12">Invoice</EccUtilsDesignTableHead>
+              <EccUtilsDesignTableHead className="w-3/12">Status</EccUtilsDesignTableHead>
+              <EccUtilsDesignTableHead className="w-3/12">Method</EccUtilsDesignTableHead>
+              <EccUtilsDesignTableHead className="w-3/12 part:text-right">Amount</EccUtilsDesignTableHead>
+            </EccUtilsDesignTableRow>
+          </EccUtilsDesignTableHeader>
+          <EccUtilsDesignTableBody>
+            <EccUtilsDesignTableRow>
+              <EccUtilsDesignTableCell className="w-3/12">INV001</EccUtilsDesignTableCell>
+              <EccUtilsDesignTableCell className="w-3/12">Paid</EccUtilsDesignTableCell>
+              <EccUtilsDesignTableCell className="w-3/12">Credit Card</EccUtilsDesignTableCell>
+              <EccUtilsDesignTableCell className="w-3/12 part:text-right">$250.00</EccUtilsDesignTableCell>
+            </EccUtilsDesignTableRow>
+            <EccUtilsDesignTableRow>
+              <EccUtilsDesignTableCell className="w-3/12">INV002</EccUtilsDesignTableCell>
+              <EccUtilsDesignTableCell className="w-3/12">Pending</EccUtilsDesignTableCell>
+              <EccUtilsDesignTableCell className="w-3/12">PayPal</EccUtilsDesignTableCell>
+              <EccUtilsDesignTableCell className="w-3/12 part:text-right">$150.00</EccUtilsDesignTableCell>
+            </EccUtilsDesignTableRow>
+            <EccUtilsDesignTableRow>
+              <EccUtilsDesignTableCell className="w-3/12">INV003</EccUtilsDesignTableCell>
+              <EccUtilsDesignTableCell className="w-3/12">Unpaid</EccUtilsDesignTableCell>
+              <EccUtilsDesignTableCell className="w-3/12">Bank Transfer</EccUtilsDesignTableCell>
+              <EccUtilsDesignTableCell className="w-3/12 part:text-right">$350.00</EccUtilsDesignTableCell>
+            </EccUtilsDesignTableRow>
+          </EccUtilsDesignTableBody>
+        </EccUtilsDesignTable>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="table-with-caption.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/table"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <ecc-utils-design-table>
+          <ecc-utils-design-table-caption>A list of recent invoices</ecc-utils-design-table-caption>
+          <ecc-utils-design-table-header>
+            <ecc-utils-design-table-row>
+              <ecc-utils-design-table-head class="w-3/12">Invoice</ecc-utils-design-table-head>
+              <ecc-utils-design-table-head class="w-3/12">Status</ecc-utils-design-table-head>
+              <ecc-utils-design-table-head class="w-3/12">Method</ecc-utils-design-table-head>
+              <ecc-utils-design-table-head class="w-3/12 text-right">Amount</ecc-utils-design-table-head>
+            </ecc-utils-design-table-row>
+          </ecc-utils-design-table-header>
+          <ecc-utils-design-table-body>
+            <ecc-utils-design-table-row>
+              <ecc-utils-design-table-cell class="w-3/12">INV001</ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-3/12">Paid</ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-3/12">Credit Card</ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-3/12 text-right">$250.00</ecc-utils-design-table-cell>
+            </ecc-utils-design-table-row>
+            <ecc-utils-design-table-row>
+              <ecc-utils-design-table-cell class="w-3/12">INV002</ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-3/12">Pending</ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-3/12">PayPal</ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-3/12 text-right">$150.00</ecc-utils-design-table-cell>
+            </ecc-utils-design-table-row>
+            <ecc-utils-design-table-row>
+              <ecc-utils-design-table-cell class="w-3/12">INV003</ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-3/12">Unpaid</ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-3/12">Bank Transfer</ecc-utils-design-table-cell>
+              <ecc-utils-design-table-cell class="w-3/12 text-right">$350.00</ecc-utils-design-table-cell>
+            </ecc-utils-design-table-row>
+          </ecc-utils-design-table-body>
+        </ecc-utils-design-table>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Components
+
+| Component        | Tag Name                           | Description                                          |
+|------------------|------------------------------------|------------------------------------------------------|
+| `Table`          | `ecc-utils-design-table`           | The root container for the table.                   |
+| `TableHeader`    | `ecc-utils-design-table-header`    | The header section of the table.                    |
+| `TableBody`      | `ecc-utils-design-table-body`      | The body section containing the main data rows.     |
+| `TableFooter`    | `ecc-utils-design-table-footer`    | The footer section of the table.                    |
+| `TableRow`       | `ecc-utils-design-table-row`       | A table row in any section.                         |
+| `TableHead`      | `ecc-utils-design-table-head`      | A header cell.                                       |
+| `TableCell`      | `ecc-utils-design-table-cell`      | A data cell.                                         |
+| `TableCaption`   | `ecc-utils-design-table-caption`   | A caption describing the table content.             |
+
+## Properties
+
+The table components do not have any custom properties. All styling and layout is controlled through CSS classes.
+
+## Events
+
+The table components are primarily presentational and do not emit custom events. However, you can add standard event listeners to individual cells or rows as needed for your application logic. 

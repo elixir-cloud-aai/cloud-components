@@ -1,0 +1,85 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import Skeleton from '@elixir-cloud/design/react/skeleton';
+
+# EccUtilsDesignSkeleton Component
+
+<ComponentName
+  tagName='ecc-utils-design-skeleton'
+  reactTagName='EccUtilsDesignSkeleton'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-utils-design-skeleton` component is used to display a placeholder preview of content while it is loading. It provides a visual cue that a component has not yet rendered, improving the user experience by reducing perceived load times.
+
+<Callout type='info'>
+  This component is designed to be styled with standard CSS classes to match the dimensions of the content it is replacing.
+</Callout>
+
+## Usage
+
+### Basic Skeleton
+
+This example shows a few basic skeleton placeholders with different dimensions.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <div className="flex items-center space-x-4">
+      <Skeleton className="part:h-12 part:w-12 part:rounded-full" />
+      <div className="flex flex-col gap-2">
+        <Skeleton className="part:h-4 part:w-[250px]" />
+        <Skeleton className="part:h-4 part:w-[200px]" />
+      </div>
+    </div>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="skeleton-basic.tsx"
+    import React from 'react';
+    import { EccUtilsDesignSkeleton } from '@elixir-cloud/design/react/skeleton';
+
+    export default function BasicSkeleton() {
+      return (
+        <div className="flex items-center space-x-4">
+          <EccUtilsDesignSkeleton className="part:h-12 part:w-12 part:rounded-full" />
+          <div className="flex flex-col gap-2">
+            <EccUtilsDesignSkeleton className="part:h-4 part:w-[250px]" />
+            <EccUtilsDesignSkeleton className="part:h-4 part:w-[200px]" />
+          </div>
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="skeleton-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/skeleton"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <div class="flex items-center space-x-4 p-4">
+          <ecc-utils-design-skeleton class="h-12 w-12 rounded-full"></ecc-utils-design-skeleton>
+          <div class="flex flex-col gap-2">
+            <ecc-utils-design-skeleton class="h-4 w-[250px]"></ecc-utils-design-skeleton>
+            <ecc-utils-design-skeleton class="h-4 w-[200px]"></ecc-utils-design-skeleton>
+          </div>
+        </div>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+This component does not have any unique properties. It can be styled using the standard `class` attribute in HTML or `className` in React.
+
+## Events
+
+This component does not emit any custom events. 

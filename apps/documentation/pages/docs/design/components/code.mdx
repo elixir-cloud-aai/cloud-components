@@ -1,65 +1,181 @@
-import { Callout, Tabs } from 'nextra/components';
-import ComponentName from '@/components/common/ComponentName.tsx';
-import Code from '@/components/packages/design/code/code.tsx';
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import Code from '@elixir-cloud/design/react/code';
 
 # EccUtilsDesignCode Component
 
 <ComponentName
   tagName='ecc-utils-design-code'
   reactTagName='EccUtilsDesignCode'
-  version='0.1.0'
-  beta
+  version='2.0.0-alpha.6'
 />
 
 ## Overview
 
-The EccUtilsDesignCode component is a customizable code editor built using the Ace editor. It provides a user-friendly interface for displaying and editing code in various languages, with syntax highlighting and theme support.
+The `ecc-utils-design-code` component is a powerful code editor built on top of the [Ace Editor](https://ace.c9.io/). It provides syntax highlighting for over 160 programming languages, automatic language detection from file extensions, and real-time change events.
 
 <Callout type='info'>
-  <div className='text-sm'>
-    This component uses the Ace editor. For more details, refer to the [Ace editor documentation](https://ace.c9.io/).
-  </div>
+  This component uses Ace Editor v1.35.0 and supports all major programming languages with intelligent syntax highlighting.
 </Callout>
 
-## Preview
+## Usage
 
-<Code />
+### Basic Code Editor
 
-## Examples
-
-### Basic Usage
-
-<Tabs items={['React', 'HTML']}>
+<Tabs items={['Preview', 'React', 'HTML']}>
   <Tabs.Tab>
-    ```tsx showLineNumbers {2, 5-10} copy filename="EccUtilsDesignCodeExample.tsx"
-    import React from 'react';
-    import EccUtilsDesignCode from '@elixir-cloud/design/dist/react/code';
+    <div style={{ height: '400px' }}>
+      <Code 
+        value={`// Interactive code editor example
+function fibonacci(n) {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+// Calculate Fibonacci numbers
+const result = fibonacci(8);
+console.log('Result:', result); // Output: 21`}
+        language="javascript"
+      />
+    </div>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="code-editor.tsx"
+    import React, { useState } from 'react';
+    import { EccUtilsDesignCode } from '@elixir-cloud/design/react/code';
 
     export default function CodeEditor() {
-      return <EccUtilsDesignCode 
-        value="echo 'Hello, World!';"
-        label="Shell Script Example"
-        language="sh"
-        disabled={false}
-      />;
+      const [code, setCode] = useState(`// Interactive code editor example
+function fibonacci(n) {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+// Calculate Fibonacci numbers
+const result = fibonacci(8);
+console.log('Result:', result); // Output: 21`);
+      
+      return (
+        <div style={{ height: '400px' }}>
+          <EccUtilsDesignCode 
+            value={code}
+            language="javascript"
+            onEccInputChanged={(e) => setCode(e.detail.value)}
+          />
+        </div>
+      );
     }
     ```
   </Tabs.Tab>
   
   <Tabs.Tab>
-    ```html showLineNumbers {4, 7-12} copy filename="index.html"
+    ```html showLineNumbers copy filename="code-editor.html"
+    <!DOCTYPE html>
     <html lang="en">
       <head>
-        <title>EccUtilsDesignCode Example</title>
-        <script src="https://esm.sh/@elixir-cloud/design/dist/index.js"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/code"></script>
+        <style>
+          .code-editor { 
+            height: 400px; 
+            width: 100%; 
+          }
+        </style>
       </head>
       <body>
-        <ecc-utils-design-code
-          value="echo 'Hello, World!';"
-          label="Shell Script Example"
-          language="sh"
-          disabled="false"
-        ></ecc-utils-design-code>
+        <div class="code-editor">
+          <ecc-utils-design-code
+            value="// Interactive code editor example
+function fibonacci(n) {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+// Calculate Fibonacci numbers
+const result = fibonacci(8);
+console.log('Result:', result); // Output: 21"
+            language="javascript"
+          ></ecc-utils-design-code>
+        </div>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Read-Only Display
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <div style={{ height: '300px' }}>
+      <Code 
+        value={`def quicksort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    right = [x for x in arr if x > pivot]
+    return quicksort(left) + [pivot] + quicksort(right)`}
+        language="python"
+        disabled={true}
+      />
+    </div>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="readonly-code.tsx"
+    import React from 'react';
+    import { EccUtilsDesignCode } from '@elixir-cloud/design/react/code';
+
+    export default function ReadOnlyCode() {
+      const pythonCode = `def quicksort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    right = [x for x in arr if x > pivot]
+    return quicksort(left) + [pivot] + quicksort(right)`;
+
+      return (
+        <div style={{ height: '300px' }}>
+          <EccUtilsDesignCode 
+            value={pythonCode}
+            language="python"
+            disabled={true}
+          />
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="readonly-code.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/code"></script>
+        <style>
+          .readonly-code { 
+            height: 300px; 
+            width: 100%; 
+          }
+        </style>
+      </head>
+      <body>
+        <div class="readonly-code">
+          <ecc-utils-design-code
+            language="python"
+            disabled="true"
+            value="def quicksort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    right = [x for x in arr if x > pivot]
+    return quicksort(left) + [pivot] + quicksort(right)"
+          ></ecc-utils-design-code>
+        </div>
       </body>
     </html>
     ```
@@ -68,43 +184,121 @@ The EccUtilsDesignCode component is a customizable code editor built using the A
 
 ## Properties
 
-| Property   | Required | Default      | Type      | Description                                   |
-|------------|----------|--------------|-----------|-----------------------------------------------|
-| `value`    | false    | `""`         | `String`  | The initial code content                      |
-| `label`    | false    | `"Code block"` | `String`  | Label displayed above the code editor         |
-| `language` | false    | `"json"`     | [`Language`](#language)| The programming language for syntax highlighting |
-| `disabled` | false    | `false`      | `Boolean` | Whether the editor is read-only               |
+| Property    | Type      | Default | Description                                                                    |
+|-------------|-----------|---------|--------------------------------------------------------------------------------|
+| `value`     | `string`  | `""`    | The code content displayed in the editor                                       |
+| `language`  | `string`  | `"text"`| Programming language for syntax highlighting                                   |
+| `extension` | `string`  | `""`    | File extension for automatic language detection (overrides `language`)         |
+| `disabled`  | `boolean` | `false` | When `true`, makes the editor read-only                                        |
 
-### value
+### `value`
+Controls the content displayed in the code editor. This property is reactive - changes to this property will update the editor content, and when users edit the code, it will emit change events with the new value.
 
-The `value` property sets the initial content of the code editor.
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignCode value="console.log('Hello!');" />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-code value="console.log('Hello!');"></ecc-utils-design-code>
+    ```
+  </Tabs.Tab>
+</Tabs>
 
-### label
+### `language`
+Specifies the programming language for syntax highlighting. Supports over 160 languages including `javascript`, `python`, `java`, `html`, `css`, `json`, `yaml`, etc. When not specified, defaults to `"text"` with no syntax highlighting.
 
-The `label` property specifies the text displayed above the code editor.
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignCode 
+      value="def hello(): print('Hello!')" 
+      language="python" 
+    />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-code 
+      value="def hello(): print('Hello!')" 
+      language="python">
+    </ecc-utils-design-code>
+    ```
+  </Tabs.Tab>
+</Tabs>
 
-### language
+### `extension`
+Automatically detects the programming language from file extensions (e.g., `.js`, `.py`, `.html`). This is useful for file-based workflows. If both `language` and `extension` are provided, `extension` takes precedence.
 
-The `language` property determines the syntax highlighting. Supported values are:
-- `"yaml"`
-- `"json"`
-- `"xml"`
-- `"makefile"`
-- `"sh"`
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignCode 
+      value="const x = 5;" 
+      extension="js" 
+    />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-code 
+      value="const x = 5;" 
+      extension="js">
+    </ecc-utils-design-code>
+    ```
+  </Tabs.Tab>
+</Tabs>
 
-<Callout type='info'>
-  <div className='text-sm'>
-    While we maintain & provide support for the above languages, the Ace editor supports many more.
-    For a full list of supported languages, refer to the [Ace editor documentation](https://ace.c9.io/).
-  </div>
-</Callout>
+### `disabled`
+When set to `true`, makes the editor read-only. Users can view and select code but cannot modify it. Perfect for documentation, code examples, or display-only scenarios.
 
-### disabled
-
-When `true`, the `disabled` property makes the code editor read-only.
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignCode 
+      value="const readOnly = true;" 
+      disabled={true} 
+    />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-code 
+      value="const readOnly = true;" 
+      disabled="true">
+    </ecc-utils-design-code>
+    ```
+  </Tabs.Tab>
+</Tabs>
 
 ## Events
 
-| Event Name        | Detail                   | Description                         |
-|-------------------|--------------------------|-------------------------------------|
-| `ecc-utils-change`| `{ value: string }`      | Fired when the editor content changes |
+| Event Name          | React Event Name     | Detail Type             | Description                                    |
+|--------------------|---------------------|-------------------------|------------------------------------------------|
+| `ecc-input-changed` | `onEccInputChanged` | `{ value: string }`    | Fired when the editor content changes          |
+
+### `ecc-input-changed`
+Emitted whenever the user modifies the code content. The event detail contains the updated code value. This allows you to track changes, save content, or update other parts of your application.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignCode 
+      value={code}
+      onEccInputChanged={(event) => {
+        setCode(event.detail.value);
+      }}
+    />
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    editor.addEventListener('ecc-input-changed', (event) => {
+      console.log('New code:', event.detail.value);
+    });
+    ```
+  </Tabs.Tab>
+</Tabs> 

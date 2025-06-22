@@ -1,0 +1,178 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import ServicePreview from '@/components/packages/service-registry/ServicePreview'
+
+# EccClientGa4ghServiceRegistryService Component
+
+<ComponentName
+  tagName='ecc-client-ga4gh-service-registry-service'
+  reactTagName='EccClientGa4ghServiceRegistryService'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-client-ga4gh-service-registry-service` component displays detailed information about a specific service from a GA4GH Service Registry. It presents service metadata, organization details, API specifications, and contact information in an organized layout.
+
+<Callout type='info'>
+  This component is designed to show comprehensive service details and works best when used alongside the Services component for navigation.
+</Callout>
+
+## Usage
+
+### Basic Service Details
+
+This example demonstrates displaying service details for a specific service ID.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <ServicePreview />
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="service-basic.tsx"
+    import React from 'react';
+    import { EccClientGa4ghServiceRegistryService } from '@elixir-cloud/service-registry/react/service';
+    import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+
+    export default function ServiceBasic() {
+      const provider = new RestServiceRegistryProvider(
+        'https://cloud-registry.anuragxd.com/ga4gh/registry/v1'
+      );
+
+      const handleServiceChanged = (event) => {
+        console.log('Service data updated:', event.detail.service);
+      };
+
+      return (
+        <div style={{ height: '600px' }}>
+          <EccClientGa4ghServiceRegistryService 
+            provider={provider}
+            serviceId="service-123"
+            onEccServiceChanged={handleServiceChanged}
+          />
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="service-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/service-registry@2.0.0-alpha.6"></script>
+        <style>
+          .service-container { 
+            height: 600px; 
+            width: 100%; 
+          }
+        </style>
+      </head>
+      <body>
+        <div class="service-container">
+          <ecc-client-ga4gh-service-registry-service
+            service-id="service-123"
+          ></ecc-client-ga4gh-service-registry-service>
+        </div>
+
+        <script type="module">
+          import { RestServiceRegistryProvider } from 'https://esm.sh/@elixir-cloud/service-registry@2.0.0-alpha.6/providers';
+          
+          const provider = new RestServiceRegistryProvider(
+            'https://cloud-registry.anuragxd.com/ga4gh/registry/v1'
+          );
+          
+          document.querySelector('ecc-client-ga4gh-service-registry-service').provider = provider;
+
+          document.addEventListener('ecc-service-changed', (event) => {
+            console.log('Service data updated:', event.detail.service);
+          });
+        </script>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property    | Type                      | Default | Description                                                                    |
+|-------------|---------------------------|---------|--------------------------------------------------------------------------------|
+| `serviceId` | `string`                  | `""`    | ID of the service to display details for                                       |
+| `provider`  | `ServiceRegistryProvider` | `null`  | Data provider for fetching service data (see [Providers](/docs/service-registry/providers)) |
+
+### `serviceId`
+The unique identifier of the service to display. This is typically obtained from the Services component's selection event or URL parameters.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientGa4ghServiceRegistryService serviceId="my-service-123" />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-client-ga4gh-service-registry-service service-id="my-service-123"></ecc-client-ga4gh-service-registry-service>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `provider`
+The data provider responsible for fetching service details from the registry. You must provide a provider that implements the `ServiceRegistryProvider` interface. See the [Providers documentation](/docs/service-registry/providers) for detailed information about available providers and how to create custom ones.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+    
+    const provider = new RestServiceRegistryProvider('https://cloud-registry.anuragxd.com/ga4gh/registry/v1');
+    
+    <EccClientGa4ghServiceRegistryService provider={provider} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <script type="module">
+      import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+      
+      const provider = new RestServiceRegistryProvider('https://cloud-registry.anuragxd.com/ga4gh/registry/v1');
+      document.querySelector('ecc-client-ga4gh-service-registry-service').provider = provider;
+    </script>
+    <ecc-client-ga4gh-service-registry-service></ecc-client-ga4gh-service-registry-service>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Events
+
+| Event Name           | React Event Name      | Detail Type                    | Description                                    |
+|----------------------|-----------------------|--------------------------------|------------------------------------------------|
+| `ecc-service-changed` | `onEccServiceChanged` | `{ service: ExternalService }` | Fired when the service data is loaded/updated |
+
+### `ecc-service-changed`
+Emitted when the service data is successfully loaded or updated, providing the complete service information.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientGa4ghServiceRegistryService 
+      onEccServiceChanged={(event) => {
+        console.log('Service loaded:', event.detail.service);
+        // Update page metadata, breadcrumbs, etc.
+      }}
+    />
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    element.addEventListener('ecc-service-changed', (event) => {
+      console.log('Service loaded:', event.detail.service);
+      // Update page title or other UI elements
+      document.title = `Service: ${event.detail.service.name}`;
+    });
+    ```
+  </Tabs.Tab>
+</Tabs> 

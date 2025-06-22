@@ -1,0 +1,52 @@
+import { Callout, Tabs } from 'nextra/components'
+
+# Providers
+
+Data providers are responsible for fetching data from a GA4GH Tool Registry Service (TRS) endpoint. The `@elixir-cloud/trs` package includes a `RestTrsProvider` for interacting with REST-based TRS APIs.
+
+## TrsProvider
+
+`TrsProvider` is an abstract base class that defines the interface for all TRS data providers. To create a custom provider, you can extend this class and implement its methods.
+
+```ts
+export declare abstract class TrsProvider {
+    abstract getTools(
+        query: ToolQuery,
+        signal?: AbortSignal,
+    ): Promise<TableData<Tool>>;
+    
+    abstract getTool(
+        id: string,
+        signal?: AbortSignal,
+    ): Promise<Tool | undefined>;
+}
+```
+
+## RestTrsProvider
+
+The `RestTrsProvider` is a concrete implementation of `TrsProvider` that uses the `fetch` API to make requests to a RESTful TRS endpoint.
+
+### Usage
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy
+    import { RestTrsProvider } from '@elixir-cloud/trs/providers';
+
+    const provider = new RestTrsProvider(
+      'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
+    );
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html showLineNumbers copy
+    <script type="module">
+      import { RestTrsProvider } from 'https://esm.sh/@elixir-cloud/trs@2.0.0-alpha.6/providers';
+      
+      const provider = new RestTrsProvider(
+        'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
+      );
+    </script>
+    ```
+  </Tabs.Tab>
+</Tabs> 

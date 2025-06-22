@@ -441,16 +441,24 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
               class="text-sm font-medium"
             >
               Workflow Type <span class="text-destructive">*</span>
+              ${this.loading
+                ? html`<span class="text-xs text-muted-foreground ml-2"
+                    >(Loading...)</span
+                  >`
+                : ""}
             </ecc-utils-design-label>
             <ecc-utils-design-select
               id="workflow-type"
               .value=${this.formData.workflowType}
               @ecc-input-changed=${this.handleWorkflowTypeChange}
+              ?disabled=${this.loading}
               required
             >
               <ecc-utils-design-select-trigger class="h-10">
                 <ecc-utils-design-select-value
-                  placeholder="Select workflow type"
+                  placeholder=${this.loading
+                    ? "Loading workflow types..."
+                    : "Select workflow type"}
                 >
                 </ecc-utils-design-select-value>
               </ecc-utils-design-select-trigger>
@@ -466,16 +474,26 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
               class="text-sm font-medium"
             >
               Workflow Type Version <span class="text-destructive">*</span>
+              ${this.loading
+                ? html`<span class="text-xs text-muted-foreground ml-2"
+                    >(Loading...)</span
+                  >`
+                : ""}
             </ecc-utils-design-label>
             <ecc-utils-design-select
               id="workflow-version"
               .value=${this.formData.workflowTypeVersion}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("workflowTypeVersion", e.detail.value)}
+              ?disabled=${this.loading || !this.formData.workflowType}
               required
             >
               <ecc-utils-design-select-trigger class="h-10">
-                <ecc-utils-design-select-value placeholder="Select version">
+                <ecc-utils-design-select-value
+                  placeholder=${this.loading
+                    ? "Loading versions..."
+                    : "Select version"}
+                >
                 </ecc-utils-design-select-value>
               </ecc-utils-design-select-trigger>
               <ecc-utils-design-select-content>
@@ -575,6 +593,14 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
   }
 
   private renderWorkflowTypeOptions() {
+    if (this.loading) {
+      return html`
+        <ecc-utils-design-select-item value="" disabled>
+          Loading workflow types...
+        </ecc-utils-design-select-item>
+      `;
+    }
+
     if (!this.serviceInfo) return html``;
 
     return Object.keys(this.serviceInfo.workflow_type_versions).map(
@@ -587,6 +613,14 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
   }
 
   private renderWorkflowVersionOptions() {
+    if (this.loading) {
+      return html`
+        <ecc-utils-design-select-item value="" disabled>
+          Loading versions...
+        </ecc-utils-design-select-item>
+      `;
+    }
+
     if (!this.serviceInfo || !this.formData.workflowType) return html``;
 
     const versions =
@@ -682,14 +716,6 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
   }
 
   render() {
-    if (this.loading) {
-      return html`
-        <div class="p-6">
-          <p>Loading service information...</p>
-        </div>
-      `;
-    }
-
     return html`
       <div class="">
         <form
@@ -727,6 +753,7 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
                 type="submit"
                 @click=${this.handleSubmit}
                 ?disabled=${this.submitting ||
+                this.loading ||
                 !this.formData.workflowUrl ||
                 !this.formData.workflowType ||
                 !this.formData.workflowTypeVersion}

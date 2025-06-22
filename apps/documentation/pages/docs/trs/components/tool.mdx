@@ -1,0 +1,91 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import ToolPreview from '@/components/packages/trs/ToolPreview'
+
+# EccClientGa4ghTrsTool Component
+
+<ComponentName
+  tagName='ecc-client-ga4gh-trs-tool'
+  reactTagName='ECCClientGa4ghTrsTool'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-client-ga4gh-trs-tool` component displays detailed information about a specific tool from a GA4GH Tool Registry Service.
+
+## Usage
+
+### Basic Tool Details
+
+This example demonstrates displaying tool details for a specific tool ID.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <ToolPreview />
+    <Callout type="info" emoji="ℹ️">
+      The preview above uses a fixed `toolId`. Since the TRS instance is not production ready, this tool may not exist.
+    </Callout>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="tool-basic.tsx"
+    import React from 'react';
+    import { ECCClientGa4ghTrsTool } from '@elixir-cloud/trs/react';
+    import { RestTrsProvider } from '@elixir-cloud/trs/providers';
+
+    export default function ToolBasic() {
+      const provider = new RestTrsProvider(
+        'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
+      );
+
+      return (
+        <ECCClientGa4ghTrsTool 
+          provider={provider}
+          toolId="placeholder-tool"
+        />
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="tool-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/trs@2.0.0-alpha.6"></script>
+      </head>
+      <body>
+        <ecc-client-ga4gh-trs-tool
+          tool-id="placeholder-tool"
+        >
+        </ecc-client-ga4gh-trs-tool>
+
+        <script type="module">
+          import { RestTrsProvider } from 'https://esm.sh/@elixir-cloud/trs@2.0.0-alpha.6/providers';
+          
+          const provider = new RestTrsProvider(
+            'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
+          );
+          
+          document.querySelector('ecc-client-ga4gh-trs-tool').provider = provider;
+        </script>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property    | Type                      | Default | Description                                                                    |
+|-------------|---------------------------|---------|--------------------------------------------------------------------------------|
+| `toolId` | `string`                  | `""`    | ID of the tool to display details for                                       |
+| `provider`  | `TrsProvider` | `null`  | Data provider for fetching tool data (see [Providers](/docs/trs/providers)) |
+
+## Events
+
+| Event Name             | React Event Name        | Detail Type                    | Description                                    |
+|------------------------|------------------------|--------------------------------|------------------------------------------------|
+| `ecc-tool-version-changed` | `onEccToolVersionChanged` | `{ toolId: string, versionId: string }`        | Fired when a user selects a tool version     |

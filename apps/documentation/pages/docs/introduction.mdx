@@ -1,6 +1,10 @@
 import { Callout } from 'nextra/components';
 import { Steps } from 'nextra/components';
-import Card from '@/components/common/Card';
+import {
+  RiBook2Line,
+  RiExternalLinkLine,
+  RiCodeBoxLine,
+} from '@remixicon/react';
 
 # Introduction
 
@@ -10,9 +14,189 @@ The ELIXIR Cloud Components (ECC) are a suite of web components designed for int
 
 While we are continuously expanding the ECC suite, the current version includes components for the following services:
 
-<div className='flex gap-4 mt-4'>
-  <Card title='Task Execution Service (TES)' href='/docs/tes/introduction' />
-  <Card title='Workflow Execution Service (WES)' href='/docs/wes/introduction' />
+<div className="w-full overflow-x-auto">
+  <table className="w-full text-left">
+    <thead className="bg-gray-50 dark:bg-gray-800">
+      <tr className="border-b">
+        <th className="p-4">Service Name & Version</th>
+        <th className="p-4">Package Name</th>
+        <th className="p-4 text-center">Links</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr className="border-b">
+        <td className="p-4">
+          <div className="font-semibold">Service Registry</div>
+          <a
+            href="#"
+            className="text-gray-400 dark:text-gray-600 cursor-not-allowed text-sm"
+            title="OpenAPI Spec (Not available)"
+          >
+            @ GA4GH API v1
+          </a>
+        </td>
+        <td className="p-4 text-sm">
+          <code>@elixir-cloud/service-registry</code>
+        </td>
+        <td className="p-4">
+          <div className="flex items-center justify-center gap-6">
+            <a
+              href="/docs/service-registry"
+              title="Documentation"
+              className="text-gray-500 hover:text-current"
+            >
+              <RiBook2Line size={20} />
+            </a>
+            <a
+              href="https://cloud-registry.anuragxd.com"
+              title="Service URL"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-current"
+            >
+              <RiExternalLinkLine size={20} />
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr className="border-b bg-gray-50 dark:bg-gray-800/50">
+        <td className="p-4">
+          <div className="font-semibold">Cloud Registry</div>
+           <a
+            href="#"
+            className="text-gray-400 dark:text-gray-600 cursor-not-allowed text-sm"
+            title="OpenAPI Spec (Not available)"
+          >
+            @ Elixir Cloud & AAI API v1
+          </a>
+        </td>
+        <td className="p-4 text-sm">
+          <code>@elixir-cloud/cloud-registry</code>
+        </td>
+        <td className="p-4">
+          <div className="flex items-center justify-center gap-6">
+            <a
+              href="/docs/cloud-registry"
+              title="Documentation"
+              className="text-gray-500 hover:text-current"
+            >
+              <RiBook2Line size={20} />
+            </a>
+            <a
+              href="https://cloud-registry.anuragxd.com"
+              title="Service URL"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-current"
+            >
+              <RiExternalLinkLine size={20} />
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr className="border-b">
+        <td className="p-4">
+          <div className="font-semibold">Tool Registry Service (TRS)</div>
+          <a
+            href="https://trs-filer.anuragxd.com/ga4gh/trs/v2/openapi.json"
+            title="OpenAPI Spec"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-500 hover:text-current text-sm"
+          >
+            @ GA4GH API v2
+          </a>
+        </td>
+        <td className="p-4 text-sm">
+          <code>@elixir-cloud/trs</code>
+        </td>
+        <td className="p-4">
+          <div className="flex items-center justify-center gap-6">
+            <a href="/docs/trs" title="Documentation" className="text-gray-500 hover:text-current">
+              <RiBook2Line size={20} />
+            </a>
+            <a
+              href="https://trs-filer.anuragxd.com"
+              title="Service URL"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-current"
+            >
+              <RiExternalLinkLine size={20} />
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr className="border-b bg-gray-50 dark:bg-gray-800/50">
+        <td className="p-4">
+          <div className="font-semibold">TRS-Filer</div>
+          <a
+            href="https://trs-filer.anuragxd.com/ga4gh/trs/v2/openapi.json"
+            title="OpenAPI Spec"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-500 hover:text-current text-sm"
+          >
+            @ Elixir Cloud & AAI API v2
+          </a>
+        </td>
+        <td className="p-4 text-sm">
+          <code>@elixir-cloud/trs-filer</code>
+        </td>
+        <td className="p-4">
+          <div className="flex items-center justify-center gap-6">
+            <a
+              href="/docs/trs-filer"
+              title="Documentation"
+              className="text-gray-500 hover:text-current"
+            >
+              <RiBook2Line size={20} />
+            </a>
+            <a
+              href="https://trs-filer.anuragxd.com"
+              title="Service URL"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-current"
+            >
+              <RiExternalLinkLine size={20} />
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr className="border-b">
+        <td className="p-4">
+          <div className="font-semibold">Workflow Execution Service (WES)</div>
+          <a
+            href="#"
+            className="text-gray-400 dark:text-gray-600 cursor-not-allowed text-sm"
+            title="OpenAPI Spec (Not available)"
+          >
+            @ GA4GH API v1
+          </a>
+        </td>
+        <td className="p-4 text-sm">
+          <code>@elixir-cloud/wes</code>
+        </td>
+        <td className="p-4">
+          <div className="flex items-center justify-center gap-6">
+            <a href="/docs/wes" title="Documentation" className="text-gray-500 hover:text-current">
+              <RiBook2Line size={20} />
+            </a>
+            <a
+              href="https://weskit.anuragxd.com"
+              title="Service URL"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-current"
+            >
+              <RiExternalLinkLine size={20} />
+            </a>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 ## Technical Overview

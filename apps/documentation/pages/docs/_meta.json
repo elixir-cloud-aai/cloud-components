@@ -1,9 +1,49 @@
 {
   "introduction": "Introduction",
   "installation": "Installation",
-  "usage": "Usage",
   "customization": "Customization",
-  "tes": "Task Execution Service (TES)",
-  "wes": "Workflow Execution Service (WES)",
-  "design": "Design Package"
+  "-- Supported Services": {
+    "type": "separator",
+    "title": "Supported Services"
+  },
+  "service-registry": {
+    "title": "Service Registry",
+    "theme": {
+      "collapsed": true
+    }
+  },
+  "cloud-registry": {
+    "title": "Cloud Registry",
+    "theme": {
+      "collapsed": true
+    }
+  },
+  "trs": {
+    "title": "Tool Registry Service (TRS)",
+    "theme": {
+      "collapsed": true
+    }
+  },
+  "trs-filer": {
+    "title": "TRS-Filer",
+    "theme": {
+      "collapsed": true
+    }
+  },
+  "wes": {
+    "title": "Workflow Execution Service (WES)",
+    "theme": {
+      "collapsed": true
+    }
+  },
+  "-- More": {
+    "type": "separator",
+    "title": "More"
+  },
+  "design": {
+    "title": "Design",
+    "theme": {
+      "collapsed": true
+    }
+  }
 }

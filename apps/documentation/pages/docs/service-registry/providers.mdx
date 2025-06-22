@@ -1,0 +1,255 @@
+import { Callout, Tabs } from 'nextra/components'
+
+# Service Registry Providers
+
+Providers are the data layer for Service Registry components, responsible for fetching and managing service data from GA4GH-compliant service registry APIs. The Service Registry package includes built-in providers and supports custom provider implementations.
+
+<Callout type='info'>
+  All Service Registry components can work with any provider that implements the `ServiceRegistryProvider` interface.
+</Callout>
+
+## Provider Types
+
+### RestServiceRegistryProvider
+
+The default provider that connects to GA4GH Service Registry APIs over HTTP/REST. This provider implements the complete GA4GH Service Registry specification and handles authentication, pagination, and error management.
+
+**Features:**
+- Full GA4GH Service Registry API compliance
+- Automatic request retry with exponential backoff
+- Built-in error handling and validation
+- Support for custom headers and authentication
+
+**Usage:**
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+
+    const provider = new RestServiceRegistryProvider(
+      'https://cloud-registry.anuragxd.com/ga4gh/registry/v1'
+    );
+
+    // Use with any Service Registry component
+    <EccClientGa4ghServiceRegistryServices provider={provider} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript copy
+    import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+
+    const provider = new RestServiceRegistryProvider(
+      'https://cloud-registry.anuragxd.com/ga4gh/registry/v1'
+    );
+
+    document.querySelector('ecc-client-ga4gh-service-registry-services').provider = provider;
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+**Constructor Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `baseUrl` | `string` | Base URL of the GA4GH Service Registry API |
+
+### Custom Providers
+
+You can create custom providers by implementing the `ServiceRegistryProvider` interface. This is useful when you need to:
+
+- Connect to non-standard APIs
+- Add custom authentication logic
+- Implement caching or offline support
+- Transform data formats
+
+**Interface Definition:**
+
+```typescript
+interface ServiceRegistryProvider {
+  getServices(): Promise<ExternalService[]>;
+  getServiceById(id: string): Promise<ExternalService>;
+  getServiceTypes(): Promise<ServiceType[]>;
+  getServiceInfo(): Promise<Service>;
+}
+```
+
+**Custom Provider Example:**
+
+<Tabs items={['TypeScript', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    import { ServiceRegistryProvider, ExternalService, ServiceType } from '@elixir-cloud/service-registry/providers';
+
+    class CustomServiceRegistryProvider implements ServiceRegistryProvider {
+      private apiKey: string;
+      private baseUrl: string;
+
+      constructor(baseUrl: string, apiKey: string) {
+        this.baseUrl = baseUrl;
+        this.apiKey = apiKey;
+      }
+
+      async getServices(): Promise<ExternalService[]> {
+        const response = await fetch(`${this.baseUrl}/services`, {
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch services: ${response.statusText}`);
+        }
+        
+        return response.json();
+      }
+
+      async getServiceById(id: string): Promise<ExternalService> {
+        const response = await fetch(`${this.baseUrl}/services/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch service: ${response.statusText}`);
+        }
+        
+        return response.json();
+      }
+
+      async getServiceTypes(): Promise<ServiceType[]> {
+        const response = await fetch(`${this.baseUrl}/service-types`, {
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch service types: ${response.statusText}`);
+        }
+        
+        return response.json();
+      }
+    }
+
+    // Usage
+    const provider = new CustomServiceRegistryProvider(
+      'https://cloud-registry.anuragxd.com/ga4gh/registry/v1',
+      'your-api-key'
+    );
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript copy
+    class CustomServiceRegistryProvider {
+      constructor(baseUrl, apiKey) {
+        this.baseUrl = baseUrl;
+        this.apiKey = apiKey;
+      }
+
+      async getServices() {
+        const response = await fetch(`${this.baseUrl}/services`, {
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch services: ${response.statusText}`);
+        }
+        
+        return response.json();
+      }
+
+      async getServiceById(id) {
+        const response = await fetch(`${this.baseUrl}/services/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch service: ${response.statusText}`);
+        }
+        
+        return response.json();
+      }
+
+      async getServiceTypes() {
+        const response = await fetch(`${this.baseUrl}/service-types`, {
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch service types: ${response.statusText}`);
+        }
+        
+        return response.json();
+      }
+    }
+
+    // Usage
+    const provider = new CustomServiceRegistryProvider(
+      'https://cloud-registry.anuragxd.com/ga4gh/registry/v1',
+      'your-api-key'
+    );
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Data Types
+
+### ExternalService
+
+Represents a service registered in the service registry.
+
+```typescript
+interface ExternalService {
+  id: string;
+  name: string;
+  type: ServiceType;
+  description?: string;
+  organization: Organization;
+  contactUrl?: string;
+  documentationUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  environment?: string;
+  version?: string;
+  url: string;
+}
+```
+
+### ServiceType
+
+Represents the type/category of a service.
+
+```typescript
+interface ServiceType {
+  group: string;
+  artifact: string;
+  version: string;
+}
+```
+
+### Organization
+
+Represents the organization that owns/maintains a service.
+
+```typescript
+interface Organization {
+  name: string;
+  url: string;
+}
+```
+
+ 

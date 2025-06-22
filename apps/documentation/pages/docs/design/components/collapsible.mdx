@@ -1,0 +1,147 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import Collapsible from '@elixir-cloud/design/react/collapsible';
+import CollapsibleTrigger from '@elixir-cloud/design/react/collapsible-trigger';
+import CollapsibleContent from '@elixir-cloud/design/react/collapsible-content';
+import Button from '@elixir-cloud/design/react/button';
+
+# EccUtilsDesignCollapsible Component
+
+<ComponentName
+  tagName='ecc-utils-design-collapsible'
+  reactTagName='EccUtilsDesignCollapsible'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-utils-design-collapsible` component is used to create interactive content sections that can be expanded or collapsed. It is a compound component composed of a trigger and content area.
+
+<Callout type='info'>
+  This component is built with three parts: `ecc-utils-design-collapsible` (the root), `ecc-utils-design-collapsible-trigger` (the control), and `ecc-utils-design-collapsible-content` (the collapsible area).
+</Callout>
+
+## Usage
+
+### Basic Collapsible
+
+This example shows a simple collapsible section with a trigger button and content.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <Collapsible>
+      <CollapsibleTrigger>
+        <Button>Toggle Content</Button>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className="p-4 border mt-2 rounded-md">
+          This is the collapsible content.
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="collapsible-basic.tsx"
+    import React from 'react';
+    import { 
+      EccUtilsDesignCollapsible,
+      EccUtilsDesignCollapsibleTrigger,
+      EccUtilsDesignCollapsibleContent 
+    } from '@elixir-cloud/design/react/collapsible';
+    import { EccUtilsDesignButton } from '@elixir-cloud/design/react/button';
+
+    export default function BasicCollapsible() {
+      return (
+        <EccUtilsDesignCollapsible>
+          <EccUtilsDesignCollapsibleTrigger>
+            <EccUtilsDesignButton>Toggle Content</EccUtilsDesignButton>
+          </EccUtilsDesignCollapsibleTrigger>
+          <EccUtilsDesignCollapsibleContent>
+            <div className="p-4 border mt-2 rounded-md">
+              This is the collapsible content.
+            </div>
+          </EccUtilsDesignCollapsibleContent>
+        </EccUtilsDesignCollapsible>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="collapsible-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/collapsible"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/button"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <ecc-utils-design-collapsible>
+          <ecc-utils-design-collapsible-trigger>
+            <ecc-utils-design-button>Toggle Content</ecc-utils-design-button>
+          </ecc-utils-design-collapsible-trigger>
+          <ecc-utils-design-collapsible-content>
+            <div class="p-4 border mt-2 rounded-md">
+              This is the collapsible content.
+            </div>
+          </ecc-utils-design-collapsible-content>
+        </ecc-utils-design-collapsible>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Components
+
+The `Collapsible` is built by combining these components:
+
+| Component                       | Tag Name                               | Description                               |
+|---------------------------------|----------------------------------------|-------------------------------------------|
+| `Collapsible`                   | `ecc-utils-design-collapsible`         | The root container for the collapsible.   |
+| `CollapsibleTrigger`            | `ecc-utils-design-collapsible-trigger` | The button or element that toggles the content. |
+| `CollapsibleContent`            | `ecc-utils-design-collapsible-content` | The content that is shown or hidden.      |
+
+## Properties
+
+### `EccUtilsDesignCollapsible`
+
+| Property    | Type      | Default | Description                               |
+|-------------|-----------|---------|-------------------------------------------|
+| `open`      | `boolean` | `false` | When `true`, the collapsible is open.     |
+| `disabled`  | `boolean` | `false` | When `true`, disables the collapsible.    |
+
+## Events
+
+### `EccUtilsDesignCollapsible`
+
+| Event Name                 | React Event Name            | Detail Type        | Description                                  |
+|----------------------------|-----------------------------|--------------------|----------------------------------------------|
+| `ecc-collapsible-toggled`  | `onEccCollapsibleToggled`   | `{ open: boolean }`| Fired when the collapsible is opened or closed. |
+
+### `ecc-collapsible-toggled`
+This event is fired when the user clicks the trigger to open or close the content.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignCollapsible 
+      onEccCollapsibleToggled={(event) => {
+        console.log('Collapsible state:', event.detail.open);
+      }}
+    >
+      ...
+    </EccUtilsDesignCollapsible>
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    element.addEventListener('ecc-collapsible-toggled', (event) => {
+      console.log('Collapsible state:', event.detail.open);
+    });
+    ```
+  </Tabs.Tab>
+</Tabs> 

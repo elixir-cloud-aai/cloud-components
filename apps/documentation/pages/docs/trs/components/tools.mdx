@@ -1,0 +1,84 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import ToolsPreview from '@/components/packages/trs/ToolsPreview'
+
+# EccClientGa4ghTrsTools Component
+
+<ComponentName
+  tagName='ecc-client-ga4gh-trs-tools'
+  reactTagName='ECCClientGa4ghTrsTools'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-client-ga4gh-trs-tools` component displays a table of tools from a GA4GH-compliant Tool Registry Service. It provides built-in search functionality and pagination for browsing large tool collections.
+
+## Usage
+
+### Basic Tool List
+
+This example demonstrates a basic TRS table with search enabled.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <ToolsPreview />
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="tools-basic.tsx"
+    import React from 'react';
+    import { ECCClientGa4ghTrsTools } from '@elixir-cloud/trs/react';
+    import { RestTrsProvider } from '@elixir-cloud/trs/providers';
+
+    export default function ToolsBasic() {
+      const provider = new RestTrsProvider(
+        'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
+      );
+
+      return (
+        <ECCClientGa4ghTrsTools
+          provider={provider}
+        />
+      );
+    }
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="tools-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/trs@2.0.0-alpha.6"></script>
+      </head>
+      <body>
+        <ecc-client-ga4gh-trs-tools>
+        </ecc-client-ga4gh-trs-tools>
+
+        <script type="module">
+          import { RestTrsProvider } from 'https://esm.sh/@elixir-cloud/trs@2.0.0-alpha.6/providers';
+
+          const provider = new RestTrsProvider(
+            'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
+          );
+
+          document.querySelector('ecc-client-ga4gh-trs-tools').provider = provider;
+        </script>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property   | Type                      | Default | Description                                                                    |
+|------------|---------------------------|---------|--------------------------------------------------------------------------------|
+| `provider` | `TrsProvider` | `null`  | Data provider for fetching tools (see [Providers](/docs/trs/providers))  |
+
+## Events
+
+| Event Name             | React Event Name        | Detail Type                    | Description                                    |
+|------------------------|------------------------|--------------------------------|------------------------------------------------|
+| `ecc-tool-selected` | `onEccToolSelected` | `{ toolId: string }`        | Fired when a user clicks on a tool row     |

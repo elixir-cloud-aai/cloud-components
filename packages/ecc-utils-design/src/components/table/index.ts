@@ -12,46 +12,78 @@ export * from "./table.js";
 export default EccUtilsDesignTable;
 
 // Define the custom element
-if (!window.customElements.get("ecc-utils-design-table")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-table")
+) {
   window.customElements.define("ecc-utils-design-table", EccUtilsDesignTable);
 }
-if (!window.customElements.get("ecc-utils-design-table-header")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-table-header")
+) {
   window.customElements.define(
     "ecc-utils-design-table-header",
     EccUtilsDesignTableHeader
   );
 }
-if (!window.customElements.get("ecc-utils-design-table-body")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-table-body")
+) {
   window.customElements.define(
     "ecc-utils-design-table-body",
     EccUtilsDesignTableBody
   );
 }
-if (!window.customElements.get("ecc-utils-design-table-footer")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-table-footer")
+) {
   window.customElements.define(
     "ecc-utils-design-table-footer",
     EccUtilsDesignTableFooter
   );
 }
-if (!window.customElements.get("ecc-utils-design-table-row")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-table-row")
+) {
   window.customElements.define(
     "ecc-utils-design-table-row",
     EccUtilsDesignTableRow
   );
 }
-if (!window.customElements.get("ecc-utils-design-table-head")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-table-head")
+) {
   window.customElements.define(
     "ecc-utils-design-table-head",
     EccUtilsDesignTableHead
   );
 }
-if (!window.customElements.get("ecc-utils-design-table-cell")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-table-cell")
+) {
   window.customElements.define(
     "ecc-utils-design-table-cell",
     EccUtilsDesignTableCell
   );
 }
-if (!window.customElements.get("ecc-utils-design-table-caption")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-table-caption")
+) {
   window.customElements.define(
     "ecc-utils-design-table-caption",
     EccUtilsDesignTableCaption

@@ -1,0 +1,196 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import Pagination from '@elixir-cloud/design/react/pagination';
+import PaginationContent from '@elixir-cloud/design/react/pagination-content';
+import PaginationItem from '@elixir-cloud/design/react/pagination-item';
+import PaginationLink from '@elixir-cloud/design/react/pagination-link';
+import PaginationPrevious from '@elixir-cloud/design/react/pagination-previous';
+import PaginationNext from '@elixir-cloud/design/react/pagination-next';
+import PaginationEllipsis from '@elixir-cloud/design/react/pagination-ellipsis';
+
+# EccUtilsDesignPagination Component
+
+<ComponentName
+  tagName='ecc-utils-design-pagination'
+  reactTagName='EccUtilsDesignPagination'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-utils-design-pagination` component provides a set of components to build custom pagination controls. It is a compound component, giving you full control over the layout and behavior of your pagination interface.
+
+<Callout type='info'>
+  This component is unopinionated and provides the building blocks. You are responsible for implementing the state management and logic for page changes.
+</Callout>
+
+## Usage
+
+### Basic Pagination
+
+This example shows a typical pagination layout with previous/next buttons, page numbers, and an ellipsis.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious />
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationLink>1</PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationLink isActive>2</PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationLink>3</PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationEllipsis />
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationNext />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="pagination-basic.tsx"
+    import React from 'react';
+    import {
+      EccUtilsDesignPagination,
+      EccUtilsDesignPaginationContent,
+      EccUtilsDesignPaginationItem,
+      EccUtilsDesignPaginationLink,
+      EccUtilsDesignPaginationPrevious,
+      EccUtilsDesignPaginationNext,
+      EccUtilsDesignPaginationEllipsis,
+    } from '@elixir-cloud/design/react/pagination';
+
+    export default function BasicPagination() {
+      // In a real application, you would manage the current page state here
+      return (
+        <EccUtilsDesignPagination>
+          <EccUtilsDesignPaginationContent>
+            <EccUtilsDesignPaginationItem>
+              <EccUtilsDesignPaginationPrevious />
+            </EccUtilsDesignPaginationItem>
+            <EccUtilsDesignPaginationItem>
+              <EccUtilsDesignPaginationLink>1</EccUtilsDesignPaginationLink>
+            </EccUtilsDesignPaginationItem>
+            <EccUtilsDesignPaginationItem>
+              <EccUtilsDesignPaginationLink isActive>2</EccUtilsDesignPaginationLink>
+            </EccUtilsDesignPaginationItem>
+            <EccUtilsDesignPaginationItem>
+              <EccUtilsDesignPaginationLink>3</EccUtilsDesignPaginationLink>
+            </EccUtilsDesignPaginationItem>
+            <EccUtilsDesignPaginationItem>
+              <EccUtilsDesignPaginationEllipsis />
+            </EccUtilsDesignPaginationItem>
+            <EccUtilsDesignPaginationItem>
+              <EccUtilsDesignPaginationNext />
+            </EccUtilsDesignPaginationItem>
+          </EccUtilsDesignPaginationContent>
+        </EccUtilsDesignPagination>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="pagination-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/pagination"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <ecc-utils-design-pagination>
+          <ecc-utils-design-pagination-content>
+            <ecc-utils-design-pagination-item>
+              <ecc-utils-design-pagination-previous></ecc-utils-design-pagination-previous>
+            </ecc-utils-design-pagination-item>
+            <ecc-utils-design-pagination-item>
+              <ecc-utils-design-pagination-link>1</ecc-utils-design-pagination-link>
+            </ecc-utils-design-pagination-item>
+            <ecc-utils-design-pagination-item>
+              <ecc-utils-design-pagination-link is-active="true">2</ecc-utils-design-pagination-link>
+            </ecc-utils-design-pagination-item>
+            <ecc-utils-design-pagination-item>
+              <ecc-utils-design-pagination-link>3</ecc-utils-design-pagination-link>
+            </ecc-utils-design-pagination-item>
+            <ecc-utils-design-pagination-item>
+              <ecc-utils-design-pagination-ellipsis></ecc-utils-design-pagination-ellipsis>
+            </ecc-utils-design-pagination-item>
+            <ecc-utils-design-pagination-item>
+              <ecc-utils-design-pagination-next></ecc-utils-design-pagination-next>
+            </ecc-utils-design-pagination-item>
+          </ecc-utils-design-pagination-content>
+        </ecc-utils-design-pagination>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Components
+
+| Component              | Tag Name                                 | Description                                  |
+|------------------------|------------------------------------------|----------------------------------------------|
+| `Pagination`           | `ecc-utils-design-pagination`            | The root container for pagination.           |
+| `PaginationContent`    | `ecc-utils-design-pagination-content`    | A container for the pagination items.        |
+| `PaginationItem`       | `ecc-utils-design-pagination-item`       | A list item for pagination elements.         |
+| `PaginationLink`       | `ecc-utils-design-pagination-link`       | A link for a specific page number.           |
+| `PaginationPrevious`   | `ecc-utils-design-pagination-previous`   | A button to navigate to the previous page.   |
+| `PaginationNext`       | `ecc-utils-design-pagination-next`       | A button to navigate to the next page.       |
+| `PaginationEllipsis`   | `ecc-utils-design-pagination-ellipsis`   | A separator indicating omitted page numbers. |
+
+## Properties
+
+### `EccUtilsDesignPaginationLink`
+
+| Property    | Type      | Default | Description                               |
+|-------------|-----------|---------|-------------------------------------------|
+| `isActive`  | `boolean` | `false` | When `true`, styles the link as active.   |
+| `size`      | `string`  | `icon`  | The size of the link button.              |
+| `href`      | `string`  | `#`     | The URL the link points to.               |
+
+### `EccUtilsDesignPaginationPrevious` & `EccUtilsDesignPaginationNext`
+
+| Property    | Type      | Default | Description                               |
+|-------------|-----------|---------|-------------------------------------------|
+| `disabled`  | `boolean` | `false` | When `true`, disables the button.         |
+
+## Events
+
+The `PaginationLink`, `PaginationPrevious`, and `PaginationNext` components emit an `ecc-button-clicked` event when clicked. You can use this to handle page navigation.
+
+| Event Name            | React Event Name        | Detail Type           | Description                                  |
+|-----------------------|-------------------------|-----------------------|----------------------------------------------|
+| `ecc-button-clicked`  | `onEccButtonClicked`    | `{ variant: string }` | Fired when a pagination button is clicked.   |
+
+### `ecc-button-clicked`
+Fires when a user clicks on a pagination control. The `variant` in the event detail will be `link`, `previous`, or `next`.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignPaginationNext 
+      onEccButtonClicked={(event) => {
+        console.log('Next button clicked');
+      }}
+    />
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    element.addEventListener('ecc-button-clicked', (event) => {
+      console.log('Button clicked:', event.detail.variant);
+    });
+    ```
+  </Tabs.Tab>
+</Tabs> 

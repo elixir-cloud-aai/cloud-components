@@ -1,0 +1,164 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import Separator from '@elixir-cloud/design/react/separator';
+
+# EccUtilsDesignSeparator Component
+
+<ComponentName
+  tagName='ecc-utils-design-separator'
+  reactTagName='EccUtilsDesignSeparator'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-utils-design-separator` component is used to visually or semantically separate content. It can be displayed horizontally or vertically.
+
+<Callout type='info'>
+  This component renders a thin line to create a visual division between elements.
+</Callout>
+
+## Usage
+
+### Horizontal Separator
+
+This is the default orientation, used for separating content vertically.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <div className="text-sm">
+      <p>Top Content</p>
+      <Separator className="part:my-2" />
+      <p>Bottom Content</p>
+    </div>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="separator-horizontal.tsx"
+    import React from 'react';
+    import { EccUtilsDesignSeparator } from '@elixir-cloud/design/react/separator';
+
+    export default function HorizontalSeparator() {
+      return (
+        <div className="text-sm">
+          <p>Top Content</p>
+          <EccUtilsDesignSeparator className="part:my-2" />
+          <p>Bottom Content</p>
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="separator-horizontal.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/separator"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <div class="text-sm p-4">
+          <p>Left Content</p>
+          <ecc-utils-design-separator class="my-2"></ecc-utils-design-separator>
+          <p>Right Content</p>
+        </div>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Vertical Separator
+
+This example shows a vertical separator for dividing content horizontally.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <div className="flex h-6 items-center text-sm">
+      <p>Left</p>
+      <Separator orientation="vertical" className="part:mx-2 h-full" />
+      <p>Right</p>
+    </div>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="separator-vertical.tsx"
+    import React from 'react';
+    import { EccUtilsDesignSeparator } from '@elixir-cloud/design/react/separator';
+
+    export default function VerticalSeparator() {
+      return (
+        <div className="flex h-10 items-center text-sm">
+          <p>Left</p>
+          <EccUtilsDesignSeparator orientation="vertical" className="part:mx-2" />
+          <p>Right</p>
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="separator-vertical.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/separator"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <div class="flex h-10 items-center text-sm p-4">
+          <p>Left</p>
+          <ecc-utils-design-separator orientation="vertical" class="mx-2"></ecc-utils-design-separator>
+          <p>Right</p>
+        </div>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property      | Type                            | Default        | Description                                  |
+|---------------|---------------------------------|----------------|----------------------------------------------|
+| `orientation` | `"horizontal"` \| `"vertical"`  | `"horizontal"` | The orientation of the separator.            |
+| `decorative`  | `boolean`                       | `true`         | Whether the separator is purely decorative. |
+
+### `orientation`
+Sets the separator to be either horizontal or vertical.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignSeparator orientation="vertical" />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-separator orientation="vertical"></ecc-utils-design-separator>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `decorative`
+When `true`, the component is treated as a visual element and ignored by screen readers.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignSeparator decorative={false} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-separator decorative="false"></ecc-utils-design-separator>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Events
+
+This component does not emit any custom events. 

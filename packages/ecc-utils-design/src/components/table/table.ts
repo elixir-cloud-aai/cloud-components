@@ -1,5 +1,4 @@
 import { LitElement, html, css } from "lit";
-import { property, query, state } from "lit/decorators.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 
@@ -114,35 +113,7 @@ export class EccUtilsDesignTableRow extends LitElement {
     `,
   ];
 
-  @property({ type: String }) state = "";
-
-  @query("slot") private defaultSlot!: HTMLSlotElement;
-
-  @state() private gridStyles = {};
-
-  firstUpdated() {
-    this.defaultSlot.addEventListener("slotchange", this.updateColumnCount);
-    this.updateColumnCount();
-  }
-
-  disconnectedCallback() {
-    this.defaultSlot.removeEventListener("slotchange", this.updateColumnCount);
-    super.disconnectedCallback();
-  }
-
-  private updateColumnCount = () => {
-    const assignedElements = this.defaultSlot
-      .assignedElements({ flatten: true })
-      .filter((node) => node.nodeType === Node.ELEMENT_NODE);
-    const columnCount = assignedElements.length || 1;
-
-    this.gridStyles = {
-      gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
-    };
-  };
-
   render() {
-    this.dataset.state = this.state;
     return html`
       <div
         part="base"

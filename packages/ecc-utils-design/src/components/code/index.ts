@@ -4,7 +4,11 @@ export * from "./code.js";
 export default EccUtilsDesignCode;
 
 // Define the custom element
-if (!window.customElements.get("ecc-utils-design-code")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-code")
+) {
   window.customElements.define("ecc-utils-design-code", EccUtilsDesignCode);
 }
 

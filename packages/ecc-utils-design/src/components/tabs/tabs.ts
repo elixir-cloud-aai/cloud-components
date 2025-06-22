@@ -64,6 +64,10 @@ export class EccUtilsDesignTabs extends LitElement {
       this._activeValue = this.value;
       this._updateActiveTab();
     }
+    if (changedProps.has("defaultValue") && this._firstUpdated) {
+      this._activeValue = this.defaultValue;
+      this._updateActiveTab();
+    }
   }
 
   _updateActiveTab() {
@@ -74,19 +78,20 @@ export class EccUtilsDesignTabs extends LitElement {
     // Update active state
     allTriggers.forEach((trigger) => {
       const value = trigger.getAttribute("value");
-      trigger.setAttribute(
-        "data-state",
-        value === this._activeValue ? "active" : "inactive"
-      );
-      trigger.setAttribute(
-        "aria-selected",
-        value === this._activeValue ? "true" : "false"
-      );
+      const shadowElement = trigger.shadowRoot?.querySelector("button");
+      const isActive =
+        value === this._activeValue ||
+        shadowElement?.getAttribute("value") === this._activeValue;
+      trigger.setAttribute("data-state", isActive ? "active" : "inactive");
+      trigger.setAttribute("aria-selected", isActive ? "true" : "false");
     });
 
     allContent.forEach((content) => {
       const value = content.getAttribute("value");
-      const isActive = value === this._activeValue;
+      const shadowElement = content.shadowRoot?.querySelector("div");
+      const isActive =
+        value === this._activeValue ||
+        shadowElement?.getAttribute("value") === this._activeValue;
       content.setAttribute("data-state", isActive ? "active" : "inactive");
       const element = content;
       element.hidden = !isActive;
@@ -260,7 +265,9 @@ export class EccUtilsDesignTabsContent extends LitElement {
       "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
     );
 
-    return html`<div part="base" class=${classes}><slot></slot></div>`;
+    return html`<div part="base" class=${classes} value=${this.value}>
+      <slot></slot>
+    </div>`;
   }
 }
 

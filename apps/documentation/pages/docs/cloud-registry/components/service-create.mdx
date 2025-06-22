@@ -1,0 +1,246 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import ServiceCreatePreview from '@/components/packages/cloud-registry/ServiceCreatePreview'
+
+# EccClientElixirCloudRegistryServiceCreate Component
+
+<ComponentName
+  tagName='ecc-client-elixir-cloud-registry-service-create'
+  reactTagName='EccClientElixirCloudRegistryServiceCreate'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-client-elixir-cloud-registry-service-create` component provides a comprehensive form interface for creating new service registrations in the Elixir Cloud Registry. It includes validation, error handling, and support for both basic and advanced service metadata.
+
+<Callout type='info'>
+  This component extends the GA4GH Service Registry specification with additional features specific to the Elixir Cloud ecosystem.
+</Callout>
+
+## Usage
+
+### Basic Service Creation
+
+This example demonstrates the basic service creation form with default settings.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <ServiceCreatePreview />
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="service-create-basic.tsx"
+    import React from 'react';
+    import { EccClientElixirCloudRegistryServiceCreate } from '@elixir-cloud/cloud-registry/react/service-create';
+    import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
+
+    export default function ServiceCreateBasic() {
+      const provider = new RestCloudRegistryProvider(
+        'https://cloud-registry.example.com/ga4gh/registry/v1'
+      );
+
+      const handleServiceCreated = (event) => {
+        console.log('Service created successfully:', event.detail);
+        alert(`Service created with ID: ${event.detail.serviceId}`);
+      };
+
+      const handleServiceCreateFailed = (event) => {
+        console.error('Service creation failed:', event.detail.error);
+        alert(`Error: ${event.detail.error}`);
+      };
+
+      const handleValidationFailed = (event) => {
+        console.error('Validation failed:', event.detail.error);
+        alert(`Validation Error: ${event.detail.error}`);
+      };
+
+      return (
+        <div style={{ height: '700px' }}>
+          <EccClientElixirCloudRegistryServiceCreate 
+            provider={provider}
+            onEccServiceCreated={handleServiceCreated}
+            onEccServiceCreateFailed={handleServiceCreateFailed}
+            onEccServiceCreateValidationFailed={handleValidationFailed}
+          />
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="service-create-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/cloud-registry@2.0.0-alpha.6"></script>
+        <style>
+          .service-create-container { 
+            height: 700px; 
+            width: 100%; 
+          }
+        </style>
+      </head>
+      <body>
+        <div class="service-create-container">
+          <ecc-client-elixir-cloud-registry-service-create>
+          </ecc-client-elixir-cloud-registry-service-create>
+        </div>
+
+        <script type="module">
+          import { RestCloudRegistryProvider } from 'https://esm.sh/@elixir-cloud/cloud-registry@2.0.0-alpha.6/providers';
+          
+          const provider = new RestCloudRegistryProvider(
+            'https://cloud-registry.example.com/ga4gh/registry/v1'
+          );
+          
+          document.querySelector('ecc-client-elixir-cloud-registry-service-create').provider = provider;
+
+          document.addEventListener('ecc-service-created', (event) => {
+            console.log('Service created successfully:', event.detail);
+            alert(`Service created with ID: ${event.detail.serviceId}`);
+          });
+
+          document.addEventListener('ecc-service-create-failed', (event) => {
+            console.error('Service creation failed:', event.detail.error);
+            alert(`Error: ${event.detail.error}`);
+          });
+
+          document.addEventListener('ecc-service-create-validation-failed', (event) => {
+            console.error('Validation failed:', event.detail.error);
+            alert(`Validation Error: ${event.detail.error}`);
+          });
+        </script>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property   | Type                    | Default | Description                                                                    |
+|------------|-------------------------|---------|--------------------------------------------------------------------------------|
+| `provider` | `CloudRegistryProvider` | `null`  | Data provider for service creation operations (see [Providers](/docs/cloud-registry/providers)) |
+
+### `provider`
+The data provider responsible for creating services in the registry. You must provide a provider that implements the `CloudRegistryProvider` interface, which extends the base `ServiceRegistryProvider` with creation capabilities. See the [Providers documentation](/docs/cloud-registry/providers) for detailed information about available providers and how to create custom ones.
+
+<Callout type='warning'>
+  The provider must support service creation operations. If no provider is provided, the component will emit a validation error.
+</Callout>
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
+    
+    const provider = new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
+    
+    <EccClientElixirCloudRegistryServiceCreate provider={provider} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <script type="module">
+      import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
+      
+      const provider = new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
+      document.querySelector('ecc-client-elixir-cloud-registry-service-create').provider = provider;
+    </script>
+    <ecc-client-elixir-cloud-registry-service-create></ecc-client-elixir-cloud-registry-service-create>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Events
+
+| Event Name                          | React Event Name                     | Detail Type                                              | Description                                          |
+|-------------------------------------|--------------------------------------|----------------------------------------------------------|------------------------------------------------------|
+| `ecc-service-created`               | `onEccServiceCreated`                | `{ serviceId: string, serviceData: object, message: string }` | Fired when a service is successfully created        |
+| `ecc-service-create-failed`         | `onEccServiceCreateFailed`           | `{ error: string }`                                      | Fired when service creation fails                   |
+| `ecc-service-create-validation-failed` | `onEccServiceCreateValidationFailed` | `{ error: string }`                                      | Fired when there are validation errors              |
+
+### `ecc-service-created`
+Emitted when a service is successfully created in the registry, providing the new service ID, the submitted service data, and a success message.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientElixirCloudRegistryServiceCreate 
+      onEccServiceCreated={(event) => {
+        console.log('Service created:', event.detail.serviceId);
+        console.log('Service data:', event.detail.serviceData);
+        console.log('Message:', event.detail.message);
+        // Navigate to the new service or show success message
+      }}
+    />
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    element.addEventListener('ecc-service-created', (event) => {
+      console.log('Service created:', event.detail.serviceId);
+      console.log('Service data:', event.detail.serviceData);
+      console.log('Message:', event.detail.message);
+      // Navigate to the new service or show success message
+    });
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `ecc-service-create-failed`
+Emitted when service creation fails due to server errors, network issues, or other runtime problems.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientElixirCloudRegistryServiceCreate 
+      onEccServiceCreateFailed={(event) => {
+        console.error('Service creation failed:', event.detail.error);
+        // Display error message to user
+        alert(`Failed to create service: ${event.detail.error}`);
+      }}
+    />
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    element.addEventListener('ecc-service-create-failed', (event) => {
+      console.error('Service creation failed:', event.detail.error);
+      // Display error message to user
+      alert(`Failed to create service: ${event.detail.error}`);
+    });
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `ecc-service-create-validation-failed`
+Emitted when there are validation errors in the form data before submission or when the component is misconfigured.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientElixirCloudRegistryServiceCreate 
+      onEccServiceCreateValidationFailed={(event) => {
+        console.error('Validation error:', event.detail.error);
+        // Handle validation errors appropriately
+        alert(`Please fix the following error: ${event.detail.error}`);
+      }}
+    />
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    element.addEventListener('ecc-service-create-validation-failed', (event) => {
+      console.error('Validation error:', event.detail.error);
+      // Handle validation errors appropriately
+      alert(`Please fix the following error: ${event.detail.error}`);
+    });
+    ```
+  </Tabs.Tab>
+</Tabs> 

@@ -4,10 +4,14 @@ const withNextra = require('nextra')({
   themeConfig: './theme.config.tsx',
 });
 
-module.exports = {
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const withLitSSR = require('@lit-labs/nextjs')();
+
+/** @type {import('next').NextConfig} */
+module.exports = withLitSSR({
   ...withNextra(),
   output: 'export',
   images: {
     unoptimized: true,
   },
-};
+});

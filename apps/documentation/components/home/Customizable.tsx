@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import CreateRun from '../packages/wes/createRun/createRun';
 import Link from 'next/link';
 
 const Customizable = () => {
@@ -55,7 +54,7 @@ const Customizable = () => {
           ))}
         </div>
         <div className='w-[40%]'>
-          <CreateRun />
+          {/* <CreateRun /> */}
         </div>
       </div>
     </section>

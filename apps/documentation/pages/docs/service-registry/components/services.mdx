@@ -1,0 +1,228 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import ServicesPreview from '@/components/packages/service-registry/ServicesPreview'
+
+# EccClientGa4ghServiceRegistryServices Component
+
+<ComponentName
+  tagName='ecc-client-ga4gh-service-registry-services'
+  reactTagName='EccClientGa4ghServiceRegistryServices'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-client-ga4gh-service-registry-services` component displays a table of services from a GA4GH-compliant Service Registry. It provides built-in search functionality, service type filtering, and pagination for browsing large service collections.
+
+<Callout type='info'>
+  This component implements the GA4GH Service Registry API specification and can connect to any compliant service registry endpoint.
+</Callout>
+
+## Usage
+
+### Basic Service List
+
+This example demonstrates a basic service registry table with search and filtering enabled.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <ServicesPreview />
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="services-basic.tsx"
+    import React from 'react';
+    import { EccClientGa4ghServiceRegistryServices } from '@elixir-cloud/service-registry/react/services';
+    import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+
+    export default function ServicesBasic() {
+      const provider = new RestServiceRegistryProvider(
+        'https://cloud-registry.anuragxd.com/ga4gh/registry/v1'
+      );
+
+      const handleServiceSelected = (event) => {
+        console.log('Service selected:', event.detail.serviceId);
+        // Navigate to service details or perform other actions
+      };
+
+      const handleServicesChanged = (event) => {
+        console.log('Services data updated:', event.detail.services);
+      };
+
+      return (
+        <div style={{ height: '600px' }}>
+          <EccClientGa4ghServiceRegistryServices 
+            provider={provider}
+            search={true}
+            filter={true}
+            onEccServiceSelected={handleServiceSelected}
+            onEccServicesChanged={handleServicesChanged}
+          />
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="services-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/service-registry@2.0.0-alpha.6"></script>
+        <style>
+          .services-container { 
+            height: 600px; 
+            width: 100%; 
+          }
+        </style>
+      </head>
+      <body>
+        <div class="services-container">
+          <ecc-client-ga4gh-service-registry-services
+            search="true"
+            filter="true"
+          ></ecc-client-ga4gh-service-registry-services>
+        </div>
+
+        <script type="module">
+          import { RestServiceRegistryProvider } from 'https://esm.sh/@elixir-cloud/service-registry@2.0.0-alpha.6/providers';
+          
+          const provider = new RestServiceRegistryProvider(
+            'https://cloud-registry.anuragxd.com/ga4gh/registry/v1'
+          );
+          
+          document.querySelector('ecc-client-ga4gh-service-registry-services').provider = provider;
+
+          document.addEventListener('ecc-service-selected', (event) => {
+            console.log('Service selected:', event.detail.serviceId);
+          });
+
+          document.addEventListener('ecc-services-changed', (event) => {
+            console.log('Services data updated:', event.detail.services);
+          });
+        </script>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property   | Type                      | Default | Description                                                                    |
+|------------|---------------------------|---------|--------------------------------------------------------------------------------|
+| `search`   | `boolean`                 | `true`  | Whether to display the search input field                                      |
+| `filter`   | `boolean`                 | `true`  | Whether to display the service type filter dropdown                           |
+| `provider` | `ServiceRegistryProvider` | `null`  | Data provider for fetching services (see [Providers](/docs/service-registry/providers))  |
+
+### `provider`
+The data provider responsible for fetching services from the registry. You must provide a provider that implements the `ServiceRegistryProvider` interface. See the [Providers documentation](/docs/service-registry/providers) for detailed information about available providers and how to create custom ones.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+    
+    const provider = new RestServiceRegistryProvider('https://cloud-registry.anuragxd.com/ga4gh/registry/v1');
+    
+    <EccClientGa4ghServiceRegistryServices provider={provider} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <script type="module">
+      import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+      
+      const provider = new RestServiceRegistryProvider('https://cloud-registry.anuragxd.com/ga4gh/registry/v1');
+      document.querySelector('ecc-client-ga4gh-service-registry-services').provider = provider;
+    </script>
+    <ecc-client-ga4gh-service-registry-services></ecc-client-ga4gh-service-registry-services>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `search`
+Controls whether the search input field is displayed, allowing users to filter services by name, description, or organization.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientGa4ghServiceRegistryServices search={false} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-client-ga4gh-service-registry-services search="false"></ecc-client-ga4gh-service-registry-services>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `filter`
+Controls whether the service type filter dropdown is displayed, allowing users to filter services by their type.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientGa4ghServiceRegistryServices filter={false} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-client-ga4gh-service-registry-services filter="false"></ecc-client-ga4gh-service-registry-services>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Events
+
+| Event Name             | React Event Name        | Detail Type                    | Description                                    |
+|------------------------|------------------------|--------------------------------|------------------------------------------------|
+| `ecc-services-changed` | `onEccServicesChanged` | `{ services: ExternalService[] }` | Fired when the services data is updated       |
+| `ecc-service-selected` | `onEccServiceSelected` | `{ serviceId: string }`        | Fired when a user clicks on a service row     |
+
+### `ecc-services-changed`
+Emitted whenever the services data is loaded or updated, providing the current list of services.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientGa4ghServiceRegistryServices 
+      onEccServicesChanged={(event) => {
+        console.log('Services updated:', event.detail.services);
+      }}
+    />
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    element.addEventListener('ecc-services-changed', (event) => {
+      console.log('Services updated:', event.detail.services);
+    });
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `ecc-service-selected`
+Emitted when a user clicks on a service in the table, providing the service ID for navigation or further actions.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientGa4ghServiceRegistryServices 
+      onEccServiceSelected={(event) => {
+        window.location.href = `/services/${event.detail.serviceId}`;
+      }}
+    />
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    element.addEventListener('ecc-service-selected', (event) => {
+      window.location.href = `/services/${event.detail.serviceId}`;
+    });
+    ```
+  </Tabs.Tab>
+</Tabs> 

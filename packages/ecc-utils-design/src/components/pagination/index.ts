@@ -10,43 +10,71 @@ import EccUtilsDesignPagination, {
 export * from "./pagination.js";
 export default EccUtilsDesignPagination;
 
-if (!window.customElements.get("ecc-utils-design-pagination")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-pagination")
+) {
   window.customElements.define(
     "ecc-utils-design-pagination",
     EccUtilsDesignPagination
   );
 }
-if (!window.customElements.get("ecc-utils-design-pagination-content")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-pagination-content")
+) {
   window.customElements.define(
     "ecc-utils-design-pagination-content",
     EccUtilsDesignPaginationContent
   );
 }
-if (!window.customElements.get("ecc-utils-design-pagination-item")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-pagination-item")
+) {
   window.customElements.define(
     "ecc-utils-design-pagination-item",
     EccUtilsDesignPaginationItem
   );
 }
-if (!window.customElements.get("ecc-utils-design-pagination-link")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-pagination-link")
+) {
   window.customElements.define(
     "ecc-utils-design-pagination-link",
     EccUtilsDesignPaginationLink
   );
 }
-if (!window.customElements.get("ecc-utils-design-pagination-previous")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-pagination-previous")
+) {
   window.customElements.define(
     "ecc-utils-design-pagination-previous",
     EccUtilsDesignPaginationPrevious
   );
 }
-if (!window.customElements.get("ecc-utils-design-pagination-next")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-pagination-next")
+) {
   window.customElements.define(
     "ecc-utils-design-pagination-next",
     EccUtilsDesignPaginationNext
   );
 }
-if (!window.customElements.get("ecc-utils-design-pagination-ellipsis")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-pagination-ellipsis")
+) {
   window.customElements.define(
     "ecc-utils-design-pagination-ellipsis",
     EccUtilsDesignPaginationEllipsis

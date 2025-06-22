@@ -1,0 +1,218 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import Button from '@elixir-cloud/design/react/button';
+
+# EccUtilsDesignButton Component
+
+<ComponentName
+  tagName='ecc-utils-design-button'
+  reactTagName='EccUtilsDesignButton'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-utils-design-button` component provides a versatile, stylable button that can be used for various actions. It offers multiple variants, sizes, and a disabled state.
+
+<Callout type='info'>
+  This component is built with Lit and Tailwind CSS, making it lightweight and easy to integrate with any design system.
+</Callout>
+
+## Usage
+
+### Button Variants
+
+This example demonstrates the different visual styles available for the button.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <div className="flex flex-wrap gap-4">
+      <Button variant="default">Default</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="destructive">Destructive</Button>
+      <Button variant="outline">Outline</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button variant="link">Link</Button>
+    </div>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="button-variants.tsx"
+    import React from 'react';
+    import { EccUtilsDesignButton } from '@elixir-cloud/design/react/button';
+
+    export default function ButtonVariants() {
+      return (
+        <div className="flex flex-wrap gap-4">
+          <EccUtilsDesignButton variant="default">Default</EccUtilsDesignButton>
+          <EccUtilsDesignButton variant="secondary">Secondary</EccUtilsDesignButton>
+          <EccUtilsDesignButton variant="destructive">Destructive</EccUtilsDesignButton>
+          <EccUtilsDesignButton variant="outline">Outline</EccUtilsDesignButton>
+          <EccUtilsDesignButton variant="ghost">Ghost</EccUtilsDesignButton>
+          <EccUtilsDesignButton variant="link">Link</EccUtilsDesignButton>
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="button-variants.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/button"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <div class="flex flex-wrap gap-4 p-4">
+          <ecc-utils-design-button variant="default">Default</ecc-utils-design-button>
+          <ecc-utils-design-button variant="secondary">Secondary</ecc-utils-design-button>
+          <ecc-utils-design-button variant="destructive">Destructive</ecc-utils-design-button>
+          <ecc-utils-design-button variant="outline">Outline</ecc-utils-design-button>
+          <ecc-utils-design-button variant="ghost">Ghost</ecc-utils-design-button>
+          <ecc-utils-design-button variant="link">Link</ecc-utils-design-button>
+        </div>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Button Sizes
+
+This example shows the different sizes the button can take.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <div className="flex items-center flex-wrap gap-4">
+      <Button size="sm">Small</Button>
+      <Button size="default">Default</Button>
+      <Button size="lg">Large</Button>
+      <Button size="icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+      </Button>
+    </div>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="button-sizes.tsx"
+    import React from 'react';
+    import { EccUtilsDesignButton } from '@elixir-cloud/design/react/button';
+
+    export default function ButtonSizes() {
+      return (
+        <div className="flex items-center flex-wrap gap-4">
+          <EccUtilsDesignButton size="sm">Small</EccUtilsDesignButton>
+          <EccUtilsDesignButton size="default">Default</EccUtilsDesignButton>
+          <EccUtilsDesignButton size="lg">Large</EccUtilsDesignButton>
+          <EccUtilsDesignButton size="icon">
+            <svg xmlns="http://www.w.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+          </EccUtilsDesignButton>
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="button-sizes.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/button"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <div class="flex items-center flex-wrap gap-4 p-4">
+          <ecc-utils-design-button size="sm">Small</ecc-utils-design-button>
+          <ecc-utils-design-button size="default">Default</ecc-utils-design-button>
+          <ecc-utils-design-button size="lg">Large</ecc-utils-design-button>
+          <ecc-utils-design-button size="icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+          </ecc-utils-design-button>
+        </div>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property   | Type                                                       | Default     | Description                               |
+|------------|------------------------------------------------------------|-------------|-------------------------------------------|
+| `variant`  | `"default"` \| `"destructive"` \| `"outline"` \| `"secondary"` \| `"ghost"` \| `"link"` | `"default"` | The visual style of the button.           |
+| `size`     | `"default"` \| `"sm"` \| `"lg"` \| `"icon"`                   | `"default"` | The size of the button.                   |
+| `disabled` | `boolean`                                                  | `false`     | When `true`, disables the button.         |
+
+### `variant`
+Controls the visual style of the button to indicate its purpose.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignButton variant="destructive">Delete</EccUtilsDesignButton>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-button variant="destructive">Delete</ecc-utils-design-button>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `size`
+Determines the button's size, affecting its padding and font size.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignButton size="lg">Large Button</EccUtilsDesignButton>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-button size="lg">Large Button</ecc-utils-design-button>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `disabled`
+When `true`, the button is non-interactive and visually de-emphasized.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignButton disabled={true}>Cannot Click</EccUtilsDesignButton>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-button disabled="true">Cannot Click</ecc-utils-design-button>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Events
+
+This component does not emit any custom events. It forwards the standard HTML `click` event, which can be listened to directly.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignButton 
+      onClick={(event) => {
+        console.log('Button clicked!', event);
+      }}
+    />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript copy
+    buttonElement.addEventListener('click', (event) => {
+      console.log('Button clicked!', event);
+    });
+    ```
+  </Tabs.Tab>
+</Tabs> 

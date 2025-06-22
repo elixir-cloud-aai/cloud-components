@@ -4,7 +4,11 @@ export * from "./textarea.js";
 export default EccUtilsDesignTextarea;
 
 // Define the custom element
-if (!window.customElements.get("ecc-utils-design-textarea")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-textarea")
+) {
   window.customElements.define(
     "ecc-utils-design-textarea",
     EccUtilsDesignTextarea

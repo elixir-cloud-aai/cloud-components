@@ -5,7 +5,7 @@
 
 // Import base types from the GA4GH TRS package
 
-import {
+import type {
   TrsProvider,
   DescriptorType,
   DescriptorTypeWithPlain,

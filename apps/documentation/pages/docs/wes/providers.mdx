@@ -1,0 +1,57 @@
+import { Callout, Tabs } from 'nextra/components'
+
+# Providers
+
+Data providers are responsible for fetching data from and sending data to a GA4GH Workflow Execution Service (WES) endpoint. The `@elixir-cloud/wes` package includes a `RestWesProvider` for interacting with REST-based WES APIs.
+
+## WesProvider
+
+`WesProvider` is an abstract base class that defines the interface for all WES data providers. To create a custom provider, you can extend this class and implement its methods.
+
+```ts
+export declare abstract class WesProvider {
+    abstract getRuns(
+        query: RunQuery,
+        signal?: AbortSignal,
+    ): Promise<TableData<Run>>;
+    
+    abstract getRun(
+        id: string,
+        signal?: AbortSignal,
+    ): Promise<Run | undefined>;
+
+    abstract postRun(
+        run: Run,
+        signal?: AbortSignal,
+    ): Promise<Run>;
+}
+```
+
+## RestWesProvider
+
+The `RestWesProvider` is a concrete implementation of `WesProvider` that uses the `fetch` API to make requests to a RESTful WES endpoint.
+
+### Usage
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy
+    import { RestWesProvider } from '@elixir-cloud/wes/providers';
+
+    const provider = new RestWesProvider(
+      'https://weskit.anuragxd.com/ga4gh/wes/v1'
+    );
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html showLineNumbers copy
+    <script type="module">
+      import { RestWesProvider } from 'https://esm.sh/@elixir-cloud/wes@2.0.0-alpha.1/providers';
+      
+      const provider = new RestWesProvider(
+        'https://weskit.anuragxd.com/ga4gh/wes/v1'
+      );
+    </script>
+    ```
+  </Tabs.Tab>
+</Tabs> 

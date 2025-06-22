@@ -8,34 +8,58 @@ import {
 } from "./card.js";
 
 // Define the custom elements
-if (!window.customElements.get("ecc-utils-design-card")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-card")
+) {
   window.customElements.define("ecc-utils-design-card", EccUtilsDesignCard);
 }
-if (!window.customElements.get("ecc-utils-design-card-header")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-card-header")
+) {
   window.customElements.define(
     "ecc-utils-design-card-header",
     EccUtilsDesignCardHeader
   );
 }
-if (!window.customElements.get("ecc-utils-design-card-title")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-card-title")
+) {
   window.customElements.define(
     "ecc-utils-design-card-title",
     EccUtilsDesignCardTitle
   );
 }
-if (!window.customElements.get("ecc-utils-design-card-description")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-card-description")
+) {
   window.customElements.define(
     "ecc-utils-design-card-description",
     EccUtilsDesignCardDescription
   );
 }
-if (!window.customElements.get("ecc-utils-design-card-content")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-card-content")
+) {
   window.customElements.define(
     "ecc-utils-design-card-content",
     EccUtilsDesignCardContent
   );
 }
-if (!window.customElements.get("ecc-utils-design-card-footer")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-card-footer")
+) {
   window.customElements.define(
     "ecc-utils-design-card-footer",
     EccUtilsDesignCardFooter

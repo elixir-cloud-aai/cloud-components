@@ -67,7 +67,7 @@ components.forEach((component) => {
       ${eventExports}
 
       const tagName = '${component.tagName}'
-      if (!window.customElements.get('${component.tagName}')) {
+      if (typeof window !== 'undefined' && window.customElements && !window.customElements.get('${component.tagName}')) {
         window.customElements.define('${component.tagName}', Component)
       }
 

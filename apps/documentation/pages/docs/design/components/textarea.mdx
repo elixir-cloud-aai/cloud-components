@@ -1,0 +1,148 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import Textarea from '@elixir-cloud/design/react/textarea';
+import Label from '@elixir-cloud/design/react/label';
+
+# EccUtilsDesignTextarea Component
+
+<ComponentName
+  tagName='ecc-utils-design-textarea'
+  reactTagName='EccUtilsDesignTextarea'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-utils-design-textarea` component provides a multi-line text input field for forms, suitable for capturing longer user input.
+
+<Callout type='info'>
+  This component is a styled wrapper around the native HTML `<textarea>` element and supports disabled states, placeholder text, and resizability.
+</Callout>
+
+## Usage
+
+### Basic Textarea
+
+This example shows a default textarea with a placeholder.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <Textarea placeholder="Enter your comments here..." />
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="textarea-basic.tsx"
+    import React from 'react';
+    import { EccUtilsDesignTextarea } from '@elixir-cloud/design/react/textarea';
+
+    export default function BasicTextarea() {
+      return (
+        <EccUtilsDesignTextarea placeholder="Enter your comments here..." />
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="textarea-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/textarea"></script>
+        <script src="https://cdn.tailwindcss.com"></script>.
+      </head>
+      <body>
+        <ecc-utils-design-textarea placeholder="Enter your comments here..."></ecc-utils-design-textarea>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Textarea with Label
+
+This example shows a textarea with a corresponding label.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <div className="grid w-full gap-1.5">
+      <Label htmlFor="message">Your Message</Label>
+      <Textarea id="message" placeholder="Type your message here." />
+    </div>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="textarea-with-label.tsx"
+    import React from 'react';
+    import { EccUtilsDesignTextarea } from '@elixir-cloud/design/react/textarea';
+    import { EccUtilsDesignLabel } from '@elixir-cloud/design/react/label';
+
+    export default function TextareaWithLabel() {
+      return (
+        <div className="grid w-full gap-1.5">
+          <EccUtilsDesignLabel htmlFor="message">Your Message</EccUtilsDesignLabel>
+          <EccUtilsDesignTextarea id="message" placeholder="Type your message here." />
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="textarea-with-label.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/textarea"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/label"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <div class="grid w-full gap-1.5 p-4">
+          <ecc-utils-design-label for="message">Your Message</ecc-utils-design-label>
+          <ecc-utils-design-textarea id="message" placeholder="Type your message here."></ecc-utils-design-textarea>
+        </div>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property      | Type      | Default | Description                               |
+|---------------|-----------|---------|-------------------------------------------|
+| `placeholder` | `string`  | `""`    | Placeholder text for the textarea.        |
+| `value`       | `string`  | `""`    | The current value of the textarea.        |
+| `disabled`    | `boolean` | `false` | When `true`, disables the textarea.       |
+| `rows`        | `number`  | `3`     | The number of visible text lines.         |
+| `cols`        | `number`  | `undefined` | The visible width of the text control.  |
+
+## Events
+
+| Event Name          | React Event Name     | Detail Type             | Description                                  |
+|--------------------|---------------------|-------------------------|----------------------------------------------|
+| `ecc-input-changed` | `onEccInputChanged` | `{ value: string }`     | Fired when the value of the textarea changes.|
+
+### `ecc-input-changed`
+This event is fired whenever the user types or pastes content into the textarea.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTextarea 
+      onEccInputChanged={(event) => {
+        console.log(event.detail.value);
+      }}
+    />
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    element.addEventListener('ecc-input-changed', (event) => {
+      console.log(event.detail.value);
+    });
+    ```
+  </Tabs.Tab>
+</Tabs> 

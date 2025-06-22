@@ -13,19 +13,31 @@ export {
 // For backwards compatibility and as default export
 export default EccUtilsDesignCollapsible;
 
-if (!window.customElements.get("ecc-utils-design-collapsible")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-collapsible")
+) {
   window.customElements.define(
     "ecc-utils-design-collapsible",
     EccUtilsDesignCollapsible
   );
 }
-if (!window.customElements.get("ecc-utils-design-collapsible-trigger")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-collapsible-trigger")
+) {
   window.customElements.define(
     "ecc-utils-design-collapsible-trigger",
     EccUtilsDesignCollapsibleTrigger
   );
 }
-if (!window.customElements.get("ecc-utils-design-collapsible-content")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-collapsible-content")
+) {
   window.customElements.define(
     "ecc-utils-design-collapsible-content",
     EccUtilsDesignCollapsibleContent

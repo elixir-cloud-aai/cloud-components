@@ -6,22 +6,38 @@ import {
 } from "./tabs.js";
 
 // Define custom elements
-if (!window.customElements.get("ecc-utils-design-tabs")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-tabs")
+) {
   window.customElements.define("ecc-utils-design-tabs", EccUtilsDesignTabs);
 }
-if (!window.customElements.get("ecc-utils-design-tabs-list")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-tabs-list")
+) {
   window.customElements.define(
     "ecc-utils-design-tabs-list",
     EccUtilsDesignTabsList
   );
 }
-if (!window.customElements.get("ecc-utils-design-tabs-trigger")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-tabs-trigger")
+) {
   window.customElements.define(
     "ecc-utils-design-tabs-trigger",
     EccUtilsDesignTabsTrigger
   );
 }
-if (!window.customElements.get("ecc-utils-design-tabs-content")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-tabs-content")
+) {
   window.customElements.define(
     "ecc-utils-design-tabs-content",
     EccUtilsDesignTabsContent

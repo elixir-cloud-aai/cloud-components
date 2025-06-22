@@ -4,7 +4,11 @@ export * from "./badge.js";
 export default EccUtilsDesignBadge;
 
 // Define the custom element
-if (!window.customElements.get("ecc-utils-design-badge")) {
+if (
+  typeof window !== "undefined" &&
+  window.customElements &&
+  !window.customElements.get("ecc-utils-design-badge")
+) {
   window.customElements.define("ecc-utils-design-badge", EccUtilsDesignBadge);
 }
 
