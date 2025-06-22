@@ -150,7 +150,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
 
         // Emit version change event for initial load
         this.dispatchEvent(
-          new CustomEvent("ecc-tool-version-change", {
+          new CustomEvent("ecc-tool-version-changed", {
             detail: {
               previousVersion,
               newVersion: this.selectedVersion,
@@ -241,7 +241,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
 
     // Emit version change event
     this.dispatchEvent(
-      new CustomEvent("ecc-tool-version-change", {
+      new CustomEvent("ecc-tool-version-changed", {
         detail: {
           previousVersion,
           newVersion,
@@ -396,7 +396,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                   <div class="w-full md:w-auto flex-shrink-0">
                     <ecc-utils-design-select
                       class="part:w-full part:md:w-64"
-                      @ecc-utils-change=${this.handleVersionChange}
+                      @ecc-input-changed=${this.handleVersionChange}
                       value=${this.selectedVersion}
                     >
                       <ecc-utils-design-select-trigger>
@@ -936,7 +936,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
             class="flex items-center gap-2 text-sm w-full justify-end font-medium"
           >
             <ecc-utils-design-select
-              @ecc-utils-change=${this.handleDescriptorTypeChange}
+              @ecc-input-changed=${this.handleDescriptorTypeChange}
               value=${this.selectedDescriptorType}
             >
               <ecc-utils-design-select-trigger>
@@ -1068,7 +1068,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
 
     // Emit version change event
     this.dispatchEvent(
-      new CustomEvent("ecc-tool-version-change", {
+      new CustomEvent("ecc-tool-version-changed", {
         detail: {
           previousVersion,
           newVersion: versionId,

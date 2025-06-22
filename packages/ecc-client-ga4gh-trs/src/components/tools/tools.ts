@@ -28,8 +28,8 @@ import "@elixir-cloud/design/components/skeleton/index.js";
  * @property {boolean} search - Determines if the search field should be rendered
  * @property {TrsProvider} provider - Custom data provider (optional, overrides baseUrl)
  *
- * @fires ecc-tools-change - Fired when tools data changes
- * @fires ecc-tools-click - Fired when a tool is clicked
+ * @fires ecc-tools-changed - Fired when tools data changes
+ * @fires ecc-tools-selected - Fired when a tool is clicked
  */
 export class ECCClientGa4ghTrsTools extends LitElement {
   static styles = [
@@ -155,7 +155,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
 
       // Emit an event with the updated tools
       this.dispatchEvent(
-        new CustomEvent("ecc-tools-change", {
+        new CustomEvent("ecc-tools-changed", {
           detail: { tools },
           bubbles: true,
           composed: true,
@@ -226,7 +226,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
 
   private handleViewDetails(toolId: string): void {
     // You can dispatch a custom event or implement navigation to a details page
-    const event = new CustomEvent("ecc-tools-click", {
+    const event = new CustomEvent("ecc-tools-selected", {
       detail: { toolId },
       bubbles: true,
       composed: true,
@@ -249,7 +249,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
           <ecc-utils-design-label>Tool Class</ecc-utils-design-label>
           <ecc-utils-design-select
             class="part:w-40"
-            @ecc-utils-change=${(e: Event) =>
+            @ecc-input-changed=${(e: Event) =>
               this.handleSelectChange("toolClass", e)}
           >
             <ecc-utils-design-select-trigger>
@@ -275,7 +275,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
           <ecc-utils-design-label>Language</ecc-utils-design-label>
           <ecc-utils-design-select
             class="part:w-40"
-            @ecc-utils-change=${(e: Event) =>
+            @ecc-input-changed=${(e: Event) =>
               this.handleSelectChange("descriptorType", e)}
           >
             <ecc-utils-design-select-trigger>
@@ -316,7 +316,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
           <ecc-utils-design-pagination-item>
             <ecc-utils-design-pagination-previous
               ?disabled=${this.currentPage === 1}
-              @ecc-utils-button-click=${(e: CustomEvent) => {
+              @ecc-button-clicked=${(e: CustomEvent) => {
                 if (e.detail.variant === "previous") {
                   this.goToPage(this.currentPage - 1);
                 }
@@ -328,7 +328,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
             ? html`
                 <ecc-utils-design-pagination-item>
                   <ecc-utils-design-pagination-link
-                    @ecc-utils-button-click=${(e: CustomEvent) => {
+                    @ecc-button-clicked=${(e: CustomEvent) => {
                       if (e.detail.variant === "link") {
                         this.goToPage(1);
                       }
@@ -349,7 +349,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
             ? html`
                 <ecc-utils-design-pagination-item>
                   <ecc-utils-design-pagination-link
-                    @ecc-utils-button-click=${(e: CustomEvent) => {
+                    @ecc-button-clicked=${(e: CustomEvent) => {
                       if (e.detail.variant === "link") {
                         this.goToPage(this.currentPage - 1);
                       }
@@ -370,7 +370,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
             ? html`
                 <ecc-utils-design-pagination-item>
                   <ecc-utils-design-pagination-link
-                    @ecc-utils-button-click=${(e: CustomEvent) => {
+                    @ecc-button-clicked=${(e: CustomEvent) => {
                       if (e.detail.variant === "link") {
                         this.goToPage(this.currentPage + 1);
                       }
@@ -387,7 +387,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
             ? html`
                 <ecc-utils-design-pagination-item>
                   <ecc-utils-design-pagination-link
-                    @ecc-utils-button-click=${(e: CustomEvent) => {
+                    @ecc-button-clicked=${(e: CustomEvent) => {
                       if (e.detail.variant === "link") {
                         this.goToPage(this.currentPage + 1);
                       }
@@ -408,7 +408,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
             ? html`
                 <ecc-utils-design-pagination-item>
                   <ecc-utils-design-pagination-link
-                    @ecc-utils-button-click=${(e: CustomEvent) => {
+                    @ecc-button-clicked=${(e: CustomEvent) => {
                       if (e.detail.variant === "link") {
                         this.goToPage(this.lastPage);
                       }
@@ -423,7 +423,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
             <ecc-utils-design-pagination-next
               ?disabled=${this.lastPage !== -1 &&
               this.lastPage === this.currentPage}
-              @ecc-utils-button-click=${(e: CustomEvent) => {
+              @ecc-button-clicked=${(e: CustomEvent) => {
                 if (e.detail.variant === "next") {
                   this.goToPage(this.currentPage + 1);
                 }
@@ -577,7 +577,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
                     <ecc-utils-design-input
                       class="part:w-full w-full"
                       placeholder="Search by tool name..."
-                      @ecc-utils-change=${this.handleSearch}
+                      @ecc-input-changed=${this.handleSearch}
                     ></ecc-utils-design-input>
                   </div>
                 </div>

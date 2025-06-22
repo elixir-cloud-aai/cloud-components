@@ -21,8 +21,8 @@ import "@elixir-cloud/design/components/skeleton/index.js";
  * @property {number} pageSize - Number of runs per page
  * @property {WesProvider} provider - Custom data provider (optional, overrides baseUrl)
  *
- * @fires ecc-runs-change - Fired when runs data changes
- * @fires ecc-runs-click - Fired when a run is clicked
+ * @fires ecc-runs-changed - Fired when runs data changes
+ * @fires ecc-runs-selected - Fired when a run is selected
  */
 export class ECCClientGa4ghWesRuns extends LitElement {
   static styles = [
@@ -97,7 +97,7 @@ export class ECCClientGa4ghWesRuns extends LitElement {
 
       // Emit an event with the updated runs
       this.dispatchEvent(
-        new CustomEvent("ecc-runs-change", {
+        new CustomEvent("ecc-runs-changed", {
           detail: { runs: this.runs },
           bubbles: true,
           composed: true,
@@ -115,7 +115,7 @@ export class ECCClientGa4ghWesRuns extends LitElement {
   }
 
   private handleViewDetails(runId: string): void {
-    const event = new CustomEvent("ecc-runs-click", {
+    const event = new CustomEvent("ecc-runs-selected", {
       detail: { runId },
       bubbles: true,
       composed: true,
@@ -138,7 +138,7 @@ export class ECCClientGa4ghWesRuns extends LitElement {
           <ecc-utils-design-pagination-item>
             <ecc-utils-design-pagination-previous
               ?disabled=${this.currentPage === 1}
-              @ecc-utils-button-click=${(e: CustomEvent) => {
+              @ecc-button-clicked=${(e: CustomEvent) => {
                 if (e.detail.variant === "previous") {
                   this.goToPage(this.currentPage - 1);
                 }
@@ -156,7 +156,7 @@ export class ECCClientGa4ghWesRuns extends LitElement {
             ? html`
                 <ecc-utils-design-pagination-item>
                   <ecc-utils-design-pagination-link
-                    @ecc-utils-button-click=${(e: CustomEvent) => {
+                    @ecc-button-clicked=${(e: CustomEvent) => {
                       if (e.detail.variant === "link") {
                         this.goToPage(this.currentPage + 1);
                       }
@@ -173,7 +173,7 @@ export class ECCClientGa4ghWesRuns extends LitElement {
           <ecc-utils-design-pagination-item>
             <ecc-utils-design-pagination-next
               ?disabled=${!this.hasMorePages}
-              @ecc-utils-button-click=${(e: CustomEvent) => {
+              @ecc-button-clicked=${(e: CustomEvent) => {
                 if (e.detail.variant === "next") {
                   this.goToPage(this.currentPage + 1);
                 }

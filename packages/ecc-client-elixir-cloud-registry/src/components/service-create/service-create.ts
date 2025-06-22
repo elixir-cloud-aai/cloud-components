@@ -23,9 +23,9 @@ import "@elixir-cloud/design/components/collapsible/index.js";
  * @property {string} baseUrl - Base URL of the Cloud Registry instance/gateway
  * @property {CloudRegistryProvider} provider - Custom data provider (optional, overrides baseUrl)
  *
- * @fires ecc-service-create-success - Fired when a service is successfully created (includes serviceId, serviceData, and success message)
- * @fires ecc-service-create-error - Fired when service creation fails
- * @fires ecc-service-create-validation-error - Fired when there are validation errors during service creation
+ * @fires ecc-service-created - Fired when a service is successfully created (includes serviceId, serviceData, and success message)
+ * @fires ecc-service-create-failed - Fired when service creation fails
+ * @fires ecc-service-create-validation-failed - Fired when there are validation errors during service creation
  */
 export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   static styles = [
@@ -98,7 +98,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   protected async firstUpdated(): Promise<void> {
     if (!this.baseUrl && !this.provider) {
       this.dispatchEvent(
-        new CustomEvent("ecc-service-create-validation-error", {
+        new CustomEvent("ecc-service-create-validation-failed", {
           detail: {
             error:
               "Please provide either a base URL for the Cloud Registry API or a custom provider.",
@@ -138,7 +138,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     } catch (error) {
       console.error("Failed to load service types:", error);
       this.dispatchEvent(
-        new CustomEvent("ecc-service-create-error", {
+        new CustomEvent("ecc-service-create-failed", {
           detail: { error: "Failed to load service types" },
           bubbles: true,
           composed: true,
@@ -171,7 +171,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   private async handleSubmit(): Promise<void> {
     if (!this._provider || !this._provider.createService) {
       this.dispatchEvent(
-        new CustomEvent("ecc-service-create-error", {
+        new CustomEvent("ecc-service-create-failed", {
           detail: {
             error: "Service creation is not supported by the current provider",
           },
@@ -244,7 +244,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
       // Emit success event with comprehensive data
       this.dispatchEvent(
-        new CustomEvent("ecc-service-create-success", {
+        new CustomEvent("ecc-service-created", {
           detail: { serviceId, serviceData, message: successMessage },
           bubbles: true,
           composed: true,
@@ -259,7 +259,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
       // Emit error event
       this.dispatchEvent(
-        new CustomEvent("ecc-service-create-error", {
+        new CustomEvent("ecc-service-create-failed", {
           detail: { error: errorMessage },
           bubbles: true,
           composed: true,
@@ -310,7 +310,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="service-name"
               .value=${this.formData.name}
-              @ecc-utils-change=${(e: CustomEvent) =>
+              @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("name", e.detail.value)}
               placeholder="Enter a descriptive name for your service"
               required
@@ -328,7 +328,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="service-url"
               .value=${this.formData.url}
-              @ecc-utils-change=${(e: CustomEvent) =>
+              @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("url", e.detail.value)}
               placeholder="https://api.example.com/v1"
               required
@@ -346,7 +346,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="org-name"
               .value=${this.formData.organization.name}
-              @ecc-utils-change=${(e: CustomEvent) =>
+              @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange(
                   "organization",
                   "name",
@@ -365,7 +365,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="org-url"
               .value=${this.formData.organization.url}
-              @ecc-utils-change=${(e: CustomEvent) =>
+              @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange(
                   "organization",
                   "url",
@@ -390,7 +390,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="type-group"
               .value=${this.formData.type.group}
-              @ecc-utils-change=${(e: CustomEvent) =>
+              @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange("type", "group", e.detail.value)}
               placeholder="org.ga4gh"
               required
@@ -408,7 +408,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="type-artifact"
               .value=${this.formData.type.artifact}
-              @ecc-utils-change=${(e: CustomEvent) =>
+              @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange(
                   "type",
                   "artifact",
@@ -430,7 +430,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="type-version"
               .value=${this.formData.type.version}
-              @ecc-utils-change=${(e: CustomEvent) =>
+              @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange("type", "version", e.detail.value)}
               placeholder="1.0.0"
               required
@@ -451,7 +451,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="service-version"
               .value=${this.formData.version}
-              @ecc-utils-change=${(e: CustomEvent) =>
+              @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("version", e.detail.value)}
               placeholder="1.0.0"
               required
@@ -469,7 +469,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-select
               id="environment"
               .value=${this.formData.environment}
-              @ecc-utils-change=${(e: CustomEvent) =>
+              @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("environment", e.detail.value)}
             >
               <ecc-utils-design-select-trigger class="h-10">
@@ -506,7 +506,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           <ecc-utils-design-textarea
             id="description"
             .value=${this.formData.description}
-            @ecc-utils-change=${(e: CustomEvent) =>
+            @ecc-input-changed=${(e: CustomEvent) =>
               this.handleInputChange("description", e.detail.value)}
             placeholder="Provide a detailed description of what your service does"
             rows="4"
@@ -561,7 +561,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                 <ecc-utils-design-input
                   id="custom-service-id"
                   .value=${this.formData.customServiceId}
-                  @ecc-utils-change=${(e: CustomEvent) => {
+                  @ecc-input-changed=${(e: CustomEvent) => {
                     this.handleInputChange("customServiceId", e.detail.value);
                     this.handleInputChange(
                       "useCustomId",
@@ -585,7 +585,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   <ecc-utils-design-input
                     id="contact-url"
                     .value=${this.formData.contactUrl}
-                    @ecc-utils-change=${(e: CustomEvent) =>
+                    @ecc-input-changed=${(e: CustomEvent) =>
                       this.handleInputChange("contactUrl", e.detail.value)}
                     placeholder="mailto:support@example.com or https://contact.example.com"
                     class="h-10"
@@ -602,7 +602,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   <ecc-utils-design-input
                     id="documentation-url"
                     .value=${this.formData.documentationUrl}
-                    @ecc-utils-change=${(e: CustomEvent) =>
+                    @ecc-input-changed=${(e: CustomEvent) =>
                       this.handleInputChange(
                         "documentationUrl",
                         e.detail.value
@@ -625,7 +625,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   <ecc-utils-design-input
                     id="created-at"
                     .value=${this.formData.createdAt}
-                    @ecc-utils-change=${(e: CustomEvent) =>
+                    @ecc-input-changed=${(e: CustomEvent) =>
                       this.handleInputChange("createdAt", e.detail.value)}
                     placeholder="2019-06-04T12:58:19Z (optional)"
                     class="h-10"
@@ -642,7 +642,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   <ecc-utils-design-input
                     id="updated-at"
                     .value=${this.formData.updatedAt}
-                    @ecc-utils-change=${(e: CustomEvent) =>
+                    @ecc-input-changed=${(e: CustomEvent) =>
                       this.handleInputChange("updatedAt", e.detail.value)}
                     placeholder="2019-06-04T12:58:19Z (optional)"
                     class="h-10"

@@ -46,7 +46,7 @@ export class EccUtilsDesignTextarea extends LitElement {
     const textarea = e.target as HTMLTextAreaElement;
     this.value = textarea.value;
     this.dispatchEvent(
-      new CustomEvent("ecc-utils-change", {
+      new CustomEvent("ecc-input-changed", {
         detail: { value: this.value },
         bubbles: true,
         composed: true,

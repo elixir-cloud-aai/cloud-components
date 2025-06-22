@@ -60,7 +60,7 @@ export class EccUtilsDesignCollapsible extends LitElement {
 
     // Dispatch change event
     this.dispatchEvent(
-      new CustomEvent("ecc-utils-change", {
+      new CustomEvent("ecc-collapsible-toggled", {
         detail: { open: this.open },
         bubbles: true,
         composed: true,

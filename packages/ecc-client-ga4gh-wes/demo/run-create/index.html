@@ -52,7 +52,7 @@
         alert(`Workflow submitted successfully! Run ID: ${event.detail.runId}`);
       });
 
-      document.addEventListener("ecc-wes-error", (event) => {
+      document.addEventListener("ecc-run-create-failed", (event) => {
         console.error("WES error:", event.detail);
         alert(`Error: ${event.detail.error}`);
       });

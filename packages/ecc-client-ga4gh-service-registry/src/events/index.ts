@@ -1,4 +1,4 @@
-export type { EccServicesChangeEvent } from "./ecc-services-change.js";
-export type { EccServicesClickEvent } from "./ecc-services-click.js";
-export type { EccServiceChangeEvent } from "./ecc-service-change.js";
-export type { EccServiceClickEvent } from "./ecc-service-click.js";
+export type { EccServiceChangedEvent } from "./ecc-service-changed.js";
+export type { EccServiceSelectedEvent } from "./ecc-service-selected.js";
+export type { EccServicesChangedEvent } from "./ecc-services-changed.js";
+export type { EccServicesSelectedEvent } from "./ecc-services-selected.js";

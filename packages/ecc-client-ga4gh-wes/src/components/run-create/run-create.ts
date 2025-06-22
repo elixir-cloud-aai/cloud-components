@@ -29,7 +29,7 @@ import "@elixir-cloud/design/components/code/index.js";
  * @property {WesProvider} provider - Custom data provider (optional, overrides baseUrl)
  *
  * @fires ecc-run-submitted - Fired when a workflow run is successfully submitted
- * @fires ecc-wes-error - Fired when an error occurs
+ * @fires ecc-run-create-failed - Fired when run creation fails
  */
 export class ECCClientGa4ghWesRunCreate extends LitElement {
   static styles = [
@@ -236,7 +236,7 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
             <div class="flex gap-2 items-center">
               <ecc-utils-design-input
                 .value=${tag.key}
-                @ecc-utils-change=${(e: CustomEvent) =>
+                @ecc-input-changed=${(e: CustomEvent) =>
                   this.handleTagChange(index, "key", e.detail.value)}
                 placeholder="Key"
                 class="flex-1 h-9"
@@ -244,7 +244,7 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
               <span class="text-muted-foreground">=</span>
               <ecc-utils-design-input
                 .value=${tag.value}
-                @ecc-utils-change=${(e: CustomEvent) =>
+                @ecc-input-changed=${(e: CustomEvent) =>
                   this.handleTagChange(index, "value", e.detail.value)}
                 placeholder="Value"
                 class="flex-1 h-9"
@@ -386,7 +386,7 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
 
       // Emit error event
       this.dispatchEvent(
-        new CustomEvent("ecc-wes-error", {
+        new CustomEvent("ecc-run-create-failed", {
           detail: { error: this.error },
           bubbles: true,
           composed: true,
@@ -425,7 +425,7 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
           <ecc-utils-design-input
             id="workflow-url"
             .value=${this.formData.workflowUrl}
-            @ecc-utils-change=${(e: CustomEvent) =>
+            @ecc-input-changed=${(e: CustomEvent) =>
               this.handleInputChange("workflowUrl", e.detail.value)}
             placeholder="https://example.com/workflow.cwl"
             required
@@ -445,7 +445,7 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
             <ecc-utils-design-select
               id="workflow-type"
               .value=${this.formData.workflowType}
-              @ecc-utils-change=${this.handleWorkflowTypeChange}
+              @ecc-input-changed=${this.handleWorkflowTypeChange}
               required
             >
               <ecc-utils-design-select-trigger class="h-10">
@@ -470,7 +470,7 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
             <ecc-utils-design-select
               id="workflow-version"
               .value=${this.formData.workflowTypeVersion}
-              @ecc-utils-change=${(e: CustomEvent) =>
+              @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("workflowTypeVersion", e.detail.value)}
               required
             >
@@ -497,7 +497,7 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
             id="workflow-params"
             value=${this.formData.workflowParams}
             extension="json"
-            @ecc-utils-change=${(e: CustomEvent) =>
+            @ecc-input-changed=${(e: CustomEvent) =>
               this.handleInputChange("workflowParams", e.detail.value)}
             placeholder='{"input_file": "https://example.com/input.txt"}'
             class="part:h-[300px]"
@@ -549,7 +549,7 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
                   id="engine-params"
                   value=${this.formData.workflowEngineParams}
                   extension="json"
-                  @ecc-utils-change=${(e: CustomEvent) =>
+                  @ecc-input-changed=${(e: CustomEvent) =>
                     this.handleInputChange(
                       "workflowEngineParams",
                       e.detail.value

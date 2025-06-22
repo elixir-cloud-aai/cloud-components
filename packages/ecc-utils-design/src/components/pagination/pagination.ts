@@ -121,7 +121,7 @@ export class EccUtilsDesignPaginationLink extends LitElement {
     if (this.href === "#") {
       e.preventDefault();
       this.dispatchEvent(
-        new CustomEvent("ecc-utils-button-click", {
+        new CustomEvent("ecc-button-clicked", {
           detail: {
             variant: "link",
           },
@@ -182,7 +182,7 @@ export class EccUtilsDesignPaginationPrevious extends LitElement {
   private _handleClick() {
     if (!this.disabled) {
       this.dispatchEvent(
-        new CustomEvent("ecc-utils-button-click", {
+        new CustomEvent("ecc-button-clicked", {
           detail: {
             variant: "previous",
           },
@@ -243,7 +243,7 @@ export class EccUtilsDesignPaginationNext extends LitElement {
   private _handleClick() {
     if (!this.disabled) {
       this.dispatchEvent(
-        new CustomEvent("ecc-utils-button-click", {
+        new CustomEvent("ecc-button-clicked", {
           detail: {
             variant: "next",
           },

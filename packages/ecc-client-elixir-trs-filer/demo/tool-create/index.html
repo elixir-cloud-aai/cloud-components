@@ -25,7 +25,7 @@
               console.log("Tool created:", e.detail);
               alert(`Tool created successfully with ID: ${e.detail.toolId}`);
             }}"
-            @ecc-tool-create-error="${(e) => {
+            @ecc-tool-create-failed="${(e) => {
               console.error("Tool creation failed:", e.detail);
               alert(`Tool creation failed: ${e.detail.error}`);
             }}"

@@ -38,17 +38,17 @@
 
       // Event listeners for demo
       function setupEventListeners() {
-        document.addEventListener("ecc-service-create-success", (e) => {
+        document.addEventListener("ecc-service-created", (e) => {
           console.log("Service created successfully:", e.detail);
           alert(`Success: ${e.detail.message}`);
         });
 
-        document.addEventListener("ecc-service-create-error", (e) => {
+        document.addEventListener("ecc-service-create-failed", (e) => {
           console.error("Service creation failed:", e.detail);
           alert(`Error: ${e.detail.error}`);
         });
 
-        document.addEventListener("ecc-service-create-validation-error", (e) => {
+        document.addEventListener("ecc-service-create-validation-failed", (e) => {
           console.error("Validation error:", e.detail);
           alert(`Validation Error: ${e.detail.error}`);
         });

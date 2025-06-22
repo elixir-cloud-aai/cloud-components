@@ -26,8 +26,8 @@ import "@elixir-cloud/design/components/skeleton/index.js";
  * @property {boolean} search - Determines if the search field should be rendered
  * @property {ServiceRegistryProvider} provider - Custom data provider (optional, overrides baseUrl)
  *
- * @fires ecc-services-change - Fired when services data changes
- * @fires ecc-service-click - Fired when a service is clicked
+ * @fires ecc-services-changed - Fired when services data changes
+ * @fires ecc-service-selected - Fired when a service is clicked
  */
 export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   static styles = [
@@ -107,7 +107,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
 
       // Emit an event with the updated services
       this.dispatchEvent(
-        new CustomEvent("ecc-services-change", {
+        new CustomEvent("ecc-services-changed", {
           detail: { services },
           bubbles: true,
           composed: true,
@@ -175,7 +175,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
 
   private handleViewDetails(serviceId: string): void {
     this.dispatchEvent(
-      new CustomEvent("ecc-service-click", {
+      new CustomEvent("ecc-service-selected", {
         detail: { serviceId },
         bubbles: true,
         composed: true,
@@ -251,7 +251,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
                 <ecc-utils-design-input
                   class="part:w-full"
                   placeholder="Search by name, type, organization..."
-                  @ecc-utils-change=${this.handleSearch}
+                  @ecc-input-changed=${this.handleSearch}
                 ></ecc-utils-design-input>
               </div>
             `

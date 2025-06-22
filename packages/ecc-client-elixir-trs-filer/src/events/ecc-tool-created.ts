@@ -1,4 +1,4 @@
-export type EccToolCreateSuccessEvent = CustomEvent<{
+export type EccToolCreatedEvent = CustomEvent<{
   toolId: string;
   toolData: Record<string, any>;
   message: string;
@@ -6,6 +6,6 @@ export type EccToolCreateSuccessEvent = CustomEvent<{
 
 declare global {
   interface GlobalEventHandlersEventMap {
-    "ecc-tool-create-success": EccToolCreateSuccessEvent;
+    "ecc-tool-created": EccToolCreatedEvent;
   }
 }

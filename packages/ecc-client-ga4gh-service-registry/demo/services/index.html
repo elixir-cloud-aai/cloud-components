@@ -24,7 +24,7 @@
           <ecc-client-ga4gh-service-registry-services
             .baseUrl="${baseUrl}"
             .search="${true}"
-            @ecc-service-click="${(e) => {
+            @ecc-service-selected="${(e) => {
               console.log("Service clicked:", e.detail);
               window.location.href = `../service/index.html?id=${e.detail.serviceId}`;
             }}"

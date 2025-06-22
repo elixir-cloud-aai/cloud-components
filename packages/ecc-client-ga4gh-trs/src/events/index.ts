@@ -1,3 +1,3 @@
-export type { EccToolsChangeEvent } from "./ecc-tools-change.js";
-export type { EccToolsClickEvent } from "./ecc-tools-click.js";
-export type { EccToolVersionChangeEvent } from "./ecc-tool-version-change.js";
+export type { EccToolsChangedEvent } from "./ecc-tools-changed.js";
+export type { EccToolsSelectedEvent } from "./ecc-tools-selected.js";
+export type { EccToolVersionChangedEvent } from "./ecc-tool-version-changed.js";

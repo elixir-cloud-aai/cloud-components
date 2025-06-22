@@ -1,6 +1,6 @@
 import { ExternalServiceRegister } from "../providers/index.js";
 
-export type EccServiceCreateSuccessEvent = CustomEvent<{
+export type EccServiceCreatedEvent = CustomEvent<{
   serviceId: string;
   serviceData: ExternalServiceRegister;
   message: string;
@@ -8,6 +8,6 @@ export type EccServiceCreateSuccessEvent = CustomEvent<{
 
 declare global {
   interface GlobalEventHandlersEventMap {
-    "ecc-service-create-success": EccServiceCreateSuccessEvent;
+    "ecc-service-created": EccServiceCreatedEvent;
   }
 }

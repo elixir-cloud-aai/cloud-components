@@ -23,7 +23,7 @@ import "@elixir-cloud/design/components/separator/index.js";
  * @property {string} serviceId - ID of the service to display
  * @property {ServiceRegistryProvider} provider - Custom data provider (optional, overrides baseUrl)
  *
- * @fires ecc-service-change - Fired when service data changes
+ * @fires ecc-service-changed - Fired when service data changes
  */
 export class ECCClientGa4ghServiceRegistryService extends LitElement {
   static styles = [
@@ -97,9 +97,9 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
       const service = await this._provider.getServiceById(this.serviceId);
       this.service = service;
 
-      // Emit an event with the updated service
+      // Emit an event with the updated service data
       this.dispatchEvent(
-        new CustomEvent("ecc-service-change", {
+        new CustomEvent("ecc-service-changed", {
           detail: { service },
           bubbles: true,
           composed: true,

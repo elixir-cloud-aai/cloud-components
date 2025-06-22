@@ -85,7 +85,7 @@ export class EccUtilsDesignSelect extends LitElement {
     this.isOpen = false;
 
     this.dispatchEvent(
-      new CustomEvent("ecc-utils-change", {
+      new CustomEvent("ecc-input-changed", {
         detail: { value },
         bubbles: true,
         composed: true,

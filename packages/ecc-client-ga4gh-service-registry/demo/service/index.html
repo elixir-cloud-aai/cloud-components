@@ -32,7 +32,7 @@
           <ecc-client-ga4gh-service-registry-service
             .baseUrl="${baseUrl}"
             .serviceId="${serviceId}"
-            @ecc-service-change="${(e) =>
+            @ecc-service-changed="${(e) =>
               console.log("Service data changed:", e.detail)}"
           ></ecc-client-ga4gh-service-registry-service>
         `,

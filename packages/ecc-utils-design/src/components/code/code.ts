@@ -664,7 +664,7 @@ export class EccUtilsDesignCode extends LitElement {
         this.value = this.editor.getValue();
 
         this.dispatchEvent(
-          new CustomEvent("ecc-utils-change", {
+          new CustomEvent("ecc-input-changed", {
             detail: { value: this.value },
             bubbles: true,
             composed: true,

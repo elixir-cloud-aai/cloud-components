@@ -61,7 +61,7 @@ export class EccUtilsDesignInput extends LitElement {
     const input = e.target as HTMLInputElement;
     this.value = input.value;
     this.dispatchEvent(
-      new CustomEvent("ecc-utils-change", {
+      new CustomEvent("ecc-input-changed", {
         detail: { value: this.value },
         bubbles: true,
         composed: true,

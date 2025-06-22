@@ -50,9 +50,9 @@ type UIFileType =
  * @property {string} baseUrl - Base URL of the TRS instance/gateway
  * @property {TrsProvider} provider - Custom data provider (optional, overrides baseUrl)
  *
- * @fires ecc-tool-create-success - Fired when a tool is successfully created (includes toolId, toolData, and success message)
- * @fires ecc-tool-create-error - Fired when tool creation fails
- * @fires ecc-tool-create-validation-error - Fired when there are validation errors during tool creation
+ * @fires ecc-tool-created - Fired when a tool is successfully created (includes toolId, toolData, and success message)
+ * @fires ecc-tool-create-failed - Fired when tool creation fails
+ * @fires ecc-tool-create-validation-failed - Fired when there are validation errors during tool creation
  */
 export class ECCClientElixirTrsToolCreate extends LitElement {
   static styles = [
@@ -156,7 +156,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
   protected async firstUpdated(): Promise<void> {
     if (!this.baseUrl && !this.provider) {
       this.dispatchEvent(
-        new CustomEvent("ecc-tool-create-validation-error", {
+        new CustomEvent("ecc-tool-create-validation-failed", {
           detail: {
             error:
               "Please provide either a base URL for the TRS API or a custom provider.",
@@ -196,7 +196,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
     } catch (error) {
       console.error("Failed to load tool classes:", error);
       this.dispatchEvent(
-        new CustomEvent("ecc-tool-create-error", {
+        new CustomEvent("ecc-tool-create-failed", {
           detail: { error: "Failed to load tool classes" },
           bubbles: true,
           composed: true,
@@ -269,7 +269,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
 
     if (!activeDescriptorType) {
       this.dispatchEvent(
-        new CustomEvent("ecc-tool-create-validation-error", {
+        new CustomEvent("ecc-tool-create-validation-failed", {
           detail: {
             error: "Please select a descriptor type before adding files.",
           },
@@ -341,7 +341,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
 
       if (!activeDescriptorType) {
         this.dispatchEvent(
-          new CustomEvent("ecc-tool-create-validation-error", {
+          new CustomEvent("ecc-tool-create-validation-failed", {
             detail: {
               error: "Please select a descriptor type before uploading files.",
             },
@@ -422,7 +422,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
 
     if (!file || !file.name.toLowerCase().endsWith(".zip")) {
       this.dispatchEvent(
-        new CustomEvent("ecc-tool-create-validation-error", {
+        new CustomEvent("ecc-tool-create-validation-failed", {
           detail: { error: "Please select a valid ZIP file" },
           bubbles: true,
           composed: true,
@@ -438,7 +438,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
 
     if (!activeDescriptorType) {
       this.dispatchEvent(
-        new CustomEvent("ecc-tool-create-validation-error", {
+        new CustomEvent("ecc-tool-create-validation-failed", {
           detail: {
             error:
               "Please select a descriptor type before uploading ZIP files.",
@@ -505,7 +505,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
       );
 
       this.dispatchEvent(
-        new CustomEvent("ecc-tool-create-error", {
+        new CustomEvent("ecc-tool-create-failed", {
           detail: {
             error: `Failed to extract ZIP file: ${
               error instanceof Error ? error.message : "Unknown error"
@@ -736,7 +736,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
   private async handleSubmit(): Promise<void> {
     if (!this._provider || !this._provider.createTool) {
       this.dispatchEvent(
-        new CustomEvent("ecc-tool-create-error", {
+        new CustomEvent("ecc-tool-create-failed", {
           detail: {
             error: "Tool creation is not supported by the current provider",
           },
@@ -838,7 +838,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
 
       // Emit success event with comprehensive data
       this.dispatchEvent(
-        new CustomEvent("ecc-tool-create-success", {
+        new CustomEvent("ecc-tool-created", {
           detail: { toolId, toolData, message: successMessage },
           bubbles: true,
           composed: true,
@@ -853,7 +853,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
 
       // Emit error event
       this.dispatchEvent(
-        new CustomEvent("ecc-tool-create-error", {
+        new CustomEvent("ecc-tool-create-failed", {
           detail: { error: errorMessage },
           bubbles: true,
           composed: true,
@@ -906,7 +906,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
             <ecc-utils-design-input
               id="tool-name"
               .value=${this.formData.name}
-              @ecc-utils-change=${(e: CustomEvent) =>
+              @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("name", e.detail.value)}
               placeholder="Enter a descriptive name for your tool"
               class="h-10"
@@ -923,7 +923,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
             <ecc-utils-design-input
               id="organization"
               .value=${this.formData.organization}
-              @ecc-utils-change=${(e: CustomEvent) =>
+              @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("organization", e.detail.value)}
               placeholder="Enter your organization name"
               required
@@ -941,7 +941,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
             <ecc-utils-design-select
               id="tool-class-select"
               .value=${this.formData.toolClassId}
-              @ecc-utils-change=${(e: CustomEvent) => {
+              @ecc-input-changed=${(e: CustomEvent) => {
                 this.handleInputChange("toolClassId", e.detail.value);
               }}
               required
@@ -978,7 +978,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
           <ecc-utils-design-textarea
             id="description"
             .value=${this.formData.description}
-            @ecc-utils-change=${(e: CustomEvent) =>
+            @ecc-input-changed=${(e: CustomEvent) =>
               this.handleInputChange("description", e.detail.value)}
             placeholder="Provide a detailed description of what your tool does"
             rows="4"
@@ -1034,7 +1034,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
                   <ecc-utils-design-input
                     id="custom-tool-id"
                     .value=${this.formData.customToolId}
-                    @ecc-utils-change=${(e: CustomEvent) => {
+                    @ecc-input-changed=${(e: CustomEvent) => {
                       this.handleInputChange("customToolId", e.detail.value);
                       this.handleInputChange(
                         "useCustomId",
@@ -1057,7 +1057,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
                   <ecc-utils-design-input
                     id="aliases"
                     .value=${this.formData.aliases.join(", ")}
-                    @ecc-utils-change=${(e: CustomEvent) =>
+                    @ecc-input-changed=${(e: CustomEvent) =>
                       this.handleArrayInputChange("aliases", e.detail.value)}
                     placeholder="alias1, alias2, alias3"
                     class="h-10"
@@ -1075,7 +1075,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
                   <ecc-utils-design-input
                     id="checker-url"
                     .value=${this.formData.checkerUrl}
-                    @ecc-utils-change=${(e: CustomEvent) => {
+                    @ecc-input-changed=${(e: CustomEvent) => {
                       this.handleInputChange("checkerUrl", e.detail.value);
                       this.handleInputChange(
                         "hasChecker",
@@ -1194,7 +1194,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
             >
             <ecc-utils-design-input
               .value=${version.name}
-              @ecc-utils-change=${(e: CustomEvent) =>
+              @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleVersionChange(index, "name", e.detail.value)}
               placeholder="e.g., v1.0.0"
               class="h-10"
@@ -1207,7 +1207,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               .value=${version.author.join(", ")}
-              @ecc-utils-change=${(e: CustomEvent) => {
+              @ecc-input-changed=${(e: CustomEvent) => {
                 const authors = e.detail.value
                   .split(",")
                   .map((a: string) => a.trim())
@@ -1227,7 +1227,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
             <ecc-utils-design-multi-select
               .value=${version.descriptorTypes}
               placeholder="Select supported languages..."
-              @ecc-utils-change=${(e: CustomEvent) => {
+              @ecc-input-changed=${(e: CustomEvent) => {
                 const updatedVersions = [...this.versions];
                 const oldDescriptorTypes =
                   updatedVersions[index].descriptorTypes;
@@ -1342,7 +1342,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
                         version
                       )}
                       placeholder="Select tags..."
-                      @ecc-utils-change=${(e: CustomEvent) => {
+                      @ecc-input-changed=${(e: CustomEvent) => {
                         this.handleVersionTagsChange(index, e.detail.value);
                       }}
                     >
@@ -1369,7 +1369,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
                     </ecc-utils-design-label>
                     <ecc-utils-design-input
                       .value=${version.customVersionId}
-                      @ecc-utils-change=${(e: CustomEvent) =>
+                      @ecc-input-changed=${(e: CustomEvent) =>
                         this.handleVersionChange(
                           index,
                           "customVersionId",
@@ -1449,7 +1449,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
                       <ecc-utils-design-select
                         .value=${this.activeDescriptorType[index] ||
                         version.descriptorTypes[0]}
-                        @ecc-utils-change=${(e: CustomEvent) => {
+                        @ecc-input-changed=${(e: CustomEvent) => {
                           this.activeDescriptorType = {
                             ...this.activeDescriptorType,
                             [index]: e.detail.value,
@@ -1651,7 +1651,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
             <ecc-utils-design-label>File Path</ecc-utils-design-label>
             <ecc-utils-design-input
               .value=${activeFile.path}
-              @ecc-utils-change=${(e: CustomEvent) => {
+              @ecc-input-changed=${(e: CustomEvent) => {
                 this.handleFileFieldChange(
                   versionIndex,
                   activeIndex,
@@ -1667,7 +1667,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
             <ecc-utils-design-label>File Type</ecc-utils-design-label>
             <ecc-utils-design-select
               .value=${activeFile.uiFileType}
-              @ecc-utils-change=${(e: CustomEvent) => {
+              @ecc-input-changed=${(e: CustomEvent) => {
                 const newUIFileType = e.detail.value as UIFileType;
                 const newFileType =
                   ECCClientElixirTrsToolCreate.convertUIFileTypeToFileType(
@@ -1760,7 +1760,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
             <ecc-utils-design-label>Checksum Type</ecc-utils-design-label>
             <ecc-utils-design-select
               .value=${activeFile.checksumType}
-              @ecc-utils-change=${(e: CustomEvent) => {
+              @ecc-input-changed=${(e: CustomEvent) => {
                 this.handleFileFieldChange(
                   versionIndex,
                   activeIndex,
@@ -1790,7 +1790,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
             >
             <ecc-utils-design-input
               .value=${activeFile.checksumValue}
-              @ecc-utils-change=${(e: CustomEvent) => {
+              @ecc-input-changed=${(e: CustomEvent) => {
                 this.handleFileFieldChange(
                   versionIndex,
                   activeIndex,
@@ -1814,7 +1814,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
                   extension=${ECCClientElixirTrsToolCreate.getFileExtension(
                     activeFile.path
                   )}
-                  @ecc-utils-change=${(e: CustomEvent) => {
+                  @ecc-input-changed=${(e: CustomEvent) => {
                     this.handleFileFieldChange(
                       versionIndex,
                       activeIndex,

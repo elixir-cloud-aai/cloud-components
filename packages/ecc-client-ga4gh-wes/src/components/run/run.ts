@@ -27,7 +27,7 @@ import "@elixir-cloud/design/components/collapsible/index.js";
  * @property {string} runId - The ID of the workflow run to display.
  * @property {WesProvider} provider - Custom data provider (optional, overrides baseUrl).
  *
- * @fires ecc-run-log-change - Fired when the run log data is loaded.
+ * @fires ecc-run-log-changed - Fired when the run log data is loaded.
  */
 export class ECCClientGa4ghWesRun extends LitElement {
   static styles = [
@@ -132,7 +132,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
       const runLog = await this._provider.getRunLog(this.runId);
       this.run = runLog;
       this.dispatchEvent(
-        new CustomEvent("ecc-run-log-change", {
+        new CustomEvent("ecc-run-log-changed", {
           detail: { runLog },
           bubbles: true,
           composed: true,

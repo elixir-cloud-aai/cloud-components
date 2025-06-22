@@ -96,7 +96,7 @@ export class EccUtilsDesignMultiSelect extends LitElement {
     this.value = [...values];
 
     this.dispatchEvent(
-      new CustomEvent("ecc-utils-change", {
+      new CustomEvent("ecc-input-changed", {
         detail: { value: this.value },
         bubbles: true,
         composed: true,
@@ -537,7 +537,7 @@ export class EccUtilsDesignMultiSelectItem extends LitElement {
           class="mr-2"
           .checked=${this.selected}
           .disabled=${this.disabled}
-          @ecc-utils-change=${(e: Event) => {
+          @ecc-input-changed=${(e: Event) => {
             e.stopPropagation();
             this._handleSelect();
           }}

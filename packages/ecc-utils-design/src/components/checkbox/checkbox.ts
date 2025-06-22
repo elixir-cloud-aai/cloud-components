@@ -98,7 +98,7 @@ export class EccUtilsDesignCheckbox extends LitElement {
 
     // Dispatch change event
     this.dispatchEvent(
-      new CustomEvent("ecc-utils-change", {
+      new CustomEvent("ecc-input-changed", {
         detail: { checked: this.checked, value: this.value },
         bubbles: true,
         composed: true,
