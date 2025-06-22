@@ -113,6 +113,46 @@ The `Collapsible` is built by combining these components:
 | `open`      | `boolean` | `false` | When `true`, the collapsible is open.     |
 | `disabled`  | `boolean` | `false` | When `true`, disables the collapsible.    |
 
+#### `open`
+Controls whether the collapsible content is visible. Can be used for controlled components.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignCollapsible open={true}>
+      ...
+    </EccUtilsDesignCollapsible>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-collapsible open="true">
+      ...
+    </ecc-utils-design-collapsible>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `disabled`
+When `true`, prevents the collapsible from being toggled and disables the trigger.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignCollapsible disabled={true}>
+      ...
+    </EccUtilsDesignCollapsible>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-collapsible disabled="true">
+      ...
+    </ecc-utils-design-collapsible>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
 ## Events
 
 ### `EccUtilsDesignCollapsible`

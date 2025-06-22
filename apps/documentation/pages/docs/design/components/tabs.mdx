@@ -129,6 +129,46 @@ This example shows a basic tabbed interface with two tabs.
 | `defaultValue`  | `string`  | `""`    | The value of the tab to be active on initial render. |
 | `value`         | `string`  | `""`    | The controlled value of the active tab.   |
 
+#### `defaultValue`
+Sets which tab is active when the component first loads. Should match the `value` of one of the TabsTrigger components.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTabs defaultValue="account">
+      ...
+    </EccUtilsDesignTabs>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-tabs default-value="account">
+      ...
+    </ecc-utils-design-tabs>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `value`
+Controls which tab is currently active. Used for controlled components where you manage the state externally.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTabs value={currentTab}>
+      ...
+    </EccUtilsDesignTabs>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-tabs value="password">
+      ...
+    </ecc-utils-design-tabs>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
 ### `EccUtilsDesignTabsTrigger`
 
 | Property    | Type      | Default   | Description                               |
@@ -136,11 +176,63 @@ This example shows a basic tabbed interface with two tabs.
 | `value`     | `string`  | `""`      | A unique value for the tab trigger.       |
 | `disabled`  | `boolean` | `false`   | When `true`, disables the tab trigger.    |
 
+#### `value`
+A unique identifier for the tab trigger. This value must match the corresponding TabsContent `value`.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTabsTrigger value="account">Account</EccUtilsDesignTabsTrigger>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-tabs-trigger value="account">Account</ecc-utils-design-tabs-trigger>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `disabled`
+When `true`, prevents the tab from being activated and visually indicates it's unavailable.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTabsTrigger value="premium" disabled={true}>Premium</EccUtilsDesignTabsTrigger>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-tabs-trigger value="premium" disabled="true">Premium</ecc-utils-design-tabs-trigger>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
 ### `EccUtilsDesignTabsContent`
 
 | Property    | Type      | Default | Description                               |
 |-------------|-----------|---------|-------------------------------------------|
 | `value`     | `string`  | `""`    | A unique value for the tab content.       |
+
+#### `value`
+A unique identifier for the tab content. This value must match the corresponding TabsTrigger `value`.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTabsContent value="account">
+      Account content goes here...
+    </EccUtilsDesignTabsContent>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-tabs-content value="account">
+      Account content goes here...
+    </ecc-utils-design-tabs-content>
+    ```
+  </Tabs.Tab>
+</Tabs>
 
 ## Events
 

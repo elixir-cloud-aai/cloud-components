@@ -118,6 +118,86 @@ This example shows a textarea with a corresponding label.
 | `rows`        | `number`  | `3`     | The number of visible text lines.         |
 | `cols`        | `number`  | `undefined` | The visible width of the text control.  |
 
+### `placeholder`
+Provides a hint to the user about what information to enter in the textarea field.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTextarea placeholder="Enter your feedback here..." />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-textarea placeholder="Enter your feedback here..."></ecc-utils-design-textarea>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `value`
+The current value of the textarea field. Can be used for controlled components in React.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTextarea value="Pre-filled content goes here" />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-textarea value="Pre-filled content goes here"></ecc-utils-design-textarea>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `disabled`
+When `true`, the textarea is non-interactive and visually de-emphasized.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTextarea disabled={true} placeholder="Cannot edit this" />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-textarea disabled="true" placeholder="Cannot edit this"></ecc-utils-design-textarea>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `rows`
+Specifies the number of visible text lines for the textarea, controlling its height.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTextarea rows={5} placeholder="Taller textarea" />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-textarea rows="5" placeholder="Taller textarea"></ecc-utils-design-textarea>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `cols`
+Specifies the visible width of the textarea in average character widths.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTextarea cols={50} placeholder="Wider textarea" />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-textarea cols="50" placeholder="Wider textarea"></ecc-utils-design-textarea>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
 ## Events
 
 | Event Name          | React Event Name     | Detail Type             | Description                                  |
@@ -125,23 +205,22 @@ This example shows a textarea with a corresponding label.
 | `ecc-input-changed` | `onEccInputChanged` | `{ value: string }`     | Fired when the value of the textarea changes.|
 
 ### `ecc-input-changed`
-This event is fired whenever the user types or pastes content into the textarea.
+Fires whenever the user types or pastes content into the textarea, providing the current value.
 
 <Tabs items={['React', 'JavaScript']}>
   <Tabs.Tab>
     ```tsx copy
     <EccUtilsDesignTextarea 
       onEccInputChanged={(event) => {
-        console.log(event.detail.value);
+        console.log('Textarea value:', event.detail.value);
       }}
     />
     ```
   </Tabs.Tab>
-
   <Tabs.Tab>
     ```javascript copy
-    element.addEventListener('ecc-input-changed', (event) => {
-      console.log(event.detail.value);
+    textareaElement.addEventListener('ecc-input-changed', (event) => {
+      console.log('New value:', event.detail.value);
     });
     ```
   </Tabs.Tab>

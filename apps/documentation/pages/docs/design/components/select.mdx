@@ -220,6 +220,46 @@ The `Select` is built by combining these components:
 | `value`     | `string`  | `""`    | The value of the currently selected option. |
 | `disabled`  | `boolean` | `false` | When `true`, disables the select.         |
 
+#### `value`
+Controls the currently selected option. Should match the `value` of one of the SelectItem components.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignSelect value="apple">
+      ...
+    </EccUtilsDesignSelect>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-select value="apple">
+      ...
+    </ecc-utils-design-select>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `disabled`
+When `true`, disables the entire select, preventing user interaction.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignSelect disabled={true}>
+      ...
+    </EccUtilsDesignSelect>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-select disabled="true">
+      ...
+    </ecc-utils-design-select>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
 ### `EccUtilsDesignSelectItem`
 
 | Property    | Type      | Default | Description                               |
@@ -227,11 +267,59 @@ The `Select` is built by combining these components:
 | `value`     | `string`  | `""`    | The unique value for this option.         |
 | `disabled`  | `boolean` | `false` | When `true`, this option cannot be selected. |
 
+#### `value`
+A unique identifier for the option. This value is used when the item is selected.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignSelectItem value="apple">Apple</EccUtilsDesignSelectItem>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-select-item value="apple">Apple</ecc-utils-design-select-item>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `disabled`
+When `true`, prevents the option from being selected and visually indicates it's unavailable.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignSelectItem value="premium" disabled={true}>Premium Option</EccUtilsDesignSelectItem>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-select-item value="premium" disabled="true">Premium Option</ecc-utils-design-select-item>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
 ### `EccUtilsDesignSelectValue`
 
 | Property      | Type     | Default            | Description                                  |
 |---------------|----------|--------------------|----------------------------------------------|
 | `placeholder` | `string` | `"Select an option"` | Text to display when no value is selected.   |
+
+#### `placeholder`
+Text displayed when no option is selected, providing guidance to users.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignSelectValue placeholder="Choose a fruit..." />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-select-value placeholder="Choose a fruit..."></ecc-utils-design-select-value>
+    ```
+  </Tabs.Tab>
+</Tabs>
 
 ## Events
 

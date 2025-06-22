@@ -192,11 +192,109 @@ This example shows a multi-select with some values pre-selected.
 | `disabled`    | `boolean`  | `false`              | When `true`, disables the multi-select.           |
 | `name`        | `string`   | `""`                 | The name attribute for form submissions.          |
 
+#### `value`
+Controls the selected values in the multi-select. This should be an array of strings matching the values of selected items.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelect value={['apple', 'banana']}>
+      ...
+    </EccUtilsDesignMultiSelect>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select>
+      <script>
+        document.querySelector('ecc-utils-design-multi-select').value = ['apple', 'banana'];
+      </script>
+    </ecc-utils-design-multi-select>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `placeholder`
+Text displayed when no options are selected, providing a hint to users about what to select.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelect placeholder="Choose your favorite fruits...">
+      ...
+    </EccUtilsDesignMultiSelect>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select placeholder="Choose your favorite fruits...">
+      ...
+    </ecc-utils-design-multi-select>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `disabled`
+When `true`, disables the entire multi-select, preventing user interaction.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelect disabled={true}>
+      ...
+    </EccUtilsDesignMultiSelect>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select disabled="true">
+      ...
+    </ecc-utils-design-multi-select>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `name`
+The name attribute used when submitting the multi-select as part of a form.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelect name="preferences">
+      ...
+    </EccUtilsDesignMultiSelect>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select name="preferences">
+      ...
+    </ecc-utils-design-multi-select>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
 ### `EccUtilsDesignMultiSelectTrigger`
 
 | Property    | Type      | Default | Description                                        |
 |-------------|-----------|---------|--------------------------------------------------- |
 | `disabled`  | `boolean` | `false` | When `true`, disables the trigger.                |
+
+#### `disabled`
+When `true`, disables the trigger button, preventing the dropdown from opening.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelectTrigger disabled={true} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select-trigger disabled="true"></ecc-utils-design-multi-select-trigger>
+    ```
+  </Tabs.Tab>
+</Tabs>
 
 ### `EccUtilsDesignMultiSelectContent`
 
@@ -204,12 +302,64 @@ This example shows a multi-select with some values pre-selected.
 |-------------|-----------|------------|-------------------------------------------------|
 | `position`  | `string`  | `"popper"` | The positioning strategy for the dropdown.     |
 
+#### `position`
+Controls how the dropdown content is positioned relative to the trigger.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelectContent position="item-aligned">
+      ...
+    </EccUtilsDesignMultiSelectContent>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select-content position="item-aligned">
+      ...
+    </ecc-utils-design-multi-select-content>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
 ### `EccUtilsDesignMultiSelectItem`
 
 | Property    | Type      | Default | Description                                        |
 |-------------|-----------|---------|--------------------------------------------------- |
 | `value`     | `string`  | `""`    | A unique value for the item.                      |
 | `disabled`  | `boolean` | `false` | When `true`, disables the item.                   |
+
+#### `value`
+A unique identifier for the item. This value is used in the multi-select's `value` array when the item is selected.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelectItem value="apple">Apple</EccUtilsDesignMultiSelectItem>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select-item value="apple">Apple</ecc-utils-design-multi-select-item>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `disabled`
+When `true`, prevents the item from being selected or deselected.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelectItem value="premium" disabled={true}>Premium Option</EccUtilsDesignMultiSelectItem>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select-item value="premium" disabled="true">Premium Option</ecc-utils-design-multi-select-item>
+    ```
+  </Tabs.Tab>
+</Tabs>
 
 ## Events
 

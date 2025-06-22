@@ -158,11 +158,77 @@ This example shows a typical pagination layout with previous/next buttons, page 
 | `size`      | `string`  | `icon`  | The size of the link button.              |
 | `href`      | `string`  | `#`     | The URL the link points to.               |
 
+#### `isActive`
+Visually indicates which page is currently active by applying active styling.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignPaginationLink isActive={true}>2</EccUtilsDesignPaginationLink>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-pagination-link is-active="true">2</ecc-utils-design-pagination-link>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `size`
+Controls the size of the pagination link button.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignPaginationLink size="default">1</EccUtilsDesignPaginationLink>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-pagination-link size="default">1</ecc-utils-design-pagination-link>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `href`
+The URL that the pagination link points to. Useful for server-side pagination.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignPaginationLink href="/page/2">2</EccUtilsDesignPaginationLink>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-pagination-link href="/page/2">2</ecc-utils-design-pagination-link>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
 ### `EccUtilsDesignPaginationPrevious` & `EccUtilsDesignPaginationNext`
 
 | Property    | Type      | Default | Description                               |
 |-------------|-----------|---------|-------------------------------------------|
 | `disabled`  | `boolean` | `false` | When `true`, disables the button.         |
+
+#### `disabled`
+When `true`, disables the previous/next button, typically used when at the first or last page.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignPaginationPrevious disabled={true} />
+    <EccUtilsDesignPaginationNext disabled={true} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-pagination-previous disabled="true"></ecc-utils-design-pagination-previous>
+    <ecc-utils-design-pagination-next disabled="true"></ecc-utils-design-pagination-next>
+    ```
+  </Tabs.Tab>
+</Tabs>
 
 ## Events
 
