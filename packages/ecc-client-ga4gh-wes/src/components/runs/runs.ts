@@ -78,6 +78,11 @@ export class ECCClientGa4ghWesRuns extends LitElement {
       this._provider = new RestWesProvider(this.baseUrl);
       this.loadData();
     }
+
+    if (changedProperties.has("provider") && this.provider) {
+      this._provider = this.provider;
+      this.loadData();
+    }
   }
 
   private async loadData(): Promise<void> {
