@@ -1,52 +1,513 @@
 import { Callout, Tabs } from 'nextra/components'
 
-# Providers
+# TRS Providers
 
-Data providers are responsible for fetching data from a GA4GH Tool Registry Service (TRS) endpoint. The `@elixir-cloud/trs` package includes a `RestTrsProvider` for interacting with REST-based TRS APIs.
+The `@elixir-cloud/trs` package provides providers for connecting to GA4GH Tool Registry Service (TRS) APIs. The main provider is `RestTrsProvider` which implements the `TrsProvider` interface for REST-based TRS endpoints.
 
-## TrsProvider
+<Callout type='info'>
+  **Quick Start**: Create a `RestTrsProvider` with your TRS server URL and pass it to TRS components to start browsing tools and workflows.
+</Callout>
 
-`TrsProvider` is an abstract base class that defines the interface for all TRS data providers. To create a custom provider, you can extend this class and implement its methods.
+## TrsProvider Interface
 
-```ts
-export declare abstract class TrsProvider {
-    abstract getTools(
-        query: ToolQuery,
-        signal?: AbortSignal,
-    ): Promise<TableData<Tool>>;
-    
-    abstract getTool(
-        id: string,
-        signal?: AbortSignal,
-    ): Promise<Tool | undefined>;
+The `TrsProvider` interface defines the operations that all TRS providers must implement:
+
+```typescript
+export interface TrsProvider {
+  // List view methods
+  getToolClasses(): Promise<ToolClass[]>;
+  getToolsList(
+    limit: number,
+    offset: number,
+    filters: Record<string, string | undefined | boolean>,
+    query: string
+  ): Promise<Tool[]>;
+
+  // Detail view methods
+  getTool(url: string, id: string): Promise<Tool>;
+  getToolVersions(url: string, id: string): Promise<ToolVersion[]>;
+  getToolVersion(url: string, id: string, versionId: string): Promise<ToolVersion>;
+  getToolFiles(
+    url: string,
+    id: string,
+    version: string,
+    descriptorType: DescriptorType,
+    format?: "zip"
+  ): Promise<ToolFile[]>;
+  getToolDescriptor(
+    url: string,
+    id: string,
+    version: string,
+    descriptorType: DescriptorType
+  ): Promise<FileWrapper>;
+  getToolDescriptorByPath(
+    url: string,
+    id: string,
+    version: string,
+    descriptorType: DescriptorType,
+    path: string
+  ): Promise<FileWrapper>;
+  getContainerfile(url: string, id: string, version: string): Promise<FileWrapper[]>;
+  getToolTests(
+    url: string,
+    id: string,
+    version: string,
+    descriptorType: DescriptorType
+  ): Promise<FileWrapper[]>;
 }
 ```
 
 ## RestTrsProvider
 
-The `RestTrsProvider` is a concrete implementation of `TrsProvider` that uses the `fetch` API to make requests to a RESTful TRS endpoint.
+The `RestTrsProvider` is the main implementation that communicates with TRS APIs using REST/HTTP.
 
-### Usage
+### Constructor
 
-<Tabs items={['React', 'HTML']}>
+```typescript
+constructor(baseUrl: string)
+```
+
+**Parameters:**
+- `baseUrl`: The base URL of the TRS API endpoint (e.g., `https://dockstore.org/api/ga4gh/trs/v2`)
+
+### Basic Usage
+
+<Tabs items={['React', 'HTML', 'Next.js']}>
   <Tabs.Tab>
-    ```tsx showLineNumbers copy
+    ```tsx copy
     import { RestTrsProvider } from '@elixir-cloud/trs/providers';
+    import { EccClientGa4ghTrsTools } from '@elixir-cloud/trs';
 
-    const provider = new RestTrsProvider(
-      'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
-    );
+    function ToolBrowser() {
+      const provider = new RestTrsProvider(
+        'https://dockstore.org/api/ga4gh/trs/v2'
+      );
+
+      return (
+        <div>
+          <h2>Available Tools</h2>
+          <EccClientGa4ghTrsTools provider={provider} />
+        </div>
+      );
+    }
     ```
   </Tabs.Tab>
   <Tabs.Tab>
-    ```html showLineNumbers copy
-    <script type="module">
-      import { RestTrsProvider } from 'https://esm.sh/@elixir-cloud/trs@2.0.0-alpha.6/providers';
-      
-      const provider = new RestTrsProvider(
-        'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
-      );
-    </script>
+    ```html copy
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <script type="module" src="https://esm.sh/@elixir-cloud/trs@latest"></script>
+    </head>
+    <body>
+      <ecc-client-ga4gh-trs-tools></ecc-client-ga4gh-trs-tools>
+
+      <script type="module">
+        import { RestTrsProvider } from 'https://esm.sh/@elixir-cloud/trs@latest/providers';
+        
+        const provider = new RestTrsProvider('https://dockstore.org/api/ga4gh/trs/v2');
+        document.querySelector('ecc-client-ga4gh-trs-tools').provider = provider;
+      </script>
+    </body>
+    </html>
     ```
   </Tabs.Tab>
-</Tabs> 
+  <Tabs.Tab>
+    ```tsx copy
+    // pages/tools.tsx
+    import { RestTrsProvider } from '@elixir-cloud/trs/providers';
+    import { EccClientGa4ghTrsTools } from '@elixir-cloud/trs';
+
+    export default function ToolsPage() {
+      const provider = new RestTrsProvider(
+        process.env.NEXT_PUBLIC_TRS_URL || 'https://dockstore.org/api/ga4gh/trs/v2'
+      );
+
+      return (
+        <div>
+          <h1>Tool Registry</h1>
+          <EccClientGa4ghTrsTools provider={provider} />
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Provider Methods
+
+### getToolClasses()
+
+Retrieves all available tool classes.
+
+```typescript
+getToolClasses(): Promise<ToolClass[]>
+```
+
+### getToolsList()
+
+Gets a list of tools with filtering and pagination.
+
+```typescript
+getToolsList(
+  limit: number,
+  offset: number,
+  filters: Record<string, string | undefined | boolean>,
+  query: string
+): Promise<Tool[]>
+```
+
+### getTool()
+
+Gets detailed information about a specific tool.
+
+```typescript
+getTool(url: string, id: string): Promise<Tool>
+```
+
+### getToolVersions()
+
+Retrieves all versions available for a specific tool.
+
+```typescript
+getToolVersions(url: string, id: string): Promise<ToolVersion[]>
+```
+
+### getToolVersion()
+
+Gets detailed information about a specific tool version.
+
+```typescript
+getToolVersion(url: string, id: string, versionId: string): Promise<ToolVersion>
+```
+
+### getToolFiles()
+
+Gets the list of files associated with a tool version.
+
+```typescript
+getToolFiles(
+  url: string,
+  id: string,
+  version: string,
+  descriptorType: DescriptorType,
+  format?: "zip"
+): Promise<ToolFile[]>
+```
+
+### getToolDescriptor()
+
+Retrieves the descriptor file (CWL, WDL, etc.) for a tool version.
+
+```typescript
+getToolDescriptor(
+  url: string,
+  id: string,
+  version: string,
+  descriptorType: DescriptorType
+): Promise<FileWrapper>
+```
+
+### getToolDescriptorByPath()
+
+Gets a specific descriptor file by path.
+
+```typescript
+getToolDescriptorByPath(
+  url: string,
+  id: string,
+  version: string,
+  descriptorType: DescriptorType,
+  path: string
+): Promise<FileWrapper>
+```
+
+### getContainerfile()
+
+Retrieves containerfiles for a tool version.
+
+```typescript
+getContainerfile(url: string, id: string, version: string): Promise<FileWrapper[]>
+```
+
+### getToolTests()
+
+Gets test files for a tool version.
+
+```typescript
+getToolTests(
+  url: string,
+  id: string,
+  version: string,
+  descriptorType: DescriptorType
+): Promise<FileWrapper[]>
+```
+
+
+
+## Type Definitions
+
+### DescriptorType
+
+```typescript
+type DescriptorType = "CWL" | "WDL" | "NFL" | "GALAXY" | "SMK";
+```
+
+### DescriptorTypeWithPlain
+
+```typescript
+type DescriptorTypeWithPlain =
+  | DescriptorType
+  | "PLAIN_CWL"
+  | "PLAIN_WDL"
+  | "PLAIN_NFL"
+  | "PLAIN_GALAXY"
+  | "PLAIN_SMK";
+```
+
+### DescriptorTypeVersion
+
+```typescript
+interface DescriptorTypeVersion {
+  descriptor_type_version: string;
+}
+```
+
+### ImageType
+
+```typescript
+type ImageType = "Docker" | "Singularity" | "Conda";
+```
+
+### Checksum
+
+```typescript
+interface Checksum {
+  checksum: string;
+  type: string;
+}
+```
+
+### ImageData
+
+```typescript
+interface ImageData {
+  registry_host?: string;
+  image_name?: string;
+  size?: number;
+  updated?: string;
+  checksum?: Checksum[];
+  image_type?: ImageType;
+}
+```
+
+### ToolClass
+
+```typescript
+interface ToolClass {
+  id: string;
+  name: string;
+  description?: string;
+}
+```
+
+### ToolVersion
+
+```typescript
+interface ToolVersion {
+  author?: string[];
+  name?: string;
+  url: string;
+  id: string;
+  is_production?: boolean;
+  images?: ImageData[];
+  descriptor_type?: DescriptorType[];
+  descriptor_type_version?: Record<DescriptorType, DescriptorTypeVersion[]>;
+  containerfile?: boolean;
+  description?: string;
+  meta_version?: string;
+  verified?: boolean;
+  verified_source?: string[];
+  signed?: boolean;
+  included_apps?: string[];
+}
+```
+
+### Tool
+
+```typescript
+interface Tool {
+  url: string;
+  id: string;
+  aliases?: string[];
+  organization: string;
+  name?: string;
+  toolclass: ToolClass;
+  description?: string;
+  meta_version?: string;
+  has_checker?: boolean;
+  checker_url?: string;
+  versions: ToolVersion[];
+}
+```
+
+### ToolFile
+
+```typescript
+interface ToolFile {
+  path: string;
+  file_type?:
+    | "TEST_FILE"
+    | "PRIMARY_DESCRIPTOR"
+    | "SECONDARY_DESCRIPTOR"
+    | "CONTAINERFILE"
+    | "OTHER";
+  checksum?: Checksum;
+}
+```
+
+### FileWrapper
+
+```typescript
+interface FileWrapper {
+  content?: string;
+  url?: string;
+  checksum?: Checksum[];
+  image_type?: ImageType | DescriptorType;
+}
+```
+
+## Using with Components
+
+### Tool Browsing
+
+```tsx copy
+import { RestTrsProvider } from '@elixir-cloud/trs/providers';
+import { EccClientGa4ghTrsTools } from '@elixir-cloud/trs';
+
+function ToolBrowser() {
+  const provider = new RestTrsProvider('https://dockstore.org/api/ga4gh/trs/v2');
+
+  return (
+    <EccClientGa4ghTrsTools 
+      provider={provider}
+      onEccToolsChanged={(event) => {
+        console.log('Tools updated:', event.detail.tools.length);
+      }}
+      onEccToolsSelected={(event) => {
+        console.log('Tool selected:', event.detail.toolId);
+      }}
+    />
+  );
+}
+```
+
+### Tool Details
+
+```tsx copy
+import { RestTrsProvider } from '@elixir-cloud/trs/providers';
+import { EccClientGa4ghTrsTool } from '@elixir-cloud/trs';
+
+function ToolDetails({ toolId }) {
+  const provider = new RestTrsProvider('https://dockstore.org/api/ga4gh/trs/v2');
+
+  return (
+    <EccClientGa4ghTrsTool 
+      provider={provider}
+      toolId={toolId}
+      onEccToolVersionChanged={(event) => {
+        console.log('Version changed:', event.detail.version);
+      }}
+    />
+  );
+}
+```
+
+## Popular TRS Endpoints
+
+Here are some popular TRS endpoints you can use:
+
+```tsx copy
+// Dockstore (public tool registry)
+const dockstoreProvider = new RestTrsProvider('https://dockstore.org/api/ga4gh/trs/v2');
+
+// WorkflowHub (workflow registry)
+const workflowhubProvider = new RestTrsProvider('https://workflowhub.eu/ga4gh/trs/v2');
+
+// BioContainers (container registry)
+const biocontainersProvider = new RestTrsProvider('https://api.biocontainers.pro/ga4gh/trs/v2');
+
+// Seven Bridges (commercial platform)
+const sbgProvider = new RestTrsProvider('https://api.sbgenomics.com/ga4gh/trs/v2');
+```
+
+## Custom Providers
+
+For custom use cases, you can extend `RestTrsProvider` or implement the `TrsProvider` interface directly. This is useful for:
+
+- Adding custom authentication
+- Implementing caching or offline support  
+- Connecting to non-standard APIs
+- Adding custom error handling or retry logic
+
+```tsx copy
+// Example: Custom provider with authentication
+class CustomTrsProvider extends RestTrsProvider {
+  constructor(baseUrl, apiKey) {
+    super(baseUrl);
+    this.apiKey = apiKey;
+  }
+
+  async fetch(url, options = {}) {
+    return super.fetch(url, {
+      ...options,
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        ...options.headers
+      }
+    });
+  }
+}
+```
+
+For comprehensive patterns and examples, see the [Providers Overview](/docs/providers) documentation.
+
+## Testing
+
+Test your TRS provider setup:
+
+```tsx copy
+async function testTrsProvider(provider) {
+  try {
+    console.log('Testing TRS provider...');
+    
+    // Test service info
+    const serviceInfo = await provider.getServiceInfo();
+    console.log('✅ Service info:', serviceInfo.name);
+    
+    // Test tool listing
+    const tools = await provider.getTools(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 5, 0);
+    console.log(`✅ Found ${tools.length} tools`);
+    
+    // Test tool details if tools exist
+    if (tools.length > 0) {
+      const tool = await provider.getTool(tools[0].id);
+      console.log(`✅ Tool details: ${tool.name}`);
+    }
+    
+    console.log('✅ TRS provider is working correctly!');
+    return true;
+  } catch (error) {
+    console.error('❌ TRS provider test failed:', error);
+    return false;
+  }
+}
+
+// Usage
+const provider = new RestTrsProvider('https://dockstore.org/api/ga4gh/trs/v2');
+testTrsProvider(provider);
+```
+
+<Callout type='tip'>
+  **Next Steps**: Check the [Providers Overview](/docs/providers) for patterns on authentication, error handling, caching, and environment configuration that you can apply to your TRS provider.
+</Callout> 

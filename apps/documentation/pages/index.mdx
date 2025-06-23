@@ -1,83 +1,14 @@
 import Hero from '@/components/home/Hero';
 import CrossPlatform from '@/components/home/CrossPlatform';
-import Customizable from '@/components/home/Customizable';
 import { Tabs, Cards, Card } from 'nextra/components';
+import RunsPreview from '@/components/packages/wes/RunsPreview';
+import RunCreatePreview from '@/components/packages/wes/RunCreatePreview';
+import ToolsPreview from '@/components/packages/trs/ToolsPreview';
+import ToolPreview from '@/components/packages/trs/ToolPreview';
+import ServicesPreview from '@/components/packages/service-registry/ServicesPreview';
+import ServicePreview from '@/components/packages/service-registry/ServicePreview';
+import ToolCreatePreview from '@/components/packages/trs-filer/ToolCreatePreview';
 
 <Hero />
 
 <CrossPlatform />
-
-<div className='flex flex-row items-start justify-center w-full gap-10'>
-
-<div className='flex flex-col w-[40%] h-[32rem]'>
-<Tabs items={['React', 'HTML', 'Vue']}>
-  <Tabs.Tab>
-    ```jsx {2, 8}
-    import React from 'react';
-    import { ECCClientGa4ghWesRuns } from '@elixir-cloud/wes/dist/react/runs/index';
-
-    function App() {
-      return (
-        <div>
-          <h1>WES Runs</h1>
-          <ECCClientGa4ghWesRuns baseURL="https://your-wes-endpoint.com" />
-        </div>
-      );
-    }
-
-    export default App;
-    ```
-
-  </Tabs.Tab>
-
-  <Tabs.Tab>
-    ```html {7, 11}
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>WES Runs Example</title>
-      <script type="module" src="https://esm.sh/@elixir-cloud/wes/dist/index.min.js"></script>
-    </head>
-    <body>
-      <h1>WES Runs</h1>
-      <ecc-client-ga4gh-wes-runs baseURL="https://your-wes-endpoint.com"></ecc-client-ga4gh-wes-runs>
-    </body>
-    </html>
-    ```
-  </Tabs.Tab>
-
-  <Tabs.Tab>
-    ```vue {4, 9}
-    <template>
-      <div>
-        <h1>WES Runs</h1>
-        <ecc-client-ga4gh-wes-runs :baseURL="baseURL" ></ecc-client-ga4gh-wes-runs>
-      </div>
-    </template>
-
-    <script>
-    import '@elixir-cloud/wes/dist/components/runs/index.js';
-    
-    export default {
-      data() {
-        return {
-          baseURL: 'https://your-wes-endpoint.com'
-        }
-      }
-    }
-    </script>
-    ```
-
-  </Tabs.Tab>
-</Tabs>
-</div>
-
-<div className='w-[40%] mt-5'>
-{/* <Runs /> */}
-</div>
-
-</div>
-
-<Customizable />

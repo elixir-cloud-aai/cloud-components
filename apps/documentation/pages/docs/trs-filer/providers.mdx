@@ -1,47 +1,550 @@
 import { Callout, Tabs } from 'nextra/components'
 
-# Providers
+# TRS Filer Providers
 
-Data providers are responsible for sending data to a GA4GH Tool Registry Service (TRS) endpoint. The `@elixir-cloud/trs-filer` package includes a `RestTrsFilerProvider` for interacting with REST-based TRS APIs.
+The `@elixir-cloud/trs-filer` package provides providers for connecting to TRS Filer APIs (Elixir Cloud's extension to TRS that supports creating and managing tools). The main provider is `RestTrsFilerProvider` which implements the `TrsFilerProvider` interface for REST-based TRS Filer endpoints.
 
-## TrsFilerProvider
+<Callout type='info'>
+  **Quick Start**: Create a `RestTrsFilerProvider` with your TRS Filer server URL and pass it to TRS Filer components to start creating and managing tools.
+</Callout>
 
-`TrsFilerProvider` is an abstract base class that defines the interface for all TRS Filer data providers. To create a custom provider, you can extend this class and implement its methods.
+## TrsFilerProvider Interface
 
-```ts
-export declare abstract class TrsFilerProvider {
-    abstract postTools(
-        tool: Tool,
-        signal?: AbortSignal,
-    ): Promise<Tool>;
+The `TrsFilerProvider` abstract class extends `TrsProvider` and defines the interface that all TRS Filer providers must implement:
+
+```typescript
+export interface TrsFilerProvider extends TrsProvider {
+  // Inherited from TrsProvider for read operations
+  getToolClasses(): Promise<ToolClass[]>;
+  getToolsList(
+    limit: number,
+    offset: number,
+    filters: Record<string, string | undefined | boolean>,
+    query: string
+  ): Promise<Tool[]>;
+  getTool(url: string, id: string): Promise<Tool>;
+  getToolVersions(url: string, id: string): Promise<ToolVersion[]>;
+  getToolVersion(url: string, id: string, versionId: string): Promise<ToolVersion>;
+  getToolFiles(
+    url: string,
+    id: string,
+    version: string,
+    descriptorType: DescriptorType,
+    format?: "zip"
+  ): Promise<ToolFile[]>;
+  getToolDescriptor(
+    url: string,
+    id: string,
+    version: string,
+    descriptorType: DescriptorType
+  ): Promise<FileWrapper>;
+  getToolDescriptorByPath(
+    url: string,
+    id: string,
+    version: string,
+    descriptorType: DescriptorType,
+    path: string
+  ): Promise<FileWrapper>;
+  getContainerfile(url: string, id: string, version: string): Promise<FileWrapper[]>;
+  getToolTests(
+    url: string,
+    id: string,
+    version: string,
+    descriptorType: DescriptorType
+  ): Promise<FileWrapper[]>;
+
+  // TRS Filer specific methods for tool management (write operations)
+  createTool(tool: ToolRegister): Promise<string>;
+  createToolWithId(id: string, tool: ToolRegister): Promise<string>;
+  createToolVersion(toolId: string, version: ToolVersionRegister): Promise<string>;
+  createToolVersionWithId(toolId: string, versionId: string, version: ToolVersionRegister): Promise<string>;
+  createToolClass(toolClass: ToolClassRegister): Promise<string>;
+  createToolClassWithId(id: string, toolClass: ToolClassRegister): Promise<string>;
+
+  // Deletion methods (TRS-Filer specific)
+  deleteTool?(id: string): Promise<string>;
+  deleteToolVersion?(toolId: string, versionId: string): Promise<string>;
+  deleteToolClass?(id: string): Promise<string>;
+
+  // Service info methods (TRS-Filer specific)
+  getServiceInfo?(): Promise<Service>;
+  createOrUpdateServiceInfo?(service: ServiceRegister): Promise<void>;
 }
 ```
 
 ## RestTrsFilerProvider
 
-The `RestTrsFilerProvider` is a concrete implementation of `TrsFilerProvider` that uses the `fetch` API to make requests to a RESTful TRS endpoint.
+The `RestTrsFilerProvider` is the main implementation that communicates with TRS Filer APIs using REST/HTTP.
 
-### Usage
+### Constructor
 
-<Tabs items={['React', 'HTML']}>
+```typescript
+constructor(baseUrl: string)
+```
+
+**Parameters:**
+- `baseUrl`: The base URL of the TRS Filer API endpoint (e.g., `https://trs-filer.example.com/ga4gh/trs/v2`)
+
+### Basic Usage
+
+<Tabs items={['React', 'HTML', 'Next.js']}>
   <Tabs.Tab>
-    ```tsx showLineNumbers copy
+    ```tsx copy
     import { RestTrsFilerProvider } from '@elixir-cloud/trs-filer/providers';
+    import { EccClientElixirTrsToolCreate } from '@elixir-cloud/trs-filer';
 
-    const provider = new RestTrsFilerProvider(
-      'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
-    );
+    function ToolCreator() {
+      const provider = new RestTrsFilerProvider(
+        'https://trs-filer.example.com/ga4gh/trs/v2'
+      );
+
+      return (
+        <div>
+          <h2>Create New Tool</h2>
+          <EccClientElixirTrsToolCreate provider={provider} />
+        </div>
+      );
+    }
     ```
   </Tabs.Tab>
   <Tabs.Tab>
-    ```html showLineNumbers copy
-    <script type="module">
-      import { RestTrsFilerProvider } from 'https://esm.sh/@elixir-cloud/trs-filer@2.0.0-alpha.4/providers';
-      
-      const provider = new RestTrsFilerProvider(
-        'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
-      );
-    </script>
+    ```html copy
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <script type="module" src="https://esm.sh/@elixir-cloud/trs-filer@latest"></script>
+    </head>
+    <body>
+      <ecc-client-elixir-trs-tool-create></ecc-client-elixir-trs-tool-create>
+
+      <script type="module">
+        import { RestTrsFilerProvider } from 'https://esm.sh/@elixir-cloud/trs-filer@latest/providers';
+        
+        const provider = new RestTrsFilerProvider('https://trs-filer.example.com/ga4gh/trs/v2');
+        document.querySelector('ecc-client-elixir-trs-tool-create').provider = provider;
+      </script>
+    </body>
+    </html>
     ```
   </Tabs.Tab>
-</Tabs> 
+  <Tabs.Tab>
+    ```tsx copy
+    // pages/create-tool.tsx
+    import { RestTrsFilerProvider } from '@elixir-cloud/trs-filer/providers';
+    import { EccClientElixirTrsToolCreate } from '@elixir-cloud/trs-filer';
+
+    export default function CreateToolPage() {
+      const provider = new RestTrsFilerProvider(
+        process.env.NEXT_PUBLIC_TRS_FILER_URL || 'https://trs-filer.example.com/ga4gh/trs/v2'
+      );
+
+      return (
+        <div>
+          <h1>Register New Tool</h1>
+          <EccClientElixirTrsToolCreate provider={provider} />
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Provider Methods
+
+### createTool()
+
+Creates a new tool in the TRS Filer registry.
+
+```typescript
+createTool(tool: ToolRegister): Promise<string>
+```
+
+### createToolWithId()
+
+Creates a new tool with a specific ID.
+
+```typescript
+createToolWithId(id: string, tool: ToolRegister): Promise<string>
+```
+
+### createToolVersion()
+
+Creates a new version for an existing tool.
+
+```typescript
+createToolVersion(toolId: string, version: ToolVersionRegister): Promise<string>
+```
+
+### createToolVersionWithId()
+
+Creates a new tool version with a specific ID.
+
+```typescript
+createToolVersionWithId(toolId: string, versionId: string, version: ToolVersionRegister): Promise<string>
+```
+
+### createToolClass()
+
+Creates a new tool class.
+
+```typescript
+createToolClass(toolClass: ToolClassRegister): Promise<string>
+```
+
+### createToolClassWithId()
+
+Creates a new tool class with a specific ID.
+
+```typescript
+createToolClassWithId(id: string, toolClass: ToolClassRegister): Promise<string>
+```
+
+### deleteTool()
+
+Removes a tool from the registry.
+
+```typescript
+deleteTool?(id: string): Promise<string>
+```
+
+### deleteToolVersion()
+
+Removes a specific version of a tool.
+
+```typescript
+deleteToolVersion?(toolId: string, versionId: string): Promise<string>
+```
+
+### deleteToolClass()
+
+Removes a tool class from the registry.
+
+```typescript
+deleteToolClass?(id: string): Promise<string>
+```
+
+### getServiceInfo()
+
+Retrieves information about the TRS Filer service.
+
+```typescript
+getServiceInfo?(): Promise<Service>
+```
+
+### createOrUpdateServiceInfo()
+
+Creates or updates the service registry information.
+
+```typescript
+createOrUpdateServiceInfo?(service: ServiceRegister): Promise<void>
+```
+
+
+
+## Type Definitions
+
+### ToolRegister
+
+```typescript
+interface ToolRegister {
+  aliases?: string[];
+  checker_url?: string;
+  description?: string;
+  has_checker?: boolean;
+  name?: string;
+  organization: string;
+  toolclass: ToolClassRegisterId;
+  versions: (ToolVersionRegister | ToolVersionRegisterId)[];
+}
+```
+
+### ToolVersionRegister
+
+```typescript
+interface ToolVersionRegister {
+  author?: string[];
+  descriptor_type?: DescriptorType[];
+  files?: FilesRegister[];
+  images?: ImageDataRegister[];
+  included_apps?: string[];
+  is_production?: boolean;
+  name?: string;
+  signed?: boolean;
+  verified?: boolean;
+  verified_source?: string[];
+}
+```
+
+### ToolVersionRegisterId
+
+```typescript
+interface ToolVersionRegisterId {
+  id: string;
+  author?: string[];
+  descriptor_type?: DescriptorType[];
+  files?: FilesRegister[];
+  images?: ImageDataRegister[];
+  included_apps?: string[];
+  is_production?: boolean;
+  name?: string;
+  signed?: boolean;
+  verified?: boolean;
+  verified_source?: string[];
+}
+```
+
+### ToolClassRegister
+
+```typescript
+interface ToolClassRegister {
+  name: string;
+  description?: string;
+}
+```
+
+### ToolClassRegisterId
+
+```typescript
+interface ToolClassRegisterId {
+  id: string;
+  name: string;
+  description?: string;
+}
+```
+
+### FilesRegister
+
+```typescript
+interface FilesRegister {
+  tool_file: ToolFileRegister;
+  file_wrapper: FileWrapperRegister;
+  type: TypeRegister;
+}
+```
+
+### ToolFileRegister
+
+```typescript
+interface ToolFileRegister {
+  path: string;
+  file_type:
+    | "TEST_FILE"
+    | "PRIMARY_DESCRIPTOR"
+    | "SECONDARY_DESCRIPTOR"
+    | "CONTAINERFILE"
+    | "OTHER";
+}
+```
+
+### FileWrapperRegister
+
+```typescript
+interface FileWrapperRegister {
+  content?: string;
+  url?: string;
+  checksum?: ChecksumRegister[];
+}
+```
+
+### ChecksumRegister
+
+```typescript
+interface ChecksumRegister {
+  checksum: string;
+  type: string;
+}
+```
+
+### ImageDataRegister
+
+```typescript
+interface ImageDataRegister {
+  registry_host?: string;
+  image_name?: string;
+  size?: number;
+  updated?: string;
+  checksum?: ChecksumRegister[];
+  image_type?: ImageType;
+}
+```
+
+### TypeRegister
+
+```typescript
+type TypeRegister = DescriptorType | ImageType;
+```
+
+### Service
+
+```typescript
+interface Service {
+  id: string;
+  name: string;
+  type: ServiceType;
+  organization: Organization;
+  version: string;
+  description?: string;
+  contactUrl?: string;
+  documentationUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  environment?: string;
+}
+```
+
+### ServiceRegister
+
+```typescript
+interface ServiceRegister {
+  id: string;
+  name: string;
+  type: ServiceTypeRegister;
+  organization: Organization;
+  version: string;
+  description?: string;
+  contactUrl?: string;
+  documentationUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  environment?: string;
+}
+```
+
+### ServiceType
+
+```typescript
+interface ServiceType {
+  group: string;
+  artifact: string;
+  version: string;
+}
+```
+
+### ServiceTypeRegister
+
+```typescript
+interface ServiceTypeRegister {
+  group: string;
+  artifact: string;
+  version: string;
+}
+```
+
+### Organization
+
+```typescript
+interface Organization {
+  name: string;
+  url: string;
+}
+```
+
+## Using with Components
+
+### Tool Creation
+
+```tsx copy
+import { RestTrsFilerProvider } from '@elixir-cloud/trs-filer/providers';
+import { EccClientElixirTrsToolCreate } from '@elixir-cloud/trs-filer';
+
+function ToolRegistration() {
+  const provider = new RestTrsFilerProvider('https://trs-filer.example.com/ga4gh/trs/v2');
+
+  return (
+    <EccClientElixirTrsToolCreate 
+      provider={provider}
+      onEccToolCreated={(event) => {
+        console.log('Tool created:', event.detail.toolId);
+        // Navigate to tool details or show success message
+      }}
+      onEccToolCreateFailed={(event) => {
+        console.error('Tool creation failed:', event.detail.error);
+      }}
+      onEccToolCreateValidationFailed={(event) => {
+        console.error('Validation failed:', event.detail.errors);
+      }}
+    />
+  );
+}
+```
+
+## Custom Providers
+
+For custom use cases, you can extend `RestTrsFilerProvider` or implement the `TrsFilerProvider` interface directly. This is useful for:
+
+- Adding custom authentication
+- Implementing caching or offline support  
+- Connecting to non-standard APIs
+- Adding custom error handling or retry logic
+
+```tsx copy
+// Example: Custom provider with authentication
+class CustomTrsFilerProvider extends RestTrsFilerProvider {
+  constructor(baseUrl, apiKey) {
+    super(baseUrl);
+    this.apiKey = apiKey;
+  }
+
+  async fetch(url, options = {}) {
+    return super.fetch(url, {
+      ...options,
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        ...options.headers
+      }
+    });
+  }
+}
+```
+
+For comprehensive patterns and examples, see the [Providers Overview](/docs/providers) documentation.
+
+## Testing
+
+Test your TRS Filer provider setup:
+
+```tsx copy
+async function testTrsFilerProvider(provider) {
+  try {
+    console.log('Testing TRS Filer provider...');
+    
+    // Test service info
+    const serviceInfo = await provider.getServiceInfo();
+    console.log('✅ Service info:', serviceInfo.name);
+    
+    // Test tool creation (use a test tool)
+    const testTool = {
+      name: "test-tool-" + Date.now(),
+      description: "Test tool for provider validation",
+      organization: "test-org",
+      toolclass: {
+        id: "CommandLineTool",
+        name: "CommandLineTool",
+        description: "Command line tool"
+      },
+      url: "https://github.com/test/tool"
+    };
+
+    const tool = await provider.createTool(testTool);
+    console.log('✅ Tool creation works:', tool.id);
+    
+    // Clean up test tool
+    await provider.deleteTool(tool.id);
+    console.log('✅ Tool deletion works');
+    
+    console.log('✅ TRS Filer provider is working correctly!');
+    return true;
+  } catch (error) {
+    console.error('❌ TRS Filer provider test failed:', error);
+    return false;
+  }
+}
+
+// Usage
+const provider = new RestTrsFilerProvider('https://trs-filer.example.com/ga4gh/trs/v2');
+testTrsFilerProvider(provider);
+```
+
+<Callout type='tip'>
+  **Next Steps**: Check the [Providers Overview](/docs/providers) for patterns on authentication, error handling, caching, and environment configuration that you can apply to your TRS Filer provider.
+</Callout> 

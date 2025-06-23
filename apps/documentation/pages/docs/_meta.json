@@ -2,6 +2,7 @@
   "introduction": "Introduction",
   "installation": "Installation",
   "customization": "Customization",
+  "providers": "Providers",
   "-- Supported Services": {
     "type": "separator",
     "title": "Supported Services"

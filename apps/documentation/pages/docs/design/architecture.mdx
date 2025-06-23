@@ -1,0 +1,88 @@
+# Component Architecture
+
+Components in the `@elixir-cloud/design` package are built with a slot-based architecture and expose CSS parts for styling. This approach, inspired by [shadcn/ui](https://ui.shadcn.com/), provides a powerful and flexible way to customize the look and feel of each component.
+
+## Design Philosophy
+
+Our customization approach focuses on:
+
+- **Component Parts**: Each component is carefully divided into logical parts that can be styled independently.
+- **Minimalism**: Only the most essential parts of a component are exposed for styling. This makes customization intuitive and prevents overwhelming developers with too many options.
+- **Encapsulation**: Styles are scoped to specific parts, preventing unintended side effects and ensuring that customizations don't leak outside the component's boundaries.
+
+This architecture makes it easy to precisely target and style specific elements of a component.
+
+## CSS Parts
+
+All components in the `@elixir-cloud/design` package expose a `base` part on their main wrapper element. You can target this with the `::part(base)` pseudo-element in your CSS.
+
+### The `part="base"` Pattern
+
+Here is a basic example of how to customize the `ecc-utils-design-button` component:
+
+```css
+/* Style all button components */
+ecc-utils-design-button::part(base) {
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  border-radius: var(--ecc-radius); /* Use global tokens */
+}
+
+/* Style specific button variants */
+ecc-utils-design-button[variant="destructive"]::part(base) {
+  background: linear-gradient(135deg, #ff6b6b 0%, #d92e2e 100%);
+  color: white;
+  border: none;
+}
+```
+
+### Component-Specific Parts
+
+For more complex components, additional parts may be exposed to allow for more granular control. For example, the `ecc-utils-design-table` component exposes several parts:
+
+```css
+/* Table component parts */
+ecc-utils-design-table::part(base) { /* The main table container */
+  border-color: var(--ecc-accent);
+}
+
+ecc-utils-design-table-header::part(base) { /* A header row */
+  background-color: var(--ecc-accent);
+  color: var(--ecc-accent-foreground);
+}
+
+ecc-utils-design-table-cell::part(base) { /* An individual cell */
+  padding: 1rem;
+}
+```
+
+You can inspect each component in your browser's developer tools to see which parts are available for styling.
+
+### Benefits of the Parts System
+
+Following the principles from [shadcn/ui](https://ui.shadcn.com/), our component architecture provides:
+
+1.  **Precise Control**: Target exactly the element you want to style.
+2.  **Maintainability**: A clear separation between a component's internal structure and its presentation.
+3.  **Flexibility**: Combine CSS parts with global design tokens for powerful and consistent theming.
+
+## Available Components
+
+The following components from the `@elixir-cloud/design` package support this architecture:
+
+-   **Badge**: Status and category indicators
+-   **Button**: Interactive action triggers
+-   **Card**: Content containers with headers, titles, and descriptions
+-   **Checkbox**: Boolean input controls
+-   **Code**: Syntax-highlighted code display
+-   **Collapsible**: Expandable content sections
+-   **Input**: Text input fields
+-   **Label**: Form field labels
+-   **Multi-Select**: Multiple option selection
+-   **Pagination**: Navigation for paginated content
+-   **Select**: Single option selection dropdown
+-   **Separator**: Visual content dividers
+-   **Skeleton**: Loading state placeholders
+-   **Table**: Tabular data display with headers, rows, and cells
+-   **Tabs**: Tabbed interface navigation
+-   **Textarea**: Multi-line text input 

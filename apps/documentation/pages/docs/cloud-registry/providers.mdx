@@ -2,314 +2,163 @@ import { Callout, Tabs } from 'nextra/components'
 
 # Cloud Registry Providers
 
-Providers are the data layer for Cloud Registry components, responsible for managing service registration and data operations with Elixir Cloud Registry APIs. The Cloud Registry package extends the GA4GH Service Registry functionality with additional features for service creation and management.
+The `@elixir-cloud/cloud-registry` package provides providers for connecting to Elixir Cloud Registry APIs. The main provider is `RestCloudRegistryProvider` which implements the `CloudRegistryProvider` interface for REST-based cloud registry endpoints with both read and write capabilities.
 
 <Callout type='info'>
-  All Cloud Registry components can work with any provider that implements the `CloudRegistryProvider` interface, which extends the base `ServiceRegistryProvider`.
+  **Quick Start**: Create a `RestCloudRegistryProvider` with your cloud registry URL and pass it to Cloud Registry components to start creating and managing services.
 </Callout>
 
-## Provider Types
+## CloudRegistryProvider Interface
 
-### RestCloudRegistryProvider
-
-The default provider that connects to Elixir Cloud Registry APIs over HTTP/REST. This provider implements both read and write operations for service management.
-
-**Features:**
-- Full GA4GH Service Registry API compliance
-- Service creation and registration capabilities
-- Extended metadata support for Elixir Cloud ecosystem
-- Built-in validation and error handling
-- Support for custom headers and authentication
-
-**Usage:**
-
-<Tabs items={['React', 'JavaScript']}>
-  <Tabs.Tab>
-    ```tsx copy
-    import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
-
-    const provider = new RestCloudRegistryProvider(
-      'https://cloud-registry.anuragxd.com/ga4gh/registry/v1'
-    );
-
-    // Use with any Cloud Registry component
-    <EccClientElixirCloudRegistryServiceCreate provider={provider} />
-    ```
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```javascript copy
-    import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
-
-    const provider = new RestCloudRegistryProvider(
-      'https://cloud-registry.anuragxd.com/ga4gh/registry/v1'
-    );
-
-    document.querySelector('ecc-client-elixir-cloud-registry-service-create').provider = provider;
-    ```
-  </Tabs.Tab>
-</Tabs>
-
-**Constructor Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `baseUrl` | `string` | Base URL of the Elixir Cloud Registry API |
-
-### Custom Providers
-
-You can create custom providers by implementing the `CloudRegistryProvider` interface. This extends the `ServiceRegistryProvider` interface with additional methods for service creation and management.
-
-**Interface Definition:**
+The `CloudRegistryProvider` interface extends `ServiceRegistryProvider` and defines the operations that all Cloud Registry providers must implement:
 
 ```typescript
-interface CloudRegistryProvider extends ServiceRegistryProvider {
+export interface CloudRegistryProvider extends ServiceRegistryProvider {
   // Inherited from ServiceRegistryProvider
   getServices(): Promise<ExternalService[]>;
   getServiceById(id: string): Promise<ExternalService>;
   getServiceTypes(): Promise<ServiceType[]>;
   getServiceInfo(): Promise<Service>;
   
-  // Cloud Registry specific methods
+  // Cloud Registry specific methods for service management
   createService(service: ExternalServiceRegister): Promise<string>;
   createServiceWithId(id: string, service: ExternalServiceRegister): Promise<string>;
+
+  // Update methods (Cloud Registry specific)
   updateService(id: string, service: ExternalServiceRegister): Promise<string>;
+
+  // Deletion methods (Cloud Registry specific)
   deleteService?(id: string): Promise<string>;
+
+  // Service info methods (Cloud Registry specific)
   createOrUpdateServiceInfo?(service: ServiceRegister): Promise<void>;
 }
 ```
 
-**Custom Provider Example:**
+## RestCloudRegistryProvider
 
-<Tabs items={['TypeScript', 'JavaScript']}>
+The `RestCloudRegistryProvider` is the main implementation that communicates with Elixir Cloud Registry APIs using REST/HTTP.
+
+### Constructor
+
+```typescript
+constructor(baseUrl: string)
+```
+
+**Parameters:**
+- `baseUrl`: The base URL of the Cloud Registry API endpoint (e.g., `https://cloud-registry.example.com/ga4gh/registry/v1`)
+
+### Basic Usage
+
+<Tabs items={['React', 'HTML', 'Next.js']}>
   <Tabs.Tab>
     ```tsx copy
-    import { 
-      CloudRegistryProvider, 
-      ExternalService, 
-      ServiceType, 
-      ExternalServiceRegister 
-    } from '@elixir-cloud/cloud-registry/providers';
+    import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
+    import { EccClientElixirCloudRegistryServiceCreate } from '@elixir-cloud/cloud-registry';
 
-    class CustomCloudRegistryProvider implements CloudRegistryProvider {
-      private apiKey: string;
-      private baseUrl: string;
+    function ServiceCreator() {
+      const provider = new RestCloudRegistryProvider(
+        'https://cloud-registry.example.com/ga4gh/registry/v1'
+      );
 
-      constructor(baseUrl: string, apiKey: string) {
-        this.baseUrl = baseUrl;
-        this.apiKey = apiKey;
-      }
-
-      private getHeaders() {
-        return {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
-        };
-      }
-
-      async getServices(): Promise<ExternalService[]> {
-        const response = await fetch(`${this.baseUrl}/services`, {
-          headers: this.getHeaders()
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch services: ${response.statusText}`);
-        }
-        
-        return response.json();
-      }
-
-      async getServiceById(id: string): Promise<ExternalService> {
-        const response = await fetch(`${this.baseUrl}/services/${id}`, {
-          headers: this.getHeaders()
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch service: ${response.statusText}`);
-        }
-        
-        return response.json();
-      }
-
-      async getServiceTypes(): Promise<ServiceType[]> {
-        const response = await fetch(`${this.baseUrl}/service-types`, {
-          headers: this.getHeaders()
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch service types: ${response.statusText}`);
-        }
-        
-        return response.json();
-      }
-
-      async createService(service: ExternalServiceRegister): Promise<string> {
-        const response = await fetch(`${this.baseUrl}/services`, {
-          method: 'POST',
-          headers: this.getHeaders(),
-          body: JSON.stringify(service)
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to create service: ${response.statusText}`);
-        }
-        
-        const result = await response.json();
-        return result.id;
-      }
-
-      async updateService(id: string, service: ExternalServiceRegister): Promise<void> {
-        const response = await fetch(`${this.baseUrl}/services/${id}`, {
-          method: 'PUT',
-          headers: this.getHeaders(),
-          body: JSON.stringify(service)
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to update service: ${response.statusText}`);
-        }
-      }
-
-      async deleteService(id: string): Promise<void> {
-        const response = await fetch(`${this.baseUrl}/services/${id}`, {
-          method: 'DELETE',
-          headers: this.getHeaders()
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to delete service: ${response.statusText}`);
-        }
-      }
+      return (
+        <div>
+          <h2>Register New Service</h2>
+          <EccClientElixirCloudRegistryServiceCreate provider={provider} />
+        </div>
+      );
     }
-
-    // Usage
-    const provider = new CustomCloudRegistryProvider(
-      'https://cloud-registry.anuragxd.com/ga4gh/registry/v1',
-      'your-api-key'
-    );
     ```
   </Tabs.Tab>
   <Tabs.Tab>
-    ```javascript copy
-    class CustomCloudRegistryProvider {
-      constructor(baseUrl, apiKey) {
-        this.baseUrl = baseUrl;
-        this.apiKey = apiKey;
-      }
+    ```html copy
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <script type="module" src="https://esm.sh/@elixir-cloud/cloud-registry@latest"></script>
+    </head>
+    <body>
+      <ecc-client-elixir-cloud-registry-service-create></ecc-client-elixir-cloud-registry-service-create>
 
-      getHeaders() {
-        return {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
-        };
-      }
+      <script type="module">
+        import { RestCloudRegistryProvider } from 'https://esm.sh/@elixir-cloud/cloud-registry@latest/providers';
+        
+        const provider = new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
+        document.querySelector('ecc-client-elixir-cloud-registry-service-create').provider = provider;
+      </script>
+    </body>
+    </html>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```tsx copy
+    // pages/register-service.tsx
+    import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
+    import { EccClientElixirCloudRegistryServiceCreate } from '@elixir-cloud/cloud-registry';
 
-      async getServices() {
-        const response = await fetch(`${this.baseUrl}/services`, {
-          headers: this.getHeaders()
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch services: ${response.statusText}`);
-        }
-        
-        return response.json();
-      }
+    export default function RegisterServicePage() {
+      const provider = new RestCloudRegistryProvider(
+        process.env.NEXT_PUBLIC_CLOUD_REGISTRY_URL || 'https://cloud-registry.example.com/ga4gh/registry/v1'
+      );
 
-      async getServiceById(id) {
-        const response = await fetch(`${this.baseUrl}/services/${id}`, {
-          headers: this.getHeaders()
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch service: ${response.statusText}`);
-        }
-        
-        return response.json();
-      }
-
-      async getServiceTypes() {
-        const response = await fetch(`${this.baseUrl}/service-types`, {
-          headers: this.getHeaders()
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch service types: ${response.statusText}`);
-        }
-        
-        return response.json();
-      }
-
-      async createService(service) {
-        const response = await fetch(`${this.baseUrl}/services`, {
-          method: 'POST',
-          headers: this.getHeaders(),
-          body: JSON.stringify(service)
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to create service: ${response.statusText}`);
-        }
-        
-        const result = await response.json();
-        return result.id;
-      }
-
-      async updateService(id, service) {
-        const response = await fetch(`${this.baseUrl}/services/${id}`, {
-          method: 'PUT',
-          headers: this.getHeaders(),
-          body: JSON.stringify(service)
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to update service: ${response.statusText}`);
-        }
-      }
-
-      async deleteService(id) {
-        const response = await fetch(`${this.baseUrl}/services/${id}`, {
-          method: 'DELETE',
-          headers: this.getHeaders()
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to delete service: ${response.statusText}`);
-        }
-      }
+      return (
+        <div>
+          <h1>Service Registration</h1>
+          <EccClientElixirCloudRegistryServiceCreate provider={provider} />
+        </div>
+      );
     }
-
-    // Usage
-    const provider = new CustomCloudRegistryProvider(
-      'https://cloud-registry.anuragxd.com/ga4gh/registry/v1',
-      'your-api-key'
-    );
     ```
   </Tabs.Tab>
 </Tabs>
 
-## Data Types
+## Provider Methods
 
-### ExternalServiceRegister
+### createService()
 
-Represents the data structure for creating or updating a service registration.
+Creates a new service in the cloud registry.
 
 ```typescript
-interface ExternalServiceRegister {
-  name: string;
-  type: ServiceTypeRegister;
-  url: string;
-  description?: string;
-  organization: OrganizationRegister;
-  contactUrl?: string;
-  documentationUrl?: string;
-  environment?: string;
-  version?: string;
-}
+createService(service: ExternalServiceRegister): Promise<string>
 ```
 
-### ServiceTypeRegister
+### createServiceWithId()
 
-Represents the service type information for registration.
+Creates a new service with a specific ID.
+
+```typescript
+createServiceWithId(id: string, service: ExternalServiceRegister): Promise<string>
+```
+
+### updateService()
+
+Updates an existing service's information.
+
+```typescript
+updateService(id: string, service: ExternalServiceRegister): Promise<string>
+```
+
+### deleteService()
+
+Removes a service from the registry.
+
+```typescript
+deleteService?(id: string): Promise<string>
+```
+
+### createOrUpdateServiceInfo()
+
+Creates or updates the service registry's own service information.
+
+```typescript
+createOrUpdateServiceInfo?(service: ServiceRegister): Promise<void>
+```
+
+
+
+## Type Definitions
+
+### ServiceTypeRegister
 
 ```typescript
 interface ServiceTypeRegister {
@@ -319,15 +168,192 @@ interface ServiceTypeRegister {
 }
 ```
 
-### OrganizationRegister
-
-Represents organization information for service registration.
+### ServiceRegister
 
 ```typescript
-interface OrganizationRegister {
+interface ServiceRegister {
+  id: string;
   name: string;
+  type: ServiceTypeRegister;
+  description?: string;
+  organization: Organization;
+  contactUrl?: string;
+  documentationUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  environment?: string;
+  version: string;
+}
+```
+
+### ExternalServiceRegister
+
+```typescript
+interface ExternalServiceRegister {
+  name: string;
+  type: ServiceTypeRegister;
+  description?: string;
+  organization: Organization;
+  contactUrl?: string;
+  documentationUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  environment?: string;
+  version: string;
   url: string;
 }
 ```
+
+## Using with Components
+
+### Service Creation
+
+```tsx copy
+import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
+import { EccClientElixirCloudRegistryServiceCreate } from '@elixir-cloud/cloud-registry';
+
+function ServiceRegistration() {
+  const provider = new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
+
+  return (
+    <EccClientElixirCloudRegistryServiceCreate 
+      provider={provider}
+      onEccServiceCreated={(event) => {
+        console.log('Service created:', event.detail.serviceId);
+        // Navigate to service details or show success message
+      }}
+      onEccServiceCreateFailed={(event) => {
+        console.error('Service creation failed:', event.detail.error);
+      }}
+      onEccServiceCreateValidationFailed={(event) => {
+        console.error('Validation failed:', event.detail.errors);
+      }}
+    />
+  );
+}
+```
+
+### Combined Service Management
+
+```tsx copy
+import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
+import { 
+  EccClientGa4ghServiceRegistryServices,
+  EccClientElixirCloudRegistryServiceCreate 
+} from '@elixir-cloud/cloud-registry';
+
+function ServiceManagement() {
+  const provider = new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
+  const [view, setView] = useState('list');
+
+  return (
+    <div>
+      <nav>
+        <button onClick={() => setView('list')}>View Services</button>
+        <button onClick={() => setView('create')}>Create Service</button>
+      </nav>
+
+      {view === 'list' && (
+        <EccClientGa4ghServiceRegistryServices provider={provider} />
+      )}
+
+      {view === 'create' && (
+        <EccClientElixirCloudRegistryServiceCreate 
+          provider={provider}
+          onEccServiceCreated={() => setView('list')}
+        />
+      )}
+    </div>
+  );
+}
+```
+
+## Custom Providers
+
+For custom use cases, you can extend `RestCloudRegistryProvider` or implement the `CloudRegistryProvider` interface directly. This is useful for:
+
+- Adding custom authentication
+- Implementing caching or offline support  
+- Connecting to non-standard APIs
+- Adding custom error handling or retry logic
+
+```tsx copy
+// Example: Custom provider with authentication
+class CustomCloudRegistryProvider extends RestCloudRegistryProvider {
+  constructor(baseUrl, apiKey) {
+    super(baseUrl);
+    this.apiKey = apiKey;
+  }
+
+  async fetch(url, options = {}) {
+    return super.fetch(url, {
+      ...options,
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        ...options.headers
+      }
+    });
+  }
+}
+```
+
+For comprehensive patterns and examples, see the [Providers Overview](/docs/providers) documentation.
+
+## Testing
+
+Test your Cloud Registry provider setup:
+
+```tsx copy
+async function testCloudRegistryProvider(provider) {
+  try {
+    console.log('Testing Cloud Registry provider...');
+    
+    // Test service info
+    const serviceInfo = await provider.getServiceInfo();
+    console.log('✅ Service info:', serviceInfo.name);
+    
+    // Test service creation with a test service
+    const testService = {
+      name: "test-service-" + Date.now(),
+      type: {
+        group: "org.ga4gh",
+        artifact: "test",
+        version: "1.0.0"
+      },
+      description: "Test service for provider validation",
+      organization: {
+        name: "Test Organization",
+        url: "https://test.example.com"
+      },
+      version: "1.0.0"
+    };
+
+    const serviceId = await provider.createService(testService);
+    console.log('✅ Service creation works:', serviceId);
+    
+    // Test service retrieval
+    const retrievedService = await provider.getServiceById(serviceId);
+    console.log('✅ Service retrieval works:', retrievedService.name);
+    
+    // Clean up test service
+    await provider.deleteService(serviceId);
+    console.log('✅ Service deletion works');
+    
+    console.log('✅ Cloud Registry provider is working correctly!');
+    return true;
+  } catch (error) {
+    console.error('❌ Cloud Registry provider test failed:', error);
+    return false;
+  }
+}
+
+// Usage
+const provider = new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
+testCloudRegistryProvider(provider);
+```
+
+<Callout type='tip'>
+  **Next Steps**: Check the [Providers Overview](/docs/providers) for patterns on authentication, error handling, caching, and environment configuration that you can apply to your Cloud Registry provider.
+</Callout>
 
  
