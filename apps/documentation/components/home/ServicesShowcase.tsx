@@ -15,7 +15,8 @@ const services = [
     components: [
       { name: 'Runs List', component: RunsPreview },
       { name: 'Create Run', component: RunCreatePreview }
-    ]
+    ],
+    link: "/docs/wes/components/runs"
   },
   {
     id: 'tool-registry',
@@ -23,7 +24,8 @@ const services = [
     description: 'TRS - Discover and manage computational tools and workflows',
     components: [
       { name: 'Tools List', component: ToolsPreview }
-    ]
+    ],
+    link: "/docs/trs/components/tools"
   },
   {
     id: 'service-registry',
@@ -31,7 +33,8 @@ const services = [
     description: 'Discover and register GA4GH-compliant services',
     components: [
       { name: 'Service Details', component: ServicePreview }
-    ]
+    ],
+    link: "/docs/service-registry/components/services"
   },
   {
     id: 'cloud-registry',
@@ -39,7 +42,8 @@ const services = [
     description: 'Elixir Cloud service registration and management',
     components: [
       { name: 'Create Service', component: ServiceCreatePreview }
-    ]
+    ],
+    link: "/docs/cloud-registry/components/service-create"
   },
   {
     id: 'trs-filer',
@@ -47,7 +51,8 @@ const services = [
     description: 'Advanced tool management with file handling capabilities',
     components: [
       { name: 'Create Tool', component: ToolCreatePreview }
-    ]
+    ],
+    link: "/docs/trs-filer/components/tool-create"
   }
 ];
 
@@ -91,7 +96,7 @@ export default function ServicesShowcase() {
         </div>
         <div className='flex justify-center mt-4'>
           <div className='flex items-center justify-center'>
-            <a href={`/docs/${services[activeService].id.replace('-', '/')}`} className='inline-flex items-center px-4 py-2 text-sm font-medium text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 rounded-lg hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors'>
+            <a href={services[activeService].link} className='inline-flex items-center px-4 py-2 text-sm font-medium text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 rounded-lg hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors'>
               View More Components
             </a>
           </div>
