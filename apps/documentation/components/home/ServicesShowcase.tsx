@@ -1,0 +1,102 @@
+'use client';
+import { useState } from 'react';
+import RunsPreview from '@/components/packages/wes/RunsPreview';
+import RunCreatePreview from '@/components/packages/wes/RunCreatePreview';
+import ToolsPreview from '@/components/packages/trs/ToolsPreview';
+import ServicePreview from '@/components/packages/service-registry/ServicePreview';
+import ToolCreatePreview from '@/components/packages/trs-filer/ToolCreatePreview';
+import ServiceCreatePreview from '@/components/packages/cloud-registry/ServiceCreatePreview';
+
+const services = [
+  {
+    id: 'workflow-execution',
+    label: 'Workflow Execution',
+    description: 'WES - Execute and manage workflows in federated cloud environments',
+    components: [
+      { name: 'Runs List', component: RunsPreview },
+      { name: 'Create Run', component: RunCreatePreview }
+    ]
+  },
+  {
+    id: 'tool-registry',
+    label: 'Tool Registry',
+    description: 'TRS - Discover and manage computational tools and workflows',
+    components: [
+      { name: 'Tools List', component: ToolsPreview }
+    ]
+  },
+  {
+    id: 'service-registry',
+    label: 'Service Registry',
+    description: 'Discover and register GA4GH-compliant services',
+    components: [
+      { name: 'Service Details', component: ServicePreview }
+    ]
+  },
+  {
+    id: 'cloud-registry',
+    label: 'Cloud Registry',
+    description: 'Elixir Cloud service registration and management',
+    components: [
+      { name: 'Create Service', component: ServiceCreatePreview }
+    ]
+  },
+  {
+    id: 'trs-filer',
+    label: 'TRS-Filer',
+    description: 'Advanced tool management with file handling capabilities',
+    components: [
+      { name: 'Create Tool', component: ToolCreatePreview }
+    ]
+  }
+];
+
+export default function ServicesShowcase() {
+  const [activeService, setActiveService] = useState(0);
+
+  return (
+    <section className='mt-24 md:mt-32 px-4 max-w-7xl mx-auto'>
+
+      {/* Service Tabs */}
+      <div className='border-b border-zinc-200 dark:border-zinc-700 mb-8'>
+        <div className='flex flex-wrap gap-0 -mb-px'>
+          {services.map((service, index) => (
+            <button
+              key={service.id}
+              onClick={() => setActiveService(index)}
+              className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors duration-200 ${
+                activeService === index
+                  ? 'border-sky-500 text-sky-600 dark:text-sky-400'
+                  : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
+              }`}
+            >
+              {service.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Active Service Content */}
+      <div className='mb-8'>
+        {/* Component Previews */}
+        <div className={`grid gap-8 ${services[activeService].components.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
+          {services[activeService].components.map((comp, index) => {
+            const Component = comp.component;
+            return (
+              <div key={index}>
+                <Component />
+              </div>
+            );
+          })}
+        </div>
+        <div className='flex justify-center mt-4'>
+          <div className='flex items-center justify-center'>
+            <a href={`/docs/${services[activeService].id.replace('-', '/')}`} className='inline-flex items-center px-4 py-2 text-sm font-medium text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 rounded-lg hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors'>
+              View More Components
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+} 

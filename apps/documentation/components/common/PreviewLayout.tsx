@@ -6,7 +6,7 @@ interface PreviewLayoutProps {
 
 const PreviewLayout: React.FC<PreviewLayoutProps> = ({ children }) => {
   return (
-    <div className="p-4 border rounded-lg shadow-inner">
+    <div className="p-4 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-inner">
       {children}
     </div>
   );
