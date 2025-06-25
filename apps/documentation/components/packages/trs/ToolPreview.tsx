@@ -12,7 +12,7 @@ export default function ToolPreview() {
     <PreviewLayout>
       <ECCClientGa4ghTrsTool 
         provider={provider}
-        toolId="placeholder-tool"
+        toolId="FTWMTY"
       />
     </PreviewLayout>
   );

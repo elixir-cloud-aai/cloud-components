@@ -3,5 +3,68 @@
 @tailwind utilities;
 
 :root {
-    /* --ecc-color-brand: #53b47e; */
+    /* Default theme tokens */
+    --ecc-background: oklch(1 0 0);
+    --ecc-foreground: oklch(0.145 0 0);
+    --ecc-primary: oklch(0.205 0 0);
+    --ecc-primary-foreground: oklch(0.985 0 0);
+    --ecc-secondary: oklch(0.97 0 0);
+    --ecc-secondary-foreground: oklch(0.205 0 0);
+    --ecc-accent: oklch(0.97 0 0);
+    --ecc-accent-foreground: oklch(0.205 0 0);
+    --ecc-border: oklch(0.922 0 0);
+    --ecc-radius: 0.625rem;
+    
+    /* Default fonts */
+    --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+    :root.dark {
+        --ecc-background: oklch(0.145 0 0);
+        --ecc-foreground: oklch(0.985 0 0);
+        --ecc-primary: oklch(0.985 0 0);
+        --ecc-primary-foreground: oklch(0.205 0 0);
+        --ecc-secondary: oklch(0.269 0 0);
+        --ecc-secondary-foreground: oklch(0.985 0 0);
+        --ecc-accent: oklch(0.269 0 0);
+        --ecc-accent-foreground: oklch(0.985 0 0);
+        --ecc-border: oklch(0.269 0 0);
+    }
+/* Mono theme */
+.theme-mono {
+    /* Color tokens */
+    --ecc-background: oklch(0.95 0 0);
+    --ecc-foreground: oklch(0.15 0 0);
+    --ecc-primary: oklch(0.1 0 0);
+    --ecc-primary-foreground: oklch(0.9 0 0);
+    --ecc-secondary: oklch(0.85 0 0);
+    --ecc-secondary-foreground: oklch(0.25 0 0);
+    --ecc-accent: oklch(0.8 0 0);
+    --ecc-accent-foreground: oklch(0.2 0 0);
+    --ecc-border: oklch(0.7 0 0);
+    --ecc-radius: 0rem;
+    
+    /* Override font to monospace */
+    --font-sans: var(--font-mono);
+}
+
+/* Mono theme typography */
+.theme-mono,
+.theme-mono *,
+.theme-mono *::part(base) {
+    font-family: var(--font-mono) !important;
+    letter-spacing: 0.025em !important;
+}
+
+.dark.theme-mono {
+    --ecc-background: oklch(0.1 0 0);
+    --ecc-foreground: oklch(0.9 0 0);
+    --ecc-primary: oklch(0.9 0 0);
+    --ecc-primary-foreground: oklch(0.1 0 0);
+    --ecc-secondary: oklch(0.2 0 0);
+    --ecc-secondary-foreground: oklch(0.8 0 0);
+    --ecc-accent: oklch(0.2 0 0);
+    --ecc-accent-foreground: oklch(0.8 0 0);
+    --ecc-border: oklch(0.2 0 0);
 }

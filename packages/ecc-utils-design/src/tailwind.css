@@ -91,3 +91,8 @@
     --tw-drop-shadow-size: initial;
   }
 }
+
+:host {
+  font-family: inherit;
+  line-height: inherit;
+}

@@ -39,3 +39,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+:host {
+  font-family: inherit;
+  line-height: inherit;
+}

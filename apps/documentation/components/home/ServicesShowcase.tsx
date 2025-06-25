@@ -1,11 +1,26 @@
 'use client';
 import { useState } from 'react';
+import { useTheme } from 'next-themes';
 import RunsPreview from '@/components/packages/wes/RunsPreview';
 import RunCreatePreview from '@/components/packages/wes/RunCreatePreview';
 import ToolsPreview from '@/components/packages/trs/ToolsPreview';
 import ServicePreview from '@/components/packages/service-registry/ServicePreview';
 import ToolCreatePreview from '@/components/packages/trs-filer/ToolCreatePreview';
 import ServiceCreatePreview from '@/components/packages/cloud-registry/ServiceCreatePreview';
+import { EccUtilsDesignSelect, EccUtilsDesignSelectItem, EccUtilsDesignSelectContent, EccUtilsDesignSelectTrigger, EccUtilsDesignSelectValue } from '@elixir-cloud/design/react';
+
+const themes = [
+  {
+    id: 'default',
+    label: 'Theme: Default',
+    value: 'default'
+  },
+  {
+    id: 'mono',
+    label: 'Theme: Mono',
+    value: 'mono'
+  }
+];
 
 const services = [
   {
@@ -58,12 +73,14 @@ const services = [
 
 export default function ServicesShowcase() {
   const [activeService, setActiveService] = useState(0);
+  const [selectedTheme, setSelectedTheme] = useState('default');
+  const { resolvedTheme } = useTheme();
 
   return (
-    <section className='mt-24 md:mt-32 px-4 max-w-7xl mx-auto'>
+    <section className='mt-24 md:mt-32 px-4 mx-auto'>
 
       {/* Service Tabs */}
-      <div className='border-b border-zinc-200 dark:border-zinc-700 mb-8'>
+      <div className='border-b border-zinc-200 dark:border-zinc-700 mb-8 relative'>
         <div className='flex flex-wrap gap-0 -mb-px'>
           {services.map((service, index) => (
             <button
@@ -79,12 +96,33 @@ export default function ServicesShowcase() {
             </button>
           ))}
         </div>
+
+        <div className='min-w-[160px] absolute right-0 top-0'>
+          <EccUtilsDesignSelect 
+            value={selectedTheme} 
+            onEccInputChanged={(e) => {
+              console.log('Theme changed:', e.detail.value);
+              setSelectedTheme(e.detail.value);
+            }}
+          >
+            <EccUtilsDesignSelectTrigger className="part:w-full">
+              <EccUtilsDesignSelectValue placeholder="Select theme" />
+            </EccUtilsDesignSelectTrigger>
+            <EccUtilsDesignSelectContent>
+              {themes.map((theme) => (
+                <EccUtilsDesignSelectItem key={theme.id} value={theme.value}>
+                  {theme.label}
+                </EccUtilsDesignSelectItem>
+              ))}
+            </EccUtilsDesignSelectContent>
+          </EccUtilsDesignSelect>
+        </div>
       </div>
 
-      {/* Active Service Content */}
-      <div className='mb-8'>
+      {/* Active Service Content with Theme Applied */}
+      <div className={`mb-8 theme-${selectedTheme} ${resolvedTheme === 'dark' ? 'dark' : ''}`}>
         {/* Component Previews */}
-        <div className={`grid gap-8 ${services[activeService].components.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
+        <div className={`grid gap-4 ${services[activeService].components.length === 2 ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
           {services[activeService].components.map((comp, index) => {
             const Component = comp.component;
             return (

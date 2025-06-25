@@ -47,8 +47,6 @@ export const GlobalStyles = css`
     );
     --sidebar-border: var(--ecc-sidebar-border, oklch(0.922 0 0));
     --sidebar-ring: var(--ecc-sidebar-ring, oklch(0.708 0 0));
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   }
 
   :host([dark]),

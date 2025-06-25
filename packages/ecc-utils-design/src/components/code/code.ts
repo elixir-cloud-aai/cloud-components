@@ -719,7 +719,7 @@ export class EccUtilsDesignCode extends LitElement {
 
   render() {
     const containerClasses = cn(
-      "rounded-md border border-border bg-background overflow-hidden h-full"
+      "rounded-md border border-input bg-background overflow-hidden h-full"
     );
 
     const editorClasses = cn(

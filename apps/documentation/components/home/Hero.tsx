@@ -1,6 +1,6 @@
 'use client';
 import { RiArrowRightLine, RiGithubLine } from '@remixicon/react';
-import { Link } from 'nextra-theme-docs';
+import { EccUtilsDesignButton } from '@elixir-cloud/design/react';
 
 export default function Hero() {
   return (
@@ -27,24 +27,26 @@ export default function Hero() {
 
         {/* CTAs */}
         <div className='flex flex-col sm:flex-row gap-4 mt-10 md:mt-12 text-sm md:text-base items-center justify-center'>
-          <Link
-            href='/docs/introduction'
-            className='rounded-xl bg-sky-600 hover:bg-sky-500 !text-white py-2 px-5 transition duration-300 ease-in-out flex items-center gap-2 shadow-lg hover:shadow-xl'
-            style={{ textDecoration: 'none' }}
+          <EccUtilsDesignButton
+            onClick={() => {
+              window.location.href = '/docs/introduction';
+            }}
+            variant='default'
+            className='part:bg-sky-600 part:hover:bg-sky-500 part:text-white'
           >
             Get Started
             <RiArrowRightLine className='h-4 w-4' />
-          </Link>
+          </EccUtilsDesignButton>
           
-          <Link
-            href='https://github.com/elixir-cloud-aai/cloud-components'
-            className='rounded-xl dark:bg-zinc-800 dark:hover:bg-zinc-700 bg-white hover:bg-zinc-50 dark:!text-white !text-zinc-900 py-2 px-5 transition duration-300 ease-in-out flex items-center gap-2 border border-zinc-200 dark:border-zinc-700 shadow-sm hover:shadow-md'
-            style={{ textDecoration: 'none' }}
-            target='_blank'
+          <EccUtilsDesignButton
+            onClick={() => {
+              window.location.href = 'https://github.com/elixir-cloud-aai/cloud-components';
+            }}
+            variant='secondary'
           >
             <RiGithubLine className='h-4 w-4' />
             View on GitHub
-          </Link>
+          </EccUtilsDesignButton>
         </div>
 
         {/* Quick stats */}

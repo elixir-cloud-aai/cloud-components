@@ -324,7 +324,7 @@ export class ECCClientGa4ghWesRuns extends LitElement {
                   <ecc-utils-design-table-row>
                     <ecc-utils-design-table-cell class="w-6/12">
                       <ecc-utils-design-button
-                        class="part:font-mono part:text-sm part:text-primary part:w-fit part:cursor-pointer part:p-0"
+                        class="part:font-mono part:text-sm part:w-fit part:cursor-pointer part:p-0"
                         variant="link"
                         @click=${() => this.handleViewDetails(run.run_id)}
                         title=${run.run_id}
