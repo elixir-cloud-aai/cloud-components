@@ -59,7 +59,7 @@ export class EccUtilsDesignCardHeader extends LitElement {
   render() {
     const classes = cn("flex flex-col gap-2");
 
-    return html`<div class=${classes}><slot></slot></div>`;
+    return html`<div part="base" class=${classes}><slot></slot></div>`;
   }
 }
 
@@ -86,7 +86,7 @@ export class EccUtilsDesignCardTitle extends LitElement {
   render() {
     const classes = cn("font-semibold leading-none tracking-tight");
 
-    return html`<div class=${classes}><slot></slot></div>`;
+    return html`<div part="base" class=${classes}><slot></slot></div>`;
   }
 }
 
@@ -113,7 +113,7 @@ export class EccUtilsDesignCardDescription extends LitElement {
   render() {
     const classes = cn("text-sm text-muted-foreground");
 
-    return html`<div class=${classes}><slot></slot></div>`;
+    return html`<div part="base" class=${classes}><slot></slot></div>`;
   }
 }
 
@@ -140,7 +140,7 @@ export class EccUtilsDesignCardContent extends LitElement {
   render() {
     const classes = cn("");
 
-    return html`<div class=${classes}><slot></slot></div>`;
+    return html`<div part="base" class=${classes}><slot></slot></div>`;
   }
 }
 
@@ -167,7 +167,7 @@ export class EccUtilsDesignCardFooter extends LitElement {
   render() {
     const classes = cn("flex items-center");
 
-    return html`<div class=${classes}><slot></slot></div>`;
+    return html`<div part="base" class=${classes}><slot></slot></div>`;
   }
 }
 

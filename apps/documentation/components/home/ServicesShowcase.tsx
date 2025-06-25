@@ -97,11 +97,11 @@ export default function ServicesShowcase() {
           ))}
         </div>
 
-        <div className='min-w-[160px] absolute right-0 top-0'>
+        <div className="min-w-[160px] absolute right-0 top-0">
           <EccUtilsDesignSelect 
+            id="theme-select"
             value={selectedTheme} 
             onEccInputChanged={(e) => {
-              console.log('Theme changed:', e.detail.value);
               setSelectedTheme(e.detail.value);
             }}
           >
