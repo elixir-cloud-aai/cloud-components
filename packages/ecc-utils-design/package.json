@@ -62,7 +62,7 @@
     "concurrently": "*",
     "custom-element-jet-brains-integration": "*",
     "custom-element-vs-code-integration": "*",
-    "esbuild": "0.18.20",
+    "esbuild": "0.25.0",
     "eslint": "*",
     "eslint-plugin-prettier": "^4.2.1",
     "globby": "^14.0.0",
