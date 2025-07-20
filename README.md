@@ -2,63 +2,86 @@
 
 ELIXIR Cloud Components (ECC) are lightweight, fast and reusable Web Components for operationalizing various [ELIXIR Cloud & AAI](https://elixir-cloud.dcc.sib.swiss/) and [GA4GH](https://ga4gh.org/) [Cloud](https://www.ga4gh.org/work_stream/cloud/) services.
 
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-
-[badge-all-contributors-image]: https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square&color=%23F6DA80%20
-
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
-
 [![License][badge-license-image]][badge-license-url]
 [![Chat][badge-chat-image]][badge-chat-url]
 
+## Documentation
 
-### Packages
+For comprehensive guides, API references, and examples, visit our documentation:
 
-| Name                       | Description                                                                                            |
-|----------------------------|--------------------------------------------------------------------------------------------------------|
-| @elixir-cloud/design           | Encapsulation & Utility components to manage the headless yet constitent design accross ecc components |
-| @elixir-cloud/tes       | Collection of Web Components for interacting with TES (Task Execution Service)                         |
-| @elixir-cloud/wes       | Collection of Web Components for interacting with WES (Workflow Execution Service)                     |
+**[https://cloud-components.2.rahtiapp.fi/](https://cloud-components.2.rahtiapp.fi/)**
 
-## Development Setup
+## Quick Start for Developers
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
+- Node.js (v18 or higher)
 - npm or yarn
 
-### Getting Started
+### Development Setup
 
-1. Clone the repository:
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/elixir-cloud-aai/cloud-components.git
+   cd cloud-components
+   ```
 
-    ```bash
-    git clone https://github.com/elixir-cloud-aai/cloud-components.git
-    ```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-2. Install dependencies:
+3. **Start development:**
+   ```bash
+   # Run the design package first (required by all other packages)
+   npm run dev --workspace=@elixir-cloud/design
 
-    ```bash
-    npm install
-    ```
+   # In another terminal, run a specific package:
+   npm run dev --workspace=@elixir-cloud/<package-name>
+   ```
 
-3. Start the development server:
+### Available Packages
 
-    - Run the design package first as it is required by all other packages as dependency:
-      ```bash
-      npm run dev --workspace=@elixir-cloud/design
-      ```
-    - Run the specific package of choice from [here](#packages):
-    
-      ```bash
-      npm run dev --workspace=@elixir-cloud/<package-name>
-      ```
+| Package | Description |
+|---------|-------------|
+| `@elixir-cloud/design` | Design system and utility components |
+| `@elixir-cloud/service-registry` | GA4GH Service Registry components |
+| `@elixir-cloud/cloud-registry` | ELIXIR Cloud Registry components |
+| `@elixir-cloud/trs` | GA4GH Tool Registry Service components |
+| `@elixir-cloud/trs-filer` | TRS-Filer service components |
+| `@elixir-cloud/wes` | GA4GH Workflow Execution Service components |
 
-      e.g.
-      ```bash
-      npm run dev --workspace=@elixir-cloud/tes
-      ```
+## Development Commands
 
+```bash
+# Install dependencies
+npm install
 
+# Run specific package in development mode
+npm run dev --workspace=@elixir-cloud/<package-name>
+
+# Build all packages
+npm run build
+
+# Run tests
+npm test
+
+# Lint code
+npm run lint
+
+# Format code
+npm run format
+```
+
+## Architecture
+
+ECC is built on modern web standards:
+
+- **Web Components**: Platform-agnostic, framework-independent components
+- **TypeScript**: Type-safe development with excellent IDE support
+- **Lit**: Efficient web component library for building reactive UIs
+- **Vite**: Fast build tool and development server
+- **Monorepo**: Organized workspace with shared dependencies and tooling
 
 ## Contributing
 
@@ -106,12 +129,11 @@ To get in touch with use, please use one of the following routes:
   [chat board][badge-chat-url] or [email] the community
   leaders.
 
+---
+
 [![logo-elixir][logo-elixir]][elixir]
 [![logo-elixir-cloud-aai][logo-elixir-cloud-aai]][elixir-cloud-aai]
 
-[all-contributors]: https://allcontributors.org/docs/en/specification
-[all-contributors-bot]: https://allcontributors.org/docs/en/bot/overview
-[all-contributors-types]: https://allcontributors.org/docs/en/emoji-key
 [badge-license-image]: https://img.shields.io/badge/license-Apache%202.0-blue.svg
 [badge-license-url]: http://www.apache.org/licenses/LICENSE-2.0
 [badge-chat-image]: https://img.shields.io/static/v1?label=chat&message=Slack&color=ff6994

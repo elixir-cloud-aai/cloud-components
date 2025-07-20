@@ -70,13 +70,13 @@ jobs:
           key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package.lock') }}-${{ steps.node.outputs.version }}
 
       - name: Install dependencies
-        run: npm ci 
+        run: npm ci
 
       - name: Install playwright browsers
         run: |
           sudo apt update
           npx playwright install --with-deps
-        
+
       - name: Build
         run: npm run build
 
@@ -113,8 +113,62 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Update version
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update root package version
         run: npm version $RELEASE_VERSION --no-git-tag-version
+
+      - name: Update all package versions
+        run: |
+          # Read ignore list from changeset config
+          IGNORE_PACKAGES=$(node -e "
+            const config = require('./.changeset/config.json');
+            const ignoreList = config.ignore || [];
+            console.log(ignoreList.join(','));
+          ")
+
+          echo "Ignore list: $IGNORE_PACKAGES"
+
+          # Find all package.json files and update versions
+          find . -name "package.json" -not -path "./node_modules/*" -not -path "./.git/*" | while read package_file; do
+            if [ "$package_file" != "./package.json" ]; then
+              # Extract package name from package.json
+              PACKAGE_NAME=$(node -e "
+                try {
+                  const pkg = require('$package_file');
+                  console.log(pkg.name || '');
+                } catch(e) {
+                  console.log('');
+                }
+              ")
+
+              # Check if package should be ignored
+              if [ -n "$PACKAGE_NAME" ]; then
+                SHOULD_IGNORE=$(echo "$IGNORE_PACKAGES" | grep -q "$PACKAGE_NAME" && echo "true" || echo "false")
+
+                if [ "$SHOULD_IGNORE" = "false" ]; then
+                  echo "Updating $PACKAGE_NAME in $package_file to version $RELEASE_VERSION"
+                  # Update version in package.json
+                  node -e "
+                    const fs = require('fs');
+                    const pkg = JSON.parse(fs.readFileSync('$package_file', 'utf8'));
+                    if (!pkg.private) {
+                      pkg.version = '$RELEASE_VERSION';
+                      fs.writeFileSync('$package_file', JSON.stringify(pkg, null, 2) + '\n');
+                    }
+                  "
+                else
+                  echo "Skipping $PACKAGE_NAME (in ignore list)"
+                fi
+              fi
+            fi
+          done
 
       - name: Commit version
         run: |
@@ -151,4 +205,4 @@ jobs:
         run: npm run build
 
       - name: Publish to npm
-        run: npm run release
+        run: echo "Publishing to npm..."
