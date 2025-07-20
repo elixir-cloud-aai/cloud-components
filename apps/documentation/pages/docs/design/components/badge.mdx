@@ -1,0 +1,167 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import Badge from '@elixir-cloud/design/react/badge';
+
+# EccUtilsDesignBadge Component
+
+<ComponentName
+  tagName='ecc-utils-design-badge'
+  reactTagName='EccUtilsDesignBadge'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-utils-design-badge` component is a simple, customizable badge for displaying statuses, counts, or labels. It provides several visual variants and sizes to suit different contexts.
+
+<Callout type='info'>
+  This component is built with Lit and Tailwind CSS, ensuring it is lightweight and easily stylable.
+</Callout>
+
+## Usage
+
+### Badge Variants
+
+This example shows the different visual styles of the badge.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <div className="flex flex-wrap gap-4">
+      <Badge variant="default">Default</Badge>
+      <Badge variant="secondary">Secondary</Badge>
+      <Badge variant="destructive">Destructive</Badge>
+      <Badge variant="outline">Outline</Badge>
+    </div>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="badge-variants.tsx"
+    import React from 'react';
+    import { EccUtilsDesignBadge } from '@elixir-cloud/design/react/badge';
+
+    export default function BadgeVariants() {
+      return (
+        <div className="flex flex-wrap gap-4">
+          <EccUtilsDesignBadge variant="default">Default</EccUtilsDesignBadge>
+          <EccUtilsDesignBadge variant="secondary">Secondary</EccUtilsDesignBadge>
+          <EccUtilsDesignBadge variant="destructive">Destructive</EccUtilsDesignBadge>
+          <EccUtilsDesignBadge variant="outline">Outline</EccUtilsDesignBadge>
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="badge-variants.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/badge"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <div class="flex flex-wrap gap-4 p-4">
+          <ecc-utils-design-badge variant="default">Default</ecc-utils-design-badge>
+          <ecc-utils-design-badge variant="secondary">Secondary</ecc-utils-design-badge>
+          <ecc-utils-design-badge variant="destructive">Destructive</ecc-utils-design-badge>
+          <ecc-utils-design-badge variant="outline">Outline</ecc-utils-design-badge>
+        </div>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Badge Sizes
+
+This example demonstrates the different sizes available for the badge.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <div className="flex items-center flex-wrap gap-4">
+      <Badge size="sm">Small</Badge>
+      <Badge size="md">Medium</Badge>
+      <Badge size="lg">Large</Badge>
+    </div>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="badge-sizes.tsx"
+    import React from 'react';
+    import { EccUtilsDesignBadge } from '@elixir-cloud/design/react/badge';
+
+    export default function BadgeSizes() {
+      return (
+        <div className="flex items-center flex-wrap gap-4">
+          <EccUtilsDesignBadge size="sm">Small</EccUtilsDesignBadge>
+          <EccUtilsDesignBadge size="md">Medium</EccUtilsDesignBadge>
+          <EccUtilsDesignBadge size="lg">Large</EccUtilsDesignBadge>
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="badge-sizes.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/badge"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <div class="flex items-center flex-wrap gap-4 p-4">
+          <ecc-utils-design-badge size="sm">Small</ecc-utils-design-badge>
+          <ecc-utils-design-badge size="md">Medium</ecc-utils-design-badge>
+          <ecc-utils-design-badge size="lg">Large</ecc-utils-design-badge>
+        </div>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property    | Type                                  | Default     | Description                                        |
+|-------------|---------------------------------------|-------------|----------------------------------------------------|
+| `variant`   | `"default"` \| `"secondary"` \| `"destructive"` \| `"outline"` | `"default"` | The visual style of the badge.                     |
+| `size`      | `"sm"` \| `"md"` \| `"lg"`            | `"md"`      | The size of the badge.                             |
+
+### `variant`
+Controls the visual style of the badge, which is useful for conveying status or intent.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignBadge variant="destructive">Error</EccUtilsDesignBadge>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-badge variant="destructive">Error</ecc-utils-design-badge>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `size`
+Determines the size of the badge, affecting its padding and font size.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignBadge size="lg">Large Badge</EccUtilsDesignBadge>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-badge size="lg">Large Badge</ecc-utils-design-badge>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Events
+
+This component does not emit any custom events. 

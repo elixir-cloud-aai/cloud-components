@@ -1,0 +1,18 @@
+{
+  "code": "Code",
+  "badge": "Badge",
+  "button": "Button",
+  "card": "Card",
+  "label": "Label",
+  "input": "Input",
+  "checkbox": "Checkbox",
+  "separator": "Separator",
+  "skeleton": "Skeleton",
+  "textarea": "Textarea",
+  "collapsible": "Collapsible",
+  "select": "Select",
+  "multi-select": "Multi-Select",
+  "pagination": "Pagination",
+  "tabs": "Tabs",
+  "table": "Table"
+}

@@ -1,0 +1,183 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import Card from '@elixir-cloud/design/react/card';
+import CardHeader from '@elixir-cloud/design/react/card-header';
+import CardTitle from '@elixir-cloud/design/react/card-title';
+import CardDescription from '@elixir-cloud/design/react/card-description';
+import CardContent from '@elixir-cloud/design/react/card-content';
+import CardFooter from '@elixir-cloud/design/react/card-footer';
+import Button from '@elixir-cloud/design/react/button';
+
+# EccUtilsDesignCard Component
+
+<ComponentName
+  tagName='ecc-utils-design-card'
+  reactTagName='EccUtilsDesignCard'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-utils-design-card` is a compound component used to group related content in a container. It provides a structured way to display information with a header, title, description, content, and footer.
+
+<Callout type='info'>
+  The card component is composed of several sub-components that work together to create a complete card.
+</Callout>
+
+## Usage
+
+### Basic Card
+
+This example demonstrates a standard card with a header, content, and footer.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <Card>
+      <CardHeader>
+        <CardTitle>Card Title</CardTitle>
+        <CardDescription>Card Description</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p>This is the main content of the card. You can put any information you want here.</p>
+      </CardContent>
+      <CardFooter>
+        <Button variant="default">View Details</Button>
+      </CardFooter>
+    </Card>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="card-basic.tsx"
+    import React from 'react';
+    import Card from '@elixir-cloud/design/react/card';
+    import CardHeader from '@elixir-cloud/design/react/card-header';
+    import CardTitle from '@elixir-cloud/design/react/card-title';
+    import CardDescription from '@elixir-cloud/design/react/card-description';
+    import CardContent from '@elixir-cloud/design/react/card-content';
+    import CardFooter from '@elixir-cloud/design/react/card-footer';
+    import Button from '@elixir-cloud/design/react/button';
+
+    export default function BasicCard() {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle>Card Title</CardTitle>
+            <CardDescription>Card Description</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>This is the main content of the card. You can put any information you want here.</p>
+          </CardContent>
+          <CardFooter>
+            <Button variant="default">View Details</Button>
+          </CardFooter>
+        </Card>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="card-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/card"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/card-header"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/card-title"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/card-description"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/card-content"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/card-footer"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/button"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <ecc-utils-design-card>
+          <ecc-utils-design-card-header>
+            <ecc-utils-design-card-title>Card Title</ecc-utils-design-card-title>
+            <ecc-utils-design-card-description>Card Description</ecc-utils-design-card-description>
+          </ecc-utils-design-card-header>
+          <ecc-utils-design-card-content>
+            <p>This is the main content of the card. You can put any information you want here.</p>
+          </ecc-utils-design-card-content>
+          <ecc-utils-design-card-footer>
+            <ecc-utils-design-button variant="default">View Details</ecc-utils-design-button>
+          </ecc-utils-design-card-footer>
+        </ecc-utils-design-card>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Simple Card
+
+This example shows a minimal card with only content.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <Card>
+      <CardContent>
+        <p>A simple card with just content.</p>
+      </CardContent>
+    </Card>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="card-simple.tsx"
+    import React from 'react';
+    import Card from '@elixir-cloud/design/react/card';
+    import CardContent from '@elixir-cloud/design/react/card-content';
+
+    export default function SimpleCard() {
+      return (
+        <Card>
+          <CardContent>
+            <p>A simple card with just content.</p>
+          </CardContent>
+        </Card>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="card-simple.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/card"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/card-content"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <ecc-utils-design-card>
+          <ecc-utils-design-card-content>
+            <p>A simple card with just content.</p>
+          </ecc-utils-design-card-content>
+        </ecc-utils-design-card>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Components
+
+The `Card` is built by combining these components:
+
+| Component                       | Tag Name                          | Description                               |
+|---------------------------------|-----------------------------------|-------------------------------------------|
+| `Card`                          | `ecc-utils-design-card`           | The main container for the card.          |
+| `CardHeader`                    | `ecc-utils-design-card-header`    | A header section for the card.            |
+| `CardTitle`                     | `ecc-utils-design-card-title`     | A title for the card, used within the header. |
+| `CardDescription`               | `ecc-utils-design-card-description` | A description, used within the header.    |
+| `CardContent`                   | `ecc-utils-design-card-content`   | The main content area of the card.        |
+| `CardFooter`                    | `ecc-utils-design-card-footer`    | A footer section for actions.             |
+
+## Properties
+
+This component and its sub-components do not have any properties. They are used for structuring and styling content.
+
+## Events
+
+This component and its sub-components do not emit any custom events. 

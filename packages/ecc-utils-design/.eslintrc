@@ -1,6 +1,7 @@
 {
   "extends": ["@open-wc", "@elixir-cloud"],
   "rules": {
-    "lit/no-classfield-shadowing": "warn"
+    "lit/no-classfield-shadowing": "warn",
+    "max-classes-per-file": "off"
   }
 }

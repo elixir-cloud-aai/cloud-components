@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="../assets/logo-elixir-cloud-aai.svg" type="image/x-icon">
+    <title>ecc-utils-design Card Demo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <style>
+      .section {
+        margin-bottom: 2rem;
+      }
+      .example-container {
+        margin: 1rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-utils-design Card Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../../dist/components/card/index.js";
+      import "../../../dist/components/button/index.js";
+      import { html, render } from "lit";
+
+      render(
+  html`
+          <div class="flex flex-col gap-8">
+            <!-- Basic Card Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Basic Card</h2>
+              <div class="example-container">
+                <ecc-utils-design-card>
+                  <ecc-utils-design-card-header>
+                    <ecc-utils-design-card-title
+                      >Basic Card</ecc-utils-design-card-title
+                    >
+                    <ecc-utils-design-card-description
+                      >A simple card with title and
+                      description</ecc-utils-design-card-description
+                    >
+                  </ecc-utils-design-card-header>
+                  <ecc-utils-design-card-content>
+                    <p>
+                      This is a basic card component with a header and content area.
+                    </p>
+                  </ecc-utils-design-card-content>
+                </ecc-utils-design-card>
+              </div>
+            </div>
+      
+            <!-- Card with Footer Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Card with Footer</h2>
+              <div class="example-container">
+                <ecc-utils-design-card>
+                  <ecc-utils-design-card-header>
+                    <ecc-utils-design-card-title
+                      >Card with Footer</ecc-utils-design-card-title
+                    >
+                    <ecc-utils-design-card-description
+                      >This card includes a footer with
+                      actions</ecc-utils-design-card-description
+                    >
+                  </ecc-utils-design-card-header>
+                  <ecc-utils-design-card-content>
+                    <p>
+                      Card content goes here. This area can contain any HTML content.
+                    </p>
+                  </ecc-utils-design-card-content>
+                  <ecc-utils-design-card-footer>
+                    <ecc-utils-design-button>Cancel</ecc-utils-design-button>
+                    <div class="w-2"></div>
+                    <ecc-utils-design-button variant="primary"
+                      >Submit</ecc-utils-design-button
+                    >
+                  </ecc-utils-design-card-footer>
+                </ecc-utils-design-card>
+              </div>
+            </div>
+      
+            <!-- Multiple Cards Grid Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Card Grid Layout</h2>
+              <div class="example-container">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <ecc-utils-design-card>
+                    <ecc-utils-design-card-header>
+                      <ecc-utils-design-card-title
+                        >Features</ecc-utils-design-card-title
+                      >
+                      <ecc-utils-design-card-description
+                        >Explore key features</ecc-utils-design-card-description
+                      >
+                    </ecc-utils-design-card-header>
+                    <ecc-utils-design-card-content>
+                      <ul class="list-disc pl-5">
+                        <li>Responsive design</li>
+                        <li>Themeable with CSS variables</li>
+                        <li>Compatible with any framework</li>
+                        <li>Accessible by default</li>
+                      </ul>
+                    </ecc-utils-design-card-content>
+                  </ecc-utils-design-card>
+
+                  <ecc-utils-design-card>
+                    <ecc-utils-design-card-header>
+                      <ecc-utils-design-card-title
+                        >Documentation</ecc-utils-design-card-title
+                      >
+                      <ecc-utils-design-card-description
+                        >Learn more about usage</ecc-utils-design-card-description
+                      >
+                    </ecc-utils-design-card-header>
+                    <ecc-utils-design-card-content>
+                      <p>
+                        Comprehensive documentation is available to help you get
+                        started with our components.
+                      </p>
+                    </ecc-utils-design-card-content>
+                    <ecc-utils-design-card-footer>
+                      <ecc-utils-design-button variant="outline"
+                        >View Docs</ecc-utils-design-button
+                      >
+                    </ecc-utils-design-card-footer>
+                  </ecc-utils-design-card>
+
+                  <ecc-utils-design-card>
+                    <ecc-utils-design-card-header>
+                      <ecc-utils-design-card-title
+                        >Support</ecc-utils-design-card-title
+                      >
+                      <ecc-utils-design-card-description
+                        >Get help with issues</ecc-utils-design-card-description
+                      >
+                    </ecc-utils-design-card-header>
+                    <ecc-utils-design-card-content>
+                      <p>
+                        If you need assistance, our support team is here to help with
+                        any questions or issues.
+                      </p>
+                    </ecc-utils-design-card-content>
+                    <ecc-utils-design-card-footer>
+                      <ecc-utils-design-button variant="outline"
+                        >Contact Us</ecc-utils-design-button
+                      >
+                    </ecc-utils-design-card-footer>
+                  </ecc-utils-design-card>
+                </div>
+              </div>
+      
+              <!-- Custom Styled Card Example -->
+              <div class="section">
+                <h2 class="text-xl font-semibold mb-2">Custom Styled Card</h2>
+                <div class="example-container">
+                  <ecc-utils-design-card class="border-primary/50 shadow-md">
+                    <ecc-utils-design-card-header class="bg-primary/5">
+                      <ecc-utils-design-card-title class="text-primary"
+                        >Custom Styled Card</ecc-utils-design-card-title
+                      >
+                      <ecc-utils-design-card-description
+                        >Using custom classes to modify the
+                        appearance</ecc-utils-design-card-description
+                      >
+                    </ecc-utils-design-card-header>
+                    <ecc-utils-design-card-content>
+                      <p>
+                        This card uses custom classes to modify its styling. You can
+                        apply your own styles using the class property.
+                      </p>
+                    </ecc-utils-design-card-content>
+                    <ecc-utils-design-card-footer class="justify-end">
+                      <ecc-utils-design-button variant="outline" size="sm"
+                        >Learn More</ecc-utils-design-button
+                      >
+                    </ecc-utils-design-card-footer>
+                  </ecc-utils-design-card>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+  document.querySelector("#demo")
+);
+    </script>
+  </body>
+</html> 

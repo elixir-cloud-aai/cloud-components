@@ -1,0 +1,77 @@
+{
+  "name": "@elixir-cloud/cloud-registry",
+  "description": "Web Component for interacting with Elixir Cloud Registry",
+  "license": "Apache-2.0",
+  "version": "2.0.0-alpha.6",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./custom-elements.json": "./dist/custom-elements.json",
+    "./components/*": "./dist/components/*",
+    "./react": "./dist/react/index.js",
+    "./react/*": "./dist/react/*",
+    "./events": "./dist/events/index.js",
+    "./events/*": "./dist/events/*",
+    "./providers": "./dist/providers/index.js",
+    "./providers/*": "./dist/providers/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elixir-cloud-aai/cloud-components.git"
+  },
+  "customElements": "dist/custom-elements.json",
+  "files": [
+    "dist",
+    "README.md",
+    "package.json",
+    "LICENSE"
+  ],
+  "scripts": {
+    "analyze": "cem analyze --litelement",
+    "build:tailwind": "node ../../scripts/tailwind/index.js",
+    "build": "node ../../scripts/tailwind/index.js && node ../../scripts/build.js -p ecc-client-elixir-cloud-registry-",
+    "dev": "concurrently -r \"node ../../scripts/tailwind/index.js --watch\" \"node ../../scripts/build.js -p ecc-client-elixir-cloud-registry- --watch\" \"wds\"",
+    "clean": "rm -rf dist node_modules custom-elements-manifest.config.js src/output.css src/tailwind.ts",
+    "test": "wtr --coverage",
+    "test:watch": "wtr --watch",
+    "lint": "npx eslint .",
+    "lint:fix": "npm run lint -- --fix",
+    "prepublish": "npm run build"
+  },
+  "dependencies": {
+    "@lit/react": "^1.0.2",
+    "@elixir-cloud/service-registry": "*",
+    "@elixir-cloud/design": "*",
+    "lit": "^2.8.0"
+  },
+  "devDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.4.17",
+    "@elixir-cloud/eslint-config": "*",
+    "@open-wc/eslint-config": "^9.2.1",
+    "@open-wc/testing": "^3.1.6",
+    "@tailwindcss/cli": "^4.1.4",
+    "@typescript-eslint/eslint-plugin": "^5.48.0",
+    "@typescript-eslint/parser": "^5.48.0",
+    "@web/dev-server": "^0.1.34",
+    "@web/dev-server-esbuild": "^0.3.0",
+    "@web/test-runner": "^0.19.0",
+    "commander": "*",
+    "concurrently": "^5.3.0",
+    "custom-element-jet-brains-integration": "*",
+    "custom-element-vs-code-integration": "*",
+    "eslint": "^8.31.0",
+    "eslint-config-prettier": "^8.3.0",
+    "react": "*",
+    "tailwindcss": "^4.1.4",
+    "tslib": "^2.3.1",
+    "tsup": "^7.2.0",
+    "tw-animate-css": "^1.2.6",
+    "typescript": "*"
+  }
+}

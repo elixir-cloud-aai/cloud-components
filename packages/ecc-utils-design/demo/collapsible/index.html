@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="icon"
+      href="../assets/logo-elixir-cloud-aai.svg"
+      type="image/x-icon"
+    />
+    <title>ecc-utils-design Collapsible Demo</title>
+    <style>
+      .collapsible-container {
+        margin: 1rem 0;
+        max-width: 600px;
+      }
+
+      .section {
+        margin-bottom: 2rem;
+      }
+
+      .demo-output {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #f3f4f6;
+        border-radius: 0.375rem;
+        font-family: monospace;
+        font-size: 0.875rem;
+      }
+
+      .trigger-button {
+        width: 100%;
+        padding: 1rem;
+        text-align: left;
+        background: white;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.2s;
+      }
+
+      .trigger-button:hover {
+        background-color: #f9fafb;
+      }
+
+      .trigger-button:focus {
+        outline: none;
+        ring: 2px;
+        ring-color: #3b82f6;
+      }
+
+      .trigger-button.disabled {
+        background-color: #f3f4f6;
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+
+      .content-area {
+        padding: 1rem;
+        background: white;
+        border-left: 1px solid #d1d5db;
+        border-right: 1px solid #d1d5db;
+        border-bottom: 1px solid #d1d5db;
+        border-bottom-left-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+      }
+
+      .chevron {
+        transition: transform 0.2s ease;
+      }
+
+      .chevron.open {
+        transform: rotate(180deg);
+      }
+
+      .custom-trigger {
+        background: linear-gradient(to right, #8b5cf6, #ec4899);
+        color: white;
+        border: none;
+      }
+
+      .custom-trigger:hover {
+        background: linear-gradient(to right, #7c3aed, #db2777);
+      }
+
+      .custom-content {
+        background: linear-gradient(to right, #f3e8ff, #fce7f3);
+        border-left: 4px solid #8b5cf6;
+      }
+    </style>
+    <!-- tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-utils-design Collapsible Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../../dist/components/collapsible/index.js";
+      import { html, render } from "lit";
+
+      // State for demo outputs
+      let basicOpen = false;
+      let defaultOpenState = true;
+      const eventLog = [];
+
+      const updateOutput = (id, value) => {
+        const outputElement = document.getElementById(id);
+        if (outputElement) {
+          outputElement.textContent = `State: ${value ? "Open" : "Closed"}`;
+        }
+      };
+
+      const logEvent = (message) => {
+        const timestamp = new Date().toLocaleTimeString();
+        eventLog.push(`[${timestamp}] ${message}`);
+        const logElement = document.getElementById("event-log");
+        if (logElement) {
+          logElement.textContent = eventLog.slice(-5).join("\n"); // Show last 5 events
+        }
+      };
+
+      const chevronIcon = (isOpen) => html`
+        <svg
+          class="chevron w-5 h-5 text-gray-500 ${isOpen ? "open" : ""}"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          ></path>
+        </svg>
+      `;
+
+      render(
+        html`
+          <div class="flex flex-col">
+            <!-- Basic Collapsible -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Basic Collapsible</h2>
+              <div class="collapsible-container">
+                <ecc-utils-design-collapsible
+                  @ecc-utils-change=${(e) => {
+                    basicOpen = e.detail.open;
+                    updateOutput("basic-output", basicOpen);
+                    console.log("Basic collapsible:", basicOpen);
+                  }}
+                >
+                  <ecc-utils-design-collapsible-trigger>
+                    <div class="trigger-button">
+                      <span class="font-medium">Is it accessible?</span>
+                      ${chevronIcon(basicOpen)}
+                    </div>
+                  </ecc-utils-design-collapsible-trigger>
+      
+                  <ecc-utils-design-collapsible-content>
+                    <div class="content-area">
+                      <p class="text-gray-700">
+                        Yes. It adheres to the WAI-ARIA design pattern and includes
+                        proper keyboard navigation and screen reader support.
+                      </p>
+                    </div>
+                  </ecc-utils-design-collapsible-content>
+                </ecc-utils-design-collapsible>
+                <div id="basic-output" class="demo-output">State: Closed</div>
+              </div>
+            </div>
+
+            <!-- Default Open -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Default Open</h2>
+              <div class="collapsible-container">
+                <ecc-utils-design-collapsible
+                  open
+                  @ecc-utils-change=${(e) => {
+                    defaultOpenState = e.detail.open;
+                    updateOutput("default-open-output", defaultOpenState);
+                    console.log("Default open collapsible:", defaultOpenState);
+                  }}
+                >
+                  <ecc-utils-design-collapsible-trigger>
+                    <div class="trigger-button">
+                      <span class="font-medium">Can it be styled?</span>
+                      ${chevronIcon(defaultOpenState)}
+                    </div>
+                  </ecc-utils-design-collapsible-trigger>
+      
+                  <ecc-utils-design-collapsible-content>
+                    <div class="content-area">
+                      <p class="text-gray-700">
+                        Yes. You can style the components using CSS classes, including
+                        Tailwind CSS utilities. The components expose data attributes
+                        for state-based styling.
+                      </p>
+                    </div>
+                  </ecc-utils-design-collapsible-content>
+                </ecc-utils-design-collapsible>
+                <div id="default-open-output" class="demo-output">State: Open</div>
+              </div>
+            </div>
+
+            <!-- Disabled State -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Disabled State</h2>
+              <div class="collapsible-container">
+                <ecc-utils-design-collapsible disabled>
+                  <ecc-utils-design-collapsible-trigger>
+                    <div class="trigger-button disabled">
+                      <span class="font-medium">Is it performant?</span>
+                      ${chevronIcon(false)}
+                    </div>
+                  </ecc-utils-design-collapsible-trigger>
+      
+                  <ecc-utils-design-collapsible-content>
+                    <div class="content-area">
+                      <p class="text-gray-600">
+                        This content cannot be accessed because the collapsible is
+                        disabled.
+                      </p>
+                    </div>
+                  </ecc-utils-design-collapsible-content>
+                </ecc-utils-design-collapsible>
+              </div>
+            </div>
+
+            <!-- Multiple Collapsibles (FAQ Style) -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">
+                Multiple Collapsibles (FAQ Style)
+              </h2>
+              <div class="collapsible-container space-y-2">
+                <ecc-utils-design-collapsible>
+                  <ecc-utils-design-collapsible-trigger>
+                    <div class="trigger-button">
+                      <span class="font-medium">What is LitElement?</span>
+                      ${chevronIcon(false)}
+                    </div>
+                  </ecc-utils-design-collapsible-trigger>
+      
+                  <ecc-utils-design-collapsible-content>
+                    <div class="content-area">
+                      <p class="text-gray-700">
+                        LitElement is a simple base class for creating fast,
+                        lightweight web components that work everywhere.
+                      </p>
+                    </div>
+                  </ecc-utils-design-collapsible-content>
+                </ecc-utils-design-collapsible>
+
+                <ecc-utils-design-collapsible>
+                  <ecc-utils-design-collapsible-trigger>
+                    <div class="trigger-button">
+                      <span class="font-medium">How does state management work?</span>
+                      ${chevronIcon(false)}
+                    </div>
+                  </ecc-utils-design-collapsible-trigger>
+      
+                  <ecc-utils-design-collapsible-content>
+                    <div class="content-area">
+                      <p class="text-gray-700">
+                        The component uses direct parent/child communication to
+                        coordinate between the trigger and content components,
+                        ensuring they stay in sync.
+                      </p>
+                    </div>
+                  </ecc-utils-design-collapsible-content>
+                </ecc-utils-design-collapsible>
+
+                <ecc-utils-design-collapsible>
+                  <ecc-utils-design-collapsible-trigger>
+                    <div class="trigger-button">
+                      <span class="font-medium">What about animations?</span>
+                      ${chevronIcon(false)}
+                    </div>
+                  </ecc-utils-design-collapsible-trigger>
+      
+                  <ecc-utils-design-collapsible-content>
+                    <div class="content-area">
+                      <p class="text-gray-700">
+                        The component uses simple show/hide behavior for maximum
+                        simplicity and reliability.
+                      </p>
+                    </div>
+                  </ecc-utils-design-collapsible-content>
+                </ecc-utils-design-collapsible>
+              </div>
+            </div>
+
+            <!-- Custom Styling -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Custom Styling</h2>
+              <div class="collapsible-container">
+                <ecc-utils-design-collapsible>
+                  <ecc-utils-design-collapsible-trigger>
+                    <div class="trigger-button custom-trigger">
+                      <span class="font-medium">Custom Styled Collapsible</span>
+                      ${chevronIcon(false)}
+                    </div>
+                  </ecc-utils-design-collapsible-trigger>
+      
+                  <ecc-utils-design-collapsible-content>
+                    <div class="content-area custom-content">
+                      <p class="text-purple-800">
+                        This collapsible uses custom gradient styling and colors to
+                        create a unique appearance.
+                      </p>
+                      <ul class="mt-2 text-purple-700 list-disc list-inside">
+                        <li>Gradient background</li>
+                        <li>Custom hover effects</li>
+                        <li>Themed content area</li>
+                      </ul>
+                    </div>
+                  </ecc-utils-design-collapsible-content>
+                </ecc-utils-design-collapsible>
+              </div>
+            </div>
+
+            <!-- Event Handling -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Event Handling</h2>
+              <div class="collapsible-container">
+                <div class="mb-4">
+                  <div id="event-log" class="demo-output h-20 overflow-y-auto">
+                    Event log will appear here...
+                  </div>
+                </div>
+      
+                <ecc-utils-design-collapsible
+                  @ecc-utils-change=${(e) => {
+                    logEvent(`Collapsible ${e.detail.open ? "opened" : "closed"}`);
+                  }}
+                >
+                  <ecc-utils-design-collapsible-trigger>
+                    <div class="trigger-button">
+                      <span class="font-medium">Click me to see events</span>
+                      ${chevronIcon(false)}
+                    </div>
+                  </ecc-utils-design-collapsible-trigger>
+      
+                  <ecc-utils-design-collapsible-content>
+                    <div class="content-area">
+                      <p class="text-gray-700">
+                        Watch the event log above to see when this collapsible opens
+                        and closes!
+                      </p>
+                    </div>
+                  </ecc-utils-design-collapsible-content>
+                </ecc-utils-design-collapsible>
+              </div>
+            </div>
+
+            <!-- Usage Instructions -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Usage Instructions</h2>
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 class="font-medium text-blue-900 mb-2">Features:</h3>
+                <ul class="text-blue-800 text-sm space-y-1">
+                  <li>• Click to open/close the collapsible</li>
+                  <li>• Keyboard navigation support (Space/Enter)</li>
+                  <li>• Disabled state support</li>
+                  <li>• Custom event emission</li>
+                  <li>• Accessible with proper ARIA attributes</li>
+                  <li>• Simple show/hide behavior</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Code Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Code Example</h2>
+              <div class="bg-gray-100 border rounded-lg p-4">
+                <pre
+                  class="text-sm overflow-x-auto"
+                ><code>&lt;ecc-utils-design-collapsible
+  @ecc-utils-change="\${(e) => console.log(e.detail.open)}"
+&gt;
+  &lt;ecc-utils-design-collapsible-trigger&gt;
+    &lt;div class="trigger-button"&gt;
+      &lt;span&gt;Click me&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/ecc-utils-design-collapsible-trigger&gt;
+  
+  &lt;ecc-utils-design-collapsible-content&gt;
+    &lt;div class="content-area"&gt;
+      Content goes here
+    &lt;/div&gt;
+  &lt;/ecc-utils-design-collapsible-content&gt;
+&lt;/ecc-utils-design-collapsible&gt;</code></pre>
+              </div>
+            </div>
+          </div>
+        `,
+        document.getElementById("demo")
+      );
+
+      // Initialize event log
+      setTimeout(() => {
+        logEvent("Event logging started");
+      }, 100);
+    </script>
+  </body>
+</html> 

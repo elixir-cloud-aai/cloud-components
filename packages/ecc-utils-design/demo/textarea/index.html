@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="../assets/logo-elixir-cloud-aai.svg" type="image/x-icon">
+    <title>ecc-utils-design Textarea Demo</title>
+    <style>
+      ecc-utils-design-textarea {
+        margin: 0.5rem;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-utils-design Textarea Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../../dist/components/textarea/index.js";
+      import { html, render } from "lit";
+
+      render(
+        html`
+          <div class="flex flex-col gap-4">
+            <div>
+              <h2 class="text-xl font-semibold mb-2">Basic Textarea</h2>
+              <ecc-utils-design-textarea
+                placeholder="Enter your message here..."
+              ></ecc-utils-design-textarea>
+            </div>
+
+            <div>
+              <h2 class="text-xl font-semibold mb-2">Different Sizes</h2>
+              <ecc-utils-design-textarea
+                placeholder="Small textarea (3 rows)"
+                rows="3"
+              ></ecc-utils-design-textarea>
+              <ecc-utils-design-textarea
+                placeholder="Medium textarea (5 rows)"
+                rows="5"
+              ></ecc-utils-design-textarea>
+              <ecc-utils-design-textarea
+                placeholder="Large textarea (8 rows)"
+                rows="8"
+              ></ecc-utils-design-textarea>
+            </div>
+
+            <div>
+              <h2 class="text-xl font-semibold mb-2">With Columns</h2>
+              <ecc-utils-design-textarea
+                placeholder="Textarea with specific columns"
+                rows="4"
+                cols="50"
+              ></ecc-utils-design-textarea>
+            </div>
+      
+            <div>
+              <h2 class="text-xl font-semibold mb-2">States</h2>
+              <ecc-utils-design-textarea
+                value="This textarea has pre-filled content that you can edit."
+                rows="3"
+              ></ecc-utils-design-textarea>
+              <ecc-utils-design-textarea
+                disabled
+                placeholder="This textarea is disabled"
+                rows="3"
+              ></ecc-utils-design-textarea>
+            </div>
+
+            <div>
+              <h2 class="text-xl font-semibold mb-2">Use Cases</h2>
+              <ecc-utils-design-textarea
+                placeholder="Write your feedback here..."
+                rows="4"
+              ></ecc-utils-design-textarea>
+              <ecc-utils-design-textarea
+                placeholder="Describe your issue in detail..."
+                rows="6"
+              ></ecc-utils-design-textarea>
+              <ecc-utils-design-textarea
+                placeholder="Enter your bio..."
+                rows="5"
+              ></ecc-utils-design-textarea>
+            </div>
+
+            <div>
+              <h2 class="text-xl font-semibold mb-2">Event Handling</h2>
+              <ecc-utils-design-textarea
+                id="event-textarea"
+                placeholder="Type something to see events..."
+                rows="3"
+              ></ecc-utils-design-textarea>
+              <div
+                id="event-output"
+                class="mt-2 p-2 bg-gray-100 rounded text-sm"
+              ></div>
+            </div>
+          </div>
+        `,
+        document.querySelector("#demo")
+      );
+
+      // Add event listener for demonstration
+      const eventTextarea = document.querySelector("#event-textarea");
+      const eventOutput = document.querySelector("#event-output");
+      
+      eventTextarea.addEventListener("ecc-utils-change", (e) => {
+        eventOutput.textContent = `Value changed: "${e.detail.value}"`;
+      });
+    </script>
+  </body>
+</html> 

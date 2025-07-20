@@ -1,6 +1,10 @@
 import { Callout } from 'nextra/components';
 import { Steps } from 'nextra/components';
-import Card from '@/components/common/Card';
+import {
+  RiBook2Line,
+  RiExternalLinkLine,
+  RiCodeBoxLine,
+} from '@remixicon/react';
 
 # Introduction
 
@@ -10,9 +14,121 @@ The ELIXIR Cloud Components (ECC) are a suite of web components designed for int
 
 While we are continuously expanding the ECC suite, the current version includes components for the following services:
 
-<div className='flex gap-4 mt-4'>
-  <Card title='Task Execution Service (TES)' href='/docs/tes/introduction' />
-  <Card title='Workflow Execution Service (WES)' href='/docs/wes/introduction' />
+<div className="w-full overflow-x-auto mt-6">
+  <table className="w-full text-left border-collapse">
+    <thead>
+      <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+        <th className="py-2 px-3 text-sm font-semibold">Service</th>
+        <th className="py-2 px-3 text-sm font-semibold">Package</th>
+        <th className="py-2 px-3 text-sm font-semibold text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody className="text-sm">
+      <tr className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+        <td className="py-2 px-3">
+          <div className="font-medium">Service Registry</div>
+          <a href="https://github.com/ga4gh-discovery/ga4gh-service-registry/blob/8c45be52940db92c2fa1cd821519c271c22b1c4c/service-registry.yaml" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 hover:underline">GA4GH v1.0.0</a>
+        </td>
+        <td className="py-2 px-3">
+          <code className="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">@elixir-cloud/service-registry</code>
+        </td>
+        <td className="py-2 px-3">
+          <div className="flex items-center justify-center gap-3">
+            <a href="/docs/service-registry/introduction" title="Documentation" className="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400">
+              <RiBook2Line size={16} />
+            </a>
+            <a href="https://cloud-registry.anuragxd.com" title="Live Demo" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-green-600 dark:hover:text-green-400">
+              <RiExternalLinkLine size={16} />
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+        <td className="py-2 px-3">
+          <div className="font-medium">Cloud Registry</div>
+          <a href="https://github.com/ga4gh-discovery/ga4gh-service-registry/blob/8c45be52940db92c2fa1cd821519c271c22b1c4c/service-registry.yaml" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 hover:underline">
+            Elixir Cloud & AAI v1.0.0
+          </a>
+        </td>
+        <td className="py-2 px-3">
+          <code className="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">@elixir-cloud/cloud-registry</code>
+        </td>
+        <td className="py-2 px-3">
+          <div className="flex items-center justify-center gap-3">
+            <a href="/docs/cloud-registry/introduction" title="Documentation" className="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400">
+              <RiBook2Line size={16} />
+            </a>
+            <a href="https://cloud-registry.anuragxd.com" title="Live Demo" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-green-600 dark:hover:text-green-400">
+              <RiExternalLinkLine size={16} />
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+        <td className="py-2 px-3">
+          <div className="font-medium">Tool Registry Service (TRS)</div>
+          <a href="https://github.com/ga4gh/tool-registry-service-schemas/blob/release-2.0.1/openapi/openapi.yaml" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 hover:underline">
+            GA4GH v2.0.1
+          </a>
+        </td>
+        <td className="py-2 px-3">
+          <code className="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">@elixir-cloud/trs</code>
+        </td>
+        <td className="py-2 px-3">
+          <div className="flex items-center justify-center gap-3">
+            <a href="/docs/trs/introduction" title="Documentation" className="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400">
+              <RiBook2Line size={16} />
+            </a>
+            <a href="https://trs-filer.anuragxd.com" title="Live Demo" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-green-600 dark:hover:text-green-400">
+              <RiExternalLinkLine size={16} />
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+        <td className="py-2 px-3">
+          <div className="font-medium">TRS-Filer</div>
+          <a href="https://github.com/ga4gh/tool-registry-service-schemas/blob/release-2.0.1/openapi/openapi.yaml" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 hover:underline">
+            Elixir Cloud & AAI v2.1.0
+          </a>
+        </td>
+        <td className="py-2 px-3">
+          <code className="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">@elixir-cloud/trs-filer</code>
+        </td>
+        <td className="py-2 px-3">
+          <div className="flex items-center justify-center gap-3">
+            <a href="/docs/trs-filer/introduction" title="Documentation" className="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400">
+              <RiBook2Line size={16} />
+            </a>
+            <a href="https://trs-filer.anuragxd.com" title="Live Demo" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-green-600 dark:hover:text-green-400">
+              <RiExternalLinkLine size={16} />
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+        <td className="py-2 px-3">
+          <div className="font-medium">Workflow Execution Service (WES)</div>
+          <a href="https://github.com/ga4gh/workflow-execution-service-schemas/blob/c5406f1d3740e21b93d3ac71a4c8d7b874011519/openapi/workflow_execution_service.swagger.yaml" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 hover:underline">
+            GA4GH v1.0.0
+          </a>
+        </td>
+        <td className="py-2 px-3">
+          <code className="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">@elixir-cloud/wes</code>
+        </td>
+        <td className="py-2 px-3">
+          <div className="flex items-center justify-center gap-3">
+            <a href="/docs/wes/introduction" title="Documentation" className="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400">
+              <RiBook2Line size={16} />
+            </a>
+            <a href="https://weskit.anuragxd.com" title="Live Demo" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-green-600 dark:hover:text-green-400">
+              <RiExternalLinkLine size={16} />
+            </a>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 ## Technical Overview
@@ -37,6 +153,6 @@ Compatible with any web framework or platform that supports vanilla HTML/JavaScr
 
 ### Headless Design
 
-Utilizes CSS parts and variables for non-programmatic styling customization.
+Utilizes CSS custom properties (design tokens) and CSS parts for flexible styling customization, inspired by [shadcn/ui](https://ui.shadcn.com/) architecture.
 
 </Steps>

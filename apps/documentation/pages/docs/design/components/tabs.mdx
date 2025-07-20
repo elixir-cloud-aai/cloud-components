@@ -1,0 +1,269 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import TabsWrapper from '@elixir-cloud/design/react/tabs';
+import TabsList from '@elixir-cloud/design/react/tabs-list';
+import TabsTrigger from '@elixir-cloud/design/react/tabs-trigger';
+import TabsContent from '@elixir-cloud/design/react/tabs-content';
+
+# EccUtilsDesignTabs Component
+
+<ComponentName
+  tagName='ecc-utils-design-tabs'
+  reactTagName='EccUtilsDesignTabs'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-utils-design-tabs` component provides a way to display content in a tabbed interface, allowing users to switch between different views within the same context. It is a compound component that gives you control over the tab list and content panels.
+
+<Callout type='info'>
+  This component is composed of `Tabs`, `TabsList`, `TabsTrigger`, and `TabsContent` to create a complete tabbed interface.
+</Callout>
+
+## Usage
+
+### Basic Tabs
+
+This example shows a basic tabbed interface with two tabs.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <TabsWrapper defaultValue="account">
+      <TabsList>
+        <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsTrigger value="password">Password</TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">
+        <div className="p-4 border mt-2 rounded-md">
+          This is the account tab.
+        </div>
+      </TabsContent>
+      <TabsContent value="password">
+        <div className="p-4 border mt-2 rounded-md">
+          This is the password tab.
+        </div>
+      </TabsContent>
+    </TabsWrapper>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="tabs-basic.tsx"
+    import React from 'react';
+    import {
+      EccUtilsDesignTabs,
+      EccUtilsDesignTabsList,
+      EccUtilsDesignTabsTrigger,
+      EccUtilsDesignTabsContent,
+    } from '@elixir-cloud/design/react/tabs';
+
+    export default function BasicTabs() {
+      return (
+        <EccUtilsDesignTabs defaultValue="account">
+          <EccUtilsDesignTabsList>
+            <EccUtilsDesignTabsTrigger value="account">Account</EccUtilsDesignTabsTrigger>
+            <EccUtilsDesignTabsTrigger value="password">Password</EccUtilsDesignTabsTrigger>
+          </EccUtilsDesignTabsList>
+          <EccUtilsDesignTabsContent value="account">
+            <div className="p-4 border mt-2 rounded-md">
+              This is the account tab.
+            </div>
+          </EccUtilsDesignTabsContent>
+          <EccUtilsDesignTabsContent value="password">
+            <div className="p-4 border mt-2 rounded-md">
+              This is the password tab.
+            </div>
+          </EccUtilsDesignTabsContent>
+        </EccUtilsDesignTabs>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="tabs-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/tabs"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <ecc-utils-design-tabs default-value="account">
+          <ecc-utils-design-tabs-list>
+            <ecc-utils-design-tabs-trigger value="account">Account</ecc-utils-design-tabs-trigger>
+            <ecc-utils-design-tabs-trigger value="password">Password</ecc-utils-design-tabs-trigger>
+          </ecc-utils-design-tabs-list>
+          <ecc-utils-design-tabs-content value="account">
+            <div class="p-4 border mt-2 rounded-md">
+              This is the account tab.
+            </div>
+          </ecc-utils-design-tabs-content>
+          <ecc-utils-design-tabs-content value="password">
+            <div class="p-4 border mt-2 rounded-md">
+              This is the password tab.
+            </div>
+          </ecc-utils-design-tabs-content>
+        </ecc-utils-design-tabs>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Components
+
+| Component       | Tag Name                        | Description                               |
+|-----------------|---------------------------------|-------------------------------------------|
+| `Tabs`          | `ecc-utils-design-tabs`         | The root container for the tabs.          |
+| `TabsList`      | `ecc-utils-design-tabs-list`    | The container for the tab triggers.       |
+| `TabsTrigger`   | `ecc-utils-design-tabs-trigger` | A button to activate a specific tab.      |
+| `TabsContent`   | `ecc-utils-design-tabs-content` | The content panel associated with a tab.  |
+
+## Properties
+
+### `EccUtilsDesignTabs`
+
+| Property        | Type      | Default | Description                               |
+|-----------------|-----------|---------|-------------------------------------------|
+| `defaultValue`  | `string`  | `""`    | The value of the tab to be active on initial render. |
+| `value`         | `string`  | `""`    | The controlled value of the active tab.   |
+
+#### `defaultValue`
+Sets which tab is active when the component first loads. Should match the `value` of one of the TabsTrigger components.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTabs defaultValue="account">
+      ...
+    </EccUtilsDesignTabs>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-tabs default-value="account">
+      ...
+    </ecc-utils-design-tabs>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `value`
+Controls which tab is currently active. Used for controlled components where you manage the state externally.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTabs value={currentTab}>
+      ...
+    </EccUtilsDesignTabs>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-tabs value="password">
+      ...
+    </ecc-utils-design-tabs>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `EccUtilsDesignTabsTrigger`
+
+| Property    | Type      | Default   | Description                               |
+|-------------|-----------|-----------|-------------------------------------------|
+| `value`     | `string`  | `""`      | A unique value for the tab trigger.       |
+| `disabled`  | `boolean` | `false`   | When `true`, disables the tab trigger.    |
+
+#### `value`
+A unique identifier for the tab trigger. This value must match the corresponding TabsContent `value`.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTabsTrigger value="account">Account</EccUtilsDesignTabsTrigger>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-tabs-trigger value="account">Account</ecc-utils-design-tabs-trigger>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `disabled`
+When `true`, prevents the tab from being activated and visually indicates it's unavailable.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTabsTrigger value="premium" disabled={true}>Premium</EccUtilsDesignTabsTrigger>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-tabs-trigger value="premium" disabled="true">Premium</ecc-utils-design-tabs-trigger>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `EccUtilsDesignTabsContent`
+
+| Property    | Type      | Default | Description                               |
+|-------------|-----------|---------|-------------------------------------------|
+| `value`     | `string`  | `""`    | A unique value for the tab content.       |
+
+#### `value`
+A unique identifier for the tab content. This value must match the corresponding TabsTrigger `value`.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTabsContent value="account">
+      Account content goes here...
+    </EccUtilsDesignTabsContent>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-tabs-content value="account">
+      Account content goes here...
+    </ecc-utils-design-tabs-content>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Events
+
+### `EccUtilsDesignTabs`
+
+| Event Name          | React Event Name     | Detail Type             | Description                                  |
+|--------------------|---------------------|-------------------------|----------------------------------------------|
+| `ecc-input-changed` | `onEccInputChanged` | `{ value: string }`     | Fired when the active tab changes.           |
+
+### `ecc-input-changed`
+This event is fired when the user clicks on a new tab trigger.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTabs 
+      onEccInputChanged={(event) => {
+        console.log('Active tab:', event.detail.value);
+      }}
+    >
+      ...
+    </EccUtilsDesignTabs>
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    element.addEventListener('ecc-input-changed', (event) => {
+      console.log('Active tab:', event.detail.value);
+    });
+    ```
+  </Tabs.Tab>
+</Tabs>
+

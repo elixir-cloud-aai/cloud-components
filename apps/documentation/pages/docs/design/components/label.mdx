@@ -1,0 +1,151 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import Label from '@elixir-cloud/design/react/label';
+
+# EccUtilsDesignLabel Component
+
+<ComponentName
+  tagName='ecc-utils-design-label'
+  reactTagName='EccUtilsDesignLabel'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-utils-design-label` component provides an accessible label for form elements. It is styled to match the design system and supports disabled states.
+
+<Callout type='info'>
+  This component is a simple wrapper around the native HTML `<label>` element, providing consistent styling.
+</Callout>
+
+## Usage
+
+### Basic Label
+
+This example shows a basic label.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <Label>Email Address</Label>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="label-basic.tsx"
+    import React from 'react';
+    import { EccUtilsDesignLabel } from '@elixir-cloud/design/react/label';
+
+    export default function BasicLabel() {
+      return (
+        <EccUtilsDesignLabel>Email Address</EccUtilsDesignLabel>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="label-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/label"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <ecc-utils-design-label>Email Address</ecc-utils-design-label>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Label for an Input
+
+This example demonstrates associating a label with an input field using the `for` property.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <div className="flex flex-col gap-2">
+      <Label htmlFor="email-input">Email</Label>
+      <input id="email-input" type="email" className="border rounded-md px-2 py-1" />
+    </div>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="label-for.tsx"
+    import React from 'react';
+    import { EccUtilsDesignLabel } from '@elixir-cloud/design/react/label';
+    import { EccUtilsDesignInput } from '@elixir-cloud/design/react/input';
+
+    export default function LabelForInput() {
+      return (
+        <div className="flex flex-col gap-2">
+          <EccUtilsDesignLabel htmlFor="email-input">Email</EccUtilsDesignLabel>
+          <EccUtilsDesignInput id="email-input" type="email" />
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="label-for.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/label"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/input"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <div class="flex flex-col gap-2 p-4">
+          <ecc-utils-design-label for="email-input">Email</ecc-utils-design-label>
+          <ecc-utils-design-input id="email-input" type="email"></ecc-utils-design-input>
+        </div>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property    | Type      | Default   | Description                                           |
+|-------------|-----------|-----------|-------------------------------------------------------|
+| `for`       | `string`  | `""`      | The `id` of the element the label is associated with. |
+| `disabled`  | `boolean` | `false`   | When `true`, applies disabled styling to the label.   |
+
+### `for`
+Associates the label with a form control. In React, use `htmlFor`.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignLabel htmlFor="username">Username</EccUtilsDesignLabel>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-label for="username">Username</ecc-utils-design-label>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `disabled`
+Applies a disabled visual style to the label, indicating that the associated input is not interactive.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignLabel disabled={true}>Disabled Label</EccUtilsDesignLabel>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-label disabled="true">Disabled Label</ecc-utils-design-label>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Events
+
+This component does not emit any custom events. 

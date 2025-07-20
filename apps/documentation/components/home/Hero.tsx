@@ -1,46 +1,67 @@
 'use client';
-import { RiArrowRightLine } from '@remixicon/react';
-import { Link } from 'nextra-theme-docs';
+import { RiArrowRightLine, RiGithubLine } from '@remixicon/react';
+import { EccUtilsDesignButton } from '@elixir-cloud/design/react';
 
 export default function Hero() {
   return (
-    <div className='mx-auto static mt-0 md:mt-[7rem] flex flex-col items-center'>
-      <div className='flex flex-col items-center w-full md:w-5/6'>
-        <h1 className='text-7xl font-extrabold bg-gradient-to-r from-sky-600 to-green-400 via-sky-400 text-transparent bg-clip-text text-center flex-col items-center gap-4 hidden md:flex'>
-          <div>The Component Library</div>
-          <div>for Federated Cloud Services</div>
+    <div className='mx-auto static mt-12 md:mt-[6rem] flex flex-col items-center'>
+      <div className='flex flex-col items-center w-full md:w-5/6 max-w-6xl'>
+        {/* Main Headline */}
+        <h1 className='text-5xl md:text-7xl font-extrabold bg-gradient-to-r from-sky-600 to-green-400 via-sky-400 text-transparent bg-clip-text text-center leading-tight'>
+          <div className='hidden md:block'>
+            <div>Build Federated Cloud</div>
+            <div>Applications with Ease</div>
+          </div>
+          <div className='block md:hidden'>
+            Build Federated Cloud Applications with Ease
+          </div>
         </h1>
-        <h1 className='text-4xl mt-32 font-extrabold bg-gradient-to-r from-sky-600 to-green-400 via-sky-400 text-transparent bg-clip-text text-center block md:hidden'>
-          The Component Library for Federated Cloud Services
-        </h1>
-        <p className='mt-6 md:mt-8 text-base md:text-xl text-zinc-500 max-w-7xl text-center'>
-          Modular, customizable, and extensible components for interacting with cloud
-          infrastructure.
+        
+        {/* Subtitle */}
+        <p className='mt-6 md:mt-8 text-lg md:text-xl text-zinc-600 dark:text-zinc-300 max-w-4xl text-center leading-relaxed'>
+          Production-ready components for GA4GH-compliant cloud services. 
+          <span className='block mt-2'>
+            Framework-agnostic, fully customizable, and built for modern development.
+          </span>
         </p>
-        <div className='flex flex-wrap gap-4 mt-10 md:mt-12 text-sm md:text-base items-center justify-center'>
-          <Link
-            href='/docs/introduction'
-            className='rounded-xl bg-sky-600 hover:bg-sky-500 !text-white py-2 px-6 transition duration-300 ease-in-out flex items-center gap-1'
-            style={{ textDecoration: 'none' }}
+
+        {/* CTAs */}
+        <div className='flex flex-col sm:flex-row gap-4 mt-10 md:mt-12 text-sm md:text-base items-center justify-center'>
+          <EccUtilsDesignButton
+            onClick={() => {
+              window.location.href = '/docs/introduction';
+            }}
+            variant='default'
+            className='part:bg-sky-600 part:hover:bg-sky-500 part:text-white'
           >
-            Get started
-            <RiArrowRightLine className='inline-block h-4' />
-          </Link>
-          <Link
-            href='/docs/installation'
-            className='rounded-xl dark:bg-zinc-700 dark:hover:bg-zinc-600 bg-zinc-300 hover:bg-zinc-200 dark:!text-white !text-zinc-900 py-2 px-6 transition duration-300 ease-in-out flex items-center justify-center'
-            style={{ textDecoration: 'none' }}
+            Get Started
+            <RiArrowRightLine className='h-4 w-4' />
+          </EccUtilsDesignButton>
+          
+          <EccUtilsDesignButton
+            onClick={() => {
+              window.location.href = 'https://github.com/elixir-cloud-aai/cloud-components';
+            }}
+            variant='secondary'
           >
-            Install
-          </Link>
-          <div className='p-0.5 rounded-xl flex items-center justify-center bg-gradient-to-r from-sky-600 to-green-400 via-sky-400'>
-            <Link
-              href='/docs/customization'
-              className='rounded-xl dark:bg-zinc-700 dark:hover:bg-zinc-600 bg-zinc-300 hover:bg-zinc-200 dark:!text-white !text-zinc-900 py-1.5 px-6 transition duration-300 ease-in-out w-full'
-              style={{ textDecoration: 'none' }}
-            >
-              Make your own?
-            </Link>
+            <RiGithubLine className='h-4 w-4' />
+            View on GitHub
+          </EccUtilsDesignButton>
+        </div>
+
+        {/* Quick stats */}
+        <div className='flex flex-wrap gap-6 mt-8 text-sm text-zinc-500 dark:text-zinc-400 items-center justify-center'>
+          <div className='flex items-center gap-2'>
+            <div className='w-2 h-2 bg-green-500 rounded-full'></div>
+            <span>5+ GA4GH Services</span>
+          </div>
+          <div className='flex items-center gap-2'>
+            <div className='w-2 h-2 bg-blue-500 rounded-full'></div>
+            <span>25+ Components</span>
+          </div>
+          <div className='flex items-center gap-2'>
+            <div className='w-2 h-2 bg-purple-500 rounded-full'></div>
+            <span>Framework Agnostic</span>
           </div>
         </div>
       </div>

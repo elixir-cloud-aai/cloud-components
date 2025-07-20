@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+		<link rel="icon" href="./logo-elixir-cloud-aai.svg" type="image/x-icon">
+    <title>ecc-utils-design Button Demo</title>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <style>
+      .styled-button {
+        --ecc-primary: oklch(0.7 0.1 337);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-button Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../../dist/components/button/index.js";
+      import { html, render } from "lit";
+
+      render(
+  html`
+          <div class="flex flex-col gap-6">
+            <div>
+              <ecc-utils-design-button>Default</ecc-utils-design-button>
+              <ecc-utils-design-button variant="destructive"
+                >Destructive</ecc-utils-design-button
+              >
+              <ecc-utils-design-button variant="outline"
+                >Outline</ecc-utils-design-button
+              >
+              <ecc-utils-design-button variant="secondary"
+                >Secondary</ecc-utils-design-button
+              >
+              <ecc-utils-design-button variant="ghost">Ghost</ecc-utils-design-button>
+              <ecc-utils-design-button variant="link">Link</ecc-utils-design-button>
+            </div>
+            <div>
+              <ecc-utils-design-button size="sm">Small</ecc-utils-design-button>
+              <ecc-utils-design-button size="default"
+                >Default</ecc-utils-design-button
+              >
+              <ecc-utils-design-button size="lg">Large</ecc-utils-design-button>
+              <ecc-utils-design-button size="icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-4 h-4"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 4.5v15m7.5-7.5h-15"
+                  />
+                </svg>
+              </ecc-utils-design-button>
+            </div>
+            <div>
+              <ecc-utils-design-button disabled>Disabled</ecc-utils-design-button>
+              <ecc-utils-design-button variant="destructive" disabled
+                >Destructive Disabled</ecc-utils-design-button
+              >
+            </div>
+            <div>
+              <ecc-utils-design-button class="styled-button">
+                Styled Button
+              </ecc-utils-design-button>
+            </div>
+          </div>
+        `,
+  document.querySelector("#demo")
+);
+    </script>
+  </body>
+</html>

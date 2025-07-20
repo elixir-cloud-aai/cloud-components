@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="icon"
+      href="../assets/logo-elixir-cloud-aai.svg"
+      type="image/x-icon"
+    />
+    <title>Cloud Registry Service Create Component Demo</title>
+    <style>
+      .section {
+        margin-bottom: 2rem;
+      }
+      .example-container {
+        margin: 2rem;
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+      }
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        margin: 0;
+        padding: 2rem;
+        background-color: #fafafa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">Cloud Registry Service Create Component Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../dist/components/service-create/index.js";
+      import { html, render } from "lit";
+
+      // Event listeners for demo
+      function setupEventListeners() {
+        document.addEventListener("ecc-service-created", (e) => {
+          console.log("Service created successfully:", e.detail);
+          alert(`Success: ${e.detail.message}`);
+        });
+
+        document.addEventListener("ecc-service-create-failed", (e) => {
+          console.error("Service creation failed:", e.detail);
+          alert(`Error: ${e.detail.error}`);
+        });
+
+        document.addEventListener("ecc-service-create-validation-failed", (e) => {
+          console.error("Validation error:", e.detail);
+          alert(`Validation Error: ${e.detail.error}`);
+        });
+      }
+
+      render(
+        html`
+          <div class="flex flex-col gap-8">
+            <!-- Service Create with Base URL -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Service Create Example</h2>
+              <p class="mb-4 text-muted-foreground">
+                This demo shows the service creation form for registering new services
+                in the Cloud Registry. Fill out the form to create a new service
+                registration.
+              </p>
+              <div class="example-container">
+                <ecc-client-elixir-cloud-registry-service-create
+                  baseUrl="http://localhost:8082/ga4gh/registry/v1"
+                >
+                </ecc-client-elixir-cloud-registry-service-create>
+              </div>
+            </div>
+          </div>
+        `,
+        document.querySelector("#demo")
+      );
+
+      // Setup event listeners after rendering
+      setupEventListeners();
+    </script>
+  </body>
+</html>

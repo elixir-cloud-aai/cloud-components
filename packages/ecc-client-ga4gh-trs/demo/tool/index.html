@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="icon"
+      href="../assets/logo-elixir-cloud-aai.svg"
+      type="image/x-icon"
+    />
+    <title>TRS Tool Component Demo</title>
+    <style>
+      .section {
+        margin-bottom: 2rem;
+      }
+      .example-container {
+        margin: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">TRS Tool Component Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../dist/components/tool/index.js";
+      import { html, render } from "lit";
+
+      render(
+        html`
+          <div class="flex flex-col gap-8">
+            <!-- Tool with Base URL and Tool ID -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">TRS Tool Example</h2>
+              <p class="mb-4 text-muted-foreground">
+                This demo displays information about a specific tool from the
+                WorkflowHub TRS API with three tabs: Overview, Versions, and Files.
+              </p>
+              <div class="example-container border">
+                <ecc-client-ga4gh-trs-tool
+                  baseUrl="http://localhost:8080/ga4gh/trs/v2"
+                  toolId="FPGRE9"
+                >
+                </ecc-client-ga4gh-trs-tool>
+              </div>
+            </div>
+
+            <!-- Error State Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Invalid Tool Example</h2>
+              <p class="mb-4 text-muted-foreground">
+                This demonstrates the error state when an invalid tool ID is provided.
+              </p>
+              <div class="example-container">
+                <ecc-client-ga4gh-trs-tool
+                  baseUrl="https://workflowhub.eu/ga4gh/trs/v2"
+                  toolId="nonexistent-tool-id"
+                >
+                </ecc-client-ga4gh-trs-tool>
+              </div>
+            </div>
+
+            <!-- Missing Parameters Example -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Missing Parameters Example</h2>
+              <p class="mb-4 text-muted-foreground">
+                This demonstrates the state when no tool ID is provided.
+              </p>
+              <div class="example-container">
+                <ecc-client-ga4gh-trs-tool
+                  baseUrl="https://workflowhub.eu/ga4gh/trs/v2"
+                ></ecc-client-ga4gh-trs-tool>
+              </div>
+            </div>
+          </div>
+        `,
+        document.querySelector("#demo")
+      );
+    </script>
+  </body>
+</html>

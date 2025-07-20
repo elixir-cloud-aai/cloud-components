@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <title>ecc-client-elixir-trs-tool-create</title>
+  <!-- tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <body>
+    <div id="demo"></div>
+
+    <script type="module">
+      import { html, render } from "lit";
+      import "../../dist/components/tool-create/index.js";
+
+      // Note: Update this URL to point to your TRS-Filer API endpoint
+      const baseUrl = "http://localhost:8080/ga4gh/trs/v2";
+
+      render(
+        html`<div class="p-4">
+    <ecc-client-elixir-trs-tool-create
+            .baseUrl="${baseUrl}"
+            .showAdvanced="${false}"
+            @ecc-tool-created="${(e) => {
+              console.log("Tool created:", e.detail);
+              alert(`Tool created successfully with ID: ${e.detail.toolId}`);
+            }}"
+            @ecc-tool-create-failed="${(e) => {
+              console.error("Tool creation failed:", e.detail);
+              alert(`Tool creation failed: ${e.detail.error}`);
+            }}"
+          ></ecc-client-elixir-trs-tool-create>
+  </div>`,
+        document.querySelector("#demo")
+      );
+    </script>
+  </body>
+</html> 

@@ -1,100 +1,114 @@
-# Customizing
+# Customization
 
-This documentation explains how to customize the suite of ELIXIR Cloud Components (ECC) to suit your specific requirements.
-This allows you to modify the appearance, behavior, and functionality of the components to better align with your application's design and user experience.
-You can customize all the components from [here](/#customizable).
+ELIXIR Cloud Components (ECC) provides a flexible and powerful customization system that allows you to adapt components to match your design requirements. The system is built on CSS custom properties (tokens), inspired by the excellent design patterns from [shadcn/ui](https://ui.shadcn.com/).
 
-## Architecture
+This page focuses on the global design tokens that can be used with any ECC package, be it a service package (like WES, TRS, etc.) or the design utility package.
 
-The ELIXIR Cloud Components (ECC) suite employs a robust and flexible customization architecture that allows for easy theming and adaptation to various design requirements. 
-This system is built on a hierarchy of design tokens, ranging from high-level, user-configurable options to low-level CSS variables that directly affect the component styles.
+## CSS Custom Properties (Design Tokens)
 
-### Token Hierarchy
+All ECC components use CSS custom properties with the `--ecc-` prefix. You can override these in your application's CSS to customize the appearance of all components.
 
-- High-Level Tokens (Adaptive UI): These are the primary customization points for users. They represent broad design concepts and are easy to understand and modify.
-- Low-Level Tokens (CSS): These are derived from the high-level tokens and provide more granular control over the component styles. They are implemented as CSS custom properties (variables).
+### Available Tokens
 
+Here are all the available design tokens you can customize:
 
-### Customization Flow
+#### Color Tokens
 
-- Users modify high-level tokens to match their design requirements.
-- The ECC system automatically recalculates all affected low-level tokens.
-- Components instantly reflect the changes, updating their appearance accordingly.
+| Token | Description | Light Default | Dark Default |
+|-------|-------------|---------------|--------------|
+| `--ecc-background` | Main background color | `oklch(1 0 0)` | `oklch(0.145 0 0)` |
+| `--ecc-foreground` | Main text color | `oklch(0.145 0 0)` | `oklch(0.985 0 0)` |
+| `--ecc-primary` | Primary brand color | `oklch(0.205 0 0)` | `oklch(0.985 0 0)` |
+| `--ecc-primary-foreground` | Text on primary background | `oklch(0.985 0 0)` | `oklch(0.205 0 0)` |
+| `--ecc-secondary` | Secondary color | `oklch(0.97 0 0)` | `oklch(0.269 0 0)` |
+| `--ecc-secondary-foreground` | Text on secondary background | `oklch(0.205 0 0)` | `oklch(0.985 0 0)` |
+| `--ecc-muted` | Muted background color | `oklch(0.97 0 0)` | `oklch(0.269 0 0)` |
+| `--ecc-muted-foreground` | Muted text color | `oklch(0.556 0 0)` | `oklch(0.708 0 0)` |
+| `--ecc-accent` | Accent color | `oklch(0.97 0 0)` | `oklch(0.269 0 0)` |
+| `--ecc-accent-foreground` | Text on accent background | `oklch(0.205 0 0)` | `oklch(0.985 0 0)` |
+| `--ecc-destructive` | Error/danger color | `oklch(0.577 0.245 27.325)` | `oklch(0.396 0.141 25.723)` |
+| `--ecc-destructive-foreground` | Text on destructive background | `oklch(0.985 0 0)` | `oklch(0.637 0.237 25.331)` |
+| `--ecc-border` | Border color | `oklch(0.922 0 0)` | `oklch(0.269 0 0)` |
+| `--ecc-input` | Input border color | `oklch(0.922 0 0)` | `oklch(0.269 0 0)` |
+| `--ecc-ring` | Focus ring color | `oklch(0.708 0 0)` | `oklch(0.439 0 0)` |
 
-```mermaid
+#### Card Tokens
 
-graph TD
-    subgraph Input
-        A[User Input]
-        F[Default Values]
-    end
+| Token | Description | Light Default | Dark Default |
+|-------|-------------|---------------|--------------|
+| `--ecc-card` | Card background | `oklch(1 0 0)` | `oklch(0.145 0 0)` |
+| `--ecc-card-foreground` | Card text color | `oklch(0.145 0 0)` | `oklch(0.985 0 0)` |
+| `--ecc-popover` | Popover background | `oklch(1 0 0)` | `oklch(0.145 0 0)` |
+| `--ecc-popover-foreground` | Popover text color | `oklch(0.145 0 0)` | `oklch(0.985 0 0)` |
 
-    subgraph "Token Layer"
-        B[High-Level Tokens]
-        C[Low-Level Tokens]
-    end
+#### Chart Colors
 
-    subgraph Output
-        D[ECC Components]
-    end
+| Token | Description | Light Default | Dark Default |
+|-------|-------------|---------------|--------------|
+| `--ecc-chart-1` | Chart color 1 | `oklch(0.646 0.222 41.116)` | `oklch(0.488 0.243 264.376)` |
+| `--ecc-chart-2` | Chart color 2 | `oklch(0.6 0.118 184.704)` | `oklch(0.696 0.17 162.48)` |
+| `--ecc-chart-3` | Chart color 3 | `oklch(0.398 0.07 227.392)` | `oklch(0.769 0.188 70.08)` |
+| `--ecc-chart-4` | Chart color 4 | `oklch(0.828 0.189 84.429)` | `oklch(0.627 0.265 303.9)` |
+| `--ecc-chart-5` | Chart color 5 | `oklch(0.769 0.188 70.08)` | `oklch(0.645 0.246 16.439)` |
 
-    A -->|Modifies| B
-    F -.->|Initializes| B
-    B -->|Derives| C
-    C -->|Styles| D
-    
-    class A,F inputNode;
-    class B,C,G tokenNode;
-    class D outputNode;
+#### Layout Tokens
 
-```
+| Token | Description | Default |
+|-------|-------------|---------|
+| `--ecc-radius` | Border radius | `0.625rem` |
 
-## Design Tokens
+#### Sidebar Tokens
 
-User can modify the appearance of ECC components by changing the following tokens.
+| Token | Description | Light Default | Dark Default |
+|-------|-------------|---------------|--------------|
+| `--ecc-sidebar` | Sidebar background | `oklch(0.985 0 0)` | `oklch(0.205 0 0)` |
+| `--ecc-sidebar-foreground` | Sidebar text | `oklch(0.145 0 0)` | `oklch(0.985 0 0)` |
+| `--ecc-sidebar-primary` | Sidebar primary | `oklch(0.205 0 0)` | `oklch(0.488 0.243 264.376)` |
+| `--ecc-sidebar-primary-foreground` | Sidebar primary text | `oklch(0.985 0 0)` | `oklch(0.985 0 0)` |
+| `--ecc-sidebar-accent` | Sidebar accent | `oklch(0.97 0 0)` | `oklch(0.269 0 0)` |
+| `--ecc-sidebar-accent-foreground` | Sidebar accent text | `oklch(0.205 0 0)` | `oklch(0.985 0 0)` |
+| `--ecc-sidebar-border` | Sidebar border | `oklch(0.922 0 0)` | `oklch(0.269 0 0)` |
+| `--ecc-sidebar-ring` | Sidebar focus ring | `oklch(0.708 0 0)` | `oklch(0.439 0 0)` |
 
-### High-Level Tokens
+## Customizing Design Tokens
 
-High-level tokens are the primary customization points for users. They represent broad design concepts and are easy to understand and modify. The following table lists all the available high-level tokens:
+To customize the appearance of ECC components, override the CSS custom properties in your application's CSS:
 
-| Token Name | Description | Default Value |
-|------------|-------------|---------------|
-| --ecc-color-brand | The primary brand color | hsl(217, 91%, 60%) |
-| --ecc-color-warning | Color used for warning states | hsl(38, 92%, 50%) |
-| --ecc-color-danger | Color used for error or danger states | hsl(0, 84%, 60%) |
-| --ecc-color-success | Color used for success states | hsl(142, 71%, 45%) |
-| --ecc-color-neutral | Base color for neutral shades | hsl(240, 4%, 46%) |
-| --ecc-corner | Base value for border radius | 0.5rem |
-| --ecc-depth | Intensity of shadows and depth effects | 1 |
-| --ecc-density | Base value for spacing and layout density | 0.5rem |
-| --ecc-sizing | Base value for component sizing | 0.9rem |
-| --ecc-motion | Duration for animations and transitions | 250ms |
-| --ecc-font-size | Base font size | 0.9rem |
-
-### Low-Level Tokens
-
-Low-level tokens are derived from the high-level tokens and provide more granular control over the component styles. Users can modify these tokens to achieve fine-grained customization of the components.
-
-For a comprehensive list of all low-level tokens, please refer to the [Primitive Stylesheet](https://github.com/elixir-cloud-aai/cloud-components/blob/main/packages/ecc-utils-design/src/styles/primitive.styles.ts).
-
-### Customizing Tokens
-
-To customize the appearance of ECC components, you can modify the tokens in your application's CSS.
-
-Here's an example of how to customize the brand color:
+### Basic Token Customization
 
 ```css
 :root {
-  --ecc-color-brand: hsl(280, 80%, 50%); /* Change to a purple hue */
+  /* Change the primary color to blue */
+  --ecc-primary: oklch(0.6 0.25 250);
+  --ecc-primary-foreground: oklch(1 0 0);
+  
+  /* Customize border radius */
+  --ecc-radius: 1rem;
+  
+  /* Update accent colors */
+  --ecc-accent: oklch(0.95 0.02 250);
+  --ecc-accent-foreground: oklch(0.2 0 250);
 }
 ```
 
-This change will affect all components and styles that use the brand color, providing a consistent update across your application.
+### Theme-Specific Customization
 
-OR for the more granular control, you can modify the low-level tokens directly:
+You can also provide different values for dark mode:
 
 ```css
 :root {
-    --ecc-color-primary-50: hsl(280, 80%, 50%); /* Change the primary color to a purple hue */
+  /* Light theme */
+  --ecc-primary: oklch(0.4 0.25 250);
+  --ecc-background: oklch(1 0 0);
+}
+
+.dark {
+  /* Dark theme */
+  --ecc-primary: oklch(0.7 0.25 250);
+  --ecc-background: oklch(0.1 0 0);
 }
 ```
+
+## Credits
+
+This customization system is inspired by the excellent work of [shadcn/ui](https://ui.shadcn.com/), which pioneered many of the patterns we use for component architecture and theming. We've adapted their approach to work seamlessly with Web Components and the ECC ecosystem.

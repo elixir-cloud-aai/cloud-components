@@ -1,0 +1,386 @@
+import { Callout, Tabs } from 'nextra/components'
+
+# WES Providers
+
+The `@elixir-cloud/wes` package provides providers for connecting to GA4GH Workflow Execution Service (WES) APIs. The main provider is `RestWesProvider` which implements the `WesProvider` interface for REST-based WES endpoints.
+
+<Callout type='info'>
+  **Quick Start**: Create a `RestWesProvider` with your WES server URL and pass it to WES components to start submitting and monitoring workflows.
+</Callout>
+
+## WesProvider Interface
+
+The `WesProvider` interface defines the operations that all WES providers must implement:
+
+```typescript
+export interface WesProvider {
+  // Service information
+  getServiceInfo(): Promise<ServiceInfo>;
+
+  // Run management
+  listRuns(pageSize?: number, pageToken?: string): Promise<RunListResponse>;
+  runWorkflow(request: RunRequest): Promise<RunId>;
+  getRunLog(runId: string): Promise<RunLog>;
+  getRunStatus(runId: string): Promise<RunStatus>;
+  cancelRun(runId: string): Promise<RunId>;
+}
+```
+
+## RestWesProvider
+
+The `RestWesProvider` is the main implementation that communicates with WES APIs using REST/HTTP.
+
+### Constructor
+
+```typescript
+constructor(baseUrl: string)
+```
+
+**Parameters:**
+- `baseUrl`: The base URL of the WES API endpoint (e.g., `https://weskit.example.com/ga4gh/wes/v1`)
+
+### Basic Usage
+
+<Tabs items={['React', 'HTML', 'Next.js']}>
+  <Tabs.Tab>
+    ```tsx copy
+    import { RestWesProvider } from '@elixir-cloud/wes/providers';
+    import { EccClientGa4ghWesRuns } from '@elixir-cloud/wes';
+
+    function WorkflowApp() {
+      const provider = new RestWesProvider(
+        'https://weskit.example.com/ga4gh/wes/v1'
+      );
+
+      return (
+        <div>
+          <h2>Workflow Runs</h2>
+          <EccClientGa4ghWesRuns provider={provider} />
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <script type="module" src="https://esm.sh/@elixir-cloud/wes@latest"></script>
+    </head>
+    <body>
+      <ecc-client-ga4gh-wes-runs></ecc-client-ga4gh-wes-runs>
+
+      <script type="module">
+        import { RestWesProvider } from 'https://esm.sh/@elixir-cloud/wes@latest/providers';
+        
+        const provider = new RestWesProvider('https://weskit.example.com/ga4gh/wes/v1');
+        document.querySelector('ecc-client-ga4gh-wes-runs').provider = provider;
+      </script>
+    </body>
+    </html>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```tsx copy
+    // pages/workflows.tsx
+    import { RestWesProvider } from '@elixir-cloud/wes/providers';
+    import { EccClientGa4ghWesRuns } from '@elixir-cloud/wes';
+
+    export default function WorkflowsPage() {
+      const provider = new RestWesProvider(
+        process.env.NEXT_PUBLIC_WES_URL || 'https://weskit.example.com/ga4gh/wes/v1'
+      );
+
+      return (
+        <div>
+          <h1>Workflow Management</h1>
+          <EccClientGa4ghWesRuns provider={provider} />
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Provider Methods
+
+### getServiceInfo()
+
+Retrieves information about the WES service.
+
+```typescript
+getServiceInfo(): Promise<ServiceInfo>
+```
+
+### listRuns()
+
+Retrieves a list of workflow runs with optional pagination.
+
+```typescript
+listRuns(pageSize?: number, pageToken?: string): Promise<RunListResponse>
+```
+
+### runWorkflow()
+
+Submits a new workflow for execution.
+
+```typescript
+runWorkflow(request: RunRequest): Promise<RunId>
+```
+
+### getRunLog()
+
+Gets detailed information and logs for a specific workflow run.
+
+```typescript
+getRunLog(runId: string): Promise<RunLog>
+```
+
+### getRunStatus()
+
+Gets the current status of a workflow run.
+
+```typescript
+getRunStatus(runId: string): Promise<RunStatus>
+```
+
+### cancelRun()
+
+Cancels a running workflow.
+
+```typescript
+cancelRun(runId: string): Promise<RunId>
+```
+
+
+
+## Type Definitions
+
+### State
+
+```typescript
+type State =
+  | "UNKNOWN"
+  | "QUEUED"
+  | "INITIALIZING"
+  | "RUNNING"
+  | "PAUSED"
+  | "COMPLETE"
+  | "EXECUTOR_ERROR"
+  | "SYSTEM_ERROR"
+  | "CANCELED"
+  | "CANCELING";
+```
+
+### RunRequest
+
+```typescript
+interface RunRequest {
+  workflow_params: object;
+  workflow_type: string;
+  workflow_type_version: string;
+  tags?: Record<string, string>;
+  workflow_engine_parameters?: Record<string, string>;
+  workflow_url: string;
+  workflow_attachment?: File[];
+}
+```
+
+### RunId
+
+```typescript
+interface RunId {
+  run_id: string;
+}
+```
+
+### RunStatus
+
+```typescript
+interface RunStatus {
+  run_id: string;
+  state: State;
+}
+```
+
+### Log
+
+```typescript
+interface Log {
+  name?: string;
+  cmd?: string[];
+  start_time?: string;
+  end_time?: string;
+  stdout?: string;
+  stderr?: string;
+  exit_code?: number;
+}
+```
+
+### RunLog
+
+```typescript
+interface RunLog {
+  run_id: string;
+  request: RunRequest;
+  state: State;
+  run_log: Log;
+  task_logs: Log[];
+  outputs: object;
+}
+```
+
+### RunListResponse
+
+```typescript
+interface RunListResponse {
+  runs: RunStatus[];
+  next_page_token?: string;
+}
+```
+
+### WorkflowTypeVersion
+
+```typescript
+interface WorkflowTypeVersion {
+  workflow_type_version: string[];
+}
+```
+
+### DefaultWorkflowEngineParameter
+
+```typescript
+interface DefaultWorkflowEngineParameter {
+  name: string;
+  type: string;
+  default_value: string;
+}
+```
+
+### ServiceInfo
+
+```typescript
+interface ServiceInfo {
+  workflow_type_versions: Record<string, WorkflowTypeVersion>;
+  supported_wes_versions: string[];
+  supported_filesystem_protocols: string[];
+  workflow_engine_versions: Record<string, string>;
+  default_workflow_engine_parameters: DefaultWorkflowEngineParameter[];
+  system_state_counts: Record<string, number>;
+  auth_instructions_url?: string;
+  contact_info_url?: string;
+  tags?: Record<string, string>;
+}
+```
+
+## Using with Components
+
+### Workflow Submission
+
+```tsx copy
+import { RestWesProvider } from '@elixir-cloud/wes/providers';
+import { EccClientGa4ghWesRunCreate } from '@elixir-cloud/wes';
+
+function WorkflowSubmitter() {
+  const provider = new RestWesProvider('https://weskit.example.com/ga4gh/wes/v1');
+
+  return (
+    <EccClientGa4ghWesRunCreate 
+      provider={provider}
+      onEccRunSubmitted={(event) => {
+        console.log('Workflow submitted:', event.detail.runId);
+      }}
+      onEccRunCreateFailed={(event) => {
+        console.error('Submission failed:', event.detail.error);
+      }}
+    />
+  );
+}
+```
+
+### Workflow Monitoring
+
+```tsx copy
+import { RestWesProvider } from '@elixir-cloud/wes/providers';
+import { EccClientGa4ghWesRun } from '@elixir-cloud/wes';
+
+function WorkflowMonitor({ runId }) {
+  const provider = new RestWesProvider('https://weskit.example.com/ga4gh/wes/v1');
+
+  return (
+    <EccClientGa4ghWesRun 
+      provider={provider}
+      runId={runId}
+      onEccRunChanged={(event) => {
+        console.log('Run status changed:', event.detail.state);
+      }}
+    />
+  );
+}
+```
+
+## Custom Providers
+
+For custom use cases, you can extend `RestWesProvider` or implement the `WesProvider` interface directly. This is useful for:
+
+- Adding custom authentication
+- Implementing caching or offline support  
+- Connecting to non-standard APIs
+- Adding custom error handling or retry logic
+
+```tsx copy
+// Example: Custom provider with authentication
+class CustomWesProvider extends RestWesProvider {
+  constructor(baseUrl, apiKey) {
+    super(baseUrl);
+    this.apiKey = apiKey;
+  }
+
+  async fetch(url, options = {}) {
+    return super.fetch(url, {
+      ...options,
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        ...options.headers
+      }
+    });
+  }
+}
+```
+
+For comprehensive patterns and examples, see the [Providers Overview](/docs/providers) documentation.
+
+## Testing
+
+Test your WES provider setup:
+
+```tsx copy
+async function testWesProvider(provider) {
+  try {
+    console.log('Testing WES provider...');
+    
+    // Test service info
+    const serviceInfo = await provider.getServiceInfo();
+    console.log('✅ Service info:', serviceInfo.workflow_type_versions);
+    
+    // Test listing runs
+    const runs = await provider.listRuns(5);
+    console.log(`✅ Found ${runs.runs.length} recent runs`);
+    
+    console.log('✅ WES provider is working correctly!');
+    return true;
+  } catch (error) {
+    console.error('❌ WES provider test failed:', error);
+    return false;
+  }
+}
+
+// Usage
+const provider = new RestWesProvider('https://weskit.example.com/ga4gh/wes/v1');
+testWesProvider(provider);
+```
+
+<Callout type='tip'>
+  **Next Steps**: Check the [Providers Overview](/docs/providers) for patterns on authentication, error handling, caching, and environment configuration that you can apply to your WES provider.
+</Callout> 

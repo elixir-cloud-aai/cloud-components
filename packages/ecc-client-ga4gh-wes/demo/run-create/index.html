@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+    </style>
+    <title>WES Run Create Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="../../dist/index.js"></script>
+  </head>
+  <body>
+    <div class="container mx-auto p-6 max-w-4xl">
+      <div class="mb-6">
+        <a href="../" class="text-blue-500 hover:underline">&larr; Back to demos</a>
+      </div>
+      
+      <h1 class="text-3xl font-bold mb-6">WES Run Create Component</h1>
+      
+      <div class="mb-6">
+        <h2 class="text-xl font-semibold mb-4">Basic Usage</h2>
+        <ecc-client-ga4gh-wes-run-create
+          baseUrl="http://weskit-api-svc.default.svc.cluster.local:5000/ga4gh/wes/v1"
+          defaultWorkflowType="NFL"
+        ></ecc-client-ga4gh-wes-run-create>
+      </div>
+      
+      <div class="mb-6">
+        <h2 class="text-xl font-semibold mb-4">With Default Parameters</h2>
+        <ecc-client-ga4gh-wes-run-create
+          id="with-defaults"
+          baseUrl="http://localhost/ga4gh/wes/v1"
+          defaultWorkflowType="WDL"
+          allowFileUpload="true"
+        ></ecc-client-ga4gh-wes-run-create>
+      </div>
+    </div>
+
+    <script>
+      // Set default parameters for the second component
+      const componentWithDefaults = document.getElementById("with-defaults");
+      componentWithDefaults.defaultParams = {
+        input_file: "https://example.com/input.txt",
+        output_dir: "/tmp/outputs",
+      };
+
+      // Listen for events
+      document.addEventListener("ecc-run-submitted", (event) => {
+        console.log("Run submitted:", event.detail);
+        alert(`Workflow submitted successfully! Run ID: ${event.detail.runId}`);
+      });
+
+      document.addEventListener("ecc-run-create-failed", (event) => {
+        console.error("WES error:", event.detail);
+        alert(`Error: ${event.detail.error}`);
+      });
+    </script>
+  </body>
+</html> 

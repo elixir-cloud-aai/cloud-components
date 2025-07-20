@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <title>ecc-client-ga4gh-trs</title>
+  <body>
+    <div id="demo"></div>
+
+    <script type="module">
+      import { html, render } from "lit";
+      import "../../dist/components/tools/index.js";
+
+      const baseUrl = "http://localhost:8080/ga4gh/trs/v2";
+      const pageSize = 30;
+
+      render(
+        html`<ecc-client-ga4gh-trs-tools
+          .baseUrl="${baseUrl}"
+          .pageSize="${pageSize}"
+          .filter="${true}"
+          .search="${true}"
+        >
+          <div slot="actions">
+            <button id="search-button">Search</button>
+          </div>
+        </ecc-client-ga4gh-trs-tools>`,
+        document.querySelector("#demo")
+      );
+    </script>
+  </body>
+</html>

@@ -60,14 +60,16 @@ components.forEach((component) => {
     `
       import * as React from 'react';
       import { createComponent } from '@lit/react';
-      import Component from '../../${component.path}';
+      import { ${component.name} as Component } from '../../${component.path}';
 
       ${eventNameImport}
       ${eventImports}
       ${eventExports}
 
       const tagName = '${component.tagName}'
-      window.customElements.define('${component.tagName}', Component)
+      if (typeof window !== 'undefined' && window.customElements && !window.customElements.get('${component.tagName}')) {
+        window.customElements.define('${component.tagName}', Component)
+      }
 
       ${jsDoc}
       const reactWrapper = createComponent({

@@ -1,0 +1,221 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import Checkbox from '@elixir-cloud/design/react/checkbox';
+import Label from '@elixir-cloud/design/react/label';
+
+# EccUtilsDesignCheckbox Component
+
+<ComponentName
+  tagName='ecc-utils-design-checkbox'
+  reactTagName='EccUtilsDesignCheckbox'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-utils-design-checkbox` component provides a standard checkbox input for forms, allowing users to select one or more options.
+
+<Callout type='info'>
+  This component is a custom-styled checkbox that provides consistent behavior and appearance across browsers.
+</Callout>
+
+## Usage
+
+### Basic Checkbox
+
+This example shows a default checkbox.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <div className="flex items-center gap-2">
+      <Checkbox id="terms" />
+      <Label htmlFor="terms">Accept terms and conditions</Label>
+    </div>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="checkbox-basic.tsx"
+    import React from 'react';
+    import { EccUtilsDesignCheckbox } from '@elixir-cloud/design/react/checkbox';
+    import { EccUtilsDesignLabel } from '@elixir-cloud/design/react/label';
+
+    export default function BasicCheckbox() {
+      return (
+        <div className="flex items-center gap-2">
+          <EccUtilsDesignCheckbox id="terms" />
+          <EccUtilsDesignLabel htmlFor="terms">Accept terms and conditions</EccUtilsDesignLabel>
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="checkbox-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/checkbox"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/label"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <div class="flex items-center gap-2 p-4">
+          <ecc-utils-design-checkbox id="terms"></ecc-utils-design-checkbox>
+          <ecc-utils-design-label for="terms">Accept terms and conditions</ecc-utils-design-label>
+        </div>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Disabled Checkbox
+
+This example shows a checkbox in a disabled state.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <div className="flex items-center gap-2">
+      <Checkbox id="disabled-checkbox" disabled={true} />
+      <Label htmlFor="disabled-checkbox" disabled={true}>Cannot be changed</Label>
+    </div>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="checkbox-disabled.tsx"
+    import React from 'react';
+    import { EccUtilsDesignCheckbox } from '@elixir-cloud/design/react/checkbox';
+    import { EccUtilsDesignLabel } from '@elixir-cloud/design/react/label';
+
+    export default function DisabledCheckbox() {
+      return (
+        <div className="flex items-center gap-2">
+          <EccUtilsDesignCheckbox id="disabled-checkbox" disabled={true} />
+          <EccUtilsDesignLabel htmlFor="disabled-checkbox" disabled={true}>Cannot be changed</EccUtilsDesignLabel>
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="checkbox-disabled.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/checkbox"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/label"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <div class="flex items-center gap-2 p-4">
+          <ecc-utils-design-checkbox id="disabled-checkbox" disabled="true"></ecc-utils-design-checkbox>
+          <ecc-utils-design-label for="disabled-checkbox" disabled="true">Cannot be changed</ecc-utils-design-label>
+        </div>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property   | Type      | Default | Description                               |
+|------------|-----------|---------|-------------------------------------------|
+| `checked`  | `boolean` | `false` | When `true`, the checkbox is checked.     |
+| `disabled` | `boolean` | `false` | When `true`, disables the checkbox.       |
+| `name`     | `string`  | `""`    | The name of the checkbox for form submission. |
+| `value`    | `string`  | `""`    | The value of the checkbox for form submission. |
+
+### `checked`
+Controls the checked state of the checkbox.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignCheckbox checked={true} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-checkbox checked="true"></ecc-utils-design-checkbox>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `disabled`
+When `true`, the checkbox is non-interactive.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignCheckbox disabled={true} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-checkbox disabled="true"></ecc-utils-design-checkbox>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `name`
+The name attribute, used when submitting the checkbox as part of a form.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignCheckbox name="newsletter" />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-checkbox name="newsletter"></ecc-utils-design-checkbox>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `value`
+The value attribute, used when submitting the checkbox as part of a form.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignCheckbox value="subscribe" />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-checkbox value="subscribe"></ecc-utils-design-checkbox>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Events
+
+| Event Name          | React Event Name     | Detail Type                      | Description                                    |
+|--------------------|---------------------|----------------------------------|------------------------------------------------|
+| `ecc-input-changed` | `onEccInputChanged` | `{ checked: boolean, value: string }` | Fired when the state of the checkbox changes. |
+
+### `ecc-input-changed`
+Fires when the checkbox is checked or unchecked by the user.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignCheckbox 
+      onEccInputChanged={(event) => {
+        console.log(event.detail.checked, event.detail.value);
+      }}
+    />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript copy
+    checkboxElement.addEventListener('ecc-input-changed', (event) => {
+      console.log(event.detail.checked, event.detail.value);
+    });
+    ```
+  </Tabs.Tab>
+</Tabs> 

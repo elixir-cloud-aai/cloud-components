@@ -17,15 +17,15 @@
     "LICENSE"
   ],
   "scripts": {
-    "analyze": "cem analyze --litelement",
-    "build": "node ../../scripts/build.js -p ecc-client-elixir-drs-filer-",
-    "dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
-    "clean": "rm -rf dist node_modules custom-elements-manifest.config.js",
-    "test": "",
-    "test:watch": "wtr --watch",
-    "lint": "npx eslint .",
-    "lint:fix": "npm run lint -- --fix",
-    "prepublish": "npm run build"
+    "depricated-analyze": "cem analyze --litelement",
+    "depricated-build": "node ../../scripts/build.js -p ecc-client-elixir-drs-filer-",
+    "depricated-dev": "concurrently -r \"npm run build -- --watch\" \"wds\"",
+    "depricated-clean": "rm -rf dist node_modules custom-elements-manifest.config.js",
+    "depricated-test": "",
+    "depricated-test:watch": "wtr --watch",
+    "depricated-lint": "npx eslint .",
+    "depricated-lint:fix": "npm run lint -- --fix",
+    "depricated-prepublish": "npm run build"
   },
   "devDependencies": {
     "@elixir-cloud/eslint-config": "*",

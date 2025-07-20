@@ -1,0 +1,85 @@
+import { Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import RunCreatePreview from '@/components/packages/wes/RunCreatePreview'
+
+# EccClientGa4ghWesRunCreate Component
+
+<ComponentName
+  tagName='ecc-client-ga4gh-wes-run-create'
+  reactTagName='ECCClientGa4ghWesRunCreate'
+  version='2.0.0-alpha.1'
+/>
+
+## Overview
+
+The `ecc-client-ga4gh-wes-run-create` component provides a form for submitting new workflow runs to a WES endpoint.
+
+## Usage
+
+### Basic Create Form
+
+This example shows the basic form for creating a new workflow run.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <RunCreatePreview />
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="run-create-basic.tsx"
+    import React from 'react';
+    import { ECCClientGa4ghWesRunCreate } from '@elixir-cloud/wes/react';
+    import { RestWesProvider } from '@elixir-cloud/wes/providers';
+
+    export default function RunCreateBasic() {
+      const provider = new RestWesProvider(
+        'https://weskit.anuragxd.com/ga4gh/wes/v1'
+      );
+
+      return (
+        <ECCClientGa4ghWesRunCreate 
+          provider={provider}
+        />
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="run-create-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/wes@2.0.0-alpha.1"></script>
+      </head>
+      <body>
+        <ecc-client-ga4gh-wes-run-create>
+        </ecc-client-ga4gh-wes-run-create>
+
+        <script type="module">
+          import { RestWesProvider } from 'https://esm.sh/@elixir-cloud/wes@2.0.0-alpha.1/providers';
+          
+          const provider = new RestWesProvider(
+            'https://weskit.anuragxd.com/ga4gh/wes/v1'
+          );
+          
+          document.querySelector('ecc-client-ga4gh-wes-run-create').provider = provider;
+        </script>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property   | Type                      | Default | Description                                                                    |
+|------------|---------------------------|---------|--------------------------------------------------------------------------------|
+| `provider` | `WesProvider` | `null`  | Data provider for submitting the run (see [Providers](/docs/wes/providers))  |
+
+## Events
+
+| Event Name             | React Event Name        | Detail Type                    | Description                                    |
+|------------------------|------------------------|--------------------------------|------------------------------------------------|
+| `ecc-run-submitted` | `onEccRunSubmitted` | `{ runId: string }`        | Fired when a workflow run is successfully submitted. |
+| `ecc-run-create-failed` | `onEccRunCreateFailed` | `Error` | Fired when run submission fails. | 

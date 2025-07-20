@@ -1,0 +1,26 @@
+import { Callout } from 'nextra/components'
+
+# Cloud Registry
+
+The `Cloud Registry` package provides web components for managing and creating service registrations in the Elixir Cloud ecosystem. This package extends the GA4GH Service Registry API to allow creation of resources.
+
+## Package Information
+
+- **Package**: `@elixir-cloud/cloud-registry`
+- **Version**: `2.0.0-alpha.6`
+- **Standard**: [Elixir Cloud & AAI v1.0.0](https://github.com/ga4gh-discovery/ga4gh-service-registry/blob/8c45be52940db92c2fa1cd821519c271c22b1c4c/service-registry.yaml)
+
+## Features
+
+- **Service Registration**: Complete form interface for registering new services.
+- **Validation**: Built-in form validation with real-time feedback.
+- **Advanced Fields**: Support for optional and advanced service metadata.
+- **Standard Compliance**: Works with Elixir Cloud Registry implementations.
+
+## Available Components
+
+- [`<ecc-client-elixir-cloud-registry-service-create>`](./components/service-create): A component for creating new service registrations.
+- [`<ecc-client-ga4gh-service-registry-services>`](../service-registry/components/services): A component for listing existing service registrations.
+- [`<ecc-client-ga4gh-service-registry-service>`](../service-registry/components/service): A component for displaying details of a specific service.
+
+*Note: The services and service components are from the [`service-registry`](../service-registry/introduction) package.* 

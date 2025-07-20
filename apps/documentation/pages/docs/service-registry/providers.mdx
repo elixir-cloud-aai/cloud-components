@@ -1,0 +1,310 @@
+import { Callout, Tabs } from 'nextra/components'
+
+# Service Registry Providers
+
+The `@elixir-cloud/service-registry` package provides providers for connecting to GA4GH Service Registry APIs. The main provider is `RestServiceRegistryProvider` which implements the `ServiceRegistryProvider` interface for REST-based service registry endpoints.
+
+<Callout type='info'>
+  **Quick Start**: Create a `RestServiceRegistryProvider` with your service registry URL and pass it to Service Registry components to start browsing services.
+</Callout>
+
+## ServiceRegistryProvider Interface
+
+The `ServiceRegistryProvider` interface defines the operations that all Service Registry providers must implement:
+
+```typescript
+export interface ServiceRegistryProvider {
+  // List services
+  getServices(): Promise<ExternalService[]>;
+
+  // Get service by ID
+  getServiceById(id: string): Promise<ExternalService>;
+
+  // Get service types
+  getServiceTypes(): Promise<ServiceType[]>;
+
+  // Get registry info
+  getServiceInfo(): Promise<Service>;
+}
+```
+
+## RestServiceRegistryProvider
+
+The `RestServiceRegistryProvider` is the main implementation that communicates with GA4GH Service Registry APIs using REST/HTTP.
+
+### Constructor
+
+```typescript
+constructor(baseUrl: string)
+```
+
+**Parameters:**
+- `baseUrl`: The base URL of the Service Registry API endpoint (e.g., `https://registry.example.com/ga4gh/registry/v1`)
+
+### Basic Usage
+
+<Tabs items={['React', 'HTML', 'Next.js']}>
+  <Tabs.Tab>
+    ```tsx copy
+    import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+    import { EccClientGa4ghServiceRegistryServices } from '@elixir-cloud/service-registry';
+
+    function ServiceBrowser() {
+      const provider = new RestServiceRegistryProvider(
+        'https://registry.example.com/ga4gh/registry/v1'
+      );
+
+      return (
+        <div>
+          <h2>Available Services</h2>
+          <EccClientGa4ghServiceRegistryServices provider={provider} />
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <script type="module" src="https://esm.sh/@elixir-cloud/service-registry@latest"></script>
+    </head>
+    <body>
+      <ecc-client-ga4gh-service-registry-services></ecc-client-ga4gh-service-registry-services>
+
+      <script type="module">
+        import { RestServiceRegistryProvider } from 'https://esm.sh/@elixir-cloud/service-registry@latest/providers';
+        
+        const provider = new RestServiceRegistryProvider('https://registry.example.com/ga4gh/registry/v1');
+        document.querySelector('ecc-client-ga4gh-service-registry-services').provider = provider;
+      </script>
+    </body>
+    </html>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```tsx copy
+    // pages/services.tsx
+    import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+    import { EccClientGa4ghServiceRegistryServices } from '@elixir-cloud/service-registry';
+
+    export default function ServicesPage() {
+      const provider = new RestServiceRegistryProvider(
+        process.env.NEXT_PUBLIC_REGISTRY_URL || 'https://registry.example.com/ga4gh/registry/v1'
+      );
+
+      return (
+        <div>
+          <h1>Service Registry</h1>
+          <EccClientGa4ghServiceRegistryServices provider={provider} />
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Provider Methods
+
+### getServices()
+
+Retrieves all services from the registry.
+
+```typescript
+getServices(): Promise<ExternalService[]>
+```
+
+### getServiceById()
+
+Gets detailed information about a specific service.
+
+```typescript
+getServiceById(id: string): Promise<ExternalService>
+```
+
+### getServiceTypes()
+
+Retrieves available service types from the registry.
+
+```typescript
+getServiceTypes(): Promise<ServiceType[]>
+```
+
+### getServiceInfo()
+
+Gets information about the service registry itself.
+
+```typescript
+getServiceInfo(): Promise<Service>
+```
+
+
+
+## Type Definitions
+
+### ServiceType
+
+```typescript
+interface ServiceType {
+  group: string;
+  artifact: string;
+  version: string;
+}
+```
+
+### Organization
+
+```typescript
+interface Organization {
+  name: string;
+  url: string;
+}
+```
+
+### Service
+
+```typescript
+interface Service {
+  id: string;
+  name: string;
+  type: ServiceType;
+  description?: string;
+  organization: Organization;
+  contactUrl?: string;
+  documentationUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  environment?: string;
+  version: string;
+}
+```
+
+### ExternalService
+
+```typescript
+interface ExternalService extends Service {
+  url: string;
+}
+```
+
+## Using with Components
+
+### Service Browsing
+
+```tsx copy
+import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+import { EccClientGa4ghServiceRegistryServices } from '@elixir-cloud/service-registry';
+
+function ServiceBrowser() {
+  const provider = new RestServiceRegistryProvider('https://registry.example.com/ga4gh/registry/v1');
+
+  return (
+    <EccClientGa4ghServiceRegistryServices 
+      provider={provider}
+      onEccServicesChanged={(event) => {
+        console.log('Services updated:', event.detail.services.length);
+      }}
+      onEccServiceSelected={(event) => {
+        console.log('Service selected:', event.detail.serviceId);
+      }}
+    />
+  );
+}
+```
+
+### Service Details
+
+```tsx copy
+import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+import { EccClientGa4ghServiceRegistryService } from '@elixir-cloud/service-registry';
+
+function ServiceDetails({ serviceId }) {
+  const provider = new RestServiceRegistryProvider('https://registry.example.com/ga4gh/registry/v1');
+
+  return (
+    <EccClientGa4ghServiceRegistryService 
+      provider={provider}
+      serviceId={serviceId}
+      onEccServiceChanged={(event) => {
+        console.log('Service details updated:', event.detail.service);
+      }}
+    />
+  );
+}
+```
+
+## Custom Providers
+
+For custom use cases, you can extend `RestServiceRegistryProvider` or implement the `ServiceRegistryProvider` interface directly. This is useful for:
+
+- Adding custom authentication
+- Implementing caching or offline support  
+- Connecting to non-standard APIs
+- Adding custom error handling or retry logic
+
+```tsx copy
+// Example: Custom provider with authentication
+class CustomServiceRegistryProvider extends RestServiceRegistryProvider {
+  constructor(baseUrl, apiKey) {
+    super(baseUrl);
+    this.apiKey = apiKey;
+  }
+
+  async fetch(url, options = {}) {
+    return super.fetch(url, {
+      ...options,
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        ...options.headers
+      }
+    });
+  }
+}
+```
+
+For comprehensive patterns and examples, see the [Providers Overview](/docs/providers) documentation.
+
+## Testing
+
+Test your Service Registry provider setup:
+
+```tsx copy
+async function testServiceRegistryProvider(provider) {
+  try {
+    console.log('Testing Service Registry provider...');
+    
+    // Test service info
+    const serviceInfo = await provider.getServiceInfo();
+    console.log('✅ Service info:', serviceInfo.name);
+    
+    // Test services listing
+    const services = await provider.getServices();
+    console.log(`✅ Found ${services.length} services`);
+    
+    // Test service types
+    const types = await provider.getServiceTypes();
+    console.log(`✅ Found ${types.length} service types`);
+    
+    // Test service details if services exist
+    if (services.length > 0) {
+      const service = await provider.getServiceById(services[0].id);
+      console.log(`✅ Service details: ${service.name}`);
+    }
+    
+    console.log('✅ Service Registry provider is working correctly!');
+    return true;
+  } catch (error) {
+    console.error('❌ Service Registry provider test failed:', error);
+    return false;
+  }
+}
+
+// Usage
+const provider = new RestServiceRegistryProvider('https://registry.example.com/ga4gh/registry/v1');
+testServiceRegistryProvider(provider);
+```
+
+<Callout type='tip'>
+  **Next Steps**: Check the [Providers Overview](/docs/providers) for patterns on authentication, error handling, caching, and environment configuration that you can apply to your Service Registry provider.
+</Callout>

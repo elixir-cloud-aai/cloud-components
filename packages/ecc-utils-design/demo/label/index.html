@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./logo-elixir-cloud-aai.svg" type="image/x-icon">
+    <title>ecc-utils-design Label Demo</title>
+    <style>
+      .demo-section {
+        margin-bottom: 2rem;
+      }
+      .input-example {
+        margin-top: 0.5rem;
+        display: block;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-utils-design-label Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../../dist/components/label/index.js";
+      import "../../../dist/components/input/index.js";
+      import { html, render } from "lit";
+
+      render(
+  html`
+          <div class="flex flex-col gap-6">
+            <div class="demo-section">
+              <h2 class="text-xl font-bold mb-2">Basic Label</h2>
+              <ecc-utils-design-label>Default Label</ecc-utils-design-label>
+            </div>
+
+            <div class="demo-section">
+              <h2 class="text-xl font-bold mb-2">Label with For Attribute</h2>
+              <ecc-utils-design-label for="example-input"
+                >Email</ecc-utils-design-label
+              >
+              <input
+                id="example-input"
+                type="email"
+                placeholder="example@email.com"
+                class="input-example"
+              />
+            </div>
+
+            <div class="demo-section">
+              <h2 class="text-xl font-bold mb-2">Disabled Label</h2>
+              <ecc-utils-design-label disabled>Disabled Label</ecc-utils-design-label>
+            </div>
+
+            <div class="demo-section">
+              <h2 class="text-xl font-bold mb-2">Label with Custom Class</h2>
+              <ecc-utils-design-label class="text-blue-500 font-bold"
+                >Custom Styled Label</ecc-utils-design-label
+              >
+            </div>
+
+            <div class="demo-section">
+              <h2 class="text-xl font-bold mb-2">Label with Input Component</h2>
+              <div>
+                <ecc-utils-design-label for="demo-input"
+                  >Username</ecc-utils-design-label
+                >
+                <ecc-utils-design-input
+                  id="demo-input"
+                  placeholder="Enter username"
+                ></ecc-utils-design-input>
+              </div>
+            </div>
+          </div>
+        `,
+  document.querySelector("#demo")
+);
+    </script>
+  </body>
+</html> 

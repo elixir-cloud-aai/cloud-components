@@ -26,6 +26,9 @@ const config: DocsThemeConfig = {
     component: <Footer />,
   },
   gitTimestamp: false,
+  nextThemes: {
+    defaultTheme: 'light'
+  },
   useNextSeoProps() {
     const { asPath } = useRouter()
     

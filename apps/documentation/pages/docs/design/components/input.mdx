@@ -1,0 +1,210 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import Input from '@elixir-cloud/design/react/input';
+import Label from '@elixir-cloud/design/react/label';
+
+# EccUtilsDesignInput Component
+
+<ComponentName
+  tagName='ecc-utils-design-input'
+  reactTagName='EccUtilsDesignInput'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-utils-design-input` component is a versatile, styled text field for form data entry. It supports various input types, placeholder text, and disabled states.
+
+<Callout type='info'>
+  This component is a wrapper around the native HTML `<input>` element, providing consistent styling and custom events.
+</Callout>
+
+## Usage
+
+### Basic Input
+
+This example shows a default text input field.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <Input placeholder="Enter your name..." />
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="input-basic.tsx"
+    import React from 'react';
+    import { EccUtilsDesignInput } from '@elixir-cloud/design/react/input';
+
+    export default function BasicInput() {
+      return (
+        <EccUtilsDesignInput placeholder="Enter your name..." />
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="input-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/input"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <ecc-utils-design-input placeholder="Enter your name..."></ecc-utils-design-input>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Input with Label
+
+This example shows an input field associated with a label.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <div className="flex flex-col gap-2">
+      <Label htmlFor="email-input">Email</Label>
+      <Input id="email-input" type="email" placeholder="user@example.com" />
+    </div>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="input-with-label.tsx"
+    import React from 'react';
+    import { EccUtilsDesignInput } from '@elixir-cloud/design/react/input';
+    import { EccUtilsDesignLabel } from '@elixir-cloud/design/react/label';
+
+    export default function InputWithLabel() {
+      return (
+        <div className="flex flex-col gap-2">
+          <EccUtilsDesignLabel htmlFor="email-input">Email</EccUtilsDesignLabel>
+          <EccUtilsDesignInput id="email-input" type="email" placeholder="user@example.com" />
+        </div>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="input-with-label.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/label"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/input"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <div class="flex flex-col gap-2 p-4">
+          <ecc-utils-design-label for="email-input">Email</ecc-utils-design-label>
+          <ecc-utils-design-input id="email-input" type="email" placeholder="user@example.com"></ecc-utils-design-input>
+        </div>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property      | Type       | Default  | Description                                |
+|---------------|------------|----------|--------------------------------------------|
+| `type`        | `string`   | `"text"` | The type of input (e.g., `text`, `email`). |
+| `placeholder` | `string`   | `""`     | Placeholder text for the input.            |
+| `value`       | `string`   | `""`     | The current value of the input.            |
+| `disabled`    | `boolean`  | `false`  | When `true`, disables the input.           |
+
+### `type`
+Specifies the input type, determining the data format and keyboard layout on mobile devices.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignInput type="password" />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-input type="password"></ecc-utils-design-input>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `placeholder`
+Provides a hint to the user about what information to enter in the input field.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignInput placeholder="Your email address" />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-input placeholder="Your email address"></ecc-utils-design-input>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `value`
+The current value of the input field. Can be used for controlled components in React.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignInput value="pre-filled.value@example.com" />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-input value="pre-filled.value@example.com"></ecc-utils-design-input>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `disabled`
+When `true`, the input is non-interactive and visually de-emphasized.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignInput disabled={true} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-input disabled="true"></ecc-utils-design-input>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Events
+
+| Event Name          | React Event Name     | Detail Type             | Description                                    |
+|--------------------|---------------------|-------------------------|------------------------------------------------|
+| `ecc-input-changed` | `onEccInputChanged` | `{ value: string }`    | Fired when the value of the input changes.     |
+
+### `ecc-input-changed`
+Fires whenever the user types or pastes content into the input.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignInput 
+      onEccInputChanged={(event) => {
+        console.log(event.detail.value);
+      }}
+    />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript copy
+    inputElement.addEventListener('ecc-input-changed', (event) => {
+      console.log('New value:', event.detail.value);
+    });
+    ```
+  </Tabs.Tab>
+</Tabs> 

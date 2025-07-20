@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WES Run Demo</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script
+      type="module"
+      src="../../../dist/index.js"
+    ></script>
+  </head>
+  <body class="p-8">
+    <h1 class="text-2xl font-bold mb-4">Workflow Run Details</h1>
+    <ecc-client-ga4gh-wes-run
+      baseUrl="http://weskit-api-svc.default.svc.cluster.local:5000/ga4gh/wes/v1"
+      runId="170146b2-7384-4c03-b914-ae24760683c6"
+    ></ecc-client-ga4gh-wes-run>
+  </body>
+</html> 
+
+
+<!-- baseUrl="http://localhost:1122"
+runId="00d89c1b-4a5b-4ec8-b310-052b5764476a" -->

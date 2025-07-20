@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <style></style>
+    <title>Service Registry - Service Component</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div id="demo" class="p-10"></div>
+
+    <script type="module">
+      import { html, render } from "lit";
+      import "../../dist/components/service/index.js";
+
+      // Example Service Registry API URL
+      // In a real scenario, this would be the URL to a GA4GH Service Registry implementation
+      const baseUrl = "http://localhost:8082/ga4gh/registry/v1";
+
+      // Get service ID from URL parameter or use a default
+      const urlParams = new URLSearchParams(window.location.search);
+      const serviceId = urlParams.get("id") || "WW7P6Q";
+
+      render(
+        html`
+          <div class="mb-5">
+            <a href="../services/index.html" class="text-blue-500 hover:underline">
+              &larr; Back to Services
+            </a>
+          </div>
+          <h1 class="text-3xl font-bold mb-5">Service Component Demo</h1>
+          <ecc-client-ga4gh-service-registry-service
+            .baseUrl="${baseUrl}"
+            .serviceId="${serviceId}"
+            @ecc-service-changed="${(e) =>
+              console.log("Service data changed:", e.detail)}"
+          ></ecc-client-ga4gh-service-registry-service>
+        `,
+        document.querySelector("#demo")
+      );
+    </script>
+  </body>
+</html>

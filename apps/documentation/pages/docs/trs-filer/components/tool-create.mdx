@@ -1,0 +1,86 @@
+import { Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import ToolCreatePreview from '@/components/packages/trs-filer/ToolCreatePreview'
+
+# EccClientElixirTrsToolCreate Component
+
+<ComponentName
+  tagName='ecc-client-elixir-trs-tool-create'
+  reactTagName='ECCClientElixirTrsToolCreate'
+  version='2.0.0-alpha.4'
+/>
+
+## Overview
+
+The `ecc-client-elixir-trs-tool-create` component provides a form to register a new tool with a GA4GH Tool Registry Service.
+
+## Usage
+
+### Basic Create Form
+
+This example demonstrates the basic tool creation form.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <ToolCreatePreview />
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="tool-create-basic.tsx"
+    import React from 'react';
+    import { ECCClientElixirTrsToolCreate } from '@elixir-cloud/trs-filer/react';
+    import { RestTrsFilerProvider } from '@elixir-cloud/trs-filer/providers';
+
+    export default function ToolCreateBasic() {
+      const provider = new RestTrsFilerProvider({
+        url: 'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
+      });
+
+      return (
+        <ECCClientElixirTrsToolCreate 
+          provider={provider}
+        />
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="tool-create-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/trs-filer@2.0.0-alpha.4"></script>
+      </head>
+      <body>
+        <ecc-client-elixir-trs-tool-create>
+        </ecc-client-elixir-trs-tool-create>
+
+        <script type="module">
+          import { RestTrsFilerProvider } from 'https://esm.sh/@elixir-cloud/trs-filer@2.0.0-alpha.4/providers';
+          
+          const provider = new RestTrsFilerProvider({
+            url: 'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
+          });
+          
+          document.querySelector('ecc-client-elixir-trs-tool-create').provider = provider;
+        </script>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property   | Type                   | Default | Description                                                                       |
+|------------|------------------------|---------|-----------------------------------------------------------------------------------|
+| `provider` | `TrsFilerProvider` | `null`  | Data provider for handling form submission (see [Providers](/docs/trs-filer/providers)) |
+
+## Events
+
+| Event Name                | React Event Name              | Detail Type | Description                           |
+|---------------------------|-------------------------------|-------------|---------------------------------------|
+| `ecc-tool-created`        | `onEccToolCreated`            | `object`    | Fired when a tool is created successfully |
+| `ecc-tool-create-failed`  | `onEccToolCreateFailed`       | `Error`     | Fired when tool creation fails        |
+| `ecc-tool-create-validation-failed` | `onEccToolCreateValidationFailed` | `object`    | Fired on form validation failure    |

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+		<link rel="icon" href="./logo-elixir-cloud-aai.svg" type="image/x-icon">
+    <title>ecc-utils-design Table Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      ecc-button {
+        margin: 0.5rem;
+      }
+    </style>
+  </head>
+  <body class="">
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-button Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../../dist/components/table/index.js";
+      import "../../../dist/components/button/index.js";
+      import { html, render } from "lit";
+
+      render(
+  html`
+          <div class="flex flex-col gap-4">
+            <ecc-utils-design-table>
+              <ecc-utils-design-table-header>
+                <ecc-utils-design-table-row>
+                  <ecc-utils-design-table-head>Name</ecc-utils-design-table-head>
+                  <ecc-utils-design-table-head>Email</ecc-utils-design-table-head>
+                  <ecc-utils-design-table-head>Status</ecc-utils-design-table-head>
+                  <ecc-utils-design-table-head>Actions</ecc-utils-design-table-head>
+                </ecc-utils-design-table-row>
+              </ecc-utils-design-table-header>
+              <ecc-utils-design-table-body>
+                <ecc-utils-design-table-row class="!hover:bg-red-600">
+                  <ecc-utils-design-table-cell>Alice</ecc-utils-design-table-cell>
+                  <ecc-utils-design-table-cell
+                    >alice@example.com</ecc-utils-design-table-cell
+                  >
+                  <ecc-utils-design-table-cell>Active</ecc-utils-design-table-cell>
+                  <ecc-utils-design-table-cell>
+                    <ecc-utils-design-button>Edit</ecc-utils-design-button>
+                    <ecc-utils-design-button>Delete</ecc-utils-design-button>
+                  </ecc-utils-design-table-cell>
+                </ecc-utils-design-table-row>
+                <ecc-utils-design-table-row>
+                  <ecc-utils-design-table-cell>Bob</ecc-utils-design-table-cell>
+                  <ecc-utils-design-table-cell
+                    >bob@example.com</ecc-utils-design-table-cell
+                  >
+                  <ecc-utils-design-table-cell>Inactive</ecc-utils-design-table-cell>
+                  <ecc-utils-design-table-cell> </ecc-utils-design-table-cell>
+                </ecc-utils-design-table-row>
+              </ecc-utils-design-table-body>
+
+              <ecc-utils-design-table-footer>
+                <ecc-utils-design-table-row>
+                  <ecc-utils-design-table-cell
+                    >Footer: 2 users</ecc-utils-design-table-cell
+                  >
+                  <ecc-utils-design-table-cell
+                    ><div>temp</div></ecc-utils-design-table-cell
+                  >
+                </ecc-utils-design-table-row>
+              </ecc-utils-design-table-footer>
+
+              <ecc-utils-design-table-caption
+                >Example Table Caption</ecc-utils-design-table-caption
+              >
+            </ecc-utils-design-table>
+          </div>
+        `,
+  document.querySelector("#demo")
+);
+    </script>
+  </body>
+</html>

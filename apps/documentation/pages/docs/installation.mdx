@@ -2,47 +2,106 @@ import { Tabs, Callout } from 'nextra/components';
 
 # Installation
 
-You can install the ELIXIR Cloud Components (ECC) package via your favorite package manager or use the CDN installation method.
+ELIXIR Cloud Components (ECC) can be installed and used in multiple ways to fit your project's needs. Choose the installation method that best suits your development environment.
 
 <Callout type='info'>
   <div class='text-sm'>
-    The following examples uses `service-name` as a placeholder. Replace it with the desired service
-    name of your use case. You can find the list of available services in the [Supported
+    The following examples use `service-name` as a placeholder. Replace it with the actual service
+    name for your use case. You can find the list of available services in the [Supported
     Services](/docs/introduction#supported-services) section.
   </div>
 </Callout>
 
-## Package Manager
+## Installation Methods
 
-To integrate ECC into your project, install the desired package using your preferred package manager. This is the recommended method for most projects.
+### Package Manager (Recommended)
+
+Install ECC packages using your preferred package manager. This method provides better dependency management, bundling optimization, and TypeScript support.
 
 <Tabs items={['npm', 'yarn', 'pnpm']}>
   <Tabs.Tab>
     ```bash copy /(service-name)/
-    npm i @elixir-cloud/(service-name)
+    npm install @elixir-cloud/(service-name)
     ```
-
   </Tabs.Tab>
   <Tabs.Tab>
     ```bash copy /(service-name)/
     yarn add @elixir-cloud/(service-name)
     ```
-
   </Tabs.Tab>
   <Tabs.Tab>
     ```bash copy /(service-name)/
-    pnpm i @elixir-cloud/(service-name)
+    pnpm add @elixir-cloud/(service-name)
     ```
-
   </Tabs.Tab>
 </Tabs>
 
-## CDN
+### CDN Installation
 
-If you prefer not to use a package manager, you can include the ECC components directly in your HTML file using a CDN. This method is suitable when you don't want to manage dependencies or while using vanilla HTML/JavaScript.
+For quick prototyping or when you prefer not to use a package manager, you can load ECC components directly from a CDN. This method is ideal for vanilla HTML/JavaScript projects.
 
-Paste the following script tag into your HTML file to include the ECC components:
-
-```html copy /(service-name)/
-<script src="https://esm.sh/@elixir-cloud/(service-name)/dist/index.min.js"></script>
+```html copy /(service-name)@(version)/
+<script type="module" src="https://esm.sh/@elixir-cloud/(service-name)@(version)/components/component-name"></script>
 ```
+
+<Callout type='warning'>
+  <div class='text-sm'>
+    When using CDN installation, make sure to specify a version to ensure consistency across deployments.
+  </div>
+</Callout>
+
+## Usage Examples
+
+### React/TypeScript Projects
+
+After installing via package manager, you can import and use components in your React application:
+
+```tsx copy
+import Button from '@elixir-cloud/design/react/button';
+
+export default function App() {
+  return (
+    <div>
+      <h1>My Application</h1>
+      <Button variant="primary">Click me</Button>
+    </div>
+  );
+}
+```
+
+### Vanilla HTML/JavaScript
+
+#### With Package Manager
+
+```javascript copy
+import '@elixir-cloud/design/components/button';
+
+// Use the web component
+document.body.innerHTML = '<ecc-utils-design-button>Click me</ecc-utils-design-button>';
+```
+
+#### With CDN
+
+```html copy
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECC Example</title>
+    <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/button"></script>
+  </head>
+  <body>
+    <h1>My Application</h1>
+    <ecc-utils-design-button>Click me</ecc-utils-design-button>
+  </body>
+</html>
+```
+
+## Next Steps
+
+After installation, you can:
+
+- Explore the [Component Documentation](/docs/design/components) to see all available components
+- Learn about [Customization](/docs/customization) to adapt components to your design system
+- Check out specific service documentation for advanced usage patterns

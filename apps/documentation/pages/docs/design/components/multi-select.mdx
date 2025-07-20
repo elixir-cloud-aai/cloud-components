@@ -1,0 +1,395 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import MultiSelect from '@elixir-cloud/design/react/multi-select';
+import MultiSelectTrigger from '@elixir-cloud/design/react/multi-select-trigger';
+import MultiSelectContent from '@elixir-cloud/design/react/multi-select-content';
+import MultiSelectItem from '@elixir-cloud/design/react/multi-select-item';
+
+# EccUtilsDesignMultiSelect Component
+
+<ComponentName
+  tagName='ecc-utils-design-multi-select'
+  reactTagName='EccUtilsDesignMultiSelect'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-utils-design-multi-select` component provides a way to select multiple options from a dropdown list. It features a searchable interface, keyboard navigation, and supports pre-selected values. The component displays selected items as removable badges in the trigger.
+
+<Callout type='info'>
+  This component is composed of `MultiSelect`, `MultiSelectTrigger`, `MultiSelectContent`, and `MultiSelectItem` to create a complete multi-select interface.
+</Callout>
+
+## Usage
+
+### Basic Multi-Select
+
+This example shows a basic multi-select with a list of options.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <MultiSelect placeholder="Select fruits...">
+      <MultiSelectTrigger />
+      <MultiSelectContent>
+        <MultiSelectItem value="apple">Apple</MultiSelectItem>
+        <MultiSelectItem value="banana">Banana</MultiSelectItem>
+        <MultiSelectItem value="orange">Orange</MultiSelectItem>
+        <MultiSelectItem value="strawberry">Strawberry</MultiSelectItem>
+        <MultiSelectItem value="blueberry">Blueberry</MultiSelectItem>
+      </MultiSelectContent>
+    </MultiSelect>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="multi-select-basic.tsx"
+    import React from 'react';
+    import {
+      EccUtilsDesignMultiSelect,
+      EccUtilsDesignMultiSelectTrigger,
+      EccUtilsDesignMultiSelectContent,
+      EccUtilsDesignMultiSelectItem,
+    } from '@elixir-cloud/design/react/multi-select';
+
+    export default function BasicMultiSelect() {
+      return (
+        <EccUtilsDesignMultiSelect placeholder="Select fruits...">
+          <EccUtilsDesignMultiSelectTrigger />
+          <EccUtilsDesignMultiSelectContent>
+            <EccUtilsDesignMultiSelectItem value="apple">Apple</EccUtilsDesignMultiSelectItem>
+            <EccUtilsDesignMultiSelectItem value="banana">Banana</EccUtilsDesignMultiSelectItem>
+            <EccUtilsDesignMultiSelectItem value="orange">Orange</EccUtilsDesignMultiSelectItem>
+            <EccUtilsDesignMultiSelectItem value="strawberry">Strawberry</EccUtilsDesignMultiSelectItem>
+            <EccUtilsDesignMultiSelectItem value="blueberry">Blueberry</EccUtilsDesignMultiSelectItem>
+          </EccUtilsDesignMultiSelectContent>
+        </EccUtilsDesignMultiSelect>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="multi-select-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/multi-select"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <ecc-utils-design-multi-select placeholder="Select fruits...">
+          <ecc-utils-design-multi-select-trigger></ecc-utils-design-multi-select-trigger>
+          <ecc-utils-design-multi-select-content>
+            <ecc-utils-design-multi-select-item value="apple">Apple</ecc-utils-design-multi-select-item>
+            <ecc-utils-design-multi-select-item value="banana">Banana</ecc-utils-design-multi-select-item>
+            <ecc-utils-design-multi-select-item value="orange">Orange</ecc-utils-design-multi-select-item>
+            <ecc-utils-design-multi-select-item value="strawberry">Strawberry</ecc-utils-design-multi-select-item>
+            <ecc-utils-design-multi-select-item value="blueberry">Blueberry</ecc-utils-design-multi-select-item>
+          </ecc-utils-design-multi-select-content>
+        </ecc-utils-design-multi-select>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### With Pre-selected Values
+
+This example shows a multi-select with some values pre-selected.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <MultiSelect value={['javascript', 'typescript']} placeholder="Select technologies...">
+      <MultiSelectTrigger />
+      <MultiSelectContent>
+        <MultiSelectItem value="javascript">JavaScript</MultiSelectItem>
+        <MultiSelectItem value="typescript">TypeScript</MultiSelectItem>
+        <MultiSelectItem value="python">Python</MultiSelectItem>
+        <MultiSelectItem value="java">Java</MultiSelectItem>
+        <MultiSelectItem value="rust">Rust</MultiSelectItem>
+      </MultiSelectContent>
+    </MultiSelect>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="multi-select-preselected.tsx"
+    import React from 'react';
+    import {
+      EccUtilsDesignMultiSelect,
+      EccUtilsDesignMultiSelectTrigger,
+      EccUtilsDesignMultiSelectContent,
+      EccUtilsDesignMultiSelectItem,
+    } from '@elixir-cloud/design/react/multi-select';
+
+    export default function PreselectedMultiSelect() {
+      return (
+        <EccUtilsDesignMultiSelect 
+          value={['javascript', 'typescript']} 
+          placeholder="Select technologies..."
+        >
+          <EccUtilsDesignMultiSelectTrigger />
+          <EccUtilsDesignMultiSelectContent>
+            <EccUtilsDesignMultiSelectItem value="javascript">JavaScript</EccUtilsDesignMultiSelectItem>
+            <EccUtilsDesignMultiSelectItem value="typescript">TypeScript</EccUtilsDesignMultiSelectItem>
+            <EccUtilsDesignMultiSelectItem value="python">Python</EccUtilsDesignMultiSelectItem>
+            <EccUtilsDesignMultiSelectItem value="java">Java</EccUtilsDesignMultiSelectItem>
+            <EccUtilsDesignMultiSelectItem value="rust">Rust</EccUtilsDesignMultiSelectItem>
+          </EccUtilsDesignMultiSelectContent>
+        </EccUtilsDesignMultiSelect>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="multi-select-preselected.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/multi-select"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <ecc-utils-design-multi-select placeholder="Select technologies...">
+          <ecc-utils-design-multi-select-trigger></ecc-utils-design-multi-select-trigger>
+          <ecc-utils-design-multi-select-content>
+            <ecc-utils-design-multi-select-item value="javascript">JavaScript</ecc-utils-design-multi-select-item>
+            <ecc-utils-design-multi-select-item value="typescript">TypeScript</ecc-utils-design-multi-select-item>
+            <ecc-utils-design-multi-select-item value="python">Python</ecc-utils-design-multi-select-item>
+            <ecc-utils-design-multi-select-item value="java">Java</ecc-utils-design-multi-select-item>
+            <ecc-utils-design-multi-select-item value="rust">Rust</ecc-utils-design-multi-select-item>
+          </ecc-utils-design-multi-select-content>
+        </ecc-utils-design-multi-select>
+        
+        <script>
+          // Set pre-selected values
+          const multiSelect = document.querySelector('ecc-utils-design-multi-select');
+          multiSelect.value = ['javascript', 'typescript'];
+        </script>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Components
+
+| Component             | Tag Name                                  | Description                                        |
+|-----------------------|-------------------------------------------|----------------------------------------------------|
+| `MultiSelect`         | `ecc-utils-design-multi-select`          | The root container for the multi-select.          |
+| `MultiSelectTrigger`  | `ecc-utils-design-multi-select-trigger`  | The clickable trigger that shows selected values.  |
+| `MultiSelectContent`  | `ecc-utils-design-multi-select-content`  | The dropdown content containing the options.       |
+| `MultiSelectItem`     | `ecc-utils-design-multi-select-item`     | An individual selectable option.                   |
+
+## Properties
+
+### `EccUtilsDesignMultiSelect`
+
+| Property      | Type       | Default              | Description                                        |
+|---------------|------------|----------------------|----------------------------------------------------|
+| `value`       | `string[]` | `[]`                 | Array of selected values.                          |
+| `placeholder` | `string`   | `"Select options..."` | Placeholder text when no options are selected.    |
+| `disabled`    | `boolean`  | `false`              | When `true`, disables the multi-select.           |
+| `name`        | `string`   | `""`                 | The name attribute for form submissions.          |
+
+#### `value`
+Controls the selected values in the multi-select. This should be an array of strings matching the values of selected items.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelect value={['apple', 'banana']}>
+      ...
+    </EccUtilsDesignMultiSelect>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select>
+      <script>
+        document.querySelector('ecc-utils-design-multi-select').value = ['apple', 'banana'];
+      </script>
+    </ecc-utils-design-multi-select>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `placeholder`
+Text displayed when no options are selected, providing a hint to users about what to select.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelect placeholder="Choose your favorite fruits...">
+      ...
+    </EccUtilsDesignMultiSelect>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select placeholder="Choose your favorite fruits...">
+      ...
+    </ecc-utils-design-multi-select>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `disabled`
+When `true`, disables the entire multi-select, preventing user interaction.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelect disabled={true}>
+      ...
+    </EccUtilsDesignMultiSelect>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select disabled="true">
+      ...
+    </ecc-utils-design-multi-select>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `name`
+The name attribute used when submitting the multi-select as part of a form.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelect name="preferences">
+      ...
+    </EccUtilsDesignMultiSelect>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select name="preferences">
+      ...
+    </ecc-utils-design-multi-select>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `EccUtilsDesignMultiSelectTrigger`
+
+| Property    | Type      | Default | Description                                        |
+|-------------|-----------|---------|--------------------------------------------------- |
+| `disabled`  | `boolean` | `false` | When `true`, disables the trigger.                |
+
+#### `disabled`
+When `true`, disables the trigger button, preventing the dropdown from opening.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelectTrigger disabled={true} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select-trigger disabled="true"></ecc-utils-design-multi-select-trigger>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `EccUtilsDesignMultiSelectContent`
+
+| Property    | Type      | Default    | Description                                     |
+|-------------|-----------|------------|-------------------------------------------------|
+| `position`  | `string`  | `"popper"` | The positioning strategy for the dropdown.     |
+
+#### `position`
+Controls how the dropdown content is positioned relative to the trigger.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelectContent position="item-aligned">
+      ...
+    </EccUtilsDesignMultiSelectContent>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select-content position="item-aligned">
+      ...
+    </ecc-utils-design-multi-select-content>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `EccUtilsDesignMultiSelectItem`
+
+| Property    | Type      | Default | Description                                        |
+|-------------|-----------|---------|--------------------------------------------------- |
+| `value`     | `string`  | `""`    | A unique value for the item.                      |
+| `disabled`  | `boolean` | `false` | When `true`, disables the item.                   |
+
+#### `value`
+A unique identifier for the item. This value is used in the multi-select's `value` array when the item is selected.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelectItem value="apple">Apple</EccUtilsDesignMultiSelectItem>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select-item value="apple">Apple</ecc-utils-design-multi-select-item>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `disabled`
+When `true`, prevents the item from being selected or deselected.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelectItem value="premium" disabled={true}>Premium Option</EccUtilsDesignMultiSelectItem>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-multi-select-item value="premium" disabled="true">Premium Option</ecc-utils-design-multi-select-item>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Events
+
+### `EccUtilsDesignMultiSelect`
+
+| Event Name          | React Event Name     | Detail Type               | Description                                  |
+|--------------------|---------------------|---------------------------|----------------------------------------------|
+| `ecc-input-changed` | `onEccInputChanged` | `{ value: string[] }`     | Fired when the selection changes.           |
+
+### `ecc-input-changed`
+This event is fired when the user selects or deselects options.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignMultiSelect 
+      onEccInputChanged={(event) => {
+        console.log('Selected values:', event.detail.value);
+      }}
+    >
+      ...
+    </EccUtilsDesignMultiSelect>
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    element.addEventListener('ecc-input-changed', (event) => {
+      console.log('Selected values:', event.detail.value);
+    });
+    ```
+  </Tabs.Tab>
+</Tabs> 

@@ -1,0 +1,355 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import Select from '@elixir-cloud/design/react/select';
+import SelectValue from '@elixir-cloud/design/react/select-value';
+import SelectTrigger from '@elixir-cloud/design/react/select-trigger';
+import SelectContent from '@elixir-cloud/design/react/select-content';
+import SelectGroup from '@elixir-cloud/design/react/select-group';
+import SelectLabel from '@elixir-cloud/design/react/select-label';
+import SelectItem from '@elixir-cloud/design/react/select-item';
+import SelectSeparator from '@elixir-cloud/design/react/select-separator';
+
+# EccUtilsDesignSelect Component
+
+<ComponentName
+  tagName='ecc-utils-design-select'
+  reactTagName='EccUtilsDesignSelect'
+  version='2.0.0-alpha.6'
+/>
+
+## Overview
+
+The `ecc-utils-design-select` component provides a flexible and accessible dropdown menu for selecting a value from a set of options. It's a compound component, giving you full control over its structure and behavior.
+
+<Callout type='info'>
+  This component is composed of several parts that work together, including a trigger, content area, items, labels, and separators.
+</Callout>
+
+## Usage
+
+### Basic Select
+
+This example shows a basic select with a few options.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <Select>
+      <SelectTrigger className="part:w-[180px]">
+        <SelectValue placeholder="Select a fruit" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="apple">Apple</SelectItem>
+        <SelectItem value="banana">Banana</SelectItem>
+        <SelectItem value="blueberry">Blueberry</SelectItem>
+      </SelectContent>
+    </Select>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="select-basic.tsx"
+    import React from 'react';
+    import {
+      EccUtilsDesignSelect,
+      EccUtilsDesignSelectValue,
+      EccUtilsDesignSelectTrigger,
+      EccUtilsDesignSelectContent,
+      EccUtilsDesignSelectItem
+    } from '@elixir-cloud/design/react/select';
+
+    export default function BasicSelect() {
+      return (
+        <EccUtilsDesignSelect>
+          <EccUtilsDesignSelectTrigger className="part:w-[180px]">
+            <EccUtilsDesignSelectValue placeholder="Select a fruit" />
+          </EccUtilsDesignSelectTrigger>
+          <EccUtilsDesignSelectContent>
+            <EccUtilsDesignSelectItem value="apple">Apple</EccUtilsDesignSelectItem>
+            <EccUtilsDesignSelectItem value="banana">Banana</EccUtilsDesignSelectItem>
+            <EccUtilsDesignSelectItem value="blueberry">Blueberry</EccUtilsDesignSelectItem>
+          </EccUtilsDesignSelectContent>
+        </EccUtilsDesignSelect>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="select-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/select"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <ecc-utils-design-select>
+          <ecc-utils-design-select-trigger class="w-[180px]">
+            <ecc-utils-design-select-value placeholder="Select a fruit"></ecc-utils-design-select-value>
+          </ecc-utils-design-select-trigger>
+          <ecc-utils-design-select-content>
+            <ecc-utils-design-select-item value="apple">Apple</ecc-utils-design-select-item>
+            <ecc-utils-design-select-item value="banana">Banana</ecc-utils-design-select-item>
+            <ecc-utils-design-select-item value="blueberry">Blueberry</ecc-utils-design-select-item>
+          </ecc-utils-design-select-content>
+        </ecc-utils-design-select>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Select with Groups
+
+This example shows how to group options using labels and separators.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <Select>
+      <SelectTrigger className="part:w-[280px]">
+        <SelectValue placeholder="Select a timezone" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>North America</SelectLabel>
+          <SelectItem value="est">Eastern Standard Time (EST)</SelectItem>
+          <SelectItem value="pst">Pacific Standard Time (PST)</SelectItem>
+        </SelectGroup>
+        <SelectSeparator />
+        <SelectGroup>
+          <SelectLabel>Europe</SelectLabel>
+          <SelectItem value="gmt">Greenwich Mean Time (GMT)</SelectItem>
+          <SelectItem value="cet">Central European Time (CET)</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="select-grouped.tsx"
+    import React from 'react';
+    import {
+      EccUtilsDesignSelect,
+      EccUtilsDesignSelectValue,
+      EccUtilsDesignSelectTrigger,
+      EccUtilsDesignSelectContent,
+      EccUtilsDesignSelectGroup,
+      EccUtilsDesignSelectLabel,
+      EccUtilsDesignSelectItem,
+      EccUtilsDesignSelectSeparator
+    } from '@elixir-cloud/design/react/select';
+
+    export default function GroupedSelect() {
+      return (
+        <EccUtilsDesignSelect>
+          <EccUtilsDesignSelectTrigger className="part:w-[280px]">
+            <EccUtilsDesignSelectValue placeholder="Select a timezone" />
+          </EccUtilsDesignSelectTrigger>
+          <EccUtilsDesignSelectContent>
+            <EccUtilsDesignSelectGroup>
+              <EccUtilsDesignSelectLabel>North America</EccUtilsDesignSelectLabel>
+              <EccUtilsDesignSelectItem value="est">Eastern Standard Time (EST)</EccUtilsDesignSelectItem>
+              <EccUtilsDesignSelectItem value="pst">Pacific Standard Time (PST)</EccUtilsDesignSelectItem>
+            </EccUtilsDesignSelectGroup>
+            <EccUtilsDesignSelectSeparator />
+            <EccUtilsDesignSelectGroup>
+              <EccUtilsDesignSelectLabel>Europe</EccUtilsDesignSelectLabel>
+              <EccUtilsDesignSelectItem value="gmt">Greenwich Mean Time (GMT)</EccUtilsDesignSelectItem>
+              <EccUtilsDesignSelectItem value="cet">Central European Time (CET)</EccUtilsDesignSelectItem>
+            </EccUtilsDesignSelectGroup>
+          </EccUtilsDesignSelectContent>
+        </EccUtilsDesignSelect>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="select-grouped.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.6/components/select"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <ecc-utils-design-select>
+          <ecc-utils-design-select-trigger class="w-[280px]">
+            <ecc-utils-design-select-value placeholder="Select a timezone"></ecc-utils-design-select-value>
+          </ecc-utils-design-select-trigger>
+          <ecc-utils-design-select-content>
+            <ecc-utils-design-select-group>
+              <ecc-utils-design-select-label>North America</ecc-utils-design-select-label>
+              <ecc-utils-design-select-item value="est">Eastern Standard Time (EST)</ecc-utils-design-select-item>
+              <ecc-utils-design-select-item value="pst">Pacific Standard Time (PST)</ecc-utils-design-select-item>
+            </ecc-utils-design-select-group>
+            <ecc-utils-design-select-separator></ecc-utils-design-select-separator>
+            <ecc-utils-design-select-group>
+              <ecc-utils-design-select-label>Europe</ecc-utils-design-select-label>
+              <ecc-utils-design-select-item value="gmt">Greenwich Mean Time (GMT)</ecc-utils-design-select-item>
+              <ecc-utils-design-select-item value="cet">Central European Time (CET)</ecc-utils-design-select-item>
+            </ecc-utils-design-select-group>
+          </ecc-utils-design-select-content>
+        </ecc-utils-design-select>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Components
+
+The `Select` is built by combining these components:
+
+| Component         | Tag Name                          | Description                               |
+|-------------------|-----------------------------------|-------------------------------------------|
+| `Select`          | `ecc-utils-design-select`         | The root container for the select.        |
+| `SelectValue`     | `ecc-utils-design-select-value`   | Displays the selected value or a placeholder. |
+| `SelectTrigger`   | `ecc-utils-design-select-trigger` | The button that opens the select dropdown. |
+| `SelectContent`   | `ecc-utils-design-select-content` | The container for the select options.     |
+| `SelectGroup`     | `ecc-utils-design-select-group`   | A container for grouping options.         |
+| `SelectLabel`     | `ecc-utils-design-select-label`   | A title for a group of options.           |
+| `SelectItem`      | `ecc-utils-design-select-item`    | A single option in the select dropdown.   |
+| `SelectSeparator` | `ecc-utils-design-select-separator`| A visual separator between groups.        |
+
+## Properties
+
+### `EccUtilsDesignSelect`
+
+| Property    | Type      | Default | Description                               |
+|-------------|-----------|---------|-------------------------------------------|
+| `value`     | `string`  | `""`    | The value of the currently selected option. |
+| `disabled`  | `boolean` | `false` | When `true`, disables the select.         |
+
+#### `value`
+Controls the currently selected option. Should match the `value` of one of the SelectItem components.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignSelect value="apple">
+      ...
+    </EccUtilsDesignSelect>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-select value="apple">
+      ...
+    </ecc-utils-design-select>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `disabled`
+When `true`, disables the entire select, preventing user interaction.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignSelect disabled={true}>
+      ...
+    </EccUtilsDesignSelect>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-select disabled="true">
+      ...
+    </ecc-utils-design-select>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `EccUtilsDesignSelectItem`
+
+| Property    | Type      | Default | Description                               |
+|-------------|-----------|---------|-------------------------------------------|
+| `value`     | `string`  | `""`    | The unique value for this option.         |
+| `disabled`  | `boolean` | `false` | When `true`, this option cannot be selected. |
+
+#### `value`
+A unique identifier for the option. This value is used when the item is selected.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignSelectItem value="apple">Apple</EccUtilsDesignSelectItem>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-select-item value="apple">Apple</ecc-utils-design-select-item>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `disabled`
+When `true`, prevents the option from being selected and visually indicates it's unavailable.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignSelectItem value="premium" disabled={true}>Premium Option</EccUtilsDesignSelectItem>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-select-item value="premium" disabled="true">Premium Option</ecc-utils-design-select-item>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `EccUtilsDesignSelectValue`
+
+| Property      | Type     | Default            | Description                                  |
+|---------------|----------|--------------------|----------------------------------------------|
+| `placeholder` | `string` | `"Select an option"` | Text to display when no value is selected.   |
+
+#### `placeholder`
+Text displayed when no option is selected, providing guidance to users.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignSelectValue placeholder="Choose a fruit..." />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-select-value placeholder="Choose a fruit..."></ecc-utils-design-select-value>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Events
+
+### `EccUtilsDesignSelect`
+
+| Event Name          | React Event Name     | Detail Type             | Description                                  |
+|--------------------|---------------------|-------------------------|----------------------------------------------|
+| `ecc-input-changed` | `onEccInputChanged` | `{ value: string }`     | Fired when an option is selected.            |
+
+### `ecc-input-changed`
+This event is fired when the user selects a new option from the dropdown.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignSelect 
+      onEccInputChanged={(event) => {
+        console.log('Selected value:', event.detail.value);
+      }}
+    >
+      ...
+    </EccUtilsDesignSelect>
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    element.addEventListener('ecc-input-changed', (event) => {
+      console.log('Selected value:', event.detail.value);
+    });
+    ```
+  </Tabs.Tab>
+</Tabs> 

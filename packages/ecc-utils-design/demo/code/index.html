@@ -2,44 +2,183 @@
 <html lang="en-GB">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="./logo-elixir-cloud-aai.svg" type="image/x-icon" />
-    <style></style>
-    <title>ecc-utils-design</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="icon"
+      href="../assets/logo-elixir-cloud-aai.svg"
+      type="image/x-icon"
+    />
+    <title>ecc-utils-design Code Demo</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+    />
+    <style>
+      .section {
+        margin-bottom: 2rem;
+      }
+      .example-container {
+        margin: 1rem 0;
+      }
+    </style>
   </head>
-  <body>
+  <body class="dark">
     <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-utils-design Code Demo</h1>
       <div id="demo"></div>
     </div>
-    <script type="module">
-      import { html, render } from "lit";
-      import "../../dist/components/code/index.js";
 
-      const code = `doe: "a deer, a female deer"
-ray: "a drop of golden sun"
-pi: 3.14159
-xmas: true
-french-hens: 3
-calling-birds:
-  - huey
-  - dewey
-  - louie
-  fred
-xmas-fifth-day:
-  calling-birds: four
-  french-hens: 3
-  golden-rings: 5
-  partridges:
-    count: 1
-    location: "a pear tree"
-  turtle-doves: two
-      `;
+    <script type="module">
+      import "../../../dist/components/code/index.js";
+      import { html, render } from "lit";
+
+      // Sample JSON for the code editor
+      const jsonSample = `{
+  "id": "tool123",
+  "name": "Genome Analysis Tool",
+  "version": "1.0.0",
+  "description": "A tool for analyzing genomic data",
+  "author": "ELIXIR Cloud",
+  "license": "MIT",
+  "inputs": [
+    {
+      "id": "genome_file",
+      "type": "File",
+      "format": "FASTQ",
+      "required": true
+    },
+    {
+      "id": "reference_genome",
+      "type": "File",
+      "format": "FASTA",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "id": "analysis_result",
+      "type": "File",
+      "format": "JSON"
+    }
+  ]
+}`;
+
+      // Sample YAML for the code editor
+      const yamlSample = `version: '1.0'
+services:
+  app:
+    image: elixir/genome-tool:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./data:/app/data
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M`;
+
+      // Sample Shell script
+      const shellSample = `#!/bin/bash
+# A simple script to run genomic analysis
+
+# Check if input file exists
+if [ ! -f "$1" ]; then
+  echo "Error: Input file not found!"
+  exit 1
+fi
+
+# Run the analysis
+echo "Running analysis on $1..."
+./analyze.py --input $1 --output results.txt
+
+# Check if analysis was successful
+if [ $? -eq 0 ]; then
+  echo "Analysis completed successfully!"
+else
+  echo "Analysis failed!"
+  exit 1
+fi`;
 
       render(
-        html`<ecc-utils-design-code
-          language="yaml"
-          value=${code}
-        ></ecc-utils-design-code>`,
+        html`
+          <div class="flex flex-col gap-8">
+            <!-- Basic JSON Code Editor -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">JSON Editor</h2>
+              <p class="text-gray-600 mb-4">
+                A simple code editor for JSON with syntax highlighting.
+              </p>
+              <div class="example-container">
+                <ecc-utils-design-code
+                  label="Tool Configuration"
+                  language="json"
+                  value=${jsonSample}
+                ></ecc-utils-design-code>
+              </div>
+            </div>
+
+            <!-- YAML Code Editor -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">YAML Editor</h2>
+              <p class="text-gray-600 mb-4">
+                Code editor with YAML syntax highlighting.
+              </p>
+              <div class="example-container">
+                <ecc-utils-design-code
+                  label="Deployment Configuration"
+                  language="yaml"
+                  value=${yamlSample}
+                ></ecc-utils-design-code>
+              </div>
+            </div>
+
+            <!-- Disabled Code Editor -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Read-Only Editor</h2>
+              <p class="text-gray-600 mb-4">
+                A disabled code editor for displaying code without allowing edits.
+              </p>
+              <div class="example-container">
+                <ecc-utils-design-code
+                  label="Example Shell Script"
+                  language="sh"
+                  value=${shellSample}
+                  disabled
+                ></ecc-utils-design-code>
+              </div>
+            </div>
+            <!-- Custom Styled Editor -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Custom Styled Editor</h2>
+              <p class="text-gray-600 mb-4">
+                A code editor with custom styling applied.
+              </p>
+              <div class="example-container">
+                <ecc-utils-design-code
+                  label="Custom Styled JSON"
+                  language="json"
+                  value=${`${jsonSample.substring(0, 150)}...`}
+                  class="border-primary shadow-md"
+                ></ecc-utils-design-code>
+              </div>
+            </div>
+
+            <!-- Empty Editor -->
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Empty Editor</h2>
+              <p class="text-gray-600 mb-4">An empty code editor for user input.</p>
+              <div class="example-container">
+                <ecc-utils-design-code
+                  label="Enter your code"
+                  language="json"
+                ></ecc-utils-design-code>
+              </div>
+            </div>
+          </div>
+        `,
         document.querySelector("#demo")
       );
     </script>

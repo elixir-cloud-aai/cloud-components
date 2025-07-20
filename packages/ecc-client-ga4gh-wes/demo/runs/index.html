@@ -1,29 +1,24 @@
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <style>
-      body {
-        background: #fafafa;
-      }
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WES Runs Demo</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script
+      type="module"
+      src="../../../dist/index.js"
+    ></script>
   </head>
-  <title>ecc-client-ga4gh-wes-runs</title>
-  <body>
-    <div id="demo"></div>
-
-    <script type="module">
-      import { html, render } from "lit";
-      import "../../dist/components/runs/index.js";
-
-      // const baseURL = "http://localhost:8090/ga4gh/wes/v1";
-      const pageSize = 10;
-      const filter = false;
-      // .baseURL="${baseURL}"
-      render(
-        html`<ecc-client-ga4gh-wes-runs .pageSize="${pageSize}" .filter=${filter} />`,
-        document.querySelector("#demo")
-      );
-    </script>
+  <body class="p-8">
+    <h1 class="text-2xl font-bold mb-4">Workflow Runs</h1>
+    <ecc-client-ga4gh-wes-runs
+      baseUrl="http://weskit-api-svc.default.svc.cluster.local:5000/ga4gh/wes/v1"
+      pageSize="5"
+      filter
+    ></ecc-client-ga4gh-wes-runs>
   </body>
-</html>
+</html> 
