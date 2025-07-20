@@ -200,6 +200,18 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: Remove 'v' from RELEASE_VERSION
+        run: |
+          echo "Original RELEASE_VERSION: $RELEASE_VERSION"
+          RELEASE_VERSION=$(echo "$RELEASE_VERSION" | sed 's/^v//')
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_ENV
+        shell: bash
 
       - name: Setup Node.js 20.x
         uses: actions/setup-node@v3
@@ -212,8 +224,83 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Update internal dependencies
+        run: |
+          # Read ignore list from changeset config
+          IGNORE_PACKAGES=$(node -e "
+            const config = require('./.changeset/config.json');
+            const ignoreList = config.ignore || [];
+            console.log(ignoreList.join(','));
+          ")
+
+          echo "Ignore list: $IGNORE_PACKAGES"
+          echo "Updating internal @elixir-cloud dependencies to version $RELEASE_VERSION"
+
+          # Only process package.json files in workspace directories (apps/* and packages/*)
+          for workspace_dir in apps packages; do
+            if [ -d "$workspace_dir" ]; then
+              find "$workspace_dir" -maxdepth 2 -name "package.json" -not -path "*/node_modules/*" | while read package_file; do
+                # Extract package name from package.json
+                PACKAGE_NAME=$(node -e "
+                  try {
+                    const pkg = require('./$package_file');
+                    console.log(pkg.name || '');
+                  } catch(e) {
+                    console.log('');
+                  }
+                ")
+
+                # Check if package should be processed (not in ignore list and starts with @elixir-cloud)
+                if [ -n "$PACKAGE_NAME" ]; then
+                  SHOULD_IGNORE=$(echo "$IGNORE_PACKAGES" | grep -q "$PACKAGE_NAME" && echo "true" || echo "false")
+                  IS_ELIXIR_CLOUD=$(echo "$PACKAGE_NAME" | grep -q "^@elixir-cloud/" && echo "true" || echo "false")
+
+                  if [ "$SHOULD_IGNORE" = "false" ] && [ "$IS_ELIXIR_CLOUD" = "true" ]; then
+                    echo "Updating internal dependencies in $PACKAGE_NAME ($package_file)"
+
+                    # Update dependencies, devDependencies, and peerDependencies
+                    node -e "
+                      const fs = require('fs');
+                      const pkg = JSON.parse(fs.readFileSync('./$package_file', 'utf8'));
+                      let updated = false;
+
+                      // Function to update dependencies in a section
+                      const updateDepsSection = (section, sectionName) => {
+                        if (pkg[section]) {
+                          Object.keys(pkg[section]).forEach(depName => {
+                            if (depName.startsWith('@elixir-cloud/')) {
+                              // Check if this dependency is not in ignore list
+                              const ignoreList = '$IGNORE_PACKAGES'.split(',');
+                              const shouldIgnoreDep = ignoreList.includes(depName);
+
+                              if (!shouldIgnoreDep && pkg[section][depName] !== '$RELEASE_VERSION') {
+                                console.log(\`  Updating \${depName} in \${sectionName}: \${pkg[section][depName]} -> $RELEASE_VERSION\`);
+                                pkg[section][depName] = '$RELEASE_VERSION';
+                                updated = true;
+                              }
+                            }
+                          });
+                        }
+                      };
+
+                      // Update all dependency sections
+                      updateDepsSection('dependencies', 'dependencies');
+                      updateDepsSection('devDependencies', 'devDependencies');
+                      updateDepsSection('peerDependencies', 'peerDependencies');
+
+                      // Write back if any updates were made
+                      if (updated) {
+                        fs.writeFileSync('./$package_file', JSON.stringify(pkg, null, 2) + '\n');
+                      }
+                    "
+                  fi
+                fi
+              done
+            fi
+          done
+
       - name: Build Packages
         run: npm run build
 
       - name: Publish to npm
-        run: echo "Publishing to npm..."
+        run: npm run release
