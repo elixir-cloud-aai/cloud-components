@@ -135,8 +135,15 @@ jobs:
 
           echo "Ignore list: $IGNORE_PACKAGES"
 
-          # Find all package.json files and update versions
-          find . -name "package.json" -not -path "./node_modules/*" -not -path "./.git/*" | while read package_file; do
+          # Find all package.json files and update versions, excluding all node_modules directories
+          find . -name "package.json" \
+            -not -path "*/node_modules/*" \
+            -not -path "./.git/*" \
+            -not -path "./.changeset/*" \
+            -not -path "./.github/*" \
+            -not -path "./.husky/*" \
+            -not -path "./.turbo/*" | while read package_file; do
+
             if [ "$package_file" != "./package.json" ]; then
               # Extract package name from package.json
               PACKAGE_NAME=$(node -e "
@@ -169,6 +176,7 @@ jobs:
               fi
             fi
           done
+
 
       - name: Commit version
         run: |
