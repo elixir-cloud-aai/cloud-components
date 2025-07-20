@@ -2,47 +2,25 @@ import { Callout } from 'nextra/components'
 
 # Cloud Registry
 
-The Elixir Cloud Registry package provides web components for managing and creating service registrations in the Elixir Cloud ecosystem. These components enable developers to register new services and manage existing service entries through an intuitive interface.
-
-<Callout type='info'>
-  This package is designed to work with Elixir Cloud Registry implementations and provides extended functionality beyond the standard GA4GH Service Registry specification.
-</Callout>
-
-## Installation
-
-<Callout type='info'>
-  The following examples use `cloud-registry` as the package name. You can find installation instructions in the [Installation Guide](/docs/installation).
-</Callout>
+The `Cloud Registry` package provides web components for managing and creating service registrations in the Elixir Cloud ecosystem. This package extends the GA4GH Service Registry API to allow creation of resources.
 
 ## Package Information
 
 - **Package**: `@elixir-cloud/cloud-registry`
 - **Version**: `2.0.0-alpha.6`
-- **Repository**: [GitHub](https://github.com/elixir-cloud-aai/cloud-components)
+- **Standard**: [Elixir Cloud & AAI v1.0.0](https://github.com/ga4gh-discovery/ga4gh-service-registry/blob/8c45be52940db92c2fa1cd821519c271c22b1c4c/service-registry.yaml)
 
-## Components
+## Features
 
-The Cloud Registry package includes the following components:
+- **Service Registration**: Complete form interface for registering new services.
+- **Validation**: Built-in form validation with real-time feedback.
+- **Advanced Fields**: Support for optional and advanced service metadata.
+- **Standard Compliance**: Works with Elixir Cloud Registry implementations.
 
-### Service Create Component
-A comprehensive form component for creating new service registrations in the Cloud Registry, with validation and error handling.
+## Available Components
 
-## Key Features
+- [`<ecc-client-elixir-cloud-registry-service-create>`](./components/service-create): A component for creating new service registrations.
+- [`<ecc-client-ga4gh-service-registry-services>`](../service-registry/components/services): A component for listing existing service registrations.
+- [`<ecc-client-ga4gh-service-registry-service>`](../service-registry/components/service): A component for displaying details of a specific service.
 
-- **Service Registration**: Complete form interface for registering new services
-- **Validation**: Built-in form validation with real-time feedback
-- **Advanced Fields**: Support for optional and advanced service metadata
-- **Event-Driven**: Emits events for successful creation, failures, and validation errors
-- **Customizable**: Support for custom data providers and base URLs
-- **Responsive Design**: Optimized for both desktop and mobile usage
-
-## Use Cases
-
-- **Service Onboarding**: Help service providers register their APIs
-- **Administrative Tools**: Build management interfaces for service registries
-- **Development Workflows**: Integrate service registration into CI/CD pipelines
-- **Self-Service Portals**: Enable users to register their own services
-
-## Getting Started
-
-To get started with Cloud Registry components, check out the [Installation Guide](/docs/installation) and explore the component documentation in the Components section. 
+*Note: The services and service components are from the [`service-registry`](../service-registry/introduction) package.* 

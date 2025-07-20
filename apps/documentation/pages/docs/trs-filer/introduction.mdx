@@ -1,6 +1,12 @@
 # TRS-Filer
 
-The `TRS-Filer` package extends the base `TRS` components with write capabilities, allowing you to create new tool registrations. It is designed to work with APIs that support tool creation, such as the Elixir Cloud TRS-Filer.
+The `TRS-Filer` package extends the base `TRS` components with write capabilities, allowing you to create new tool registrations. This package extends the GA4GH Tool Registry Service API to allow creation of resources.
+
+## Package Information
+
+- **Package**: `@elixir-cloud/trs-filer`
+- **Version**: `2.0.0-alpha.6`
+- **Standard**: [Elixir Cloud & AAI v2.1.0](https://github.com/ga4gh/tool-registry-service-schemas/blob/release-2.0.1/openapi/openapi.yaml)
 
 ## Features
 
@@ -10,4 +16,8 @@ The `TRS-Filer` package extends the base `TRS` components with write capabilitie
 
 ## Available Components
 
-- [`<ecc-client-elixir-trs-filer-tool-create>`](./components/tool-create): A component for registering new tools. 
+- [`<ecc-client-elixir-trs-filer-tool-create>`](./components/tool-create): A component for registering new tools.
+- [`<ecc-client-ga4gh-trs-tools>`](../trs/components/tools): A component for listing existing tools.
+- [`<ecc-client-ga4gh-trs-tool>`](../trs/components/tool): A component for displaying details of a specific tool.
+
+*Note: The tools and tool components are from the [`trs`](../trs/introduction) package.* 

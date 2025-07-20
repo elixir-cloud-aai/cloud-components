@@ -3,7 +3,8 @@ import { property, state } from "lit/decorators.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 import "ace-builds/src-noconflict/ace.js";
-import "ace-builds/src-noconflict/theme-github.js";
+import "ace-builds/src-noconflict/theme-cloud9_day.js";
+import "ace-builds/src-noconflict/theme-cloud9_night.js";
 
 // Pre-load common modes to ensure they're available
 import "ace-builds/src-noconflict/mode-javascript.js";
@@ -633,6 +634,7 @@ export class EccUtilsDesignCode extends LitElement {
 
   firstUpdated() {
     this.initializeAceEditor();
+    this.setupThemeObserver();
   }
 
   // Set language based on extension if provided
@@ -640,6 +642,42 @@ export class EccUtilsDesignCode extends LitElement {
     super.connectedCallback();
     if (this.extension && !this.language) {
       this.language = getLanguageFromExtension(this.extension);
+    }
+  }
+
+  setupThemeObserver() {
+    // Set up mutation observer to watch for theme changes
+    const observer = new MutationObserver(() => {
+      this.updateEditorTheme();
+    });
+
+    // Observe changes to the document element and body
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  }
+
+  isDarkMode() {
+    return (
+      document.documentElement.classList.contains("dark") ||
+      document.body.classList.contains("dark") ||
+      this.matches(":host-context(.dark)") ||
+      this.matches(":host-context([dark])")
+    );
+  }
+
+  updateEditorTheme() {
+    if (this.editor) {
+      const theme = this.isDarkMode()
+        ? "ace/theme/cloud9_night"
+        : "ace/theme/cloud9_day";
+      this.editor.setTheme(theme);
     }
   }
 
@@ -652,10 +690,16 @@ export class EccUtilsDesignCode extends LitElement {
         `https://cdn.jsdelivr.net/npm/ace-builds@${ace.version}/src-min-noconflict`
       );
       this.editor = ace.edit(editorElement);
-      this.editor.setTheme("ace/theme/github");
+
+      // Set initial theme based on current mode
+      this.updateEditorTheme();
+
       this.editor.session.setUseWorker(true);
       this.editor.renderer.attachToShadowRoot();
       this.editor.setValue(this.value);
+
+      // Clear selection after setting value
+      this.editor.clearSelection();
 
       this.setEditorLanguage(this.language);
       if (this.disabled) this.editor.setReadOnly(true);
@@ -699,7 +743,6 @@ export class EccUtilsDesignCode extends LitElement {
       !changedProperties.has("language")
     ) {
       const newLanguage = getLanguageFromExtension(this.extension);
-      console.log("newLanguage", newLanguage);
       if (newLanguage !== this.language) {
         this.language = newLanguage;
         this.setEditorLanguage(this.language);

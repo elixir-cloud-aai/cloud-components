@@ -2,42 +2,21 @@ import { Callout } from 'nextra/components'
 
 # Service Registry
 
-The GA4GH Service Registry package provides web components for interacting with GA4GH-compliant service registry implementations. These components enable you to browse, search, and view detailed information about registered services in a standardized way.
-
-<Callout type='info'>
-  This package implements the GA4GH Service Registry specification, allowing you to connect to any compliant service registry endpoint.
-</Callout>
-
-## Installation
-
-<Callout type='info'>
-  The following examples use `service-registry` as the package name. You can find installation instructions in the [Installation Guide](/docs/installation).
-</Callout>
+The `Service Registry` package provides web components for interacting with GA4GH Service Registry APIs. It allows you to browse, search, and view detailed information about registered services in a standardized way.
 
 ## Package Information
 
 - **Package**: `@elixir-cloud/service-registry`
 - **Version**: `2.0.0-alpha.6`
-- **Repository**: [GitHub](https://github.com/elixir-cloud-aai/cloud-components)
+- **Standard**: [GA4GH v1.0.0](https://github.com/ga4gh-discovery/ga4gh-service-registry/blob/8c45be52940db92c2fa1cd821519c271c22b1c4c/service-registry.yaml)
 
-## Components
+## Features
 
-The Service Registry package includes the following components:
+- **Service Discovery**: Browse and search registered services.
+- **Detailed Views**: Display comprehensive information for each service, including metadata, organization details, and API specifications.
+- **Standard Compliance**: Works with any GA4GH Service Registry v1.0.0 compliant API.
 
-### Services Component
-Display a list of services from a GA4GH Service Registry with search and filtering capabilities.
+## Available Components
 
-### Service Component  
-Show detailed information about a specific service, including metadata, organization details, and API specifications.
-
-## Key Features
-
-- **GA4GH Compliance**: Full compatibility with GA4GH Service Registry specification
-- **Search & Filter**: Built-in search functionality and service type filtering
-- **Responsive Design**: Works across desktop and mobile devices
-- **Event-Driven**: Emits events for service selection and data changes
-- **Customizable**: Support for custom data providers and styling
-
-## Getting Started
-
-To get started with Service Registry components, check out the [Installation Guide](/docs/installation) and explore the individual component documentation in the Components section. 
+- [`<ecc-client-ga4gh-service-registry-services>`](./components/services): A component to list and filter services.
+- [`<ecc-client-ga4gh-service-registry-service>`](./components/service): A component to display details of a specific service. 

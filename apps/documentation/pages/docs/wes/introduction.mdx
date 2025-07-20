@@ -1,16 +1,22 @@
-import { Card, Cards } from 'nextra/components'
+# WES (Workflow Execution Service)
 
-# Introduction to GA4GH Workflow Execution Service (WES) Components
+The `WES` package provides web components for interacting with GA4GH Workflow Execution Service APIs. It allows you to create, monitor, and manage workflow runs in federated cloud environments.
 
-This section contains documentation for web components that interact with a GA4GH Workflow Execution Service (WES) API. These components facilitate the creation, monitoring, and management of workflow runs.
+## Package Information
 
-<Cards>
-    <Card
-      title="Components"
-      href="/docs/wes/components"
-    />
-    <Card
-      title="Providers"
-      href="/docs/wes/providers"
-    />
-</Cards> 
+- **Package**: `@elixir-cloud/wes`
+- **Version**: `2.0.0-alpha.6`
+- **Standard**: [GA4GH v1.0.0](https://github.com/ga4gh/workflow-execution-service-schemas/blob/c5406f1d3740e21b93d3ac71a4c8d7b874011519/openapi/workflow_execution_service.swagger.yaml)
+
+## Features
+
+- **Workflow Execution**: Create and submit new workflow runs.
+- **Run Monitoring**: Track the status and progress of workflow executions.
+- **Run Management**: View detailed information about specific workflow runs.
+- **Standard Compliance**: Works with any GA4GH WES v1.0.0 compliant API.
+
+## Available Components
+
+- [`<ecc-client-ga4gh-wes-runs>`](./components/runs): A component to list and filter workflow runs.
+- [`<ecc-client-ga4gh-wes-run>`](./components/run): A component to display details of a specific workflow run.
+- [`<ecc-client-ga4gh-wes-run-create>`](./components/run-create): A component for creating new workflow runs.
