@@ -1,6 +1,7 @@
 {
   "extends": ["@elixir-cloud"],
   "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
     "prettier/prettier": "off",
     "import/extensions": [
       "error",

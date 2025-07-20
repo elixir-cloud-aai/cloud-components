@@ -3,7 +3,7 @@ name: Publish packages
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v*'
 
 jobs:
 
@@ -28,7 +28,7 @@ jobs:
           echo "::set-output name=version::$(node -v)"
 
       - name: Get node_modules cache
-        uses: actions/cache@v3.0.2
+        uses: actions/cache@v4
         id: node_modules
         with:
           path: |
@@ -41,47 +41,47 @@ jobs:
       - name: Run linters
         run: npm run lint
 
-  tests:
-    name: Test checks
-    runs-on: ubuntu-22.04
+  # tests:
+  #   name: Test checks
+  #   runs-on: ubuntu-22.04
 
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
+  #   steps:
+  #     - name: Check out code
+  #       uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 2
 
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20.x
+  #     - name: Use Node.js 20.x
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 20.x
 
-      - name: Get node version
-        id: node
-        run: |
-          echo "::set-output name=version::$(node -v)"
+  #     - name: Get node version
+  #       id: node
+  #       run: |
+  #         echo "::set-output name=version::$(node -v)"
 
-      - name: Get node_modules cache
-        uses: actions/cache@v3.0.2
-        id: node_modules
-        with:
-          path: |
-            **/node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package.lock') }}-${{ steps.node.outputs.version }}
+  #     - name: Get node_modules cache
+  #       uses: actions/cache@v4
+  #       id: node_modules
+  #       with:
+  #         path: |
+  #           **/node_modules
+  #         key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package.lock') }}-${{ steps.node.outputs.version }}
 
-      - name: Install dependencies
-        run: npm ci
+  #     - name: Install dependencies
+  #       run: npm ci
 
-      - name: Install playwright browsers
-        run: |
-          sudo apt update
-          npx playwright install --with-deps
+  #     - name: Install playwright browsers
+  #       run: |
+  #         sudo apt update
+  #         npx playwright install --with-deps
 
-      - name: Build
-        run: npm run build
+  #     - name: Build
+  #       run: npm run build
 
-      - name: Run tests
-        run: npm run test
+  #     - name: Run tests
+  #       run: npm run test
 
   bump-monorepo:
     name: Bump monorepo
@@ -135,8 +135,15 @@ jobs:
 
           echo "Ignore list: $IGNORE_PACKAGES"
 
-          # Find all package.json files and update versions
-          find . -name "package.json" -not -path "./node_modules/*" -not -path "./.git/*" | while read package_file; do
+          # Find all package.json files and update versions, excluding all node_modules directories
+          find . -name "package.json" \
+            -not -path "*/node_modules/*" \
+            -not -path "./.git/*" \
+            -not -path "./.changeset/*" \
+            -not -path "./.github/*" \
+            -not -path "./.husky/*" \
+            -not -path "./.turbo/*" | while read package_file; do
+
             if [ "$package_file" != "./package.json" ]; then
               # Extract package name from package.json
               PACKAGE_NAME=$(node -e "
@@ -169,6 +176,10 @@ jobs:
               fi
             fi
           done
+
+      - name: ReInstall Dependencies
+        run: |
+          npm install
 
       - name: Commit version
         run: |

@@ -8,3 +8,17 @@ exportpart
 drei
 remixicon
 selectconfig
+resizability
+shadcn
+Retryable
+toolclass
+Containerfile
+CONTAINERFILE
+containerfiles
+containerfile
+Dockstore
+dockstore
+workflowhub
+biocontainers
+JOMGD
+FTWMTY
