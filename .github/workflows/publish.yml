@@ -126,12 +126,8 @@ jobs:
 
       - name: Update all package versions
         run: |
-          # Read ignore list from changeset config
-          IGNORE_PACKAGES=$(node -e "
-            const config = require('./.changeset/config.json');
-            const ignoreList = config.ignore || [];
-            console.log(ignoreList.join(','));
-          ")
+          # Custom ignore list (includes eslint-config which we don't want to bump)
+          IGNORE_PACKAGES="ecc-docs,@elixir-cloud/drs-filer,@elixir-cloud/ro-crate,@elixir-cloud/tes,@elixir-cloud/eslint-config"
 
           echo "Ignore list: $IGNORE_PACKAGES"
 
@@ -226,12 +222,8 @@ jobs:
 
       - name: Update internal dependencies
         run: |
-          # Read ignore list from changeset config
-          IGNORE_PACKAGES=$(node -e "
-            const config = require('./.changeset/config.json');
-            const ignoreList = config.ignore || [];
-            console.log(ignoreList.join(','));
-          ")
+          # Custom ignore list (includes eslint-config which we don't want to update dependencies for)
+          IGNORE_PACKAGES="ecc-docs,@elixir-cloud/drs-filer,@elixir-cloud/ro-crate,@elixir-cloud/tes,@elixir-cloud/eslint-config"
 
           echo "Ignore list: $IGNORE_PACKAGES"
           echo "Updating internal @elixir-cloud dependencies to version $RELEASE_VERSION"

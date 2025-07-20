@@ -7,5 +7,10 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["ecc-docs", "@elixir-cloud/drs-filer", "@elixir-cloud/ro-crate", "@elixir-cloud/tes", "@elixir-cloud/eslint-config"]
+  "ignore": [
+    "ecc-docs",
+    "@elixir-cloud/drs-filer",
+    "@elixir-cloud/ro-crate",
+    "@elixir-cloud/tes"
+  ]
 }
