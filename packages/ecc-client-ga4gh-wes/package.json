@@ -2,7 +2,7 @@
   "name": "@elixir-cloud/wes",
   "description": "Web Component for interacting with GA4GH WES Standard",
   "license": "Apache-2.0",
-  "version": "2.0.0-alpha.28",
+  "version": "2.0.0-alpha.29",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
