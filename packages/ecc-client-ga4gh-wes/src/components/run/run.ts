@@ -440,20 +440,37 @@ export class ECCClientGa4ghWesRun extends LitElement {
 
           <!-- Tags Section -->
           ${request.tags
-            ? html`
-                <div class="flex flex-col gap-3">
-                  <div class="font-bold text-base">Tags</div>
-                  <div class="flex flex-wrap gap-2">
-                    ${Object.entries(request.tags).map(
-                      ([key, value]) => html`
-                        <ecc-utils-design-badge variant="outline"
-                          >${key}: ${value}</ecc-utils-design-badge
-                        >
-                      `
-                    )}
-                  </div>
-                </div>
-              `
+            ? (() => {
+                let tagsObj: Record<string, string> | null = null;
+                if (typeof request.tags === "string") {
+                  try {
+                    tagsObj = JSON.parse(request.tags);
+                  } catch {
+                    tagsObj = null;
+                  }
+                } else if (
+                  typeof request.tags === "object" &&
+                  request.tags !== null
+                ) {
+                  tagsObj = request.tags;
+                }
+                return tagsObj
+                  ? html`
+                      <div class="flex flex-col gap-3">
+                        <div class="font-bold text-base">Tags</div>
+                        <div class="flex flex-wrap gap-2">
+                          ${Object.entries(tagsObj).map(
+                            ([key, value]) => html`
+                              <ecc-utils-design-badge variant="outline"
+                                >${key}: ${value}</ecc-utils-design-badge
+                              >
+                            `
+                          )}
+                        </div>
+                      </div>
+                    `
+                  : "";
+              })()
             : ""}
         </div>
       </div>
@@ -510,6 +527,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
                   value=${log.cmd.join(" ")}
                   extension="sh"
                   disabled
+                  class="part:h-[40px]"
                 ></ecc-utils-design-code>
               </div>
             `
@@ -664,7 +682,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
 
     return html`
       <div class="space-y-4">
-        ${this.renderRunHeader()}
+        <slot name="header">${this.renderRunHeader()}</slot>
 
         <ecc-utils-design-tabs
           default-value="overview"

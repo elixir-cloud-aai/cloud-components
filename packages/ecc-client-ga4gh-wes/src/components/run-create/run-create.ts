@@ -164,7 +164,7 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
     }
   }
 
-  private handleInputChange(
+  public handleInputChange(
     field: keyof typeof this.formData,
     value: string
   ): void {
@@ -416,21 +416,23 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
       <div class="grid gap-4">
         <!-- Workflow URL spans full width -->
         <div class="grid gap-2">
-          <ecc-utils-design-label
-            for="workflow-url"
-            class="text-sm font-medium"
-          >
-            Workflow URL <span class="text-destructive">*</span>
-          </ecc-utils-design-label>
-          <ecc-utils-design-input
-            id="workflow-url"
-            .value=${this.formData.workflowUrl}
-            @ecc-input-changed=${(e: CustomEvent) =>
-              this.handleInputChange("workflowUrl", e.detail.value)}
-            placeholder="https://example.com/workflow.cwl"
-            required
-            class="h-10"
-          ></ecc-utils-design-input>
+          <slot name="workflow-url">
+            <ecc-utils-design-label
+              for="workflow-url"
+              class="text-sm font-medium"
+            >
+              Workflow URL <span class="text-destructive">*</span>
+            </ecc-utils-design-label>
+            <ecc-utils-design-input
+              id="workflow-url"
+              .value=${this.formData.workflowUrl}
+              @ecc-input-changed=${(e: CustomEvent) =>
+                this.handleInputChange("workflowUrl", e.detail.value)}
+              placeholder="https://example.com/workflow.cwl"
+              required
+              class="h-10"
+            ></ecc-utils-design-input>
+          </slot>
         </div>
 
         <!-- Workflow Type and Version in same row -->
@@ -441,11 +443,6 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
               class="text-sm font-medium"
             >
               Workflow Type <span class="text-destructive">*</span>
-              ${this.loading
-                ? html`<span class="text-xs text-muted-foreground ml-2"
-                    >(Loading...)</span
-                  >`
-                : ""}
             </ecc-utils-design-label>
             <ecc-utils-design-select
               id="workflow-type"
@@ -474,11 +471,6 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
               class="text-sm font-medium"
             >
               Workflow Type Version <span class="text-destructive">*</span>
-              ${this.loading
-                ? html`<span class="text-xs text-muted-foreground ml-2"
-                    >(Loading...)</span
-                  >`
-                : ""}
             </ecc-utils-design-label>
             <ecc-utils-design-select
               id="workflow-version"
