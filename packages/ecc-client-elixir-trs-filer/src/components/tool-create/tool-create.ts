@@ -282,11 +282,20 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
 
     const updatedVersions = [...this.versions];
     const descriptorType = activeDescriptorType as DescriptorType;
+    let fileType: FileType = "PRIMARY_DESCRIPTOR";
+
+    if (
+      updatedVersions[versionIndex].files.find(
+        (file) => file.fileType === "PRIMARY_DESCRIPTOR"
+      )
+    ) {
+      fileType = "SECONDARY_DESCRIPTOR";
+    }
 
     updatedVersions[versionIndex].files.push({
       path: "",
-      fileType: "PRIMARY_DESCRIPTOR",
-      uiFileType: "PRIMARY_DESCRIPTOR",
+      fileType,
+      uiFileType: fileType,
       content: "",
       checksumType: "sha256",
       checksumValue: "",
