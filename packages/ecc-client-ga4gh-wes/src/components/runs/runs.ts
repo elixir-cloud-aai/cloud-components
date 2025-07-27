@@ -46,6 +46,8 @@ export class ECCClientGa4ghWesRuns extends LitElement {
   @state() private error: string | null = null;
   @state() private nextPageToken: string | null = null;
   @state() private hasMorePages = true;
+  @state() private lastPage = -1;
+  @state() private pageTokens: Map<number, string | undefined> = new Map();
 
   private _provider: WesProvider | null = null;
 
@@ -65,22 +67,36 @@ export class ECCClientGa4ghWesRuns extends LitElement {
     }
 
     if (this._provider) {
+      // Initialize page tokens - page 1 doesn't need a token
+      this.pageTokens.set(1, undefined);
       await this.loadData();
     }
   }
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
     if (changedProperties.has("pageSize")) {
+      this.pageTokens.clear();
+      this.pageTokens.set(1, undefined);
+      this.currentPage = 1;
+      this.lastPage = -1;
       this.loadData();
     }
 
     if (changedProperties.has("baseUrl") && this.baseUrl) {
       this._provider = new RestWesProvider(this.baseUrl);
+      this.pageTokens.clear();
+      this.pageTokens.set(1, undefined);
+      this.currentPage = 1;
+      this.lastPage = -1;
       this.loadData();
     }
 
     if (changedProperties.has("provider") && this.provider) {
       this._provider = this.provider;
+      this.pageTokens.clear();
+      this.pageTokens.set(1, undefined);
+      this.currentPage = 1;
+      this.lastPage = -1;
       this.loadData();
     }
   }
@@ -92,13 +108,53 @@ export class ECCClientGa4ghWesRuns extends LitElement {
     this.error = null;
 
     try {
-      const pageToken =
-        this.currentPage === 1 ? undefined : this.nextPageToken || undefined;
+      // Get the token for the current page
+      const pageToken = this.pageTokens.get(this.currentPage);
       const response = await this._provider.listRuns(this.pageSize, pageToken);
 
       this.runs = response.runs;
       this.nextPageToken = response.next_page_token || null;
       this.hasMorePages = !!response.next_page_token;
+
+      // Store the token for the next page if it exists
+      if (response.next_page_token) {
+        this.pageTokens.set(this.currentPage + 1, response.next_page_token);
+      }
+
+      // Update lastPage based on returned items
+      if (this.runs.length === 0) {
+        this.lastPage = this.currentPage - 1;
+        // Clear any tokens beyond the last valid page
+        for (
+          let page = this.currentPage;
+          page <= this.currentPage + 10;
+          page += 1
+        ) {
+          this.pageTokens.delete(page);
+        }
+      } else if (
+        this.runs.length < this.pageSize ||
+        !response.next_page_token
+      ) {
+        // This is the last page if we got fewer items than pageSize OR no next token
+        this.lastPage = this.currentPage;
+        // Clear any tokens beyond the last page
+        for (
+          let page = this.currentPage + 1;
+          page <= this.currentPage + 10;
+          page += 1
+        ) {
+          this.pageTokens.delete(page);
+        }
+      }
+
+      // Update UI based on returned items
+      if (this.runs.length === 0 && this.currentPage > 1) {
+        // If we get no results and we're not on the first page, go back a page
+        this.currentPage -= 1;
+        this.loadData();
+        return;
+      }
 
       // Emit an event with the updated runs
       this.dispatchEvent(
@@ -130,7 +186,17 @@ export class ECCClientGa4ghWesRuns extends LitElement {
 
   private goToPage(page: number): void {
     if (page < 1) return;
-    if (page > this.currentPage && !this.hasMorePages) return;
+
+    // Don't allow going beyond last known page
+    if (this.lastPage !== -1 && page > this.lastPage) return;
+
+    // Don't allow going forward if we don't have a token for that page and no more pages available
+    if (
+      page > this.currentPage &&
+      !this.pageTokens.has(page) &&
+      !this.hasMorePages
+    )
+      return;
 
     this.currentPage = page;
     this.loadData();
@@ -151,13 +217,49 @@ export class ECCClientGa4ghWesRuns extends LitElement {
             ></ecc-utils-design-pagination-previous>
           </ecc-utils-design-pagination-item>
 
+          ${this.currentPage > 2
+            ? html`
+                <ecc-utils-design-pagination-item>
+                  <ecc-utils-design-pagination-link
+                    @ecc-button-clicked=${(e: CustomEvent) => {
+                      if (e.detail.variant === "link") {
+                        this.goToPage(1);
+                      }
+                    }}
+                    >1</ecc-utils-design-pagination-link
+                  >
+                </ecc-utils-design-pagination-item>
+              `
+            : ""}
+          ${this.currentPage > 3
+            ? html`
+                <ecc-utils-design-pagination-item>
+                  <ecc-utils-design-pagination-ellipsis></ecc-utils-design-pagination-ellipsis>
+                </ecc-utils-design-pagination-item>
+              `
+            : ""}
+          ${this.currentPage > 1
+            ? html`
+                <ecc-utils-design-pagination-item>
+                  <ecc-utils-design-pagination-link
+                    @ecc-button-clicked=${(e: CustomEvent) => {
+                      if (e.detail.variant === "link") {
+                        this.goToPage(this.currentPage - 1);
+                      }
+                    }}
+                    >${this.currentPage - 1}</ecc-utils-design-pagination-link
+                  >
+                </ecc-utils-design-pagination-item>
+              `
+            : ""}
+
           <ecc-utils-design-pagination-item>
             <ecc-utils-design-pagination-link isActive>
               ${this.currentPage}
             </ecc-utils-design-pagination-link>
           </ecc-utils-design-pagination-item>
 
-          ${this.hasMorePages
+          ${this.lastPage === -1
             ? html`
                 <ecc-utils-design-pagination-item>
                   <ecc-utils-design-pagination-link
@@ -174,10 +276,47 @@ export class ECCClientGa4ghWesRuns extends LitElement {
                 </ecc-utils-design-pagination-item>
               `
             : ""}
+          ${this.lastPage !== -1 && this.currentPage < this.lastPage
+            ? html`
+                <ecc-utils-design-pagination-item>
+                  <ecc-utils-design-pagination-link
+                    @ecc-button-clicked=${(e: CustomEvent) => {
+                      if (e.detail.variant === "link") {
+                        this.goToPage(this.currentPage + 1);
+                      }
+                    }}
+                    >${this.currentPage + 1}
+                  </ecc-utils-design-pagination-link>
+                </ecc-utils-design-pagination-item>
+              `
+            : ""}
+          ${this.lastPage !== -1 && this.currentPage < this.lastPage - 2
+            ? html`
+                <ecc-utils-design-pagination-item>
+                  <ecc-utils-design-pagination-ellipsis></ecc-utils-design-pagination-ellipsis>
+                </ecc-utils-design-pagination-item>
+              `
+            : ""}
+          ${this.lastPage !== -1 && this.currentPage < this.lastPage - 1
+            ? html`
+                <ecc-utils-design-pagination-item>
+                  <ecc-utils-design-pagination-link
+                    @ecc-button-clicked=${(e: CustomEvent) => {
+                      if (e.detail.variant === "link") {
+                        this.goToPage(this.lastPage);
+                      }
+                    }}
+                    >${this.lastPage}
+                  </ecc-utils-design-pagination-link>
+                </ecc-utils-design-pagination-item>
+              `
+            : ""}
 
           <ecc-utils-design-pagination-item>
             <ecc-utils-design-pagination-next
-              ?disabled=${!this.hasMorePages}
+              ?disabled=${(this.lastPage !== -1 &&
+                this.lastPage === this.currentPage) ||
+              (this.lastPage === -1 && !this.hasMorePages)}
               @ecc-button-clicked=${(e: CustomEvent) => {
                 if (e.detail.variant === "next") {
                   this.goToPage(this.currentPage + 1);
