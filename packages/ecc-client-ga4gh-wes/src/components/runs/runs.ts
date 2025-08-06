@@ -484,31 +484,31 @@ export class ECCClientGa4ghWesRuns extends LitElement {
                       })()}
                     </ecc-utils-design-table-cell>
                     <ecc-utils-design-table-cell class="w-3/12">
-                      <div class="flex gap-2">
-                        <ecc-utils-design-button
-                          size="sm"
-                          variant="outline"
-                          @click=${() => this.handleViewDetails(run.run_id)}
-                        >
-                          View Details
-                        </ecc-utils-design-button>
-                        ${run.state === "RUNNING" ||
-                        run.state === "QUEUED" ||
-                        run.state === "INITIALIZING"
-                          ? html`
-                              <ecc-utils-design-button
-                                size="sm"
-                                variant="destructive"
-                                @click=${() => this.handleCancelRun(run.run_id)}
-                              >
-                                Cancel
-                              </ecc-utils-design-button>
-                            `
-                          : ""}
-                      </div>
-                    </ecc-utils-design-table-cell>
-                    <ecc-utils-design-table-cell class="w-1/12">
-                      <slot name=${`actions-${run.run_id}`}> </slot>
+                      <slot name=${`actions-${run.run_id}`}>
+                        <div class="flex gap-2">
+                          <ecc-utils-design-button
+                            size="sm"
+                            variant="outline"
+                            @click=${() => this.handleViewDetails(run.run_id)}
+                          >
+                            View Details
+                          </ecc-utils-design-button>
+                          ${run.state === "RUNNING" ||
+                          run.state === "QUEUED" ||
+                          run.state === "INITIALIZING"
+                            ? html`
+                                <ecc-utils-design-button
+                                  size="sm"
+                                  variant="destructive"
+                                  @click=${() =>
+                                    this.handleCancelRun(run.run_id)}
+                                >
+                                  Cancel
+                                </ecc-utils-design-button>
+                              `
+                            : ""}
+                        </div>
+                      </slot>
                     </ecc-utils-design-table-cell>
                   </ecc-utils-design-table-row>
                 `
