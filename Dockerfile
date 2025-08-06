@@ -42,7 +42,7 @@ COPY --from=builder /app/apps/documentation/nginx.conf /etc/nginx/conf.d/default
 
 # support running as arbitrary user which belogs to the root group
 RUN chmod g+rwx /var/cache/nginx /var/run /var/log/nginx && \
-    chown nginx.root /var/cache/nginx /var/run /var/log/nginx && \
+    chown nginx:nginx /var/cache/nginx /var/run /var/log/nginx && \
     # comment user directive as master process is run as user in OpenShift anyhow
     sed -i.bak 's/^user/#user/' /etc/nginx/nginx.conf && \
     # Make /etc/nginx/html/ available to use
