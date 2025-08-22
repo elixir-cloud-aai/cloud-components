@@ -1,0 +1,48 @@
+name: Trigger Build on Push to Main
+
+on:
+  push:
+    branches:
+      - main
+      - add-ci
+
+jobs:
+  trigger-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get repository name
+        id: repo
+        run: echo "REPO_NAME=$(echo ${{ github.repository }} | cut -d'/' -f2)" >> $GITHUB_ENV
+
+      - name: Get branch name
+        id: branch
+        run: echo "BRANCH_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: Get version from commit
+        id: version
+        run: echo "VERSION=$(git describe --tags --always --dirty)" >> $GITHUB_ENV
+
+      - name: Trigger build with cURL
+        env:
+          PROJECT_ACCESS_TOKEN: ${{ secrets.PROJECT_ACCESS_TOKEN }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKER_ORGANIZATION: ${{ secrets.DOCKERHUB_ORG }}
+        run: |
+          curl --location 'https://pubgrade.dyn.cloud.e-infra.cz/repositories/eissea/builds' \
+          --header 'X-Project-Access-Token: ${{ env.PROJECT_ACCESS_TOKEN }}' \
+          --header 'Content-Type: application/json' \
+          --data '{
+              "images": [
+                  {
+                      "name": "${{ env.DOCKER_ORGANIZATION }}/cloud-components:${{ env.VERSION }}",
+                      "location": "./Dockerfile"
+                  }
+              ],
+              "head_commit": {
+                  "branch": "${{ env.BRANCH_NAME }}"
+              },
+              "dockerhub_token": "${{ env.DOCKERHUB_TOKEN }}"
+          }'
