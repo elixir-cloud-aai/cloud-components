@@ -1,6 +1,6 @@
 {
   "name": "elixir-cloud-components",
-  "version": "2.0.0-alpha.32",
+  "version": "2.0.0-alpha.33",
   "description": "Elixir Cloud Components is lightweight, fast, and reusable web-components developed by Elixir Cloud and AAI Community for managing and accessing various services.",
   "repository": {
     "type": "git",
