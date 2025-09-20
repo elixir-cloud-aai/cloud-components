@@ -195,8 +195,6 @@ export class EccUtilsDesignCollapsibleContent extends LitElement {
     const parent = this._getParentCollapsible();
     const isOpen = parent?.open || false;
 
-    console.log("isOpen", isOpen);
-
     return html`
       <div class=${isOpen ? "block" : "hidden"}>
         <slot></slot>
