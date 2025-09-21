@@ -1,11 +1,11 @@
-# @elixir-cloud/drs-filer
+# @elixir-cloud/drs
 
-A web component for interacting with Elixir DRS Filer API.
+A web component for interacting with GA4GH Data Repository Service (DRS) API.
 
 ## Installation
 
 ```bash
-npm install @elixir-cloud/drs-filer
+npm install @elixir-cloud/drs
 ```
 
 ## Usage
@@ -16,13 +16,13 @@ npm install @elixir-cloud/drs-filer
   <head>
     <script
       type="module"
-      src="node_modules/@elixir-cloud/drs-filer/dist/index.js"
+      src="node_modules/@elixir-cloud/drs/dist/index.js"
     ></script>
   </head>
   <body>
-    <ecc-client-elixir-drs-filer-object-create
+    <ecc-client-ga4gh-drs-objects
       baseUrl="https://drs-filer-test.rahtiapp.fi/ga4gh/drs/v1"
-    ></ecc-client-elixir-drs-filer-object-create>
+    ></ecc-client-ga4gh-drs-objects>
   </body>
 </html>
 ```
