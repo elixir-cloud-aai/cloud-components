@@ -366,164 +366,172 @@ export class ECCClientGa4ghDrsObject extends LitElement {
     `;
   }
 
-  private renderAccessMethodsTab() {
-    if (
-      !this.object ||
-      !this.object.access_methods ||
-      this.object.access_methods.length === 0
-    ) {
-      return html`
-        <div class="mt-4">
-          <ecc-utils-design-card>
-            <ecc-utils-design-card-content>
-              <p class="text-muted-foreground">
-                No access methods available for this object
-              </p>
-            </ecc-utils-design-card-content>
-          </ecc-utils-design-card>
-        </div>
-      `;
-    }
+  private renderContentsTab() {
+    if (!this.object) return html``;
+
+    const { object } = this; // Fix for TypeScript null checks
+    const hasContents = object.contents && object.contents.length > 0;
+    const hasAccessMethods =
+      object.access_methods && object.access_methods.length > 0;
 
     return html`
-      <div class="mt-4">
-        <div class="space-y-4">
-          ${this.object.access_methods.map(
-            (method) => html`
-              <ecc-utils-design-card>
-                <ecc-utils-design-card-content>
-                  <div class="flex flex-col gap-4">
-                    <div class="flex justify-between items-center">
-                      <div class="flex items-center gap-2">
-                        <ecc-utils-design-badge variant="default">
-                          ${method.type.toUpperCase()}
-                        </ecc-utils-design-badge>
-                        ${method.region
-                          ? html`
-                              <ecc-utils-design-badge variant="outline">
-                                ${method.region}
-                              </ecc-utils-design-badge>
-                            `
-                          : ""}
-                      </div>
-                    </div>
+      <div class="mt-4 space-y-6">
+        <!-- Access Methods Section -->
+        ${hasAccessMethods
+          ? html`
+              <div>
+                <h3 class="text-lg font-semibold mb-4">Access Methods</h3>
+                <div class="space-y-4">
+                  ${object.access_methods!.map(
+                    (method) => html`
+                      <ecc-utils-design-card>
+                        <ecc-utils-design-card-content>
+                          <div class="flex flex-col gap-4">
+                            <div class="flex justify-between items-center">
+                              <div class="flex items-center gap-2">
+                                <ecc-utils-design-badge variant="default">
+                                  ${method.type.toUpperCase()}
+                                </ecc-utils-design-badge>
+                                ${method.region
+                                  ? html`
+                                      <ecc-utils-design-badge variant="outline">
+                                        ${method.region}
+                                      </ecc-utils-design-badge>
+                                    `
+                                  : ""}
+                              </div>
+                            </div>
 
-                    ${method.access_url
-                      ? html`
-                          <div>
-                            <strong>Direct URL:</strong>
-                            <div
-                              class="mt-1 p-2 bg-muted rounded font-mono text-sm break-all"
-                            >
-                              <a
-                                href="${method.access_url.url}"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="text-primary hover:underline"
-                              >
-                                ${method.access_url.url}
-                              </a>
-                            </div>
-                            ${method.access_url.headers &&
-                            method.access_url.headers.length > 0
+                            ${method.access_url
                               ? html`
-                                  <div class="mt-2">
-                                    <strong>Headers:</strong>
-                                    <ul class="mt-1 text-sm">
-                                      ${method.access_url.headers.map(
-                                        (header) =>
-                                          html`<li class="font-mono">
-                                            ${header}
-                                          </li>`
-                                      )}
-                                    </ul>
-                                  </div>
-                                `
-                              : ""}
-                          </div>
-                        `
-                      : ""}
-                    ${method.access_id
-                      ? html`
-                          <div>
-                            <strong>Access ID:</strong>
-                            <div class="mt-1 flex gap-2 items-center">
-                              <span class="font-mono text-sm"
-                                >${method.access_id}</span
-                              >
-                              <ecc-utils-design-button
-                                size="sm"
-                                variant="outline"
-                                ?disabled=${this.loadingAccess[
-                                  method.access_id
-                                ]}
-                                @click=${() =>
-                                  this.getAccessURL(method.access_id!)}
-                              >
-                                ${this.loadingAccess[method.access_id]
-                                  ? "Loading..."
-                                  : "Get Access URL"}
-                              </ecc-utils-design-button>
-                            </div>
-                            ${this.accessUrls[method.access_id]
-                              ? html`
-                                  <div class="mt-2 p-2 bg-muted rounded">
-                                    <strong>Access URL:</strong>
+                                  <div>
+                                    <strong>Direct URL:</strong>
                                     <div
-                                      class="mt-1 font-mono text-sm break-all"
+                                      class="mt-1 p-2 bg-muted rounded font-mono text-sm break-all"
                                     >
                                       <a
-                                        href="${this.accessUrls[
-                                          method.access_id
-                                        ].url}"
+                                        href="${method.access_url.url}"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         class="text-primary hover:underline"
                                       >
-                                        ${this.accessUrls[method.access_id].url}
+                                        ${method.access_url.url}
                                       </a>
                                     </div>
+                                    ${method.access_url.headers &&
+                                    method.access_url.headers.length > 0
+                                      ? html`
+                                          <div class="mt-2">
+                                            <strong>Headers:</strong>
+                                            <ul class="mt-1 text-sm">
+                                              ${method.access_url.headers.map(
+                                                (header) =>
+                                                  html`<li class="font-mono">
+                                                    ${header}
+                                                  </li>`
+                                              )}
+                                            </ul>
+                                          </div>
+                                        `
+                                      : ""}
+                                  </div>
+                                `
+                              : ""}
+                            ${method.access_id
+                              ? html`
+                                  <div>
+                                    <strong>Access ID:</strong>
+                                    <div class="mt-1 flex gap-2 items-center">
+                                      <span class="font-mono text-sm"
+                                        >${method.access_id}</span
+                                      >
+                                      <ecc-utils-design-button
+                                        size="sm"
+                                        variant="outline"
+                                        ?disabled=${this.loadingAccess[
+                                          method.access_id
+                                        ]}
+                                        @click=${() =>
+                                          this.getAccessURL(method.access_id!)}
+                                      >
+                                        ${this.loadingAccess[method.access_id]
+                                          ? "Loading..."
+                                          : "Get Access URL"}
+                                      </ecc-utils-design-button>
+                                    </div>
+                                    ${this.accessUrls[method.access_id]
+                                      ? html`
+                                          <div
+                                            class="mt-2 p-2 bg-muted rounded"
+                                          >
+                                            <strong>Access URL:</strong>
+                                            <div
+                                              class="mt-1 font-mono text-sm break-all"
+                                            >
+                                              <a
+                                                href="${this.accessUrls[
+                                                  method.access_id
+                                                ].url}"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="text-primary hover:underline"
+                                              >
+                                                ${this.accessUrls[
+                                                  method.access_id
+                                                ].url}
+                                              </a>
+                                            </div>
+                                          </div>
+                                        `
+                                      : ""}
                                   </div>
                                 `
                               : ""}
                           </div>
-                        `
-                      : ""}
-                  </div>
-                </ecc-utils-design-card-content>
-              </ecc-utils-design-card>
+                        </ecc-utils-design-card-content>
+                      </ecc-utils-design-card>
+                    `
+                  )}
+                </div>
+              </div>
             `
-          )}
-        </div>
-      </div>
-    `;
-  }
+          : html`
+              <div>
+                <h3 class="text-lg font-semibold mb-4">Access Methods</h3>
+                <ecc-utils-design-card>
+                  <ecc-utils-design-card-content>
+                    <p class="text-muted-foreground">
+                      No access methods available for this object
+                    </p>
+                  </ecc-utils-design-card-content>
+                </ecc-utils-design-card>
+              </div>
+            `}
 
-  private renderContentsTab() {
-    if (
-      !this.object ||
-      !this.object.contents ||
-      this.object.contents.length === 0
-    ) {
-      return html`
-        <div class="mt-4">
-          <ecc-utils-design-card>
-            <ecc-utils-design-card-content>
-              <p class="text-muted-foreground">
-                This object does not contain any bundle contents
-              </p>
-            </ecc-utils-design-card-content>
-          </ecc-utils-design-card>
-        </div>
-      `;
-    }
-
-    return html`
-      <div class="mt-4">
-        <div class="font-mono text-sm space-y-1">
-          ${this.object.contents.map((content) =>
-            this.renderContentItem(content, 0)
-          )}
+        <!-- Bundle Contents Section -->
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Bundle Contents</h3>
+          ${hasContents
+            ? html`
+                <ecc-utils-design-card>
+                  <ecc-utils-design-card-content>
+                    <div class="font-mono text-sm space-y-1">
+                      ${object.contents!.map((content) =>
+                        this.renderContentItem(content, 0)
+                      )}
+                    </div>
+                  </ecc-utils-design-card-content>
+                </ecc-utils-design-card>
+              `
+            : html`
+                <ecc-utils-design-card>
+                  <ecc-utils-design-card-content>
+                    <p class="text-muted-foreground">
+                      This object does not contain any bundle contents
+                    </p>
+                  </ecc-utils-design-card-content>
+                </ecc-utils-design-card>
+              `}
         </div>
       </div>
     `;
@@ -617,14 +625,9 @@ export class ECCClientGa4ghDrsObject extends LitElement {
               >Overview</ecc-utils-design-tabs-trigger
             >
             <ecc-utils-design-tabs-trigger
-              value="access"
-              class="part:flex-1 flex-1"
-              >Access Methods</ecc-utils-design-tabs-trigger
-            >
-            <ecc-utils-design-tabs-trigger
               value="contents"
               class="part:flex-1 flex-1"
-              >Contents</ecc-utils-design-tabs-trigger
+              >Contents & Access</ecc-utils-design-tabs-trigger
             >
           </ecc-utils-design-tabs-list>
 
@@ -632,12 +635,8 @@ export class ECCClientGa4ghDrsObject extends LitElement {
             ${this.renderOverviewTab()}
           </ecc-utils-design-tabs-content>
 
-          <ecc-utils-design-tabs-content value="access">
-            ${this.renderAccessMethodsTab()}
-          </ecc-utils-design-tabs-content>
-
           <ecc-utils-design-tabs-content value="contents">
-            ${this.renderContentsTab()}
+            <slot name="contents"> ${this.renderContentsTab()} </slot>
           </ecc-utils-design-tabs-content>
         </ecc-utils-design-tabs>
       </div>

@@ -20,6 +20,8 @@ import "@elixir-cloud/design/components/skeleton/index.js";
  * @property {number} pageSize - Number of objects per page
  * @property {boolean} search - Determines if the search field should be rendered
  * @property {DrsProvider} provider - Custom data provider (optional, overrides baseUrl)
+ *
+ * @fires ecc-objects-selected - Fired when an object is selected
  */
 export class ECCClientGa4ghDrsObjects extends LitElement {
   static styles = [
@@ -132,7 +134,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
   }
 
   private handleObjectSelect(objectId: string): void {
-    const event = new CustomEvent("ecc-drs-object-selected", {
+    const event = new CustomEvent("ecc-objects-selected", {
       detail: { objectId },
       bubbles: true,
       composed: true,
