@@ -732,7 +732,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
             : ""}
 
           <ecc-utils-design-tabs-content value="outputs">
-            ${this.renderOutputsTab()}
+            <slot name="outputs">${this.renderOutputsTab()}</slot>
           </ecc-utils-design-tabs-content>
         </ecc-utils-design-tabs>
       </div>
