@@ -750,7 +750,7 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
                 !this.formData.workflowType ||
                 !this.formData.workflowTypeVersion}
               >
-                ${this.submitting ? "Submitting..." : "Submit Workflow"}
+                ${this.submitting ? "Submitting..." : "Submit Run"}
               </ecc-utils-design-button>
             </div>
           </div>
