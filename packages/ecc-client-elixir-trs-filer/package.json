@@ -2,7 +2,7 @@
   "name": "@elixir-cloud/trs-filer",
   "description": "Web Component for interacting with Elixir TRS Filer",
   "license": "Apache-2.0",
-  "version": "2.0.0-alpha.37",
+  "version": "2.0.0-alpha.38",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
