@@ -280,11 +280,6 @@ export class ECCClientGa4ghDrsObject extends LitElement {
                   </div>
                   <ecc-utils-design-separator></ecc-utils-design-separator>
                   <div class="flex flex-row gap-2 w-full justify-between">
-                    <dt class="text-muted-foreground">Self URI</dt>
-                    <dd class="font-mono break-all">${this.object.self_uri}</dd>
-                  </div>
-                  <ecc-utils-design-separator></ecc-utils-design-separator>
-                  <div class="flex flex-row gap-2 w-full justify-between">
                     <dt class="text-muted-foreground">Size</dt>
                     <dd>
                       ${ECCClientGa4ghDrsObject.formatFileSize(

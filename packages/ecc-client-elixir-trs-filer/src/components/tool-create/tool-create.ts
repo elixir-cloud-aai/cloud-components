@@ -68,6 +68,7 @@ type UIFileType =
  * @property {string} defaultVerifiedSource - Default value for verified source (comma-separated)
  * @property {string} defaultIncludedApps - Default value for included apps (comma-separated)
  * @property {string} defaultCustomVersionId - Default value for custom version ID
+ * @property {DescriptorType[]} supportedDescriptorTypes - Array of supported descriptor types to filter available workflow languages
  *
  * @fires ecc-tool-created - Fired when a tool is successfully created (includes toolId, toolData, and success message)
  * @fires ecc-tool-create-failed - Fired when tool creation fails
@@ -152,6 +153,9 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
 
   @property({ type: String, attribute: "default-custom-version-id" })
   defaultCustomVersionId = "";
+
+  @property({ type: Array, reflect: true })
+  supportedDescriptorTypes: DescriptorType[] = [];
 
   @state() private toolClasses: ToolClass[] = [];
   @state() private loading = false;
@@ -1478,21 +1482,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
               </ecc-utils-design-multi-select-trigger>
 
               <ecc-utils-design-multi-select-content>
-                <ecc-utils-design-multi-select-item value="CWL">
-                  CWL (Common Workflow Language)
-                </ecc-utils-design-multi-select-item>
-                <ecc-utils-design-multi-select-item value="WDL">
-                  WDL (Workflow Description Language)
-                </ecc-utils-design-multi-select-item>
-                <ecc-utils-design-multi-select-item value="NFL">
-                  Nextflow
-                </ecc-utils-design-multi-select-item>
-                <ecc-utils-design-multi-select-item value="GALAXY">
-                  Galaxy
-                </ecc-utils-design-multi-select-item>
-                <ecc-utils-design-multi-select-item value="SMK">
-                  Snakemake
-                </ecc-utils-design-multi-select-item>
+                ${this.renderDescriptorTypeOptions()}
               </ecc-utils-design-multi-select-content>
             </ecc-utils-design-multi-select>
           </div>
@@ -2173,6 +2163,33 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
         </form>
       </div>
     `;
+  }
+
+  private renderDescriptorTypeOptions() {
+    // Define all available descriptor types with their display names
+    const allDescriptorTypes = [
+      { value: "CWL", label: "CWL (Common Workflow Language)" },
+      { value: "WDL", label: "WDL (Workflow Description Language)" },
+      { value: "NFL", label: "Nextflow" },
+      { value: "GALAXY", label: "Galaxy" },
+      { value: "SMK", label: "Snakemake" },
+    ];
+
+    // Filter by supported descriptor types if specified
+    const availableTypes =
+      this.supportedDescriptorTypes.length > 0
+        ? allDescriptorTypes.filter((type) =>
+            this.supportedDescriptorTypes.includes(type.value as DescriptorType)
+          )
+        : allDescriptorTypes;
+
+    return availableTypes.map(
+      (type) => html`
+        <ecc-utils-design-multi-select-item value=${type.value}>
+          ${type.label}
+        </ecc-utils-design-multi-select-item>
+      `
+    );
   }
 }
 
