@@ -462,14 +462,16 @@ export class ECCClientGa4ghWesRuns extends LitElement {
                 (run) => html`
                   <ecc-utils-design-table-row>
                     <ecc-utils-design-table-cell class="w-6/12">
-                      <ecc-utils-design-button
-                        class="part:font-mono part:text-sm part:w-fit part:cursor-pointer part:p-0"
-                        variant="link"
-                        @click=${() => this.handleViewDetails(run.run_id)}
-                        title=${run.run_id}
-                      >
-                        ${ECCClientGa4ghWesRuns.formatRunId(run.run_id)}
-                      </ecc-utils-design-button>
+                      <slot name=${`run-name-${run.run_id}`}>
+                        <ecc-utils-design-button
+                          class="part:font-mono part:text-sm part:w-fit part:cursor-pointer part:p-0"
+                          variant="link"
+                          @click=${() => this.handleViewDetails(run.run_id)}
+                          title=${run.run_id}
+                        >
+                          ${ECCClientGa4ghWesRuns.formatRunId(run.run_id)}
+                        </ecc-utils-design-button>
+                      </slot>
                     </ecc-utils-design-table-cell>
                     <ecc-utils-design-table-cell class="w-2/12">
                       ${(() => {
