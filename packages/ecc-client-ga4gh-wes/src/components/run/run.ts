@@ -48,6 +48,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
   @state() private run: RunLog | null = null;
   @state() private loading = false;
   @state() private error: string | null = null;
+  @state() private logContents: Record<string, string> = {};
 
   private _provider: WesProvider | null = null;
 
@@ -127,6 +128,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
     this.loading = true;
     this.error = null;
     this.run = null;
+    this.logContents = {};
 
     try {
       const runLog = await this._provider.getRunLog(this.runId);
@@ -477,7 +479,67 @@ export class ECCClientGa4ghWesRun extends LitElement {
     `;
   }
 
-  private static renderLog(log: Log) {
+  private static isProbablyUrl(value: string): boolean {
+    try {
+      const url = new URL(value);
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+      return false;
+    }
+  }
+
+  private resolveLogContent(
+    raw: string | undefined,
+    key: string,
+    label: string
+  ): string {
+    console.log("resolveLogContent", raw, key, label);
+    if (!raw) return `No ${label}.`;
+    const cached = this.logContents[key];
+    if (cached !== undefined) return cached;
+    if (ECCClientGa4ghWesRun.isProbablyUrl(raw)) {
+      this.logContents = { ...this.logContents, [key]: "Loading..." };
+      // Fire-and-forget fetch
+      this.fetchLogUrlToCache(raw, key);
+      return this.logContents[key];
+    }
+    // Raw inline content
+    this.logContents = { ...this.logContents, [key]: raw };
+    return raw;
+  }
+
+  private async fetchLogUrlToCache(url: string, key: string): Promise<void> {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(response.statusText || "Failed to fetch log");
+      }
+      const text = await response.text();
+      this.logContents = { ...this.logContents, [key]: text };
+    } catch (err) {
+      this.logContents = {
+        ...this.logContents,
+        [key]: `Error loading log: ${
+          err instanceof Error ? err.message : String(err)
+        }`,
+      };
+    }
+  }
+
+  private renderLog(log: Log, keyPrefix: string) {
+    const stdoutKey = `${keyPrefix}-stdout`;
+    const stderrKey = `${keyPrefix}-stderr`;
+    const stdoutValue = this.resolveLogContent(
+      log.stdout,
+      stdoutKey,
+      "standard output"
+    );
+    const stderrValue = this.resolveLogContent(
+      log.stderr,
+      stderrKey,
+      "standard error"
+    );
+
     return html`
       <div class="space-y-4 text-sm">
         <div class="flex flex-col gap-2">
@@ -539,7 +601,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
             <div>
               <h4 class="font-medium mb-2">Standard Output</h4>
               <ecc-utils-design-code
-                value=${log.stdout || "No standard output."}
+                value=${stdoutValue}
                 extension="log"
                 class="part:h-[300px]"
                 disabled
@@ -549,7 +611,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
             <div>
               <h4 class="font-medium mb-2">Standard Error</h4>
               <ecc-utils-design-code
-                value=${log.stderr || "No standard error."}
+                value=${stderrValue}
                 extension="log"
                 class="part:h-[300px]"
                 disabled
@@ -574,7 +636,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
       `;
     }
     return html`<div class="mt-4">
-      ${ECCClientGa4ghWesRun.renderLog(this.run.run_log)}
+      ${this.renderLog(this.run.run_log, "run_log")}
     </div>`;
   }
 
@@ -607,7 +669,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
               </ecc-utils-design-collapsible-trigger>
               <ecc-utils-design-collapsible-content>
                 <div class="p-4 border border-t-0 rounded-b-md">
-                  ${ECCClientGa4ghWesRun.renderLog(taskLog)}
+                  ${this.renderLog(taskLog, `task_logs-${index}`)}
                 </div>
               </ecc-utils-design-collapsible-content>
             </ecc-utils-design-collapsible>
