@@ -433,9 +433,9 @@ export class ECCClientGa4ghWesRuns extends LitElement {
               <ecc-utils-design-table-head class="w-2/12"
                 >State</ecc-utils-design-table-head
               >
-              <ecc-utils-design-table-head class="w-3/12"
-                >Actions</ecc-utils-design-table-head
-              >
+              <ecc-utils-design-table-head
+                class="w-3/12"
+              ></ecc-utils-design-table-head>
               <ecc-utils-design-table-head
                 class="w-1/12"
               ></ecc-utils-design-table-head>

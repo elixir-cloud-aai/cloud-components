@@ -21,6 +21,7 @@ import "@elixir-cloud/design/components/skeleton/index.js";
  * @property {boolean} search - Determines if the search field should be rendered
  * @property {DrsProvider} provider - Custom data provider (optional, overrides baseUrl)
  *
+ * @fires ecc-objects-changed - Fired when objects data changes
  * @fires ecc-objects-selected - Fired when an object is selected
  */
 export class ECCClientGa4ghDrsObjects extends LitElement {
@@ -104,7 +105,17 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
         // If we get no results and we're not on the first page, go back a page
         this.currentPage -= 1;
         this.loadData();
+        return;
       }
+
+      // Emit an event with the updated objects
+      this.dispatchEvent(
+        new CustomEvent("ecc-objects-changed", {
+          detail: { objects: this.objects },
+          bubbles: true,
+          composed: true,
+        })
+      );
     } catch (err) {
       this.error =
         err instanceof Error ? err.message : "Failed to load objects";
@@ -389,9 +400,6 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                 >Object Info</ecc-utils-design-table-head
               >
               <ecc-utils-design-table-head class="w-2/12"
-                >Type</ecc-utils-design-table-head
-              >
-              <ecc-utils-design-table-head class="w-2/12"
                 >Size</ecc-utils-design-table-head
               >
               <ecc-utils-design-table-head class="w-2/12"
@@ -419,10 +427,8 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                   </ecc-utils-design-table-row>
                 `;
               }
-              return this.objects.map((object) => {
-                const objectType =
-                  ECCClientGa4ghDrsObjects.getObjectType(object);
-                return html`
+              return this.objects.map(
+                (object) => html`
                   <ecc-utils-design-table-row>
                     <ecc-utils-design-table-cell class="w-6/12">
                       <div class="flex flex-col w-full">
@@ -448,11 +454,6 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                       </div>
                     </ecc-utils-design-table-cell>
                     <ecc-utils-design-table-cell class="w-2/12">
-                      <ecc-utils-design-badge variant=${objectType.variant}>
-                        ${objectType.label}
-                      </ecc-utils-design-badge>
-                    </ecc-utils-design-table-cell>
-                    <ecc-utils-design-table-cell class="w-2/12">
                       <span class="text-sm"
                         >${ECCClientGa4ghDrsObjects.formatFileSize(
                           object.size
@@ -467,16 +468,18 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                       >
                     </ecc-utils-design-table-cell>
                     <ecc-utils-design-table-cell class="w-2/12">
-                      <ecc-utils-design-button
-                        size="sm"
-                        @click=${() => this.handleObjectSelect(object.id)}
-                      >
-                        View Details
-                      </ecc-utils-design-button>
+                      <slot name=${`actions-${object.id}`}>
+                        <ecc-utils-design-button
+                          size="sm"
+                          @click=${() => this.handleObjectSelect(object.id)}
+                        >
+                          View Details
+                        </ecc-utils-design-button>
+                      </slot>
                     </ecc-utils-design-table-cell>
                   </ecc-utils-design-table-row>
-                `;
-              });
+                `
+              );
             })()}
           </ecc-utils-design-table-body>
         </ecc-utils-design-table>
