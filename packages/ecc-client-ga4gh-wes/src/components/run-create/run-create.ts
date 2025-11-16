@@ -142,9 +142,25 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
 
     try {
       this.serviceInfo = await this._provider.getServiceInfo();
+      const workflowTypes = Object.keys(
+        this.serviceInfo.workflow_type_versions
+      );
 
-      // Set default workflow type version if available
-      if (this.serviceInfo.workflow_type_versions[this.formData.workflowType]) {
+      if (workflowTypes.length === 1) {
+        const soleWorkflowType = workflowTypes[0] as WorkflowType;
+        const versions =
+          this.serviceInfo.workflow_type_versions[soleWorkflowType]
+            ?.workflow_type_version || [];
+
+        this.formData = {
+          ...this.formData,
+          workflowType: soleWorkflowType,
+          workflowTypeVersion: versions.length > 0 ? versions[0] : "",
+        };
+      } else if (
+        this.serviceInfo.workflow_type_versions[this.formData.workflowType]
+      ) {
+        // Set default workflow type version if available
         const versions =
           this.serviceInfo.workflow_type_versions[this.formData.workflowType]
             .workflow_type_version;
