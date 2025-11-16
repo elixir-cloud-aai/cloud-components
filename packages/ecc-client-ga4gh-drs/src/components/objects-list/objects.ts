@@ -48,7 +48,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
   @state() private error: string | null = null;
   @state() private searchTimeout: ReturnType<typeof setTimeout> | null = null;
   @state() private totalObjects = 0;
-  @state() private lastPage = -1;
+  @state() private totalPages = 0;
 
   private _provider: DrsProvider | null = null;
 
@@ -90,14 +90,25 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
     this.error = null;
 
     try {
-      const offset = (this.currentPage - 1) * this.pageSize;
-      const result = await this._provider.getObjects(this.pageSize, offset);
+      // API treats offset as page number, not actual offset
+      const result = await this._provider.getObjects(
+        this.pageSize,
+        this.currentPage - 1
+      );
       this.objects = result.objects;
 
-      if (this.objects.length === 0) {
-        this.lastPage = this.currentPage - 1;
+      // Update total objects and pages from API response
+      if (result.pagination?.total !== undefined) {
+        this.totalObjects = result.pagination.total;
+        this.totalPages = Math.ceil(this.totalObjects / this.pageSize);
+      } else if (this.objects.length === 0) {
+        // Fallback: estimate based on current response
+        this.totalPages = Math.max(0, this.currentPage - 1);
       } else if (this.objects.length < this.pageSize) {
-        this.lastPage = this.currentPage;
+        this.totalPages = this.currentPage;
+      } else {
+        // We don't know the total, so assume there are more pages
+        this.totalPages = -1; // -1 means unknown total
       }
 
       // Update UI based on returned items
@@ -119,10 +130,6 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
     } catch (err) {
       this.error =
         err instanceof Error ? err.message : "Failed to load objects";
-      console.error({
-        error: this.error,
-        breakPoint: "ECCClientGa4ghDrsObjects.loadData",
-      });
     } finally {
       this.loading = false;
     }
@@ -139,7 +146,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
     // Set a new timeout for debouncing
     this.searchTimeout = setTimeout(() => {
       this.currentPage = 1; // Reset to first page on search
-      this.lastPage = -1; // Reset lastPage when search changes
+      this.totalPages = 0; // Reset total pages when search changes
       this.loadData();
     }, 500); // 500ms debounce time
   }
@@ -216,7 +223,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
             </ecc-utils-design-pagination-link>
           </ecc-utils-design-pagination-item>
 
-          ${this.lastPage === -1
+          ${this.totalPages === 0 || this.totalPages === -1
             ? html`
                 <ecc-utils-design-pagination-item>
                   <ecc-utils-design-pagination-link
@@ -233,7 +240,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                 </ecc-utils-design-pagination-item>
               `
             : ""}
-          ${this.lastPage !== -1 && this.currentPage < this.lastPage
+          ${this.totalPages > 0 && this.currentPage < this.totalPages
             ? html`
                 <ecc-utils-design-pagination-item>
                   <ecc-utils-design-pagination-link
@@ -247,23 +254,23 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                 </ecc-utils-design-pagination-item>
               `
             : ""}
-          ${this.lastPage !== -1 && this.currentPage < this.lastPage - 2
+          ${this.totalPages > 0 && this.currentPage < this.totalPages - 2
             ? html`
                 <ecc-utils-design-pagination-item>
                   <ecc-utils-design-pagination-ellipsis></ecc-utils-design-pagination-ellipsis>
                 </ecc-utils-design-pagination-item>
               `
             : ""}
-          ${this.lastPage !== -1 && this.currentPage < this.lastPage - 1
+          ${this.totalPages > 0 && this.currentPage < this.totalPages - 1
             ? html`
                 <ecc-utils-design-pagination-item>
                   <ecc-utils-design-pagination-link
                     @ecc-button-clicked=${(e: CustomEvent) => {
                       if (e.detail.variant === "link") {
-                        this.goToPage(this.lastPage);
+                        this.goToPage(this.totalPages);
                       }
                     }}
-                    >${this.lastPage}</ecc-utils-design-pagination-link
+                    >${this.totalPages}</ecc-utils-design-pagination-link
                   >
                 </ecc-utils-design-pagination-item>
               `
@@ -271,8 +278,8 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
 
           <ecc-utils-design-pagination-item>
             <ecc-utils-design-pagination-next
-              ?disabled=${this.lastPage !== -1 &&
-              this.lastPage === this.currentPage}
+              ?disabled=${this.totalPages > 0 &&
+              this.totalPages === this.currentPage}
               @ecc-button-clicked=${(e: CustomEvent) => {
                 if (e.detail.variant === "next") {
                   this.goToPage(this.currentPage + 1);
