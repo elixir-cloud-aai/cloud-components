@@ -243,9 +243,16 @@ export class ECCClientGa4ghWesRun extends LitElement {
           </div>
 
           <div class="flex flex-wrap gap-2 items-center">
-            <ecc-utils-design-badge variant=${stateInfo.variant}>
-              ${stateInfo.label}
-            </ecc-utils-design-badge>
+                      ${(() => {
+                        const stateInfo = ECCClientGa4ghWesRun.getStateInfo(
+                          this.run.state
+                        );
+                        return html`
+                          <ecc-utils-design-badge variant=${stateInfo.variant}>
+                            ${stateInfo.label}
+                          </ecc-utils-design-badge>
+                        `;
+                      })()}
             <ecc-utils-design-badge variant="outline">
               ${this.run.request.workflow_type}
             </ecc-utils-design-badge>
