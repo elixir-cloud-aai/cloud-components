@@ -628,20 +628,6 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                     <dd>${this.tool.organization || "Not specified"}</dd>
                   </div>
                   <ecc-utils-design-separator></ecc-utils-design-separator>
-                  <div class="flex flex-row gap-2 w-full justify-between">
-                    <dt class="text-muted-foreground">URL</dt>
-                    <dd>
-                      <a
-                        href="${this.tool.url}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-primary hover:underline break-all"
-                      >
-                        ${this.tool.url}
-                      </a>
-                    </dd>
-                  </div>
-                  <ecc-utils-design-separator></ecc-utils-design-separator>
 
                   <div class="flex flex-row gap-2 w-full justify-between">
                     <dt class="text-muted-foreground">Checker Workflow</dt>
@@ -726,21 +712,6 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                               </dd>`}
                         </div>
 
-                        <ecc-utils-design-separator></ecc-utils-design-separator>
-
-                        <div class="flex flex-row gap-2 w-full justify-between">
-                          <dt class="text-muted-foreground">URL</dt>
-                          <dd>
-                            <a
-                              href="${version.url}"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              class="text-primary hover:underline break-all"
-                            >
-                              ${version.url}
-                            </a>
-                          </dd>
-                        </div>
                         <ecc-utils-design-separator></ecc-utils-design-separator>
 
                         <div class="flex flex-row gap-2 w-full justify-between">

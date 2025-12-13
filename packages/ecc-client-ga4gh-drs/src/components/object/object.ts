@@ -160,11 +160,11 @@ export class ECCClientGa4ghDrsObject extends LitElement {
   private renderObjectHeader() {
     if (!this.object) return html``;
 
-    const objectType =
-      this.object.contents && this.object.contents.length > 0
-        ? "Bundle"
-        : "Blob";
-    const objectTypeVariant = objectType === "Bundle" ? "default" : "secondary";
+    // const objectType =
+    //   this.object.contents && this.object.contents.length > 0
+    //     ? "Bundle"
+    //     : "Blob";
+    // const objectTypeVariant = objectType === "Bundle" ? "default" : "secondary";
 
     return html`
       <div class="mb-6">
@@ -173,9 +173,6 @@ export class ECCClientGa4ghDrsObject extends LitElement {
             <h2 class="text-xl truncate">
               ${this.object.name || this.object.id}
             </h2>
-            <ecc-utils-design-badge variant=${objectTypeVariant}>
-              ${objectType}
-            </ecc-utils-design-badge>
           </div>
 
           <div class="flex flex-wrap gap-2 items-center">

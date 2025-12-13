@@ -2,7 +2,7 @@
   "name": "@elixir-cloud/cloud-registry",
   "description": "Web Component for interacting with Elixir Cloud Registry",
   "license": "Apache-2.0",
-  "version": "2.0.0-alpha.40",
+  "version": "2.0.0-alpha.43",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

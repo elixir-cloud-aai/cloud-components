@@ -21,6 +21,7 @@ import "@elixir-cloud/design/components/skeleton/index.js";
  * @property {boolean} search - Determines if the search field should be rendered
  * @property {DrsProvider} provider - Custom data provider (optional, overrides baseUrl)
  *
+ * @fires ecc-objects-changed - Fired when objects data changes
  * @fires ecc-objects-selected - Fired when an object is selected
  */
 export class ECCClientGa4ghDrsObjects extends LitElement {
@@ -47,7 +48,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
   @state() private error: string | null = null;
   @state() private searchTimeout: ReturnType<typeof setTimeout> | null = null;
   @state() private totalObjects = 0;
-  @state() private lastPage = -1;
+  @state() private totalPages = 0;
 
   private _provider: DrsProvider | null = null;
 
@@ -89,14 +90,25 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
     this.error = null;
 
     try {
-      const offset = (this.currentPage - 1) * this.pageSize;
-      const result = await this._provider.getObjects(this.pageSize, offset);
+      // API treats offset as page number, not actual offset
+      const result = await this._provider.getObjects(
+        this.pageSize,
+        this.currentPage - 1
+      );
       this.objects = result.objects;
 
-      if (this.objects.length === 0) {
-        this.lastPage = this.currentPage - 1;
+      // Update total objects and pages from API response
+      if (result.pagination?.total !== undefined) {
+        this.totalObjects = result.pagination.total;
+        this.totalPages = Math.ceil(this.totalObjects / this.pageSize);
+      } else if (this.objects.length === 0) {
+        // Fallback: estimate based on current response
+        this.totalPages = Math.max(0, this.currentPage - 1);
       } else if (this.objects.length < this.pageSize) {
-        this.lastPage = this.currentPage;
+        this.totalPages = this.currentPage;
+      } else {
+        // We don't know the total, so assume there are more pages
+        this.totalPages = -1; // -1 means unknown total
       }
 
       // Update UI based on returned items
@@ -104,14 +116,20 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
         // If we get no results and we're not on the first page, go back a page
         this.currentPage -= 1;
         this.loadData();
+        return;
       }
+
+      // Emit an event with the updated objects
+      this.dispatchEvent(
+        new CustomEvent("ecc-objects-changed", {
+          detail: { objects: this.objects },
+          bubbles: true,
+          composed: true,
+        })
+      );
     } catch (err) {
       this.error =
         err instanceof Error ? err.message : "Failed to load objects";
-      console.error({
-        error: this.error,
-        breakPoint: "ECCClientGa4ghDrsObjects.loadData",
-      });
     } finally {
       this.loading = false;
     }
@@ -128,7 +146,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
     // Set a new timeout for debouncing
     this.searchTimeout = setTimeout(() => {
       this.currentPage = 1; // Reset to first page on search
-      this.lastPage = -1; // Reset lastPage when search changes
+      this.totalPages = 0; // Reset total pages when search changes
       this.loadData();
     }, 500); // 500ms debounce time
   }
@@ -205,7 +223,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
             </ecc-utils-design-pagination-link>
           </ecc-utils-design-pagination-item>
 
-          ${this.lastPage === -1
+          ${this.totalPages === 0 || this.totalPages === -1
             ? html`
                 <ecc-utils-design-pagination-item>
                   <ecc-utils-design-pagination-link
@@ -222,7 +240,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                 </ecc-utils-design-pagination-item>
               `
             : ""}
-          ${this.lastPage !== -1 && this.currentPage < this.lastPage
+          ${this.totalPages > 0 && this.currentPage < this.totalPages
             ? html`
                 <ecc-utils-design-pagination-item>
                   <ecc-utils-design-pagination-link
@@ -236,23 +254,23 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                 </ecc-utils-design-pagination-item>
               `
             : ""}
-          ${this.lastPage !== -1 && this.currentPage < this.lastPage - 2
+          ${this.totalPages > 0 && this.currentPage < this.totalPages - 2
             ? html`
                 <ecc-utils-design-pagination-item>
                   <ecc-utils-design-pagination-ellipsis></ecc-utils-design-pagination-ellipsis>
                 </ecc-utils-design-pagination-item>
               `
             : ""}
-          ${this.lastPage !== -1 && this.currentPage < this.lastPage - 1
+          ${this.totalPages > 0 && this.currentPage < this.totalPages - 1
             ? html`
                 <ecc-utils-design-pagination-item>
                   <ecc-utils-design-pagination-link
                     @ecc-button-clicked=${(e: CustomEvent) => {
                       if (e.detail.variant === "link") {
-                        this.goToPage(this.lastPage);
+                        this.goToPage(this.totalPages);
                       }
                     }}
-                    >${this.lastPage}</ecc-utils-design-pagination-link
+                    >${this.totalPages}</ecc-utils-design-pagination-link
                   >
                 </ecc-utils-design-pagination-item>
               `
@@ -260,8 +278,8 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
 
           <ecc-utils-design-pagination-item>
             <ecc-utils-design-pagination-next
-              ?disabled=${this.lastPage !== -1 &&
-              this.lastPage === this.currentPage}
+              ?disabled=${this.totalPages > 0 &&
+              this.totalPages === this.currentPage}
               @ecc-button-clicked=${(e: CustomEvent) => {
                 if (e.detail.variant === "next") {
                   this.goToPage(this.currentPage + 1);
@@ -389,9 +407,6 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                 >Object Info</ecc-utils-design-table-head
               >
               <ecc-utils-design-table-head class="w-2/12"
-                >Type</ecc-utils-design-table-head
-              >
-              <ecc-utils-design-table-head class="w-2/12"
                 >Size</ecc-utils-design-table-head
               >
               <ecc-utils-design-table-head class="w-2/12"
@@ -419,10 +434,8 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                   </ecc-utils-design-table-row>
                 `;
               }
-              return this.objects.map((object) => {
-                const objectType =
-                  ECCClientGa4ghDrsObjects.getObjectType(object);
-                return html`
+              return this.objects.map(
+                (object) => html`
                   <ecc-utils-design-table-row>
                     <ecc-utils-design-table-cell class="w-6/12">
                       <div class="flex flex-col w-full">
@@ -448,11 +461,6 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                       </div>
                     </ecc-utils-design-table-cell>
                     <ecc-utils-design-table-cell class="w-2/12">
-                      <ecc-utils-design-badge variant=${objectType.variant}>
-                        ${objectType.label}
-                      </ecc-utils-design-badge>
-                    </ecc-utils-design-table-cell>
-                    <ecc-utils-design-table-cell class="w-2/12">
                       <span class="text-sm"
                         >${ECCClientGa4ghDrsObjects.formatFileSize(
                           object.size
@@ -467,16 +475,18 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                       >
                     </ecc-utils-design-table-cell>
                     <ecc-utils-design-table-cell class="w-2/12">
-                      <ecc-utils-design-button
-                        size="sm"
-                        @click=${() => this.handleObjectSelect(object.id)}
-                      >
-                        View Details
-                      </ecc-utils-design-button>
+                      <slot name=${`actions-${object.id}`}>
+                        <ecc-utils-design-button
+                          size="sm"
+                          @click=${() => this.handleObjectSelect(object.id)}
+                        >
+                          View Details
+                        </ecc-utils-design-button>
+                      </slot>
                     </ecc-utils-design-table-cell>
                   </ecc-utils-design-table-row>
-                `;
-              });
+                `
+              );
             })()}
           </ecc-utils-design-table-body>
         </ecc-utils-design-table>
