@@ -2,7 +2,7 @@
   "name": "@elixir-cloud/trs",
   "description": "Web Component for interacting with GA4GH TRS Standard",
   "license": "Apache-2.0",
-  "version": "2.0.0-alpha.45",
+  "version": "2.0.0-alpha.46",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
