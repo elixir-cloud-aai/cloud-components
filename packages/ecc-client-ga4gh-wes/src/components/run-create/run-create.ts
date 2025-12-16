@@ -414,6 +414,13 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
   }
 
   private resetForm(): void {
+    this.dispatchEvent(
+      new CustomEvent("ecc-run-create-reset", {
+        bubbles: true,
+        composed: true,
+      })
+    );
+
     this.formData = {
       workflowUrl: "",
       workflowType: this.defaultWorkflowType,
