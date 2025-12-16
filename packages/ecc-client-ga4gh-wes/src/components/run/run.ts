@@ -143,6 +143,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
     } catch (err) {
       this.error =
         err instanceof Error ? err.message : "Failed to load run details";
+      // eslint-disable-next-line no-console
       console.error({
         error: this.error,
         breakPoint: "ECCClientGa4ghWesRun.loadRunData",
@@ -231,7 +232,6 @@ export class ECCClientGa4ghWesRun extends LitElement {
 
   private renderRunHeader() {
     if (!this.run) return html``;
-    const stateInfo = ECCClientGa4ghWesRun.getStateInfo(this.run.state);
 
     return html`
       <div class="mb-6">
@@ -243,16 +243,16 @@ export class ECCClientGa4ghWesRun extends LitElement {
           </div>
 
           <div class="flex flex-wrap gap-2 items-center">
-                      ${(() => {
-                        const stateInfo = ECCClientGa4ghWesRun.getStateInfo(
-                          this.run.state
-                        );
-                        return html`
-                          <ecc-utils-design-badge variant=${stateInfo.variant}>
-                            ${stateInfo.label}
-                          </ecc-utils-design-badge>
-                        `;
-                      })()}
+            ${(() => {
+              const stateInfo = ECCClientGa4ghWesRun.getStateInfo(
+                this.run.state
+              );
+              return html`
+                <ecc-utils-design-badge variant=${stateInfo.variant}>
+                  ${stateInfo.label}
+                </ecc-utils-design-badge>
+              `;
+            })()}
             <ecc-utils-design-badge variant="outline">
               ${this.run.request.workflow_type}
             </ecc-utils-design-badge>
@@ -500,7 +500,6 @@ export class ECCClientGa4ghWesRun extends LitElement {
     key: string,
     label: string
   ): string {
-    console.log("resolveLogContent", raw, key, label);
     if (!raw) return `No ${label}.`;
     const cached = this.logContents[key];
     if (cached !== undefined) return cached;
