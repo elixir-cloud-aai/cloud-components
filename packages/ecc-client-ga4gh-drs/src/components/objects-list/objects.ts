@@ -95,7 +95,9 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
         this.pageSize,
         this.currentPage - 1
       );
-      this.objects = this.sortObjectsByLastUpdated(result.objects);
+      this.objects = ECCClientGa4ghDrsObjects.sortObjectsByLastUpdated(
+        result.objects
+      );
 
       // Update total objects and pages from API response
       if (result.pagination?.total !== undefined) {
@@ -166,12 +168,12 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
     this.loadData();
   }
 
-  private sortObjectsByLastUpdated(objects: DrsObject[]): DrsObject[] {
+  private static sortObjectsByLastUpdated(objects: DrsObject[]): DrsObject[] {
     return [...objects].sort((a, b) => {
       // Use updated_time if available, otherwise fall back to created_time
       const aTime = a.updated_time || a.created_time;
       const bTime = b.updated_time || b.created_time;
-      
+
       // Sort in reverse chronological order (most recent first)
       return new Date(bTime).getTime() - new Date(aTime).getTime();
     });
@@ -354,14 +356,14 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
 
   private static formatDateTime(dateString: string): string {
     try {
-      return new Date(dateString).toLocaleString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
+      return new Date(dateString).toLocaleString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
       });
     } catch {
       return dateString;
