@@ -95,7 +95,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
         this.pageSize,
         this.currentPage - 1
       );
-      this.objects = result.objects;
+      this.objects = this.sortObjectsByLastUpdated(result.objects);
 
       // Update total objects and pages from API response
       if (result.pagination?.total !== undefined) {
@@ -164,6 +164,17 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
     if (page < 1) return;
     this.currentPage = page;
     this.loadData();
+  }
+
+  private sortObjectsByLastUpdated(objects: DrsObject[]): DrsObject[] {
+    return [...objects].sort((a, b) => {
+      // Use updated_time if available, otherwise fall back to created_time
+      const aTime = a.updated_time || a.created_time;
+      const bTime = b.updated_time || b.created_time;
+      
+      // Sort in reverse chronological order (most recent first)
+      return new Date(bTime).getTime() - new Date(aTime).getTime();
+    });
   }
 
   private renderPagination() {
@@ -299,7 +310,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
         .map(
           () => html`
             <ecc-utils-design-table-row>
-              <ecc-utils-design-table-cell class="w-6/12">
+              <ecc-utils-design-table-cell class="w-5/12">
                 <div class="flex flex-col w-full gap-2">
                   <ecc-utils-design-skeleton
                     class="part:h-5 part:w-40"
@@ -317,14 +328,14 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                   class="part:h-4 part:w-20"
                 ></ecc-utils-design-skeleton>
               </ecc-utils-design-table-cell>
-              <ecc-utils-design-table-cell class="w-2/12">
+              <ecc-utils-design-table-cell class="w-2.5/12">
                 <ecc-utils-design-skeleton
                   class="part:h-4 part:w-24"
                 ></ecc-utils-design-skeleton>
               </ecc-utils-design-table-cell>
-              <ecc-utils-design-table-cell class="w-2/12">
+              <ecc-utils-design-table-cell class="w-2.5/12">
                 <ecc-utils-design-skeleton
-                  class="part:h-8 part:w-8 part:rounded"
+                  class="part:h-4 part:w-24"
                 ></ecc-utils-design-skeleton>
               </ecc-utils-design-table-cell>
             </ecc-utils-design-table-row>
@@ -341,9 +352,17 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
     return `${parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`;
   }
 
-  private static formatDate(dateString: string): string {
+  private static formatDateTime(dateString: string): string {
     try {
-      return new Date(dateString).toLocaleDateString();
+      return new Date(dateString).toLocaleString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      });
     } catch {
       return dateString;
     }
@@ -403,18 +422,18 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
         <ecc-utils-design-table>
           <ecc-utils-design-table-header>
             <ecc-utils-design-table-row>
-              <ecc-utils-design-table-head class="w-6/12"
+              <ecc-utils-design-table-head class="w-5/12"
                 >Object Info</ecc-utils-design-table-head
               >
               <ecc-utils-design-table-head class="w-2/12"
                 >Size</ecc-utils-design-table-head
               >
-              <ecc-utils-design-table-head class="w-2/12"
+              <ecc-utils-design-table-head class="w-2.5/12"
                 >Created</ecc-utils-design-table-head
               >
-              <ecc-utils-design-table-head
-                class="w-2/12"
-              ></ecc-utils-design-table-head>
+              <ecc-utils-design-table-head class="w-2.5/12"
+                >Last Updated</ecc-utils-design-table-head
+              >
             </ecc-utils-design-table-row>
           </ecc-utils-design-table-header>
           <ecc-utils-design-table-body>
@@ -426,7 +445,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                 return html`
                   <ecc-utils-design-table-row>
                     <ecc-utils-design-table-cell
-                      colspan="5"
+                      colspan="4"
                       class="part:text-center part:py-8 part:text-muted-foreground"
                     >
                       No objects found
@@ -437,7 +456,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
               return this.objects.map(
                 (object) => html`
                   <ecc-utils-design-table-row>
-                    <ecc-utils-design-table-cell class="w-6/12">
+                    <ecc-utils-design-table-cell class="w-5/12">
                       <div class="flex flex-col w-full">
                         <ecc-utils-design-button
                           class="part:font-medium part:text-primary part:w-fit part:cursor-pointer part:p-0"
@@ -467,22 +486,19 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                         )}</span
                       >
                     </ecc-utils-design-table-cell>
-                    <ecc-utils-design-table-cell class="w-2/12">
+                    <ecc-utils-design-table-cell class="w-2.5/12">
                       <span class="text-sm"
-                        >${ECCClientGa4ghDrsObjects.formatDate(
+                        >${ECCClientGa4ghDrsObjects.formatDateTime(
                           object.created_time
                         )}</span
                       >
                     </ecc-utils-design-table-cell>
-                    <ecc-utils-design-table-cell class="w-2/12">
-                      <slot name=${`actions-${object.id}`}>
-                        <ecc-utils-design-button
-                          size="sm"
-                          @click=${() => this.handleObjectSelect(object.id)}
-                        >
-                          View Details
-                        </ecc-utils-design-button>
-                      </slot>
+                    <ecc-utils-design-table-cell class="w-2.5/12">
+                      <span class="text-sm"
+                        >${ECCClientGa4ghDrsObjects.formatDateTime(
+                          object.updated_time || object.created_time
+                        )}</span
+                      >
                     </ecc-utils-design-table-cell>
                   </ecc-utils-design-table-row>
                 `
