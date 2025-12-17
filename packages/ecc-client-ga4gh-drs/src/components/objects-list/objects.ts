@@ -23,6 +23,10 @@ import "@elixir-cloud/design/components/skeleton/index.js";
  *
  * @fires ecc-objects-changed - Fired when objects data changes
  * @fires ecc-objects-selected - Fired when an object is selected
+ *
+ * @breaking-change The `actions-${object.id}` slot has been removed in favor of
+ *                  clickable dataset titles. Use the `ecc-objects-selected` event
+ *                  to handle object selection instead.
  */
 export class ECCClientGa4ghDrsObjects extends LitElement {
   static styles = [
@@ -170,11 +174,13 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
 
   private static sortObjectsByLastUpdated(objects: DrsObject[]): DrsObject[] {
     return [...objects].sort((a, b) => {
-      // Use updated_time if available, otherwise fall back to created_time
       const aTime = a.updated_time || a.created_time;
       const bTime = b.updated_time || b.created_time;
 
-      // Sort in reverse chronological order (most recent first)
+      if (!aTime && !bTime) return 0;
+      if (!aTime) return 1;
+      if (!bTime) return -1;
+
       return new Date(bTime).getTime() - new Date(aTime).getTime();
     });
   }
@@ -356,7 +362,9 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
 
   private static formatDateTime(dateString: string): string {
     try {
-      return new Date(dateString).toLocaleString("en-US", {
+      if (!dateString) return "—";
+
+      return new Date(dateString).toLocaleString(undefined, {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
@@ -366,7 +374,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
         hour12: false,
       });
     } catch {
-      return dateString;
+      return dateString || "—";
     }
   }
 
