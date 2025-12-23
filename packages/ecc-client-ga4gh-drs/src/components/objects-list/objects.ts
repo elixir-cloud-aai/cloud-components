@@ -482,18 +482,22 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                       >
                     </ecc-utils-design-table-cell>
                     <ecc-utils-design-table-cell class="w-2.5/12">
-                      <span class="text-sm"
-                        >${ECCClientGa4ghDrsObjects.formatDateTime(
-                          object.created_time
-                        )}</span
-                      >
+                      <slot name="created-date">
+                        <span class="text-sm">
+                          ${ECCClientGa4ghDrsObjects.formatDateTime(
+                            object.created_time
+                          )}
+                        </span>
+                      </slot>
                     </ecc-utils-design-table-cell>
                     <ecc-utils-design-table-cell class="w-2.5/12">
-                      <span class="text-sm"
-                        >${ECCClientGa4ghDrsObjects.formatDateTime(
-                          object.updated_time || object.created_time
-                        )}</span
-                      >
+                      <slot name="updated-date">
+                        <span class="text-sm">
+                          ${ECCClientGa4ghDrsObjects.formatDateTime(
+                            object.updated_time || object.created_time
+                          )}
+                        </span>
+                      </slot>
                     </ecc-utils-design-table-cell>
                   </ecc-utils-design-table-row>
                 `
