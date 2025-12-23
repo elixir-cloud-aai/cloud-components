@@ -99,9 +99,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
         this.pageSize,
         this.currentPage - 1
       );
-      this.objects = ECCClientGa4ghDrsObjects.sortObjectsByLastUpdated(
-        result.objects
-      );
+      this.objects = result.objects;
 
       // Update total objects and pages from API response
       if (result.pagination?.total !== undefined) {
@@ -170,19 +168,6 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
     if (page < 1) return;
     this.currentPage = page;
     this.loadData();
-  }
-
-  private static sortObjectsByLastUpdated(objects: DrsObject[]): DrsObject[] {
-    return [...objects].sort((a, b) => {
-      const aTime = a.updated_time || a.created_time;
-      const bTime = b.updated_time || b.created_time;
-
-      if (!aTime && !bTime) return 0;
-      if (!aTime) return 1;
-      if (!bTime) return -1;
-
-      return new Date(bTime).getTime() - new Date(aTime).getTime();
-    });
   }
 
   private renderPagination() {
