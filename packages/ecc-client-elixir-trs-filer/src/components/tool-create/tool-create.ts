@@ -50,9 +50,42 @@ type UIFileType =
  * @property {string} baseUrl - Base URL of the TRS instance/gateway
  * @property {TrsProvider} provider - Custom data provider (optional, overrides baseUrl)
  *
+ * // Default value properties for basic fields
+ * @property {string} defaultName - Default value for tool name
+ * @property {string} defaultOrganization - Default value for organization
+ * @property {string} defaultDescription - Default value for description
+ * @property {string} defaultToolClassId - Default value for tool class ID
+ * @property {string} defaultAliases - Default value for aliases (comma-separated)
+ * @property {string} defaultCheckerUrl - Default value for checker URL
+ * @property {string} defaultCustomToolId - Default value for custom tool ID
+ *
+ * // Default value properties for version fields
+ * @property {string} defaultVersionName - Default value for version name
+ * @property {string} defaultVersionAuthor - Default value for version author (comma-separated)
+ * @property {boolean} defaultIsProduction - Default value for production status
+ * @property {boolean} defaultSigned - Default value for signed status
+ * @property {boolean} defaultVerified - Default value for verified status
+ * @property {string} defaultVerifiedSource - Default value for verified source (comma-separated)
+ * @property {string} defaultIncludedApps - Default value for included apps (comma-separated)
+ * @property {string} defaultCustomVersionId - Default value for custom version ID
+ * @property {DescriptorType[]} supportedDescriptorTypes - Array of supported descriptor types to filter available workflow languages
+ *
  * @fires ecc-tool-created - Fired when a tool is successfully created (includes toolId, toolData, and success message)
  * @fires ecc-tool-create-failed - Fired when tool creation fails
  * @fires ecc-tool-create-validation-failed - Fired when there are validation errors during tool creation
+ * @fires ecc-tool-create-input-changed - Fired when an input field is changed
+ *
+ * @slot tool-name - Custom content for tool name field (default field used if empty)
+ * @slot organization - Custom content for organization field (default field used if empty)
+ * @slot description - Custom content for description field (default field used if empty)
+ * @slot tool-class - Custom content for tool class field (default field used if empty)
+ * @slot custom-tool-id - Custom content for custom tool ID field (default field used if empty)
+ * @slot aliases - Custom content for aliases field (default field used if empty)
+ * @slot checker-url - Custom content for checker URL field (default field used if empty)
+ * @slot version-name - Custom content for version name field (default field used if empty)
+ * @slot version-author - Custom content for version author field (default field used if empty)
+ * @slot version-advanced-options - Custom content for advanced version options section (default advanced version options used if empty)
+ * @slot advanced-fields - Custom content for entire advanced fields section (default advanced fields used if empty)
  */
 export class ECCClientElixirTrsToolCreate extends LitElement {
   static styles = [
@@ -77,6 +110,52 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
 
   @property({ type: String, reflect: true }) baseUrl = "";
   @property({ attribute: false, reflect: true }) provider?: TrsFilerProvider;
+
+  // Default value properties for basic fields
+  @property({ type: String, attribute: "default-name" }) defaultName = "";
+  @property({ type: String, attribute: "default-organization" })
+  defaultOrganization = "";
+
+  @property({ type: String, attribute: "default-description" })
+  defaultDescription = "";
+
+  @property({ type: String, attribute: "default-tool-class-id" })
+  defaultToolClassId = "";
+
+  @property({ type: String, attribute: "default-aliases" }) defaultAliases = "";
+  @property({ type: String, attribute: "default-checker-url" })
+  defaultCheckerUrl = "";
+
+  @property({ type: String, attribute: "default-custom-tool-id" })
+  defaultCustomToolId = "";
+
+  // Default value properties for version fields
+  @property({ type: String, attribute: "default-version-name" })
+  defaultVersionName = "";
+
+  @property({ type: String, attribute: "default-version-author" })
+  defaultVersionAuthor = "";
+
+  @property({ type: Boolean, attribute: "default-is-production" })
+  defaultIsProduction = false;
+
+  @property({ type: Boolean, attribute: "default-signed" }) defaultSigned =
+    false;
+
+  @property({ type: Boolean, attribute: "default-verified" }) defaultVerified =
+    false;
+
+  @property({ type: String, attribute: "default-verified-source" })
+  defaultVerifiedSource = "";
+
+  @property({ type: String, attribute: "default-included-apps" })
+  defaultIncludedApps = "";
+
+  @property({ type: String, attribute: "default-custom-version-id" })
+  defaultCustomVersionId = "";
+
+  @property({ type: Array, reflect: true })
+  supportedDescriptorTypes: DescriptorType[] = [];
 
   @state() private toolClasses: ToolClass[] = [];
   @state() private loading = false;
@@ -154,6 +233,9 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
   } = {};
 
   protected async firstUpdated(): Promise<void> {
+    // Initialize form data with default values
+    this.initializeFormWithDefaults();
+
     if (!this.baseUrl && !this.provider) {
       this.dispatchEvent(
         new CustomEvent("ecc-tool-create-validation-failed", {
@@ -181,7 +263,80 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
     }
   }
 
+  private initializeFormWithDefaults(): void {
+    this.formData = {
+      name: this.defaultName,
+      organization: this.defaultOrganization,
+      description: this.defaultDescription,
+      toolClassId: this.defaultToolClassId,
+      aliases: this.defaultAliases
+        ? this.defaultAliases
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : [],
+      checkerUrl: this.defaultCheckerUrl,
+      hasChecker: Boolean(this.defaultCheckerUrl),
+      customToolId: this.defaultCustomToolId,
+      useCustomId: Boolean(this.defaultCustomToolId),
+    };
+
+    // Initialize first version with default values
+    if (this.versions.length > 0) {
+      this.versions[0] = {
+        ...this.versions[0],
+        name: this.defaultVersionName,
+        author: this.defaultVersionAuthor
+          ? this.defaultVersionAuthor
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [],
+        isProduction: this.defaultIsProduction,
+        signed: this.defaultSigned,
+        verified: this.defaultVerified,
+        verifiedSource: this.defaultVerifiedSource
+          ? this.defaultVerifiedSource
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [],
+        includedApps: this.defaultIncludedApps
+          ? this.defaultIncludedApps
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [],
+        customVersionId: this.defaultCustomVersionId,
+        useCustomVersionId: Boolean(this.defaultCustomVersionId),
+      };
+    }
+  }
+
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
+    // Re-initialize defaults if any default property changes
+    const defaultProps = [
+      "defaultName",
+      "defaultOrganization",
+      "defaultDescription",
+      "defaultToolClassId",
+      "defaultAliases",
+      "defaultCheckerUrl",
+      "defaultCustomToolId",
+      "defaultVersionName",
+      "defaultVersionAuthor",
+      "defaultIsProduction",
+      "defaultSigned",
+      "defaultVerified",
+      "defaultVerifiedSource",
+      "defaultIncludedApps",
+      "defaultCustomVersionId",
+    ];
+
+    if (defaultProps.some((prop) => changedProperties.has(prop))) {
+      this.initializeFormWithDefaults();
+    }
+
     if (changedProperties.has("baseUrl") && this.baseUrl) {
       this._provider = new RestTrsFilerProvider(this.baseUrl);
       this.loadToolClasses();
@@ -239,18 +394,33 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
     this.versions = [
       ...this.versions,
       {
-        name: "",
-        author: [],
+        name: this.defaultVersionName,
+        author: this.defaultVersionAuthor
+          ? this.defaultVersionAuthor
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [],
         descriptorTypes: [],
-        isProduction: false,
-        signed: false,
-        verified: false,
-        verifiedSource: [],
-        includedApps: [],
+        isProduction: this.defaultIsProduction,
+        signed: this.defaultSigned,
+        verified: this.defaultVerified,
+        verifiedSource: this.defaultVerifiedSource
+          ? this.defaultVerifiedSource
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [],
+        includedApps: this.defaultIncludedApps
+          ? this.defaultIncludedApps
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [],
         files: [],
         images: [],
-        customVersionId: "",
-        useCustomVersionId: false,
+        customVersionId: this.defaultCustomVersionId,
+        useCustomVersionId: Boolean(this.defaultCustomVersionId),
       },
     ];
   }
@@ -874,127 +1044,126 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
   }
 
   private resetForm(): void {
-    this.formData = {
-      name: "",
-      organization: "",
-      description: "",
-      toolClassId: "",
-      aliases: [],
-      checkerUrl: "",
-      hasChecker: false,
-      customToolId: "",
-      useCustomId: false,
-    };
-    this.versions = [
-      {
-        name: "",
-        author: [],
-        descriptorTypes: [],
-        isProduction: false,
-        signed: false,
-        verified: false,
-        verifiedSource: [],
-        includedApps: [],
-        files: [],
-        images: [],
-        customVersionId: "",
-        useCustomVersionId: false,
-      },
-    ];
+    // Reset to default values instead of empty values
+    this.initializeFormWithDefaults();
+
+    this.error = null;
+    this.success = null;
+    this.activeFileIndex = {};
+    this.activeDescriptorType = {};
   }
 
   private renderBasicFields() {
     return html`
       <div class="grid gap-4">
         <!-- Tool Name, Organization, Tool Class in same row on desktop -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="grid gap-2">
-            <ecc-utils-design-label for="tool-name" class="text-sm font-medium">
-              Tool Name
-            </ecc-utils-design-label>
-            <ecc-utils-design-input
-              id="tool-name"
-              .value=${this.formData.name}
-              @ecc-input-changed=${(e: CustomEvent) =>
-                this.handleInputChange("name", e.detail.value)}
-              placeholder="Enter a descriptive name for your tool"
-              class="h-10"
-            ></ecc-utils-design-input>
-          </div>
+        <div class="flex md:flex-row flex-col">
+          <!-- Tool Name Field -->
+          <slot name="tool-name">
+            <div class="flex-1 pr-4">
+              <ecc-utils-design-label
+                for="tool-name"
+                class="text-sm font-medium"
+              >
+                Tool Name
+              </ecc-utils-design-label>
+              <ecc-utils-design-input
+                id="tool-name"
+                .value=${this.formData.name}
+                @ecc-input-changed=${(e: CustomEvent) =>
+                  this.handleInputChange("name", e.detail.value)}
+                placeholder="Enter a descriptive name for your tool"
+                class="h-10"
+              ></ecc-utils-design-input>
+            </div>
+          </slot>
 
-          <div class="grid gap-2">
-            <ecc-utils-design-label
-              for="organization"
-              class="text-sm font-medium"
-            >
-              Organization <span class="text-destructive">*</span>
-            </ecc-utils-design-label>
-            <ecc-utils-design-input
-              id="organization"
-              .value=${this.formData.organization}
-              @ecc-input-changed=${(e: CustomEvent) =>
-                this.handleInputChange("organization", e.detail.value)}
-              placeholder="Enter your organization name"
-              required
-              class="h-10"
-            ></ecc-utils-design-input>
-          </div>
+          <!-- Organization Field -->
+          <slot name="organization">
+            <div class="flex-1 pr-4">
+              <ecc-utils-design-label
+                for="organization"
+                class="text-sm font-medium"
+              >
+                Organization <span class="text-destructive">*</span>
+              </ecc-utils-design-label>
+              <ecc-utils-design-input
+                id="organization"
+                .value=${this.formData.organization}
+                @ecc-input-changed=${(e: CustomEvent) =>
+                  this.handleInputChange("organization", e.detail.value)}
+                placeholder="Enter your organization name"
+                required
+                class="h-10"
+              ></ecc-utils-design-input>
+            </div>
+          </slot>
 
-          <div class="grid gap-1">
-            <ecc-utils-design-label
-              for="tool-class"
-              class="text-sm font-medium"
-            >
-              Tool Class <span class="text-destructive">*</span>
-            </ecc-utils-design-label>
-            <ecc-utils-design-select
-              id="tool-class-select"
-              .value=${this.formData.toolClassId}
-              @ecc-input-changed=${(e: CustomEvent) => {
-                this.handleInputChange("toolClassId", e.detail.value);
-              }}
-              required
-            >
-              <ecc-utils-design-select-trigger class="h-10">
-                <ecc-utils-design-select-value
-                  placeholder="Select a tool class"
-                ></ecc-utils-design-select-value>
-              </ecc-utils-design-select-trigger>
+          <!-- Tool Class Field -->
+          <slot name="tool-class">
+            <div class="flex-1">
+              <ecc-utils-design-label
+                for="tool-class"
+                class="text-sm font-medium"
+              >
+                Tool Class <span class="text-destructive">*</span>
+              </ecc-utils-design-label>
+              <ecc-utils-design-select
+                id="tool-class-select"
+                .value=${this.formData.toolClassId}
+                @ecc-input-changed=${(e: CustomEvent) => {
+                  this.handleInputChange("toolClassId", e.detail.value);
+                }}
+                required
+              >
+                <ecc-utils-design-select-trigger class="h-10">
+                  <ecc-utils-design-select-value
+                    placeholder="Select a tool class"
+                  ></ecc-utils-design-select-value>
+                </ecc-utils-design-select-trigger>
 
-              <ecc-utils-design-select-content>
-                <ecc-utils-design-select-item value="">
-                  Select a tool class
-                </ecc-utils-design-select-item>
-                ${this.toolClasses.map(
-                  (tc) => html`
-                    <ecc-utils-design-select-item value=${tc.id}>
-                      <div class="flex flex-col">
-                        <span class="font-medium">${tc.name}</span>
-                      </div>
-                    </ecc-utils-design-select-item>
-                  `
-                )}
-              </ecc-utils-design-select-content>
-            </ecc-utils-design-select>
-          </div>
+                <ecc-utils-design-select-content>
+                  <ecc-utils-design-select-item value="">
+                    Select a tool class
+                  </ecc-utils-design-select-item>
+                  ${this.toolClasses.map(
+                    (tc) => html`
+                      <ecc-utils-design-select-item value=${tc.id}>
+                        <div class="flex flex-col">
+                          <span class="font-medium">${tc.name}</span>
+                        </div>
+                      </ecc-utils-design-select-item>
+                    `
+                  )}
+                </ecc-utils-design-select-content>
+              </ecc-utils-design-select>
+            </div>
+          </slot>
         </div>
 
         <!-- Description spans full width -->
-        <div class="grid gap-2">
-          <ecc-utils-design-label for="description" class="text-sm font-medium">
-            Description
-          </ecc-utils-design-label>
-          <ecc-utils-design-textarea
-            id="description"
-            .value=${this.formData.description}
-            @ecc-input-changed=${(e: CustomEvent) =>
-              this.handleInputChange("description", e.detail.value)}
-            placeholder="Provide a detailed description of what your tool does"
-            rows="4"
-            class="resize-none"
-          ></ecc-utils-design-textarea>
-        </div>
-        ${this.renderAdvancedFields()}
+        <slot name="description">
+          <div class="grid gap-2">
+            <ecc-utils-design-label
+              for="description"
+              class="text-sm font-medium"
+            >
+              Description
+            </ecc-utils-design-label>
+            <ecc-utils-design-textarea
+              id="description"
+              .value=${this.formData.description}
+              @ecc-input-changed=${(e: CustomEvent) =>
+                this.handleInputChange("description", e.detail.value)}
+              placeholder="Provide a detailed description of what your tool does"
+              rows="4"
+              class="resize-none"
+            ></ecc-utils-design-textarea>
+          </div>
+        </slot>
+
+        <!-- Advanced Fields -->
+        <slot name="advanced-fields"> ${this.renderAdvancedFields()} </slot>
       </div>
     `;
   }
@@ -1033,68 +1202,74 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
               <!-- Tool Configuration in grid layout -->
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <!-- Custom Tool ID Section -->
-                <div class="grid gap-2">
-                  <ecc-utils-design-label
-                    for="custom-tool-id"
-                    class="text-sm font-medium h-6"
-                  >
-                    Custom Tool ID
-                  </ecc-utils-design-label>
-                  <ecc-utils-design-input
-                    id="custom-tool-id"
-                    .value=${this.formData.customToolId}
-                    @ecc-input-changed=${(e: CustomEvent) => {
-                      this.handleInputChange("customToolId", e.detail.value);
-                      this.handleInputChange(
-                        "useCustomId",
-                        Boolean(e.detail.value)
-                      );
-                    }}
-                    placeholder="my-org/my-tool (optional)"
-                    class="h-10"
-                  ></ecc-utils-design-input>
-                </div>
+                <slot name="custom-tool-id">
+                  <div class="grid gap-2">
+                    <ecc-utils-design-label
+                      for="custom-tool-id"
+                      class="text-sm font-medium h-6"
+                    >
+                      Custom Tool ID
+                    </ecc-utils-design-label>
+                    <ecc-utils-design-input
+                      id="custom-tool-id"
+                      .value=${this.formData.customToolId}
+                      @ecc-input-changed=${(e: CustomEvent) => {
+                        this.handleInputChange("customToolId", e.detail.value);
+                        this.handleInputChange(
+                          "useCustomId",
+                          Boolean(e.detail.value)
+                        );
+                      }}
+                      placeholder="my-org/my-tool (optional)"
+                      class="h-10"
+                    ></ecc-utils-design-input>
+                  </div>
+                </slot>
 
                 <!-- Aliases Section -->
-                <div class="grid gap-2">
-                  <ecc-utils-design-label
-                    for="aliases"
-                    class="text-sm font-medium h-6"
-                  >
-                    Aliases
-                  </ecc-utils-design-label>
-                  <ecc-utils-design-input
-                    id="aliases"
-                    .value=${this.formData.aliases.join(", ")}
-                    @ecc-input-changed=${(e: CustomEvent) =>
-                      this.handleArrayInputChange("aliases", e.detail.value)}
-                    placeholder="alias1, alias2, alias3"
-                    class="h-10"
-                  ></ecc-utils-design-input>
-                </div>
+                <slot name="aliases">
+                  <div class="grid gap-2">
+                    <ecc-utils-design-label
+                      for="aliases"
+                      class="text-sm font-medium h-6"
+                    >
+                      Aliases
+                    </ecc-utils-design-label>
+                    <ecc-utils-design-input
+                      id="aliases"
+                      .value=${this.formData.aliases.join(", ")}
+                      @ecc-input-changed=${(e: CustomEvent) =>
+                        this.handleArrayInputChange("aliases", e.detail.value)}
+                      placeholder="alias1, alias2, alias3"
+                      class="h-10"
+                    ></ecc-utils-design-input>
+                  </div>
+                </slot>
 
                 <!-- Checker Tool Section -->
-                <div class="grid gap-2">
-                  <ecc-utils-design-label
-                    for="checker-url"
-                    class="text-sm font-medium h-6"
-                  >
-                    Checker Tool URL
-                  </ecc-utils-design-label>
-                  <ecc-utils-design-input
-                    id="checker-url"
-                    .value=${this.formData.checkerUrl}
-                    @ecc-input-changed=${(e: CustomEvent) => {
-                      this.handleInputChange("checkerUrl", e.detail.value);
-                      this.handleInputChange(
-                        "hasChecker",
-                        Boolean(e.detail.value)
-                      );
-                    }}
-                    placeholder="https://example.com/checker-tool (optional)"
-                    class="h-10"
-                  ></ecc-utils-design-input>
-                </div>
+                <slot name="checker-url">
+                  <div class="grid gap-2">
+                    <ecc-utils-design-label
+                      for="checker-url"
+                      class="text-sm font-medium h-6"
+                    >
+                      Checker Tool URL
+                    </ecc-utils-design-label>
+                    <ecc-utils-design-input
+                      id="checker-url"
+                      .value=${this.formData.checkerUrl}
+                      @ecc-input-changed=${(e: CustomEvent) => {
+                        this.handleInputChange("checkerUrl", e.detail.value);
+                        this.handleInputChange(
+                          "hasChecker",
+                          Boolean(e.detail.value)
+                        );
+                      }}
+                      placeholder="https://example.com/checker-tool (optional)"
+                      class="h-10"
+                    ></ecc-utils-design-input>
+                  </div>
+                </slot>
               </div>
             </div>
           </ecc-utils-design-collapsible-content>
@@ -1196,47 +1371,62 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
     return html`
       <div class="flex flex-col gap-4 pt-4">
         <!-- Basic Version Information -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="grid gap-2">
-            <ecc-utils-design-label class="text-sm font-medium h-6"
-              >Version Name</ecc-utils-design-label
-            >
-            <ecc-utils-design-input
-              .value=${version.name}
-              @ecc-input-changed=${(e: CustomEvent) =>
-                this.handleVersionChange(index, "name", e.detail.value)}
-              placeholder="e.g., v1.0.0"
-              class="h-10"
-            ></ecc-utils-design-input>
-          </div>
+        <div class="flex md:flex-row flex-col">
+          <!-- Version Name Field -->
+          <slot name="version-${index}-name">
+            <div class="flex-1 pr-4">
+              <ecc-utils-design-label class="text-sm font-medium h-6"
+                >Version Name</ecc-utils-design-label
+              >
+              <ecc-utils-design-input
+                .value=${version.name}
+                @ecc-input-changed=${(e: CustomEvent) =>
+                  this.handleVersionChange(index, "name", e.detail.value)}
+                placeholder="e.g., v1.0.0"
+                class="h-10"
+              ></ecc-utils-design-input>
+            </div>
+          </slot>
 
-          <div class="grid gap-2">
-            <ecc-utils-design-label class="text-sm font-medium h-6">
-              Authors (comma-separated)
-            </ecc-utils-design-label>
-            <ecc-utils-design-input
-              .value=${version.author.join(", ")}
-              @ecc-input-changed=${(e: CustomEvent) => {
-                const authors = e.detail.value
-                  .split(",")
-                  .map((a: string) => a.trim())
-                  .filter((a: string) => a);
-                this.handleVersionChange(index, "author", authors);
-              }}
-              placeholder="author1, author2"
-              class="h-10"
-            ></ecc-utils-design-input>
-          </div>
+          <!-- Version Author Field -->
+          <slot name="version-${index}-author">
+            <div class="flex-1 pr-4">
+              <ecc-utils-design-label class="text-sm font-medium h-6">
+                Authors (comma-separated)
+              </ecc-utils-design-label>
+              <ecc-utils-design-input
+                .value=${version.author.join(", ")}
+                @ecc-input-changed=${(e: CustomEvent) => {
+                  const authors = e.detail.value
+                    .split(",")
+                    .map((a: string) => a.trim())
+                    .filter((a: string) => a);
+                  this.handleVersionChange(index, "author", authors);
+                }}
+                placeholder="author1, author2"
+                class="h-10"
+              ></ecc-utils-design-input>
+            </div>
+          </slot>
 
           <!-- Descriptor Types Selection -->
-          <div class="grid">
+          <div class="flex-1">
             <ecc-utils-design-label class="text-sm font-medium"
-              >Supported Languages</ecc-utils-design-label
+              >Languages</ecc-utils-design-label
             >
             <ecc-utils-design-multi-select
               .value=${version.descriptorTypes}
-              placeholder="Select supported languages..."
+              placeholder="Select languages..."
               @ecc-input-changed=${(e: CustomEvent) => {
+                this.dispatchEvent(
+                  new CustomEvent("ecc-tool-create-input-changed", {
+                    detail: {
+                      value: e.detail.value,
+                      versionIndex: index,
+                      type: "version-descriptor-types",
+                    },
+                  })
+                );
                 const updatedVersions = [...this.versions];
                 const oldDescriptorTypes =
                   updatedVersions[index].descriptorTypes;
@@ -1292,248 +1482,267 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
               </ecc-utils-design-multi-select-trigger>
 
               <ecc-utils-design-multi-select-content>
-                <ecc-utils-design-multi-select-item value="CWL">
-                  CWL (Common Workflow Language)
-                </ecc-utils-design-multi-select-item>
-                <ecc-utils-design-multi-select-item value="WDL">
-                  WDL (Workflow Description Language)
-                </ecc-utils-design-multi-select-item>
-                <ecc-utils-design-multi-select-item value="NFL">
-                  Nextflow
-                </ecc-utils-design-multi-select-item>
-                <ecc-utils-design-multi-select-item value="GALAXY">
-                  Galaxy
-                </ecc-utils-design-multi-select-item>
-                <ecc-utils-design-multi-select-item value="SMK">
-                  Snakemake
-                </ecc-utils-design-multi-select-item>
+                ${this.renderDescriptorTypeOptions()}
               </ecc-utils-design-multi-select-content>
             </ecc-utils-design-multi-select>
           </div>
         </div>
 
         <!-- Advanced Version Options -->
-        <div class="">
-          <ecc-utils-design-collapsible>
-            <ecc-utils-design-collapsible-trigger>
-              <div
-                class="flex items-center justify-between w-full py-2 text-left hover:bg-muted/50 focus:outline-none focus:ring-1 focus:ring-ring rounded cursor-pointer transition-colors px-2"
-              >
-                <h4 class="text-sm font-medium text-muted-foreground">
-                  Advance Version Configuration
-                </h4>
-                <svg
-                  class="w-4 h-4 text-muted-foreground/60 transition-transform duration-200 shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+        <slot name="version-${index}-advanced-options">
+          <div class="">
+            <ecc-utils-design-collapsible>
+              <ecc-utils-design-collapsible-trigger>
+                <div
+                  class="flex items-center justify-between w-full py-2 text-left hover:bg-muted/50 focus:outline-none focus:ring-1 focus:ring-ring rounded cursor-pointer transition-colors px-2"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  ></path>
-                </svg>
-              </div>
-            </ecc-utils-design-collapsible-trigger>
+                  <h4 class="text-sm font-medium text-muted-foreground">
+                    Advance Version Configuration
+                  </h4>
+                  <svg
+                    class="w-4 h-4 text-muted-foreground/60 transition-transform duration-200 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    ></path>
+                  </svg>
+                </div>
+              </ecc-utils-design-collapsible-trigger>
 
-            <ecc-utils-design-collapsible-content>
-              <div class="pt-4 space-y-4 border-t border-border/50">
-                <!-- Tags and Custom Version ID in same row -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div class="grid gap-1">
-                    <ecc-utils-design-label class="text-sm font-medium h-6">
-                      Tags
-                    </ecc-utils-design-label>
-                    <ecc-utils-design-multi-select
-                      .value=${ECCClientElixirTrsToolCreate.getVersionTags(
-                        version
-                      )}
-                      placeholder="Select tags..."
-                      @ecc-input-changed=${(e: CustomEvent) => {
-                        this.handleVersionTagsChange(index, e.detail.value);
-                      }}
-                    >
-                      <ecc-utils-design-multi-select-trigger>
-                      </ecc-utils-design-multi-select-trigger>
-
-                      <ecc-utils-design-multi-select-content>
-                        <ecc-utils-design-multi-select-item value="prod">
-                          Production
-                        </ecc-utils-design-multi-select-item>
-                        <ecc-utils-design-multi-select-item value="verified">
-                          Verified
-                        </ecc-utils-design-multi-select-item>
-                        <ecc-utils-design-multi-select-item value="signed">
-                          Signed
-                        </ecc-utils-design-multi-select-item>
-                      </ecc-utils-design-multi-select-content>
-                    </ecc-utils-design-multi-select>
-                  </div>
-
-                  <div class="grid gap-2">
-                    <ecc-utils-design-label class="text-sm font-medium h-6">
-                      Custom Version ID
-                    </ecc-utils-design-label>
-                    <ecc-utils-design-input
-                      .value=${version.customVersionId}
-                      @ecc-input-changed=${(e: CustomEvent) =>
-                        this.handleVersionChange(
-                          index,
-                          "customVersionId",
-                          e.detail.value
+              <ecc-utils-design-collapsible-content>
+                <div class="pt-4 space-y-4 border-t border-border/50">
+                  <!-- Tags and Custom Version ID in same row -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid gap-1">
+                      <ecc-utils-design-label class="text-sm font-medium h-6">
+                        Tags
+                      </ecc-utils-design-label>
+                      <ecc-utils-design-multi-select
+                        .value=${ECCClientElixirTrsToolCreate.getVersionTags(
+                          version
                         )}
-                      placeholder="Enter custom version ID (optional)"
-                      class="h-10"
-                    ></ecc-utils-design-input>
+                        placeholder="Select tags..."
+                        @ecc-input-changed=${(e: CustomEvent) => {
+                          this.handleVersionTagsChange(index, e.detail.value);
+                        }}
+                      >
+                        <ecc-utils-design-multi-select-trigger>
+                        </ecc-utils-design-multi-select-trigger>
+
+                        <ecc-utils-design-multi-select-content>
+                          <ecc-utils-design-multi-select-item value="prod">
+                            Production
+                          </ecc-utils-design-multi-select-item>
+                          <ecc-utils-design-multi-select-item value="verified">
+                            Verified
+                          </ecc-utils-design-multi-select-item>
+                          <ecc-utils-design-multi-select-item value="signed">
+                            Signed
+                          </ecc-utils-design-multi-select-item>
+                        </ecc-utils-design-multi-select-content>
+                      </ecc-utils-design-multi-select>
+                    </div>
+
+                    <div class="grid gap-2">
+                      <ecc-utils-design-label class="text-sm font-medium h-6">
+                        Custom Version ID
+                      </ecc-utils-design-label>
+                      <ecc-utils-design-input
+                        .value=${version.customVersionId}
+                        @ecc-input-changed=${(e: CustomEvent) =>
+                          this.handleVersionChange(
+                            index,
+                            "customVersionId",
+                            e.detail.value
+                          )}
+                        placeholder="Enter custom version ID (optional)"
+                        class="h-10"
+                      ></ecc-utils-design-input>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </ecc-utils-design-collapsible-content>
-          </ecc-utils-design-collapsible>
-        </div>
+              </ecc-utils-design-collapsible-content>
+            </ecc-utils-design-collapsible>
+          </div>
+        </slot>
 
         <!-- Files Section -->
-        <div class="space-y-2">
-          <div class="flex justify-between items-center">
-            <h4 class="text-base font-semibold">Files</h4>
-            <div class="flex gap-2">
-              <div class="relative">
-                <input
-                  type="file"
-                  multiple
-                  @change=${(e: Event) => this.handleBulkFileUpload(index, e)}
-                  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  id="bulk-upload-${index}"
-                  ?disabled=${version.descriptorTypes.length === 0}
-                />
+        <slot
+          name="version-${index}-files-section"
+          version-index=${index}
+          .version=${version}
+          .files=${version.files}
+          .descriptorTypes=${version.descriptorTypes}
+          .activeDescriptorType=${this.activeDescriptorType[index]}
+          .activeFileIndex=${this.activeFileIndex[index]}
+          .onBulkFileUpload=${(e: Event) => this.handleBulkFileUpload(index, e)}
+          .onZipFileUpload=${(e: Event) => this.handleZipFileUpload(index, e)}
+          .onAddFile=${() => this.addFileToVersion(index)}
+          .onRemoveFile=${(fileIndex: number) =>
+            this.removeFileFromVersion(index, fileIndex)}
+          .onDescriptorTypeChange=${(descriptorType: DescriptorType) => {
+            this.activeDescriptorType = {
+              ...this.activeDescriptorType,
+              [index]: descriptorType,
+            };
+            this.requestUpdate();
+          }}
+          .onFileSelect=${(fileIndex: number) => {
+            this.activeFileIndex = {
+              ...this.activeFileIndex,
+              [index]: fileIndex,
+            };
+            this.requestUpdate();
+          }}
+          .onFileFieldChange=${(fileIndex: number, field: string, value: any) =>
+            this.handleFileFieldChange(index, fileIndex, field, value)}
+        >
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <h4 class="text-base font-semibold">Files</h4>
+              <div class="flex gap-2">
+                <div class="relative">
+                  <input
+                    type="file"
+                    multiple
+                    @change=${(e: Event) => this.handleBulkFileUpload(index, e)}
+                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    id="bulk-upload-${index}"
+                    ?disabled=${version.descriptorTypes.length === 0}
+                  />
+                  <ecc-utils-design-button
+                    variant="outline"
+                    size="sm"
+                    as="label"
+                    for="bulk-upload-${index}"
+                    .disabled=${version.descriptorTypes.length === 0}
+                  >
+                    Upload Files
+                  </ecc-utils-design-button>
+                </div>
+                <div class="relative">
+                  <input
+                    type="file"
+                    accept=".zip"
+                    @change=${(e: Event) => this.handleZipFileUpload(index, e)}
+                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    id="zip-upload-${index}"
+                    ?disabled=${version.descriptorTypes.length === 0}
+                  />
+                  <ecc-utils-design-button
+                    variant="outline"
+                    size="sm"
+                    as="label"
+                    for="zip-upload-${index}"
+                    .disabled=${version.descriptorTypes.length === 0}
+                  >
+                    Upload ZIP
+                  </ecc-utils-design-button>
+                </div>
                 <ecc-utils-design-button
+                  @click=${() => this.addFileToVersion(index)}
                   variant="outline"
                   size="sm"
-                  as="label"
-                  for="bulk-upload-${index}"
                   .disabled=${version.descriptorTypes.length === 0}
                 >
-                  Upload Files
+                  Add File Manually
                 </ecc-utils-design-button>
-              </div>
-              <div class="relative">
-                <input
-                  type="file"
-                  accept=".zip"
-                  @change=${(e: Event) => this.handleZipFileUpload(index, e)}
-                  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  id="zip-upload-${index}"
-                  ?disabled=${version.descriptorTypes.length === 0}
-                />
-                <ecc-utils-design-button
-                  variant="outline"
-                  size="sm"
-                  as="label"
-                  for="zip-upload-${index}"
-                  .disabled=${version.descriptorTypes.length === 0}
-                >
-                  Upload ZIP
-                </ecc-utils-design-button>
-              </div>
-              <ecc-utils-design-button
-                @click=${() => this.addFileToVersion(index)}
-                variant="outline"
-                size="sm"
-                .disabled=${version.descriptorTypes.length === 0}
-              >
-                Add File Manually
-              </ecc-utils-design-button>
-              ${version.descriptorTypes.length > 0
-                ? html`
-                    <div
-                      class="flex items-center gap-2 text-sm text-muted-foreground"
-                    >
-                      <span
-                        class="text-sm text-muted-foreground"
-                        style="font-style: italic;"
-                        >for:</span
+                ${version.descriptorTypes.length > 0
+                  ? html`
+                      <div
+                        class="flex items-center gap-2 text-sm text-muted-foreground"
                       >
-                      <ecc-utils-design-select
-                        .value=${this.activeDescriptorType[index] ||
-                        version.descriptorTypes[0]}
-                        @ecc-input-changed=${(e: CustomEvent) => {
-                          this.activeDescriptorType = {
-                            ...this.activeDescriptorType,
-                            [index]: e.detail.value,
-                          };
+                        <span
+                          class="text-sm text-muted-foreground"
+                          style="font-style: italic;"
+                          >for:</span
+                        >
+                        <ecc-utils-design-select
+                          .value=${this.activeDescriptorType[index] ||
+                          version.descriptorTypes[0]}
+                          @ecc-input-changed=${(e: CustomEvent) => {
+                            this.activeDescriptorType = {
+                              ...this.activeDescriptorType,
+                              [index]: e.detail.value,
+                            };
 
-                          // Find the first file of the newly selected descriptor type and select it
-                          if (e.detail.value) {
-                            const filteredFiles = version.files.filter(
-                              (file: any) =>
-                                file.descriptorType === e.detail.value
-                            );
-                            if (filteredFiles.length > 0) {
-                              // Find the original index of the first filtered file
-                              const firstFileIndex = version.files.indexOf(
-                                filteredFiles[0]
+                            // Find the first file of the newly selected descriptor type and select it
+                            if (e.detail.value) {
+                              const filteredFiles = version.files.filter(
+                                (file: any) =>
+                                  file.descriptorType === e.detail.value
                               );
-                              this.activeFileIndex = {
-                                ...this.activeFileIndex,
-                                [index]: firstFileIndex,
-                              };
+                              if (filteredFiles.length > 0) {
+                                // Find the original index of the first filtered file
+                                const firstFileIndex = version.files.indexOf(
+                                  filteredFiles[0]
+                                );
+                                this.activeFileIndex = {
+                                  ...this.activeFileIndex,
+                                  [index]: firstFileIndex,
+                                };
+                              } else {
+                                // No files for this descriptor type, clear selection
+                                this.activeFileIndex = {
+                                  ...this.activeFileIndex,
+                                  [index]: -1,
+                                };
+                              }
                             } else {
-                              // No files for this descriptor type, clear selection
+                              // No descriptor type selected, clear selection
                               this.activeFileIndex = {
                                 ...this.activeFileIndex,
                                 [index]: -1,
                               };
                             }
-                          } else {
-                            // No descriptor type selected, clear selection
-                            this.activeFileIndex = {
-                              ...this.activeFileIndex,
-                              [index]: -1,
-                            };
-                          }
 
-                          this.requestUpdate();
-                        }}
-                        class="w-24"
-                      >
-                        <ecc-utils-design-select-trigger
-                          class="part:text-sm part:h-8 part:w-24"
+                            this.requestUpdate();
+                          }}
+                          class="w-24"
                         >
-                          <ecc-utils-design-select-value></ecc-utils-design-select-value>
-                        </ecc-utils-design-select-trigger>
-                        <ecc-utils-design-select-content
-                          class="part:text-sm part:w-24 part:min-w-24"
-                        >
-                          ${version.descriptorTypes.map(
-                            (descriptorType: DescriptorType) => html`
-                              <ecc-utils-design-select-item
-                                value=${descriptorType}
-                                class="part:text-sm"
-                              >
-                                ${descriptorType}
-                              </ecc-utils-design-select-item>
-                            `
-                          )}
-                        </ecc-utils-design-select-content>
-                      </ecc-utils-design-select>
-                    </div>
-                  `
-                : ``}
+                          <ecc-utils-design-select-trigger
+                            class="part:text-sm part:h-8 part:w-24"
+                          >
+                            <ecc-utils-design-select-value></ecc-utils-design-select-value>
+                          </ecc-utils-design-select-trigger>
+                          <ecc-utils-design-select-content
+                            class="part:text-sm part:w-24 part:min-w-24"
+                          >
+                            ${version.descriptorTypes.map(
+                              (descriptorType: DescriptorType) => html`
+                                <ecc-utils-design-select-item
+                                  value=${descriptorType}
+                                  class="part:text-sm"
+                                >
+                                  ${descriptorType}
+                                </ecc-utils-design-select-item>
+                              `
+                            )}
+                          </ecc-utils-design-select-content>
+                        </ecc-utils-design-select>
+                      </div>
+                    `
+                  : ``}
+              </div>
             </div>
+
+            <!-- Language Filter Section -->
+
+            ${version.files.length === 0
+              ? html`<p class="text-gray-500 text-sm">
+                  ${version.descriptorTypes.length > 0
+                    ? "No files added yet. Upload files or add them manually."
+                    : "Select a language this version supports to upload and manage files."}
+                </p>`
+              : this.renderFilesLayout(index, version.files)}
           </div>
-
-          <!-- Language Filter Section -->
-
-          ${version.files.length === 0
-            ? html`<p class="text-gray-500 text-sm">
-                ${version.descriptorTypes.length > 0
-                  ? "No files added yet. Upload files or add them manually."
-                  : "Select a language this version supports to upload and manage files."}
-              </p>`
-            : this.renderFilesLayout(index, version.files)}
-        </div>
+        </slot>
       </div>
     `;
   }
@@ -1563,68 +1772,88 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
     );
 
     return html`
-      <div class="grid grid-cols-5 gap-4">
-        <!-- Files List Section - 1/5 of screen -->
-        <div class="col-span-5 md:col-span-1">
-          <div class="space-y-1 max-h-[400px] overflow-y-auto">
-            ${filteredFiles.map((file: any) => {
-              const originalIndex = files.indexOf(file);
-              return html`
-                <ecc-utils-design-button
-                  variant="ghost"
-                  type="button"
-                  class="part:h-8 part:w-full part:text-left part:px-3 part:py-1 part:rounded-md part:text-sm part:flex part:items-center part:justify-between ${this
-                    .activeFileIndex[versionIndex] === originalIndex
-                    ? "part:bg-primary/10"
-                    : "part:hover:bg-muted"}"
-                  @click=${() => {
-                    this.activeFileIndex = {
-                      ...this.activeFileIndex,
-                      [versionIndex]: originalIndex,
-                    };
-                    this.requestUpdate();
-                  }}
-                >
-                  <span class="truncate">
-                    ${file.path || `File ${originalIndex + 1}`}
-                    ${file.uiFileType
-                      ? html`<span class="text-xs text-muted-foreground ml-1"
-                          >(${file.uiFileType})</span
-                        >`
-                      : ""}
-                  </span>
+      <!-- Descriptor-specific files slot -->
+      <slot
+        name="version-${versionIndex}-${activeDescriptor}-files"
+        version-index=${versionIndex}
+        descriptor-type=${activeDescriptor}
+        .filteredFiles=${filteredFiles}
+        .activeFileIndex=${this.activeFileIndex[versionIndex]}
+        .onFileSelect=${(fileIndex: number) => {
+          this.activeFileIndex = {
+            ...this.activeFileIndex,
+            [versionIndex]: fileIndex,
+          };
+          this.requestUpdate();
+        }}
+        .onRemoveFile=${(originalIndex: number) =>
+          this.removeFileFromVersion(versionIndex, originalIndex)}
+        .onFileFieldChange=${(fileIndex: number, field: string, value: any) =>
+          this.handleFileFieldChange(versionIndex, fileIndex, field, value)}
+      >
+        <div class="grid grid-cols-5 gap-4">
+          <!-- Files List Section - 1/5 of screen -->
+          <div class="col-span-5 md:col-span-1">
+            <div class="space-y-1 max-h-[400px] overflow-y-auto">
+              ${filteredFiles.map((file: any) => {
+                const originalIndex = files.indexOf(file);
+                return html`
                   <ecc-utils-design-button
-                    type="button"
                     variant="ghost"
-                    class="part:h-8 part:w-8 part:text-left part:px-3 part:py-1 part:rounded-md part:text-sm part:flex part:items-center part:justify-between"
-                    @click=${(e: Event) => {
-                      e.stopPropagation();
-                      this.removeFileFromVersion(versionIndex, originalIndex);
+                    type="button"
+                    class="part:h-8 part:w-full part:text-left part:px-3 part:py-1 part:rounded-md part:text-sm part:flex part:items-center part:justify-between ${this
+                      .activeFileIndex[versionIndex] === originalIndex
+                      ? "part:bg-primary/10"
+                      : "part:hover:bg-muted"}"
+                    @click=${() => {
+                      this.activeFileIndex = {
+                        ...this.activeFileIndex,
+                        [versionIndex]: originalIndex,
+                      };
+                      this.requestUpdate();
                     }}
                   >
-                    ×
+                    <span class="truncate">
+                      ${file.path || `File ${originalIndex + 1}`}
+                      ${file.uiFileType
+                        ? html`<span class="text-xs text-muted-foreground ml-1"
+                            >(${file.uiFileType})</span
+                          >`
+                        : ""}
+                    </span>
+                    <ecc-utils-design-button
+                      type="button"
+                      variant="ghost"
+                      class="part:h-8 part:w-8 part:text-left part:px-3 part:py-1 part:rounded-md part:text-sm part:flex part:items-center part:justify-between"
+                      @click=${(e: Event) => {
+                        e.stopPropagation();
+                        this.removeFileFromVersion(versionIndex, originalIndex);
+                      }}
+                    >
+                      ×
+                    </ecc-utils-design-button>
                   </ecc-utils-design-button>
-                </ecc-utils-design-button>
-              `;
-            })}
+                `;
+              })}
+            </div>
+          </div>
+
+          <!-- Mobile Separator -->
+          <div class="block md:hidden col-span-5">
+            <ecc-utils-design-separator
+              orientation="horizontal"
+              class="part:my-4"
+            ></ecc-utils-design-separator>
+          </div>
+
+          <!-- File Content Section - 4/5 of screen -->
+          <div
+            class="col-span-5 md:col-span-4 md:border-l md:pl-4 md:border-muted w-full"
+          >
+            ${this.renderFileContentArea(versionIndex, files)}
           </div>
         </div>
-
-        <!-- Mobile Separator -->
-        <div class="block md:hidden col-span-5">
-          <ecc-utils-design-separator
-            orientation="horizontal"
-            class="part:my-4"
-          ></ecc-utils-design-separator>
-        </div>
-
-        <!-- File Content Section - 4/5 of screen -->
-        <div
-          class="col-span-5 md:col-span-4 md:border-l md:pl-4 md:border-muted w-full"
-        >
-          ${this.renderFileContentArea(versionIndex, files)}
-        </div>
-      </div>
+      </slot>
     `;
   }
 
@@ -1934,6 +2163,33 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
         </form>
       </div>
     `;
+  }
+
+  private renderDescriptorTypeOptions() {
+    // Define all available descriptor types with their display names
+    const allDescriptorTypes = [
+      { value: "CWL", label: "CWL (Common Workflow Language)" },
+      { value: "WDL", label: "WDL (Workflow Description Language)" },
+      { value: "NFL", label: "Nextflow" },
+      { value: "GALAXY", label: "Galaxy" },
+      { value: "SMK", label: "Snakemake" },
+    ];
+
+    // Filter by supported descriptor types if specified
+    const availableTypes =
+      this.supportedDescriptorTypes.length > 0
+        ? allDescriptorTypes.filter((type) =>
+            this.supportedDescriptorTypes.includes(type.value as DescriptorType)
+          )
+        : allDescriptorTypes;
+
+    return availableTypes.map(
+      (type) => html`
+        <ecc-utils-design-multi-select-item value=${type.value}>
+          ${type.label}
+        </ecc-utils-design-multi-select-item>
+      `
+    );
   }
 }
 

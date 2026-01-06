@@ -29,6 +29,12 @@ import "@elixir-cloud/design/components/code/index.js";
  * @property {string} baseUrl - Base URL of the TRS instance/gateway
  * @property {string} toolId - ID of the tool to display
  * @property {TrsProvider} provider - Custom data provider (optional, overrides baseUrl)
+ *
+ * @slot version-{index}-files-section - Custom content for files section of specific version (default files section used if empty)
+ * @slot version-{index}-{descriptor-type}-files - Custom content for files of specific version and descriptor type
+ * @slot version-{index}-files-header - Custom content for files header of specific version
+ * @slot version-{index}-files-list - Custom content for files list of specific version
+ * @slot version-{index}-file-content - Custom content for file content viewer of specific version
  */
 export class ECCClientGa4ghTrsTool extends LitElement {
   static styles = [
@@ -475,6 +481,11 @@ export class ECCClientGa4ghTrsTool extends LitElement {
     return version && version.descriptor_type ? version.descriptor_type : [];
   }
 
+  private getCurrentVersionIndex(): number {
+    if (!this.tool || !this.selectedVersion) return -1;
+    return this.tool.versions.findIndex((v) => v.id === this.selectedVersion);
+  }
+
   static renderLoading() {
     return html`
       <div class="space-y-6">
@@ -617,20 +628,6 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                     <dd>${this.tool.organization || "Not specified"}</dd>
                   </div>
                   <ecc-utils-design-separator></ecc-utils-design-separator>
-                  <div class="flex flex-row gap-2 w-full justify-between">
-                    <dt class="text-muted-foreground">URL</dt>
-                    <dd>
-                      <a
-                        href="${this.tool.url}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-primary hover:underline break-all"
-                      >
-                        ${this.tool.url}
-                      </a>
-                    </dd>
-                  </div>
-                  <ecc-utils-design-separator></ecc-utils-design-separator>
 
                   <div class="flex flex-row gap-2 w-full justify-between">
                     <dt class="text-muted-foreground">Checker Workflow</dt>
@@ -715,21 +712,6 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                               </dd>`}
                         </div>
 
-                        <ecc-utils-design-separator></ecc-utils-design-separator>
-
-                        <div class="flex flex-row gap-2 w-full justify-between">
-                          <dt class="text-muted-foreground">URL</dt>
-                          <dd>
-                            <a
-                              href="${version.url}"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              class="text-primary hover:underline break-all"
-                            >
-                              ${version.url}
-                            </a>
-                          </dd>
-                        </div>
                         <ecc-utils-design-separator></ecc-utils-design-separator>
 
                         <div class="flex flex-row gap-2 w-full justify-between">
@@ -928,114 +910,182 @@ export class ECCClientGa4ghTrsTool extends LitElement {
   private renderFilesTab() {
     if (!this.tool || !this.selectedVersion) return html``;
 
+    const versionIndex = this.getCurrentVersionIndex();
+    if (versionIndex === -1) return html``;
+
+    // Find the selected version object
+    const version = this.tool.versions[versionIndex];
+
     return html`
       <div class="mt-4">
-        <div class="w-full flex items-start justify-between">
-          <div class="w-full">Browse Files</div>
-          <div
-            class="flex items-center gap-2 text-sm w-full justify-end font-medium"
+        <!-- Version-specific Files Section Slot -->
+        <slot
+          name="version-${versionIndex}-files-section"
+          version-index=${versionIndex}
+          .tool=${this.tool}
+          .version=${version}
+          .selectedVersion=${this.selectedVersion}
+          .selectedDescriptorType=${this.selectedDescriptorType}
+          .toolFiles=${this.toolFiles}
+          .activeFileIndex=${this.activeFileIndex}
+          .fileContents=${this.fileContents}
+          .onDescriptorTypeChange=${(e: CustomEvent) =>
+            this.handleDescriptorTypeChange(e)}
+          .onFileSelect=${(index: number) => this.viewFileContent(index)}
+          .getAvailableDescriptorTypes=${() =>
+            this.getAvailableDescriptorTypes()}
+        >
+          <!-- Version-specific Files Header Slot -->
+          <slot
+            name="version-${versionIndex}-files-header"
+            version-index=${versionIndex}
+            .selectedDescriptorType=${this.selectedDescriptorType}
+            .availableDescriptorTypes=${this.getAvailableDescriptorTypes()}
+            .onDescriptorTypeChange=${(e: CustomEvent) =>
+              this.handleDescriptorTypeChange(e)}
           >
-            <ecc-utils-design-select
-              @ecc-input-changed=${this.handleDescriptorTypeChange}
-              value=${this.selectedDescriptorType}
-            >
-              <ecc-utils-design-select-trigger>
-                <ecc-utils-design-select-value placeholder="Select language">
-                  ${this.selectedDescriptorType || "Select language"}
-                </ecc-utils-design-select-value>
-              </ecc-utils-design-select-trigger>
-              <ecc-utils-design-select-content>
-                ${this.getAvailableDescriptorTypes().map(
-                  (type) => html`
-                    <ecc-utils-design-select-item value=${type}
-                      >${type}</ecc-utils-design-select-item
+            <div class="w-full flex items-start justify-between">
+              <div class="w-full">Browse Files</div>
+              <div
+                class="flex items-center gap-2 text-sm w-full justify-end font-medium"
+              >
+                <ecc-utils-design-select
+                  @ecc-input-changed=${this.handleDescriptorTypeChange}
+                  value=${this.selectedDescriptorType}
+                >
+                  <ecc-utils-design-select-trigger>
+                    <ecc-utils-design-select-value
+                      placeholder="Select language"
                     >
-                  `
-                )}
-              </ecc-utils-design-select-content>
-            </ecc-utils-design-select>
-          </div>
-        </div>
-        <div class="grid grid-cols-5 gap-4">
-          <!-- Files List Section - 1/5 of screen -->
-          <div class="col-span-5 md:col-span-1">
-            ${this.toolFiles.length === 0
-              ? html`<p class="text-muted-foreground">
-                  No files available for ${this.selectedDescriptorType}
-                </p>`
-              : html`
-                  <div class="space-y-1 max-h-[400px] overflow-y-auto">
-                    ${this.toolFiles.map(
-                      (file, index) => html`
-                        <button
-                          class="w-full text-left px-3 py-1 rounded-md text-sm ${this
-                            .activeFileIndex === index
-                            ? "bg-primary/30"
-                            : "hover:bg-muted"}"
-                          @click=${() => this.viewFileContent(index)}
+                      ${this.selectedDescriptorType || "Select language"}
+                    </ecc-utils-design-select-value>
+                  </ecc-utils-design-select-trigger>
+                  <ecc-utils-design-select-content>
+                    ${this.getAvailableDescriptorTypes().map(
+                      (type) => html`
+                        <ecc-utils-design-select-item value=${type}
+                          >${type}</ecc-utils-design-select-item
                         >
-                          <div class="flex items-center justify-between">
-                            <span class="truncate">${file.path}</span>
-                            ${file.file_type
-                              ? html`
-                                  <ecc-utils-design-badge
-                                    variant="outline"
-                                    class="ml-2"
-                                    size="sm"
-                                  >
-                                    ${file.file_type}
-                                  </ecc-utils-design-badge>
-                                `
-                              : ""}
-                          </div>
-                        </button>
                       `
                     )}
-                  </div>
-                `}
-          </div>
-
-          <!-- Mobile Separator -->
-          <div class="block md:hidden col-span-5">
-            <ecc-utils-design-separator
-              orientation="horizontal"
-              class="part:my-4"
-            ></ecc-utils-design-separator>
-          </div>
-
-          <!-- File Content Section - 4/5 of screen -->
-          <div
-            class="col-span-5 md:col-span-4 md:border-l md:pl-4 md:border-muted w-full"
-          >
-            <div>
-              <h3 class="text-sm font-medium mb-2">
-                ${this.activeFileIndex >= 0 &&
-                this.toolFiles[this.activeFileIndex]
-                  ? this.toolFiles[this.activeFileIndex].path
-                  : "File Content"}
-              </h3>
-              ${this.activeFileIndex >= 0 &&
-              this.toolFiles[this.activeFileIndex]
-                ? html`
-                    <ecc-utils-design-code
-                      value=${this.fileContents[
-                        this.toolFiles[this.activeFileIndex].path
-                      ] || "Loading file content..."}
-                      extension=${ifDefined(
-                        this.toolFiles[this.activeFileIndex].path
-                          .split(".")
-                          .pop()
-                      )}
-                      disabled
-                      class="part:h-[500px]"
-                    ></ecc-utils-design-code>
-                  `
-                : html`<p class="text-muted-foreground">
-                    Select a file to view its content
-                  </p>`}
+                  </ecc-utils-design-select-content>
+                </ecc-utils-design-select>
+              </div>
             </div>
-          </div>
-        </div>
+          </slot>
+
+          <!-- Version and Descriptor-specific Files Slot -->
+          <slot
+            name="version-${versionIndex}-${this.selectedDescriptorType}-files"
+            version-index=${versionIndex}
+            descriptor-type=${this.selectedDescriptorType}
+            .toolFiles=${this.toolFiles}
+            .activeFileIndex=${this.activeFileIndex}
+            .fileContents=${this.fileContents}
+            .onFileSelect=${(index: number) => this.viewFileContent(index)}
+          >
+            <div class="grid grid-cols-5 gap-4">
+              <!-- Files List Section - 1/5 of screen -->
+              <div class="col-span-5 md:col-span-1">
+                <!-- Version-specific Files List Slot -->
+                <slot
+                  name="version-${versionIndex}-files-list"
+                  version-index=${versionIndex}
+                  .toolFiles=${this.toolFiles}
+                  .activeFileIndex=${this.activeFileIndex}
+                  .selectedDescriptorType=${this.selectedDescriptorType}
+                  .onFileSelect=${(index: number) =>
+                    this.viewFileContent(index)}
+                >
+                  ${this.toolFiles.length === 0
+                    ? html`<p class="text-muted-foreground">
+                        No files available for ${this.selectedDescriptorType}
+                      </p>`
+                    : html`
+                        <div class="space-y-1 max-h-[400px] overflow-y-auto">
+                          ${this.toolFiles.map(
+                            (file, index) => html`
+                              <button
+                                class="w-full text-left px-3 py-1 rounded-md text-sm ${this
+                                  .activeFileIndex === index
+                                  ? "bg-primary/30"
+                                  : "hover:bg-muted"}"
+                                @click=${() => this.viewFileContent(index)}
+                              >
+                                <div class="flex items-center justify-between">
+                                  <span class="truncate">${file.path}</span>
+                                  ${file.file_type
+                                    ? html`
+                                        <ecc-utils-design-badge
+                                          variant="outline"
+                                          class="ml-2"
+                                          size="sm"
+                                        >
+                                          ${file.file_type}
+                                        </ecc-utils-design-badge>
+                                      `
+                                    : ""}
+                                </div>
+                              </button>
+                            `
+                          )}
+                        </div>
+                      `}
+                </slot>
+              </div>
+
+              <!-- Mobile Separator -->
+              <div class="block md:hidden col-span-5">
+                <ecc-utils-design-separator
+                  orientation="horizontal"
+                  class="part:my-4"
+                ></ecc-utils-design-separator>
+              </div>
+
+              <!-- File Content Section - 4/5 of screen -->
+              <div
+                class="col-span-5 md:col-span-4 md:border-l md:pl-4 md:border-muted w-full"
+              >
+                <!-- Version-specific File Content Slot -->
+                <slot
+                  name="version-${versionIndex}-file-content"
+                  version-index=${versionIndex}
+                  .activeFileIndex=${this.activeFileIndex}
+                  .toolFiles=${this.toolFiles}
+                  .fileContents=${this.fileContents}
+                >
+                  <div>
+                    <h3 class="text-sm font-medium mb-2">
+                      ${this.activeFileIndex >= 0 &&
+                      this.toolFiles[this.activeFileIndex]
+                        ? this.toolFiles[this.activeFileIndex].path
+                        : "File Content"}
+                    </h3>
+                    ${this.activeFileIndex >= 0 &&
+                    this.toolFiles[this.activeFileIndex]
+                      ? html`
+                          <ecc-utils-design-code
+                            value=${this.fileContents[
+                              this.toolFiles[this.activeFileIndex].path
+                            ] || "Loading file content..."}
+                            extension=${ifDefined(
+                              this.toolFiles[this.activeFileIndex].path
+                                .split(".")
+                                .pop()
+                            )}
+                            disabled
+                            class="part:h-[500px]"
+                          ></ecc-utils-design-code>
+                        `
+                      : html`<p class="text-muted-foreground">
+                          Select a file to view its content
+                        </p>`}
+                  </div>
+                </slot>
+              </div>
+            </div>
+          </slot>
+        </slot>
       </div>
     `;
   }

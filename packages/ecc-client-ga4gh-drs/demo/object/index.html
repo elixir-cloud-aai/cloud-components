@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        background: #f5f5f5;
+      }
+    </style>
+    <title>DRS Object Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="../../dist/index.js"></script>
+  </head>
+  <body>
+    <div class="p-10 max-w-6xl mx-auto">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold mb-2">DRS Object Detail Demo</h1>
+        <p class="text-gray-600">
+          This demo shows the DRS Object Detail component which displays detailed information
+          about a specific DRS object including access methods and bundle contents.
+        </p>
+        <div class="mt-4">
+          <a href="../" class="text-blue-500 hover:underline">← Back to demos</a>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg shadow-sm border">
+        <h2 class="text-lg font-semibold mb-4">Basic Object View</h2>
+        <ecc-client-ga4gh-drs-object
+          baseUrl="http://drs-filer.default.svc.cluster.local:8080/ga4gh/drs/v1"
+          objectId="d669e7ee-5c21-4775-9910-a986eb4e04bd"
+        ></ecc-client-ga4gh-drs-object>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg shadow-sm border mt-6">
+        <h2 class="text-lg font-semibold mb-4">Bundle with Expanded Contents</h2>
+        <ecc-client-ga4gh-drs-object
+          baseUrl="http://drs-filer.default.svc.cluster.local:8080/ga4gh/drs/v1"
+          objectId="d669e7ee-5c21-4775-9910-a986eb4e04bd"
+          expand="true"
+        ></ecc-client-ga4gh-drs-object>
+      </div>
+
+      <div class="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded">
+        <h3 class="font-medium text-yellow-800 mb-2">Note</h3>
+        <p class="text-yellow-700 text-sm">
+          This demo uses the DRS Filer API endpoint with example object IDs. 
+          Replace the objectId with valid object IDs from your DRS service to view real data.
+        </p>
+      </div>
+
+      <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded">
+        <h3 class="font-medium text-blue-800 mb-2">Features</h3>
+        <ul class="text-blue-700 text-sm space-y-1">
+          <li>• View object metadata and checksums</li>
+          <li>• Access methods with direct URLs or access ID resolution</li>
+          <li>• Bundle contents listing for nested objects</li>
+          <li>• Support for aliases and version information</li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

@@ -127,7 +127,7 @@ jobs:
       - name: Update all package versions
         run: |
           # Custom ignore list (includes eslint-config which we don't want to bump)
-          IGNORE_PACKAGES="ecc-docs,@elixir-cloud/drs-filer,@elixir-cloud/ro-crate,@elixir-cloud/tes,@elixir-cloud/eslint-config"
+          IGNORE_PACKAGES="ecc-docs,@elixir-cloud/ro-crate,@elixir-cloud/tes,@elixir-cloud/eslint-config"
 
           echo "Ignore list: $IGNORE_PACKAGES"
 
@@ -223,7 +223,7 @@ jobs:
       - name: Update internal dependencies
         run: |
           # Custom ignore list (includes eslint-config which we don't want to update dependencies for)
-          IGNORE_PACKAGES="ecc-docs,@elixir-cloud/drs-filer,@elixir-cloud/ro-crate,@elixir-cloud/tes,@elixir-cloud/eslint-config"
+          IGNORE_PACKAGES="ecc-docs,@elixir-cloud/ro-crate,@elixir-cloud/tes,@elixir-cloud/eslint-config"
 
           echo "Ignore list: $IGNORE_PACKAGES"
           echo "Updating internal @elixir-cloud dependencies to version $RELEASE_VERSION"
