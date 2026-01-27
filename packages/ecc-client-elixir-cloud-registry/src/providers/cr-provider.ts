@@ -11,7 +11,7 @@ import {
   Service,
   ExternalService,
   Error,
-} from "@elixir-cloud/service-registry/dist/providers";
+} from "@elixir-cloud/service-registry/providers";
 
 // Re-export base types for use in other modules
 export type { ServiceType, Organization, Service, ExternalService, Error };

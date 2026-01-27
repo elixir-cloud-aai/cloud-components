@@ -10,7 +10,7 @@ const options = program.option("-d, --outdir <string>").parse().opts();
 const { execSync } = require("child_process");
 
 execSync(
-  `custom-elements-manifest analyze --litelement --outdir "${options.outdir}"`,
+  `npx custom-elements-manifest analyze --litelement --outdir "${options.outdir}"`,
   {
     stdio: "inherit",
   }

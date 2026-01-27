@@ -219,7 +219,7 @@ export class EccUtilsDesignSelectContent extends LitElement {
 
   private _updateState() {
     const select = this._getParentSelect();
-    if (select) {
+    if (select && typeof select.getSelectId === "function") {
       const selectStateData = selectState.get(select.getSelectId());
       if (selectStateData) {
         this.isOpen = selectStateData.isOpen;
@@ -233,7 +233,7 @@ export class EccUtilsDesignSelectContent extends LitElement {
     const classes = cn(
       "absolute z-50 w-full min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
       this.position === "popper" &&
-        "top-full mt-1 data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1"
+      "top-full mt-1 data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1"
     );
 
     return html`
@@ -294,7 +294,7 @@ export class EccUtilsDesignSelectItem extends LitElement {
 
   private _updateSelected() {
     const select = this._getParentSelect();
-    if (select) {
+    if (select && typeof select.getSelectId === "function") {
       const selectStateData = selectState.get(select.getSelectId());
       if (selectStateData) {
         this.selected = selectStateData.value === this.value;
@@ -325,7 +325,7 @@ export class EccUtilsDesignSelectItem extends LitElement {
     const classes = cn(
       "relative flex w-full select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none",
       !this.disabled &&
-        "cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+      "cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
       this.disabled && "pointer-events-none opacity-50",
       this.selected && "bg-accent text-accent-foreground"
     );
@@ -345,7 +345,7 @@ export class EccUtilsDesignSelectItem extends LitElement {
           class="absolute right-2 flex h-3.5 w-3.5 items-center justify-center"
         >
           ${this.selected
-            ? html`
+        ? html`
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -361,7 +361,7 @@ export class EccUtilsDesignSelectItem extends LitElement {
                   <path d="M20 6 9 17l-5-5" />
                 </svg>
               `
-            : ""}
+        : ""}
         </span>
         <slot></slot>
       </div>
@@ -467,7 +467,7 @@ export class EccUtilsDesignSelectValue extends LitElement {
 
   private _updateState() {
     const select = this._getParentSelect();
-    if (select) {
+    if (select && typeof select.getSelectId === "function") {
       const selectStateData = selectState.get(select.getSelectId());
       if (selectStateData && selectStateData.value) {
         const options = select.querySelectorAll("ecc-utils-design-select-item");
