@@ -4,7 +4,7 @@
         "target": "es2018",
         "module": "Node16",
         "moduleResolution": "node16",
-        "noEmitOnError": true,
+        "noEmitOnError": false,
         "lib": [
             "es2017",
             "dom"
