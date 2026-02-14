@@ -374,18 +374,28 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
       <div class="flex flex-col gap-4">
         ${this.search
           ? html`
-              <div class="flex flex-wrap gap-4 items-end">
-                <div class="flex-1 flex flex-col gap-1">
-                  <ecc-utils-design-label
-                    >Search Objects</ecc-utils-design-label
+              <div class="mb-2 flex items-center gap-4">
+                <div class="relative flex-1">
+                  <svg
+                    class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                   >
-                  <div class="flex">
-                    <ecc-utils-design-input
-                      class="part:w-full w-full"
-                      placeholder="Search by object name or ID..."
-                      @ecc-input-changed=${this.handleSearch}
-                    ></ecc-utils-design-input>
-                  </div>
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                  </svg>
+                  <ecc-utils-design-input
+                    class="part:w-full part:pl-10 w-full"
+                    placeholder="Search datasets..."
+                    @ecc-input-changed=${this.handleSearch}
+                  ></ecc-utils-design-input>
                 </div>
               </div>
             `
@@ -404,7 +414,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
           <ecc-utils-design-table-header>
             <ecc-utils-design-table-row>
               <ecc-utils-design-table-head class="w-6/12"
-                >Object Info</ecc-utils-design-table-head
+                >Name</ecc-utils-design-table-head
               >
               <ecc-utils-design-table-head class="w-2/12"
                 >Size</ecc-utils-design-table-head
@@ -429,7 +439,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                       colspan="5"
                       class="part:text-center part:py-8 part:text-muted-foreground"
                     >
-                      No objects found
+                      No datasets found
                     </ecc-utils-design-table-cell>
                   </ecc-utils-design-table-row>
                 `;
@@ -438,7 +448,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                 (object) => html`
                   <ecc-utils-design-table-row>
                     <ecc-utils-design-table-cell class="w-6/12">
-                      <div class="flex flex-col w-full">
+                      <div class="flex flex-col w-full my-1.5">
                         <ecc-utils-design-button
                           class="part:font-medium part:text-primary part:w-fit part:cursor-pointer part:p-0"
                           variant="link"
@@ -451,11 +461,6 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
                               class="text-xs text-muted-foreground line-clamp-2 break-all whitespace-normal overflow-hidden max-w-full"
                             >
                               ${object.description}
-                            </div>`
-                          : ""}
-                        ${object.mime_type
-                          ? html`<div class="text-xs text-muted-foreground">
-                              MIME: ${object.mime_type}
                             </div>`
                           : ""}
                       </div>

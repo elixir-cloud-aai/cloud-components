@@ -168,28 +168,80 @@ export class ECCClientGa4ghDrsObject extends LitElement {
 
     return html`
       <div class="mb-6">
-        <div class="w-full flex flex-col gap-2">
-          <div class="flex flex-col md:flex-row md:items-center gap-2">
-            <h2 class="text-xl truncate">
-              ${this.object.name || this.object.id}
-            </h2>
-          </div>
+        <div class="w-full flex flex-col gap-3">
+          <div
+            class="flex flex-col gap-2 md:flex-row md:items-start md:justify-between"
+          >
+            <div class="flex flex-col gap-2">
+              <div class="flex flex-col md:flex-row md:items-center gap-2">
+                <h2 class="text-xl truncate">
+                  ${this.object.name || this.object.id}
+                </h2>
+              </div>
 
-          <div class="flex flex-wrap gap-2 items-center">
-            ${this.object.mime_type
-              ? html`
-                  <ecc-utils-design-badge variant="outline">
-                    ${this.object.mime_type}
-                  </ecc-utils-design-badge>
-                `
-              : ""}
-            ${this.object.version
-              ? html`
-                  <ecc-utils-design-badge variant="outline">
-                    v${this.object.version}
-                  </ecc-utils-design-badge>
-                `
-              : ""}
+              <div class="flex flex-wrap gap-2 items-center">
+                ${this.object.mime_type
+                  ? html`
+                      <ecc-utils-design-badge variant="outline">
+                        ${this.object.mime_type}
+                      </ecc-utils-design-badge>
+                    `
+                  : ""}
+                ${this.object.version
+                  ? html`
+                      <ecc-utils-design-badge variant="outline">
+                        v${this.object.version}
+                      </ecc-utils-design-badge>
+                    `
+                  : ""}
+              </div>
+            </div>
+
+            <div
+              class="flex flex-row flex-wrap items-center gap-4 text-xs text-muted-foreground md:justify-end"
+            >
+              <div class="flex items-center gap-1.5">
+                <svg
+                  class="h-3.5 w-3.5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                  <path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"></path>
+                  <path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"></path>
+                </svg>
+                <span>
+                  Size
+                  ${ECCClientGa4ghDrsObject.formatFileSize(this.object.size)}
+                </span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <svg
+                  class="h-3.5 w-3.5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 6v6l4 2"></path>
+                </svg>
+                <span>
+                  Created
+                  ${ECCClientGa4ghDrsObject.formatShortDate(
+                    this.object.created_time
+                  )}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -258,7 +310,7 @@ export class ECCClientGa4ghDrsObject extends LitElement {
       <div class="mt-4">
         <div class="flex flex-col gap-4 text-sm">
           <div class="flex flex-col gap-2">
-            <div class="font-bold text-base">Object Information</div>
+            <div class="font-bold text-base">Dataset Information</div>
             <div class="flex flex-col gap-3">
               ${this.object.description
                 ? html`
@@ -567,6 +619,18 @@ export class ECCClientGa4ghDrsObject extends LitElement {
     }
   }
 
+  private static formatShortDate(dateString: string): string {
+    try {
+      return new Date(dateString).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    } catch {
+      return dateString;
+    }
+  }
+
   render() {
     if (!this.baseUrl && !this.provider) {
       return html`
@@ -607,28 +671,28 @@ export class ECCClientGa4ghDrsObject extends LitElement {
         ${this.renderObjectHeader()}
 
         <ecc-utils-design-tabs
-          default-value="overview"
+          default-value="contents"
           class="part:mb-6 part:w-full"
         >
           <ecc-utils-design-tabs-list class="part:w-full">
             <ecc-utils-design-tabs-trigger
-              value="overview"
-              class="part:flex-1 flex-1"
-              >Overview</ecc-utils-design-tabs-trigger
-            >
-            <ecc-utils-design-tabs-trigger
               value="contents"
               class="part:flex-1 flex-1"
-              >Contents & Access</ecc-utils-design-tabs-trigger
+              >Contents</ecc-utils-design-tabs-trigger
+            >
+            <ecc-utils-design-tabs-trigger
+              value="details"
+              class="part:flex-1 flex-1"
+              >Details</ecc-utils-design-tabs-trigger
             >
           </ecc-utils-design-tabs-list>
 
-          <ecc-utils-design-tabs-content value="overview">
-            ${this.renderOverviewTab()}
-          </ecc-utils-design-tabs-content>
-
           <ecc-utils-design-tabs-content value="contents">
             <slot name="contents"> ${this.renderContentsTab()} </slot>
+          </ecc-utils-design-tabs-content>
+
+          <ecc-utils-design-tabs-content value="details">
+            ${this.renderOverviewTab()}
           </ecc-utils-design-tabs-content>
         </ecc-utils-design-tabs>
       </div>
