@@ -187,13 +187,6 @@ export class ECCClientGa4ghDrsObject extends LitElement {
                       </ecc-utils-design-badge>
                     `
                   : ""}
-                ${this.object.version
-                  ? html`
-                      <ecc-utils-design-badge variant="outline">
-                        v${this.object.version}
-                      </ecc-utils-design-badge>
-                    `
-                  : ""}
               </div>
             </div>
 
