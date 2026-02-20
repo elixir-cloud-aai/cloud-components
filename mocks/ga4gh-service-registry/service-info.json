@@ -1,0 +1,14 @@
+{
+    "id": "mock-registry-001",
+    "name": "Mock Service Registry",
+    "type": {
+        "group": "org.ga4gh",
+        "artifact": "service-registry",
+        "version": "1.0.0"
+    },
+    "organization": {
+        "name": "ELIXIR Mock",
+        "url": "https://example.com"
+    },
+    "version": "1.0.0"
+}

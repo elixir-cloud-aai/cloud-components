@@ -1,0 +1,1 @@
+[{"content": "FROM ubuntu:latest\nRUN echo mock", "url": "https://example.com/containerfile"}]

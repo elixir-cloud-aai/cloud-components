@@ -1,0 +1,40 @@
+{
+    "run_id": "run-001",
+    "state": "COMPLETE",
+    "request": {
+        "workflow_params": {
+            "input_file": "s3://mock-bucket/input.txt"
+        },
+        "workflow_type": "CWL",
+        "workflow_type_version": "v1.0",
+        "tags": {
+            "env": "mock"
+        },
+        "workflow_engine_parameters": {},
+        "workflow_url": "https://github.com/mock-org/mock-workflow.cwl"
+    },
+    "run_log": {
+        "name": "Mock Run 001",
+        "cmd": [
+            "echo",
+            "mock"
+        ],
+        "start_time": "2023-01-01T12:00:00Z",
+        "end_time": "2023-01-01T12:05:00Z",
+        "stdout": "Mock successful run",
+        "stderr": "",
+        "exit_code": 0
+    },
+    "task_logs": [
+        {
+            "name": "task-1",
+            "start_time": "2023-01-01T12:01:00Z",
+            "end_time": "2023-01-01T12:04:00Z",
+            "stdout": "Task 1 completed",
+            "exit_code": 0
+        }
+    ],
+    "outputs": {
+        "output_file": "s3://mock-bucket/output.txt"
+    }
+}

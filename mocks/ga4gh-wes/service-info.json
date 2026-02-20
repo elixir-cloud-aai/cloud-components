@@ -1,0 +1,19 @@
+{
+    "contactUrl": "mailto:support@elixir-europe.org",
+    "createdAt": "2023-01-01T00:00:00Z",
+    "description": "Mock WES Service",
+    "environment": "test",
+    "id": "mock-wes-service",
+    "name": "Mock WES",
+    "organization": {
+        "name": "ELIXIR",
+        "url": "https://elixir-europe.org"
+    },
+    "type": {
+        "artifact": "wes",
+        "group": "org.ga4gh",
+        "version": "1.0.0"
+    },
+    "updatedAt": "2023-01-01T00:00:00Z",
+    "version": "1.0.0"
+}
