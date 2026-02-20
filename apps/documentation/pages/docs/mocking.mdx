@@ -1,0 +1,32 @@
+# Mock APIs
+
+ELIXIR Cloud Components provides a built-in mock API layer to allow reliable testing, offline development, and demonstration without relying on live services.
+
+Our documentation and demo pages are configured to use these mock responses to ensure consistent behavior.
+
+## Enabling Mock APIs
+
+The mock API layer is controlled via environment variables. By default, components will attempt to use live API routes provided via the `baseUrl` property. If you want to intercept these requests and serve mock data instead, set the appropriate environment variable:
+
+- **For Vite / standard web environments:** `VITE_USE_MOCK_API=true`
+- **For Next.js environments:** `NEXT_PUBLIC_USE_MOCK_API=true`
+
+Once enabled, API calls (e.g., fetching a GA4GH WES run or an ELIXIR Service Registry listing) will automatically be intercepted and resolved using local JSON files.
+
+## How it works
+
+The components use a centralized `fetcher` utility from `@elixir-cloud/design` under the hood. When the mock environment variable is detected, `fetcher` substitutes the HTTP request with a local fetch to the `/mocks/` directory.
+
+> **Note:** If a mock file doesn't exist for a particular endpoint, the library will gracefully fall back to the live API to ensure development isn't blocked.
+
+## Writing or Updating Mocks
+
+Mock files are standard JSON files stored in the `mocks/` directory at the root of the repository. When setting up a new application or documentation site, ensure that this folder is publicly served (e.g., via a symlink to `public/mocks/` in Next.js).
+
+If you want to modify a mock response, simply edit the corresponding JSON file. For example, to change the mocked response of a specific TRS tool, you would modify:
+
+```text
+/mocks/ga4gh-trs/tools/id.json
+```
+
+No rebuild of the components is necessary when updating mock JSON files—they are resolved at runtime by the browser. 

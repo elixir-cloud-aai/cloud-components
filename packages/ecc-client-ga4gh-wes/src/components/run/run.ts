@@ -9,6 +9,7 @@ import {
   Log,
 } from "../../providers/wes-provider.js";
 import { RestWesProvider } from "../../providers/rest-wes-provider.js";
+import { fetcher } from "@elixir-cloud/design";
 import "@elixir-cloud/design/components/table/index.js";
 import "@elixir-cloud/design/components/button/index.js";
 import "@elixir-cloud/design/components/badge/index.js";
@@ -244,15 +245,15 @@ export class ECCClientGa4ghWesRun extends LitElement {
 
           <div class="flex flex-wrap gap-2 items-center">
             ${(() => {
-              const stateInfo = ECCClientGa4ghWesRun.getStateInfo(
-                this.run.state
-              );
-              return html`
+        const stateInfo = ECCClientGa4ghWesRun.getStateInfo(
+          this.run.state
+        );
+        return html`
                 <ecc-utils-design-badge variant=${stateInfo.variant}>
                   ${stateInfo.label}
                 </ecc-utils-design-badge>
               `;
-            })()}
+      })()}
             <ecc-utils-design-badge variant="outline">
               ${this.run.request.workflow_type}
             </ecc-utils-design-badge>
@@ -373,15 +374,15 @@ export class ECCClientGa4ghWesRun extends LitElement {
                     <dt class="text-muted-foreground">State</dt>
                     <dd>
                       ${(() => {
-                        const stateInfo = ECCClientGa4ghWesRun.getStateInfo(
-                          this.run.state
-                        );
-                        return html`
+        const stateInfo = ECCClientGa4ghWesRun.getStateInfo(
+          this.run.state
+        );
+        return html`
                           <ecc-utils-design-badge variant=${stateInfo.variant}>
                             ${stateInfo.label}
                           </ecc-utils-design-badge>
                         `;
-                      })()}
+      })()}
                     </dd>
                   </div>
                   <ecc-utils-design-separator></ecc-utils-design-separator>
@@ -428,59 +429,59 @@ export class ECCClientGa4ghWesRun extends LitElement {
               </div>
 
               ${request.workflow_engine_parameters
-                ? html`
+        ? html`
                     <div>
                       <h4 class="font-medium mb-2">Engine Parameters</h4>
                       <ecc-utils-design-code
                         value=${JSON.stringify(
-                          request.workflow_engine_parameters,
-                          null,
-                          2
-                        )}
+          request.workflow_engine_parameters,
+          null,
+          2
+        )}
                         extension="json"
                         class="part:h-[200px]"
                         disabled
                       ></ecc-utils-design-code>
                     </div>
                   `
-                : ""}
+        : ""}
             </div>
           </div>
 
           <!-- Tags Section -->
           ${request.tags
-            ? (() => {
-                let tagsObj: Record<string, string> | null = null;
-                if (typeof request.tags === "string") {
-                  try {
-                    tagsObj = JSON.parse(request.tags);
-                  } catch {
-                    tagsObj = null;
-                  }
-                } else if (
-                  typeof request.tags === "object" &&
-                  request.tags !== null
-                ) {
-                  tagsObj = request.tags;
-                }
-                return tagsObj
-                  ? html`
+        ? (() => {
+          let tagsObj: Record<string, string> | null = null;
+          if (typeof request.tags === "string") {
+            try {
+              tagsObj = JSON.parse(request.tags);
+            } catch {
+              tagsObj = null;
+            }
+          } else if (
+            typeof request.tags === "object" &&
+            request.tags !== null
+          ) {
+            tagsObj = request.tags;
+          }
+          return tagsObj
+            ? html`
                       <div class="flex flex-col gap-3">
                         <div class="font-bold text-base">Tags</div>
                         <div class="flex flex-wrap gap-2">
                           ${Object.entries(tagsObj).map(
-                            ([key, value]) => html`
+              ([key, value]) => html`
                               <ecc-utils-design-badge variant="outline"
                                 >${key}: ${value}</ecc-utils-design-badge
                               >
                             `
-                          )}
+            )}
                         </div>
                       </div>
                     `
-                  : "";
-              })()
-            : ""}
+            : "";
+        })()
+        : ""}
         </div>
       </div>
     `;
@@ -516,7 +517,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
 
   private async fetchLogUrlToCache(url: string, key: string): Promise<void> {
     try {
-      const response = await fetch(url);
+      const response = await fetcher(url);
       if (!response.ok) {
         throw new Error(response.statusText || "Failed to fetch log");
       }
@@ -525,9 +526,8 @@ export class ECCClientGa4ghWesRun extends LitElement {
     } catch (err) {
       this.logContents = {
         ...this.logContents,
-        [key]: `Error loading log: ${
-          err instanceof Error ? err.message : String(err)
-        }`,
+        [key]: `Error loading log: ${err instanceof Error ? err.message : String(err)
+          }`,
       };
     }
   }
@@ -554,14 +554,14 @@ export class ECCClientGa4ghWesRun extends LitElement {
             <div>
               <dl class="flex flex-col gap-2">
                 ${log.name
-                  ? html`
+        ? html`
                       <div class="flex flex-row gap-2 w-full justify-between">
                         <dt class="text-muted-foreground">Name</dt>
                         <dd>${log.name}</dd>
                       </div>
                       <ecc-utils-design-separator></ecc-utils-design-separator>
                     `
-                  : ""}
+        : ""}
                 <div class="flex flex-row gap-2 w-full justify-between">
                   <dt class="text-muted-foreground">Start Time</dt>
                   <dd>
@@ -588,7 +588,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
         </div>
 
         ${log.cmd && log.cmd.length > 0
-          ? html`
+        ? html`
               <div class="flex flex-col gap-3">
                 <div class="font-bold text-base">Command</div>
                 <ecc-utils-design-code
@@ -599,7 +599,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
                 ></ecc-utils-design-code>
               </div>
             `
-          : ""}
+        : ""}
 
         <div class="flex flex-col gap-3">
           <div class="font-bold text-base">Output Logs</div>
@@ -661,7 +661,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
     return html`
       <div class="mt-4 space-y-2">
         ${this.run.task_logs.map(
-          (taskLog, index) => html`
+      (taskLog, index) => html`
             <ecc-utils-design-collapsible>
               <ecc-utils-design-collapsible-trigger class="part:w-full">
                 <div
@@ -680,7 +680,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
               </ecc-utils-design-collapsible-content>
             </ecc-utils-design-collapsible>
           `
-        )}
+    )}
       </div>
     `;
   }
@@ -768,14 +768,14 @@ export class ECCClientGa4ghWesRun extends LitElement {
               >Run Log</ecc-utils-design-tabs-trigger
             >
             ${this.hasTaskLogs()
-              ? html`
+        ? html`
                   <ecc-utils-design-tabs-trigger
                     value="task_logs"
                     class="part:flex-1 flex-1"
                     >Task Logs</ecc-utils-design-tabs-trigger
                   >
                 `
-              : ""}
+        : ""}
             <ecc-utils-design-tabs-trigger
               value="outputs"
               class="part:flex-1 flex-1"
@@ -792,12 +792,12 @@ export class ECCClientGa4ghWesRun extends LitElement {
           </ecc-utils-design-tabs-content>
 
           ${this.hasTaskLogs()
-            ? html`
+        ? html`
                 <ecc-utils-design-tabs-content value="task_logs">
                   ${this.renderTaskLogsTab()}
                 </ecc-utils-design-tabs-content>
               `
-            : ""}
+        : ""}
 
           <ecc-utils-design-tabs-content value="outputs">
             <slot name="outputs">${this.renderOutputsTab()}</slot>

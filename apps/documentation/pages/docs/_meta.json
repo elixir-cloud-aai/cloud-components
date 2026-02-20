@@ -2,6 +2,7 @@
   "introduction": "Introduction",
   "installation": "Installation",
   "customization": "Customization",
+  "mocking": "Mock APIs",
   "providers": "Providers",
   "-- Supported Services": {
     "type": "separator",

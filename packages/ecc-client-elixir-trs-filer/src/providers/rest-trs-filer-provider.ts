@@ -10,6 +10,7 @@ import {
   ToolClassRegister,
   ToolVersionRegister,
 } from "./trs-filer-provider.js";
+import { fetcher } from "@elixir-cloud/design";
 
 /**
  * Implementation of the TrsFilerProvider interface using direct REST API calls
@@ -17,11 +18,11 @@ import {
  */
 export class RestTrsFilerProvider implements TrsFilerProvider {
   // eslint-disable-next-line no-useless-constructor
-  constructor(public readonly baseUrl: string) {}
+  constructor(public readonly baseUrl: string) { }
 
   async getToolClasses(): Promise<ToolClass[]> {
     const url = `${this.baseUrl}/toolClasses`;
-    const response = await fetch(url);
+    const response = await fetcher(url, undefined, "elixir-trs-filer/toolClasses/get");
     if (!response.ok) {
       throw new Error(`Failed to fetch tool classes: ${response.statusText}`);
     }
@@ -34,9 +35,8 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
     filters: Record<string, string | undefined | boolean>,
     query: string
   ): Promise<Tool[]> {
-    let url = `${this.baseUrl}/tools?${limit ? `limit=${limit}&` : ""}${
-      offset ? `offset=${offset}&` : ""
-    }`;
+    let url = `${this.baseUrl}/tools?${limit ? `limit=${limit}&` : ""}${offset ? `offset=${offset}&` : ""
+      }`;
 
     // Add search query if provided
     if (query && query.length > 0) {
@@ -50,7 +50,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
       }
     });
 
-    const response = await fetch(url);
+    const response = await fetcher(url, undefined, "elixir-trs-filer/tools/get");
     if (!response.ok) {
       throw new Error(`Failed to fetch tools: ${response.statusText}`);
     }
@@ -59,7 +59,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
 
   async getTool(url: string, id: string): Promise<Tool> {
     const encodedToolId = encodeURIComponent(id);
-    const response = await fetch(`${this.baseUrl}/tools/${encodedToolId}`);
+    const response = await fetcher(`${this.baseUrl}/tools/${encodedToolId}`, undefined, "elixir-trs-filer/tools/id");
     if (!response.ok) {
       throw new Error(`Failed to fetch tool: ${response.statusText}`);
     }
@@ -68,8 +68,10 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
 
   async getToolVersions(url: string, id: string): Promise<ToolVersion[]> {
     const encodedToolId = encodeURIComponent(id);
-    const response = await fetch(
-      `${this.baseUrl}/tools/${encodedToolId}/versions`
+    const response = await fetcher(
+      `${this.baseUrl}/tools/${encodedToolId}/versions`,
+      undefined,
+      "elixir-trs-filer/tools/versions"
     );
     if (!response.ok) {
       throw new Error(`Failed to fetch tool versions: ${response.statusText}`);
@@ -87,8 +89,10 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
       ? versionId.split(":")[1]
       : versionId;
     const encodedVersionId = encodeURIComponent(version);
-    const response = await fetch(
-      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}`
+    const response = await fetcher(
+      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}`,
+      undefined,
+      "elixir-trs-filer/tools/version-id"
     );
     if (!response.ok) {
       throw new Error(`Failed to fetch tool version: ${response.statusText}`);
@@ -112,7 +116,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
     if (format) {
       requestUrl += `?format=${format}`;
     }
-    const response = await fetch(requestUrl);
+    const response = await fetcher(requestUrl, undefined, "elixir-trs-filer/tools/files");
     if (!response.ok) {
       throw new Error(`Failed to fetch tool files: ${response.statusText}`);
     }
@@ -129,8 +133,10 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
     const versionPart = version.split(":")[1] ? version.split(":")[1] : version;
     const encodedVersionId = encodeURIComponent(versionPart);
     const encodedType = encodeURIComponent(descriptorType);
-    const response = await fetch(
-      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor`
+    const response = await fetcher(
+      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor`,
+      undefined,
+      "elixir-trs-filer/tools/descriptor"
     );
     if (!response.ok) {
       throw new Error(
@@ -154,8 +160,10 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
 
     // Try with unencoded path first
     try {
-      const response = await fetch(
-        `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${path}`
+      const response = await fetcher(
+        `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${path}`,
+        undefined,
+        "elixir-trs-filer/tools/descriptor-path"
       );
 
       if (response.ok) {
@@ -164,8 +172,10 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
 
       // If unencoded path fails, try with encoded path
       const encodedPath = encodeURIComponent(path);
-      const encodedResponse = await fetch(
-        `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${encodedPath}`
+      const encodedResponse = await fetcher(
+        `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${encodedPath}`,
+        undefined,
+        "elixir-trs-filer/tools/descriptor-path"
       );
 
       if (encodedResponse.ok) {
@@ -180,8 +190,10 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
       // If there's a network error or other exception, try encoded path
       const encodedPath = encodeURIComponent(path);
       try {
-        const encodedResponse = await fetch(
-          `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${encodedPath}`
+        const encodedResponse = await fetcher(
+          `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${encodedPath}`,
+          undefined,
+          "elixir-trs-filer/tools/descriptor-path"
         );
 
         if (encodedResponse.ok) {
@@ -206,8 +218,10 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
     const encodedToolId = encodeURIComponent(id);
     const versionPart = version.split(":")[1] ? version.split(":")[1] : version;
     const encodedVersionId = encodeURIComponent(versionPart);
-    const response = await fetch(
-      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/containerfile`
+    const response = await fetcher(
+      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/containerfile`,
+      undefined,
+      "elixir-trs-filer/tools/containerfile"
     );
     if (!response.ok) {
       throw new Error(`Failed to fetch containerfile: ${response.statusText}`);
@@ -225,8 +239,10 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
     const versionPart = version.split(":")[1] ? version.split(":")[1] : version;
     const encodedVersionId = encodeURIComponent(versionPart);
     const encodedType = encodeURIComponent(descriptorType);
-    const response = await fetch(
-      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/tests`
+    const response = await fetcher(
+      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/tests`,
+      undefined,
+      "elixir-trs-filer/tools/tests"
     );
     if (!response.ok) {
       throw new Error(`Failed to fetch tool tests: ${response.statusText}`);
@@ -237,13 +253,13 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
   // Creation methods (TRS-Filer specific functionality)
   async createTool(tool: ToolRegister): Promise<string> {
     console.log("Creating tool:", tool);
-    const response = await fetch(`${this.baseUrl}/tools`, {
+    const response = await fetcher(`${this.baseUrl}/tools`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(tool),
-    });
+    }, "elixir-trs-filer/tools/post");
 
     if (!response.ok) {
       throw new Error(`Failed to create tool: ${response.statusText}`);
@@ -254,13 +270,13 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
 
   async createToolWithId(id: string, tool: ToolRegister): Promise<string> {
     const encodedToolId = encodeURIComponent(id);
-    const response = await fetch(`${this.baseUrl}/tools/${encodedToolId}`, {
+    const response = await fetcher(`${this.baseUrl}/tools/${encodedToolId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(tool),
-    });
+    }, "elixir-trs-filer/tools/put");
 
     if (!response.ok) {
       throw new Error(`Failed to create/update tool: ${response.statusText}`);
@@ -274,7 +290,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
     version: ToolVersionRegister
   ): Promise<string> {
     const encodedToolId = encodeURIComponent(toolId);
-    const response = await fetch(
+    const response = await fetcher(
       `${this.baseUrl}/tools/${encodedToolId}/versions`,
       {
         method: "POST",
@@ -282,7 +298,8 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(version),
-      }
+      },
+      "elixir-trs-filer/tools/versions-post"
     );
 
     if (!response.ok) {
@@ -299,7 +316,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
   ): Promise<string> {
     const encodedToolId = encodeURIComponent(toolId);
     const encodedVersionId = encodeURIComponent(versionId);
-    const response = await fetch(
+    const response = await fetcher(
       `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}`,
       {
         method: "PUT",
@@ -307,7 +324,8 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(version),
-      }
+      },
+      "elixir-trs-filer/tools/versions-put"
     );
 
     if (!response.ok) {
@@ -320,13 +338,13 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
   }
 
   async createToolClass(toolClass: ToolClassRegister): Promise<string> {
-    const response = await fetch(`${this.baseUrl}/toolClasses`, {
+    const response = await fetcher(`${this.baseUrl}/toolClasses`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(toolClass),
-    });
+    }, "elixir-trs-filer/toolClasses/post");
 
     if (!response.ok) {
       throw new Error(`Failed to create tool class: ${response.statusText}`);
@@ -340,13 +358,13 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
     toolClass: ToolClassRegister
   ): Promise<string> {
     const encodedId = encodeURIComponent(id);
-    const response = await fetch(`${this.baseUrl}/toolClasses/${encodedId}`, {
+    const response = await fetcher(`${this.baseUrl}/toolClasses/${encodedId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(toolClass),
-    });
+    }, "elixir-trs-filer/toolClasses/put");
 
     if (!response.ok) {
       throw new Error(

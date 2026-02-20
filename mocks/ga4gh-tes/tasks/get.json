@@ -1,0 +1,17 @@
+{
+    "tasks": [
+        {
+            "id": "task-001",
+            "state": "COMPLETE"
+        },
+        {
+            "id": "task-002",
+            "state": "RUNNING"
+        },
+        {
+            "id": "task-003",
+            "state": "ERROR"
+        }
+    ],
+    "next_page_token": ""
+}

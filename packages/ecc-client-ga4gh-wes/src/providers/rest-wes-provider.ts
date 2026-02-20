@@ -8,6 +8,7 @@ import {
   RunStatus,
   ErrorResponse,
 } from "./wes-provider.js";
+import { fetcher } from "@elixir-cloud/design";
 
 /**
  * REST API implementation of WesProvider
@@ -40,7 +41,7 @@ export class RestWesProvider implements WesProvider {
   }
 
   async getServiceInfo(): Promise<ServiceInfo> {
-    const response = await fetch(`${this.baseUrl}/service-info`);
+    const response = await fetcher(`${this.baseUrl}/service-info`, undefined, "ga4gh-wes/service-info");
     return RestWesProvider.handleResponse<ServiceInfo>(response);
   }
 
@@ -58,10 +59,9 @@ export class RestWesProvider implements WesProvider {
       params.append("page_token", pageToken);
     }
 
-    const url = `${this.baseUrl}/runs${
-      params.toString() ? `?${params.toString()}` : ""
-    }`;
-    const response = await fetch(url);
+    const url = `${this.baseUrl}/runs${params.toString() ? `?${params.toString()}` : ""
+      }`;
+    const response = await fetcher(url, undefined, "ga4gh-wes/runs/get");
     return RestWesProvider.handleResponse<RunListResponse>(response);
   }
 
@@ -93,34 +93,39 @@ export class RestWesProvider implements WesProvider {
       });
     }
 
-    const response = await fetch(`${this.baseUrl}/runs`, {
+    const response = await fetcher(`${this.baseUrl}/runs`, {
       method: "POST",
       body: formData,
-    });
+    }, "ga4gh-wes/runs/post");
 
     return RestWesProvider.handleResponse<RunId>(response);
   }
 
   async getRunLog(runId: string): Promise<RunLog> {
-    const response = await fetch(
-      `${this.baseUrl}/runs/${encodeURIComponent(runId)}`
+    const response = await fetcher(
+      `${this.baseUrl}/runs/${encodeURIComponent(runId)}`,
+      undefined,
+      "ga4gh-wes/runs/id"
     );
     return RestWesProvider.handleResponse<RunLog>(response);
   }
 
   async getRunStatus(runId: string): Promise<RunStatus> {
-    const response = await fetch(
-      `${this.baseUrl}/runs/${encodeURIComponent(runId)}/status`
+    const response = await fetcher(
+      `${this.baseUrl}/runs/${encodeURIComponent(runId)}/status`,
+      undefined,
+      "ga4gh-wes/runs/status"
     );
     return RestWesProvider.handleResponse<RunStatus>(response);
   }
 
   async cancelRun(runId: string): Promise<RunId> {
-    const response = await fetch(
+    const response = await fetcher(
       `${this.baseUrl}/runs/${encodeURIComponent(runId)}/cancel`,
       {
         method: "POST",
-      }
+      },
+      "ga4gh-wes/runs/cancel"
     );
     return RestWesProvider.handleResponse<RunId>(response);
   }
