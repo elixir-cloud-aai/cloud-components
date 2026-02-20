@@ -647,8 +647,9 @@ export class EccUtilsDesignCode extends LitElement {
   }
 
   setupThemeObserver() {
-    // SSR guard: MutationObserver and document are not available on the server
-    if (!isBrowser()) return;
+    // Guard: MutationObserver and document are not available on the server or in some
+    // constrained environments
+    if (!isBrowser() || typeof MutationObserver === "undefined") return;
 
     // Set up mutation observer to watch for theme changes
     const observer = new MutationObserver(() => {
