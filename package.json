@@ -22,7 +22,7 @@
     "lint": "turbo run lint",
     "lint:fix": "eslint . --fix && turbo run lint:fix  && prettier .",
     "new": "turbo gen",
-    "prepare": "husky install",
+    "prepare": "husky",
     "release": "changeset publish",
     "test": "turbo run test --parallel",
     "test:watch": "turbo run test --watch"
@@ -43,7 +43,8 @@
     "eslint": "^7.32.0",
     "fast-glob": "^3.3.2",
     "globby": "^14.0.1",
-    "husky": "^8.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "playwright": "^1.56.1",
     "prettier": "^2.8.8",
     "sinon": "^17.0.1",
@@ -61,5 +62,13 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix"
+    ],
+    "*.{ts,js,mjs,json,md,yaml,yml}": [
+      "prettier --write"
+    ]
+  }
 }
