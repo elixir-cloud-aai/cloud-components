@@ -1,0 +1,32 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "compilerOptions": {
+        "target": "es2018",
+        "module": "Node16",
+        "moduleResolution": "node16",
+        "noEmitOnError": false,
+        "lib": [
+            "es2017",
+            "dom"
+        ],
+        "strict": true,
+        "esModuleInterop": false,
+        "allowSyntheticDefaultImports": true,
+        "experimentalDecorators": true,
+        "importHelpers": true,
+        "outDir": "dist",
+        "sourceMap": true,
+        "inlineSources": true,
+        "rootDir": "./",
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "skipLibCheck": true
+    },
+    "include": [
+        "**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}
