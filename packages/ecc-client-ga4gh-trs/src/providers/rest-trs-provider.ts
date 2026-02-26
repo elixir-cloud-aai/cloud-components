@@ -7,6 +7,7 @@ import {
   ToolVersion,
   FileWrapper,
 } from "./trs-provider.js";
+import { fetcher } from "@elixir-cloud/design";
 
 /**
  * Implementation of the TrsProvider interface using direct REST API calls
@@ -14,11 +15,11 @@ import {
  */
 export class RestTrsProvider implements TrsProvider {
   // eslint-disable-next-line no-useless-constructor
-  constructor(public readonly baseUrl: string) {}
+  constructor(public readonly baseUrl: string) { }
 
   async getToolClasses(): Promise<ToolClass[]> {
     const url = `${this.baseUrl}/toolClasses`;
-    const response = await fetch(url);
+    const response = await fetcher(url, undefined, "ga4gh-trs/toolClasses/get");
     if (!response.ok) {
       throw new Error(`Failed to fetch tool classes: ${response.statusText}`);
     }
@@ -31,9 +32,8 @@ export class RestTrsProvider implements TrsProvider {
     filters: Record<string, string | undefined | boolean>,
     query: string
   ): Promise<Tool[]> {
-    let url = `${this.baseUrl}/tools?${limit ? `limit=${limit}&` : ""}${
-      offset ? `offset=${offset}&` : ""
-    }`;
+    let url = `${this.baseUrl}/tools?${limit ? `limit=${limit}&` : ""}${offset ? `offset=${offset}&` : ""
+      }`;
 
     // Add search query if provided
     if (query && query.length > 0) {
@@ -47,7 +47,7 @@ export class RestTrsProvider implements TrsProvider {
       }
     });
 
-    const response = await fetch(url);
+    const response = await fetcher(url, undefined, "ga4gh-trs/tools/get");
     if (!response.ok) {
       throw new Error(`Failed to fetch tools: ${response.statusText}`);
     }
@@ -56,7 +56,7 @@ export class RestTrsProvider implements TrsProvider {
 
   async getTool(url: string, id: string): Promise<Tool> {
     const encodedToolId = encodeURIComponent(id);
-    const response = await fetch(`${this.baseUrl}/tools/${encodedToolId}`);
+    const response = await fetcher(`${this.baseUrl}/tools/${encodedToolId}`, undefined, "ga4gh-trs/tools/id");
     if (!response.ok) {
       throw new Error(`Failed to fetch tool: ${response.statusText}`);
     }
@@ -65,8 +65,10 @@ export class RestTrsProvider implements TrsProvider {
 
   async getToolVersions(url: string, id: string): Promise<ToolVersion[]> {
     const encodedToolId = encodeURIComponent(id);
-    const response = await fetch(
-      `${this.baseUrl}/tools/${encodedToolId}/versions`
+    const response = await fetcher(
+      `${this.baseUrl}/tools/${encodedToolId}/versions`,
+      undefined,
+      "ga4gh-trs/tools/versions"
     );
     if (!response.ok) {
       throw new Error(`Failed to fetch tool versions: ${response.statusText}`);
@@ -84,8 +86,10 @@ export class RestTrsProvider implements TrsProvider {
       ? versionId.split(":")[1]
       : versionId;
     const encodedVersionId = encodeURIComponent(version);
-    const response = await fetch(
-      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}`
+    const response = await fetcher(
+      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}`,
+      undefined,
+      "ga4gh-trs/tools/version-id"
     );
     if (!response.ok) {
       throw new Error(`Failed to fetch tool version: ${response.statusText}`);
@@ -109,7 +113,7 @@ export class RestTrsProvider implements TrsProvider {
     if (format) {
       requestUrl += `?format=${format}`;
     }
-    const response = await fetch(requestUrl);
+    const response = await fetcher(requestUrl, undefined, "ga4gh-trs/tools/files");
     if (!response.ok) {
       throw new Error(`Failed to fetch tool files: ${response.statusText}`);
     }
@@ -126,8 +130,10 @@ export class RestTrsProvider implements TrsProvider {
     const versionPart = version.split(":")[1] ? version.split(":")[1] : version;
     const encodedVersionId = encodeURIComponent(versionPart);
     const encodedType = encodeURIComponent(descriptorType);
-    const response = await fetch(
-      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor`
+    const response = await fetcher(
+      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor`,
+      undefined,
+      "ga4gh-trs/tools/descriptor"
     );
     if (!response.ok) {
       throw new Error(
@@ -151,8 +157,10 @@ export class RestTrsProvider implements TrsProvider {
 
     // Try with unencoded path first
     try {
-      const response = await fetch(
-        `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${path}`
+      const response = await fetcher(
+        `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${path}`,
+        undefined,
+        "ga4gh-trs/tools/descriptor-path"
       );
 
       if (response.ok) {
@@ -161,8 +169,10 @@ export class RestTrsProvider implements TrsProvider {
 
       // If unencoded path fails, try with encoded path
       const encodedPath = encodeURIComponent(path);
-      const encodedResponse = await fetch(
-        `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${encodedPath}`
+      const encodedResponse = await fetcher(
+        `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${encodedPath}`,
+        undefined,
+        "ga4gh-trs/tools/descriptor-path"
       );
 
       if (encodedResponse.ok) {
@@ -177,8 +187,10 @@ export class RestTrsProvider implements TrsProvider {
       // If there's a network error or other exception, try encoded path
       const encodedPath = encodeURIComponent(path);
       try {
-        const encodedResponse = await fetch(
-          `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${encodedPath}`
+        const encodedResponse = await fetcher(
+          `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${encodedPath}`,
+          undefined,
+          "ga4gh-trs/tools/descriptor-path"
         );
 
         if (encodedResponse.ok) {
@@ -203,8 +215,10 @@ export class RestTrsProvider implements TrsProvider {
     const encodedToolId = encodeURIComponent(id);
     const versionPart = version.split(":")[1] ? version.split(":")[1] : version;
     const encodedVersionId = encodeURIComponent(versionPart);
-    const response = await fetch(
-      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/containerfile`
+    const response = await fetcher(
+      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/containerfile`,
+      undefined,
+      "ga4gh-trs/tools/containerfile"
     );
     if (!response.ok) {
       throw new Error(`Failed to fetch containerfile: ${response.statusText}`);
@@ -222,8 +236,10 @@ export class RestTrsProvider implements TrsProvider {
     const versionPart = version.split(":")[1] ? version.split(":")[1] : version;
     const encodedVersionId = encodeURIComponent(versionPart);
     const encodedType = encodeURIComponent(descriptorType);
-    const response = await fetch(
-      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/tests`
+    const response = await fetcher(
+      `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/tests`,
+      undefined,
+      "ga4gh-trs/tools/tests"
     );
     if (!response.ok) {
       throw new Error(`Failed to fetch tool tests: ${response.statusText}`);

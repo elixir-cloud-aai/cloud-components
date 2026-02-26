@@ -1,0 +1,1 @@
+Mocked file content for GA4GH TRS file wrappers.

@@ -1,0 +1,17 @@
+[
+    {
+        "id": "mock-service-001",
+        "name": "Mock Service 1",
+        "type": {
+            "group": "org.ga4gh",
+            "artifact": "tes",
+            "version": "1.0.0"
+        },
+        "organization": {
+            "name": "ELIXIR Mock",
+            "url": "https://example.com"
+        },
+        "version": "1.0.0",
+        "url": "https://example.com/tes/v1"
+    }
+]

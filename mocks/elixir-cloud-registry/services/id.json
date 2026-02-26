@@ -1,0 +1,15 @@
+{
+    "id": "mock-elixir-cr-001",
+    "name": "Mock ELIXIR Cloud Registry Service",
+    "type": {
+        "group": "org.elixir",
+        "artifact": "cloud-registry",
+        "version": "1.0.0"
+    },
+    "organization": {
+        "name": "ELIXIR Mock",
+        "url": "https://example.com"
+    },
+    "version": "1.0.0",
+    "url": "https://example.com/cr/v1"
+}

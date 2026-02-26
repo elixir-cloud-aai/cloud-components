@@ -1,0 +1,14 @@
+{
+    "id": "mock-registry-info-001",
+    "name": "Mock ELIXIR Registry Info",
+    "type": {
+        "group": "org.elixir",
+        "artifact": "registry-info",
+        "version": "1.0.0"
+    },
+    "organization": {
+        "name": "ELIXIR Mock",
+        "url": "https://example.com"
+    },
+    "version": "1.0.0"
+}

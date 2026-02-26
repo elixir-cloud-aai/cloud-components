@@ -1,4 +1,8 @@
-import { DrsProvider, DrsObject, AccessURL, Service } from "./drs-provider.js";
+import {
+  DrsProvider, DrsObject, AccessURL,
+  Service,
+} from "./drs-provider.js";
+import { fetcher } from "@elixir-cloud/design";
 
 /**
  * Implementation of the DrsProvider interface using direct REST API calls
@@ -6,7 +10,7 @@ import { DrsProvider, DrsObject, AccessURL, Service } from "./drs-provider.js";
  */
 export class RestDrsProvider implements DrsProvider {
   // eslint-disable-next-line no-useless-constructor
-  constructor(public readonly baseUrl: string) {}
+  constructor(public readonly baseUrl: string) { }
 
   async getObjects(
     limit?: number,
@@ -34,7 +38,7 @@ export class RestDrsProvider implements DrsProvider {
       url += `?${params.toString()}`;
     }
 
-    const response = await fetch(url);
+    const response = await fetcher(url, undefined, "ga4gh-drs/objects/get");
     if (!response.ok) {
       throw new Error(`Failed to fetch objects: ${response.statusText}`);
     }
@@ -54,7 +58,7 @@ export class RestDrsProvider implements DrsProvider {
       url += "?expand=true";
     }
 
-    const response = await fetch(url);
+    const response = await fetcher(url, undefined, "ga4gh-drs/objects/id");
     if (!response.ok) {
       throw new Error(`Failed to fetch object: ${response.statusText}`);
     }
@@ -64,8 +68,10 @@ export class RestDrsProvider implements DrsProvider {
   async getAccessURL(objectId: string, accessId: string): Promise<AccessURL> {
     const encodedObjectId = encodeURIComponent(objectId);
     const encodedAccessId = encodeURIComponent(accessId);
-    const response = await fetch(
-      `${this.baseUrl}/objects/${encodedObjectId}/access/${encodedAccessId}`
+    const response = await fetcher(
+      `${this.baseUrl}/objects/${encodedObjectId}/access/${encodedAccessId}`,
+      undefined,
+      "ga4gh-drs/objects/access"
     );
     if (!response.ok) {
       throw new Error(`Failed to fetch access URL: ${response.statusText}`);
@@ -74,7 +80,7 @@ export class RestDrsProvider implements DrsProvider {
   }
 
   async getServiceInfo(): Promise<Service> {
-    const response = await fetch(`${this.baseUrl}/service-info`);
+    const response = await fetcher(`${this.baseUrl}/service-info`, undefined, "ga4gh-drs/service-info");
     if (!response.ok) {
       throw new Error(`Failed to fetch service info: ${response.statusText}`);
     }

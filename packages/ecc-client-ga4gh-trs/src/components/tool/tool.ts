@@ -10,6 +10,7 @@ import {
   DescriptorType,
 } from "../../providers/trs-provider.js";
 import { RestTrsProvider } from "../../providers/rest-trs-provider.js";
+import { fetcher } from "@elixir-cloud/design";
 import "@elixir-cloud/design/components/table/index.js";
 import "@elixir-cloud/design/components/button/index.js";
 import "@elixir-cloud/design/components/input/index.js";
@@ -315,7 +316,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
           };
         } else if (fileWrapper.url) {
           // If only URL is provided, fetch the content from the URL
-          const response = await fetch(fileWrapper.url);
+          const response = await fetcher(fileWrapper.url);
           if (response.ok) {
             const content = await response.text();
             // Create a new object to trigger change detection
@@ -347,7 +348,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
           };
         } else if (fileWrapper.url) {
           // If only URL is provided, fetch the content from the URL
-          const response = await fetch(fileWrapper.url);
+          const response = await fetcher(fileWrapper.url);
           if (response.ok) {
             const content = await response.text();
             // Create a new object to trigger change detection
@@ -369,9 +370,8 @@ export class ECCClientGa4ghTrsTool extends LitElement {
       // Create a new object to trigger change detection
       this.fileContents = {
         ...this.fileContents,
-        [file.path]: `Error loading file content: ${
-          err instanceof Error ? err.message : String(err)
-        }`,
+        [file.path]: `Error loading file content: ${err instanceof Error ? err.message : String(err)
+          }`,
       };
     }
   }
@@ -398,7 +398,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
 
             <!-- Version selector integrated next to the name -->
             ${this.tool.versions && this.tool.versions.length > 0
-              ? html`
+        ? html`
                   <div class="w-full md:w-auto flex-shrink-0">
                     <ecc-utils-design-select
                       class="part:w-full part:md:w-64"
@@ -412,20 +412,20 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                           <div class="flex items-center gap-2">
                             <span>${versionName}</span>
                             ${isProduction
-                              ? html`
+            ? html`
                                   <ecc-utils-design-badge
                                     variant="default"
                                     class="part:text-xs"
                                     >Production</ecc-utils-design-badge
                                   >
                                 `
-                              : ""}
+            : ""}
                           </div>
                         </ecc-utils-design-select-value>
                       </ecc-utils-design-select-trigger>
                       <ecc-utils-design-select-content>
                         ${this.tool.versions.map(
-                          (version) => html`
+              (version) => html`
                             <ecc-utils-design-select-item value=${version.id}>
                               <div
                                 class="flex items-center justify-between w-full"
@@ -434,38 +434,38 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                               </div>
                             </ecc-utils-design-select-item>
                           `
-                        )}
+            )}
                       </ecc-utils-design-select-content>
                     </ecc-utils-design-select>
                   </div>
                 `
-              : ""}
+        : ""}
           </div>
 
           <div class="flex flex-wrap gap-2 items-center">
             ${selectedVersion?.is_production
-              ? html`
+        ? html`
                   <ecc-utils-design-badge
                     variant="default"
                     class="part:ml-2 part:text-xs"
                     >Production</ecc-utils-design-badge
                   >
                 `
-              : ""}
+        : ""}
             ${this.tool.toolclass
-              ? html`
+        ? html`
                   <ecc-utils-design-badge variant="secondary">
                     ${this.tool.toolclass.name}
                   </ecc-utils-design-badge>
                 `
-              : ""}
+        : ""}
             ${this.getAvailableDescriptorTypes().map(
-              (type) => html`
+          (type) => html`
                 <ecc-utils-design-badge variant="outline">
                   ${type}
                 </ecc-utils-design-badge>
               `
-            )}
+        )}
           </div>
         </div>
       </div>
@@ -608,14 +608,14 @@ export class ECCClientGa4ghTrsTool extends LitElement {
             <div class="flex flex-col gap-3">
               <!-- Tool Information Section -->
               ${this.tool.description
-                ? html`
+        ? html`
                     <div>
                       ${this.tool.description
-                        .split("\n")
-                        .map((line) => html` <p>${line}</p> `)}
+            .split("\n")
+            .map((line) => html` <p>${line}</p> `)}
                     </div>
                   `
-                : ""}
+        : ""}
               <div>
                 <dl class="flex flex-col gap-2">
                   <div class="flex flex-row gap-2 w-full justify-between">
@@ -632,7 +632,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                   <div class="flex flex-row gap-2 w-full justify-between">
                     <dt class="text-muted-foreground">Checker Workflow</dt>
                     ${this.tool.has_checker
-                      ? html`
+        ? html`
                           <dd>
                             <a
                               href="${ifDefined(this.tool.checker_url)}"
@@ -644,7 +644,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                             </a>
                           </dd>
                         `
-                      : html`
+        : html`
                           <span class="text-muted-foreground">
                             Not specified
                           </span>
@@ -659,37 +659,37 @@ export class ECCClientGa4ghTrsTool extends LitElement {
 
           <!-- Tool Aliases Section -->
           ${this.tool.aliases && this.tool.aliases.length > 0
-            ? html`
+        ? html`
                 <div>
                   <h3 class="text-base font-medium mb-2">Aliases</h3>
                   <div class="flex flex-wrap gap-2">
                     ${this.tool.aliases.map(
-                      (alias) => html`
+          (alias) => html`
                         <ecc-utils-design-badge variant="outline"
                           >${alias}</ecc-utils-design-badge
                         >
                       `
-                    )}
+        )}
                   </div>
                 </div>
               `
-            : ""}
+        : ""}
 
           <!-- Active Version Information Section -->
           <div class="flex flex-col gap-3">
             <div class="font-bold text-base">Version Information</div>
             ${version
-              ? html`
+        ? html`
                   <div class="flex flex-col gap-3">
                     ${version.description
-                      ? html`
+            ? html`
                           <div>
                             ${version.description
-                              .split("\n")
-                              .map((line) => html` <p>${line}</p> `)}
+                .split("\n")
+                .map((line) => html` <p>${line}</p> `)}
                           </div>
                         `
-                      : ""}
+            : ""}
                     <div>
                       <dl class="flex flex-col gap-2">
                         <div class="flex flex-row gap-2 w-full justify-between">
@@ -706,8 +706,8 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                         <div class="flex flex-row gap-2 w-full justify-between">
                           <dt class="text-muted-foreground">Author(s)</dt>
                           ${version.author && version.author.length > 0
-                            ? html` <dd>${version.author.join(", ")}</dd> `
-                            : html`<dd class="text-muted-foreground">
+            ? html` <dd>${version.author.join(", ")}</dd> `
+            : html`<dd class="text-muted-foreground">
                                 Not specified
                               </dd>`}
                         </div>
@@ -718,7 +718,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                           <dt class="text-muted-foreground">Status</dt>
                           <dd class="flex items-center">
                             ${version.verified
-                              ? html`
+            ? html`
                                   <span
                                     class="text-green-500 flex items-center"
                                   >
@@ -739,7 +739,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                                     Verified
                                   </span>
                                 `
-                              : html`<span class="text-muted-foreground"
+            : html`<span class="text-muted-foreground"
                                   >Not verified</span
                                 >`}
                           </dd>
@@ -751,15 +751,15 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                           </dt>
                           <dd class="flex flex-wrap gap-2">
                             ${version.descriptor_type &&
-                            version.descriptor_type.length > 0
-                              ? version.descriptor_type.map(
-                                  (type) => html`
+            version.descriptor_type.length > 0
+            ? version.descriptor_type.map(
+              (type) => html`
                                     <ecc-utils-design-badge variant="secondary"
                                       >${type}</ecc-utils-design-badge
                                     >
                                   `
-                                )
-                              : html`<span class="text-muted-foreground"
+            )
+            : html`<span class="text-muted-foreground"
                                   >Not specified</span
                                 >`}
                           </dd>
@@ -768,7 +768,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                     </div>
                   </div>
                 `
-              : ""}
+        : ""}
           </div>
         </div>
       </div>
@@ -811,11 +811,11 @@ export class ECCClientGa4ghTrsTool extends LitElement {
           </ecc-utils-design-table-header>
           <ecc-utils-design-table-body>
             ${this.tool.versions.map(
-              (version) => html`
+      (version) => html`
                 <ecc-utils-design-table-row
                   class="${version.id === this.selectedVersion
-                    ? "part:bg-primary/20"
-                    : "part:hover:bg-muted part:cursor-pointer"}"
+          ? "part:bg-primary/20"
+          : "part:hover:bg-muted part:cursor-pointer"}"
                   @click=${() => this.handleSetActiveVersion(version.id)}
                 >
                   <ecc-utils-design-table-cell class="w-4/12">
@@ -826,14 +826,14 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                         <span class="font-medium flex items-center gap-2">
                           <span>${version.name || version.id}</span>
                           ${version.is_production
-                            ? html`
+          ? html`
                                 <ecc-utils-design-badge
                                   variant="default"
                                   size="sm"
                                   >Production</ecc-utils-design-badge
                                 >
                               `
-                            : ""}
+          : ""}
                         </span>
 
                         <span class="text-xs text-muted-foreground"
@@ -845,34 +845,34 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                   <ecc-utils-design-table-cell class="w-3/12">
                     <div class="flex flex-wrap gap-1">
                       ${version.descriptor_type &&
-                      version.descriptor_type.length > 0
-                        ? version.descriptor_type.map(
-                            (type) => html`
+          version.descriptor_type.length > 0
+          ? version.descriptor_type.map(
+            (type) => html`
                               <ecc-utils-design-badge
                                 variant="secondary"
                                 size="sm"
                                 >${type}</ecc-utils-design-badge
                               >
                             `
-                          )
-                        : html`<span class="text-xs text-muted-foreground"
+          )
+          : html`<span class="text-xs text-muted-foreground"
                             >None specified</span
                           >`}
                     </div>
                   </ecc-utils-design-table-cell>
                   <ecc-utils-design-table-cell class="w-3/12">
                     ${version.author && version.author.length > 0
-                      ? html`<span class="text-sm"
+          ? html`<span class="text-sm"
                           >${version.author.join(", ")}</span
                         >`
-                      : html`<span class="text-xs text-muted-foreground"
+          : html`<span class="text-xs text-muted-foreground"
                           >Not specified</span
                         >`}
                   </ecc-utils-design-table-cell>
                   <ecc-utils-design-table-cell class="w-2/12">
                     <div class="flex flex-col gap-1">
                       ${version.verified
-                        ? html`
+          ? html`
                             <span
                               class="text-green-500 flex items-center text-sm"
                             >
@@ -893,14 +893,14 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                               Verified
                             </span>
                           `
-                        : html`<span class="text-muted-foreground text-sm"
+          : html`<span class="text-muted-foreground text-sm"
                             >Not verified</span
                           >`}
                     </div>
                   </ecc-utils-design-table-cell>
                 </ecc-utils-design-table-row>
               `
-            )}
+    )}
           </ecc-utils-design-table-body>
         </ecc-utils-design-table>
       </div>
@@ -930,10 +930,10 @@ export class ECCClientGa4ghTrsTool extends LitElement {
           .activeFileIndex=${this.activeFileIndex}
           .fileContents=${this.fileContents}
           .onDescriptorTypeChange=${(e: CustomEvent) =>
-            this.handleDescriptorTypeChange(e)}
+        this.handleDescriptorTypeChange(e)}
           .onFileSelect=${(index: number) => this.viewFileContent(index)}
           .getAvailableDescriptorTypes=${() =>
-            this.getAvailableDescriptorTypes()}
+        this.getAvailableDescriptorTypes()}
         >
           <!-- Version-specific Files Header Slot -->
           <slot
@@ -942,7 +942,7 @@ export class ECCClientGa4ghTrsTool extends LitElement {
             .selectedDescriptorType=${this.selectedDescriptorType}
             .availableDescriptorTypes=${this.getAvailableDescriptorTypes()}
             .onDescriptorTypeChange=${(e: CustomEvent) =>
-              this.handleDescriptorTypeChange(e)}
+        this.handleDescriptorTypeChange(e)}
           >
             <div class="w-full flex items-start justify-between">
               <div class="w-full">Browse Files</div>
@@ -962,12 +962,12 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                   </ecc-utils-design-select-trigger>
                   <ecc-utils-design-select-content>
                     ${this.getAvailableDescriptorTypes().map(
-                      (type) => html`
+          (type) => html`
                         <ecc-utils-design-select-item value=${type}
                           >${type}</ecc-utils-design-select-item
                         >
                       `
-                    )}
+        )}
                   </ecc-utils-design-select-content>
                 </ecc-utils-design-select>
               </div>
@@ -995,27 +995,27 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                   .activeFileIndex=${this.activeFileIndex}
                   .selectedDescriptorType=${this.selectedDescriptorType}
                   .onFileSelect=${(index: number) =>
-                    this.viewFileContent(index)}
+        this.viewFileContent(index)}
                 >
                   ${this.toolFiles.length === 0
-                    ? html`<p class="text-muted-foreground">
+        ? html`<p class="text-muted-foreground">
                         No files available for ${this.selectedDescriptorType}
                       </p>`
-                    : html`
+        : html`
                         <div class="space-y-1 max-h-[400px] overflow-y-auto">
                           ${this.toolFiles.map(
-                            (file, index) => html`
+          (file, index) => html`
                               <button
                                 class="w-full text-left px-3 py-1 rounded-md text-sm ${this
-                                  .activeFileIndex === index
-                                  ? "bg-primary/30"
-                                  : "hover:bg-muted"}"
+              .activeFileIndex === index
+              ? "bg-primary/30"
+              : "hover:bg-muted"}"
                                 @click=${() => this.viewFileContent(index)}
                               >
                                 <div class="flex items-center justify-between">
                                   <span class="truncate">${file.path}</span>
                                   ${file.file_type
-                                    ? html`
+              ? html`
                                         <ecc-utils-design-badge
                                           variant="outline"
                                           class="ml-2"
@@ -1024,11 +1024,11 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                                           ${file.file_type}
                                         </ecc-utils-design-badge>
                                       `
-                                    : ""}
+              : ""}
                                 </div>
                               </button>
                             `
-                          )}
+        )}
                         </div>
                       `}
                 </slot>
@@ -1057,27 +1057,27 @@ export class ECCClientGa4ghTrsTool extends LitElement {
                   <div>
                     <h3 class="text-sm font-medium mb-2">
                       ${this.activeFileIndex >= 0 &&
-                      this.toolFiles[this.activeFileIndex]
-                        ? this.toolFiles[this.activeFileIndex].path
-                        : "File Content"}
+        this.toolFiles[this.activeFileIndex]
+        ? this.toolFiles[this.activeFileIndex].path
+        : "File Content"}
                     </h3>
                     ${this.activeFileIndex >= 0 &&
-                    this.toolFiles[this.activeFileIndex]
-                      ? html`
+        this.toolFiles[this.activeFileIndex]
+        ? html`
                           <ecc-utils-design-code
                             value=${this.fileContents[
-                              this.toolFiles[this.activeFileIndex].path
-                            ] || "Loading file content..."}
+          this.toolFiles[this.activeFileIndex].path
+          ] || "Loading file content..."}
                             extension=${ifDefined(
-                              this.toolFiles[this.activeFileIndex].path
-                                .split(".")
-                                .pop()
-                            )}
+            this.toolFiles[this.activeFileIndex].path
+              .split(".")
+              .pop()
+          )}
                             disabled
                             class="part:h-[500px]"
                           ></ecc-utils-design-code>
                         `
-                      : html`<p class="text-muted-foreground">
+        : html`<p class="text-muted-foreground">
                           Select a file to view its content
                         </p>`}
                   </div>

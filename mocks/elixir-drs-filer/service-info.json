@@ -1,0 +1,14 @@
+{
+    "id": "mock-drs-service",
+    "name": "Mock DRS Service",
+    "type": {
+        "group": "org.ga4gh",
+        "artifact": "drs",
+        "version": "1.1.0"
+    },
+    "organization": {
+        "name": "Mock Org",
+        "url": "https://example.com"
+    },
+    "version": "1.1.0"
+}

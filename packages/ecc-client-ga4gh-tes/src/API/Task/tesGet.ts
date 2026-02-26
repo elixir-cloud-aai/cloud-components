@@ -1,3 +1,5 @@
+import { fetcher } from "@elixir-cloud/design";
+
 /**
  * Fetches service-info endpoint
  * @param baseURL The base URL for fetching tasks
@@ -6,8 +8,8 @@
 const fetchService = async (baseURL: string) => {
   const url = `${baseURL}/service-info?`;
   try {
-    const response = await fetch(url);
-    if (!response) {
+    const response = await fetcher(url, undefined, "ga4gh-tes/service-info");
+    if (!response || !response.ok) {
       return {
         isError: true,
         breakpoint: "fetchTasks",
@@ -73,8 +75,8 @@ const fetchTasks = async (
   }
 
   try {
-    const response = await fetch(url);
-    if (!response) {
+    const response = await fetcher(url, undefined, "ga4gh-tes/tasks/get");
+    if (!response || !response.ok) {
       return {
         isError: true,
         breakpoint: "fetchTasks",
@@ -100,8 +102,8 @@ const fetchTask = async (baseURL: string, id: string) => {
   const url = `${baseURL}/tasks/${id}?view=FULL`;
 
   try {
-    const response = await fetch(url);
-    if (!response) {
+    const response = await fetcher(url, undefined, "ga4gh-tes/tasks/id");
+    if (!response || !response.ok) {
       return {
         isError: true,
         breakpoint: "fetchTask",
@@ -125,9 +127,9 @@ const fetchTask = async (baseURL: string, id: string) => {
 const deleteTask = async (baseURL: string, id: string) => {
   const url = `${baseURL}/tasks/${id}:cancel`;
   try {
-    const response = await fetch(url, {
+    const response = await fetcher(url, {
       method: "DELETE",
-    });
+    }, "ga4gh-tes/tasks/cancel");
     return response;
   } catch (error) {
     return {
@@ -151,15 +153,15 @@ const postTask = async (baseURL: string, taskData: object) => {
   const url = `${baseURL}/tasks`;
 
   try {
-    const response = await fetch(url, {
+    const response = await fetcher(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(taskData),
-    });
+    }, "ga4gh-tes/tasks/post");
 
-    if (!response) {
+    if (!response || !response.ok) {
       return {
         isError: true,
         breakpoint: "postTask",

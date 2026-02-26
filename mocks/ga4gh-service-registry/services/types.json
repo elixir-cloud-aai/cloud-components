@@ -1,0 +1,12 @@
+[
+    {
+        "group": "org.ga4gh",
+        "artifact": "tes",
+        "version": "1.0.0"
+    },
+    {
+        "group": "org.ga4gh",
+        "artifact": "wes",
+        "version": "1.0.0"
+    }
+]

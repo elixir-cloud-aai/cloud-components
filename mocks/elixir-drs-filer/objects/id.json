@@ -1,0 +1,22 @@
+{
+    "id": "mock-drs-001",
+    "name": "Mock DRS Object 1",
+    "size": 1024,
+    "created_time": "2023-01-01T00:00:00Z",
+    "updated_time": "2023-01-01T00:00:00Z",
+    "version": "1.0",
+    "mime_type": "text/plain",
+    "checksums": [
+        {
+            "type": "md5",
+            "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+        }
+    ],
+    "access_methods": [
+        {
+            "access_id": "access-001",
+            "type": "s3",
+            "region": "us-east-1"
+        }
+    ]
+}
