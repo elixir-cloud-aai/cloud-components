@@ -10,6 +10,8 @@ function cn(...classes: (string | undefined | false)[]) {
 
 /**
  * EccUtilsDesignPagination - Root pagination component
+ *
+ * @element ecc-utils-design-pagination
  */
 export class EccUtilsDesignPagination extends LitElement {
   static styles = [
@@ -39,6 +41,8 @@ export class EccUtilsDesignPagination extends LitElement {
 
 /**
  * EccUtilsDesignPaginationContent - Content component
+ *
+ * @element ecc-utils-design-pagination-content
  */
 export class EccUtilsDesignPaginationContent extends LitElement {
   static styles = [
@@ -63,6 +67,8 @@ export class EccUtilsDesignPaginationContent extends LitElement {
 
 /**
  * EccUtilsDesignPaginationItem - Item component
+ *
+ * @element ecc-utils-design-pagination-item
  */
 export class EccUtilsDesignPaginationItem extends LitElement {
   static styles = [
@@ -85,6 +91,8 @@ export class EccUtilsDesignPaginationItem extends LitElement {
 
 /**
  * EccUtilsDesignPaginationLink - Link component
+ *
+ * @element ecc-utils-design-pagination-link
  */
 export class EccUtilsDesignPaginationLink extends LitElement {
   static styles = [
@@ -135,6 +143,8 @@ export class EccUtilsDesignPaginationLink extends LitElement {
 
 /**
  * EccUtilsDesignPaginationPrevious - Previous button component
+ *
+ * @element ecc-utils-design-pagination-previous
  */
 export class EccUtilsDesignPaginationPrevious extends LitElement {
   static styles = [
@@ -196,6 +206,8 @@ export class EccUtilsDesignPaginationPrevious extends LitElement {
 
 /**
  * EccUtilsDesignPaginationNext - Next button component
+ *
+ * @element ecc-utils-design-pagination-next
  */
 export class EccUtilsDesignPaginationNext extends LitElement {
   static styles = [
@@ -257,6 +269,8 @@ export class EccUtilsDesignPaginationNext extends LitElement {
 
 /**
  * EccUtilsDesignPaginationEllipsis - Ellipsis component
+ *
+ * @element ecc-utils-design-pagination-ellipsis
  */
 export class EccUtilsDesignPaginationEllipsis extends LitElement {
   static styles = [

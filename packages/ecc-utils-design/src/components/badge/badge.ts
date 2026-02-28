@@ -34,6 +34,8 @@ const sizeStyles: Record<"sm" | "md" | "lg", string> = {
 
 /**
  * EccUtilsDesignBadge - Badge component
+ *
+ * @element ecc-utils-design-badge
  */
 export class EccUtilsDesignBadge extends LitElement {
   static styles = [
