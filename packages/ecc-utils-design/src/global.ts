@@ -186,6 +186,8 @@ export const GlobalStyles = css`
     color: var(--foreground);
     padding: var(--ecc-surface-padding, 1rem);
     border-radius: var(--radius);
+    /* Many hosts are width: 100%; keep the padding inside that width */
+    box-sizing: border-box;
   }
 
   :host([dark]) {

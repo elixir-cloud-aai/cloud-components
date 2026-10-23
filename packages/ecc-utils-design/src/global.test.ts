@@ -58,6 +58,16 @@ describe("GlobalStyles", () => {
       `);
       expect(getComputedStyle(el).paddingLeft).to.equal("7px");
     });
+
+    it("keeps full-width surfaces within their container", async () => {
+      const wrapper = await fixture<HTMLElement>(html`
+        <div style="width: 200px">
+          <ecc-utils-design-code surface value="{}"></ecc-utils-design-code>
+        </div>
+      `);
+      const el = wrapper.querySelector("ecc-utils-design-code") as HTMLElement;
+      expect(el.getBoundingClientRect().width).to.equal(200);
+    });
   });
 
   describe("font tokens", () => {
