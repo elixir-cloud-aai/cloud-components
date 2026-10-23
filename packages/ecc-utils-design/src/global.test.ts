@@ -48,6 +48,16 @@ describe("GlobalStyles", () => {
       expect(style.backgroundColor).to.equal("rgb(1, 2, 3)");
       expect(style.color).to.equal("rgb(4, 5, 6)");
     });
+
+    it("insets the surface by --ecc-surface-padding", async () => {
+      const el = await fixture(html`
+        <ecc-utils-design-badge
+          surface
+          style="--ecc-surface-padding: 7px"
+        ></ecc-utils-design-badge>
+      `);
+      expect(getComputedStyle(el).paddingLeft).to.equal("7px");
+    });
   });
 
   describe("font tokens", () => {
@@ -85,6 +95,15 @@ describe("GlobalStyles", () => {
   });
 
   describe("dark mode", () => {
+    it("uses light defaults without dark", async () => {
+      const el = await fixture(html`
+        <ecc-utils-design-badge>Badge</ecc-utils-design-badge>
+      `);
+      expect(
+        getComputedStyle(inShadow(el, "[part=base]")).backgroundColor
+      ).to.equal(await resolveColor("oklch(0.205 0 0)"));
+    });
+
     it("applies dark defaults via the dark attribute", async () => {
       const el = await fixture(html`
         <ecc-utils-design-badge dark>Badge</ecc-utils-design-badge>
@@ -102,6 +121,20 @@ describe("GlobalStyles", () => {
       await badge.updateComplete;
       expect(
         getComputedStyle(inShadow(badge, "[part=base]")).backgroundColor
+      ).to.equal(await resolveColor("oklch(0.985 0 0)"));
+    });
+
+    it("applies dark defaults via a .dark ancestor", async function darkAncestor() {
+      // Relies on :host-context(), which Firefox does not support
+      if (!CSS.supports("selector(:host-context(.dark))")) this.skip();
+      const wrapper = await fixture(html`
+        <div class="dark">
+          <ecc-utils-design-badge>Badge</ecc-utils-design-badge>
+        </div>
+      `);
+      const el = wrapper.querySelector("ecc-utils-design-badge");
+      expect(
+        getComputedStyle(inShadow(el, "[part=base]")).backgroundColor
       ).to.equal(await resolveColor("oklch(0.985 0 0)"));
     });
 
@@ -128,6 +161,18 @@ describe("GlobalStyles", () => {
       const style = getComputedStyle(inShadow(el, ".ace_editor"));
       expect(style.backgroundColor).to.equal("rgb(10, 20, 30)");
       expect(style.color).to.equal("rgb(40, 50, 60)");
+    });
+
+    it("paints the gutter with --ecc-muted", async () => {
+      const el = await fixture(html`
+        <ecc-utils-design-code
+          style="--ecc-muted: rgb(70, 80, 90)"
+          value="{}"
+        ></ecc-utils-design-code>
+      `);
+      expect(
+        getComputedStyle(inShadow(el, ".ace_gutter")).backgroundColor
+      ).to.equal("rgb(70, 80, 90)");
     });
   });
 });

@@ -53,11 +53,13 @@ const DarkDefaults = css`
  * - `dark` attribute on a component, or a `.dark` class or `dark` attribute
  *   on an ancestor, switches to dark defaults
  * - `surface` attribute makes a component paint its own background and text
- *   color from the `--ecc-background` and `--ecc-foreground` tokens
+ *   color from the `--ecc-background` and `--ecc-foreground` tokens, inset by
+ *   `--ecc-surface-padding` and rounded by `--ecc-radius`
  */
 export const GlobalStyles = css`
   :host {
     font-family: var(--ecc-font-sans, inherit);
+    /* Not --font-mono: that name is Tailwind's theme variable, which maps here */
     --font-family-mono: var(
       --ecc-font-mono,
       ui-monospace,
@@ -182,6 +184,8 @@ export const GlobalStyles = css`
   :host([surface]) {
     background-color: var(--background);
     color: var(--foreground);
+    padding: var(--ecc-surface-padding, 1rem);
+    border-radius: var(--radius);
   }
 
   :host([dark]) {

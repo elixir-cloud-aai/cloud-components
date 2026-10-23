@@ -58,6 +58,7 @@ Here are all the available design tokens you can customize:
 | Token | Description | Default |
 |-------|-------------|---------|
 | `--ecc-radius` | Border radius | `0.625rem` |
+| `--ecc-surface-padding` | Inset of components with the `surface` attribute | `1rem` |
 
 #### Typography Tokens
 
@@ -153,7 +154,9 @@ Any `--ecc-*` token you set takes precedence over the dark defaults.
 By default, components are transparent: they show the page's background and
 inherit its text color, which suits embedding them into an existing layout.
 Add the `surface` attribute to have a component paint its own background and
-text color from `--ecc-background` and `--ecc-foreground`:
+text color from `--ecc-background` and `--ecc-foreground`. The surface is
+inset by `--ecc-surface-padding` (default `1rem`) and its corners are rounded
+by `--ecc-radius`:
 
 ```html
 <ecc-client-ga4gh-wes-runs surface dark></ecc-client-ga4gh-wes-runs>
@@ -167,9 +170,10 @@ components nested inside them inherit the painted surface.
 
 The code editor used for parameters, logs and file contents follows the same
 tokens: background and text use `--ecc-background` and `--ecc-foreground`, the
-gutter uses `--ecc-muted`, keys and keywords use `--ecc-primary`, strings and
-numbers are derived from `--ecc-chart-2` and `--ecc-chart-1`, and the font is
-`--ecc-font-mono`.
+gutter uses `--ecc-muted` and `--ecc-muted-foreground`, keys and keywords use
+`--ecc-primary`, strings are derived from `--ecc-chart-2`, numbers and other
+constants from `--ecc-chart-1`, invalid code uses `--ecc-destructive`,
+selections use `--ecc-ring`, and the font is `--ecc-font-mono`.
 
 ## Credits
 
