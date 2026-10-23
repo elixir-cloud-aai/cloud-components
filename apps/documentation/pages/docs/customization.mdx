@@ -29,7 +29,7 @@ Here are all the available design tokens you can customize:
 | `--ecc-accent` | Accent color | `oklch(0.97 0 0)` | `oklch(0.269 0 0)` |
 | `--ecc-accent-foreground` | Text on accent background | `oklch(0.205 0 0)` | `oklch(0.985 0 0)` |
 | `--ecc-destructive` | Error/danger color, also used for error text | `oklch(0.577 0.245 27.325)` | `oklch(0.704 0.191 22.216)` |
-| `--ecc-destructive-foreground` | Text on destructive background | `oklch(0.985 0 0)` | `oklch(0.985 0 0)` |
+| `--ecc-destructive-foreground` | Text on destructive background | `oklch(0.985 0 0)` | `oklch(0.205 0 0)` |
 | `--ecc-border` | Border color | `oklch(0.922 0 0)` | `oklch(0.269 0 0)` |
 | `--ecc-input` | Input border color | `oklch(0.922 0 0)` | `oklch(0.269 0 0)` |
 | `--ecc-ring` | Focus ring color | `oklch(0.708 0 0)` | `oklch(0.439 0 0)` |
@@ -142,12 +142,20 @@ setting `dark` on the outermost component is enough.
 
 <Callout type="warning">
   Detection of a `dark` class or attribute on an *ancestor* relies on the CSS
-  `:host-context()` selector, which Firefox does not support. For dark mode in
-  all browsers, set the `dark` attribute on the components themselves, or set
-  the `--ecc-*` tokens for your dark theme explicitly.
+  `:host-context()` selector, which only Chromium-based browsers support (not
+  Firefox or Safari). For dark mode in all browsers, set the `dark` attribute
+  on the components themselves, or set the `--ecc-*` tokens for your dark theme
+  explicitly.
 </Callout>
 
 Any `--ecc-*` token you set takes precedence over the dark defaults.
+
+<Callout type="info">
+  Error messages use `--ecc-destructive` as their text color, so it should be
+  readable on `--ecc-background`. Earlier versions used a dark red default for
+  `--ecc-destructive` in dark mode; if you copied that value into your own
+  dark theme, use a lighter red such as `oklch(0.704 0.191 22.216)`.
+</Callout>
 
 ## Surface Painting
 

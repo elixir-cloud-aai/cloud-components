@@ -7,7 +7,7 @@ import { css } from "lit";
  * than as the tokens themselves, so that components nested in another
  * component's shadow tree pick them up through inheritance. This keeps the
  * `dark` attribute working in browsers without `:host-context()` support
- * (Firefox). Public `--ecc-*` tokens still take precedence.
+ * (Firefox, Safari). Public `--ecc-*` tokens still take precedence.
  */
 const DarkDefaults = css`
   color-scheme: dark;
@@ -26,7 +26,7 @@ const DarkDefaults = css`
   --_ecc-default-accent: oklch(0.269 0 0);
   --_ecc-default-accent-foreground: oklch(0.985 0 0);
   --_ecc-default-destructive: oklch(0.704 0.191 22.216);
-  --_ecc-default-destructive-foreground: oklch(0.985 0 0);
+  --_ecc-default-destructive-foreground: oklch(0.205 0 0);
   --_ecc-default-border: oklch(0.269 0 0);
   --_ecc-default-input: oklch(0.269 0 0);
   --_ecc-default-ring: oklch(0.439 0 0);
