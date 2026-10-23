@@ -59,6 +59,7 @@ describe("GlobalStyles", () => {
       expect(getComputedStyle(el).paddingLeft).to.equal("7px");
     });
 
+    // The code editor host is width: 100%, the case that used to overflow
     it("keeps full-width surfaces within their container", async () => {
       const wrapper = await fixture<HTMLElement>(html`
         <div style="width: 200px">
@@ -171,6 +172,25 @@ describe("GlobalStyles", () => {
       const style = getComputedStyle(inShadow(el, ".ace_editor"));
       expect(style.backgroundColor).to.equal("rgb(10, 20, 30)");
       expect(style.color).to.equal("rgb(40, 50, 60)");
+    });
+
+    it("draws fold arrows in --ecc-muted-foreground", async () => {
+      const foldableJson = JSON.stringify({ a: 1 }, null, 2);
+      const el = await fixture(html`
+        <ecc-utils-design-code
+          style="--ecc-muted-foreground: rgb(11, 22, 33)"
+          language="json"
+          value=${foldableJson}
+        ></ecc-utils-design-code>
+      `);
+      // Ace renders the gutter asynchronously
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100);
+      });
+      const widget = inShadow(el, ".ace_fold-widget");
+      const style = getComputedStyle(widget);
+      expect(style.backgroundImage).to.equal("none");
+      expect(style.backgroundColor).to.equal("rgb(11, 22, 33)");
     });
 
     it("paints the gutter with --ecc-muted", async () => {

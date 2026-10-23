@@ -4,9 +4,9 @@ import "ace-builds/src-noconflict/ace.js";
  * Ace editor theme driven by ECC design tokens.
  *
  * Colors and fonts use the internal variables (`--background`, `--muted`,
- * ...) that GlobalStyles derives from `--ecc-*` tokens, so the editor follows custom
- * themes and light/dark mode like every other component, without having to
- * detect the mode in JavaScript.
+ * ...) that GlobalStyles derives from `--ecc-*` tokens, so the editor
+ * follows custom themes and light/dark mode like every other component,
+ * without having to detect the mode in JavaScript.
  */
 export const ACE_THEME = "ace/theme/ecc";
 
@@ -122,9 +122,8 @@ ace.define(
   ["require", "exports", "module", "ace/lib/dom"],
   (require: (id: string) => any, exports: Record<string, unknown>) => {
     /* eslint-disable no-param-reassign */
-    // Static flag; the theme is light or dark depending on tokens. Ace uses
-    // it to add ace_dark, which switches artwork such as fold arrows (drawn
-    // from tokens above instead) and widgets ECC does not load.
+    // Always false: colors come from tokens, so Ace's ace_dark artwork is
+    // never needed (fold arrows are token-colored masks above).
     exports.isDark = false;
     exports.cssClass = "ace-ecc";
     exports.cssText = cssText;
