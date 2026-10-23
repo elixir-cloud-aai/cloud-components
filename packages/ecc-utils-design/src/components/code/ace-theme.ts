@@ -3,15 +3,23 @@ import "ace-builds/src-noconflict/ace.js";
 /**
  * Ace editor theme driven by ECC design tokens.
  *
- * Colors and fonts resolve from the component's `--ecc-*` tokens (via the
- * internal variables set in GlobalStyles), so the editor follows custom
+ * Colors and fonts use the internal variables (`--background`, `--muted`,
+ * ...) that GlobalStyles derives from `--ecc-*` tokens, so the editor follows custom
  * themes and light/dark mode like every other component, without having to
  * detect the mode in JavaScript.
  */
 export const ACE_THEME = "ace/theme/ecc";
 
-const mix = (color: string, amount: number) =>
-  `color-mix(in oklch, var(${color}) ${amount}%, var(--foreground))`;
+// Share of the token color when blending syntax colors toward the text
+// color; keeps chart colors legible on both light and dark backgrounds.
+const SYNTAX_COLOR_SHARE = 75;
+
+const mixWithForeground = (color: string) =>
+  `color-mix(in oklch, var(${color}) ${SYNTAX_COLOR_SHARE}%, var(--foreground))`;
+
+// Neutral highlight that works on any background color.
+const tintForeground = (amount: number) =>
+  `color-mix(in oklch, var(--foreground) ${amount}%, transparent)`;
 
 const cssText = `
 .ace_editor.ace-ecc {
@@ -24,7 +32,7 @@ const cssText = `
   color: var(--muted-foreground);
 }
 .ace-ecc .ace_gutter-active-line {
-  background-color: var(--accent);
+  background-color: ${tintForeground(10)};
 }
 .ace-ecc .ace_print-margin {
   width: 1px;
@@ -57,11 +65,11 @@ const cssText = `
   color: var(--muted-foreground);
 }
 .ace-ecc .ace_string {
-  color: ${mix("--chart-2", 75)};
+  color: ${mixWithForeground("--chart-2")};
 }
 .ace-ecc .ace_constant,
 .ace-ecc .ace_support {
-  color: ${mix("--chart-1", 75)};
+  color: ${mixWithForeground("--chart-1")};
 }
 .ace-ecc .ace_invalid,
 .ace-ecc .ace_string.ace_regex {
@@ -71,7 +79,7 @@ const cssText = `
   background: color-mix(in oklch, var(--ring) 35%, transparent);
 }
 .ace-ecc .ace_marker-layer .ace_active-line {
-  background: color-mix(in oklch, var(--accent) 60%, transparent);
+  background: ${tintForeground(5)};
 }
 .ace-ecc .ace_marker-layer .ace_selected-word,
 .ace-ecc .ace_marker-layer .ace_bracket {
@@ -90,6 +98,9 @@ ace.define(
   ["require", "exports", "module", "ace/lib/dom"],
   (require: (id: string) => any, exports: Record<string, unknown>) => {
     /* eslint-disable no-param-reassign */
+    // Static flag; the theme is light or dark depending on tokens. It only
+    // adds Ace's ace_dark class, used by widgets (search box, autocomplete)
+    // that ECC does not enable.
     exports.isDark = false;
     exports.cssClass = "ace-ecc";
     exports.cssText = cssText;
