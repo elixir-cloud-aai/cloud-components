@@ -21,7 +21,31 @@ const mixWithForeground = (color: string) =>
 const tintForeground = (amount: number) =>
   `color-mix(in oklch, var(--foreground) ${amount}%, transparent)`;
 
+// Fold arrows as masks filled with a token color: Ace's own arrow images
+// only switch for its ace_dark class, which a token-driven theme cannot set.
+const chevron = (path: string) =>
+  `url("data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path d="${path}" fill="none" stroke="black" stroke-width="1.5"/></svg>`
+  )}")`;
+const FOLD_OPEN = chevron("M2 3.5l3 3 3-3");
+const FOLD_CLOSED = chevron("M3.5 2l3 3-3 3");
+
 const cssText = `
+.ace-ecc .ace_fold-widget {
+  background-image: none;
+  background-color: var(--muted-foreground);
+  -webkit-mask: ${FOLD_OPEN} center / 10px no-repeat;
+  mask: ${FOLD_OPEN} center / 10px no-repeat;
+}
+.ace-ecc .ace_fold-widget.ace_closed {
+  -webkit-mask-image: ${FOLD_CLOSED};
+  mask-image: ${FOLD_CLOSED};
+}
+.ace-ecc .ace_fold-widget:hover {
+  background-color: var(--foreground);
+  border-color: transparent;
+  box-shadow: none;
+}
 .ace_editor.ace-ecc {
   background-color: var(--background);
   color: var(--foreground);
@@ -98,9 +122,9 @@ ace.define(
   ["require", "exports", "module", "ace/lib/dom"],
   (require: (id: string) => any, exports: Record<string, unknown>) => {
     /* eslint-disable no-param-reassign */
-    // Static flag; the theme is light or dark depending on tokens. It only
-    // adds Ace's ace_dark class, used by widgets (search box, autocomplete)
-    // that ECC does not enable.
+    // Static flag; the theme is light or dark depending on tokens. Ace uses
+    // it to add ace_dark, which switches artwork such as fold arrows (drawn
+    // from tokens above instead) and widgets ECC does not load.
     exports.isDark = false;
     exports.cssClass = "ace-ecc";
     exports.cssText = cssText;
