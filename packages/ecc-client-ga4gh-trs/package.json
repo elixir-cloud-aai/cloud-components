@@ -38,7 +38,6 @@
     "build": "node ../../scripts/tailwind/index.js && node ../../scripts/build.js -p ecc-client-ga4gh-trs-",
     "dev": "concurrently -r \"node ../../scripts/tailwind/index.js --watch\" \"node ../../scripts/build.js -p ecc-client-ga4gh-trs- --watch\" \"wds\"",
     "clean": "rm -rf dist node_modules custom-elements-manifest.config.js src/output.css src/tailwind.ts",
-    "test": "wtr --coverage",
     "test:watch": "wtr --watch",
     "lint": "npx eslint .",
     "lint:fix": "npm run lint -- --fix",
