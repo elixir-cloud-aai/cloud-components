@@ -171,8 +171,10 @@ by `--ecc-radius`:
 ```
 
 This lets a component use a dark (or otherwise different) theme regardless of
-the page it is placed on. Set `surface` on top-level components only;
-components nested inside them inherit the painted surface.
+the page it is placed on. Set `surface` on top-level, block-level components
+only, such as the service components (`ecc-client-*`); components nested
+inside them inherit the painted surface. Inline design components (e.g.
+badges or buttons) are not laid out as a padded box.
 
 ## Code Editor
 

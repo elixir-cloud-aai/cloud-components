@@ -37,6 +37,9 @@ const cssText = `
   -webkit-mask: ${FOLD_OPEN} center / 10px no-repeat;
   mask: ${FOLD_OPEN} center / 10px no-repeat;
 }
+.ace-ecc .ace_fold-widget.ace_invalid {
+  background-color: var(--destructive);
+}
 .ace-ecc .ace_fold-widget.ace_closed {
   -webkit-mask-image: ${FOLD_CLOSED};
   mask-image: ${FOLD_CLOSED};

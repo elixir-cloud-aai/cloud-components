@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { expect, fixture, html } from "@open-wc/testing";
+import { expect, fixture, html, waitUntil } from "@open-wc/testing";
 import { LitElement } from "lit";
 import { GlobalStyles } from "./global.js";
 import "./components/badge/index.js";
@@ -184,9 +184,7 @@ describe("GlobalStyles", () => {
         ></ecc-utils-design-code>
       `);
       // Ace renders the gutter asynchronously
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100);
-      });
+      await waitUntil(() => inShadow(el, ".ace_fold-widget"));
       const widget = inShadow(el, ".ace_fold-widget");
       const style = getComputedStyle(widget);
       expect(style.backgroundImage).to.equal("none");
