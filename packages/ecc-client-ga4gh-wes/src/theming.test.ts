@@ -15,6 +15,7 @@ const TAGS = [
 describe("WES component theming", () => {
   TAGS.forEach((tag) => {
     it(`${tag} applies --ecc-font-sans`, async () => {
+      // String fixture: lit's html template cannot interpolate tag names
       const el = await fixture(
         `<${tag} style="--ecc-font-sans: Georgia, serif"></${tag}>`
       );
@@ -35,6 +36,8 @@ describe("WES component theming", () => {
       ".error-message"
     ) as HTMLElement;
     expect(message, "error message rendered").to.be.instanceOf(HTMLElement);
+    expect(message.textContent).to.contain("custom provider");
+    // GlobalStyles maps the public --ecc-destructive to --destructive
     expect(getComputedStyle(message).color).to.equal("rgb(1, 2, 3)");
   });
 });
