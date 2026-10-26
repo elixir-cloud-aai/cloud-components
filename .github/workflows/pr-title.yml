@@ -2,7 +2,7 @@
 # the commit messages on `main` (squash merges). A workflow of its own, so
 # that editing a title or description reruns only this check, not CI. Its
 # job `title` ("PR title") reports on every pull request and can be required
-# by branch rules next to "CI passed"
+# by branch rules next to "CI passed" (skipped, so passed, for Dependabot)
 
 name: PR title
 
@@ -18,6 +18,9 @@ jobs:
 
   title:
     name: PR title
+    # Dependabot's titles can't be configured to pass (lowercase, at most 50
+    # characters); a skipped job counts as passed for branch rules
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

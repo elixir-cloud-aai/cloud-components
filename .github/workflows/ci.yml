@@ -31,12 +31,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: List files with merge conflict markers
-        run: git --no-pager grep "<<<<<<<" ":(exclude).github/" || true
-      - name: Fail or succeed job if any files with merge conflict markers have been checked in
-        # Find lines containing "<<<<<<<", then count the number of lines.
-        # 0 matching lines results in exit code 0, i.e. success.
-        run: exit $(git grep "<<<<<<<" ":(exclude).github/" | wc --lines)
+      # `.github/` is excluded, as this workflow contains the marker itself
+      - name: Check for merge conflict markers
+        run: |
+          if git --no-pager grep -n "<<<<<<<" ":(exclude).github/"; then
+            echo "::error::Merge conflict markers found (see above)"
+            exit 1
+          fi
 
   lint:
     name: Lint
