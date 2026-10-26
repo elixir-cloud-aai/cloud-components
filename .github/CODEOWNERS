@@ -1,0 +1,6 @@
+# Code owners are requested for review on pull requests that change matching
+# files. To add owners for a path, add a line below the catch-all (the last
+# matching pattern wins), e.g. `/packages/ecc-client-ga4gh-wes/ @anuragxxd @<user>`.
+# See
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+* @anuragxxd
