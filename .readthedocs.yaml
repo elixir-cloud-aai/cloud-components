@@ -1,0 +1,13 @@
+# Read the Docs configuration for the documentation app (apps/documentation).
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html
+version: 2
+
+build:
+  os: ubuntu-24.04
+  tools:
+    nodejs: "20"
+  commands:
+    - npm ci --no-audit --no-fund
+    - npx turbo run build --filter=ecc-docs...
+    - mkdir -p $READTHEDOCS_OUTPUT
+    - cp -r apps/documentation/out $READTHEDOCS_OUTPUT/html
