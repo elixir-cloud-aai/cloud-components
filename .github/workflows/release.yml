@@ -1,14 +1,24 @@
-name: Publish packages
+# Releases from version tags: a maintainer pushes `v<version>` on `main` (see
+# "Releases" in CONTRIBUTING.md). The workflow lints, sets all released
+# packages to the version, pushes `bump: v<version>` to `main`, publishes the
+# packages to npm with trusted publishing (OIDC, with provenance) and creates
+# a GitHub release for the tag. The trusted publishers on npmjs.com name this
+# file (`release.yml`): keep the name
+
+name: Release
 
 on:
   push:
     tags:
       - 'v*'
 
+permissions:
+  contents: read
+
 jobs:
 
-  linters:
-    name: Linting checks
+  lint:
+    name: Lint release
     runs-on: ubuntu-24.04
 
     steps:
@@ -73,11 +83,11 @@ jobs:
   #     - name: Run tests
   #       run: npm run test
 
-  bump-monorepo:
-    name: Bump monorepo
+  bump:
+    name: Bump version
     runs-on: ubuntu-latest
     needs:
-      - linters
+      - lint
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set env
@@ -181,9 +191,12 @@ jobs:
           branch: main
 
   publish:
-    name: Publish on npm
+    name: Publish packages
     runs-on: ubuntu-latest
-    needs: bump-monorepo
+    needs: bump
+    permissions:
+      contents: read
+      id-token: write # npm trusted publishing (OIDC) and provenance
     steps:
       - name: Checkout Repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -207,8 +220,29 @@ jobs:
           # No dependency cache in releases, see above
           package-manager-cache: false
 
-      - name: Login to npm
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+      # Trusted publishing needs npm 11.5.1 or later (Node.js 24 has it)
+      - name: Check npm version
+        run: |
+          version="$(npm --version)"
+          if ! node -e '
+            const [major, minor, patch] = process.argv[1].split(".").map(Number);
+            process.exit(major > 11 || (major === 11 && (minor > 5 || (minor === 5 && patch >= 1))) ? 0 : 1);
+          ' "${version}"; then
+            echo "::error::npm ${version} can't publish with trusted publishing (needs 11.5.1 or later)"
+            exit 1
+          fi
+
+      # Fallback until the first release with trusted publishing has worked:
+      # npm tries OIDC first and uses this token only if that fails (e.g. no
+      # trusted publisher configured for a package). Then remove this step
+      # and revoke the `NPM_TOKEN` secret
+      - name: Configure npm token (fallback)
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "${NPM_TOKEN}" ]; then
+            printf '//registry.npmjs.org/:_authToken=%s\n' "${NPM_TOKEN}" > ~/.npmrc
+          fi
 
       - name: Install Dependencies
         run: npm ci
@@ -289,3 +323,36 @@ jobs:
 
       - name: Publish to npm
         run: npm run release
+
+  # A GitHub release for the tag, with notes generated from the previous
+  # version tag on (a prerelease for versions such as `2.0.0-alpha.49`).
+  # Skipped if the release exists already, so that the job can be re-run
+  github:
+    name: GitHub release
+    runs-on: ubuntu-latest
+    needs: publish
+    permissions:
+      contents: write # create the release
+    steps:
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "${TAG}" --repo "${REPOSITORY}" > /dev/null 2>&1; then
+            echo "::notice::Release ${TAG} exists already"
+            exit 0
+          fi
+          args=(--repo "${REPOSITORY}" --verify-tag --title "${TAG}" --generate-notes)
+          # The version tag before this one, by version order
+          previous="$(gh api --paginate "repos/${REPOSITORY}/tags" --jq '.[].name' \
+            | grep -E '^v[0-9]' | sort -V \
+            | awk -v tag="${TAG}" '$0 == tag { print prev; exit } { prev = $0 }')"
+          if [ -n "${previous}" ]; then
+            args+=(--notes-start-tag "${previous}")
+          fi
+          if [[ "${TAG}" == *-* ]]; then
+            args+=(--prerelease)
+          fi
+          gh release create "${TAG}" "${args[@]}"
