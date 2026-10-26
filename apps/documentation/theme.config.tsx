@@ -27,8 +27,12 @@ const config: DocsThemeConfig = {
     component: <Footer />,
   },
   gitTimestamp: false,
+  // Replaces Nextra's default head: keep its generic tags, drop its own
+  // branding (description and social tags).
   head: (
     <>
+      <meta name="msapplication-TileColor" content="#fff" />
+      <meta httpEquiv="Content-Language" content="en" />
       <link rel="icon" href={withBasePath('/favicon.ico')} />
     </>
   ),
