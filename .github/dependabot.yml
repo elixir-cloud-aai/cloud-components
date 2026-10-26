@@ -4,6 +4,9 @@ updates:
   # (and their version comments) up to date, in one grouped pull request
   - package-ecosystem: github-actions
     directory: /
+    # Pull request titles must be Conventional Commits (PR title check)
+    commit-message:
+      prefix: ci
     schedule:
       interval: monthly
     groups:
