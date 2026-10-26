@@ -27,6 +27,11 @@ const config: DocsThemeConfig = {
     component: <Footer />,
   },
   gitTimestamp: false,
+  head: (
+    <>
+      <link rel="icon" href={withBasePath('/favicon.ico')} />
+    </>
+  ),
   nextThemes: {
     defaultTheme: 'light'
   },
