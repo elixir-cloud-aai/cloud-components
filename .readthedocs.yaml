@@ -1,10 +1,15 @@
 # Read the Docs configuration for the documentation app (apps/documentation).
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html
+#
+# Pull request previews and per-branch builds are project settings on Read
+# the Docs ("Build pull requests" and an "activate" automation rule for
+# branches), not part of this file.
 version: 2
 
 build:
   os: ubuntu-24.04
   tools:
+    # Same major version as the docs image (Dockerfile) once #466 is done
     nodejs: "24"
   commands:
     - npm ci --no-audit --no-fund
