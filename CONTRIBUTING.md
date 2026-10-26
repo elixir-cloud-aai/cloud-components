@@ -14,7 +14,8 @@ describes what is specific to this repository.
 
 1. Branch off `main` (e.g. `feat/<topic>` or `fix/<topic>`) and open a pull
    request against `main` that references the issue it closes (e.g.
-   `Closes #123`).
+   `Fixes #123`, as in the pull request template). Maintainers may also push
+   small changes to `main` directly.
 2. Title the pull request as a [Conventional
    Commit](https://www.conventionalcommits.org/):
    `<type>[(<scope>)][!]: <description>`, where the description starts in
@@ -25,8 +26,7 @@ describes what is specific to this repository.
    24) and the other CI jobs. Run `npm run lint`, `npm run build` and
    `npm test` locally before you push.
 4. Add or update tests and the documentation (`apps/documentation`) for
-   changed behaviour; for UI changes, check the documentation preview if one
-   is posted on the pull request.
+   changed behaviour.
 5. The code owners (see `.github/CODEOWNERS`) are requested for review
    automatically. A maintainer merges once the pull request is approved.
 
@@ -40,8 +40,8 @@ comments.
 
 All published packages share one version and are released together
 (currently `2.0.0-alpha.N`, until 2.0.0). `@elixir-cloud/tes`,
-`@elixir-cloud/ro-crate` and `@elixir-cloud/eslint-config` are frozen and
-not released.
+`@elixir-cloud/ro-crate` and `@elixir-cloud/eslint-config` are frozen: the
+release doesn't change their versions, so they aren't published again.
 
 To release, a maintainer pushes a tag `v<version>` (e.g. `v2.0.0-alpha.49`)
 on `main`. The `Release` workflow (`.github/workflows/release.yml`) then:
@@ -53,8 +53,9 @@ on `main`. The `Release` workflow (`.github/workflows/release.yml`) then:
 3. builds the packages from `main` and publishes those whose version is not
    on npm yet, with `changeset publish`, under the dist-tag `latest`; npm
    authenticates the workflow by [trusted
-   publishing](https://docs.npmjs.com/trusted-publishers) (OpenID Connect),
-   so no npm token is needed, and adds provenance;
+   publishing](https://docs.npmjs.com/trusted-publishers) (OpenID Connect)
+   and adds provenance (an npm token remains as a fallback until the first
+   release with trusted publishing has worked, see #471);
 4. creates a GitHub release for the tag, with generated notes (a prerelease
    for versions such as `2.0.0-alpha.49`).
 
