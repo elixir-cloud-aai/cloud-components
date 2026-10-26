@@ -7,7 +7,8 @@
     },
     "build": {
       "outputs": ["dist/**"],
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "env": ["READTHEDOCS_CANONICAL_URL", "NEXT_PUBLIC_BASE_PATH"]
     },
     "test": {
       "inputs": [],

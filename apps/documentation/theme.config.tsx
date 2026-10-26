@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import { DocsThemeConfig } from 'nextra-theme-docs';
 import Image from 'next/image';
+import { withBasePath } from './utils/basePath';
 import { RiSlackFill, RiGithubFill } from '@remixicon/react';
 
 import Footer from './components/common/Footer';
@@ -8,7 +9,7 @@ import Footer from './components/common/Footer';
 const config: DocsThemeConfig = {
   logo: (
     <div className='flex gap-3 items-center'>
-      <Image src='/elixir-cloud/logo.svg' alt='Logo' width={44} height={44} />
+      <Image src={withBasePath('/elixir-cloud/logo.svg')} alt='Logo' width={44} height={44} />
       <span className='tracking-wide font-semibold'>ELIXIR Cloud Components</span>
     </div>
   ),
