@@ -191,7 +191,7 @@ jobs:
           branch: main
 
   publish:
-    name: Publish packages
+    name: Release packages
     runs-on: ubuntu-latest
     needs: bump
     permissions:
@@ -230,18 +230,6 @@ jobs:
           ' "${version}"; then
             echo "::error::npm ${version} can't publish with trusted publishing (needs 11.5.1 or later)"
             exit 1
-          fi
-
-      # Fallback until the first release with trusted publishing has worked:
-      # npm tries OIDC first and uses this token only if that fails (e.g. no
-      # trusted publisher configured for a package). Then remove this step
-      # and revoke the `NPM_TOKEN` secret
-      - name: Configure npm token (fallback)
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          if [ -n "${NPM_TOKEN}" ]; then
-            printf '//registry.npmjs.org/:_authToken=%s\n' "${NPM_TOKEN}" > ~/.npmrc
           fi
 
       - name: Install Dependencies
@@ -321,14 +309,41 @@ jobs:
       - name: Build Packages
         run: npm run build
 
+      # Fallback until the first release with trusted publishing has worked
+      # (configured only right before publishing, not during install and
+      # build):
+      # npm tries OIDC first and uses this token only if that fails (e.g. no
+      # trusted publisher configured for a package). Then remove this step
+      # and revoke the `NPM_TOKEN` secret
+      - name: Configure npm token (fallback)
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "${NPM_TOKEN}" ]; then
+            echo "::notice::Using the NPM_TOKEN fallback for packages without a trusted publisher"
+            printf '//registry.npmjs.org/:_authToken=%s\n' "${NPM_TOKEN}" > ~/.npmrc
+          fi
+
       - name: Publish to npm
         run: npm run release
+
+      # Trusted publishing adds provenance; a version without it was published
+      # with the `NPM_TOKEN` fallback (check this before removing the token)
+      - name: Check provenance
+        run: |
+          for package_file in packages/*/package.json; do
+            name="$(node -p "const p = require('./${package_file}'); p.private || p.version !== '${RELEASE_VERSION}' ? '' : p.name")"
+            [ -n "${name}" ] || continue
+            if [ -z "$(npm view "${name}@${RELEASE_VERSION}" dist.attestations.provenance 2> /dev/null)" ]; then
+              echo "::warning::${name}@${RELEASE_VERSION} has no provenance: published with the NPM_TOKEN fallback, or not visible on npm yet"
+            fi
+          done
 
   # A GitHub release for the tag, with notes generated from the previous
   # version tag on (a prerelease for versions such as `2.0.0-alpha.49`).
   # Skipped if the release exists already, so that the job can be re-run
   github:
-    name: GitHub release
+    name: Release on GitHub
     runs-on: ubuntu-latest
     needs: publish
     permissions:
@@ -345,9 +360,11 @@ jobs:
             exit 0
           fi
           args=(--repo "${REPOSITORY}" --verify-tag --title "${TAG}" --generate-notes)
-          # The version tag before this one, by version order
+          # The version tag before this one, in semver order: `sort -V` puts
+          # `v2.0.0` before `v2.0.0-alpha.1`, so versions without a suffix get
+          # a temporary `_`, which sorts after `-`
           previous="$(gh api --paginate "repos/${REPOSITORY}/tags" --jq '.[].name' \
-            | grep -E '^v[0-9]' | sort -V \
+            | grep -E '^v[0-9]' | sed '/-/!s/$/_/' | sort -V | sed 's/_$//' \
             | awk -v tag="${TAG}" '$0 == tag { print prev; exit } { prev = $0 }')"
           if [ -n "${previous}" ]; then
             args+=(--notes-start-tag "${previous}")
