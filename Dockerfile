@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as the base image
-FROM node:20-alpine AS base
+FROM node:24-alpine AS base
 
 FROM base AS builder
 RUN apk update

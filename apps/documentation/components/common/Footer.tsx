@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { withBasePath } from '@/utils/basePath';
 
 function Footer() {
   return (
@@ -6,17 +7,17 @@ function Footer() {
       <div className='container flex flex-col sm:flex-row justify-between px-4 py-4'>
         <div className='flex justify-center items-center my-2 gap-4'>
           <a href='https://elixir-cloud.dcc.sib.swiss/' target='_blank' rel='noopener noreferrer'>
-            <Image src='/elixir-cloud/logo.svg' alt='Elixir Cloud & AAI' width={75} height={75} />
+            <Image src={withBasePath('/elixir-cloud/logo.svg')} alt='Elixir Cloud & AAI' width={75} height={75} />
           </a>
           <Image
-            src='/cloud-sdk/dark.svg'
+            src={withBasePath('/cloud-sdk/dark.svg')}
             alt='Cloud SDK'
             width={75}
             height={75}
             className='dark:block hidden'
           />
           <Image
-            src='/cloud-sdk/light.svg'
+            src={withBasePath('/cloud-sdk/light.svg')}
             alt='Cloud SDK'
             width={75}
             height={75}
@@ -24,14 +25,14 @@ function Footer() {
           />
           <a href='https://elixir-europe.org/' target='_blank' rel='noopener noreferrer'>
             <Image
-              src='/elixir/dark.png'
+              src={withBasePath('/elixir/dark.png')}
               alt='Elixir'
               width={75}
               height={75}
               className='dark:block hidden ml-2'
             />
             <Image
-              src='/elixir/light.svg'
+              src={withBasePath('/elixir/light.svg')}
               alt='Elixir'
               width={95}
               height={95}

@@ -14,12 +14,21 @@ export class RestServiceRegistryProvider implements ServiceRegistryProvider {
   constructor(public readonly baseUrl: string) {}
 
   /**
+   * Sends every request of this provider. Override it in a subclass to add
+   * headers (e.g. `Authorization`) or otherwise change requests.
+   */
+  // eslint-disable-next-line class-methods-use-this
+  protected fetch(input: RequestInfo | URL, init?: RequestInit) {
+    return fetch(input, init);
+  }
+
+  /**
    * Fetch list of services from the registry
    * @returns Promise resolving to array of services
    */
   async getServices(): Promise<ExternalService[]> {
     const url = `${this.baseUrl}/services`;
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch services: ${response.statusText}`);
     }
@@ -34,7 +43,7 @@ export class RestServiceRegistryProvider implements ServiceRegistryProvider {
   async getServiceById(serviceId: string): Promise<ExternalService> {
     const encodedServiceId = encodeURIComponent(serviceId);
     const url = `${this.baseUrl}/services/${encodedServiceId}`;
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch service: ${response.statusText}`);
     }
@@ -47,7 +56,7 @@ export class RestServiceRegistryProvider implements ServiceRegistryProvider {
    */
   async getServiceTypes(): Promise<ServiceType[]> {
     const url = `${this.baseUrl}/services/types`;
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch service types: ${response.statusText}`);
     }
@@ -60,7 +69,7 @@ export class RestServiceRegistryProvider implements ServiceRegistryProvider {
    */
   async getServiceInfo(): Promise<Service> {
     const url = `${this.baseUrl}/service-info`;
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch service info: ${response.statusText}`);
     }

@@ -8,6 +8,15 @@ export class RestDrsProvider implements DrsProvider {
   // eslint-disable-next-line no-useless-constructor
   constructor(public readonly baseUrl: string) {}
 
+  /**
+   * Sends every request of this provider. Override it in a subclass to add
+   * headers (e.g. `Authorization`) or otherwise change requests.
+   */
+  // eslint-disable-next-line class-methods-use-this
+  protected fetch(input: RequestInfo | URL, init?: RequestInit) {
+    return fetch(input, init);
+  }
+
   async getObjects(
     limit?: number,
     offset = 0
@@ -34,7 +43,7 @@ export class RestDrsProvider implements DrsProvider {
       url += `?${params.toString()}`;
     }
 
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch objects: ${response.statusText}`);
     }
@@ -54,7 +63,7 @@ export class RestDrsProvider implements DrsProvider {
       url += "?expand=true";
     }
 
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch object: ${response.statusText}`);
     }
@@ -64,7 +73,7 @@ export class RestDrsProvider implements DrsProvider {
   async getAccessURL(objectId: string, accessId: string): Promise<AccessURL> {
     const encodedObjectId = encodeURIComponent(objectId);
     const encodedAccessId = encodeURIComponent(accessId);
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/objects/${encodedObjectId}/access/${encodedAccessId}`
     );
     if (!response.ok) {
@@ -74,7 +83,7 @@ export class RestDrsProvider implements DrsProvider {
   }
 
   async getServiceInfo(): Promise<Service> {
-    const response = await fetch(`${this.baseUrl}/service-info`);
+    const response = await this.fetch(`${this.baseUrl}/service-info`);
     if (!response.ok) {
       throw new Error(`Failed to fetch service info: ${response.statusText}`);
     }
