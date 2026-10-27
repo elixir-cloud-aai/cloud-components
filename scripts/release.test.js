@@ -73,12 +73,24 @@ test("parseVersion accepts versions and rejects other strings", () => {
   );
 });
 
-test("distTag uses latest for releases and the prerelease identifier", () => {
-  assert.strictEqual(distTag("2.0.0"), "latest");
-  assert.strictEqual(distTag("2.0.0-alpha.49"), "alpha");
-  assert.strictEqual(distTag("2.1.0-rc.1"), "rc");
-  assert.strictEqual(distTag("2.1.0-1"), "next");
-  assert.strictEqual(distTag("2.1.0-latest.1"), "next");
+test("distTag uses the prerelease identifier once the major is released", () => {
+  const tags = ["v1.0.0", "v1.0.1", "v2.0.0-alpha.48", "not-a-version", "v3"];
+  assert.strictEqual(distTag("2.0.0", tags), "latest");
+  assert.strictEqual(distTag("1.1.0-rc.1", tags), "rc");
+  assert.strictEqual(distTag("1.1.0-1", tags), "next");
+  assert.strictEqual(distTag("1.1.0-latest.1", tags), "next");
+});
+
+test("distTag uses latest for prereleases of an unreleased major", () => {
+  const tags = ["v1.0.1", "v2.0.0-alpha.48"];
+  assert.strictEqual(distTag("2.0.0-alpha.49", tags), "latest");
+  assert.throws(() => distTag("2.0.0-alpha.49", []), /No release tags/);
+  assert.throws(
+    () => distTag("2.0.0-alpha.49", ["v2.0.0-alpha.48", "v2.0.0+build"]),
+    /No release tags/
+  );
+  assert.strictEqual(distTag("2.1.0-rc.1", [...tags, "v2.0.0"]), "rc");
+  assert.strictEqual(distTag("3.0.0-alpha.1", [...tags, "v2.0.0"]), "latest");
 });
 
 test("releasedPackages lists public packages, sorted by directory", (t) => {
@@ -143,10 +155,7 @@ const run = (...args) =>
     encoding: "utf8",
   });
 
-test("the command line prints the dist-tag and released packages", () => {
-  const distTagRun = run("dist-tag", "2.0.0-alpha.49");
-  assert.strictEqual(distTagRun.status, 0);
-  assert.strictEqual(distTagRun.stdout, "alpha\n");
+test("the command line prints the released packages", () => {
   const packagesRun = run("packages");
   assert.strictEqual(packagesRun.status, 0);
   const dirs = packagesRun.stdout.trim().split("\n");
