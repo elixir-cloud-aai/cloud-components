@@ -15,7 +15,7 @@ For comprehensive guides, API references, and examples, visit our documentation:
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
+- Node.js 22 or later (CI tests 22 and 24)
 - npm or yarn
 
 ### Development Setup

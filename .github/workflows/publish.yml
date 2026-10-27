@@ -17,10 +17,10 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Use Node.js 20.x
+      - name: Use Node.js 24.x
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 20.x
+          node-version: 24.x
           # No dependency cache in releases (cache poisoning); `package.json`
           # sets `packageManager`, which would turn on npm caching by default
           package-manager-cache: false
@@ -106,7 +106,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 20.x
+          node-version: 24.x
           # No dependency cache in releases, see above
           package-manager-cache: false
 
@@ -200,10 +200,10 @@ jobs:
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_ENV
         shell: bash
 
-      - name: Setup Node.js 20.x
+      - name: Setup Node.js 24.x
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 20.x
+          node-version: 24.x
           # No dependency cache in releases, see above
           package-manager-cache: false
 
