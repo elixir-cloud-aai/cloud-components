@@ -1,5 +1,6 @@
 # Releases from version tags (see "Releases" in CONTRIBUTING.md): after the
-# version bump pull request, a maintainer pushes `v<version>` on `dev`. The
+# version bump pull request, a maintainer pushes `v<version>` on `dev` (tags
+# on other branches fail). The
 # workflow checks the tag, lints, builds the packages from the tag, stages
 # them on npm with trusted publishing (OIDC, with provenance) once the `npm`
 # environment is approved, and creates a GitHub release for the tag. Staged
@@ -151,7 +152,9 @@ jobs:
 
       # Staged versions aren't public until a maintainer approves them on
       # npmjs.com. Versions already on npm are skipped, so that the job can
-      # be re-run; a version staged by an earlier run fails to stage again
+      # be re-run; `npm view` doesn't see staged versions, so a version
+      # staged by an earlier run fails to stage again with a conflict (E409)
+      # and counts as staged (the same commit, as tags are immutable)
       - name: Stage packages on npm
         run: |
           args=(--provenance --tag "${DIST_TAG}")
@@ -165,11 +168,12 @@ jobs:
             echo "::error::No packages to release"
             exit 1
           fi
+          log="$(mktemp)"
           staged=()
           failed=()
           while read -r dir; do
             name="$(node -p "require('./${dir}/package.json').name")"
-            if output="$(npm view "${name}@${VERSION}" version 2>&1)"; then
+            if output="$(npm view "${name}@${VERSION}" version 2>&1 < /dev/null)"; then
               if [ -n "${output}" ]; then
                 echo "::notice::${name}@${VERSION} is on npm already"
                 continue
@@ -181,8 +185,12 @@ jobs:
               continue
             fi
             echo "::group::${name}@${VERSION}"
-            if (cd "${dir}" && npm stage publish "${args[@]}"); then
+            if (cd "${dir}" && npm stage publish "${args[@]}" < /dev/null 2>&1) | tee "${log}" \
+              && [ "${PIPESTATUS[0]}" -eq 0 ]; then
               staged+=("${name}@${VERSION}")
+            elif grep -q "code E409" "${log}"; then
+              echo "::warning::${name}@${VERSION} was staged earlier"
+              staged+=("${name}@${VERSION} (staged earlier)")
             else
               failed+=("${name}@${VERSION}")
               echo "::error::Could not stage ${name}@${VERSION}"
