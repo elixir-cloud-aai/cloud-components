@@ -117,20 +117,23 @@ const cssText = `
 }
 `;
 
-// globalThis rather than window: this module is also evaluated during SSR
+// globalThis rather than window: this module is also evaluated during SSR,
+// where Ace may not have registered itself; skip the theme there
 const { ace } = globalThis as any;
 
-ace.define(
-  ACE_THEME,
-  ["require", "exports", "module", "ace/lib/dom"],
-  (require: (id: string) => any, exports: Record<string, unknown>) => {
-    /* eslint-disable no-param-reassign */
-    // Always false: colors come from tokens, so Ace's ace_dark artwork is
-    // never needed (fold arrows are token-colored masks above).
-    exports.isDark = false;
-    exports.cssClass = "ace-ecc";
-    exports.cssText = cssText;
-    /* eslint-enable no-param-reassign */
-    require("ace/lib/dom").importCssString(cssText, "ace-ecc");
-  }
-);
+if (typeof ace?.define === "function") {
+  ace.define(
+    ACE_THEME,
+    ["require", "exports", "module", "ace/lib/dom"],
+    (require: (id: string) => any, exports: Record<string, unknown>) => {
+      /* eslint-disable no-param-reassign */
+      // Always false: colors come from tokens, so Ace's ace_dark artwork is
+      // never needed (fold arrows are token-colored masks above).
+      exports.isDark = false;
+      exports.cssClass = "ace-ecc";
+      exports.cssText = cssText;
+      /* eslint-enable no-param-reassign */
+      require("ace/lib/dom").importCssString(cssText, "ace-ecc");
+    }
+  );
+}
