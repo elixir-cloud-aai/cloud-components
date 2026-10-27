@@ -1,7 +1,8 @@
 # Everything that must pass on pull requests and pushes to `dev`: conflict
-# markers, linting (includes the build) and tests on all supported Node.js
-# versions. The gate `passed` ("CI passed") is the only check that branch
-# rules need to require from this workflow; the PR title is checked in
+# markers, linting (includes the build) with the tests of the release script,
+# and tests on all supported Node.js versions. The gate `passed` ("CI
+# passed") is the only check that branch rules need to require from this
+# workflow; the PR title is checked in
 # `pr-title.yml`. No `paths:` filters, so that the gate always reports.
 
 name: CI
@@ -59,6 +60,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Test the release script
+        run: node --test scripts/release.test.js
 
       - name: Run linters
         run: npm run lint
