@@ -1,4 +1,4 @@
-# Everything that must pass on pull requests and pushes to `main`: conflict
+# Everything that must pass on pull requests and pushes to `dev`: conflict
 # markers, linting (includes the build) and tests on all supported Node.js
 # versions. The gate `passed` ("CI passed") is the only check that branch
 # rules need to require from this workflow; the PR title is checked in
@@ -8,9 +8,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [dev]
   pull_request:
-    branches: [main]
+    branches: [dev]
 
 permissions:
   contents: read

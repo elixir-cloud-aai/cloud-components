@@ -1,5 +1,5 @@
 # Checks that pull request titles are Conventional Commits, as they become
-# the commit messages on `main` (squash merges). A workflow of its own, so
+# the commit messages on `dev` (squash merges). A workflow of its own, so
 # that editing a title or description reruns only this check, not CI. Its
 # job `title` ("PR title") reports on every pull request and can be required
 # by branch rules next to "CI passed" (skipped, so passed, for Dependabot)
@@ -9,7 +9,7 @@ name: PR title
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, edited]
-    branches: [main]
+    branches: [dev]
 
 permissions:
   pull-requests: read
