@@ -23,12 +23,10 @@
     "lint:fix": "eslint . --fix && turbo run lint:fix  && prettier .",
     "new": "turbo gen",
     "prepare": "husky install",
-    "release": "changeset publish",
     "test": "turbo run test --parallel",
     "test:watch": "turbo run test --watch"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.10",
     "@custom-elements-manifest/analyzer": "^0.9.0",
     "@elixir-cloud/eslint-config": "*",
     "@lit/react": "^1.0.2",

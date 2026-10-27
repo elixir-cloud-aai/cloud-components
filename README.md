@@ -140,7 +140,7 @@ To get in touch with use, please use one of the following routes:
 [badge-chat-url]: https://join.slack.com/t/elixir-cloud/shared_invite/enQtNzA3NTQ5Mzg2NjQ3LTZjZGI1OGQ5ZTRiOTRkY2ExMGUxNmQyODAxMDdjM2EyZDQ1YWM0ZGFjOTJhNzg5NjE0YmJiZTZhZDVhOWE4MWM
 [email]: mailto:alexander.kanitz@alumni.ethz.ch
 [code-of-conduct]: CODE_OF_CONDUCT.md
-[contributing]: https://elixir-cloud-aai.github.io/guides/guide-contributor/
+[contributing]: CONTRIBUTING.md
 [contributors]: CONTRIBUTORS.md
 [elixir]: https://elixir-europe.org/
 [elixir-cloud-aai]: https://elixir-cloud.dcc.sib.swiss/
