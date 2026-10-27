@@ -189,6 +189,10 @@ describe("GlobalStyles", () => {
       const style = getComputedStyle(widget);
       expect(style.backgroundImage).to.equal("none");
       expect(style.backgroundColor).to.equal("rgb(11, 22, 33)");
+      // Without the mask, the widget would be a filled square
+      expect(style.maskImage || style.webkitMaskImage).to.match(
+        /^url\("data:image\/svg\+xml,/
+      );
     });
 
     it("paints the gutter with --ecc-muted", async () => {
