@@ -643,6 +643,32 @@ export class EccUtilsDesignCode extends LitElement {
     }
   }
 
+  /**
+   * @deprecated The editor theme follows design tokens and dark mode via CSS,
+   * so there is nothing to observe; this only re-applies the token-driven
+   * theme, like `updateEditorTheme()`.
+   */
+  setupThemeObserver() {
+    this.updateEditorTheme();
+  }
+
+  /**
+   * @deprecated Dark mode is applied via CSS (`dark` attribute, or a `.dark`
+   * class or `dark` attribute on an ancestor). Returns whether this
+   * component currently renders with a dark color scheme.
+   */
+  isDarkMode() {
+    return getComputedStyle(this).getPropertyValue("color-scheme") === "dark";
+  }
+
+  /**
+   * @deprecated The editor theme follows design tokens and dark mode via CSS;
+   * this only re-applies the token-driven theme.
+   */
+  updateEditorTheme() {
+    this.editor?.setTheme(ACE_THEME);
+  }
+
   async initializeAceEditor() {
     const editorElement = this.shadowRoot?.getElementById("editor");
     if (editorElement) {
