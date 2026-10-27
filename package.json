@@ -23,7 +23,6 @@
     "lint:fix": "eslint . --fix && turbo run lint:fix  && prettier .",
     "new": "turbo gen",
     "prepare": "husky install",
-    "release": "changeset publish",
     "test": "turbo run test --parallel",
     "test:watch": "turbo run test --watch"
   },
