@@ -1,0 +1,14 @@
+version: 2
+updates:
+  # Actions in the workflows are pinned to commit SHAs; this keeps the pins
+  # (and their version comments) up to date, in one grouped pull request
+  - package-ecosystem: github-actions
+    directory: /
+    # Pull request titles must be Conventional Commits (PR title check)
+    commit-message:
+      prefix: ci
+    schedule:
+      interval: monthly
+    groups:
+      github-actions:
+        patterns: ["*"]

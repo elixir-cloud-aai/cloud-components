@@ -1,0 +1,23 @@
+# Only send what the docs image build needs to the build context (allow
+# list): the workspaces, the build scripts and the root manifests read by
+# `turbo prune`. Everything else, such as `.env*` files with secrets, never
+# reaches the image
+*
+!apps/
+!packages/
+!scripts/
+!package.json
+!package-lock.json
+!turbo.json
+
+# Exclude local files within the included paths: environment files (except
+# examples), dependencies and build output (rebuilt in the image)
+**/.env*
+!**/.env.example
+**/node_modules
+**/.next
+**/.turbo
+**/.vercel
+**/coverage
+**/dist
+**/out
