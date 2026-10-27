@@ -13,9 +13,9 @@
 //                                            released packages, one per line
 //   node scripts/release.js dist-tag <version>
 //                                            print the npm dist-tag for
-//                                            <version>: `latest`, or the
-//                                            prerelease identifier (`alpha`
-//                                            for `2.0.0-alpha.49`)
+//                                            <version> (see `distTag`; reads
+//                                            the version tags of the
+//                                            repository with `git tag`)
 //   node scripts/release.js pin <version>    set the `@elixir-cloud/*`
 //                                            dependencies and peer
 //                                            dependencies of the released
@@ -43,7 +43,10 @@ const parseVersion = (version) => {
   if (!match) {
     throw new Error(`Not a version (e.g. 2.0.0-alpha.49): '${version}'`);
   }
-  return { prerelease: match[4] ? match[4].split(".") : [] };
+  return {
+    major: Number(match[1]),
+    prerelease: match[4] ? match[4].split(".") : [],
+  };
 };
 
 // Public packages in `packages/*`, sorted by directory
@@ -78,11 +81,20 @@ const versionMismatches = (version, base = root) => {
     );
 };
 
-// `latest` for releases, the first prerelease identifier otherwise (or
-// `next`, if it is a number)
-const distTag = (version) => {
-  const { prerelease } = parseVersion(version);
-  if (prerelease.length === 0) {
+// The dist-tag for `version`, given the repository's tags (e.g. `v1.0.1`):
+// `latest` for releases, and also for prereleases of a major version
+// without a release yet (the 2.0.0 alphas, until 2.0.0 is out). Other
+// prereleases get their first identifier (`rc` for `2.1.0-rc.1`), or
+// `next` if it is a number
+const distTag = (version, tags = []) => {
+  const { major, prerelease } = parseVersion(version);
+  const majorReleased = tags.some((tag) => {
+    const parsed = semverPattern.test(tag.replace(/^v/, ""))
+      ? parseVersion(tag.replace(/^v/, ""))
+      : null;
+    return parsed && parsed.major === major && parsed.prerelease.length === 0;
+  });
+  if (prerelease.length === 0 || !majorReleased) {
     return "latest";
   }
   return /^[a-zA-Z][0-9a-zA-Z-]*$/.test(prerelease[0]) &&
@@ -119,6 +131,12 @@ const pinInternalDependencies = (version, base = root) => {
   return changes;
 };
 
+// The repository's tags `v*`
+const versionTags = () =>
+  execFileSync("git", ["tag", "--list", "v*"], { cwd: root, encoding: "utf8" })
+    .split("\n")
+    .filter(Boolean);
+
 // Sets the version with `npm version`, which also updates the lock file
 const setVersion = (version) => {
   parseVersion(version);
@@ -154,7 +172,7 @@ const main = (args) => {
       releasedPackages().forEach(({ dir }) => console.log(dir));
       return 0;
     case "dist-tag":
-      console.log(distTag(version));
+      console.log(distTag(version, versionTags()));
       return 0;
     case "pin":
       pinInternalDependencies(version).forEach((change) => console.log(change));

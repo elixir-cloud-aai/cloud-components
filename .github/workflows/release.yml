@@ -43,6 +43,7 @@ jobs:
           # The commit that the tag pointed to when the run started, also in
           # later jobs, so that all jobs check, build and stage the same code
           ref: ${{ github.sha }}
+          # All history and tags: for the branch check and the dist-tag
           fetch-depth: 0
           persist-credentials: false
 
