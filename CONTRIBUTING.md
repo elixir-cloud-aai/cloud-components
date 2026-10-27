@@ -74,11 +74,12 @@ To release `<version>` (e.g. `2.0.0-alpha.49`), maintainers:
    `npm stage publish` and lists them in the run's summary. An npm
    maintainer approves each one, with two-factor authentication, on the
    package's page on npmjs.com or with `npm stage list <package>` and
-   `npm stage approve <stage-id>`. Prereleases get the dist-tag of their
-   prerelease identifier (`alpha` for `2.0.0-alpha.49`), releases `latest`;
-   the dist-tag of a staged version can't be changed, and moving `latest`
-   to a prerelease is a manual `npm dist-tag add` (with two-factor
-   authentication).
+   `npm stage approve <stage-id>`. The dist-tag is `latest` for releases
+   and for prereleases of a major version without a release yet (the
+   `2.0.0-alpha.N` series, until 2.0.0 is out; there is no tag
+   `v2.<minor>.<patch>` yet). Once a major version is released, its
+   prereleases get their identifier as dist-tag (`rc` for `2.1.0-rc.1`).
+   The dist-tag of a staged version can't be changed.
 5. **Fast-forward `main`** to the tag:
    `git push origin v<version>^{commit}:refs/heads/main` (only fast-forwards;
    the ruleset of `main` lets only admins update it).
