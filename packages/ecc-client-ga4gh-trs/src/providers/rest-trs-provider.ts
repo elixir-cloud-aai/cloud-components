@@ -16,9 +16,18 @@ export class RestTrsProvider implements TrsProvider {
   // eslint-disable-next-line no-useless-constructor
   constructor(public readonly baseUrl: string) {}
 
+  /**
+   * Sends every request of this provider. Override it in a subclass to add
+   * headers (e.g. `Authorization`) or otherwise change requests.
+   */
+  // eslint-disable-next-line class-methods-use-this
+  protected fetch(input: RequestInfo | URL, init?: RequestInit) {
+    return fetch(input, init);
+  }
+
   async getToolClasses(): Promise<ToolClass[]> {
     const url = `${this.baseUrl}/toolClasses`;
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch tool classes: ${response.statusText}`);
     }
@@ -47,7 +56,7 @@ export class RestTrsProvider implements TrsProvider {
       }
     });
 
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch tools: ${response.statusText}`);
     }
@@ -56,7 +65,7 @@ export class RestTrsProvider implements TrsProvider {
 
   async getTool(url: string, id: string): Promise<Tool> {
     const encodedToolId = encodeURIComponent(id);
-    const response = await fetch(`${this.baseUrl}/tools/${encodedToolId}`);
+    const response = await this.fetch(`${this.baseUrl}/tools/${encodedToolId}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch tool: ${response.statusText}`);
     }
@@ -65,7 +74,7 @@ export class RestTrsProvider implements TrsProvider {
 
   async getToolVersions(url: string, id: string): Promise<ToolVersion[]> {
     const encodedToolId = encodeURIComponent(id);
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/tools/${encodedToolId}/versions`
     );
     if (!response.ok) {
@@ -84,7 +93,7 @@ export class RestTrsProvider implements TrsProvider {
       ? versionId.split(":")[1]
       : versionId;
     const encodedVersionId = encodeURIComponent(version);
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}`
     );
     if (!response.ok) {
@@ -109,7 +118,7 @@ export class RestTrsProvider implements TrsProvider {
     if (format) {
       requestUrl += `?format=${format}`;
     }
-    const response = await fetch(requestUrl);
+    const response = await this.fetch(requestUrl);
     if (!response.ok) {
       throw new Error(`Failed to fetch tool files: ${response.statusText}`);
     }
@@ -126,7 +135,7 @@ export class RestTrsProvider implements TrsProvider {
     const versionPart = version.split(":")[1] ? version.split(":")[1] : version;
     const encodedVersionId = encodeURIComponent(versionPart);
     const encodedType = encodeURIComponent(descriptorType);
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor`
     );
     if (!response.ok) {
@@ -151,7 +160,7 @@ export class RestTrsProvider implements TrsProvider {
 
     // Try with unencoded path first
     try {
-      const response = await fetch(
+      const response = await this.fetch(
         `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${path}`
       );
 
@@ -161,7 +170,7 @@ export class RestTrsProvider implements TrsProvider {
 
       // If unencoded path fails, try with encoded path
       const encodedPath = encodeURIComponent(path);
-      const encodedResponse = await fetch(
+      const encodedResponse = await this.fetch(
         `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${encodedPath}`
       );
 
@@ -177,7 +186,7 @@ export class RestTrsProvider implements TrsProvider {
       // If there's a network error or other exception, try encoded path
       const encodedPath = encodeURIComponent(path);
       try {
-        const encodedResponse = await fetch(
+        const encodedResponse = await this.fetch(
           `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${encodedPath}`
         );
 
@@ -203,7 +212,7 @@ export class RestTrsProvider implements TrsProvider {
     const encodedToolId = encodeURIComponent(id);
     const versionPart = version.split(":")[1] ? version.split(":")[1] : version;
     const encodedVersionId = encodeURIComponent(versionPart);
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/containerfile`
     );
     if (!response.ok) {
@@ -222,7 +231,7 @@ export class RestTrsProvider implements TrsProvider {
     const versionPart = version.split(":")[1] ? version.split(":")[1] : version;
     const encodedVersionId = encodeURIComponent(versionPart);
     const encodedType = encodeURIComponent(descriptorType);
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/tests`
     );
     if (!response.ok) {

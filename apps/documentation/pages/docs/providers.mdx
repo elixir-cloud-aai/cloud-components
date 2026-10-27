@@ -133,111 +133,83 @@ Manage different API endpoints across environments:
 
 ### Authentication Patterns
 
+Components don't handle authentication; your app does. Every REST provider sends all of its requests through a `fetch(input, init)` method. Override it in a subclass to add headers such as `Authorization`, so you can use any auth flow (OAuth/OIDC, API keys, ...). You can also implement the provider interface yourself.
+
+<Callout type='warning'>
+  Build headers inside `fetch`, so that every request gets a current token. Don't set `Content-Type`: providers set it where needed, and file uploads (e.g. WES `runWorkflow`) need the browser to set it.
+</Callout>
+
 #### API Key Authentication
 
 ```tsx copy
-// Base authenticated provider class
-class AuthenticatedProvider {
-  constructor(baseProvider, apiKey, keyHeader = 'X-API-Key') {
-    this.baseProvider = baseProvider;
+class ApiKeyServiceRegistryProvider extends RestServiceRegistryProvider {
+  constructor(baseUrl, apiKey) {
+    super(baseUrl);
     this.apiKey = apiKey;
-    this.keyHeader = keyHeader;
   }
 
-  // Wrap all provider methods with authentication
-  async makeRequest(url, options = {}) {
-    return fetch(url, {
-      ...options,
-      headers: {
-        [this.keyHeader]: this.apiKey,
-        'Content-Type': 'application/json',
-        ...options.headers
-      }
-    });
+  fetch(input, init = {}) {
+    const headers = new Headers(init.headers);
+    headers.set('X-API-Key', this.apiKey);
+    return super.fetch(input, { ...init, headers });
   }
-}
-
-// Apply to any provider
-function withApiKey(Provider, apiKey) {
-  return class extends Provider {
-    async fetch(url, options = {}) {
-      return super.fetch(url, {
-        ...options,
-        headers: {
-          'X-API-Key': apiKey,
-          ...options.headers
-        }
-      });
-    }
-  };
 }
 
 // Usage
-const AuthenticatedServiceRegistryProvider = withApiKey(RestServiceRegistryProvider, 'your-api-key');
-const provider = new AuthenticatedServiceRegistryProvider('https://api.example.com');
+const provider = new ApiKeyServiceRegistryProvider('https://api.example.com', 'your-api-key');
 ```
+
+<Callout type='warning'>
+  Anyone can read an API key that ships to the browser. Only use keys that are meant to be public, or add the key in a backend proxy instead.
+</Callout>
 
 #### Bearer Token Authentication
 
 ```tsx copy
-// Token-based authentication
-class TokenProvider {
-  constructor(BaseProvider, getToken) {
-    this.BaseProvider = BaseProvider;
+class TokenWesProvider extends RestWesProvider {
+  constructor(baseUrl, getToken) {
+    super(baseUrl);
     this.getToken = getToken;
   }
 
-  async createProvider(baseUrl) {
-    const token = await this.getToken();
-    
-    return new (class extends this.BaseProvider {
-      async fetch(url, options = {}) {
-        return super.fetch(url, {
-          ...options,
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            ...options.headers
-          }
-        });
-      }
-    })(baseUrl);
+  async fetch(input, init = {}) {
+    const headers = new Headers(init.headers);
+    // Requested for every call, so refreshed tokens are used
+    headers.set('Authorization', `Bearer ${await this.getToken()}`);
+    return super.fetch(input, { ...init, headers });
   }
 }
 
 // Usage with OAuth
-const tokenProvider = new TokenProvider(RestWesProvider, () => oauth.getAccessToken());
-const wesProvider = await tokenProvider.createProvider('https://wes.example.com/ga4gh/wes/v1');
+const wesProvider = new TokenWesProvider(
+  'https://wes.example.com/ga4gh/wes/v1',
+  () => oauth.getAccessToken()
+);
 ```
 
 #### Custom Headers
 
 ```tsx copy
-// Custom headers for organization, versioning, etc.
-function withCustomHeaders(Provider, headers) {
+// Add headers to every request of any REST provider
+function withHeaders(Provider, getHeaders) {
   return class extends Provider {
-    constructor(baseUrl) {
-      super(baseUrl);
-      this.customHeaders = headers;
-    }
-
-    async fetch(url, options = {}) {
-      return super.fetch(url, {
-        ...options,
-        headers: {
-          ...this.customHeaders,
-          ...options.headers
-        }
+    async fetch(input, init = {}) {
+      const headers = new Headers(init.headers);
+      Object.entries(await getHeaders()).forEach(([name, value]) => {
+        headers.set(name, value);
       });
+      return super.fetch(input, { ...init, headers });
     }
   };
 }
 
-// Usage
-const OrganizationalProvider = withCustomHeaders(RestServiceRegistryProvider, {
+// Usage: header values must be strings, so compute them per request
+const OrganizationalProvider = withHeaders(RestServiceRegistryProvider, () => ({
   'X-Organization': 'my-org',
   'X-Client-Version': '1.0.0',
-  'X-Request-ID': () => generateRequestId()
-});
+  'X-Request-ID': generateRequestId()
+}));
+const provider = new OrganizationalProvider('https://api.example.com');
 ```
 
 ### Error Handling Patterns
