@@ -13,9 +13,11 @@
 //                                            released packages, one per line
 //   node scripts/release.js dist-tag <version>
 //                                            print the npm dist-tag for
-//                                            <version> (see `distTag`; reads
-//                                            the version tags of the
-//                                            repository with `git tag`)
+//                                            <version>: `latest` for
+//                                            releases and for prereleases of
+//                                            a major without a release tag
+//                                            yet, else the prerelease
+//                                            identifier (needs the git tags)
 //   node scripts/release.js pin <version>    set the `@elixir-cloud/*`
 //                                            dependencies and peer
 //                                            dependencies of the released
@@ -85,16 +87,22 @@ const versionMismatches = (version, base = root) => {
 // `latest` for releases, and also for prereleases of a major version
 // without a release yet (the 2.0.0 alphas, until 2.0.0 is out). Other
 // prereleases get their first identifier (`rc` for `2.1.0-rc.1`), or
-// `next` if it is a number
-const distTag = (version, tags = []) => {
+// `next` if it is a number. Fails without any release tag (e.g. in a clone
+// without tags), which would otherwise send every prerelease to `latest`
+const distTag = (version, tags) => {
   const { major, prerelease } = parseVersion(version);
-  const majorReleased = tags.some((tag) => {
-    const parsed = semverPattern.test(tag.replace(/^v/, ""))
-      ? parseVersion(tag.replace(/^v/, ""))
-      : null;
-    return parsed && parsed.major === major && parsed.prerelease.length === 0;
-  });
-  if (prerelease.length === 0 || !majorReleased) {
+  const releases = tags
+    .map((tag) => tag.replace(/^v/, ""))
+    .filter((tag) => semverPattern.test(tag))
+    .map(parseVersion)
+    .filter((parsed) => parsed.prerelease.length === 0);
+  if (releases.length === 0) {
+    throw new Error("No release tags (e.g. v1.0.1) found: fetch the tags");
+  }
+  if (
+    prerelease.length === 0 ||
+    !releases.some((parsed) => parsed.major === major)
+  ) {
     return "latest";
   }
   return /^[a-zA-Z][0-9a-zA-Z-]*$/.test(prerelease[0]) &&
@@ -132,10 +140,19 @@ const pinInternalDependencies = (version, base = root) => {
 };
 
 // The repository's tags `v*`
-const versionTags = () =>
-  execFileSync("git", ["tag", "--list", "v*"], { cwd: root, encoding: "utf8" })
-    .split("\n")
-    .filter(Boolean);
+const versionTags = () => {
+  try {
+    return execFileSync("git", ["tag", "--list", "v*"], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    })
+      .split("\n")
+      .filter(Boolean);
+  } catch (error) {
+    throw new Error(`Can't read the git tags: ${error.message}`);
+  }
+};
 
 // Sets the version with `npm version`, which also updates the lock file
 const setVersion = (version) => {

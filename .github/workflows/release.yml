@@ -57,9 +57,12 @@ jobs:
             echo "::error::Version check failed for ${TAG} (see above): tag a commit with the versions of the version bump pull request"
             exit 1
           fi
+          # From the git tags (see `fetch-depth`); fails without release tags
+          dist_tag="$(node scripts/release.js dist-tag "${version}")"
+          echo "::notice::Dist-tag for ${version}: ${dist_tag}"
           {
             echo "version=${version}"
-            echo "dist-tag=$(node scripts/release.js dist-tag "${version}")"
+            echo "dist-tag=${dist_tag}"
           } >> "${GITHUB_OUTPUT}"
 
       - name: Check the branch
