@@ -1,0 +1,141 @@
+# Everything that must pass on pull requests and pushes to `dev`: conflict
+# markers, linting (includes the build) with the tests of the release script,
+# and tests on all supported Node.js versions. The gate `passed` ("CI
+# passed") is the only check that branch rules need to require from this
+# workflow; the PR title is checked in
+# `pr-title.yml`. No `paths:` filters, so that the gate always reports.
+
+name: CI
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+
+permissions:
+  contents: read
+
+# Cancel superseded runs of a pull request; runs for pushes get their own
+# group, so that runs for successive pushes are not dropped
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'push' && github.sha || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+
+  conflicts:
+    name: Conflict markers
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # `.github/` is excluded, as this workflow contains the marker itself
+      - name: Check for merge conflict markers
+        run: |
+          if git --no-pager grep -n "<<<<<<<" ":(exclude).github/"; then
+            echo "::error::Merge conflict markers found (see above)"
+            exit 1
+          fi
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test the release script
+        run: node --test scripts/release.test.js
+
+      - name: Run linters
+        run: npm run lint
+
+  test:
+    name: Test (Node ${{ matrix.node }})
+    # Playwright 1.56 can't install its browsers on Ubuntu 26.04, which
+    # `ubuntu-latest` now is; move on when Playwright is upgraded
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["22", "24"]
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}.x
+          cache: npm
+
+      - name: Cache Playwright
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install playwright
+        run: npx playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      - name: Install playwright dependencies
+        run: npx playwright install-deps
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+
+      - name: Build
+        run: npm run build
+
+      - name: Run tests
+        run: npm run test
+
+  # The only required check of this workflow: passes if every other job
+  # passed, fails on any other result (failure, cancelled, skipped). Add
+  # every new job to `needs`
+  passed:
+    name: CI passed
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: always()
+    needs: [conflicts, lint, test]
+    steps:
+      - name: Check results of all jobs
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          failed="$(jq -r 'to_entries[]
+            | select(.value.result != "success")
+            | "\(.key): \(.value.result)"' <<< "${NEEDS}")"
+          if [[ -n "${failed}" ]]; then
+            echo "::error::Jobs did not pass: ${failed//$'\n'/, }"
+            exit 1
+          fi
