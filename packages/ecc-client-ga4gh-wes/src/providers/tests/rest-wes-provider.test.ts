@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { expect } from "@open-wc/testing";
 import sinon from "sinon";
-import { RestWesProvider } from "./rest-wes-provider.js";
+import { RestWesProvider } from "../rest-wes-provider.js";
 
 const BASE_URL = "https://wes.example.org/ga4gh/wes/v1";
 
