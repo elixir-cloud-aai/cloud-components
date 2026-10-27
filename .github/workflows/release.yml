@@ -5,10 +5,11 @@
 # environment is approved, and creates a GitHub release for the tag. Staged
 # versions become public only when a maintainer approves them on npmjs.com.
 # The workflow pushes nothing. The trusted publishers on npmjs.com name this
-# file (`release.yml`): keep the name
+# file (`release.yml`): keep the name.
 #
 # Outside elixir-cloud-aai/cloud-components (e.g. in a fork, for a dry run),
-# `npm stage publish` runs with `--dry-run`
+# `npm stage publish` runs with `--dry-run`; the GitHub release is still
+# created there.
 
 name: Release
 
@@ -38,7 +39,9 @@ jobs:
       - name: Check out code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.ref }}
+          # The commit that the tag pointed to when the run started, also in
+          # later jobs, so that all jobs check, build and stage the same code
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -49,7 +52,7 @@ jobs:
         run: |
           version="${TAG#v}"
           if ! node scripts/release.js check "${version}"; then
-            echo "::error::Not all package versions are ${version}: merge the version bump pull request before tagging"
+            echo "::error::Version check failed for ${TAG} (see above): tag a commit with the versions of the version bump pull request"
             exit 1
           fi
           {
@@ -58,14 +61,14 @@ jobs:
           } >> "${GITHUB_OUTPUT}"
 
       - name: Check the branch
-        env:
-          BRANCH: ${{ github.event.repository.default_branch }}
         run: |
-          if ! git merge-base --is-ancestor "${GITHUB_SHA}" "origin/${BRANCH}"; then
-            echo "::error::The tag is not on ${BRANCH}"
+          if ! git merge-base --is-ancestor "${GITHUB_SHA}" origin/dev; then
+            echo "::error::The tag is not on dev"
             exit 1
           fi
 
+  # Lint and publish install the dependencies each, so that lint code never
+  # runs in the job with `id-token: write`
   lint:
     name: Lint release
     runs-on: ubuntu-24.04
@@ -75,7 +78,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.ref }}
+          ref: ${{ github.sha }}
           persist-credentials: false
 
       - name: Use Node.js 24.x
@@ -112,7 +115,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.ref }}
+          ref: ${{ github.sha }}
           persist-credentials: false
 
       - name: Use Node.js 24.x
@@ -156,12 +159,25 @@ jobs:
             echo "::notice::Dry run outside elixir-cloud-aai/cloud-components"
             args+=(--dry-run)
           fi
+          # Not `done < <(...)` below: that would hide a failure of the script
+          dirs="$(node scripts/release.js packages)"
+          if [ -z "${dirs}" ]; then
+            echo "::error::No packages to release"
+            exit 1
+          fi
           staged=()
           failed=()
           while read -r dir; do
             name="$(node -p "require('./${dir}/package.json').name")"
-            if [ -n "$(npm view "${name}@${VERSION}" version 2> /dev/null)" ]; then
-              echo "::notice::${name}@${VERSION} is on npm already"
+            if output="$(npm view "${name}@${VERSION}" version 2>&1)"; then
+              if [ -n "${output}" ]; then
+                echo "::notice::${name}@${VERSION} is on npm already"
+                continue
+              fi
+            elif ! grep -q E404 <<< "${output}"; then
+              echo "${output}"
+              failed+=("${name}@${VERSION}")
+              echo "::error::Could not look up ${name}@${VERSION} on npm"
               continue
             fi
             echo "::group::${name}@${VERSION}"
@@ -172,12 +188,12 @@ jobs:
               echo "::error::Could not stage ${name}@${VERSION}"
             fi
             echo "::endgroup::"
-          done < <(node scripts/release.js packages)
+          done <<< "${dirs}"
           {
             echo "## npm"
             echo
             if [ "${DRY_RUN}" = "true" ]; then
-              echo "Dry run: nothing was staged."
+              echo "Dry run: nothing was staged; these packages would be:"
             elif [ "${#staged[@]}" -gt 0 ]; then
               echo "Staged with the dist-tag \`${DIST_TAG}\`; approve each version on npmjs.com (2FA):"
             fi
@@ -188,6 +204,10 @@ jobs:
             for package in "${failed[@]}"; do
               echo "- \`${package}\`: failed"
             done
+            if [ "${#failed[@]}" -gt 0 ]; then
+              echo
+              echo "**Don't approve any version until all packages are staged:** the packages depend on each other's exact versions."
+            fi
           } >> "${GITHUB_STEP_SUMMARY}"
           if [ "${#staged[@]}" -gt 0 ] && [ "${DRY_RUN}" != "true" ]; then
             echo "::notice::Staged ${#staged[@]} packages: approve them on npmjs.com"

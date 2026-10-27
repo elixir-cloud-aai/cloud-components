@@ -28,7 +28,6 @@ const fs = require("fs");
 const path = require("path");
 
 const root = path.resolve(__dirname, "..");
-const scope = "@elixir-cloud/";
 
 // Semantic Versioning 2.0.0, without build metadata
 const semverPattern =
@@ -102,7 +101,7 @@ const pinInternalDependencies = (version, base = root) => {
     let changed = false;
     ["dependencies", "peerDependencies"].forEach((section) => {
       Object.keys(manifest[section] || {})
-        .filter((name) => name.startsWith(scope) && names.has(name))
+        .filter((name) => names.has(name))
         .forEach((name) => {
           if (manifest[section][name] !== version) {
             changes.push(

@@ -4,6 +4,7 @@ const assert = require("assert");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
+const { spawnSync } = require("child_process");
 const { test } = require("node:test");
 
 const {
@@ -23,8 +24,10 @@ const readJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
 
 // A repository with a root, two public packages, a private one and a
 // directory without `package.json`
-const fixture = (version = "2.0.0-alpha.49") => {
+// (removed when the test `t` ends)
+const fixture = (t, version = "2.0.0-alpha.49") => {
   const base = fs.mkdtempSync(path.join(os.tmpdir(), "release-test-"));
+  t.after(() => fs.rmSync(base, { recursive: true, force: true }));
   writeJson(path.join(base, "package.json"), { name: "root", version });
   writeJson(path.join(base, "packages", "b-design", "package.json"), {
     name: "@elixir-cloud/design",
@@ -78,20 +81,20 @@ test("distTag uses latest for releases and the prerelease identifier", () => {
   assert.strictEqual(distTag("2.1.0-latest.1"), "next");
 });
 
-test("releasedPackages lists public packages, sorted by directory", () => {
-  const base = fixture();
+test("releasedPackages lists public packages, sorted by directory", (t) => {
+  const base = fixture(t);
   assert.deepStrictEqual(
     releasedPackages(base).map(({ dir }) => dir),
     [path.join("packages", "a-wes"), path.join("packages", "b-design")]
   );
 });
 
-test("versionMismatches is empty when all versions match", () => {
-  assert.deepStrictEqual(versionMismatches("2.0.0-alpha.49", fixture()), []);
+test("versionMismatches is empty when all versions match", (t) => {
+  assert.deepStrictEqual(versionMismatches("2.0.0-alpha.49", fixture(t)), []);
 });
 
-test("versionMismatches names the root and packages with other versions", () => {
-  const base = fixture();
+test("versionMismatches names the root and packages with other versions", (t) => {
+  const base = fixture(t);
   const design = path.join(base, "packages", "b-design", "package.json");
   writeJson(design, { ...readJson(design), version: "2.0.0-alpha.48" });
   assert.deepStrictEqual(versionMismatches("2.0.0-alpha.49", base), [
@@ -100,15 +103,20 @@ test("versionMismatches names the root and packages with other versions", () => 
       "b-design"
     )}) has version 2.0.0-alpha.48, not 2.0.0-alpha.49`,
   ]);
-  assert.strictEqual(versionMismatches("2.0.0-alpha.50", base).length, 3);
+  assert.deepStrictEqual(
+    versionMismatches("2.0.0-alpha.50", base).map((message) =>
+      message.slice(0, message.indexOf(" "))
+    ),
+    ["root", "@elixir-cloud/wes", "@elixir-cloud/design"]
+  );
   assert.throws(
     () => versionMismatches("v2.0.0-alpha.49", base),
     /Not a version/
   );
 });
 
-test("pinInternalDependencies pins dependencies on released packages only", () => {
-  const base = fixture();
+test("pinInternalDependencies pins dependencies on released packages only", (t) => {
+  const base = fixture(t);
   const changes = pinInternalDependencies("2.0.0-alpha.49", base);
   assert.strictEqual(changes.length, 2);
   const wes = readJson(path.join(base, "packages", "a-wes", "package.json"));
@@ -127,4 +135,33 @@ test("pinInternalDependencies pins dependencies on released packages only", () =
     "@elixir-cloud/eslint-config": "*",
   });
   assert.deepStrictEqual(pinInternalDependencies("2.0.0-alpha.49", base), []);
+});
+
+// The command line, run on this repository
+const run = (...args) =>
+  spawnSync(process.execPath, [path.join(__dirname, "release.js"), ...args], {
+    encoding: "utf8",
+  });
+
+test("the command line prints the dist-tag and released packages", () => {
+  const distTagRun = run("dist-tag", "2.0.0-alpha.49");
+  assert.strictEqual(distTagRun.status, 0);
+  assert.strictEqual(distTagRun.stdout, "alpha\n");
+  const packagesRun = run("packages");
+  assert.strictEqual(packagesRun.status, 0);
+  const dirs = packagesRun.stdout.trim().split("\n");
+  assert.ok(dirs.includes(path.join("packages", "ecc-utils-design")));
+  assert.ok(!dirs.includes(path.join("packages", "ecc-client-ga4gh-tes")));
+});
+
+test("the command line fails on bad versions and commands", () => {
+  const badVersion = run("check", "v2.0.0-alpha.49");
+  assert.strictEqual(badVersion.status, 1);
+  assert.match(badVersion.stderr, /Not a version/);
+  const missingVersion = run("pin");
+  assert.strictEqual(missingVersion.status, 1);
+  assert.match(missingVersion.stderr, /Not a version/);
+  const badCommand = run("publish");
+  assert.strictEqual(badCommand.status, 2);
+  assert.match(badCommand.stderr, /Usage/);
 });
