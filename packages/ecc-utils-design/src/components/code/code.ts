@@ -653,9 +653,10 @@ export class EccUtilsDesignCode extends LitElement {
   }
 
   /**
-   * @deprecated Dark mode is applied via CSS (`dark` attribute, or a `.dark`
-   * class or `dark` attribute on an ancestor). Returns whether this
-   * component currently renders with a dark color scheme.
+   * @deprecated Dark mode is applied via CSS (`dark` attribute; a `.dark`
+   * class or `dark` attribute on an ancestor where `:host-context()` is
+   * supported). Returns whether this component currently renders with a
+   * dark color scheme.
    */
   isDarkMode() {
     return getComputedStyle(this).getPropertyValue("color-scheme") === "dark";

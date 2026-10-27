@@ -118,7 +118,8 @@ const cssText = `
 `;
 
 // globalThis rather than window: this module is also evaluated during SSR,
-// where Ace may not have registered itself; skip the theme there
+// where Ace may not have registered itself; skip the theme there (in a
+// browser, a missing Ace still fails in initializeAceEditor)
 const { ace } = globalThis as any;
 
 if (typeof ace?.define === "function") {
