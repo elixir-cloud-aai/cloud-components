@@ -1,10 +1,10 @@
 # Releases from version tags (see "Releases" in CONTRIBUTING.md): after the
 # version bump pull request, a maintainer pushes `v<version>` on `dev` (tags
-# on other branches fail). The
-# workflow checks the tag, lints, builds the packages from the tag, stages
-# them on npm with trusted publishing (OIDC, with provenance) once the `npm`
-# environment is approved, and creates a GitHub release for the tag. Staged
-# versions become public only when a maintainer approves them on npmjs.com.
+# on other branches fail). The workflow checks the tag, lints, builds the
+# packages from the tag, stages them on npm with trusted publishing (OIDC,
+# with provenance) once the `npm` environment is approved, and creates a
+# GitHub release for the tag. Staged versions become public only when a
+# maintainer approves them on npmjs.com.
 # The workflow pushes nothing. The trusted publishers on npmjs.com name this
 # file (`release.yml`): keep the name.
 #
