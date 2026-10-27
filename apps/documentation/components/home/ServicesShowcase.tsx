@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import RunsPreview from '@/components/packages/wes/RunsPreview';
 import RunCreatePreview from '@/components/packages/wes/RunCreatePreview';
@@ -134,9 +135,9 @@ export default function ServicesShowcase() {
         </div>
         <div className='flex justify-center mt-4'>
           <div className='flex items-center justify-center'>
-            <a href={services[activeService].link} className='inline-flex items-center px-4 py-2 text-sm font-medium text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 rounded-lg hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors'>
+            <Link href={services[activeService].link} className='inline-flex items-center px-4 py-2 text-sm font-medium text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 rounded-lg hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors'>
               View More Components
-            </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -1,8 +1,10 @@
 'use client';
+import { useRouter } from 'next/router';
 import { RiArrowRightLine, RiGithubLine } from '@remixicon/react';
 import { EccUtilsDesignButton } from '@elixir-cloud/design/react';
 
 export default function Hero() {
+  const router = useRouter();
   return (
     <div className='mx-auto static mt-12 md:mt-[6rem] flex flex-col items-center'>
       <div className='flex flex-col items-center w-full md:w-5/6 max-w-6xl'>
@@ -29,7 +31,7 @@ export default function Hero() {
         <div className='flex flex-col sm:flex-row gap-4 mt-10 md:mt-12 text-sm md:text-base items-center justify-center'>
           <EccUtilsDesignButton
             onClick={() => {
-              window.location.href = '/docs/introduction';
+              router.push('/docs/introduction');
             }}
             variant='default'
             className='part:bg-sky-600 part:hover:bg-sky-500 part:text-white'
