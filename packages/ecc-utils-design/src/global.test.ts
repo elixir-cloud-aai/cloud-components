@@ -3,6 +3,7 @@ import { expect, fixture, html, waitUntil } from "@open-wc/testing";
 import { LitElement } from "lit";
 import { GlobalStyles } from "./global.js";
 import "./components/badge/index.js";
+import "./components/button/index.js";
 import "./components/code/index.js";
 
 /** Minimal host that nests a design component in its own shadow tree. */
@@ -147,6 +148,21 @@ describe("GlobalStyles", () => {
       expect(
         getComputedStyle(inShadow(el, "[part=base]")).backgroundColor
       ).to.equal(await resolveColor("oklch(0.985 0 0)"));
+    });
+
+    // Tailwind dark: variants cannot see a dark attribute or class outside the
+    // shadow root, so buttons take their dark colors from tokens only
+    it("paints dark buttons from dark tokens", async () => {
+      const el = await fixture(html`
+        <ecc-utils-design-button dark variant="destructive"
+          >Delete</ecc-utils-design-button
+        >
+      `);
+      const style = getComputedStyle(inShadow(el, "[part=base]"));
+      expect(style.backgroundColor).to.equal(
+        await resolveColor("oklch(0.704 0.191 22.216)")
+      );
+      expect(style.color).to.equal(await resolveColor("oklch(0.205 0 0)"));
     });
 
     it("lets explicit tokens override dark defaults", async () => {
