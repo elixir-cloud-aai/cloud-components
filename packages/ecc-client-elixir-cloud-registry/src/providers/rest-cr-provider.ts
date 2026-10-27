@@ -16,12 +16,21 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
   constructor(public readonly baseUrl: string) {}
 
   /**
+   * Sends every request of this provider. Override it in a subclass to add
+   * headers (e.g. `Authorization`) or otherwise change requests.
+   */
+  // eslint-disable-next-line class-methods-use-this
+  protected fetch(input: RequestInfo | URL, init?: RequestInit) {
+    return fetch(input, init);
+  }
+
+  /**
    * Fetch list of services from the registry
    * @returns Promise resolving to array of services
    */
   async getServices(): Promise<ExternalService[]> {
     const url = `${this.baseUrl}/services`;
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch services: ${response.statusText}`);
     }
@@ -36,7 +45,7 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
   async getServiceById(serviceId: string): Promise<ExternalService> {
     const encodedServiceId = encodeURIComponent(serviceId);
     const url = `${this.baseUrl}/services/${encodedServiceId}`;
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch service: ${response.statusText}`);
     }
@@ -49,7 +58,7 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
    */
   async getServiceTypes(): Promise<ServiceType[]> {
     const url = `${this.baseUrl}/services/types`;
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch service types: ${response.statusText}`);
     }
@@ -62,7 +71,7 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
    */
   async getServiceInfo(): Promise<Service> {
     const url = `${this.baseUrl}/service-info`;
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch service info: ${response.statusText}`);
     }
@@ -76,7 +85,7 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
    */
   async createService(service: ExternalServiceRegister): Promise<string> {
     const url = `${this.baseUrl}/services`;
-    const response = await fetch(url, {
+    const response = await this.fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -103,7 +112,7 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
   ): Promise<string> {
     const encodedServiceId = encodeURIComponent(id);
     const url = `${this.baseUrl}/services/${encodedServiceId}`;
-    const response = await fetch(url, {
+    const response = await this.fetch(url, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -132,7 +141,7 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
   ): Promise<string> {
     const encodedServiceId = encodeURIComponent(id);
     const url = `${this.baseUrl}/services/${encodedServiceId}`;
-    const response = await fetch(url, {
+    const response = await this.fetch(url, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -155,7 +164,7 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
   async deleteService(id: string): Promise<string> {
     const encodedServiceId = encodeURIComponent(id);
     const url = `${this.baseUrl}/services/${encodedServiceId}`;
-    const response = await fetch(url, {
+    const response = await this.fetch(url, {
       method: "DELETE",
     });
 
@@ -173,7 +182,7 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
    */
   async createOrUpdateServiceInfo(service: ServiceRegister): Promise<void> {
     const url = `${this.baseUrl}/service-info`;
-    const response = await fetch(url, {
+    const response = await this.fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -19,9 +19,18 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
   // eslint-disable-next-line no-useless-constructor
   constructor(public readonly baseUrl: string) {}
 
+  /**
+   * Sends every request of this provider. Override it in a subclass to add
+   * headers (e.g. `Authorization`) or otherwise change requests.
+   */
+  // eslint-disable-next-line class-methods-use-this
+  protected fetch(input: RequestInfo | URL, init?: RequestInit) {
+    return fetch(input, init);
+  }
+
   async getToolClasses(): Promise<ToolClass[]> {
     const url = `${this.baseUrl}/toolClasses`;
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch tool classes: ${response.statusText}`);
     }
@@ -50,7 +59,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
       }
     });
 
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch tools: ${response.statusText}`);
     }
@@ -59,7 +68,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
 
   async getTool(url: string, id: string): Promise<Tool> {
     const encodedToolId = encodeURIComponent(id);
-    const response = await fetch(`${this.baseUrl}/tools/${encodedToolId}`);
+    const response = await this.fetch(`${this.baseUrl}/tools/${encodedToolId}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch tool: ${response.statusText}`);
     }
@@ -68,7 +77,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
 
   async getToolVersions(url: string, id: string): Promise<ToolVersion[]> {
     const encodedToolId = encodeURIComponent(id);
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/tools/${encodedToolId}/versions`
     );
     if (!response.ok) {
@@ -87,7 +96,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
       ? versionId.split(":")[1]
       : versionId;
     const encodedVersionId = encodeURIComponent(version);
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}`
     );
     if (!response.ok) {
@@ -112,7 +121,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
     if (format) {
       requestUrl += `?format=${format}`;
     }
-    const response = await fetch(requestUrl);
+    const response = await this.fetch(requestUrl);
     if (!response.ok) {
       throw new Error(`Failed to fetch tool files: ${response.statusText}`);
     }
@@ -129,7 +138,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
     const versionPart = version.split(":")[1] ? version.split(":")[1] : version;
     const encodedVersionId = encodeURIComponent(versionPart);
     const encodedType = encodeURIComponent(descriptorType);
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor`
     );
     if (!response.ok) {
@@ -154,7 +163,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
 
     // Try with unencoded path first
     try {
-      const response = await fetch(
+      const response = await this.fetch(
         `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${path}`
       );
 
@@ -164,7 +173,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
 
       // If unencoded path fails, try with encoded path
       const encodedPath = encodeURIComponent(path);
-      const encodedResponse = await fetch(
+      const encodedResponse = await this.fetch(
         `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${encodedPath}`
       );
 
@@ -180,7 +189,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
       // If there's a network error or other exception, try encoded path
       const encodedPath = encodeURIComponent(path);
       try {
-        const encodedResponse = await fetch(
+        const encodedResponse = await this.fetch(
           `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/descriptor/${encodedPath}`
         );
 
@@ -206,7 +215,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
     const encodedToolId = encodeURIComponent(id);
     const versionPart = version.split(":")[1] ? version.split(":")[1] : version;
     const encodedVersionId = encodeURIComponent(versionPart);
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/containerfile`
     );
     if (!response.ok) {
@@ -225,7 +234,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
     const versionPart = version.split(":")[1] ? version.split(":")[1] : version;
     const encodedVersionId = encodeURIComponent(versionPart);
     const encodedType = encodeURIComponent(descriptorType);
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}/${encodedType}/tests`
     );
     if (!response.ok) {
@@ -237,7 +246,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
   // Creation methods (TRS-Filer specific functionality)
   async createTool(tool: ToolRegister): Promise<string> {
     console.log("Creating tool:", tool);
-    const response = await fetch(`${this.baseUrl}/tools`, {
+    const response = await this.fetch(`${this.baseUrl}/tools`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -254,13 +263,16 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
 
   async createToolWithId(id: string, tool: ToolRegister): Promise<string> {
     const encodedToolId = encodeURIComponent(id);
-    const response = await fetch(`${this.baseUrl}/tools/${encodedToolId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(tool),
-    });
+    const response = await this.fetch(
+      `${this.baseUrl}/tools/${encodedToolId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(tool),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to create/update tool: ${response.statusText}`);
@@ -274,7 +286,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
     version: ToolVersionRegister
   ): Promise<string> {
     const encodedToolId = encodeURIComponent(toolId);
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/tools/${encodedToolId}/versions`,
       {
         method: "POST",
@@ -299,7 +311,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
   ): Promise<string> {
     const encodedToolId = encodeURIComponent(toolId);
     const encodedVersionId = encodeURIComponent(versionId);
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/tools/${encodedToolId}/versions/${encodedVersionId}`,
       {
         method: "PUT",
@@ -320,7 +332,7 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
   }
 
   async createToolClass(toolClass: ToolClassRegister): Promise<string> {
-    const response = await fetch(`${this.baseUrl}/toolClasses`, {
+    const response = await this.fetch(`${this.baseUrl}/toolClasses`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -340,13 +352,16 @@ export class RestTrsFilerProvider implements TrsFilerProvider {
     toolClass: ToolClassRegister
   ): Promise<string> {
     const encodedId = encodeURIComponent(id);
-    const response = await fetch(`${this.baseUrl}/toolClasses/${encodedId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(toolClass),
-    });
+    const response = await this.fetch(
+      `${this.baseUrl}/toolClasses/${encodedId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(toolClass),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(

@@ -14,10 +14,19 @@ import {
  * Handles HTTP requests to GA4GH WES v1.0.0 compliant endpoints
  */
 export class RestWesProvider implements WesProvider {
-  private baseUrl: string;
+  protected baseUrl: string;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+  }
+
+  /**
+   * Sends every request of this provider. Override it in a subclass to add
+   * headers (e.g. `Authorization`) or otherwise change requests.
+   */
+  // eslint-disable-next-line class-methods-use-this
+  protected fetch(input: RequestInfo | URL, init?: RequestInit) {
+    return fetch(input, init);
   }
 
   private static async handleResponse<T>(response: Response): Promise<T> {
@@ -40,7 +49,7 @@ export class RestWesProvider implements WesProvider {
   }
 
   async getServiceInfo(): Promise<ServiceInfo> {
-    const response = await fetch(`${this.baseUrl}/service-info`);
+    const response = await this.fetch(`${this.baseUrl}/service-info`);
     return RestWesProvider.handleResponse<ServiceInfo>(response);
   }
 
@@ -61,7 +70,7 @@ export class RestWesProvider implements WesProvider {
     const url = `${this.baseUrl}/runs${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     return RestWesProvider.handleResponse<RunListResponse>(response);
   }
 
@@ -93,7 +102,7 @@ export class RestWesProvider implements WesProvider {
       });
     }
 
-    const response = await fetch(`${this.baseUrl}/runs`, {
+    const response = await this.fetch(`${this.baseUrl}/runs`, {
       method: "POST",
       body: formData,
     });
@@ -102,21 +111,21 @@ export class RestWesProvider implements WesProvider {
   }
 
   async getRunLog(runId: string): Promise<RunLog> {
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/runs/${encodeURIComponent(runId)}`
     );
     return RestWesProvider.handleResponse<RunLog>(response);
   }
 
   async getRunStatus(runId: string): Promise<RunStatus> {
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/runs/${encodeURIComponent(runId)}/status`
     );
     return RestWesProvider.handleResponse<RunStatus>(response);
   }
 
   async cancelRun(runId: string): Promise<RunId> {
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/runs/${encodeURIComponent(runId)}/cancel`,
       {
         method: "POST",

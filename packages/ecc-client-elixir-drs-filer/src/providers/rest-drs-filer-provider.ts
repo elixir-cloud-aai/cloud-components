@@ -15,6 +15,15 @@ export class RestDrsFilerProvider implements DrsFilerProvider {
   // eslint-disable-next-line no-useless-constructor
   constructor(public readonly baseUrl: string) {}
 
+  /**
+   * Sends every request of this provider. Override it in a subclass to add
+   * headers (e.g. `Authorization`) or otherwise change requests.
+   */
+  // eslint-disable-next-line class-methods-use-this
+  protected fetch(input: RequestInfo | URL, init?: RequestInit) {
+    return fetch(input, init);
+  }
+
   // Base DRS operations (inherited from DrsProvider)
   async getObjects(
     limit?: number,
@@ -42,7 +51,7 @@ export class RestDrsFilerProvider implements DrsFilerProvider {
       url += `?${params.toString()}`;
     }
 
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch objects: ${response.statusText}`);
     }
@@ -62,7 +71,7 @@ export class RestDrsFilerProvider implements DrsFilerProvider {
       url += "?expand=true";
     }
 
-    const response = await fetch(url);
+    const response = await this.fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch object: ${response.statusText}`);
     }
@@ -72,7 +81,7 @@ export class RestDrsFilerProvider implements DrsFilerProvider {
   async getAccessURL(objectId: string, accessId: string): Promise<AccessURL> {
     const encodedObjectId = encodeURIComponent(objectId);
     const encodedAccessId = encodeURIComponent(accessId);
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/objects/${encodedObjectId}/access/${encodedAccessId}`
     );
     if (!response.ok) {
@@ -82,7 +91,7 @@ export class RestDrsFilerProvider implements DrsFilerProvider {
   }
 
   async getServiceInfo(): Promise<Service> {
-    const response = await fetch(`${this.baseUrl}/service-info`);
+    const response = await this.fetch(`${this.baseUrl}/service-info`);
     if (!response.ok) {
       throw new Error(`Failed to fetch service info: ${response.statusText}`);
     }
@@ -91,7 +100,7 @@ export class RestDrsFilerProvider implements DrsFilerProvider {
 
   // DRS-Filer specific operations
   async createObject(object: DrsObjectRegister): Promise<string> {
-    const response = await fetch(`${this.baseUrl}/objects`, {
+    const response = await this.fetch(`${this.baseUrl}/objects`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -112,13 +121,16 @@ export class RestDrsFilerProvider implements DrsFilerProvider {
     object: DrsObjectRegister
   ): Promise<string> {
     const encodedObjectId = encodeURIComponent(id);
-    const response = await fetch(`${this.baseUrl}/objects/${encodedObjectId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(object),
-    });
+    const response = await this.fetch(
+      `${this.baseUrl}/objects/${encodedObjectId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(object),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to create/update object: ${response.statusText}`);
@@ -130,13 +142,16 @@ export class RestDrsFilerProvider implements DrsFilerProvider {
 
   async updateObject(id: string, object: DrsObjectRegister): Promise<string> {
     const encodedObjectId = encodeURIComponent(id);
-    const response = await fetch(`${this.baseUrl}/objects/${encodedObjectId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(object),
-    });
+    const response = await this.fetch(
+      `${this.baseUrl}/objects/${encodedObjectId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(object),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to update object: ${response.statusText}`);
@@ -148,9 +163,12 @@ export class RestDrsFilerProvider implements DrsFilerProvider {
 
   async deleteObject(id: string): Promise<void> {
     const encodedObjectId = encodeURIComponent(id);
-    const response = await fetch(`${this.baseUrl}/objects/${encodedObjectId}`, {
-      method: "DELETE",
-    });
+    const response = await this.fetch(
+      `${this.baseUrl}/objects/${encodedObjectId}`,
+      {
+        method: "DELETE",
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to delete object: ${response.statusText}`);
@@ -160,7 +178,7 @@ export class RestDrsFilerProvider implements DrsFilerProvider {
   async deleteAccessMethod(objectId: string, accessId: string): Promise<void> {
     const encodedObjectId = encodeURIComponent(objectId);
     const encodedAccessId = encodeURIComponent(accessId);
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/objects/${encodedObjectId}/access/${encodedAccessId}`,
       {
         method: "DELETE",
@@ -173,7 +191,7 @@ export class RestDrsFilerProvider implements DrsFilerProvider {
   }
 
   async updateServiceInfo(service: ServiceRegister): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/service-info`, {
+    const response = await this.fetch(`${this.baseUrl}/service-info`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
