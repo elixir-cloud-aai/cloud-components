@@ -16,8 +16,10 @@ import "@elixir-cloud/design/components/label/index.js";
 import "@elixir-cloud/design/components/textarea/index.js";
 import "@elixir-cloud/design/components/collapsible/index.js";
 
-// Value of the choice "Add new service type" in the type list; keys of
-// listed types are JSON arrays (cf. `typeKey()`), so they never equal it
+/**
+ * Value of the choice "Add new service type" in the type list; keys of
+ * listed types are JSON arrays (cf. `typeKey()`), so they never equal it
+ */
 const NEW_TYPE = "new";
 
 /** Key of a service type, as the value of its choice in the type list */
@@ -68,13 +70,21 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
    */
   @property({
     attribute: "allow-new-type",
-    converter: { fromAttribute: (value: string | null) => value !== "false" },
+    // `type: Boolean` can't turn a property that defaults to `true` off from
+    // HTML (any attribute value is `true`), hence the converter
+    converter: {
+      fromAttribute: (value: string | null) => value?.toLowerCase() !== "false",
+    },
   })
   allowNewType = true;
 
   @state() private serviceTypes: ServiceType[] = [];
   // Choice in the type list: the key of a listed type, `NEW_TYPE`, or empty
   @state() private typeChoice = "";
+  // Whether the type list is loading, loaded or failed to load
+  @state() private typesStatus: "loading" | "loaded" | "failed" = "loading";
+  // Number of the latest request for types, so that older answers are ignored
+  private typesRequest = 0;
   @state() private loading = false;
   @state() private error: string | null = null;
   @state() private success: string | null = null;
@@ -155,11 +165,20 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   }
 
   protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
-    // a new type entered before adding types was turned off is dropped
+    // switching adding types off discards a new type entered so far
     if (
       changedProperties.has("allowNewType") &&
       !this.allowNewType &&
-      this.typeChoice === NEW_TYPE
+      !this.listedChoice
+    ) {
+      this.selectType("");
+    }
+    // a chosen type that is no longer listed (e.g. after a reload) is dropped
+    if (
+      changedProperties.has("serviceTypes") &&
+      this.typeChoice !== "" &&
+      this.typeChoice !== NEW_TYPE &&
+      !this.listedChoice
     ) {
       this.selectType("");
     }
@@ -172,13 +191,28 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     }
   }
 
-  private async loadServiceTypes(): Promise<void> {
+  /**
+   * Load the registered service types
+   * @param reportErrors Whether to fire `ecc-service-create-failed` if they
+   * can't be loaded (not for reloads after a service was created)
+   */
+  private async loadServiceTypes(reportErrors = true): Promise<void> {
     if (!this._provider) return;
 
+    this.typesRequest += 1;
+    const request = this.typesRequest;
+    // a reload after a create keeps the list; other loads start over
+    if (reportErrors) this.typesStatus = "loading";
     try {
-      this.serviceTypes = await this._provider.getServiceTypes();
+      const types = await this._provider.getServiceTypes();
+      if (request !== this.typesRequest) return;
+      this.serviceTypes = types;
+      this.typesStatus = "loaded";
     } catch (error) {
+      if (request !== this.typesRequest) return;
+      this.typesStatus = this.serviceTypes.length > 0 ? "loaded" : "failed";
       console.error("Failed to load service types:", error);
+      if (!reportErrors) return;
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-failed", {
           detail: { error: "Failed to load service types" },
@@ -197,20 +231,29 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     return (
       this.allowNewType &&
       (this.typeChoice === NEW_TYPE ||
-        (this.typeChoice === "" && this.serviceTypes.length === 0))
+        (this.typeChoice === "" &&
+          this.typesStatus === "loaded" &&
+          this.serviceTypes.length === 0))
     );
+  }
+
+  /** Whether a listed type is chosen */
+  private get listedChoice(): boolean {
+    return this.serviceTypes.some((type) => typeKey(type) === this.typeChoice);
   }
 
   /** Whether the form has a complete service type to send */
   private get typeComplete(): boolean {
     const { group, artifact, version } = this.formData.type;
     return (
-      (this.newType || this.typeChoice !== "") &&
+      (this.newType || this.listedChoice) &&
       Boolean(group && artifact && version)
     );
   }
 
   private selectType(choice: string): void {
+    // choosing the current choice again keeps what was entered
+    if (choice === (this.newType ? NEW_TYPE : this.typeChoice)) return;
     this.typeChoice = choice;
     const listed = this.serviceTypes.find((type) => typeKey(type) === choice);
     this.formData = {
@@ -332,7 +375,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
       // Reset form, and list a type that the service added
       this.resetForm();
-      this.loadServiceTypes();
+      this.loadServiceTypes(false);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to create service";
@@ -542,7 +585,10 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   }
 
   private renderTypeFields() {
-    const noChoice = this.serviceTypes.length === 0 && !this.allowNewType;
+    const noChoice =
+      this.typesStatus === "loaded" &&
+      this.serviceTypes.length === 0 &&
+      !this.allowNewType;
     return html`
       <div class="grid gap-2">
         <ecc-utils-design-label for="service-type" class="text-sm font-medium">
@@ -562,7 +608,9 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
               >
                 <ecc-utils-design-select-trigger class="h-10">
                   <ecc-utils-design-select-value
-                    placeholder="Select a service type"
+                    placeholder=${this.typesStatus === "loading"
+                      ? "Loading service types..."
+                      : "Select a service type"}
                   ></ecc-utils-design-select-value>
                 </ecc-utils-design-select-trigger>
                 <ecc-utils-design-select-content>
@@ -585,6 +633,11 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             `}
       </div>
 
+      ${this.typesStatus === "failed"
+        ? html`<p class="text-sm text-destructive">
+            Could not load the registered service types.
+          </p>`
+        : ""}
       ${this.newType ? this.renderNewTypeFields() : ""}
     `;
   }

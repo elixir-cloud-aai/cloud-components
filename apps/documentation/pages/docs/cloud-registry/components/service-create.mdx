@@ -156,7 +156,7 @@ The data provider responsible for creating services in the registry. You must pr
 </Tabs>
 
 ### `allowNewType`
-The form offers the registered service types (`GET /services/types`) as one list, labelled `group · artifact · version` (e.g. `org.ga4gh · tes · 1.1.0`). If `allowNewType` is `true`, the list ends with "Add new service type", which shows required fields for the group, artifact and version of a new type; if no types are registered yet, the form shows these fields right away. If it is `false`, users can only choose a listed type. Cloud Registry may let only admins add types (`custom.access_control.service_types: controlled`): apps take the value from `may_add_service_types` of the registry's `GET /me`. As an attribute, `allow-new-type="false"` turns it off.
+The form offers the registered service types (`GET /services/types`) as one list, labelled `group · artifact · version` (e.g. `org.ga4gh · tes · 1.1.0`). If `allowNewType` is `true`, the list ends with "Add new service type", which shows required fields for the group, artifact and version of a new type; if no types are registered yet, the form shows these fields right away. If it is `false`, users can only choose a listed type; if none is registered, the form says so and can't be submitted. The list reloads after a service is created, so that a new type shows up. Cloud Registry may let only admins add types (`custom.access_control.service_types: controlled`): apps take the value from `may_add_service_types` of the registry's `GET /me`. As an attribute, `allow-new-type="false"` (in any case) turns it off. The property only changes the form: the registry checks permissions itself. In the example, `me` is the response of `GET /me`.
 
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>
