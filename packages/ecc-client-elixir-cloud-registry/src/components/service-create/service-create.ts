@@ -93,6 +93,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     useCustomId: false,
   };
 
+  /** The provider in use: `provider`, else `restProvider`. */
   private _provider: CloudRegistryProvider | null = null;
 
   /** The provider for `baseUrl`, used if `provider` isn't set. */
@@ -136,6 +137,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     // the types shown stay until those of the new provider are loaded
     this._provider = provider;
     if (provider) this.loadServiceTypes();
+    else this.serviceTypes = [];
   }
 
   private async loadServiceTypes(): Promise<void> {
@@ -148,6 +150,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       if (provider === this._provider) this.serviceTypes = serviceTypes;
     } catch (error) {
       if (provider !== this._provider) return;
+      // not those of a replaced provider
+      this.serviceTypes = [];
       console.error("Failed to load service types:", error);
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-failed", {

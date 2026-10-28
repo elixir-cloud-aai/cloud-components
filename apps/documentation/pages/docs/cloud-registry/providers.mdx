@@ -212,8 +212,10 @@ interface ExternalServiceRegister {
 import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
 import { EccClientElixirCloudRegistryServiceCreate } from '@elixir-cloud/cloud-registry';
 
+// created once: a new provider makes the components load their data again
+const provider = new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
+
 function ServiceRegistration() {
-  const provider = new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
 
   return (
     <EccClientElixirCloudRegistryServiceCreate 
@@ -242,8 +244,10 @@ import {
   EccClientElixirCloudRegistryServiceCreate 
 } from '@elixir-cloud/cloud-registry';
 
+// created once: a new provider makes the components load their data again
+const provider = new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
+
 function ServiceManagement() {
-  const provider = new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
   const [view, setView] = useState('list');
 
   return (
