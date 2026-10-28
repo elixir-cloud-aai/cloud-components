@@ -2,6 +2,7 @@ import { LitElement, html, css } from "lit";
 import { property, state } from "lit/decorators.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
+import { isBrowser } from "../../ssr.js";
 import "ace-builds/src-noconflict/ace.js";
 import "ace-builds/src-noconflict/theme-cloud9_day.js";
 import "ace-builds/src-noconflict/theme-cloud9_night.js";
@@ -646,6 +647,10 @@ export class EccUtilsDesignCode extends LitElement {
   }
 
   setupThemeObserver() {
+    // Guard: MutationObserver and document are not available on the server or in some
+    // constrained environments
+    if (!isBrowser() || typeof MutationObserver === "undefined") return;
+
     // Set up mutation observer to watch for theme changes
     const observer = new MutationObserver(() => {
       this.updateEditorTheme();
@@ -664,6 +669,9 @@ export class EccUtilsDesignCode extends LitElement {
   }
 
   isDarkMode() {
+    // SSR guard: document is not available on the server
+    if (!isBrowser()) return false;
+
     return (
       document.documentElement.classList.contains("dark") ||
       document.body.classList.contains("dark") ||

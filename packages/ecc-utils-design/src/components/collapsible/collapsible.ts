@@ -2,6 +2,7 @@ import { LitElement, html, css, PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
+import { generateDeterministicId } from "../../ssr.js";
 
 // Global state manager for collapsible
 const collapsibleState = new Map<
@@ -24,9 +25,8 @@ export class EccUtilsDesignCollapsible extends LitElement {
     `,
   ];
 
-  @state() private collapsibleId = `collapsible-${Math.random()
-    .toString(36)
-    .substring(2, 9)}`;
+  // SSR-safe: deterministic IDs prevent hydration mismatches between server and client
+  @state() private collapsibleId = generateDeterministicId("collapsible");
 
   @property({ type: Boolean }) open = false;
   @property({ type: Boolean }) disabled = false;

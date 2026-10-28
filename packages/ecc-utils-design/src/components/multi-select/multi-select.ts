@@ -2,6 +2,7 @@ import { LitElement, html, css, PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
+import { generateDeterministicId } from "../../ssr.js";
 import "../checkbox/index.js";
 
 function cn(...classes: (string | undefined | false)[]) {
@@ -40,9 +41,8 @@ export class EccUtilsDesignMultiSelect extends LitElement {
     `,
   ];
 
-  @state() private selectId = `multi-select-${Math.random()
-    .toString(36)
-    .substring(2, 9)}`;
+  // SSR-safe: deterministic IDs prevent hydration mismatches between server and client
+  @state() private selectId = generateDeterministicId("multi-select");
 
   @property({ type: Array }) value: string[] = [];
   @property({ type: String }) placeholder = "Select options...";

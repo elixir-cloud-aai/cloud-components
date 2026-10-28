@@ -2,6 +2,7 @@ import { LitElement, html, css, PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
+import { generateDeterministicId } from "../../ssr.js";
 
 function cn(...classes: (string | undefined | false)[]) {
   return classes.filter(Boolean).join(" ");
@@ -30,9 +31,8 @@ export class EccUtilsDesignSelect extends LitElement {
     `,
   ];
 
-  @state() private selectId = `select-${Math.random()
-    .toString(36)
-    .substring(2, 9)}`;
+  // SSR-safe: deterministic IDs prevent hydration mismatches between server and client
+  @state() private selectId = generateDeterministicId("select");
 
   @property({ type: String }) value = "";
   @property({ type: Boolean }) disabled = false;
