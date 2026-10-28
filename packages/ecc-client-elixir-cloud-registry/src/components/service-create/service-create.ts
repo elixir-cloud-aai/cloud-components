@@ -175,7 +175,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     ) {
       const options = this.environmentOptions;
       if (
-        options.length > 0 &&
+        !this.anyEnvironment &&
         !options.some((option) => option.value === this.formData.environment)
       ) {
         this.formData = { ...this.formData, environment: "" };
@@ -212,8 +212,18 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   }
 
   /**
+   * Whether any environment is allowed (free text): the registry's list, else
+   * the property's, is empty
+   */
+  private get anyEnvironment(): boolean {
+    return this.registryEnvironments === null
+      ? Array.isArray(this.environments) && this.environments.length === 0
+      : this.registryEnvironments.length === 0;
+  }
+
+  /**
    * Environments to offer: the registry's, else the property's, else the
-   * defaults; empty if any value is allowed
+   * defaults (cf. `anyEnvironment` for empty lists)
    */
   private get environmentOptions(): EnvironmentOption[] {
     // the property may come from an attribute (JSON), so it is checked
@@ -614,7 +624,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
   private renderEnvironmentField() {
     const options = this.environmentOptions;
-    if (options.length === 0) {
+    if (this.anyEnvironment) {
       return html`
         <ecc-utils-design-input
           id="environment"
