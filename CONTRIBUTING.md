@@ -78,10 +78,11 @@ To release `<version>` (e.g. `2.0.0-alpha.49`), maintainers:
    `npm stage approve <stage-id>`. The dist-tag is `latest` for releases
    and `next` for prereleases (e.g. `2.1.0-rc.1` or `3.0.0-alpha.1`), so
    that `latest` holds the newest release and `next` the prerelease
-   published last. Until there is a tag `v2.<minor>.<patch>` or later
-   (2.0.0 is out), prereleases of 2.x (the `2.0.0-alpha.N` series) get
-   `latest` instead; any such tag ends this, even if its release failed.
-   A release of an older major (a backport) also gets `latest`.
+   published last. Until 2.0.0 (or a later release) is tagged, i.e. there
+   is a tag `v2.<minor>.<patch>` or later, prereleases of 2.x (the
+   `2.0.0-alpha.N` series) get `latest` instead; any such tag ends this,
+   even if its release failed. A release of an older major (a backport)
+   also gets `latest`, which then moves back to that older version.
    `node scripts/release.js dist-tag <version>` prints the dist-tag. The
    dist-tag of a staged version can't be changed.
 5. **Fast-forward `main`** to the tag:

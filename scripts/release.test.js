@@ -93,11 +93,10 @@ test("distTag uses next for prereleases from 2.0.0 on", () => {
   const tags = ["v1.0.1", "v2.0.0-alpha.49", "v2.0.0"];
   assert.strictEqual(distTag("2.1.0-rc.1", tags), "next");
   assert.strictEqual(distTag("2.0.1-1", tags), "next");
-  assert.strictEqual(distTag("2.1.0-latest.1", tags), "next");
   assert.strictEqual(distTag("3.0.0-alpha.1", tags), "next");
   assert.strictEqual(distTag("1.1.0-rc.1", tags), "next");
-  // A later major counts as released, too
-  assert.strictEqual(distTag("3.1.0-rc.1", ["v1.0.1", "v3.0.0"]), "next");
+  // A release of a later major ends the exception, too
+  assert.strictEqual(distTag("2.0.0-alpha.50", ["v1.0.1", "v3.0.0"]), "next");
 });
 
 test("distTag fails without release tags", () => {

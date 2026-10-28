@@ -83,7 +83,8 @@ const versionMismatches = (version, base = root) => {
 };
 
 // Prereleases of this major version are published as `latest` until its
-// first release (the 2.0.0 alphas, from before the rule below)
+// first release (the 2.0.0 alphas, published as `latest` before
+// prereleases got `next`)
 const latestPrereleaseMajor = 2;
 
 // The dist-tag for `version`, given the repository's tags (e.g. `v1.0.1`):
@@ -91,7 +92,7 @@ const latestPrereleaseMajor = 2;
 // newest release. Exception: prereleases of `latestPrereleaseMajor` get
 // `latest` while there is no release of it or a later major. Fails without
 // any release tag (e.g. in a clone without tags), which would otherwise
-// send prereleases to `latest`
+// send 2.x prereleases to `latest`
 const distTag = (version, tags) => {
   const { major, prerelease } = parseVersion(version);
   const releases = tags
