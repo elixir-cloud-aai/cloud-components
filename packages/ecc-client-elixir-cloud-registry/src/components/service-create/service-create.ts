@@ -52,7 +52,11 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
    * for compatibility; as an attribute, `admin="false"` turns it off.
    */
   @property({
-    converter: { fromAttribute: (value: string | null) => value !== "false" },
+    // `type: Boolean` can't turn a property that defaults to `true` off from
+    // HTML (any attribute value is `true`), hence the converter
+    converter: {
+      fromAttribute: (value: string | null) => value?.toLowerCase() !== "false",
+    },
   })
   admin = true;
 
@@ -239,10 +243,12 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
         contactUrl: this.formData.contactUrl || undefined,
         documentationUrl: this.formData.documentationUrl || undefined,
         environment: this.formData.environment || undefined,
-        // only admins may set the timestamps and choose the ID
-        createdAt: (this.admin && this.formData.createdAt) || undefined,
-        updatedAt: (this.admin && this.formData.updatedAt) || undefined,
       };
+      // admin-only fields (cf. `admin`), sent by admins only
+      if (this.admin) {
+        serviceData.createdAt = this.formData.createdAt || undefined;
+        serviceData.updatedAt = this.formData.updatedAt || undefined;
+      }
 
       let serviceId: string;
       if (
@@ -575,7 +581,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   }
 
   private renderAdvancedFields() {
-    // only admin-only fields are advanced
+    // "Advanced Configuration" holds admin-only fields only
     if (!this.admin) return html``;
 
     return html`
