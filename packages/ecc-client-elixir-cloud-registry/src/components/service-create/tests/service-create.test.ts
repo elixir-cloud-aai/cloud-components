@@ -182,7 +182,49 @@ describe("ecc-client-elixir-cloud-registry-service-create provider", () => {
     await el.updateComplete;
     await waitUntil(() => internals(el).serviceTypes[0]?.artifact === "tes");
 
-    expect(typeRequests(fetchStub)).to.have.length(1);
+    expect(typeRequests(fetchStub).map((call) => call.args[0])).to.deep.equal([
+      `${BASE_URL}/services/types`,
+    ]);
+  });
+
+  it("submits with a provider set just before", async () => {
+    const first = stubProvider([TYPE_A]);
+    const second = stubProvider([TYPE_A]);
+    const el = await fixture<ECCClientElixirCloudRegistryServiceCreate>(
+      html`<ecc-client-elixir-cloud-registry-service-create
+        .provider=${first}
+      ></ecc-client-elixir-cloud-registry-service-create>`
+    );
+    fillForm(el);
+
+    el.provider = second;
+    await internals(el).handleSubmit();
+
+    expect(second.createService.callCount).to.equal(1);
+    expect(first.createService.callCount).to.equal(0);
+  });
+
+  it("drops a late answer of a provider that came back", async () => {
+    const late = deferred<ServiceType[]>();
+    const first = stubProvider([]);
+    first.getServiceTypes.onFirstCall().callsFake(() => late.promise);
+    first.getServiceTypes.onSecondCall().resolves([TYPE_B]);
+    const second = stubProvider([TYPE_A]);
+    const el = await fixture<ECCClientElixirCloudRegistryServiceCreate>(
+      html`<ecc-client-elixir-cloud-registry-service-create
+        .provider=${first}
+      ></ecc-client-elixir-cloud-registry-service-create>`
+    );
+
+    el.provider = second;
+    await el.updateComplete;
+    el.provider = first;
+    await el.updateComplete;
+    await waitUntil(() => internals(el).serviceTypes[0] === TYPE_B);
+    late.resolve([TYPE_A]);
+    await settle(el);
+
+    expect(internals(el).serviceTypes).to.deep.equal([TYPE_B]);
   });
 
   it("keeps the types of the current provider", async () => {
