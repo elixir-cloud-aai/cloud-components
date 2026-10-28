@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { expect } from "@open-wc/testing";
 import sinon from "sinon";
+import { MAX_PROBLEM_BYTES, PROBLEM_TIMEOUT_MS } from "../errors.js";
 import {
   CloudRegistryError,
   ExternalServiceRegister,
@@ -184,5 +185,41 @@ describe("RestCloudRegistryProvider errors", () => {
     )) as CloudRegistryError;
 
     expect(err.message).to.equal("Failed to fetch services (502)");
+  });
+
+  it("skips error bodies that are too large", async () => {
+    const detail = "x".repeat(MAX_PROBLEM_BYTES);
+    fetchStub.callsFake(
+      async () => new Response(JSON.stringify({ detail }), { status: 500 })
+    );
+
+    const err = (await rejection(() =>
+      provider.getServices()
+    )) as CloudRegistryError;
+
+    expect(err.message).to.equal("Failed to fetch services (500)");
+  });
+
+  it("doesn't wait for a stalled error body", async () => {
+    const clock = sinon.useFakeTimers({
+      toFake: ["setTimeout", "clearTimeout"],
+    });
+    try {
+      // a body that never ends
+      const body = new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode('{"detail": "'));
+        },
+      });
+      fetchStub.callsFake(async () => new Response(body, { status: 502 }));
+
+      const pending = rejection(() => provider.getServices());
+      await clock.tickAsync(PROBLEM_TIMEOUT_MS);
+      const err = (await pending) as CloudRegistryError;
+
+      expect(err.message).to.equal("Failed to fetch services (502)");
+    } finally {
+      clock.restore();
+    }
   });
 });
