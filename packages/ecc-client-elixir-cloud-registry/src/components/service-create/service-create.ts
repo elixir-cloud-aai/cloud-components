@@ -16,6 +16,14 @@ import "@elixir-cloud/design/components/select/index.js";
 import "@elixir-cloud/design/components/label/index.js";
 import "@elixir-cloud/design/components/textarea/index.js";
 import "@elixir-cloud/design/components/collapsible/index.js";
+import {
+  MAX_LENGTHS,
+  checkServiceId,
+  checkUrl,
+  hasUnpairedSurrogates,
+  isDateTime,
+  length,
+} from "./validation.js";
 
 /** Choice of an environment: its value, and an optional label to show */
 export interface EnvironmentOption {
@@ -39,10 +47,11 @@ const DEFAULT_ENVIRONMENTS: EnvironmentOption[] = [
  * @property {string} baseUrl - Base URL of the Cloud Registry instance/gateway
  * @property {CloudRegistryProvider} provider - Custom data provider (optional, overrides baseUrl)
  * @property {(string | EnvironmentOption)[]} environments - Environments to offer if the registry doesn't publish its own (default: prod, test, dev, staging)
+ * @property {string[]} urlSchemes - Schemes allowed in service URLs if the registry doesn't publish its own (default: https)
  *
  * @fires ecc-service-created - Fired when a service is successfully created (includes serviceId, serviceData, and success message)
  * @fires ecc-service-create-failed - Fired when service creation fails
- * @fires ecc-service-create-validation-failed - Fired when there are validation errors during service creation
+ * @fires ecc-service-create-validation-failed - Fired when there are validation errors during service creation (the form shows them at the fields and sends nothing)
  */
 export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   static styles = [
@@ -52,6 +61,9 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       :host {
         display: block;
         width: 100%;
+      }
+      [aria-invalid="true"]::part(base) {
+        border-color: var(--destructive);
       }
     `,
   ];
@@ -70,9 +82,34 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   @property({ type: Array })
   environments?: (string | EnvironmentOption)[];
 
+  /**
+   * Schemes allowed in service URLs (`url`), lowercase: `https` and, if the
+   * registry allows it, `http`. Registries that publish their rules
+   * (`registration_rules` of `GET /service-info`, cloud-registry 0.6.0 and
+   * later) override it. Defaults to `["https"]`, the registry's default; as
+   * an attribute, a list separated by commas or spaces (e.g. `https,http`).
+   */
+  @property({
+    attribute: "url-schemes",
+    converter: {
+      fromAttribute: (value: string | null) =>
+        value === null
+          ? undefined
+          : value
+              .split(/[\s,]+/)
+              .map((scheme) => scheme.toLowerCase())
+              .filter(Boolean),
+    },
+  })
+  urlSchemes?: string[];
+
   @state() private serviceTypes: ServiceType[] = [];
   // Environments allowed by the registry; null if it doesn't publish them
   @state() private registryEnvironments: string[] | null = null;
+  // Schemes of service URLs allowed by the registry; null if not published
+  @state() private registryUrlSchemes: string[] | null = null;
+  // Whether a submission was tried, so that missing fields are flagged too
+  @state() private submitted = false;
   // Number of the latest request for the rules, so that older answers are
   // ignored (e.g. of a previous registry)
   private rulesRequest = 0;
@@ -193,11 +230,13 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     this.rulesRequest += 1;
     const request = this.rulesRequest;
     let environments: unknown;
+    let urlSchemes: unknown;
     try {
       // `registration_rules` is optional, so any service info will do
       const info: RegistryServiceInfo | undefined =
         await this._provider.getServiceInfo();
       environments = info?.registration_rules?.environments;
+      urlSchemes = info?.registration_rules?.url_schemes;
     } catch (error) {
       // without rules, the properties apply
       console.warn("Failed to load the registration rules:", error);
@@ -213,6 +252,170 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       );
     }
     this.registryEnvironments = valid ? (environments as string[]) : null;
+    this.registryUrlSchemes =
+      Array.isArray(urlSchemes) &&
+      urlSchemes.length > 0 &&
+      urlSchemes.every((value) => value === "http" || value === "https")
+        ? urlSchemes
+        : null;
+  }
+
+  /** Schemes allowed in service URLs: the registry's, else the property's */
+  private get serviceUrlSchemes(): string[] {
+    const configured = Array.isArray(this.urlSchemes)
+      ? this.urlSchemes.filter(
+          (scheme) => scheme === "http" || scheme === "https"
+        )
+      : [];
+    return (
+      this.registryUrlSchemes ?? (configured.length ? configured : ["https"])
+    );
+  }
+
+  /**
+   * Errors of the fields, by the IDs of their inputs, as the registry would
+   * reject them (`400`); missing required fields only after a submission
+   * was tried (or with `all`)
+   */
+  private fieldErrors(all = this.submitted): Record<string, string> {
+    const errors: Record<string, string> = {};
+    const { formData } = this;
+    const add = (id: string, message: string) => {
+      if (!(id in errors)) errors[id] = message;
+    };
+    const text = (
+      id: string,
+      label: string,
+      value: string,
+      max: number,
+      required = false
+    ) => {
+      if (required && all && !value) add(id, `${label} is required.`);
+      if (length(value) > max) {
+        add(id, `${label} must be at most ${max} characters.`);
+      }
+      if (hasUnpairedSurrogates(value)) {
+        add(id, `${label} must not contain invalid characters.`);
+      }
+    };
+    const url = (
+      id: string,
+      label: string,
+      value: string,
+      schemes: string[],
+      mailto = false
+    ) => {
+      if (!value) return;
+      const error = checkUrl(value, schemes, mailto);
+      if (error) add(id, `${label} ${error}.`);
+    };
+    const links = ["http", "https"];
+
+    text("service-name", "Service name", formData.name, MAX_LENGTHS.name, true);
+    text("service-url", "Service URL", formData.url, MAX_LENGTHS.url, true);
+    // the registry ignores leading and trailing spaces of service URLs
+    url(
+      "service-url",
+      "Service URL",
+      formData.url.replace(/^ +| +$/g, ""),
+      this.serviceUrlSchemes
+    );
+    text(
+      "org-name",
+      "Organization name",
+      formData.organization.name,
+      MAX_LENGTHS.organizationName,
+      true
+    );
+    text(
+      "org-url",
+      "Organization URL",
+      formData.organization.url,
+      MAX_LENGTHS.url,
+      true
+    );
+    url("org-url", "Organization URL", formData.organization.url, links);
+    text(
+      "type-group",
+      "Type group",
+      formData.type.group,
+      MAX_LENGTHS.type,
+      true
+    );
+    text(
+      "type-artifact",
+      "Type artifact",
+      formData.type.artifact,
+      MAX_LENGTHS.type,
+      true
+    );
+    text(
+      "type-version",
+      "Type version",
+      formData.type.version,
+      MAX_LENGTHS.type,
+      true
+    );
+    text(
+      "service-version",
+      "Service version",
+      formData.version,
+      MAX_LENGTHS.version,
+      true
+    );
+    text(
+      "environment",
+      "Environment",
+      formData.environment,
+      MAX_LENGTHS.environment
+    );
+    text(
+      "description",
+      "Description",
+      formData.description,
+      MAX_LENGTHS.description
+    );
+    url("contact-url", "Contact URL", formData.contactUrl, links, true);
+    url(
+      "documentation-url",
+      "Documentation URL",
+      formData.documentationUrl,
+      links
+    );
+    if (formData.customServiceId) {
+      const error = checkServiceId(formData.customServiceId);
+      if (error) add("custom-service-id", `Custom service ID ${error}.`);
+      text(
+        "custom-service-id",
+        "Custom service ID",
+        formData.customServiceId,
+        Infinity
+      );
+    }
+    for (const [id, label, value] of [
+      ["created-at", "Created At", formData.createdAt],
+      ["updated-at", "Updated At", formData.updatedAt],
+    ]) {
+      if (value && !isDateTime(value)) {
+        add(
+          id,
+          `${label} must be an RFC 3339 date-time, e.g. 2024-01-01T00:00:00Z.`
+        );
+      }
+    }
+    return errors;
+  }
+
+  /** Message under a field, if it is invalid */
+  private renderError(id: string) {
+    const error = this.fieldErrors()[id];
+    return error
+      ? html`<p id="${id}-error" class="text-sm text-destructive">${error}</p>`
+      : "";
+  }
+
+  private invalid(id: string): string {
+    return id in this.fieldErrors() ? "true" : "false";
   }
 
   /**
@@ -317,32 +520,23 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       return;
     }
 
+    // invalid inputs are shown at their fields, and nothing is sent
+    this.submitted = true;
+    const errors = Object.values(this.fieldErrors(true));
+    if (errors.length > 0) {
+      this.dispatchEvent(
+        new CustomEvent("ecc-service-create-validation-failed", {
+          detail: { error: errors.join(" ") },
+          bubbles: true,
+          composed: true,
+        })
+      );
+      return;
+    }
+
     this.loading = true;
 
     try {
-      // Validate required fields
-      if (!this.formData.name) {
-        throw new Error("Service name is required");
-      }
-      if (!this.formData.url) {
-        throw new Error("Service URL is required");
-      }
-      if (!this.formData.organization.name) {
-        throw new Error("Organization name is required");
-      }
-      if (!this.formData.organization.url) {
-        throw new Error("Organization URL is required");
-      }
-      if (!this.formData.type.artifact) {
-        throw new Error("Service type artifact is required");
-      }
-      if (!this.formData.type.version) {
-        throw new Error("Service type version is required");
-      }
-      if (!this.formData.version) {
-        throw new Error("Service version is required");
-      }
-
       // Prepare service data
       const serviceData: ExternalServiceRegister = {
         name: this.formData.name,
@@ -406,6 +600,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   }
 
   private resetForm(): void {
+    this.submitted = false;
     this.formData = {
       name: "",
       url: "",
@@ -444,6 +639,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               id="service-name"
+              aria-invalid=${this.invalid("service-name")}
+              aria-describedby="service-name-error"
               .value=${this.formData.name}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("name", e.detail.value)}
@@ -451,6 +648,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
               required
               class="h-10"
             ></ecc-utils-design-input>
+            ${this.renderError("service-name")}
           </div>
 
           <div class="grid gap-2">
@@ -462,6 +660,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               id="service-url"
+              aria-invalid=${this.invalid("service-url")}
+              aria-describedby="service-url-error"
               .value=${this.formData.url}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("url", e.detail.value)}
@@ -469,6 +669,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
               required
               class="h-10"
             ></ecc-utils-design-input>
+            ${this.renderError("service-url")}
           </div>
         </div>
 
@@ -480,6 +681,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               id="org-name"
+              aria-invalid=${this.invalid("org-name")}
+              aria-describedby="org-name-error"
               .value=${this.formData.organization.name}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange(
@@ -491,6 +694,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
               required
               class="h-10"
             ></ecc-utils-design-input>
+            ${this.renderError("org-name")}
           </div>
 
           <div class="grid gap-2">
@@ -499,6 +703,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               id="org-url"
+              aria-invalid=${this.invalid("org-url")}
+              aria-describedby="org-url-error"
               .value=${this.formData.organization.url}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange(
@@ -510,6 +716,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
               required
               class="h-10"
             ></ecc-utils-design-input>
+            ${this.renderError("org-url")}
           </div>
         </div>
 
@@ -524,6 +731,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               id="type-group"
+              aria-invalid=${this.invalid("type-group")}
+              aria-describedby="type-group-error"
               .value=${this.formData.type.group}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange("type", "group", e.detail.value)}
@@ -531,6 +740,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
               required
               class="h-10"
             ></ecc-utils-design-input>
+            ${this.renderError("type-group")}
           </div>
 
           <div class="grid gap-2">
@@ -542,6 +752,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               id="type-artifact"
+              aria-invalid=${this.invalid("type-artifact")}
+              aria-describedby="type-artifact-error"
               .value=${this.formData.type.artifact}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange(
@@ -553,6 +765,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
               required
               class="h-10"
             ></ecc-utils-design-input>
+            ${this.renderError("type-artifact")}
           </div>
 
           <div class="grid gap-2">
@@ -564,6 +777,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               id="type-version"
+              aria-invalid=${this.invalid("type-version")}
+              aria-describedby="type-version-error"
               .value=${this.formData.type.version}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange("type", "version", e.detail.value)}
@@ -571,6 +786,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
               required
               class="h-10"
             ></ecc-utils-design-input>
+            ${this.renderError("type-version")}
           </div>
         </div>
 
@@ -585,6 +801,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               id="service-version"
+              aria-invalid=${this.invalid("service-version")}
+              aria-describedby="service-version-error"
               .value=${this.formData.version}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("version", e.detail.value)}
@@ -592,6 +810,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
               required
               class="h-10"
             ></ecc-utils-design-input>
+            ${this.renderError("service-version")}
           </div>
 
           <div class="grid gap-2">
@@ -612,6 +831,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           </ecc-utils-design-label>
           <ecc-utils-design-textarea
             id="description"
+            aria-invalid=${this.invalid("description")}
+            aria-describedby="description-error"
             .value=${this.formData.description}
             @ecc-input-changed=${(e: CustomEvent) =>
               this.handleInputChange("description", e.detail.value)}
@@ -619,6 +840,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             rows="4"
             class="resize-none"
           ></ecc-utils-design-textarea>
+          ${this.renderError("description")}
         </div>
 
         ${this.renderAdvancedFields()}
@@ -632,17 +854,22 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       return html`
         <ecc-utils-design-input
           id="environment"
+          aria-invalid=${this.invalid("environment")}
+          aria-describedby="environment-error"
           .value=${this.formData.environment}
           @ecc-input-changed=${(e: CustomEvent) =>
             this.handleInputChange("environment", e.detail.value)}
           placeholder="Environment (optional)"
           class="h-10"
         ></ecc-utils-design-input>
+        ${this.renderError("environment")}
       `;
     }
     return html`
       <ecc-utils-design-select
         id="environment"
+        aria-invalid=${this.invalid("environment")}
+        aria-describedby="environment-error"
         .value=${this.formData.environment}
         @ecc-input-changed=${(e: CustomEvent) =>
           this.handleInputChange("environment", e.detail.value)}
@@ -665,6 +892,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           )}
         </ecc-utils-design-select-content>
       </ecc-utils-design-select>
+      ${this.renderError("environment")}
     `;
   }
 
@@ -709,6 +937,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                 </ecc-utils-design-label>
                 <ecc-utils-design-input
                   id="custom-service-id"
+                  aria-invalid=${this.invalid("custom-service-id")}
+                  aria-describedby="custom-service-id-error"
                   .value=${this.formData.customServiceId}
                   @ecc-input-changed=${(e: CustomEvent) => {
                     this.handleInputChange("customServiceId", e.detail.value);
@@ -720,6 +950,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   placeholder="org.example.my-service (optional)"
                   class="h-10"
                 ></ecc-utils-design-input>
+                ${this.renderError("custom-service-id")}
               </div>
 
               <!-- Contact and Documentation URLs -->
@@ -733,12 +964,15 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   </ecc-utils-design-label>
                   <ecc-utils-design-input
                     id="contact-url"
+                    aria-invalid=${this.invalid("contact-url")}
+                    aria-describedby="contact-url-error"
                     .value=${this.formData.contactUrl}
                     @ecc-input-changed=${(e: CustomEvent) =>
                       this.handleInputChange("contactUrl", e.detail.value)}
                     placeholder="mailto:support@example.com or https://contact.example.com"
                     class="h-10"
                   ></ecc-utils-design-input>
+                  ${this.renderError("contact-url")}
                 </div>
 
                 <div class="grid gap-2">
@@ -750,6 +984,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   </ecc-utils-design-label>
                   <ecc-utils-design-input
                     id="documentation-url"
+                    aria-invalid=${this.invalid("documentation-url")}
+                    aria-describedby="documentation-url-error"
                     .value=${this.formData.documentationUrl}
                     @ecc-input-changed=${(e: CustomEvent) =>
                       this.handleInputChange(
@@ -759,6 +995,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                     placeholder="https://docs.example.com"
                     class="h-10"
                   ></ecc-utils-design-input>
+                  ${this.renderError("documentation-url")}
                 </div>
               </div>
 
@@ -773,12 +1010,15 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   </ecc-utils-design-label>
                   <ecc-utils-design-input
                     id="created-at"
+                    aria-invalid=${this.invalid("created-at")}
+                    aria-describedby="created-at-error"
                     .value=${this.formData.createdAt}
                     @ecc-input-changed=${(e: CustomEvent) =>
                       this.handleInputChange("createdAt", e.detail.value)}
                     placeholder="2019-06-04T12:58:19Z (optional)"
                     class="h-10"
                   ></ecc-utils-design-input>
+                  ${this.renderError("created-at")}
                 </div>
 
                 <div class="grid gap-2">
@@ -790,12 +1030,15 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   </ecc-utils-design-label>
                   <ecc-utils-design-input
                     id="updated-at"
+                    aria-invalid=${this.invalid("updated-at")}
+                    aria-describedby="updated-at-error"
                     .value=${this.formData.updatedAt}
                     @ecc-input-changed=${(e: CustomEvent) =>
                       this.handleInputChange("updatedAt", e.detail.value)}
                     placeholder="2019-06-04T12:58:19Z (optional)"
                     class="h-10"
                   ></ecc-utils-design-input>
+                  ${this.renderError("updated-at")}
                 </div>
               </div>
             </div>
