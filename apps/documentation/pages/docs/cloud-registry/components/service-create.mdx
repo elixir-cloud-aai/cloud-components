@@ -123,6 +123,7 @@ This example demonstrates the basic service creation form with default settings.
 | Property   | Type                    | Default | Description                                                                    |
 |------------|-------------------------|---------|--------------------------------------------------------------------------------|
 | `provider` | `CloudRegistryProvider` | `null`  | Data provider for service creation operations (see [Providers](/docs/cloud-registry/providers)) |
+| `allowNewType` | `boolean`           | `true`  | Whether users may add a new service type instead of choosing a registered one |
 
 ### `provider`
 The data provider responsible for creating services in the registry. You must provide a provider that implements the `CloudRegistryProvider` interface, which extends the base `ServiceRegistryProvider` with creation capabilities. See the [Providers documentation](/docs/cloud-registry/providers) for detailed information about available providers and how to create custom ones.
@@ -150,6 +151,22 @@ The data provider responsible for creating services in the registry. You must pr
       document.querySelector('ecc-client-elixir-cloud-registry-service-create').provider = provider;
     </script>
     <ecc-client-elixir-cloud-registry-service-create></ecc-client-elixir-cloud-registry-service-create>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `allowNewType`
+The form offers the registered service types (`GET /services/types`) as one list, labelled `group · artifact · version` (e.g. `org.ga4gh · tes · 1.1.0`). If `allowNewType` is `true`, the list ends with "Add new service type", which shows required fields for the group, artifact and version of a new type; if no types are registered yet, the form shows these fields right away. If it is `false`, users can only choose a listed type. Cloud Registry may let only admins add types (`custom.access_control.service_types: controlled`): apps take the value from `may_add_service_types` of the registry's `GET /me`. As an attribute, `allow-new-type="false"` turns it off.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientElixirCloudRegistryServiceCreate provider={provider} allowNewType={me.may_add_service_types} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-client-elixir-cloud-registry-service-create allow-new-type="false"></ecc-client-elixir-cloud-registry-service-create>
     ```
   </Tabs.Tab>
 </Tabs>

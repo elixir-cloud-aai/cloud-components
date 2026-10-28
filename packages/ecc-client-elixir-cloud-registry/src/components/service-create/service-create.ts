@@ -16,12 +16,27 @@ import "@elixir-cloud/design/components/label/index.js";
 import "@elixir-cloud/design/components/textarea/index.js";
 import "@elixir-cloud/design/components/collapsible/index.js";
 
+// Value of the choice "Add new service type" in the type list; keys of
+// listed types are JSON arrays (cf. `typeKey()`), so they never equal it
+const NEW_TYPE = "new";
+
+/** Key of a service type, as the value of its choice in the type list */
+function typeKey({ group, artifact, version }: ServiceTypeRegister): string {
+  return JSON.stringify([group, artifact, version]);
+}
+
+/** Label of a service type in the type list, e.g. `org.ga4gh · tes · 1.1.0` */
+function typeLabel({ group, artifact, version }: ServiceTypeRegister): string {
+  return `${group} · ${artifact} · ${version}`;
+}
+
 /**
  * @summary Component for creating new services in Cloud Registry
  * @since 2.0.0
  *
  * @property {string} baseUrl - Base URL of the Cloud Registry instance/gateway
  * @property {CloudRegistryProvider} provider - Custom data provider (optional, overrides baseUrl)
+ * @property {boolean} allowNewType - Whether users may add a new service type instead of choosing a listed one; default `true`, set `allow-new-type="false"` to offer listed types only
  *
  * @fires ecc-service-created - Fired when a service is successfully created (includes serviceId, serviceData, and success message)
  * @fires ecc-service-create-failed - Fired when service creation fails
@@ -43,7 +58,23 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   @property({ attribute: false, reflect: true })
   provider?: CloudRegistryProvider;
 
+  /**
+   * Whether users may add a new service type instead of choosing one of the
+   * registered types (`GET /services/types`): the type list then ends with
+   * "Add new service type", which shows fields for the group, artifact and
+   * version. Apps set it from `may_add_service_types` of the registry's
+   * `GET /me`. Defaults to `true` for compatibility; as an attribute,
+   * `allow-new-type="false"` turns it off.
+   */
+  @property({
+    attribute: "allow-new-type",
+    converter: { fromAttribute: (value: string | null) => value !== "false" },
+  })
+  allowNewType = true;
+
   @state() private serviceTypes: ServiceType[] = [];
+  // Choice in the type list: the key of a listed type, `NEW_TYPE`, or empty
+  @state() private typeChoice = "";
   @state() private loading = false;
   @state() private error: string | null = null;
   @state() private success: string | null = null;
@@ -123,6 +154,17 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     }
   }
 
+  protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+    // a new type entered before adding types was turned off is dropped
+    if (
+      changedProperties.has("allowNewType") &&
+      !this.allowNewType &&
+      this.typeChoice === NEW_TYPE
+    ) {
+      this.selectType("");
+    }
+  }
+
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
     if (changedProperties.has("baseUrl") && this.baseUrl) {
       this._provider = new RestCloudRegistryProvider(this.baseUrl);
@@ -145,6 +187,42 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
         })
       );
     }
+  }
+
+  /**
+   * Whether the form asks for a new type: chosen in the type list, or, if no
+   * types are registered, the only choice, as long as adding types is allowed
+   */
+  private get newType(): boolean {
+    return (
+      this.allowNewType &&
+      (this.typeChoice === NEW_TYPE ||
+        (this.typeChoice === "" && this.serviceTypes.length === 0))
+    );
+  }
+
+  /** Whether the form has a complete service type to send */
+  private get typeComplete(): boolean {
+    const { group, artifact, version } = this.formData.type;
+    return (
+      (this.newType || this.typeChoice !== "") &&
+      Boolean(group && artifact && version)
+    );
+  }
+
+  private selectType(choice: string): void {
+    this.typeChoice = choice;
+    const listed = this.serviceTypes.find((type) => typeKey(type) === choice);
+    this.formData = {
+      ...this.formData,
+      type: listed
+        ? {
+            group: listed.group,
+            artifact: listed.artifact,
+            version: listed.version,
+          }
+        : { group: "org.ga4gh", artifact: "", version: "" },
+    };
   }
 
   private handleInputChange(
@@ -198,11 +276,12 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       if (!this.formData.organization.url) {
         throw new Error("Organization URL is required");
       }
-      if (!this.formData.type.artifact) {
-        throw new Error("Service type artifact is required");
-      }
-      if (!this.formData.type.version) {
-        throw new Error("Service type version is required");
+      if (!this.typeComplete) {
+        throw new Error(
+          this.newType
+            ? "Service type group, artifact and version are required"
+            : "Service type is required"
+        );
       }
       if (!this.formData.version) {
         throw new Error("Service version is required");
@@ -251,8 +330,9 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
         })
       );
 
-      // Reset form
+      // Reset form, and list a type that the service added
       this.resetForm();
+      this.loadServiceTypes();
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to create service";
@@ -271,6 +351,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   }
 
   private resetForm(): void {
+    this.typeChoice = "";
     this.formData = {
       name: "",
       url: "",
@@ -378,66 +459,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           </div>
         </div>
 
-        <!-- Service Type fields -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="grid gap-2">
-            <ecc-utils-design-label
-              for="type-group"
-              class="text-sm font-medium"
-            >
-              Type Group <span class="text-destructive">*</span>
-            </ecc-utils-design-label>
-            <ecc-utils-design-input
-              id="type-group"
-              .value=${this.formData.type.group}
-              @ecc-input-changed=${(e: CustomEvent) =>
-                this.handleNestedInputChange("type", "group", e.detail.value)}
-              placeholder="org.ga4gh"
-              required
-              class="h-10"
-            ></ecc-utils-design-input>
-          </div>
-
-          <div class="grid gap-2">
-            <ecc-utils-design-label
-              for="type-artifact"
-              class="text-sm font-medium"
-            >
-              Type Artifact <span class="text-destructive">*</span>
-            </ecc-utils-design-label>
-            <ecc-utils-design-input
-              id="type-artifact"
-              .value=${this.formData.type.artifact}
-              @ecc-input-changed=${(e: CustomEvent) =>
-                this.handleNestedInputChange(
-                  "type",
-                  "artifact",
-                  e.detail.value
-                )}
-              placeholder="beacon, wes, trs, etc."
-              required
-              class="h-10"
-            ></ecc-utils-design-input>
-          </div>
-
-          <div class="grid gap-2">
-            <ecc-utils-design-label
-              for="type-version"
-              class="text-sm font-medium"
-            >
-              Type Version <span class="text-destructive">*</span>
-            </ecc-utils-design-label>
-            <ecc-utils-design-input
-              id="type-version"
-              .value=${this.formData.type.version}
-              @ecc-input-changed=${(e: CustomEvent) =>
-                this.handleNestedInputChange("type", "version", e.detail.value)}
-              placeholder="1.0.0"
-              required
-              class="h-10"
-            ></ecc-utils-design-input>
-          </div>
-        </div>
+        ${this.renderTypeFields()}
 
         <!-- Service Version -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -515,6 +537,111 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
         </div>
 
         ${this.renderAdvancedFields()}
+      </div>
+    `;
+  }
+
+  private renderTypeFields() {
+    const noChoice = this.serviceTypes.length === 0 && !this.allowNewType;
+    return html`
+      <div class="grid gap-2">
+        <ecc-utils-design-label for="service-type" class="text-sm font-medium">
+          Service Type <span class="text-destructive">*</span>
+        </ecc-utils-design-label>
+        ${noChoice
+          ? html`<p id="service-type" class="text-sm text-muted-foreground">
+              No service types are registered yet. Ask an admin of the registry
+              to add one.
+            </p>`
+          : html`
+              <ecc-utils-design-select
+                id="service-type"
+                .value=${this.newType ? NEW_TYPE : this.typeChoice}
+                @ecc-input-changed=${(e: CustomEvent) =>
+                  this.selectType(e.detail.value)}
+              >
+                <ecc-utils-design-select-trigger class="h-10">
+                  <ecc-utils-design-select-value
+                    placeholder="Select a service type"
+                  ></ecc-utils-design-select-value>
+                </ecc-utils-design-select-trigger>
+                <ecc-utils-design-select-content>
+                  ${this.serviceTypes.map(
+                    (type) => html`
+                      <ecc-utils-design-select-item value=${typeKey(type)}
+                        >${typeLabel(type)}</ecc-utils-design-select-item
+                      >
+                    `
+                  )}
+                  ${this.allowNewType
+                    ? html`
+                        <ecc-utils-design-select-item value=${NEW_TYPE}
+                          >Add new service type</ecc-utils-design-select-item
+                        >
+                      `
+                    : ""}
+                </ecc-utils-design-select-content>
+              </ecc-utils-design-select>
+            `}
+      </div>
+
+      ${this.newType ? this.renderNewTypeFields() : ""}
+    `;
+  }
+
+  private renderNewTypeFields() {
+    return html`
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid gap-2">
+          <ecc-utils-design-label for="type-group" class="text-sm font-medium">
+            Type Group <span class="text-destructive">*</span>
+          </ecc-utils-design-label>
+          <ecc-utils-design-input
+            id="type-group"
+            .value=${this.formData.type.group}
+            @ecc-input-changed=${(e: CustomEvent) =>
+              this.handleNestedInputChange("type", "group", e.detail.value)}
+            placeholder="org.ga4gh"
+            required
+            class="h-10"
+          ></ecc-utils-design-input>
+        </div>
+
+        <div class="grid gap-2">
+          <ecc-utils-design-label
+            for="type-artifact"
+            class="text-sm font-medium"
+          >
+            Type Artifact <span class="text-destructive">*</span>
+          </ecc-utils-design-label>
+          <ecc-utils-design-input
+            id="type-artifact"
+            .value=${this.formData.type.artifact}
+            @ecc-input-changed=${(e: CustomEvent) =>
+              this.handleNestedInputChange("type", "artifact", e.detail.value)}
+            placeholder="beacon, wes, trs, etc."
+            required
+            class="h-10"
+          ></ecc-utils-design-input>
+        </div>
+
+        <div class="grid gap-2">
+          <ecc-utils-design-label
+            for="type-version"
+            class="text-sm font-medium"
+          >
+            Type Version <span class="text-destructive">*</span>
+          </ecc-utils-design-label>
+          <ecc-utils-design-input
+            id="type-version"
+            .value=${this.formData.type.version}
+            @ecc-input-changed=${(e: CustomEvent) =>
+              this.handleNestedInputChange("type", "version", e.detail.value)}
+            placeholder="1.0.0"
+            required
+            class="h-10"
+          ></ecc-utils-design-input>
+        </div>
       </div>
     `;
   }
@@ -685,8 +812,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                 !this.formData.url ||
                 !this.formData.organization.name ||
                 !this.formData.organization.url ||
-                !this.formData.type.artifact ||
-                !this.formData.type.version ||
+                !this.typeComplete ||
                 !this.formData.version}
               >
                 ${this.loading ? "Creating..." : "Create Service"}
