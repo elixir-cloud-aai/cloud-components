@@ -6,7 +6,8 @@ follows the [contributor guide of ELIXIR
 On-Cloud](https://elixir-cloud-aai.github.io/contribute/); this file only
 describes what is specific to this repository.
 
-- Follow our [code of conduct](CODE_OF_CONDUCT.md).
+- Follow our [code of
+  conduct](https://github.com/elixir-cloud-aai/.github/blob/main/CODE_OF_CONDUCT.md).
 - Work on [issues](https://github.com/elixir-cloud-aai/cloud-components/issues):
   open or find one and agree on the approach before you change code.
 
@@ -14,7 +15,7 @@ describes what is specific to this repository.
 
 1. Branch off `dev`, the default branch (e.g. `feat/<topic>` or
    `fix/<topic>`), and open a pull request against `dev` that references the
-   issue it closes (e.g. `Fixes #123`, as in the pull request template).
+   issue it closes (e.g. `Closes #123`, as in the pull request template).
    `main` points at the latest release; nobody pushes to it except to
    fast-forward it after a release.
 2. Title the pull request as a [Conventional
@@ -75,11 +76,18 @@ To release `<version>` (e.g. `2.0.0-alpha.49`), maintainers:
    maintainer approves each one, with two-factor authentication, on the
    package's page on npmjs.com or with `npm stage list <package>` and
    `npm stage approve <stage-id>`. The dist-tag is `latest` for releases
-   and for prereleases of a major version without a release yet (the
-   `2.0.0-alpha.N` series, until 2.0.0 is out; there is no tag
-   `v2.<minor>.<patch>` yet). Once a major version is released, its
-   prereleases get their identifier as dist-tag (`rc` for `2.1.0-rc.1`).
-   The dist-tag of a staged version can't be changed.
+   and `next` for prereleases (e.g. `2.1.0-rc.1` or `3.0.0-alpha.1`), so
+   that `latest` holds the newest release and `next` the prerelease
+   published last. Until 2.0.0 (or a later release) is tagged, i.e. there
+   is a tag `v2.<minor>.<patch>` or later, prereleases of 2.x (the
+   `2.0.0-alpha.N` series) get `latest` instead; any such tag ends this,
+   even if its release failed. A release of an older major (a backport)
+   also gets `latest`, which then moves back to that older version.
+   `node scripts/release.js dist-tag <version>` prints the dist-tag. The
+   dist-tag of a staged version can't be changed, and approving it moves
+   the dist-tag to it: approve or reject all staged versions before you
+   tag the next version, so that an older version can't take `latest` or
+   `next` back.
 5. **Fast-forward `main`** to the tag:
    `git push origin v<version>^{commit}:refs/heads/main` (only fast-forwards;
    the ruleset of `main` lets only admins update it).
@@ -91,3 +99,25 @@ don't approve any staged version yet: re-run the failed jobs of the run.
 Packages already on npm are skipped, and versions staged by the earlier
 attempt count as staged. If a package can't be staged at all, reject the
 staged versions (`npm stage reject <stage-id>`) and release a new version.
+
+### Documentation versions
+
+The documentation is built on [Read the
+Docs](https://cloud-components.readthedocs.io/) (configuration:
+`.readthedocs.yaml`); its page "Versions"
+(`apps/documentation/pages/docs/versions.mdx`) explains the versions to
+users. `latest` is built from `dev`. Two
+automation rules of the Read the Docs project activate each new tag `v*`
+and set it as the default version, so that the newest prerelease is the
+default until 2.0.0 is out. `stable` (the newest tag without a prerelease
+suffix, built by Read the Docs) stays inactive until then.
+
+When 2.0.0 is released, a maintainer of the Read the Docs project:
+
+1. deletes the automation rule that sets new tags `v*` as the default
+   version (the rule that activates them stays);
+2. activates `stable` and sets it as the default version (Settings →
+   "Default version");
+3. enables the notification on non-stable versions (Settings → Addons →
+   Notifications), so that pages of `latest` and of older versions point
+   readers to `stable`.

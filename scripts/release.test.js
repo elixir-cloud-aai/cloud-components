@@ -73,24 +73,38 @@ test("parseVersion accepts versions and rejects other strings", () => {
   );
 });
 
-test("distTag uses the prerelease identifier once the major is released", () => {
-  const tags = ["v1.0.0", "v1.0.1", "v2.0.0-alpha.48", "not-a-version", "v3"];
+test("distTag uses latest for releases", () => {
+  const tags = ["v1.0.0", "v1.0.1", "v2.0.0-alpha.48"];
   assert.strictEqual(distTag("2.0.0", tags), "latest");
-  assert.strictEqual(distTag("1.1.0-rc.1", tags), "rc");
-  assert.strictEqual(distTag("1.1.0-1", tags), "next");
-  assert.strictEqual(distTag("1.1.0-latest.1", tags), "next");
+  assert.strictEqual(distTag("2.1.0", [...tags, "v2.0.0"]), "latest");
+  assert.strictEqual(distTag("3.0.0", [...tags, "v2.0.0"]), "latest");
 });
 
-test("distTag uses latest for prereleases of an unreleased major", () => {
-  const tags = ["v1.0.1", "v2.0.0-alpha.48"];
+test("distTag uses latest for prereleases of 2.x until 2.0.0", () => {
+  const tags = ["v1.0.1", "v2.0.0-alpha.48", "v2.0.0-rc.1", "v2.0.0+build"];
   assert.strictEqual(distTag("2.0.0-alpha.49", tags), "latest");
+  assert.strictEqual(distTag("2.0.0-rc.2", tags), "latest");
+  // Only prereleases of 2.x went to `latest`
+  assert.strictEqual(distTag("1.1.0-rc.1", tags), "next");
+  assert.strictEqual(distTag("3.0.0-alpha.1", tags), "next");
+});
+
+test("distTag uses next for prereleases from 2.0.0 on", () => {
+  const tags = ["v1.0.1", "v2.0.0-alpha.49", "v2.0.0"];
+  assert.strictEqual(distTag("2.1.0-rc.1", tags), "next");
+  assert.strictEqual(distTag("2.0.1-1", tags), "next");
+  assert.strictEqual(distTag("3.0.0-alpha.1", tags), "next");
+  assert.strictEqual(distTag("1.1.0-rc.1", tags), "next");
+  // A release of a later major ends the exception, too
+  assert.strictEqual(distTag("2.0.0-alpha.50", ["v1.0.1", "v3.0.0"]), "next");
+});
+
+test("distTag fails without release tags", () => {
   assert.throws(() => distTag("2.0.0-alpha.49", []), /No release tags/);
   assert.throws(
     () => distTag("2.0.0-alpha.49", ["v2.0.0-alpha.48", "v2.0.0+build"]),
     /No release tags/
   );
-  assert.strictEqual(distTag("2.1.0-rc.1", [...tags, "v2.0.0"]), "rc");
-  assert.strictEqual(distTag("3.0.0-alpha.1", [...tags, "v2.0.0"]), "latest");
 });
 
 test("releasedPackages lists public packages, sorted by directory", (t) => {

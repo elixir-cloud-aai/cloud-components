@@ -14,10 +14,9 @@
 //   node scripts/release.js dist-tag <version>
 //                                            print the npm dist-tag for
 //                                            <version>: `latest` for
-//                                            releases and for prereleases of
-//                                            a major without a release tag
-//                                            yet, else the prerelease
-//                                            identifier (needs the git tags)
+//                                            releases and for the 2.x
+//                                            prereleases until 2.0.0, else
+//                                            `next` (needs the git tags)
 //   node scripts/release.js pin <version>    set the `@elixir-cloud/*`
 //                                            dependencies and peer
 //                                            dependencies of the released
@@ -83,12 +82,17 @@ const versionMismatches = (version, base = root) => {
     );
 };
 
+// Prereleases of this major version are published as `latest` until its
+// first release (the 2.0.0 alphas, published as `latest` before
+// prereleases got `next`)
+const latestPrereleaseMajor = 2;
+
 // The dist-tag for `version`, given the repository's tags (e.g. `v1.0.1`):
-// `latest` for releases, and also for prereleases of a major version
-// without a release yet (the 2.0.0 alphas, until 2.0.0 is out). Other
-// prereleases get their first identifier (`rc` for `2.1.0-rc.1`), or
-// `next` if it is a number. Fails without any release tag (e.g. in a clone
-// without tags), which would otherwise send every prerelease to `latest`
+// `latest` for releases, `next` for prereleases, so that `latest` holds the
+// newest release. Exception: prereleases of `latestPrereleaseMajor` get
+// `latest` while there is no release of it or a later major. Fails without
+// any release tag (e.g. in a clone without tags), which would otherwise
+// send 2.x prereleases to `latest`
 const distTag = (version, tags) => {
   const { major, prerelease } = parseVersion(version);
   const releases = tags
@@ -99,16 +103,13 @@ const distTag = (version, tags) => {
   if (releases.length === 0) {
     throw new Error("No release tags (e.g. v1.0.1) found: fetch the tags");
   }
-  if (
-    prerelease.length === 0 ||
-    !releases.some((parsed) => parsed.major === major)
-  ) {
+  if (prerelease.length === 0) {
     return "latest";
   }
-  return /^[a-zA-Z][0-9a-zA-Z-]*$/.test(prerelease[0]) &&
-    prerelease[0] !== "latest"
-    ? prerelease[0]
-    : "next";
+  const exceptionEnded = releases.some(
+    (parsed) => parsed.major >= latestPrereleaseMajor
+  );
+  return major === latestPrereleaseMajor && !exceptionEnded ? "latest" : "next";
 };
 
 // Pins the dependencies on released packages; returns the changes made

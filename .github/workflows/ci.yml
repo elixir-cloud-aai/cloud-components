@@ -120,22 +120,17 @@ jobs:
 
   # The only required check of this workflow: passes if every other job
   # passed, fails on any other result (failure, cancelled, skipped). Add
-  # every new job to `needs`
+  # every new job to `needs`. Uses the shared gate action of
+  # elixir-cloud-aai/.github, pinned to a commit on `main`
   passed:
     name: CI passed
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: always()
     needs: [conflicts, lint, test]
+    permissions: {}
     steps:
       - name: Check results of all jobs
-        env:
-          NEEDS: ${{ toJSON(needs) }}
-        run: |
-          failed="$(jq -r 'to_entries[]
-            | select(.value.result != "success")
-            | "\(.key): \(.value.result)"' <<< "${NEEDS}")"
-          if [[ -n "${failed}" ]]; then
-            echo "::error::Jobs did not pass: ${failed//$'\n'/, }"
-            exit 1
-          fi
+        uses: elixir-cloud-aai/.github/actions/gate@397a1c8a82d72af2a3a5908c546a9ad1101de32d # gate
+        with:
+          needs: ${{ toJSON(needs) }}
