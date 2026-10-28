@@ -1,0 +1,45 @@
+import { Callout } from 'nextra/components';
+
+# Versions
+
+This documentation is hosted on [Read the Docs](https://cloud-components.readthedocs.io/), in several
+versions. Pick one in the version menu of Read the Docs (the flyout in the corner of the page).
+
+<Callout type='info'>
+  <div className='text-sm'>
+    Read the documentation version that matches the version of the packages you use.
+  </div>
+</Callout>
+
+## Documentation versions
+
+- **`stable`** (from 2.0.0 on): the newest release. Read this version if you install the packages
+  without a version (`npm install @elixir-cloud/(service-name)`), which installs the npm dist-tag
+  `latest`. Once 2.0.0 is out, `stable` is the default version.
+- **`latest`**: the `dev` branch, the work done since the newest release. It may or may not be part
+  of a future release. Read it if you contribute to the components or try unreleased changes.
+- **Tagged versions** (e.g. `v2.0.0-alpha.49`): one version per release, including prereleases, as
+  of its tag `v<version>`. Read the one that matches the version in your `package.json`. Until 2.0.0
+  is out, the newest tag is the default version.
+
+## npm and branches
+
+```text
+Documentation     Branch or tag     npm dist-tag
+stable            main              latest
+latest            dev               (none)
+v<version>        tag v<version>    the dist-tag of that release
+```
+
+- All public `@elixir-cloud/*` packages share one version and are released together, from tags on
+  `dev`. After a release, `main` is moved to the release; `stable` is built from the newest release
+  tag.
+- The npm dist-tag `latest` holds the newest release: `npm install @elixir-cloud/(service-name)`
+  installs it.
+- Until 2.0.0 is out, the 2.0.0 prereleases (`2.0.0-alpha.N`) are published with the dist-tag
+  `latest`, as there is no 2.x release yet. From 2.0.0 on, prereleases get the dist-tag `next`
+  (`npm install @elixir-cloud/(service-name)@next`), so `latest` stays on the newest release.
+
+Maintainers: see "Releases" in
+[CONTRIBUTING.md](https://github.com/elixir-cloud-aai/cloud-components/blob/dev/CONTRIBUTING.md#releases)
+for the Read the Docs settings that change with the 2.0.0 release.
