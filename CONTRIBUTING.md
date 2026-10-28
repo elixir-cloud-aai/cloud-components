@@ -84,7 +84,10 @@ To release `<version>` (e.g. `2.0.0-alpha.49`), maintainers:
    even if its release failed. A release of an older major (a backport)
    also gets `latest`, which then moves back to that older version.
    `node scripts/release.js dist-tag <version>` prints the dist-tag. The
-   dist-tag of a staged version can't be changed.
+   dist-tag of a staged version can't be changed, and approving it moves
+   the dist-tag to it: approve or reject all staged versions before you
+   tag the next version, so that an older version can't take `latest` or
+   `next` back.
 5. **Fast-forward `main`** to the tag:
    `git push origin v<version>^{commit}:refs/heads/main` (only fast-forwards;
    the ruleset of `main` lets only admins update it).
