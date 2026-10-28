@@ -26,6 +26,7 @@ import "@elixir-cloud/design/components/collapsible/index.js";
  * @fires ecc-service-created - Fired when a service is successfully created (includes serviceId, serviceData, and success message)
  * @fires ecc-service-create-failed - Fired when service creation fails
  * @fires ecc-service-create-validation-failed - Fired when there are validation errors during service creation
+ * @fires ecc-service-form-changed - Fired when the form's values change (includes dirty: whether they differ from the empty form; false again after Reset or a successful create)
  */
 export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   static styles = [
@@ -95,6 +96,19 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
   private _provider: CloudRegistryProvider | null = null;
 
+  // Values of the empty form, and the values when the form last changed,
+  // to tell whether it has unsaved input (cf. `dirty`)
+  private readonly emptyValues = JSON.stringify(this.formData);
+  private lastValues = this.emptyValues;
+
+  /**
+   * Whether the form has unsaved input: values that differ from the empty
+   * form. False again after Reset or a successful create.
+   */
+  get dirty(): boolean {
+    return this.lastValues !== this.emptyValues;
+  }
+
   protected async firstUpdated(): Promise<void> {
     if (!this.baseUrl && !this.provider) {
       this.dispatchEvent(
@@ -124,10 +138,25 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   }
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
+    if (changedProperties.has("formData")) this.notifyChange();
     if (changedProperties.has("baseUrl") && this.baseUrl) {
       this._provider = new RestCloudRegistryProvider(this.baseUrl);
       this.loadServiceTypes();
     }
+  }
+
+  /** Fire `ecc-service-form-changed` if the values have changed */
+  private notifyChange(): void {
+    const values = JSON.stringify(this.formData);
+    if (values === this.lastValues) return;
+    this.lastValues = values;
+    this.dispatchEvent(
+      new CustomEvent("ecc-service-form-changed", {
+        detail: { dirty: this.dirty },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
   private async loadServiceTypes(): Promise<void> {
