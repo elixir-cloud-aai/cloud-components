@@ -123,6 +123,7 @@ This example demonstrates the basic service creation form with default settings.
 | Property   | Type                    | Default | Description                                                                    |
 |------------|-------------------------|---------|--------------------------------------------------------------------------------|
 | `provider` | `CloudRegistryProvider` | `null`  | Data provider for service creation operations (see [Providers](/docs/cloud-registry/providers)) |
+| `admin`    | `boolean`               | `true`  | Whether to offer the fields that only admins may set (custom service ID, timestamps) |
 
 ### `provider`
 The data provider responsible for creating services in the registry. You must provide a provider that implements the `CloudRegistryProvider` interface, which extends the base `ServiceRegistryProvider` with creation capabilities. See the [Providers documentation](/docs/cloud-registry/providers) for detailed information about available providers and how to create custom ones.
@@ -150,6 +151,22 @@ The data provider responsible for creating services in the registry. You must pr
       document.querySelector('ecc-client-elixir-cloud-registry-service-create').provider = provider;
     </script>
     <ecc-client-elixir-cloud-registry-service-create></ecc-client-elixir-cloud-registry-service-create>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `admin`
+Whether the form offers the fields that only admins of the registry may set: a custom service ID and the timestamps (`createdAt`, `updatedAt`). Cloud Registry sets the timestamps itself, and only admins may register a service with an ID of their choice. Set `admin` to `false` for all other users: the form then hides these fields, and with them the "Advanced Configuration" section, and never sends them. Apps can take the value from `admin` of the registry's `GET /me`.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientElixirCloudRegistryServiceCreate provider={provider} admin={me.admin} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-client-elixir-cloud-registry-service-create admin="false"></ecc-client-elixir-cloud-registry-service-create>
     ```
   </Tabs.Tab>
 </Tabs>
