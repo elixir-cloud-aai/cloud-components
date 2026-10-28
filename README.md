@@ -94,14 +94,12 @@ you are interested in contributing.
 
 ## Code of Conduct
 
-Please mind the code of conduct described in
-[`CODE_OF_CONDUCT.md`][code-of-conduct] for all interactions with the community.
-Please be nice to one another! :)
+Please mind the [code of conduct][code-of-conduct] of ELIXIR Cloud & AAI for
+all interactions with the community. Please be nice to one another! :)
 
 If you experience any unacceptable behavior by any member of the community,
-please refer to the contact method specified in
-[`CODE_OF_CONDUCT.md`][code-of-conduct] to report the incident to the community
-leaders.
+please report the incident to the community moderators as described in the
+[code of conduct][code-of-conduct].
 
 ## Versioning
 
@@ -139,7 +137,7 @@ To get in touch with use, please use one of the following routes:
 [badge-chat-image]: https://img.shields.io/static/v1?label=chat&message=Slack&color=ff6994
 [badge-chat-url]: https://join.slack.com/t/elixir-cloud/shared_invite/enQtNzA3NTQ5Mzg2NjQ3LTZjZGI1OGQ5ZTRiOTRkY2ExMGUxNmQyODAxMDdjM2EyZDQ1YWM0ZGFjOTJhNzg5NjE0YmJiZTZhZDVhOWE4MWM
 [email]: mailto:alexander.kanitz@alumni.ethz.ch
-[code-of-conduct]: CODE_OF_CONDUCT.md
+[code-of-conduct]: https://github.com/elixir-cloud-aai/.github/blob/main/CODE_OF_CONDUCT.md
 [contributing]: CONTRIBUTING.md
 [contributors]: CONTRIBUTORS.md
 [elixir]: https://elixir-europe.org/

@@ -6,7 +6,8 @@ follows the [contributor guide of ELIXIR
 On-Cloud](https://elixir-cloud-aai.github.io/contribute/); this file only
 describes what is specific to this repository.
 
-- Follow our [code of conduct](CODE_OF_CONDUCT.md).
+- Follow our [code of
+  conduct](https://github.com/elixir-cloud-aai/.github/blob/main/CODE_OF_CONDUCT.md).
 - Work on [issues](https://github.com/elixir-cloud-aai/cloud-components/issues):
   open or find one and agree on the approach before you change code.
 
@@ -14,7 +15,7 @@ describes what is specific to this repository.
 
 1. Branch off `dev`, the default branch (e.g. `feat/<topic>` or
    `fix/<topic>`), and open a pull request against `dev` that references the
-   issue it closes (e.g. `Fixes #123`, as in the pull request template).
+   issue it closes (e.g. `Closes #123`, as in the pull request template).
    `main` points at the latest release; nobody pushes to it except to
    fast-forward it after a release.
 2. Title the pull request as a [Conventional
