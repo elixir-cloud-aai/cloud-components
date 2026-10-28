@@ -14,7 +14,7 @@ versions. Pick one in the version menu of Read the Docs (the flyout in the corne
 ## Documentation versions
 
 - **`stable`** (from 2.0.0 on): the newest release. Read this version if you install the packages
-  without a version (`npm install @elixir-cloud/(service-name)`), which installs the npm dist-tag
+  without a version (e.g. `npm install @elixir-cloud/design`), which installs the npm dist-tag
   `latest`. Once 2.0.0 is out, `stable` is the default version.
 - **`latest`**: the `dev` branch, the work done since the newest release. It may or may not be part
   of a future release. Read it if you contribute to the components or try unreleased changes.
@@ -34,11 +34,11 @@ v<version>        tag v<version>    the dist-tag of that release
 - All public `@elixir-cloud/*` packages share one version and are released together, from tags on
   `dev`. After a release, `main` is moved to the release; `stable` is built from the newest release
   tag.
-- The npm dist-tag `latest` holds the newest release: `npm install @elixir-cloud/(service-name)`
+- The npm dist-tag `latest` holds the newest release: `npm install @elixir-cloud/design`
   installs it.
 - Until 2.0.0 is out, the 2.0.0 prereleases (`2.0.0-alpha.N`) are published with the dist-tag
   `latest`, as there is no 2.x release yet. From 2.0.0 on, prereleases get the dist-tag `next`
-  (`npm install @elixir-cloud/(service-name)@next`), so `latest` stays on the newest release.
+  (`npm install @elixir-cloud/design@next`), so `latest` stays on the newest release.
 
 Maintainers: see "Releases" in
 [CONTRIBUTING.md](https://github.com/elixir-cloud-aai/cloud-components/blob/dev/CONTRIBUTING.md#releases)
