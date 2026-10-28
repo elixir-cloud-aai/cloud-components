@@ -9,12 +9,41 @@ import {
   ServiceType,
   ServiceTypeRegister,
 } from "../../providers/index.js";
+import type { EccServiceCreateFailedEvent } from "../../events/index.js";
 import "@elixir-cloud/design/components/button/index.js";
 import "@elixir-cloud/design/components/input/index.js";
 import "@elixir-cloud/design/components/select/index.js";
 import "@elixir-cloud/design/components/label/index.js";
 import "@elixir-cloud/design/components/textarea/index.js";
 import "@elixir-cloud/design/components/collapsible/index.js";
+
+const stringOrUndefined = (value: unknown): string | undefined =>
+  typeof value === "string" ? value : undefined;
+
+/**
+ * Detail of `ecc-service-create-failed` for an error that a provider threw:
+ * its message, and the status and problem details if it has them (as
+ * `CloudRegistryError` has, or errors of custom providers with the same
+ * fields).
+ * @param err The error
+ * @param fallback Message if the error has none
+ * @returns The event's detail
+ */
+const failureDetail = (
+  err: unknown,
+  fallback: string
+): EccServiceCreateFailedEvent["detail"] => {
+  const fields =
+    err && typeof err === "object" ? (err as Record<string, unknown>) : {};
+  return {
+    error: (err instanceof Error && err.message) || fallback,
+    status: typeof fields.status === "number" ? fields.status : undefined,
+    title: stringOrUndefined(fields.title),
+    detail: stringOrUndefined(fields.detail),
+    serviceId: stringOrUndefined(fields.serviceId),
+    cause: err,
+  };
+};
 
 /**
  * @summary Component for creating new services in Cloud Registry
@@ -24,7 +53,7 @@ import "@elixir-cloud/design/components/collapsible/index.js";
  * @property {CloudRegistryProvider} provider - Custom data provider (optional, overrides baseUrl)
  *
  * @fires ecc-service-created - Fired when a service is successfully created (includes serviceId, serviceData, and success message)
- * @fires ecc-service-create-failed - Fired when service creation fails
+ * @fires ecc-service-create-failed - Fired when service creation or loading the service types fails (includes the error message and, if the registry sent them, the status and problem details)
  * @fires ecc-service-create-validation-failed - Fired when there are validation errors during service creation
  */
 export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
@@ -139,7 +168,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       console.error("Failed to load service types:", error);
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-failed", {
-          detail: { error: "Failed to load service types" },
+          detail: failureDetail(error, "Failed to load service types"),
           bubbles: true,
           composed: true,
         })
@@ -254,13 +283,10 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       // Reset form
       this.resetForm();
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to create service";
-
       // Emit error event
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-failed", {
-          detail: { error: errorMessage },
+          detail: failureDetail(err, "Failed to create service"),
           bubbles: true,
           composed: true,
         })

@@ -1,6 +1,9 @@
-export { CloudRegistryProvider } from "./cr-provider.js";
+export type { CloudRegistryProvider } from "./cr-provider.js";
 
 export { RestCloudRegistryProvider } from "./rest-cr-provider.js";
+
+export { CloudRegistryError } from "./errors.js";
+export type { ProblemDetails } from "./errors.js";
 
 export type {
   Service,
