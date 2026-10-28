@@ -1,0 +1,179 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import CookieConsent from '@elixir-cloud/design/react/cookie-consent';
+import ComplianceFooter from '@elixir-cloud/design/react/compliance-footer';
+
+# EccUtilsDesignCookieConsent Component
+
+<ComponentName
+  tagName='ecc-utils-design-cookie-consent'
+  reactTagName='EccUtilsDesignCookieConsent'
+  version='2.0.0-alpha.50'
+/>
+
+## Overview
+
+The `ecc-utils-design-cookie-consent` component asks users for their consent to cookies (and similar storage, such as `localStorage`), per category, and lets them change their choice at any time. It works together with the [compliance footer](/docs/design/components/compliance-footer), which links to the preferences, and both read the same configuration, so an app adds them from configuration alone.
+
+- **Banner** on the first visit, with "Accept all", "Necessary only" (as prominent as accepting) and "Customize".
+- **Preferences** dialog with one switch per category; strictly necessary categories are always on.
+- **Stored** in the browser (`localStorage`, key `ecc-cookie-consent`), and asked again when the configured categories or the `version` change.
+- **Checks** for other code: `hasConsent('analytics')`, `onConsentChange(...)` and the `ecc-cookie-consent-changed` event on `window`.
+
+<Callout type='warning'>
+  The component provides the mechanics only. Operators decide which categories their deployment needs and are responsible for the texts, the policies they link to, and for loading optional scripts only with consent (see [Loading scripts with consent](#loading-scripts-with-consent)).
+</Callout>
+
+Without optional categories, nothing needs consent and the banner isn't shown (unless `notice` is set); the preferences still list the necessary category, e.g. for the footer's "Cookie Preferences" item.
+
+## Preview
+
+This page shows the banner until you choose (stored only for this demo); the footer's "Cookie Preferences" opens the preferences again.
+
+<div className="mt-4 rounded-md border p-4">
+  <ComplianceFooter config={{}} />
+  <CookieConsent
+    config={{
+      cookies: {
+        storageKey: 'ecc-docs-cookie-consent-demo',
+        categories: [
+          { id: 'necessary', label: 'Necessary', required: true, description: 'Remembers these choices.' },
+          { id: 'analytics', label: 'Analytics', description: 'Not used on this page; for the demo only.' },
+        ],
+      },
+    }}
+  />
+</div>
+
+## Usage
+
+Add the component once per page, e.g. in the app's layout, next to the compliance footer:
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="layout.tsx"
+    import EccUtilsDesignCookieConsent from '@elixir-cloud/design/react/cookie-consent';
+    import EccUtilsDesignComplianceFooter from '@elixir-cloud/design/react/compliance-footer';
+    import type { ComplianceConfig } from '@elixir-cloud/design/components/cookie-consent/index.js';
+
+    // e.g. from the deployment's runtime settings
+    const compliance: ComplianceConfig = {
+      cookies: {
+        version: '2026-10',
+        policyUrl: '/cookies',
+        categories: [
+          { id: 'necessary', label: 'Necessary', required: true,
+            description: 'Login and these choices.' },
+          { id: 'analytics', label: 'Analytics',
+            description: 'Anonymous usage statistics.' },
+        ],
+      },
+      footer: {
+        items: [
+          { id: 'privacy-policy', action: { type: 'link', href: '/privacy' } },
+          { id: 'contact', action: { type: 'mailto', email: 'support@example.org' } },
+        ],
+      },
+    };
+
+    export default function Layout({ children }) {
+      return (
+        <>
+          {children}
+          <footer>
+            <EccUtilsDesignComplianceFooter config={compliance} />
+          </footer>
+          <EccUtilsDesignCookieConsent
+            config={compliance}
+            onEccCookieConsentChanged={(event) =>
+              console.log(event.detail.consent.categories)
+            }
+          />
+        </>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="index.html"
+    <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.50/components/cookie-consent"></script>
+    <ecc-utils-design-cookie-consent></ecc-utils-design-cookie-consent>
+    <script type="module">
+      document.querySelector('ecc-utils-design-cookie-consent').config = {
+        cookies: {
+          categories: [{ id: 'analytics', label: 'Analytics' }],
+        },
+      };
+    </script>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property | Type               | Default | Description                                                                 |
+|----------|--------------------|---------|-----------------------------------------------------------------------------|
+| `config` | `ComplianceConfig` | `{}`    | Shared compliance configuration; this component uses `config.cookies`.      |
+
+## Methods
+
+| Method              | Description                                                        |
+|---------------------|--------------------------------------------------------------------|
+| `openPreferences()` | Opens the preferences. `openCookiePreferences()` does the same from anywhere on the page. |
+
+## Events
+
+| Event Name                   | React Event Name            | Detail Type                  | Description                                  |
+|------------------------------|-----------------------------|------------------------------|----------------------------------------------|
+| `ecc-cookie-consent-changed` | `onEccCookieConsentChanged` | `{ consent: CookieConsent }` | Fired when the user saved their choices. It doesn't bubble; `saveConsent()` fires the same event on `window`. |
+
+## Configuration (`config.cookies`)
+
+| Field        | Type                          | Description                                                                 |
+|--------------|-------------------------------|-----------------------------------------------------------------------------|
+| `categories` | `CookieCategory[]`            | `{ id, label, description?, required? }`. A required "necessary" category is added if none is required. |
+| `version`    | `string`                      | Version of the cookie policy; changing it asks users again.                 |
+| `policyUrl`  | `string`                      | Link to the cookie policy (`http(s)` or relative), shown in the banner and the preferences. |
+| `notice`     | `boolean`                     | Show the banner although there are no optional categories.                 |
+| `storageKey` | `string`                      | `localStorage` key, default `ecc-cookie-consent`.                           |
+| `texts`      | `Partial<CookieConsentTexts>` | Texts of the banner and the preferences, e.g. for translations: `bannerTitle`, `bannerText`, `policyLink`, `acceptAll`, `rejectAll`, `customize`, `preferencesTitle`, `preferencesText`, `save`, `close`, `alwaysOn`, `embedConsent`. |
+
+Changing a category's `id`, adding or removing a category, or changing `version` asks users again; changing texts or descriptions doesn't.
+
+## Loading scripts with consent
+
+The functions below come from `@elixir-cloud/design/components/cookie-consent/index.js` (also exported by the package's main entry). Pass the same `cookies` configuration that the component uses.
+
+```ts copy
+import {
+  hasConsent,
+  onConsentChange,
+  openCookiePreferences,
+} from '@elixir-cloud/design/components/cookie-consent/index.js';
+
+const loadAnalytics = () => { /* add the analytics script */ };
+
+if (hasConsent('analytics', compliance.cookies)) loadAnalytics();
+onConsentChange((consent) => {
+  if (consent.categories.analytics) loadAnalytics();
+  // revoking consent: stop tracking and remove its cookies, or reload
+});
+
+// e.g. from a link of your own
+openCookiePreferences();
+```
+
+| Function                               | Description                                                     |
+|----------------------------------------|-----------------------------------------------------------------|
+| `hasConsent(category, config?)`        | Whether users consented to a category (required ones: always).  |
+| `readConsent(config?)`                 | The stored `CookieConsent`, or `null` if users must be asked.   |
+| `saveConsent(config, choices)`         | Stores choices and fires `ecc-cookie-consent-changed` on `window`. |
+| `onConsentChange(listener)`            | Calls `listener` on every change; returns a function to stop.   |
+| `openCookiePreferences()`              | Asks the page's component to open the preferences.              |
+
+## Notes for operators
+
+- List every category that your deployment uses, with a description users understand. Keep "Necessary" for what the site can't work without (e.g. login cookies); these need no consent under the GDPR and ePrivacy rules, but should be explained in the cookie policy.
+- Bump `version` when the cookie policy changes in a way users should see.
+- Provide the cookie policy (`policyUrl`, or a footer item) and load optional scripts only after `hasConsent()`.
+- Consent is stored per browser and origin; it isn't sent to a server.
