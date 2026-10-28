@@ -21,7 +21,7 @@ import "@elixir-cloud/design/components/collapsible/index.js";
  * @since 2.0.0
  *
  * @property {string} baseUrl - Base URL of the Cloud Registry instance/gateway
- * @property {CloudRegistryProvider} provider - Custom data provider (optional, overrides baseUrl)
+ * @property {CloudRegistryProvider} provider - Custom data provider (optional, overrides baseUrl); replacing it makes later requests use the new one
  *
  * @fires ecc-service-created - Fired when a service is successfully created (includes serviceId, serviceData, and success message)
  * @fires ecc-service-create-failed - Fired when service creation fails
@@ -95,7 +95,10 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
   private _provider: CloudRegistryProvider | null = null;
 
-  protected async firstUpdated(): Promise<void> {
+  /** The provider for `baseUrl`, used if `provider` isn't set. */
+  private restProvider: RestCloudRegistryProvider | null = null;
+
+  protected firstUpdated(): void {
     if (!this.baseUrl && !this.provider) {
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-validation-failed", {
@@ -107,35 +110,44 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           composed: true,
         })
       );
-      return;
-    }
-
-    if (this.provider) {
-      this._provider = this.provider;
-    } else if (this.baseUrl) {
-      this._provider = new RestCloudRegistryProvider(this.baseUrl);
-    } else {
-      this._provider = null;
-    }
-
-    if (this._provider) {
-      await this.loadServiceTypes();
     }
   }
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
-    if (changedProperties.has("baseUrl") && this.baseUrl) {
-      this._provider = new RestCloudRegistryProvider(this.baseUrl);
-      this.loadServiceTypes();
+    if (changedProperties.has("provider") || changedProperties.has("baseUrl")) {
+      this.useProvider();
     }
   }
 
+  /**
+   * Uses `provider` or, without one, a REST provider for `baseUrl`, and
+   * loads its service types. Apps may replace either property at any time,
+   * e.g. once the user's token is known or has changed.
+   */
+  private useProvider(): void {
+    if (this.baseUrl && this.restProvider?.baseUrl !== this.baseUrl) {
+      this.restProvider = new RestCloudRegistryProvider(this.baseUrl);
+    } else if (!this.baseUrl) {
+      this.restProvider = null;
+    }
+    const provider = this.provider ?? this.restProvider;
+    if (provider === this._provider) return;
+
+    // the types shown stay until those of the new provider are loaded
+    this._provider = provider;
+    if (provider) this.loadServiceTypes();
+  }
+
   private async loadServiceTypes(): Promise<void> {
-    if (!this._provider) return;
+    const provider = this._provider;
+    if (!provider) return;
 
     try {
-      this.serviceTypes = await this._provider.getServiceTypes();
+      const serviceTypes = await provider.getServiceTypes();
+      // the types of a provider that was replaced meanwhile are dropped
+      if (provider === this._provider) this.serviceTypes = serviceTypes;
     } catch (error) {
+      if (provider !== this._provider) return;
       console.error("Failed to load service types:", error);
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-failed", {

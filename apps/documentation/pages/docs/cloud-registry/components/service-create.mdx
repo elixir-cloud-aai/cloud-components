@@ -131,6 +131,8 @@ The data provider responsible for creating services in the registry. You must pr
   The provider must support service creation operations. If no provider is provided, the component will emit a validation error.
 </Callout>
 
+You can replace the provider at any time, e.g. when the user's token changes: the component then loads the service types from the new provider and sends all later requests through it. It keeps the form's input.
+
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>
     ```tsx copy
