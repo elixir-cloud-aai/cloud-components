@@ -1,3 +1,5 @@
+// a type export: browsers loading the unbundled modules (e.g. in tests)
+// find no value export of an interface
 export type { CloudRegistryProvider } from "./cr-provider.js";
 
 export { RestCloudRegistryProvider } from "./rest-cr-provider.js";

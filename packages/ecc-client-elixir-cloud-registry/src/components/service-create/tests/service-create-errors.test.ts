@@ -88,11 +88,15 @@ describe("ecc-client-elixir-cloud-registry-service-create errors", () => {
 
     const failed = oneEvent(el, "ecc-service-create-failed");
     document.body.appendChild(el);
-    const { detail } = (await failed) as EccServiceCreateFailedEvent;
-    el.remove();
+    try {
+      const { detail } = (await failed) as EccServiceCreateFailedEvent;
 
-    expect(detail.error).to.equal("Log in.");
-    expect(detail.status).to.equal(401);
+      expect(detail.error).to.equal("Failed to load service types: Log in.");
+      expect(detail.status).to.equal(401);
+      expect(detail.detail).to.equal("Log in.");
+    } finally {
+      el.remove();
+    }
   });
 
   it("reports errors of custom providers by their fields", async () => {
@@ -119,5 +123,45 @@ describe("ecc-client-elixir-cloud-registry-service-create errors", () => {
     expect(detail.title).to.equal(undefined);
     expect(detail.serviceId).to.equal(undefined);
     expect(detail.cause).to.equal(err);
+  });
+
+  /** The detail of the failed event for a provider that rejects with `err`. */
+  const detailFor = async (
+    err: unknown
+  ): Promise<EccServiceCreateFailedEvent["detail"]> => {
+    const provider = new RestCloudRegistryProvider(BASE_URL);
+    sinon.stub(provider, "getServiceTypes").resolves([]);
+    sinon.stub(provider, "createService").callsFake(() => Promise.reject(err)); // as thrown, not wrapped
+    const el = await fixture<ECCClientElixirCloudRegistryServiceCreate>(
+      html`<ecc-client-elixir-cloud-registry-service-create
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-create>`
+    );
+    fillForm(el);
+    const failed = oneEvent(el, "ecc-service-create-failed");
+    (el as unknown as Internals).handleSubmit();
+    return ((await failed) as EccServiceCreateFailedEvent).detail;
+  };
+
+  it("reports the detail of a plain object", async () => {
+    const detail = await detailFor({ status: 403, detail: "No role." });
+
+    expect(detail.error).to.equal("No role.");
+    expect(detail.status).to.equal(403);
+  });
+
+  it("reports a thrown string", async () => {
+    const detail = await detailFor("Registry down");
+
+    expect(detail.error).to.equal("Registry down");
+    expect(detail.status).to.equal(undefined);
+    expect(detail.cause).to.equal("Registry down");
+  });
+
+  it("ignores a status that isn't a number", async () => {
+    const detail = await detailFor({ status: "403" });
+
+    expect(detail.error).to.equal("Failed to create service");
+    expect(detail.status).to.equal(undefined);
   });
 });

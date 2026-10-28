@@ -160,7 +160,7 @@ If the registry answers with an error status, the methods of `RestCloudRegistryP
 
 | Property    | Type                          | Description                                                                 |
 |-------------|-------------------------------|-----------------------------------------------------------------------------|
-| `message`   | `string`                      | The problem's `detail` (else a `message` field), or the failed action and the status, e.g. "Failed to create service (502)" |
+| `message`   | `string`                      | The problem's `detail` (else a `message` field, as some servers send), or the failed action and the status, e.g. "Failed to create service (502)" |
 | `status`    | `number`                      | HTTP status, e.g. `401` (log in) or `403` (no role on the service)          |
 | `title`     | `string \| undefined`         | Short summary of the problem type, e.g. "Conflict"                          |
 | `detail`    | `string \| undefined`         | Explanation of this occurrence, e.g. which field is invalid                 |
@@ -172,6 +172,10 @@ import {
   CloudRegistryError,
   RestCloudRegistryProvider,
 } from '@elixir-cloud/cloud-registry/providers';
+
+const provider = new RestCloudRegistryProvider(
+  'https://cloud-registry.example.com/ga4gh/registry/v1'
+);
 
 try {
   await provider.createService(service);

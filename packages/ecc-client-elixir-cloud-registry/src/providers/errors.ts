@@ -1,6 +1,8 @@
 /**
  * Problem details of a failed request (RFC 9457), as the Cloud Registry
- * sends them, e.g. with `serviceId` for duplicate registrations.
+ * sends them, e.g. with `serviceId` for duplicate registrations. Bodies
+ * of other servers (e.g. proxies) may have other fields, such as
+ * `message`.
  */
 export interface ProblemDetails {
   type?: string;
@@ -12,8 +14,13 @@ export interface ProblemDetails {
   [key: string]: unknown;
 }
 
-const stringOrUndefined = (value: unknown): string | undefined =>
-  typeof value === "string" ? value : undefined;
+/**
+ * The value if it is a string with more than white space, else `undefined`.
+ * @param value Any value, e.g. a field of a response body
+ * @returns The string or `undefined`
+ */
+export const nonBlankString = (value: unknown): string | undefined =>
+  typeof value === "string" && value.trim() ? value : undefined;
 
 /**
  * Error of a request that the Cloud Registry answered with an error status.
@@ -43,9 +50,9 @@ export class CloudRegistryError extends Error {
     this.name = "CloudRegistryError";
     this.status = status;
     this.problem = problem;
-    this.title = stringOrUndefined(problem?.title);
-    this.detail = stringOrUndefined(problem?.detail);
-    this.serviceId = stringOrUndefined(problem?.serviceId);
+    this.title = nonBlankString(problem?.title);
+    this.detail = nonBlankString(problem?.detail);
+    this.serviceId = nonBlankString(problem?.serviceId);
   }
 
   /**
@@ -70,11 +77,11 @@ export class CloudRegistryError extends Error {
     } catch {
       // no JSON body
     }
-    const status = `${response.status} ${response.statusText}`.trim();
+    // the status only: HTTP/2 has no status text
     const message =
-      stringOrUndefined(problem?.detail) ??
-      stringOrUndefined(problem?.message) ??
-      `${action} (${status})`;
+      nonBlankString(problem?.detail) ??
+      nonBlankString(problem?.message) ??
+      `${action} (${response.status})`;
     return new CloudRegistryError(message, response.status, problem);
   }
 }

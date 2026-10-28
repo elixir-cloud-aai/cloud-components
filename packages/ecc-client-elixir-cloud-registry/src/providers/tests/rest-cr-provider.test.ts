@@ -157,4 +157,32 @@ describe("RestCloudRegistryProvider errors", () => {
     expect(err.title).to.equal(undefined);
     expect(err.serviceId).to.equal(undefined);
   });
+
+  it("skips a blank detail", async () => {
+    fetchStub.callsFake(
+      async () =>
+        new Response(JSON.stringify({ detail: " ", message: "Bad input" }), {
+          status: 400,
+        })
+    );
+
+    const err = (await rejection(() =>
+      provider.getServices()
+    )) as CloudRegistryError;
+
+    expect(err.message).to.equal("Bad input");
+    expect(err.detail).to.equal(undefined);
+  });
+
+  it("leaves out the status text", async () => {
+    fetchStub.callsFake(
+      async () => new Response("", { status: 502, statusText: "Bad Gateway" })
+    );
+
+    const err = (await rejection(() =>
+      provider.getServices()
+    )) as CloudRegistryError;
+
+    expect(err.message).to.equal("Failed to fetch services (502)");
+  });
 });

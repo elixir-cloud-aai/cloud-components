@@ -9,6 +9,7 @@ import {
   ServiceType,
   ServiceTypeRegister,
 } from "../../providers/index.js";
+import { nonBlankString } from "../../providers/errors.js";
 import type { EccServiceCreateFailedEvent } from "../../events/index.js";
 import "@elixir-cloud/design/components/button/index.js";
 import "@elixir-cloud/design/components/input/index.js";
@@ -17,30 +18,34 @@ import "@elixir-cloud/design/components/label/index.js";
 import "@elixir-cloud/design/components/textarea/index.js";
 import "@elixir-cloud/design/components/collapsible/index.js";
 
-const stringOrUndefined = (value: unknown): string | undefined =>
-  typeof value === "string" ? value : undefined;
-
 /**
  * Detail of `ecc-service-create-failed` for an error that a provider threw:
- * its message, and the status and problem details if it has them (as
- * `CloudRegistryError` has, or errors of custom providers with the same
- * fields).
+ * its message, and the status and problem details if it has them. They are
+ * read from the error's fields, as `CloudRegistryError` has them, so that
+ * errors of custom providers with the same fields work too.
  * @param err The error
- * @param fallback Message if the error has none
+ * @param action The failed action, e.g. "Failed to create service"
+ * @param prefix Whether the message starts with the action
  * @returns The event's detail
  */
 const failureDetail = (
   err: unknown,
-  fallback: string
+  action: string,
+  prefix = false
 ): EccServiceCreateFailedEvent["detail"] => {
   const fields =
     err && typeof err === "object" ? (err as Record<string, unknown>) : {};
+  const detail = nonBlankString(fields.detail);
+  const message =
+    nonBlankString(fields.message) ?? detail ?? nonBlankString(err);
+  let error = message ?? action;
+  if (prefix && message) error = `${action}: ${message}`;
   return {
-    error: (err instanceof Error && err.message) || fallback,
+    error,
     status: typeof fields.status === "number" ? fields.status : undefined,
-    title: stringOrUndefined(fields.title),
-    detail: stringOrUndefined(fields.detail),
-    serviceId: stringOrUndefined(fields.serviceId),
+    title: nonBlankString(fields.title),
+    detail,
+    serviceId: nonBlankString(fields.serviceId),
     cause: err,
   };
 };
@@ -168,7 +173,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       console.error("Failed to load service types:", error);
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-failed", {
-          detail: failureDetail(error, "Failed to load service types"),
+          detail: failureDetail(error, "Failed to load service types", true),
           bubbles: true,
           composed: true,
         })

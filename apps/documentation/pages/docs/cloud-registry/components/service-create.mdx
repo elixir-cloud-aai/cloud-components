@@ -194,7 +194,7 @@ Emitted when a service is successfully created in the registry, providing the ne
 ### `ecc-service-create-failed`
 Emitted when service creation or loading the service types fails due to server errors, network issues, or other runtime problems.
 
-- `error`: what went wrong, e.g. the registry's explanation (the problem's `detail`);
+- `error`: what went wrong, e.g. the registry's explanation (the problem's `detail`); if the service types can't be loaded, it starts with "Failed to load service types";
 - `status`: the HTTP status of the failed request, if there was one, e.g. `401` (log in) or `403` (no role on the service);
 - `title`, `detail`: the problem details that the registry sent, if any;
 - `serviceId`: the ID of the existing service, for duplicate registrations (`409`);
