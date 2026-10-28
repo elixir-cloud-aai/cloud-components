@@ -195,20 +195,24 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     let environments: unknown;
     try {
       // `registration_rules` is optional, so any service info will do
-      const info = (await this._provider.getServiceInfo()) as
-        | RegistryServiceInfo
-        | undefined;
+      const info: RegistryServiceInfo | undefined =
+        await this._provider.getServiceInfo();
       environments = info?.registration_rules?.environments;
     } catch (error) {
       // without rules, the properties apply
       console.warn("Failed to load the registration rules:", error);
     }
     if (request !== this.rulesRequest) return;
-    this.registryEnvironments =
+    const valid =
       Array.isArray(environments) &&
-      environments.every((value) => typeof value === "string")
-        ? environments
-        : null;
+      environments.every((value) => typeof value === "string");
+    if (environments !== undefined && !valid) {
+      console.warn(
+        "Ignoring invalid registration rules (environments):",
+        environments
+      );
+    }
+    this.registryEnvironments = valid ? (environments as string[]) : null;
   }
 
   /**

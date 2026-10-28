@@ -97,4 +97,8 @@ export interface CloudRegistryProvider extends ServiceRegistryProvider {
 
   // Service info methods (Cloud Registry specific)
   createOrUpdateServiceInfo?(service: ServiceRegister): Promise<void>;
+
+  // Service info, with the registration rules of Cloud Registry 0.6.0 and
+  // later (optional, so providers returning a plain `Service` still conform)
+  getServiceInfo(): Promise<RegistryServiceInfo>;
 }

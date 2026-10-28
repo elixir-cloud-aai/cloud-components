@@ -1,10 +1,10 @@
 import {
   CloudRegistryProvider,
   ExternalService,
-  Service,
   ServiceType,
   ExternalServiceRegister,
   ServiceRegister,
+  RegistryServiceInfo,
 } from "./cr-provider.js";
 
 /**
@@ -69,7 +69,7 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
    * Fetch information about the registry
    * @returns Promise resolving to service information
    */
-  async getServiceInfo(): Promise<Service> {
+  async getServiceInfo(): Promise<RegistryServiceInfo> {
     const url = `${this.baseUrl}/service-info`;
     const response = await this.fetch(url);
     if (!response.ok) {
