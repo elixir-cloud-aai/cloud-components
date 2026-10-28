@@ -178,7 +178,9 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       changedProperties.has("serviceTypes") &&
       this.allowNewType &&
       this.typeChoice === "" &&
-      (this.formData.type.artifact || this.formData.type.version)
+      (this.formData.type.artifact ||
+        this.formData.type.version ||
+        this.formData.type.group !== "org.ga4gh")
     ) {
       this.typeChoice = NEW_TYPE;
     }
