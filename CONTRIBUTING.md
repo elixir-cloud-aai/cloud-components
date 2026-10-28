@@ -92,3 +92,25 @@ don't approve any staged version yet: re-run the failed jobs of the run.
 Packages already on npm are skipped, and versions staged by the earlier
 attempt count as staged. If a package can't be staged at all, reject the
 staged versions (`npm stage reject <stage-id>`) and release a new version.
+
+### Documentation versions
+
+The documentation is built on [Read the
+Docs](https://cloud-components.readthedocs.io/) (configuration:
+`.readthedocs.yaml`); its page "Versions"
+(`apps/documentation/pages/docs/versions.mdx`) explains the versions to
+users. `latest` is built from `dev`. Two
+automation rules of the Read the Docs project activate each new tag `v*`
+and set it as the default version, so that the newest prerelease is the
+default until 2.0.0 is out. `stable` (the newest tag without a prerelease
+suffix, built by Read the Docs) stays inactive until then.
+
+When 2.0.0 is released, a maintainer of the Read the Docs project:
+
+1. deletes the automation rule that sets new tags `v*` as the default
+   version (the rule that activates them stays);
+2. activates `stable` and sets it as the default version (Settings →
+   "Default version");
+3. enables the notification on non-stable versions (Settings → Addons →
+   Notifications), so that pages of `latest` and of older versions point
+   readers to `stable`.
