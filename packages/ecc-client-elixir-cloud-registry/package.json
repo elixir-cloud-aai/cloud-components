@@ -38,7 +38,7 @@
     "build": "node ../../scripts/tailwind/index.js && node ../../scripts/build.js -p ecc-client-elixir-cloud-registry-",
     "dev": "concurrently -r \"node ../../scripts/tailwind/index.js --watch\" \"node ../../scripts/build.js -p ecc-client-elixir-cloud-registry- --watch\" \"wds\"",
     "clean": "rm -rf dist node_modules custom-elements-manifest.config.js src/output.css src/tailwind.ts",
-    "test": "web-test-runner --group default --config ../../web-test.runner-config.mjs",
+    "test": "web-test-runner --group default --config ../../web-test.runner-config.mjs --port 8002",
     "test:watch": "wtr --watch",
     "lint": "npx eslint .",
     "lint:fix": "npm run lint -- --fix",
