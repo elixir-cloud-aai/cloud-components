@@ -6,6 +6,7 @@ import { RestCloudRegistryProvider } from "../../providers/rest-cr-provider.js";
 import {
   CloudRegistryProvider,
   ExternalServiceRegister,
+  RegistryServiceInfo,
   ServiceType,
   ServiceTypeRegister,
 } from "../../providers/index.js";
@@ -16,12 +17,28 @@ import "@elixir-cloud/design/components/label/index.js";
 import "@elixir-cloud/design/components/textarea/index.js";
 import "@elixir-cloud/design/components/collapsible/index.js";
 
+/** Choice of an environment: its value, and an optional label to show */
+export interface EnvironmentOption {
+  value: string;
+  label?: string;
+}
+
+// Environments that the GA4GH specification suggests, and Cloud Registry
+// allows by default
+const DEFAULT_ENVIRONMENTS: EnvironmentOption[] = [
+  { value: "prod", label: "Production" },
+  { value: "test", label: "Test" },
+  { value: "dev", label: "Development" },
+  { value: "staging", label: "Staging" },
+];
+
 /**
  * @summary Component for creating new services in Cloud Registry
  * @since 2.0.0
  *
  * @property {string} baseUrl - Base URL of the Cloud Registry instance/gateway
  * @property {CloudRegistryProvider} provider - Custom data provider (optional, overrides baseUrl)
+ * @property {(string | EnvironmentOption)[]} environments - Environments to offer if the registry doesn't publish its own (default: prod, test, dev, staging); labels also apply to the registry's
  *
  * @fires ecc-service-created - Fired when a service is successfully created (includes serviceId, serviceData, and success message)
  * @fires ecc-service-create-failed - Fired when service creation fails
@@ -43,7 +60,19 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   @property({ attribute: false, reflect: true })
   provider?: CloudRegistryProvider;
 
+  /**
+   * Environments to offer, as values or `{ value, label }` objects; an empty
+   * list allows any value (free text). Registries that publish their rules
+   * (`registration_rules` of `GET /service-info`, cloud-registry 0.6.0 and
+   * later) override it with their allowed environments, which take the labels
+   * given here. Defaults to `prod`, `test`, `dev` and `staging`.
+   */
+  @property({ type: Array })
+  environments?: (string | EnvironmentOption)[];
+
   @state() private serviceTypes: ServiceType[] = [];
+  // Environments allowed by the registry; null if it doesn't publish them
+  @state() private registryEnvironments: string[] | null = null;
   @state() private loading = false;
   @state() private error: string | null = null;
   @state() private success: string | null = null;
@@ -119,7 +148,10 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     }
 
     if (this._provider) {
-      await this.loadServiceTypes();
+      await Promise.all([
+        this.loadServiceTypes(),
+        this.loadRegistrationRules(),
+      ]);
     }
   }
 
@@ -127,7 +159,65 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     if (changedProperties.has("baseUrl") && this.baseUrl) {
       this._provider = new RestCloudRegistryProvider(this.baseUrl);
       this.loadServiceTypes();
+      this.loadRegistrationRules();
     }
+  }
+
+  protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+    // an environment that is no longer offered is dropped
+    if (
+      (changedProperties.has("environments") ||
+        changedProperties.has("registryEnvironments")) &&
+      this.formData.environment
+    ) {
+      const options = this.environmentOptions;
+      if (
+        options.length > 0 &&
+        !options.some((option) => option.value === this.formData.environment)
+      ) {
+        this.formData = { ...this.formData, environment: "" };
+      }
+    }
+  }
+
+  /**
+   * Load the registry's rules for registrations, if it publishes them; older
+   * registries (and other providers) fall back to the properties
+   */
+  private async loadRegistrationRules(): Promise<void> {
+    if (!this._provider) return;
+
+    let environments: unknown;
+    try {
+      const info = (await this._provider.getServiceInfo()) as
+        | RegistryServiceInfo
+        | undefined;
+      environments = info?.registration_rules?.environments;
+    } catch {
+      // without rules, the properties apply
+    }
+    this.registryEnvironments =
+      Array.isArray(environments) &&
+      environments.every((value) => typeof value === "string")
+        ? environments
+        : null;
+  }
+
+  /**
+   * Environments to offer: the registry's, else the property's, else the
+   * defaults; empty if any value is allowed
+   */
+  private get environmentOptions(): EnvironmentOption[] {
+    const configured = (this.environments ?? DEFAULT_ENVIRONMENTS).map(
+      (option) => (typeof option === "string" ? { value: option } : option)
+    );
+    if (this.registryEnvironments === null) return configured;
+    return this.registryEnvironments.map((value) => ({
+      value,
+      label:
+        configured.find((option) => option.value === value)?.label ??
+        DEFAULT_ENVIRONMENTS.find((option) => option.value === value)?.label,
+    }));
   }
 
   private async loadServiceTypes(): Promise<void> {
@@ -466,35 +556,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             >
               Environment
             </ecc-utils-design-label>
-            <ecc-utils-design-select
-              id="environment"
-              .value=${this.formData.environment}
-              @ecc-input-changed=${(e: CustomEvent) =>
-                this.handleInputChange("environment", e.detail.value)}
-            >
-              <ecc-utils-design-select-trigger class="h-10">
-                <ecc-utils-design-select-value
-                  placeholder="Select environment"
-                ></ecc-utils-design-select-value>
-              </ecc-utils-design-select-trigger>
-              <ecc-utils-design-select-content>
-                <ecc-utils-design-select-item value=""
-                  >No environment specified</ecc-utils-design-select-item
-                >
-                <ecc-utils-design-select-item value="prod"
-                  >Production</ecc-utils-design-select-item
-                >
-                <ecc-utils-design-select-item value="test"
-                  >Test</ecc-utils-design-select-item
-                >
-                <ecc-utils-design-select-item value="dev"
-                  >Development</ecc-utils-design-select-item
-                >
-                <ecc-utils-design-select-item value="staging"
-                  >Staging</ecc-utils-design-select-item
-                >
-              </ecc-utils-design-select-content>
-            </ecc-utils-design-select>
+            ${this.renderEnvironmentField()}
           </div>
         </div>
 
@@ -516,6 +578,48 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
         ${this.renderAdvancedFields()}
       </div>
+    `;
+  }
+
+  private renderEnvironmentField() {
+    const options = this.environmentOptions;
+    if (options.length === 0) {
+      return html`
+        <ecc-utils-design-input
+          id="environment"
+          .value=${this.formData.environment}
+          @ecc-input-changed=${(e: CustomEvent) =>
+            this.handleInputChange("environment", e.detail.value)}
+          placeholder="prod, test, dev, staging, etc. (optional)"
+          class="h-10"
+        ></ecc-utils-design-input>
+      `;
+    }
+    return html`
+      <ecc-utils-design-select
+        id="environment"
+        .value=${this.formData.environment}
+        @ecc-input-changed=${(e: CustomEvent) =>
+          this.handleInputChange("environment", e.detail.value)}
+      >
+        <ecc-utils-design-select-trigger class="h-10">
+          <ecc-utils-design-select-value
+            placeholder="Select environment"
+          ></ecc-utils-design-select-value>
+        </ecc-utils-design-select-trigger>
+        <ecc-utils-design-select-content>
+          <ecc-utils-design-select-item value=""
+            >No environment specified</ecc-utils-design-select-item
+          >
+          ${options.map(
+            ({ value, label }) => html`
+              <ecc-utils-design-select-item value=${value}
+                >${label ?? value}</ecc-utils-design-select-item
+              >
+            `
+          )}
+        </ecc-utils-design-select-content>
+      </ecc-utils-design-select>
     `;
   }
 
