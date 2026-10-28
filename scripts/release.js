@@ -14,7 +14,7 @@
 //   node scripts/release.js dist-tag <version>
 //                                            print the npm dist-tag for
 //                                            <version>: `latest` for
-//                                            releases and for the 2.0.0
+//                                            releases and for the 2.x
 //                                            prereleases until 2.0.0, else
 //                                            `next` (needs the git tags)
 //   node scripts/release.js pin <version>    set the `@elixir-cloud/*`
@@ -82,17 +82,16 @@ const versionMismatches = (version, base = root) => {
     );
 };
 
-// Until the first release of this major version (2.0.0), prereleases of a
-// major without a release are published as `latest` (the 2.0.0 alphas);
-// from then on, `latest` is only for releases
-const firstStableMajor = 2;
+// Prereleases of this major version are published as `latest` until its
+// first release (the 2.0.0 alphas, from before the rule below)
+const latestPrereleaseMajor = 2;
 
 // The dist-tag for `version`, given the repository's tags (e.g. `v1.0.1`):
-// `latest` for releases; `next` for prereleases, except for those of a
-// major version without a release while there is no release of
-// `firstStableMajor` or later (the 2.0.0 alphas, until 2.0.0 is out), which
-// get `latest`. Fails without any release tag (e.g. in a clone without
-// tags), which would otherwise send prereleases to `latest`
+// `latest` for releases, `next` for prereleases, so that `latest` holds the
+// newest release. Exception: prereleases of `latestPrereleaseMajor` get
+// `latest` while there is no release of it or a later major. Fails without
+// any release tag (e.g. in a clone without tags), which would otherwise
+// send prereleases to `latest`
 const distTag = (version, tags) => {
   const { major, prerelease } = parseVersion(version);
   const releases = tags
@@ -106,11 +105,10 @@ const distTag = (version, tags) => {
   if (prerelease.length === 0) {
     return "latest";
   }
-  const majorReleased = releases.some((parsed) => parsed.major === major);
-  const stableReleased = releases.some(
-    (parsed) => parsed.major >= firstStableMajor
+  const exceptionEnded = releases.some(
+    (parsed) => parsed.major >= latestPrereleaseMajor
   );
-  return majorReleased || stableReleased ? "next" : "latest";
+  return major === latestPrereleaseMajor && !exceptionEnded ? "latest" : "next";
 };
 
 // Pins the dependencies on released packages; returns the changes made

@@ -77,10 +77,13 @@ To release `<version>` (e.g. `2.0.0-alpha.49`), maintainers:
    package's page on npmjs.com or with `npm stage list <package>` and
    `npm stage approve <stage-id>`. The dist-tag is `latest` for releases
    and `next` for prereleases (e.g. `2.1.0-rc.1` or `3.0.0-alpha.1`), so
-   that `latest` holds the newest release. Until 2.0.0 is out (no tag
-   `v2.<minor>.<patch>` yet), the `2.0.0-alpha.N` prereleases get `latest`
-   instead (`node scripts/release.js dist-tag <version>` prints the
-   dist-tag). The dist-tag of a staged version can't be changed.
+   that `latest` holds the newest release and `next` the prerelease
+   published last. Until there is a tag `v2.<minor>.<patch>` or later
+   (2.0.0 is out), prereleases of 2.x (the `2.0.0-alpha.N` series) get
+   `latest` instead; any such tag ends this, even if its release failed.
+   A release of an older major (a backport) also gets `latest`.
+   `node scripts/release.js dist-tag <version>` prints the dist-tag. The
+   dist-tag of a staged version can't be changed.
 5. **Fast-forward `main`** to the tag:
    `git push origin v<version>^{commit}:refs/heads/main` (only fast-forwards;
    the ruleset of `main` lets only admins update it).

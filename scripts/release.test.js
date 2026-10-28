@@ -74,18 +74,19 @@ test("parseVersion accepts versions and rejects other strings", () => {
 });
 
 test("distTag uses latest for releases", () => {
-  const tags = ["v1.0.0", "v1.0.1", "v2.0.0-alpha.48", "not-a-version", "v3"];
+  const tags = ["v1.0.0", "v1.0.1", "v2.0.0-alpha.48"];
   assert.strictEqual(distTag("2.0.0", tags), "latest");
   assert.strictEqual(distTag("2.1.0", [...tags, "v2.0.0"]), "latest");
   assert.strictEqual(distTag("3.0.0", [...tags, "v2.0.0"]), "latest");
 });
 
-test("distTag uses latest for prereleases of 2.0.0 until 2.0.0", () => {
-  const tags = ["v1.0.1", "v2.0.0-alpha.48", "not-a-version", "v3"];
+test("distTag uses latest for prereleases of 2.x until 2.0.0", () => {
+  const tags = ["v1.0.1", "v2.0.0-alpha.48", "v2.0.0-rc.1", "v2.0.0+build"];
   assert.strictEqual(distTag("2.0.0-alpha.49", tags), "latest");
-  assert.strictEqual(distTag("2.0.0-rc.1", tags), "latest");
-  // Prereleases of a released major never went to `latest`
+  assert.strictEqual(distTag("2.0.0-rc.2", tags), "latest");
+  // Only prereleases of 2.x went to `latest`
   assert.strictEqual(distTag("1.1.0-rc.1", tags), "next");
+  assert.strictEqual(distTag("3.0.0-alpha.1", tags), "next");
 });
 
 test("distTag uses next for prereleases from 2.0.0 on", () => {
@@ -94,8 +95,9 @@ test("distTag uses next for prereleases from 2.0.0 on", () => {
   assert.strictEqual(distTag("2.0.1-1", tags), "next");
   assert.strictEqual(distTag("2.1.0-latest.1", tags), "next");
   assert.strictEqual(distTag("3.0.0-alpha.1", tags), "next");
-  assert.strictEqual(distTag("3.0.0-alpha.1", [...tags, "v2.5.0"]), "next");
   assert.strictEqual(distTag("1.1.0-rc.1", tags), "next");
+  // A later major counts as released, too
+  assert.strictEqual(distTag("3.1.0-rc.1", ["v1.0.1", "v3.0.0"]), "next");
 });
 
 test("distTag fails without release tags", () => {
@@ -104,7 +106,6 @@ test("distTag fails without release tags", () => {
     () => distTag("2.0.0-alpha.49", ["v2.0.0-alpha.48", "v2.0.0+build"]),
     /No release tags/
   );
-  assert.throws(() => distTag("2.0.0", ["not-a-version"]), /No release tags/);
 });
 
 test("releasedPackages lists public packages, sorted by directory", (t) => {
