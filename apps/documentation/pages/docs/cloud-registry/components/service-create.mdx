@@ -158,7 +158,7 @@ The data provider responsible for creating services in the registry. You must pr
 ### `environments`
 The environments that the form offers for `environment`, as values or `{ value, label }` objects (`EnvironmentOption`); an empty list allows any value, and the form then shows a text field. The default is the GA4GH suggestion: `prod`, `test`, `dev` and `staging`.
 
-Cloud Registry 0.6.0 and later publish the environments they allow (`registration_rules.environments` of `GET /service-info`, configured with `custom.endpoints.services.environments`). The form reads them and offers these instead, with the labels given in `environments` (or the default labels); `environments` applies only to registries and providers without these rules. A chosen environment that is no longer offered is cleared.
+Cloud Registry 0.6.0 and later publish the environments they allow (`registration_rules.environments` of `GET /service-info`, configured with `custom.endpoints.services.environments`). The form reads them and offers these instead, with the labels given in `environments` (or the default labels); `environments` applies only to registries and providers without these rules. A registry that allows any environment (an empty list) gets a text field, whatever `environments` says. A chosen environment that is no longer offered is cleared. As an attribute, `environments` takes a JSON list.
 
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>

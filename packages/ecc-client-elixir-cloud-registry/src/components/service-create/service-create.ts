@@ -38,7 +38,7 @@ const DEFAULT_ENVIRONMENTS: EnvironmentOption[] = [
  *
  * @property {string} baseUrl - Base URL of the Cloud Registry instance/gateway
  * @property {CloudRegistryProvider} provider - Custom data provider (optional, overrides baseUrl)
- * @property {(string | EnvironmentOption)[]} environments - Environments to offer if the registry doesn't publish its own (default: prod, test, dev, staging); labels also apply to the registry's
+ * @property {(string | EnvironmentOption)[]} environments - Environments to offer if the registry doesn't publish its own (default: prod, test, dev, staging)
  *
  * @fires ecc-service-created - Fired when a service is successfully created (includes serviceId, serviceData, and success message)
  * @fires ecc-service-create-failed - Fired when service creation fails
@@ -73,6 +73,9 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   @state() private serviceTypes: ServiceType[] = [];
   // Environments allowed by the registry; null if it doesn't publish them
   @state() private registryEnvironments: string[] | null = null;
+  // Number of the latest request for the rules, so that older answers are
+  // ignored (e.g. of a previous registry)
+  private rulesRequest = 0;
   @state() private loading = false;
   @state() private error: string | null = null;
   @state() private success: string | null = null;
@@ -187,15 +190,20 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   private async loadRegistrationRules(): Promise<void> {
     if (!this._provider) return;
 
+    this.rulesRequest += 1;
+    const request = this.rulesRequest;
     let environments: unknown;
     try {
+      // `registration_rules` is optional, so any service info will do
       const info = (await this._provider.getServiceInfo()) as
         | RegistryServiceInfo
         | undefined;
       environments = info?.registration_rules?.environments;
-    } catch {
+    } catch (error) {
       // without rules, the properties apply
+      console.warn("Failed to load the registration rules:", error);
     }
+    if (request !== this.rulesRequest) return;
     this.registryEnvironments =
       Array.isArray(environments) &&
       environments.every((value) => typeof value === "string")
@@ -208,16 +216,39 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
    * defaults; empty if any value is allowed
    */
   private get environmentOptions(): EnvironmentOption[] {
-    const configured = (this.environments ?? DEFAULT_ENVIRONMENTS).map(
-      (option) => (typeof option === "string" ? { value: option } : option)
+    // the property may come from an attribute (JSON), so it is checked
+    const configured = (
+      Array.isArray(this.environments)
+        ? this.environments
+        : DEFAULT_ENVIRONMENTS
+    ).flatMap((option): EnvironmentOption[] => {
+      if (typeof option === "string") return [{ value: option }];
+      if (option && typeof option.value === "string") {
+        return [
+          {
+            value: option.value,
+            label: typeof option.label === "string" ? option.label : undefined,
+          },
+        ];
+      }
+      return [];
+    });
+    const options =
+      this.registryEnvironments === null
+        ? configured
+        : this.registryEnvironments.map((value) => ({
+            value,
+            label:
+              configured.find((option) => option.value === value)?.label ??
+              DEFAULT_ENVIRONMENTS.find((option) => option.value === value)
+                ?.label,
+          }));
+    // empty values mean "no environment", offered anyway; no duplicates
+    return options.filter(
+      (option, index) =>
+        option.value !== "" &&
+        options.findIndex((other) => other.value === option.value) === index
     );
-    if (this.registryEnvironments === null) return configured;
-    return this.registryEnvironments.map((value) => ({
-      value,
-      label:
-        configured.find((option) => option.value === value)?.label ??
-        DEFAULT_ENVIRONMENTS.find((option) => option.value === value)?.label,
-    }));
   }
 
   private async loadServiceTypes(): Promise<void> {
@@ -590,7 +621,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           .value=${this.formData.environment}
           @ecc-input-changed=${(e: CustomEvent) =>
             this.handleInputChange("environment", e.detail.value)}
-          placeholder="prod, test, dev, staging, etc. (optional)"
+          placeholder="Environment (optional)"
           class="h-10"
         ></ecc-utils-design-input>
       `;

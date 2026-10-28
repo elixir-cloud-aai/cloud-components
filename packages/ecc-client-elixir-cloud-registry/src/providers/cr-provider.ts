@@ -57,20 +57,22 @@ export interface ExternalServiceRegister {
   url: string;
 }
 
-// Rules for registrations that Cloud Registry publishes in its service info
-// (`registration_rules` of `GET /service-info`, since cloud-registry 0.6.0)
+/**
+ * Rules for registrations that Cloud Registry publishes in its service info
+ * (`registration_rules` of `GET /service-info`, since cloud-registry 0.6.0)
+ */
 export interface RegistrationRules {
-  // Values allowed for `environment`; empty if any value is allowed
+  /** Values allowed for `environment`; empty if any value is allowed */
   environments: string[];
-  // Schemes allowed in service URLs (`url`), e.g. `["https"]`
+  /** Schemes allowed in service URLs (`url`), e.g. `["https"]` */
   url_schemes: string[];
-  // Who may add service types: `open`, `controlled` or `moderated`
+  /** Who may add service types: `open`, `controlled` or `moderated` */
   service_types: string;
-  // How many unused types a user other than an admin may add; unset if any
+  /** How many unused types a user other than an admin may add; unset if any */
   max_unused_service_types?: number;
 }
 
-// Service info of Cloud Registry: a GA4GH service with registration rules
+/** Service info of Cloud Registry: a GA4GH service with registration rules */
 export interface RegistryServiceInfo extends Service {
   registration_rules?: RegistrationRules;
 }

@@ -204,6 +204,23 @@ interface ExternalServiceRegister {
 }
 ```
 
+### RegistryServiceInfo and RegistrationRules
+
+Cloud Registry 0.6.0 and later extend their service info (`getServiceInfo()`) with the rules for registrations, which the create form reads (e.g. the allowed environments). Custom providers can return them from `getServiceInfo()`; without them, the form falls back to its properties.
+
+```typescript
+interface RegistryServiceInfo extends Service {
+  registration_rules?: RegistrationRules;
+}
+
+interface RegistrationRules {
+  environments: string[]; // empty if any value is allowed
+  url_schemes: string[]; // e.g. ['https']
+  service_types: string; // 'open', 'controlled' or 'moderated'
+  max_unused_service_types?: number;
+}
+```
+
 ## Using with Components
 
 ### Service Creation
