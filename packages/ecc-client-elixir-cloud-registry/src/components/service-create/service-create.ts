@@ -171,7 +171,16 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       !this.allowNewType &&
       !this.listedChoice
     ) {
-      this.selectType("");
+      this.clearType();
+    }
+    // a new type entered while none was listed stays when types show up
+    if (
+      changedProperties.has("serviceTypes") &&
+      this.allowNewType &&
+      this.typeChoice === "" &&
+      (this.formData.type.artifact || this.formData.type.version)
+    ) {
+      this.typeChoice = NEW_TYPE;
     }
     // a chosen type that is no longer listed (e.g. after a reload) is dropped
     if (
@@ -180,7 +189,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       this.typeChoice !== NEW_TYPE &&
       !this.listedChoice
     ) {
-      this.selectType("");
+      this.clearType();
     }
   }
 
@@ -210,6 +219,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       this.typesStatus = "loaded";
     } catch (error) {
       if (request !== this.typesRequest) return;
+      // a failed reload after a create keeps the list; others don't
+      if (reportErrors) this.serviceTypes = [];
       this.typesStatus = this.serviceTypes.length > 0 ? "loaded" : "failed";
       console.error("Failed to load service types:", error);
       if (!reportErrors) return;
@@ -249,6 +260,15 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       (this.newType || this.listedChoice) &&
       Boolean(group && artifact && version)
     );
+  }
+
+  /** Clear the type choice and the type */
+  private clearType(): void {
+    this.typeChoice = "";
+    this.formData = {
+      ...this.formData,
+      type: { group: "org.ga4gh", artifact: "", version: "" },
+    };
   }
 
   private selectType(choice: string): void {
