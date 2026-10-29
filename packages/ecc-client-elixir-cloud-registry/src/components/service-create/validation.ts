@@ -22,7 +22,7 @@ export const MAX_LENGTHS = {
 // which URLs must not contain (except joiners in host names)
 const REJECTED_CHARACTER = /[\s\p{Cc}\p{Cf}\p{Cs}\p{Zl}\p{Zp}\p{Zs}]/u;
 // Zero width non-joiner and joiner, allowed in international host names
-const JOINERS = /[‌‍]/g;
+const JOINERS = /[\u200c\u200d]/g;
 // Percent signs that don't start a percent-encoding
 const MALFORMED_PERCENT = /%(?![0-9A-Fa-f]{2})/;
 // ASCII characters allowed in paths, queries and fragments (RFC 3986):
@@ -36,7 +36,7 @@ const IPV6_AUTHORITY =
   /^\[([0-9A-Fa-f:.]+)(%25[A-Za-z0-9\-._~]+)?\](?::(\d*))?$/;
 const NAME_AUTHORITY = /^([^:]*)(?::(\d*))?$/;
 // Characters of registered names (RFC 3986) and non-ASCII characters
-const REG_NAME = /^[A-Za-z0-9\-._~!$&'()*+,;=\u0080-￿]+$/;
+const REG_NAME = /^[A-Za-z0-9\-._~!$&'()*+,;=\u0080-\uffff]+$/;
 // Last labels that browsers take as IPv4 addresses (e.g. `127.1`)
 const NUMERIC_LABEL = /^(?:[0-9]+|0[xX][0-9A-Fa-f]*)$/;
 const IPV4 =

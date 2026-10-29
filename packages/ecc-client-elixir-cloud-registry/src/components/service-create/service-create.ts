@@ -1,4 +1,4 @@
-import { LitElement, html, css } from "lit";
+import { LitElement, html, css, nothing } from "lit";
 import { property, state } from "lit/decorators.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
@@ -109,7 +109,10 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   // Schemes of service URLs allowed by the registry; null if not published
   @state() private registryUrlSchemes: string[] | null = null;
   // Whether a submission was tried, so that missing fields are flagged too
+  // (until the form is reset)
   @state() private submitted = false;
+  // Errors of the fields, computed once per render (cf. `fieldErrors()`)
+  private errors: Record<string, string> = {};
   // Number of the latest request for the rules, so that older answers are
   // ignored (e.g. of a previous registry)
   private rulesRequest = 0;
@@ -263,9 +266,9 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   /** Schemes allowed in service URLs: the registry's, else the property's */
   private get serviceUrlSchemes(): string[] {
     const configured = Array.isArray(this.urlSchemes)
-      ? this.urlSchemes.filter(
-          (scheme) => scheme === "http" || scheme === "https"
-        )
+      ? this.urlSchemes
+          .map((scheme) => String(scheme).toLowerCase())
+          .filter((scheme) => scheme === "http" || scheme === "https")
       : [];
     return (
       this.registryUrlSchemes ?? (configured.length ? configured : ["https"])
@@ -277,9 +280,10 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
    * reject them (`400`); missing required fields only after a submission
    * was tried (or with `all`)
    */
-  private fieldErrors(all = this.submitted): Record<string, string> {
+  private fieldErrors(includeMissing = this.submitted): Record<string, string> {
     const errors: Record<string, string> = {};
     const { formData } = this;
+    // the first error of a field is shown: missing, too long, then invalid
     const add = (id: string, message: string) => {
       if (!(id in errors)) errors[id] = message;
     };
@@ -290,7 +294,9 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       max: number,
       required = false
     ) => {
-      if (required && all && !value) add(id, `${label} is required.`);
+      if (required && includeMissing && !value) {
+        add(id, `${label} is required.`);
+      }
       if (length(value) > max) {
         add(id, `${label} must be at most ${max} characters.`);
       }
@@ -385,12 +391,12 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     if (formData.customServiceId) {
       const error = checkServiceId(formData.customServiceId);
       if (error) add("custom-service-id", `Custom service ID ${error}.`);
-      text(
-        "custom-service-id",
-        "Custom service ID",
-        formData.customServiceId,
-        Infinity
-      );
+      if (hasUnpairedSurrogates(formData.customServiceId)) {
+        add(
+          "custom-service-id",
+          "Custom service ID must not contain invalid characters."
+        );
+      }
     }
     for (const [id, label, value] of [
       ["created-at", "Created At", formData.createdAt],
@@ -406,16 +412,26 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     return errors;
   }
 
-  /** Message under a field, if it is invalid */
+  /** Message under a field, if it is invalid (announced politely) */
   private renderError(id: string) {
-    const error = this.fieldErrors()[id];
+    const error = this.errors[id];
     return error
-      ? html`<p id="${id}-error" class="text-sm text-destructive">${error}</p>`
+      ? html`<p
+          id="${id}-error"
+          class="text-sm text-destructive"
+          aria-live="polite"
+        >
+          ${error}
+        </p>`
       : "";
   }
 
   private invalid(id: string): string {
-    return id in this.fieldErrors() ? "true" : "false";
+    return id in this.errors ? "true" : "false";
+  }
+
+  private describedBy(id: string) {
+    return id in this.errors ? `${id}-error` : nothing;
   }
 
   /**
@@ -522,11 +538,11 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
     // invalid inputs are shown at their fields, and nothing is sent
     this.submitted = true;
-    const errors = Object.values(this.fieldErrors(true));
-    if (errors.length > 0) {
+    const errors = this.fieldErrors(true);
+    if (Object.keys(errors).length > 0) {
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-validation-failed", {
-          detail: { error: errors.join(" ") },
+          detail: { error: Object.values(errors).join(" "), errors },
           bubbles: true,
           composed: true,
         })
@@ -640,7 +656,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="service-name"
               aria-invalid=${this.invalid("service-name")}
-              aria-describedby="service-name-error"
+              aria-describedby=${this.describedBy("service-name")}
               .value=${this.formData.name}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("name", e.detail.value)}
@@ -661,7 +677,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="service-url"
               aria-invalid=${this.invalid("service-url")}
-              aria-describedby="service-url-error"
+              aria-describedby=${this.describedBy("service-url")}
               .value=${this.formData.url}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("url", e.detail.value)}
@@ -682,7 +698,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="org-name"
               aria-invalid=${this.invalid("org-name")}
-              aria-describedby="org-name-error"
+              aria-describedby=${this.describedBy("org-name")}
               .value=${this.formData.organization.name}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange(
@@ -704,7 +720,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="org-url"
               aria-invalid=${this.invalid("org-url")}
-              aria-describedby="org-url-error"
+              aria-describedby=${this.describedBy("org-url")}
               .value=${this.formData.organization.url}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange(
@@ -732,7 +748,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="type-group"
               aria-invalid=${this.invalid("type-group")}
-              aria-describedby="type-group-error"
+              aria-describedby=${this.describedBy("type-group")}
               .value=${this.formData.type.group}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange("type", "group", e.detail.value)}
@@ -753,7 +769,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="type-artifact"
               aria-invalid=${this.invalid("type-artifact")}
-              aria-describedby="type-artifact-error"
+              aria-describedby=${this.describedBy("type-artifact")}
               .value=${this.formData.type.artifact}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange(
@@ -778,7 +794,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="type-version"
               aria-invalid=${this.invalid("type-version")}
-              aria-describedby="type-version-error"
+              aria-describedby=${this.describedBy("type-version")}
               .value=${this.formData.type.version}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange("type", "version", e.detail.value)}
@@ -802,7 +818,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             <ecc-utils-design-input
               id="service-version"
               aria-invalid=${this.invalid("service-version")}
-              aria-describedby="service-version-error"
+              aria-describedby=${this.describedBy("service-version")}
               .value=${this.formData.version}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("version", e.detail.value)}
@@ -832,7 +848,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           <ecc-utils-design-textarea
             id="description"
             aria-invalid=${this.invalid("description")}
-            aria-describedby="description-error"
+            aria-describedby=${this.describedBy("description")}
             .value=${this.formData.description}
             @ecc-input-changed=${(e: CustomEvent) =>
               this.handleInputChange("description", e.detail.value)}
@@ -855,7 +871,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
         <ecc-utils-design-input
           id="environment"
           aria-invalid=${this.invalid("environment")}
-          aria-describedby="environment-error"
+          aria-describedby=${this.describedBy("environment")}
           .value=${this.formData.environment}
           @ecc-input-changed=${(e: CustomEvent) =>
             this.handleInputChange("environment", e.detail.value)}
@@ -869,7 +885,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       <ecc-utils-design-select
         id="environment"
         aria-invalid=${this.invalid("environment")}
-        aria-describedby="environment-error"
+        aria-describedby=${this.describedBy("environment")}
         .value=${this.formData.environment}
         @ecc-input-changed=${(e: CustomEvent) =>
           this.handleInputChange("environment", e.detail.value)}
@@ -938,7 +954,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                 <ecc-utils-design-input
                   id="custom-service-id"
                   aria-invalid=${this.invalid("custom-service-id")}
-                  aria-describedby="custom-service-id-error"
+                  aria-describedby=${this.describedBy("custom-service-id")}
                   .value=${this.formData.customServiceId}
                   @ecc-input-changed=${(e: CustomEvent) => {
                     this.handleInputChange("customServiceId", e.detail.value);
@@ -965,7 +981,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   <ecc-utils-design-input
                     id="contact-url"
                     aria-invalid=${this.invalid("contact-url")}
-                    aria-describedby="contact-url-error"
+                    aria-describedby=${this.describedBy("contact-url")}
                     .value=${this.formData.contactUrl}
                     @ecc-input-changed=${(e: CustomEvent) =>
                       this.handleInputChange("contactUrl", e.detail.value)}
@@ -985,7 +1001,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   <ecc-utils-design-input
                     id="documentation-url"
                     aria-invalid=${this.invalid("documentation-url")}
-                    aria-describedby="documentation-url-error"
+                    aria-describedby=${this.describedBy("documentation-url")}
                     .value=${this.formData.documentationUrl}
                     @ecc-input-changed=${(e: CustomEvent) =>
                       this.handleInputChange(
@@ -1011,7 +1027,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   <ecc-utils-design-input
                     id="created-at"
                     aria-invalid=${this.invalid("created-at")}
-                    aria-describedby="created-at-error"
+                    aria-describedby=${this.describedBy("created-at")}
                     .value=${this.formData.createdAt}
                     @ecc-input-changed=${(e: CustomEvent) =>
                       this.handleInputChange("createdAt", e.detail.value)}
@@ -1031,7 +1047,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   <ecc-utils-design-input
                     id="updated-at"
                     aria-invalid=${this.invalid("updated-at")}
-                    aria-describedby="updated-at-error"
+                    aria-describedby=${this.describedBy("updated-at")}
                     .value=${this.formData.updatedAt}
                     @ecc-input-changed=${(e: CustomEvent) =>
                       this.handleInputChange("updatedAt", e.detail.value)}
@@ -1049,6 +1065,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   }
 
   render() {
+    this.errors = this.fieldErrors();
     return html`
       <div class="">
         <form
