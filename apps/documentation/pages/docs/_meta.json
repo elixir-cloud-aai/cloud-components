@@ -38,6 +38,12 @@
       "collapsed": true
     }
   },
+  "tes": {
+    "title": "Task Execution Service (TES)",
+    "theme": {
+      "collapsed": true
+    }
+  },
   "-- More": {
     "type": "separator",
     "title": "More"
