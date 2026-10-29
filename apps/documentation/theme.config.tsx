@@ -10,7 +10,7 @@ const config: DocsThemeConfig = {
   logo: (
     <div className='flex gap-3 items-center'>
       <Image src={withBasePath('/elixir-cloud/logo.svg')} alt='Logo' width={44} height={44} />
-      <span className='tracking-wide font-semibold'>ELIXIR Cloud Components</span>
+      <span className='tracking-wide font-semibold'>Cloud Components</span>
     </div>
   ),
   project: {
