@@ -277,11 +277,16 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       );
     }
     this.registryEnvironments = valid ? (environments as string[]) : null;
+    // schemes are case-insensitive
+    const schemes = Array.isArray(urlSchemes)
+      ? urlSchemes.map((value) =>
+          typeof value === "string" ? value.toLowerCase() : value
+        )
+      : [];
     this.registryUrlSchemes =
-      Array.isArray(urlSchemes) &&
-      urlSchemes.length > 0 &&
-      urlSchemes.every((value) => HTTP_SCHEMES.includes(value))
-        ? urlSchemes
+      schemes.length > 0 &&
+      schemes.every((value) => HTTP_SCHEMES.includes(value))
+        ? schemes
         : null;
   }
 
