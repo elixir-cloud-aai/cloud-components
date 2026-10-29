@@ -113,7 +113,7 @@ Add the component once per page, e.g. in the app's layout, next to the complianc
 
 | Property | Type               | Default | Description                                                                 |
 |----------|--------------------|---------|-----------------------------------------------------------------------------|
-| `config` | `ComplianceConfig` | `{}`    | Shared compliance configuration; this component uses `config.cookies`.      |
+| `config` | `ComplianceConfig` | `{}`    | Shared compliance configuration; this component uses `config.cookies`. A new object with the same categories, `version`, `storageKey` and `notice` keeps the choices users haven't saved yet, so it may be created on every render. |
 
 ## Methods
 
@@ -138,7 +138,7 @@ Add the component once per page, e.g. in the app's layout, next to the complianc
 | `storageKey` | `string`                      | `localStorage` key, default `ecc-cookie-consent`.                           |
 | `texts`      | `Partial<CookieConsentTexts>` | Texts of the banner and the preferences, e.g. for translations: `bannerTitle`, `bannerText`, `policyLink`, `acceptAll`, `rejectAll`, `customize`, `preferencesTitle`, `preferencesText`, `save`, `close`, `alwaysOn`, `embedConsent`. |
 
-Changing a category's `id`, adding or removing a category, or changing `version` asks users again; changing texts or descriptions doesn't.
+Changing a category's `id` or `required`, adding or removing a category, or changing `version` asks users again; changing texts or descriptions doesn't.
 
 ## Loading scripts with consent
 
@@ -155,9 +155,9 @@ const loadAnalytics = () => { /* add the analytics script */ };
 
 if (hasConsent('analytics', compliance.cookies)) loadAnalytics();
 onConsentChange((consent) => {
-  if (consent.categories.analytics) loadAnalytics();
+  if (consent?.categories.analytics) loadAnalytics();
   // revoking consent: stop tracking and remove its cookies, or reload
-});
+}, compliance.cookies);
 
 // e.g. from a link of your own
 openCookiePreferences();
@@ -168,7 +168,7 @@ openCookiePreferences();
 | `hasConsent(category, config?)`        | Whether users consented to a category (required ones: always).  |
 | `readConsent(config?)`                 | The stored `CookieConsent`, or `null` if users must be asked.   |
 | `saveConsent(config, choices)`         | Stores choices and fires `ecc-cookie-consent-changed` on `window`. |
-| `onConsentChange(listener)`            | Calls `listener` on every change; returns a function to stop.   |
+| `onConsentChange(listener, config?)`   | Calls `listener` on every change in this page, and in other tabs for the storage key of `config` (with `null` if that consent was removed); returns a function to stop. |
 | `openCookiePreferences()`              | Asks the page's component to open the preferences.              |
 
 ## Notes for operators
@@ -176,4 +176,4 @@ openCookiePreferences();
 - List every category that your deployment uses, with a description users understand. Keep "Necessary" for what the site can't work without (e.g. login cookies); these need no consent under the GDPR and ePrivacy rules, but should be explained in the cookie policy.
 - Bump `version` when the cookie policy changes in a way users should see.
 - Provide the cookie policy (`policyUrl`, or a footer item) and load optional scripts only after `hasConsent()`.
-- Consent is stored per browser and origin; it isn't sent to a server.
+- Consent is stored per browser and origin; it isn't sent to a server. If the browser can't store it, it applies to the current page only.

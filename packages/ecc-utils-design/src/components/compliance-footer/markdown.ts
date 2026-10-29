@@ -1,12 +1,12 @@
 import { html, nothing, TemplateResult } from "lit";
-import { safeHref } from "../cookie-consent/urls.js";
+import { isExternal, safeHref } from "../cookie-consent/urls.js";
 
 /*
  * A small Markdown subset for legal pages, rendered with Lit templates, so
  * that all text is escaped and no HTML from the configuration reaches the
  * page: headings (`#` to `###`), paragraphs, lists (`-`, `*`, `1.`),
  * `**bold**`, `*emphasis*` and links (`[text](url)`, only `http(s)`,
- * `mailto` and relative URLs).
+ * `mailto` and relative URLs; links to other origins open in a new tab).
  */
 
 type Inline = string | TemplateResult;
@@ -29,13 +29,14 @@ export function renderInline(text: string): Inline[] {
       else if (em) parts.push(html`<em>${em}</em>`);
       else {
         const href = safeHref(url);
+        const external = !!href && isExternal(href);
         parts.push(
           href
             ? html`<a
                 class="underline underline-offset-4"
                 href=${href}
-                target="_blank"
-                rel="noopener noreferrer"
+                target=${external ? "_blank" : nothing}
+                rel=${external ? "noopener noreferrer" : nothing}
                 >${label}</a
               >`
             : label
@@ -65,13 +66,13 @@ export function renderMarkdown(markdown: string): TemplateResult[] {
   let paragraph: string[] = [];
   let list: { ordered: boolean; items: string[] } | null = null;
 
-  const flush = () => {
-    if (paragraph.length) {
-      blocks.push(
-        html`<p class="mt-2">${renderInline(paragraph.join(" "))}</p>`
-      );
-      paragraph = [];
-    }
+  const flushParagraph = () => {
+    if (!paragraph.length) return;
+    blocks.push(html`<p class="mt-2">${renderInline(paragraph.join(" "))}</p>`);
+    paragraph = [];
+  };
+
+  const flushList = () => {
     if (list) {
       const items = list.items.map(
         (item) => html`<li>${renderInline(item)}</li>`
@@ -87,6 +88,11 @@ export function renderMarkdown(markdown: string): TemplateResult[] {
       );
       list = null;
     }
+  };
+
+  const flush = () => {
+    flushParagraph();
+    flushList();
   };
 
   (typeof markdown === "string" ? markdown : "")
@@ -110,20 +116,14 @@ export function renderMarkdown(markdown: string): TemplateResult[] {
           blocks.push(html`<h4 class=${classes}>${content}</h4>`);
         else blocks.push(html`<h5 class=${classes}>${content}</h5>`);
       } else if (bullet || numbered) {
-        if (paragraph.length) {
-          const pending = paragraph;
-          paragraph = [];
-          blocks.push(
-            html`<p class="mt-2">${renderInline(pending.join(" "))}</p>`
-          );
-        }
+        flushParagraph();
         const ordered = !!numbered;
-        if (list && list.ordered !== ordered) flush();
+        if (list && list.ordered !== ordered) flushList();
         if (!list) list = { ordered, items: [] };
         const item = bullet ?? numbered;
         if (item) list.items.push(item[1]);
       } else {
-        if (list) flush();
+        flushList();
         paragraph.push(line);
       }
     });

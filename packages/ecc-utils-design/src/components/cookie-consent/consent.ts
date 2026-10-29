@@ -102,6 +102,12 @@ export interface FooterItemConfig extends Partial<FooterItem> {
   hidden?: boolean;
 }
 
+/** Texts of the compliance footer. */
+export interface ComplianceFooterTexts {
+  /** Button that closes a page or embed. */
+  close: string;
+}
+
 /** Configuration of the compliance footer. */
 export interface ComplianceFooterConfig {
   /**
@@ -111,8 +117,10 @@ export interface ComplianceFooterConfig {
   items?: FooterItemConfig[];
   /** Use only the configured items, not the defaults. */
   replaceDefaults?: boolean;
-  /** Accessible name of the footer's navigation. */
+  /** Accessible name of the footer's navigation, default "Legal". */
   label?: string;
+  /** Texts of the footer's dialog. */
+  texts?: Partial<ComplianceFooterTexts>;
 }
 
 /** Shared configuration of the compliance components. */
@@ -191,38 +199,52 @@ export function cookieCategories(
 }
 
 /**
- * Identifies a configuration for stored consent: its version and category
- * IDs, so that consent is asked again when they change.
+ * Identifies a configuration for stored consent: its version and its
+ * categories (IDs and whether they are required), so that consent is asked
+ * again when they change.
  * @param config Cookie consent configuration
  * @returns The signature
  */
 export function consentSignature(config?: CookieConsentConfig): string {
-  const ids = cookieCategories(config)
-    .map((category) => category.id)
-    .sort();
-  return JSON.stringify([config?.version ?? "", ids]);
+  const categories = cookieCategories(config)
+    .map((category): [string, boolean] => [category.id, !!category.required])
+    .sort(([a], [b]) => (a < b ? -1 : Number(a > b)));
+  return JSON.stringify([config?.version ?? "", categories]);
 }
 
-const storageKey = (config?: CookieConsentConfig) =>
+/**
+ * The `localStorage` key of a configuration.
+ * @param config Cookie consent configuration
+ * @returns The key
+ */
+export const consentStorageKey = (config?: CookieConsentConfig): string =>
   config?.storageKey || DEFAULT_STORAGE_KEY;
 
-// consent of this page if `localStorage` can't be used, e.g. if blocked
+// consent of this page that couldn't be stored, e.g. if storage is blocked
+// or full; it takes precedence over what `localStorage` still holds
 const memory = new Map<string, string>();
 
 function readItem(key: string): string | null {
+  if (memory.has(key)) return memory.get(key) ?? null;
   try {
     return window.localStorage.getItem(key);
   } catch {
-    return memory.get(key) ?? null;
+    return null;
   }
 }
 
 function writeItem(key: string, value: string): void {
-  memory.set(key, value);
   try {
     window.localStorage.setItem(key, value);
+    memory.delete(key);
   } catch {
-    // kept in memory for this page
+    memory.set(key, value);
+    try {
+      // don't leave an older choice behind for other pages
+      window.localStorage.removeItem(key);
+    } catch {
+      // storage can't be used at all
+    }
   }
 }
 
@@ -234,7 +256,7 @@ function writeItem(key: string, value: string): void {
 export function readConsent(
   config?: CookieConsentConfig
 ): CookieConsent | null {
-  const raw = readItem(storageKey(config));
+  const raw = readItem(consentStorageKey(config));
   if (!raw) return null;
   let stored: unknown;
   try {
@@ -297,7 +319,7 @@ export function saveConsent(
     signature: consentSignature(config),
     updatedAt: new Date().toISOString(),
   };
-  writeItem(storageKey(config), JSON.stringify(consent));
+  writeItem(consentStorageKey(config), JSON.stringify(consent));
   window.dispatchEvent(
     new CustomEvent(CONSENT_CHANGED_EVENT, { detail: { consent } })
   );
@@ -305,19 +327,31 @@ export function saveConsent(
 }
 
 /**
- * Calls `listener` whenever consent is saved, in this page.
- * @param listener Called with the new consent
+ * Calls `listener` whenever consent is saved, in this page or, for the
+ * storage key of `config`, in another tab or window of the same origin.
+ * @param listener Called with the new consent; `null` if the consent of
+ * another tab was removed or doesn't fit `config`
+ * @param config Cookie consent configuration
  * @returns A function that removes the listener
  */
 export function onConsentChange(
-  listener: (consent: CookieConsent) => void
+  listener: (consent: CookieConsent | null) => void,
+  config?: CookieConsentConfig
 ): () => void {
   const handler = (event: Event) => {
     const { detail } = event as CustomEvent<{ consent: CookieConsent }>;
     if (detail?.consent) listener(detail.consent);
   };
+  const storageHandler = (event: StorageEvent) => {
+    if (event.key !== consentStorageKey(config)) return;
+    listener(readConsent(config));
+  };
   window.addEventListener(CONSENT_CHANGED_EVENT, handler);
-  return () => window.removeEventListener(CONSENT_CHANGED_EVENT, handler);
+  window.addEventListener("storage", storageHandler);
+  return () => {
+    window.removeEventListener(CONSENT_CHANGED_EVENT, handler);
+    window.removeEventListener("storage", storageHandler);
+  };
 }
 
 /** Asks the page's cookie consent component to open the preferences. */

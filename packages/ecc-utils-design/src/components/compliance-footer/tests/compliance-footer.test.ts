@@ -97,6 +97,17 @@ describe("markdown pages", () => {
     );
   });
 
+  it("opens only links to other origins in a new tab", () => {
+    const container = rendered(
+      "[ours](/terms) and [theirs](https://other.example.org/)"
+    );
+    const [ours, theirs] = Array.from(container.querySelectorAll("a"));
+
+    expect(ours.hasAttribute("target")).to.equal(false);
+    expect(theirs.getAttribute("target")).to.equal("_blank");
+    expect(theirs.getAttribute("rel")).to.equal("noopener noreferrer");
+  });
+
   it("escapes HTML and drops unsafe links", () => {
     const container = rendered(
       '<img src=x onerror="alert(1)"> [click](javascript:alert(1))'
@@ -280,5 +291,44 @@ describe("ecc-utils-design-compliance-footer", () => {
     );
     expect(frame?.getAttribute("sandbox")).to.contain("allow-scripts");
     dialog(el).close();
+  });
+
+  it("doesn't let same-origin embeds lift the sandbox", async () => {
+    const config: ComplianceConfig = {
+      footer: {
+        texts: { close: "Schliessen" },
+        items: [
+          { id: "terms", action: { type: "embed", src: "/legal/terms" } },
+        ],
+      },
+    };
+    const el = await fixture<EccUtilsDesignComplianceFooter>(
+      html`<ecc-utils-design-compliance-footer
+        .config=${config}
+      ></ecc-utils-design-compliance-footer>`
+    );
+
+    item(el, "Terms & Conditions").click();
+    await waitUntil(() => dialog(el).open);
+    const sandbox = dialog(el).querySelector("iframe")?.getAttribute("sandbox");
+
+    expect(sandbox).to.contain("allow-scripts");
+    expect(sandbox).not.to.contain("allow-same-origin");
+    expect(dialog(el).textContent).to.contain("Schliessen");
+    dialog(el).close();
+  });
+
+  it("stops listening for consent once removed", async () => {
+    const el = await fixture<EccUtilsDesignComplianceFooter>(
+      html`<ecc-utils-design-compliance-footer
+        .config=${{ cookies: COOKIES }}
+      ></ecc-utils-design-compliance-footer>`
+    );
+    const update = sinon.spy(el, "requestUpdate");
+    el.remove();
+
+    saveConsent(COOKIES, { embeds: true });
+
+    expect(update.callCount).to.equal(0);
   });
 });

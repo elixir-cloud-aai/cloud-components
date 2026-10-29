@@ -8,7 +8,10 @@ import {
   CookieConsent,
   DEFAULT_COOKIE_TEXTS,
   PREFERENCES_REQUESTED_EVENT,
+  consentSignature,
+  consentStorageKey,
   cookieCategories,
+  onConsentChange,
   readConsent,
   saveConsent,
 } from "./consent.js";
@@ -20,7 +23,7 @@ import "../button/index.js";
  * compliance configuration.
  * @since 2.0.0
  *
- * @property {ComplianceConfig} config - Shared compliance configuration; the component uses `config.cookies`.
+ * @property {ComplianceConfig} config - Shared compliance configuration; the component uses `config.cookies`. A new object with the same categories, version, storage key and `notice` keeps the user's unsaved choices.
  *
  * @fires ecc-cookie-consent-changed - Fired when the user saved their choices (detail: `{ consent }`). The event doesn't bubble; the same event fires on `window` for any code on the page.
  *
@@ -55,6 +58,11 @@ export class EccUtilsDesignCookieConsent extends LitElement {
 
   @query("dialog") private dialog?: HTMLDialogElement;
 
+  /** What the banner and the choices were last derived from. */
+  private derivedFrom?: string;
+
+  private stopListening?: () => void;
+
   private readonly onPreferencesRequested = () => this.openPreferences();
 
   connectedCallback(): void {
@@ -63,6 +71,7 @@ export class EccUtilsDesignCookieConsent extends LitElement {
       PREFERENCES_REQUESTED_EVENT,
       this.onPreferencesRequested
     );
+    this.listen();
   }
 
   disconnectedCallback(): void {
@@ -70,17 +79,40 @@ export class EccUtilsDesignCookieConsent extends LitElement {
       PREFERENCES_REQUESTED_EVENT,
       this.onPreferencesRequested
     );
+    this.stopListening?.();
+    this.stopListening = undefined;
     super.disconnectedCallback();
   }
 
   protected willUpdate(changed: Map<PropertyKey, unknown>): void {
-    if (changed.has("config")) {
-      const consent = readConsent(this.config?.cookies);
-      const optional = this.categories.some((category) => !category.required);
-      this.bannerOpen =
-        !consent && (optional || !!this.config?.cookies?.notice);
-      this.choices = this.currentChoices(consent);
-    }
+    if (!changed.has("config")) return;
+    const cookies = this.config?.cookies;
+    const derivedFrom = JSON.stringify([
+      consentSignature(cookies),
+      consentStorageKey(cookies),
+      !!cookies?.notice,
+    ]);
+    // a new but equal object (e.g. from a React render) keeps the choices
+    if (derivedFrom === this.derivedFrom) return;
+    this.derivedFrom = derivedFrom;
+    this.refresh();
+    if (this.isConnected) this.listen();
+  }
+
+  /** Follows consent saved in this page or in other tabs. */
+  private listen(): void {
+    this.stopListening?.();
+    this.stopListening = onConsentChange(() => {
+      if (!this.dialog?.open) this.refresh();
+    }, this.config?.cookies);
+  }
+
+  /** Shows the banner and sets the choices from the stored consent. */
+  private refresh(): void {
+    const consent = readConsent(this.config?.cookies);
+    const optional = this.categories.some((category) => !category.required);
+    this.bannerOpen = !consent && (optional || !!this.config?.cookies?.notice);
+    this.choices = this.currentChoices(consent);
   }
 
   /** Opens the preferences, e.g. from a "Cookie Preferences" link. */
@@ -113,7 +145,8 @@ export class EccUtilsDesignCookieConsent extends LitElement {
     this.bannerOpen = false;
     if (this.dialog?.open) this.dialog.close();
     this.dispatchEvent(
-      // not bubbling: `saveConsent()` fires the same event on `window`
+      // not bubbling: `saveConsent()` fires the same event on `window`;
+      // a literal (= CONSENT_CHANGED_EVENT), which the React wrapper needs
       new CustomEvent("ecc-cookie-consent-changed", { detail: { consent } })
     );
   }

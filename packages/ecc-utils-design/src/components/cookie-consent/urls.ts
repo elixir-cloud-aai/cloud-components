@@ -44,6 +44,39 @@ export function safeEmbedSrc(url: unknown): string | undefined {
   }
 }
 
+// a plain address: no percent-encoding, header separators or extra recipients
+const EMAIL = /^[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*$/;
+
+/**
+ * Whether a URL is absolute and points to another origin, e.g. to open it in
+ * a new tab.
+ * @param url A URL that passed `safeHref()`
+ * @returns Whether it is external
+ */
+export function isExternal(url: string): boolean {
+  try {
+    const parsed = new URL(url, window.location.href);
+    return (
+      parsed.protocol !== "mailto:" && parsed.origin !== window.location.origin
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Whether a URL has the origin of the page.
+ * @param url A URL that passed `safeEmbedSrc()`
+ * @returns Whether it is same-origin
+ */
+export function isSameOrigin(url: string): boolean {
+  try {
+    return new URL(url, window.location.href).origin === window.location.origin;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * A `mailto:` link for an address, or `undefined` if it isn't one.
  * @param email E-mail address
@@ -54,7 +87,7 @@ export function mailtoHref(
   email: unknown,
   subject?: unknown
 ): string | undefined {
-  if (typeof email !== "string" || !/^[^\s@?&#/]+@[^\s@?&#/]+$/.test(email)) {
+  if (typeof email !== "string" || !EMAIL.test(email)) {
     return undefined;
   }
   const query =

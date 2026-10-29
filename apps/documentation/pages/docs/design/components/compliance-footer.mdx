@@ -19,7 +19,7 @@ Each item has an action:
 | Action        | Configuration                                         | Result                                                     |
 |---------------|-------------------------------------------------------|------------------------------------------------------------|
 | `link`        | `{ type: 'link', href, newTab? }`                     | A link (`http(s)` or relative).                            |
-| `mailto`      | `{ type: 'mailto', email, subject? }`                 | Opens the mail client.                                     |
+| `mailto`      | `{ type: 'mailto', email, subject? }`                 | Opens the mail client; `email` is a plain address (letters, digits, `.`, `_`, `+`, `-`). |
 | `preferences` | `{ type: 'preferences' }`                             | Opens the cookie preferences.                              |
 | `page`        | `{ type: 'page', markdown, title? }`                  | Shows a page from Markdown in a dialog.                    |
 | `embed`       | `{ type: 'embed', src, title?, consent? }`            | Shows an `https` page in a frame in a dialog, e.g. a policy hosted by Iubenda, Termly or GetTerms; with `consent`, only once users consented to that cookie category. |
@@ -99,6 +99,7 @@ Each item has an action:
 | `items`           | `FooterItemConfig[]` | `{ id, label?, action?, hidden? }`. An entry with the `id` of a default item changes it (`label`, `action`) or removes it (`hidden: true`); other entries are added after the defaults, in their order. |
 | `replaceDefaults` | `boolean`            | Use only the configured items.                                                |
 | `label`           | `string`             | Accessible name of the footer's navigation, default "Legal".                  |
+| `texts`           | `{ close?: string }` | Texts of the footer's dialog, e.g. for translations; `close` defaults to `config.cookies.texts.close`, then "Close". |
 
 Items without an action, or whose link, address or embed URL isn't valid, aren't shown.
 
@@ -115,15 +116,15 @@ Items without an action, or whose link, address or embed URL isn't valid, aren't
 | `contact`            | Contact Us              | none            |
 | `privacy-choices`    | Your Privacy Choices    | none            |
 
-So without configuration, the footer shows only "Cookie Preferences"; each item that the operator gives an action appears, in this order.
+So without configuration, the footer shows only "Cookie Preferences"; each item that the operator gives an action appears, in this order. "Cookie Preferences" opens the preferences of the [cookie consent](/docs/design/components/cookie-consent) component, so add that component to the page too, or hide the item (`{ id: 'cookie-preferences', hidden: true }`).
 
 ### Markdown pages
 
-`page` items support a small subset of Markdown: headings (`#` to `###`), paragraphs, lists (`-`, `*`, `1.`), `**bold**`, `*emphasis*` and links (`[text](url)`, only `http(s)`, `mailto` and relative URLs). All text is escaped; HTML in the Markdown is shown as text, not rendered.
+`page` items support a small subset of Markdown: headings (`#` to `###`), paragraphs, lists (`-`, `*`, `1.`), `**bold**`, `*emphasis*` and links (`[text](url)`, only `http(s)`, `mailto` and relative URLs; links to other origins open in a new tab). All text is escaped; HTML in the Markdown is shown as text, not rendered.
 
 ### Embeds
 
-- Only `https` URLs (and `http` on `localhost`) are embedded. The frame is sandboxed (`allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox`) and sends no referrer.
+- Only `https` URLs (and `http` on `localhost`) are embedded. The frame is sandboxed (`allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox`; without `allow-same-origin` for pages of the app's own origin, which couldn't be isolated otherwise) and sends no referrer. For pages of your own, prefer `page` or `link`.
 - Allow the embed's origin in the app's Content Security Policy (`frame-src`).
-- Embeds whose provider sets cookies should name a cookie category in `consent`; until users consent to it, the dialog shows a note and a button to the preferences instead of the frame.
+- An embed loads its frame when users open the item, whether or not they chose their cookies yet. Embeds whose provider sets cookies or tracks visitors (check the provider's documentation) must therefore name a cookie category in `consent`; until users consent to it, the dialog shows a note and a button to the preferences instead of the frame.
 - Script-based embeds (a `<script>` tag that injects the policy) aren't supported, since configuration must not run code on the page. Most policy services also offer a page URL that can be embedded or linked.

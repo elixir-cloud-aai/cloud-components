@@ -137,6 +137,78 @@ describe("cookie consent store", () => {
   });
 });
 
+describe("cookie consent store, edge cases", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it("asks again when a required category becomes optional", () => {
+    const forced: CookieConsentConfig = {
+      categories: [
+        { id: "necessary", label: "Necessary", required: true },
+        { id: "analytics", label: "Analytics", required: true },
+      ],
+    };
+    saveConsent(forced, {});
+    const optional: CookieConsentConfig = {
+      categories: [
+        { id: "necessary", label: "Necessary", required: true },
+        { id: "analytics", label: "Analytics" },
+      ],
+    };
+
+    expect(readConsent(optional)).to.equal(null);
+    expect(hasConsent("analytics", optional)).to.equal(false);
+  });
+
+  it("revokes consent if storage can be read but not written", () => {
+    saveConsent(COOKIES, { analytics: true });
+    sinon.stub(Storage.prototype, "setItem").throws(new Error("full"));
+
+    saveConsent(COOKIES, { analytics: false });
+
+    expect(hasConsent("analytics", COOKIES)).to.equal(false);
+    sinon.restore();
+    // the older choice doesn't stay behind for other pages
+    expect(window.localStorage.getItem(DEFAULT_STORAGE_KEY)).to.equal(null);
+
+    // once storage works again, it is used again
+    saveConsent(COOKIES, { analytics: false });
+    expect(window.localStorage.getItem(DEFAULT_STORAGE_KEY)).to.contain(
+      "analytics"
+    );
+  });
+
+  it("tells listeners about consent saved in other tabs", () => {
+    const listener = sinon.spy();
+    const stop = onConsentChange(listener, COOKIES);
+    window.localStorage.setItem(
+      DEFAULT_STORAGE_KEY,
+      JSON.stringify({
+        categories: { necessary: true, analytics: true },
+        signature: consentSignature(COOKIES),
+        updatedAt: "2026-10-29T00:00:00Z",
+      })
+    );
+
+    window.dispatchEvent(new StorageEvent("storage", { key: "other" }));
+    window.dispatchEvent(
+      new StorageEvent("storage", { key: DEFAULT_STORAGE_KEY })
+    );
+    stop();
+    window.dispatchEvent(
+      new StorageEvent("storage", { key: DEFAULT_STORAGE_KEY })
+    );
+
+    expect(listener.callCount).to.equal(1);
+    expect(listener.firstCall.args[0].categories.analytics).to.equal(true);
+  });
+});
+
 describe("ecc-utils-design-cookie-consent", () => {
   beforeEach(() => {
     window.localStorage.clear();
@@ -271,5 +343,66 @@ describe("ecc-utils-design-cookie-consent", () => {
     expect(button(banner(el) as Element, "accept").textContent).to.contain(
       "Alle"
     );
+  });
+
+  it("keeps unsaved choices when an equal config is passed", async () => {
+    const el = await fixture<EccUtilsDesignCookieConsent>(
+      html`<ecc-utils-design-cookie-consent
+        .config=${CONFIG}
+      ></ecc-utils-design-cookie-consent>`
+    );
+    await el.openPreferences();
+    const box = () =>
+      dialog(el).querySelectorAll<HTMLInputElement>("input[type=checkbox]")[1];
+    box().click();
+    await el.updateComplete;
+
+    // e.g. a React render with an inline object
+    el.config = { cookies: { ...COOKIES } };
+    await el.updateComplete;
+
+    expect(dialog(el).open).to.equal(true);
+    expect(box().checked).to.equal(true);
+    expect(banner(el)).not.to.equal(null);
+    dialog(el).close();
+  });
+
+  it("follows consent saved in another tab", async () => {
+    const el = await fixture<EccUtilsDesignCookieConsent>(
+      html`<ecc-utils-design-cookie-consent
+        .config=${CONFIG}
+      ></ecc-utils-design-cookie-consent>`
+    );
+    expect(banner(el)).not.to.equal(null);
+    window.localStorage.setItem(
+      DEFAULT_STORAGE_KEY,
+      JSON.stringify({
+        categories: { necessary: true, analytics: false },
+        signature: consentSignature(COOKIES),
+        updatedAt: "2026-10-29T00:00:00Z",
+      })
+    );
+
+    window.dispatchEvent(
+      new StorageEvent("storage", { key: DEFAULT_STORAGE_KEY })
+    );
+    await el.updateComplete;
+
+    expect(banner(el)).to.equal(null);
+  });
+
+  it("stops listening once removed", async () => {
+    const el = await fixture<EccUtilsDesignCookieConsent>(
+      html`<ecc-utils-design-cookie-consent
+        .config=${CONFIG}
+      ></ecc-utils-design-cookie-consent>`
+    );
+    const open = sinon.spy(el, "openPreferences");
+    el.remove();
+
+    openCookiePreferences();
+    saveConsent(COOKIES, { analytics: true });
+
+    expect(open.callCount).to.equal(0);
   });
 });

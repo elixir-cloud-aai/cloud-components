@@ -4,15 +4,20 @@ import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 import {
   ComplianceConfig,
-  CONSENT_CHANGED_EVENT,
   cookieCategories,
   DEFAULT_COOKIE_TEXTS,
   FooterItem,
   footerItems,
   hasConsent,
+  onConsentChange,
   openCookiePreferences,
 } from "../cookie-consent/consent.js";
-import { mailtoHref, safeEmbedSrc, safeHref } from "../cookie-consent/urls.js";
+import {
+  isSameOrigin,
+  mailtoHref,
+  safeEmbedSrc,
+  safeHref,
+} from "../cookie-consent/urls.js";
 import { renderMarkdown } from "./markdown.js";
 import "../button/index.js";
 
@@ -56,23 +61,32 @@ export class EccUtilsDesignComplianceFooter extends LitElement {
   /** The page or embed shown in the dialog. */
   @state() private openItem: DialogItem | null = null;
 
-  /** Bumped when consent changes, so that embeds load once allowed. */
-  @state() private consentVersion = 0;
-
   @query("dialog") private dialog?: HTMLDialogElement;
 
-  private readonly onConsentChanged = () => {
-    this.consentVersion += 1;
-  };
+  private stopListening?: () => void;
 
   connectedCallback(): void {
     super.connectedCallback();
-    window.addEventListener(CONSENT_CHANGED_EVENT, this.onConsentChanged);
+    this.listen();
   }
 
   disconnectedCallback(): void {
-    window.removeEventListener(CONSENT_CHANGED_EVENT, this.onConsentChanged);
+    this.stopListening?.();
+    this.stopListening = undefined;
     super.disconnectedCallback();
+  }
+
+  protected willUpdate(changed: Map<PropertyKey, unknown>): void {
+    if (changed.has("config") && this.isConnected) this.listen();
+  }
+
+  /** Renders again when consent changes, so that embeds load once allowed. */
+  private listen(): void {
+    this.stopListening?.();
+    this.stopListening = onConsentChange(
+      () => this.requestUpdate(),
+      this.config?.cookies
+    );
   }
 
   private select(item: FooterItem, event?: Event): boolean {
@@ -142,12 +156,8 @@ export class EccUtilsDesignComplianceFooter extends LitElement {
     const { consent } = item.action;
     const src = safeEmbedSrc(item.action.src);
     if (!src) return nothing;
-    // read again when consent changes (consentVersion)
-    if (
-      consent &&
-      this.consentVersion >= 0 &&
-      !hasConsent(consent, this.config?.cookies)
-    ) {
+    // checked on every render; consent changes request one
+    if (consent && !hasConsent(consent, this.config?.cookies)) {
       const texts = { ...DEFAULT_COOKIE_TEXTS, ...this.config?.cookies?.texts };
       const label =
         cookieCategories(this.config?.cookies).find((c) => c.id === consent)
@@ -162,18 +172,25 @@ export class EccUtilsDesignComplianceFooter extends LitElement {
           >${texts.preferencesTitle}</ecc-utils-design-button
         >`;
     }
+    // a same-origin frame with both flags could lift its own sandbox
+    const sandbox = isSameOrigin(src)
+      ? "allow-scripts allow-popups allow-popups-to-escape-sandbox"
+      : "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox";
     return html`<iframe
       class="mt-4 h-[60vh] w-full rounded-md border border-border"
       src=${src}
       title=${item.action.title ?? item.label}
       referrerpolicy="no-referrer"
-      sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+      sandbox=${sandbox}
     ></iframe>`;
   }
 
   private renderDialog() {
     const item = this.openItem;
-    const { close } = DEFAULT_COOKIE_TEXTS;
+    const close =
+      this.config?.footer?.texts?.close ??
+      this.config?.cookies?.texts?.close ??
+      DEFAULT_COOKIE_TEXTS.close;
     return html`
       <dialog
         part="dialog"
@@ -200,8 +217,7 @@ export class EccUtilsDesignComplianceFooter extends LitElement {
           <ecc-utils-design-button
             variant="outline"
             @click=${() => this.dialog?.close()}
-            >${this.config?.cookies?.texts?.close ??
-            close}</ecc-utils-design-button
+            >${close}</ecc-utils-design-button
           >
         </div>
       </dialog>
