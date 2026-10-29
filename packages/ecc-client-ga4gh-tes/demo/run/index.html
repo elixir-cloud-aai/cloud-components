@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TES Task Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="../../dist/index.js"></script>
+  </head>
+  <body class="p-8">
+    <a href="../runs/index.html" class="text-blue-600 hover:underline"
+      >&larr; Back to tasks</a
+    >
+    <h1 class="text-2xl font-bold my-4">Task Details</h1>
+    <ecc-client-ga4gh-tes-run
+      id="run"
+      baseUrl="http://127.0.0.1:6010/ga4gh/tes/v1"
+    ></ecc-client-ga4gh-tes-run>
+
+    <script type="module">
+      const runId = new URLSearchParams(window.location.search).get("runId");
+      if (runId) document.getElementById("run").runId = runId;
+    </script>
+  </body>
+</html>

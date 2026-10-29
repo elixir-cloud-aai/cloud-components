@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TES Create Task Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="../../dist/index.js"></script>
+  </head>
+  <body class="p-8 max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4">Create Task</h1>
+    <ecc-client-ga4gh-tes-run-create
+      baseUrl="http://127.0.0.1:6010/ga4gh/tes/v1"
+    ></ecc-client-ga4gh-tes-run-create>
+
+    <script>
+      document.addEventListener("ecc-run-submitted", (event) => {
+        console.log("Task submitted:", event.detail);
+      });
+      document.addEventListener("ecc-run-create-failed", (event) => {
+        console.error("TES error:", event.detail);
+      });
+    </script>
+  </body>
+</html>
