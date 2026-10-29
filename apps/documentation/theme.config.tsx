@@ -43,7 +43,7 @@ const config: DocsThemeConfig = {
     const { asPath } = useRouter()
     
     return {
-      titleTemplate: `${asPath === '/' ? '' : `%s – `}Elixir Cloud Components`,
+      titleTemplate: `${asPath === '/' ? '' : `%s – `}Cloud Components`,
     };
   },
 };
