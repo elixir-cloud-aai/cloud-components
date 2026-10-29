@@ -72,6 +72,8 @@ export class EccUtilsDesignCookieConsent extends LitElement {
       this.onPreferencesRequested
     );
     this.listen();
+    // consent may have changed while the element was detached
+    if (this.hasUpdated) this.refresh();
   }
 
   disconnectedCallback(): void {
@@ -249,6 +251,7 @@ export class EccUtilsDesignCookieConsent extends LitElement {
       <dialog
         part="dialog"
         aria-labelledby="ecc-cookie-preferences-title"
+        @close=${() => this.refresh()}
         class="m-auto w-[min(32rem,calc(100%-2rem))] rounded-lg border border-border bg-background p-6 text-foreground shadow-lg"
       >
         <h2 id="ecc-cookie-preferences-title" class="text-lg font-semibold">

@@ -183,6 +183,34 @@ describe("cookie consent store, edge cases", () => {
     );
   });
 
+  it("prefers another tab's consent to one kept in memory", () => {
+    sinon.stub(Storage.prototype, "setItem").throws(new Error("full"));
+    saveConsent(COOKIES, { analytics: true });
+    sinon.restore();
+    const listener = sinon.spy();
+    const stop = onConsentChange(listener, COOKIES);
+    window.localStorage.setItem(
+      DEFAULT_STORAGE_KEY,
+      JSON.stringify({
+        categories: { necessary: true, analytics: false },
+        signature: consentSignature(COOKIES),
+        updatedAt: "2026-10-29T00:00:00Z",
+      })
+    );
+
+    window.dispatchEvent(
+      new StorageEvent("storage", { key: DEFAULT_STORAGE_KEY })
+    );
+    // another tab cleared the storage
+    window.localStorage.clear();
+    window.dispatchEvent(new StorageEvent("storage", { key: null }));
+    stop();
+
+    expect(listener.firstCall.args[0].categories.analytics).to.equal(false);
+    expect(listener.secondCall.args[0]).to.equal(null);
+    expect(hasConsent("analytics", COOKIES)).to.equal(false);
+  });
+
   it("tells listeners about consent saved in other tabs", () => {
     const listener = sinon.spy();
     const stop = onConsentChange(listener, COOKIES);
@@ -386,6 +414,37 @@ describe("ecc-utils-design-cookie-consent", () => {
     window.dispatchEvent(
       new StorageEvent("storage", { key: DEFAULT_STORAGE_KEY })
     );
+    await el.updateComplete;
+
+    expect(banner(el)).to.equal(null);
+  });
+
+  it("follows other tabs once the preferences are closed", async () => {
+    const el = await fixture<EccUtilsDesignCookieConsent>(
+      html`<ecc-utils-design-cookie-consent
+        .config=${CONFIG}
+      ></ecc-utils-design-cookie-consent>`
+    );
+    await el.openPreferences();
+    saveConsent(COOKIES, { analytics: true });
+    await el.updateComplete;
+    expect(banner(el)).not.to.equal(null);
+
+    dialog(el).close();
+    await waitUntil(() => banner(el) === null);
+  });
+
+  it("follows consent changed while it was detached", async () => {
+    const el = await fixture<EccUtilsDesignCookieConsent>(
+      html`<ecc-utils-design-cookie-consent
+        .config=${CONFIG}
+      ></ecc-utils-design-cookie-consent>`
+    );
+    const parent = el.parentElement as HTMLElement;
+    el.remove();
+    saveConsent(COOKIES, { analytics: false });
+
+    parent.appendChild(el);
     await el.updateComplete;
 
     expect(banner(el)).to.equal(null);

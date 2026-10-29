@@ -343,7 +343,11 @@ export function onConsentChange(
     if (detail?.consent) listener(detail.consent);
   };
   const storageHandler = (event: StorageEvent) => {
-    if (event.key !== consentStorageKey(config)) return;
+    // `null`: another tab cleared the storage
+    const key = consentStorageKey(config);
+    if (event.key !== null && event.key !== key) return;
+    // the other tab's write is newer than consent kept in memory here
+    memory.delete(key);
     listener(readConsent(config));
   };
   window.addEventListener(CONSENT_CHANGED_EVENT, handler);
