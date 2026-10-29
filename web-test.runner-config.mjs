@@ -2,6 +2,8 @@ import { esbuildPlugin } from "@web/dev-server-esbuild";
 import fg from "fast-glob";
 import { playwrightLauncher } from "@web/test-runner-playwright";
 
+// Packages run tests in parallel (turbo --parallel), so each package's test
+// scripts pass a unique --port: design 8000, wes 8001.
 export default {
   rootDir: ".",
   files: "src/**/*.test.ts", // "default" group
@@ -19,6 +21,8 @@ export default {
     esbuildPlugin({
       ts: true,
       target: "es2020",
+      // Lit decorators need the package's experimentalDecorators setting
+      tsconfig: "./tsconfig.json",
     }),
   ],
   browsers: [

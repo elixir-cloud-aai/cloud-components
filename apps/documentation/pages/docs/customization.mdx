@@ -1,3 +1,5 @@
+import { Callout } from 'nextra/components'
+
 # Customization
 
 Cloud Components (ECC) provides a flexible and powerful customization system that allows you to adapt components to match your design requirements. The system is built on CSS custom properties (tokens), inspired by the excellent design patterns from [shadcn/ui](https://ui.shadcn.com/).
@@ -26,8 +28,8 @@ Here are all the available design tokens you can customize:
 | `--ecc-muted-foreground` | Muted text color | `oklch(0.556 0 0)` | `oklch(0.708 0 0)` |
 | `--ecc-accent` | Accent color | `oklch(0.97 0 0)` | `oklch(0.269 0 0)` |
 | `--ecc-accent-foreground` | Text on accent background | `oklch(0.205 0 0)` | `oklch(0.985 0 0)` |
-| `--ecc-destructive` | Error/danger color | `oklch(0.577 0.245 27.325)` | `oklch(0.396 0.141 25.723)` |
-| `--ecc-destructive-foreground` | Text on destructive background | `oklch(0.985 0 0)` | `oklch(0.637 0.237 25.331)` |
+| `--ecc-destructive` | Error/danger color, also used for error text | `oklch(0.577 0.245 27.325)` | `oklch(0.704 0.191 22.216)` |
+| `--ecc-destructive-foreground` | Text on destructive background | `oklch(0.985 0 0)` | `oklch(0.205 0 0)` |
 | `--ecc-border` | Border color | `oklch(0.922 0 0)` | `oklch(0.269 0 0)` |
 | `--ecc-input` | Input border color | `oklch(0.922 0 0)` | `oklch(0.269 0 0)` |
 | `--ecc-ring` | Focus ring color | `oklch(0.708 0 0)` | `oklch(0.439 0 0)` |
@@ -56,6 +58,14 @@ Here are all the available design tokens you can customize:
 | Token | Description | Default |
 |-------|-------------|---------|
 | `--ecc-radius` | Border radius | `0.625rem` |
+| `--ecc-surface-padding` | Inset of components with the `surface` attribute | `1rem` |
+
+#### Typography Tokens
+
+| Token | Description | Default |
+|-------|-------------|---------|
+| `--ecc-font-sans` | Font family for all component text | Inherited from the page |
+| `--ecc-font-mono` | Font family for IDs, code and the code editor | `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace` |
 
 #### Sidebar Tokens
 
@@ -108,6 +118,72 @@ You can also provide different values for dark mode:
   --ecc-background: oklch(0.1 0 0);
 }
 ```
+
+### Typography
+
+Components inherit the page's font unless you set the typography tokens:
+
+```css
+:root {
+  --ecc-font-sans: "Inter", system-ui, sans-serif;
+  --ecc-font-mono: "JetBrains Mono", monospace;
+}
+```
+
+## Dark Mode
+
+Components switch to the dark defaults listed above when either:
+
+- the component itself has a `dark` attribute (`<ecc-client-ga4gh-wes-runs dark>`), or
+- an ancestor element has a `dark` attribute or a `dark` class (e.g. `<html class="dark">`).
+
+Dark defaults are passed on to components nested inside other components, so
+setting `dark` on the outermost component is enough.
+
+<Callout type="warning">
+  Detection of a `dark` class or attribute on an *ancestor* relies on the CSS
+  `:host-context()` selector, which only Chromium-based browsers support (not
+  Firefox or Safari). For dark mode in all browsers, set the `dark` attribute
+  on the components themselves, or set the `--ecc-*` tokens for your dark theme
+  explicitly.
+</Callout>
+
+Any `--ecc-*` token you set takes precedence over the dark defaults.
+
+<Callout type="info">
+  Error messages use `--ecc-destructive` as their text color, so it should be
+  readable on `--ecc-background`. Earlier versions used a dark red default for
+  `--ecc-destructive` in dark mode; if you copied that value into your own
+  dark theme, use a lighter red such as `oklch(0.704 0.191 22.216)`.
+</Callout>
+
+## Surface Painting
+
+By default, components are transparent: they show the page's background and
+inherit its text color, which suits embedding them into an existing layout.
+Add the `surface` attribute to have a component paint its own background and
+text color from `--ecc-background` and `--ecc-foreground`. The surface is
+inset by `--ecc-surface-padding` (default `1rem`) and its corners are rounded
+by `--ecc-radius`:
+
+```html
+<ecc-client-ga4gh-wes-runs surface dark></ecc-client-ga4gh-wes-runs>
+```
+
+This lets a component use a dark (or otherwise different) theme regardless of
+the page it is placed on. Set `surface` on top-level, block-level components
+only, such as the service components (`ecc-client-*`); components nested
+inside them inherit the painted surface. Inline design components (e.g.
+badges or buttons) are not laid out as a padded box.
+
+## Code Editor
+
+The code editor used for parameters, logs and file contents follows the same
+tokens: background and text use `--ecc-background` and `--ecc-foreground`, the
+gutter uses `--ecc-muted` and `--ecc-muted-foreground`, keys and keywords use
+`--ecc-primary`, strings are derived from `--ecc-chart-2`, numbers and other
+constants from `--ecc-chart-1`, invalid code uses `--ecc-destructive`,
+selections use `--ecc-ring`, and the font is `--ecc-font-mono`.
 
 ## Credits
 
