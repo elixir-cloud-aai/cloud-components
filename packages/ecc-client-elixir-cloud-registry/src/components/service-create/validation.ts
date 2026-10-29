@@ -7,6 +7,9 @@
  * names), which the registry then reports.
  */
 
+/** Schemes of HTTP(S) URLs */
+export const HTTP_SCHEMES = ["http", "https"];
+
 /** Maximum lengths of fields, in characters (code points) */
 export const MAX_LENGTHS = {
   name: 1024,
@@ -18,8 +21,9 @@ export const MAX_LENGTHS = {
   url: 2048,
 } as const;
 
-// Whitespace, control and format characters, surrogates and separators,
-// which URLs must not contain (except joiners in host names)
+// Whitespace, control and format characters, surrogates (so unpaired ones
+// too) and separators, which URLs must not contain (except joiners in host
+// names)
 const REJECTED_CHARACTER = /[\s\p{Cc}\p{Cf}\p{Cs}\p{Zl}\p{Zp}\p{Zs}]/u;
 // Zero width non-joiner and joiner, allowed in international host names
 const JOINERS = /[\u200c\u200d]/g;
@@ -152,7 +156,7 @@ function checkHttpUrl(url: string, schemes: string[]): string | undefined {
 function checkMailto(url: string): string | undefined {
   const rest = url.slice("mailto:".length);
   const invalid =
-    "needs valid email addresses, e.g. mailto:support@example.org";
+    "needs valid email addresses (e.g. mailto:support@example.org)";
   if (rest.startsWith("//")) return invalid;
   const [, path = "", query = "", fragment = ""] =
     MAILTO_PARTS.exec(rest) ?? [];
@@ -173,7 +177,12 @@ function checkMailto(url: string): string | undefined {
     let ascii = domain;
     if (/[^\0-\x7f]/.test(domain)) {
       try {
-        ascii = new URL(`http://${domain}/`).hostname;
+        // a stand-in last label, so that browsers don't take numeric ones
+        // (e.g. `0x1`) as IPv4 addresses
+        ascii = new URL(`http://${domain}.invalid/`).hostname.replace(
+          /\.invalid$/,
+          ""
+        );
       } catch {
         return invalid;
       }
@@ -209,7 +218,7 @@ export function checkUrl(
   }
   if (mailto && /^mailto:/i.test(url)) return checkMailto(url);
   if (mailto && /^[^:/@\s]+@[^@\s]+$/.test(url)) {
-    return `needs mailto: for email addresses, e.g. mailto:${url}`;
+    return `needs mailto: for email addresses (e.g. mailto:${url})`;
   }
   return checkHttpUrl(url, schemes);
 }

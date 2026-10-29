@@ -17,6 +17,7 @@ import "@elixir-cloud/design/components/label/index.js";
 import "@elixir-cloud/design/components/textarea/index.js";
 import "@elixir-cloud/design/components/collapsible/index.js";
 import {
+  HTTP_SCHEMES,
   MAX_LENGTHS,
   checkServiceId,
   checkUrl,
@@ -51,6 +52,11 @@ const ADVANCED_FIELDS = [
 // Timestamps, whose errors don't keep the form from being sent: the
 // registry ignores timestamps unless they come from admins
 const TIMESTAMP_FIELDS = ["created-at", "updated-at"];
+
+/** IDs of the invalid fields that keep the form from being sent */
+function blockingFields(errors: Record<string, string>): string[] {
+  return Object.keys(errors).filter((id) => !TIMESTAMP_FIELDS.includes(id));
+}
 
 /**
  * @summary Component for creating new services in Cloud Registry
@@ -125,7 +131,9 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   @state() private submitted = false;
   // Whether "Advanced Configuration" is expanded
   @state() private advancedOpen = false;
-  // Errors of the fields, computed once per render (cf. `fieldErrors()`)
+  // Errors of the fields, cached at the start of each render for the
+  // helpers of the template (`renderError()`, `invalid()`, ...); every
+  // change of the form state renders again
   private errors: Record<string, string> = {};
   // Number of the latest request for the rules, so that older answers are
   // ignored (e.g. of a previous registry)
@@ -272,7 +280,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     this.registryUrlSchemes =
       Array.isArray(urlSchemes) &&
       urlSchemes.length > 0 &&
-      urlSchemes.every((value) => value === "http" || value === "https")
+      urlSchemes.every((value) => HTTP_SCHEMES.includes(value))
         ? urlSchemes
         : null;
   }
@@ -282,7 +290,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     const configured = Array.isArray(this.urlSchemes)
       ? this.urlSchemes
           .map((scheme) => String(scheme).toLowerCase())
-          .filter((scheme) => scheme === "http" || scheme === "https")
+          .filter((scheme) => HTTP_SCHEMES.includes(scheme))
       : [];
     return (
       this.registryUrlSchemes ?? (configured.length ? configured : ["https"])
@@ -291,8 +299,9 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
   /**
    * Errors of the fields, by the IDs of their inputs, as the registry would
-   * reject them (`400`); missing required fields only after a submission
-   * was tried (or with `all`)
+   * reject them (`400`)
+   * @param includeMissing Whether to flag missing required fields (by
+   * default, once a submission was tried)
    */
   private fieldErrors(includeMissing = this.submitted): Record<string, string> {
     const errors: Record<string, string> = {};
@@ -329,7 +338,6 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       const error = checkUrl(value, schemes, mailto);
       if (error) add(id, `${label} ${error}.`);
     };
-    const links = ["http", "https"];
 
     text("service-name", "Service name", formData.name, MAX_LENGTHS.name, true);
     text("service-url", "Service URL", formData.url, MAX_LENGTHS.url, true);
@@ -354,7 +362,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       MAX_LENGTHS.url,
       true
     );
-    url("org-url", "Organization URL", formData.organization.url, links);
+    url("org-url", "Organization URL", formData.organization.url, HTTP_SCHEMES);
     text(
       "type-group",
       "Type group",
@@ -395,12 +403,12 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       formData.description,
       MAX_LENGTHS.description
     );
-    url("contact-url", "Contact URL", formData.contactUrl, links, true);
+    url("contact-url", "Contact URL", formData.contactUrl, HTTP_SCHEMES, true);
     url(
       "documentation-url",
       "Documentation URL",
       formData.documentationUrl,
-      links
+      HTTP_SCHEMES
     );
     if (formData.customServiceId) {
       const error = checkServiceId(formData.customServiceId);
@@ -428,9 +436,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
   /** Whether the shown errors keep the form from being sent */
   private hasBlockingErrors(): boolean {
-    return Object.keys(this.errors).some(
-      (id) => !TIMESTAMP_FIELDS.includes(id)
-    );
+    return blockingFields(this.errors).length > 0;
   }
 
   /** Message under a field, if it is invalid (announced politely) */
@@ -560,9 +566,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     // invalid inputs are shown at their fields, and nothing is sent
     this.submitted = true;
     const errors = this.fieldErrors(true);
-    const blocking = Object.keys(errors).filter(
-      (id) => !TIMESTAMP_FIELDS.includes(id)
-    );
+    const blocking = blockingFields(errors);
     if (blocking.length > 0) {
       // errors in the collapsed section are shown too
       if (blocking.some((id) => ADVANCED_FIELDS.includes(id))) {
