@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in ELIXIR Cloud Components! Bug reports, feature
+Thanks for your interest in Cloud Components! Bug reports, feature
 requests, discussions, documentation and code are all welcome. The project
 follows the [contributor guide of ELIXIR
 On-Cloud](https://elixir-cloud-aai.github.io/contribute/); this file only
