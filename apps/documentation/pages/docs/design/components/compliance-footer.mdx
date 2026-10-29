@@ -124,7 +124,7 @@ So without configuration, the footer shows only "Cookie Preferences"; each item 
 
 ### Embeds
 
-- Only `https` URLs (and `http` on `localhost`) are embedded. The frame is sandboxed (`allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox`; without `allow-same-origin` for pages of the app's own origin, which couldn't be isolated otherwise) and sends no referrer. For pages of your own, prefer `page` or `link`.
+- Only `https` URLs (and `http` on `localhost`) are embedded. The frame is sandboxed (`allow-scripts allow-same-origin allow-popups`, so pages it opens stay sandboxed; without `allow-same-origin` for pages of the app's own origin, which couldn't be isolated otherwise) and sends no referrer. For pages of your own, prefer `page` or `link`.
 - Allow the embed's origin in the app's Content Security Policy (`frame-src`).
 - An embed loads its frame when users open the item, whether or not they chose their cookies yet. Embeds whose provider sets cookies or tracks visitors (check the provider's documentation) must therefore name a cookie category in `consent`; until users consent to it, the dialog shows a note and a button to the preferences instead of the frame.
 - Script-based embeds (a `<script>` tag that injects the policy) aren't supported, since configuration must not run code on the page. Most policy services also offer a page URL that can be embedded or linked.

@@ -58,6 +58,9 @@ export class EccUtilsDesignCookieConsent extends LitElement {
 
   @query("dialog") private dialog?: HTMLDialogElement;
 
+  /** Categories that users switched in the open preferences. */
+  private touched = new Set<string>();
+
   /** What the banner and the choices were last derived from. */
   private derivedFrom?: string;
 
@@ -104,8 +107,17 @@ export class EccUtilsDesignCookieConsent extends LitElement {
   /** Follows consent saved in this page or in other tabs. */
   private listen(): void {
     this.stopListening?.();
-    this.stopListening = onConsentChange(() => {
-      if (!this.dialog?.open) this.refresh();
+    this.stopListening = onConsentChange((consent) => {
+      if (!this.dialog?.open) {
+        this.refresh();
+        return;
+      }
+      // keep what users switched here, take the rest from the new consent
+      const choices = this.currentChoices(consent);
+      this.touched.forEach((id) => {
+        choices[id] = !!this.choices[id];
+      });
+      this.choices = choices;
     }, this.config?.cookies);
   }
 
@@ -119,9 +131,14 @@ export class EccUtilsDesignCookieConsent extends LitElement {
 
   /** Opens the preferences, e.g. from a "Cookie Preferences" link. */
   async openPreferences(): Promise<void> {
-    this.choices = this.currentChoices(readConsent(this.config?.cookies));
+    if (!this.dialog?.open) {
+      this.touched.clear();
+      this.choices = this.currentChoices(readConsent(this.config?.cookies));
+    }
     await this.updateComplete;
-    if (this.dialog && !this.dialog.open) this.dialog.showModal();
+    if (this.isConnected && this.dialog && !this.dialog.open) {
+      this.dialog.showModal();
+    }
   }
 
   private get categories(): CookieCategory[] {
@@ -163,6 +180,7 @@ export class EccUtilsDesignCookieConsent extends LitElement {
 
   private toggle(id: string, event: Event): void {
     const { checked } = event.target as HTMLInputElement;
+    this.touched.add(id);
     this.choices = { ...this.choices, [id]: checked };
   }
 

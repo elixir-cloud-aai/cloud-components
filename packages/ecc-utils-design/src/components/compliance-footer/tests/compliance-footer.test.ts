@@ -290,6 +290,9 @@ describe("ecc-utils-design-compliance-footer", () => {
       "https://policies.example.org/privacy"
     );
     expect(frame?.getAttribute("sandbox")).to.contain("allow-scripts");
+    expect(frame?.getAttribute("sandbox")).not.to.contain(
+      "allow-popups-to-escape-sandbox"
+    );
     dialog(el).close();
   });
 

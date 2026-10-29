@@ -168,7 +168,7 @@ openCookiePreferences();
 | `hasConsent(category, config?)`        | Whether users consented to a category (required ones: always).  |
 | `readConsent(config?)`                 | The stored `CookieConsent`, or `null` if users must be asked.   |
 | `saveConsent(config, choices)`         | Stores choices and fires `ecc-cookie-consent-changed` on `window`. |
-| `onConsentChange(listener, config?)`   | Calls `listener` on every change in this page, and in other tabs for the storage key of `config` (with `null` if that consent was removed); returns a function to stop. |
+| `onConsentChange(listener, config?)`   | Calls `listener` on every change for the storage key of `config`, in this page and in other tabs (with `null` if that consent was removed); returns a function to stop. |
 | `openCookiePreferences()`              | Asks the page's component to open the preferences.              |
 
 ## Notes for operators

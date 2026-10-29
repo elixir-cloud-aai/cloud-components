@@ -104,7 +104,9 @@ export class EccUtilsDesignComplianceFooter extends LitElement {
   private async openDialog(item: DialogItem): Promise<void> {
     this.openItem = item;
     await this.updateComplete;
-    if (this.dialog && !this.dialog.open) this.dialog.showModal();
+    if (this.isConnected && this.dialog && !this.dialog.open) {
+      this.dialog.showModal();
+    }
   }
 
   private runAction(item: FooterItem): void {
@@ -174,8 +176,8 @@ export class EccUtilsDesignComplianceFooter extends LitElement {
     }
     // a same-origin frame with both flags could lift its own sandbox
     const sandbox = isSameOrigin(src)
-      ? "allow-scripts allow-popups allow-popups-to-escape-sandbox"
-      : "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox";
+      ? "allow-scripts allow-popups"
+      : "allow-scripts allow-same-origin allow-popups";
     return html`<iframe
       class="mt-4 h-[60vh] w-full rounded-md border border-border"
       src=${src}

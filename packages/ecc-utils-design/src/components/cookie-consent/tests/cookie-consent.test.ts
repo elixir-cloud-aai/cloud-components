@@ -211,6 +211,74 @@ describe("cookie consent store, edge cases", () => {
     expect(hasConsent("analytics", COOKIES)).to.equal(false);
   });
 
+  it("tells listeners only about their own configuration", () => {
+    const listener = sinon.spy();
+    const stop = onConsentChange(listener, COOKIES);
+
+    saveConsent({ ...COOKIES, storageKey: "other-app" }, { analytics: true });
+    saveConsent(COOKIES, { analytics: false });
+    stop();
+
+    expect(listener.callCount).to.equal(1);
+    expect(listener.firstCall.args[0].categories.analytics).to.equal(false);
+  });
+
+  it("tells listeners in save order if a listener saves", () => {
+    const seen: boolean[] = [];
+    const stopFirst = onConsentChange((consent) => {
+      if (consent?.categories.analytics) {
+        saveConsent(COOKIES, { analytics: false });
+      }
+    }, COOKIES);
+    const stopSecond = onConsentChange((consent) => {
+      seen.push(!!consent?.categories.analytics);
+    }, COOKIES);
+
+    saveConsent(COOKIES, { analytics: true });
+    stopFirst();
+    stopSecond();
+
+    expect(seen).to.deep.equal([true, false]);
+    expect(hasConsent("analytics", COOKIES)).to.equal(false);
+  });
+
+  it("merges duplicate categories and skips unusable ones", () => {
+    const config = {
+      categories: [
+        { id: "necessary", label: "Needed" },
+        { id: "analytics", label: "Analytics" },
+        { id: "analytics", label: "Statistics", required: true },
+        { id: "__proto__", label: "Proto" },
+      ],
+    } as CookieConsentConfig;
+
+    const categories = cookieCategories(config);
+
+    expect(categories.map((c) => [c.id, c.label, !!c.required])).to.deep.equal([
+      ["necessary", "Needed", false],
+      ["analytics", "Statistics", true],
+    ]);
+  });
+
+  it("adds the necessary category for a configured optional one", () => {
+    const categories = cookieCategories({
+      categories: [{ id: "necessary", label: "Needed" }],
+    });
+
+    expect(categories).to.have.length(1);
+    expect(categories[0].required).to.equal(true);
+  });
+
+  it("ignores settings that aren't lists", () => {
+    const config = {
+      categories: "analytics",
+    } as unknown as CookieConsentConfig;
+
+    expect(cookieCategories(config).map((c) => c.id)).to.deep.equal([
+      "necessary",
+    ]);
+  });
+
   it("tells listeners about consent saved in other tabs", () => {
     const listener = sinon.spy();
     const stop = onConsentChange(listener, COOKIES);
@@ -448,6 +516,47 @@ describe("ecc-utils-design-cookie-consent", () => {
     await el.updateComplete;
 
     expect(banner(el)).to.equal(null);
+  });
+
+  it("merges another tab's consent into open preferences", async () => {
+    const cookies: CookieConsentConfig = {
+      ...COOKIES,
+      categories: [
+        ...(COOKIES.categories ?? []),
+        { id: "marketing", label: "Marketing" },
+      ],
+    };
+    const el = await fixture<EccUtilsDesignCookieConsent>(
+      html`<ecc-utils-design-cookie-consent
+        .config=${{ cookies }}
+      ></ecc-utils-design-cookie-consent>`
+    );
+    await el.openPreferences();
+    const boxes = () =>
+      dialog(el).querySelectorAll<HTMLInputElement>("input[type=checkbox]");
+    boxes()[1].click(); // analytics on
+    await el.updateComplete;
+
+    saveConsent(cookies, { marketing: true });
+    await el.updateComplete;
+    button(dialog(el), "save").click();
+    await el.updateComplete;
+
+    expect(hasConsent("analytics", cookies)).to.equal(true);
+    expect(hasConsent("marketing", cookies)).to.equal(true);
+  });
+
+  it("doesn't open the preferences once removed", async () => {
+    const el = await fixture<EccUtilsDesignCookieConsent>(
+      html`<ecc-utils-design-cookie-consent
+        .config=${CONFIG}
+      ></ecc-utils-design-cookie-consent>`
+    );
+    const opening = el.openPreferences();
+    el.remove();
+
+    await opening;
+    expect(dialog(el).open).to.equal(false);
   });
 
   it("stops listening once removed", async () => {

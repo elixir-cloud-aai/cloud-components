@@ -183,19 +183,42 @@ export const DEFAULT_FOOTER_ITEMS: readonly FooterItem[] = Object.freeze([
 ]);
 
 /**
- * The categories of a configuration, with a required one first.
+ * The categories of a configuration, with a required one first. Entries
+ * with the same ID are merged (required if any of them is); entries that
+ * aren't usable (no ID, `__proto__`, a non-array setting) are skipped.
  * @param config Cookie consent configuration
  * @returns The categories
  */
 export function cookieCategories(
   config?: CookieConsentConfig
 ): CookieCategory[] {
-  const categories = (config?.categories ?? []).filter(
-    (category) => category && typeof category.id === "string" && category.id
+  const listed = config?.categories;
+  const configured = Array.isArray(listed) ? listed : [];
+  const categories = configured.filter(
+    (category) =>
+      category &&
+      typeof category.id === "string" &&
+      category.id &&
+      category.id !== "__proto__"
   );
-  return categories.some((category) => category.required)
+  const all = categories.some((category) => category.required)
     ? categories
     : [NECESSARY_CATEGORY, ...categories];
+  const byId = new Map<string, CookieCategory>();
+  all.forEach((category) => {
+    const known = byId.get(category.id);
+    byId.set(
+      category.id,
+      known
+        ? {
+            ...known,
+            ...category,
+            required: !!known.required || !!category.required,
+          }
+        : category
+    );
+  });
+  return Array.from(byId.values());
 }
 
 /**
@@ -299,6 +322,33 @@ export function hasConsent(
   return readConsent(config)?.categories[category] === true;
 }
 
+/** Detail of the `window` event `ecc-cookie-consent-changed`. */
+export interface ConsentChangedDetail {
+  consent: CookieConsent;
+  /** Storage key of the configuration that the consent was saved for. */
+  storageKey: string;
+}
+
+// notifications in save order, also if a listener saves consent itself
+const pending: ConsentChangedDetail[] = [];
+let notifying = false;
+
+function notify(detail: ConsentChangedDetail): void {
+  pending.push(detail);
+  if (notifying) return;
+  notifying = true;
+  try {
+    while (pending.length) {
+      const next = pending.shift() as ConsentChangedDetail;
+      window.dispatchEvent(
+        new CustomEvent(CONSENT_CHANGED_EVENT, { detail: next })
+      );
+    }
+  } finally {
+    notifying = false;
+  }
+}
+
 /**
  * Stores the consent and fires `ecc-cookie-consent-changed` on `window`.
  * @param config Cookie consent configuration
@@ -319,16 +369,15 @@ export function saveConsent(
     signature: consentSignature(config),
     updatedAt: new Date().toISOString(),
   };
-  writeItem(consentStorageKey(config), JSON.stringify(consent));
-  window.dispatchEvent(
-    new CustomEvent(CONSENT_CHANGED_EVENT, { detail: { consent } })
-  );
+  const storageKey = consentStorageKey(config);
+  writeItem(storageKey, JSON.stringify(consent));
+  notify({ consent, storageKey });
   return consent;
 }
 
 /**
- * Calls `listener` whenever consent is saved, in this page or, for the
- * storage key of `config`, in another tab or window of the same origin.
+ * Calls `listener` whenever consent for the storage key of `config` is
+ * saved, in this page or in another tab or window of the same origin.
  * @param listener Called with the new consent; `null` if the consent of
  * another tab was removed or doesn't fit `config`
  * @param config Cookie consent configuration
@@ -339,8 +388,10 @@ export function onConsentChange(
   config?: CookieConsentConfig
 ): () => void {
   const handler = (event: Event) => {
-    const { detail } = event as CustomEvent<{ consent: CookieConsent }>;
-    if (detail?.consent) listener(detail.consent);
+    const { detail } = event as CustomEvent<Partial<ConsentChangedDetail>>;
+    if (!detail?.consent) return;
+    if (detail.storageKey !== consentStorageKey(config)) return;
+    listener(detail.consent);
   };
   const storageHandler = (event: StorageEvent) => {
     // `null`: another tab cleared the storage
@@ -371,7 +422,8 @@ export function openCookiePreferences(): void {
  * @returns The items to show
  */
 export function footerItems(config?: ComplianceFooterConfig): FooterItem[] {
-  const configured = (config?.items ?? []).filter(
+  const listed = config?.items;
+  const configured = (Array.isArray(listed) ? listed : []).filter(
     (item) => item && typeof item.id === "string" && item.id
   );
   const byId = new Map(configured.map((item) => [item.id, item]));
