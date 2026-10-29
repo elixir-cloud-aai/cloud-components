@@ -31,6 +31,8 @@ const URI_CHARACTERS = /^[A-Za-z0-9\-._~!$&'()*+,;=:@/?%]$/;
 // HTTP(S) URLs: scheme, authority, path, query, fragment
 const HTTP_URL =
   /^([A-Za-z][A-Za-z0-9+.-]*):\/\/([^/?#]*)([^?#]*)(\?[^#]*)?(#.*)?$/s;
+// `mailto:` URLs after the scheme: addresses, query, fragment
+const MAILTO_PARTS = /^([^?#]*)(\?[^#]*)?(#.*)?$/s;
 // Hosts with optional port: IPv6 address in brackets, or a name
 const IPV6_AUTHORITY =
   /^\[([0-9A-Fa-f:.]+)(%25[A-Za-z0-9\-._~]+)?\](?::(\d*))?$/;
@@ -87,7 +89,9 @@ function checkHostName(host: string): string | undefined {
   const labels = host.replace(/\.$/, "").split(".");
   const last = labels[labels.length - 1];
   if (NUMERIC_LABEL.test(last)) {
-    return IPV4.test(host) ? undefined : "needs a valid host or IPv4 address";
+    return IPV4.test(host.replace(/\.$/, ""))
+      ? undefined
+      : "needs a valid host or IPv4 address";
   }
   // international names: as browsers encode them (UTS 46)
   let ascii: string;
@@ -133,11 +137,13 @@ function checkHttpUrl(url: string, schemes: string[]): string | undefined {
     const error = checkCharacters(part);
     if (error) return error;
   }
+  // browsers don't take zone IDs (RFC 6874), which the registry allows
+  const zone = ipv6?.[2];
   try {
     // eslint-disable-next-line no-new
-    new URL(url);
+    new URL(zone ? url.replace(zone, "") : url);
   } catch {
-    return "must be a valid URL";
+    return ipv6 ? "needs a valid host" : "must be a valid URL";
   }
   return undefined;
 }
@@ -148,25 +154,29 @@ function checkMailto(url: string): string | undefined {
   const invalid =
     "needs valid email addresses, e.g. mailto:support@example.org";
   if (rest.startsWith("//")) return invalid;
-  const characterError = checkCharacters(url);
-  if (characterError) return characterError;
-  const [addresses] = rest.split(/[?#]/);
-  if (addresses === "") return invalid;
-  let decoded: string;
-  try {
-    decoded = decodeURIComponent(addresses);
-  } catch {
-    return invalid;
+  const [, path = "", query = "", fragment = ""] =
+    MAILTO_PARTS.exec(rest) ?? [];
+  for (const part of [path, query.slice(1), fragment.slice(1)]) {
+    const error = checkCharacters(part);
+    if (error) return error;
   }
-  for (const address of decoded.split(",")) {
+  if (path === "") return invalid;
+  // addresses as written (not decoded), as the registry checks them
+  for (const address of path.split(",")) {
     const at = address.lastIndexOf("@");
-    if (at <= 0) return invalid;
     const domain = address.slice(at + 1);
-    let ascii: string;
-    try {
-      ascii = new URL(`http://${domain}/`).hostname;
-    } catch {
+    if (at <= 0 || address.slice(0, at).includes("@") || domain === "") {
       return invalid;
+    }
+    // letters, digits, hyphens and dots, or international names
+    if (/[^A-Za-z0-9.\-\u0080-\uffff]/.test(domain)) return invalid;
+    let ascii = domain;
+    if (/[^\0-\x7f]/.test(domain)) {
+      try {
+        ascii = new URL(`http://${domain}/`).hostname;
+      } catch {
+        return invalid;
+      }
     }
     const labels = ascii.split(".");
     if (

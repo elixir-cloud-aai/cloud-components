@@ -186,10 +186,10 @@ The form checks its fields as Cloud Registry checks registrations, and shows wha
 
 - URLs (service, organization, contact and documentation URLs) must be HTTP(S) URLs with a host, without user info, whitespace, control characters, characters that URLs only allow percent-encoded (e.g. `<`, `|`) or malformed percent-encodings, and at most 2048 characters. Service URLs must use one of the allowed schemes (see `urlSchemes`). Contact URLs can also be `mailto:` URLs with email addresses; a plain email address asks for `mailto:`.
 - Maximum lengths: 1024 characters for the service and organization names, 4096 for the description, 256 for the version, the environment and the parts of the service type.
-- "Created At" and "Updated At" must be RFC 3339 date-times (e.g. `2024-01-01T00:00:00Z`).
+- "Created At" and "Updated At" must be RFC 3339 date-times (e.g. `2024-01-01T00:00:00Z`). Invalid timestamps are flagged but don't keep the form from being sent, as the registry ignores timestamps unless an admin sends them (it then rejects invalid ones).
 - A custom service ID must not be `.`, `..` or `types`, and must not contain slashes, commas or line breaks.
 
-If a field is invalid when the form is submitted, the form sends nothing and fires `ecc-service-create-validation-failed` with all messages. The registry remains the authority: it reports anything the form doesn't catch (`ecc-service-create-failed`).
+If a field is invalid when the form is submitted, the form sends nothing, shows a note at the submit button, expands "Advanced Configuration" if one of its fields is invalid, and fires `ecc-service-create-validation-failed` with all messages. The registry remains the authority: it reports anything the form doesn't catch (`ecc-service-create-failed`).
 
 ## Events
 

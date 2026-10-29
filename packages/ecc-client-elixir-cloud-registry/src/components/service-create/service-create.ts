@@ -40,6 +40,18 @@ const DEFAULT_ENVIRONMENTS: EnvironmentOption[] = [
   { value: "staging", label: "Staging" },
 ];
 
+// Fields in "Advanced Configuration", by the IDs of their inputs
+const ADVANCED_FIELDS = [
+  "custom-service-id",
+  "contact-url",
+  "documentation-url",
+  "created-at",
+  "updated-at",
+];
+// Timestamps, whose errors don't keep the form from being sent: the
+// registry ignores timestamps unless they come from admins
+const TIMESTAMP_FIELDS = ["created-at", "updated-at"];
+
 /**
  * @summary Component for creating new services in Cloud Registry
  * @since 2.0.0
@@ -111,6 +123,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   // Whether a submission was tried, so that missing fields are flagged too
   // (until the form is reset)
   @state() private submitted = false;
+  // Whether "Advanced Configuration" is expanded
+  @state() private advancedOpen = false;
   // Errors of the fields, computed once per render (cf. `fieldErrors()`)
   private errors: Record<string, string> = {};
   // Number of the latest request for the rules, so that older answers are
@@ -412,6 +426,13 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     return errors;
   }
 
+  /** Whether the shown errors keep the form from being sent */
+  private hasBlockingErrors(): boolean {
+    return Object.keys(this.errors).some(
+      (id) => !TIMESTAMP_FIELDS.includes(id)
+    );
+  }
+
   /** Message under a field, if it is invalid (announced politely) */
   private renderError(id: string) {
     const error = this.errors[id];
@@ -539,7 +560,14 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     // invalid inputs are shown at their fields, and nothing is sent
     this.submitted = true;
     const errors = this.fieldErrors(true);
-    if (Object.keys(errors).length > 0) {
+    const blocking = Object.keys(errors).filter(
+      (id) => !TIMESTAMP_FIELDS.includes(id)
+    );
+    if (blocking.length > 0) {
+      // errors in the collapsed section are shown too
+      if (blocking.some((id) => ADVANCED_FIELDS.includes(id))) {
+        this.advancedOpen = true;
+      }
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-validation-failed", {
           detail: { error: Object.values(errors).join(" "), errors },
@@ -617,6 +645,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
   private resetForm(): void {
     this.submitted = false;
+    this.advancedOpen = false;
     this.formData = {
       name: "",
       url: "",
@@ -915,7 +944,12 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   private renderAdvancedFields() {
     return html`
       <div class="space-y-6">
-        <ecc-utils-design-collapsible>
+        <ecc-utils-design-collapsible
+          .open=${this.advancedOpen}
+          @ecc-collapsible-toggled=${(e: CustomEvent) => {
+            this.advancedOpen = e.detail.open;
+          }}
+        >
           <ecc-utils-design-collapsible-trigger>
             <div
               class="flex items-center justify-between w-full py-2 text-left hover:bg-muted/50 focus:outline-none focus:ring-1 focus:ring-ring rounded-t cursor-pointer transition-colors px-2"
@@ -1077,7 +1111,13 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           <div class="space-y-4">${this.renderBasicFields()}</div>
 
           <div class="flex justify-between items-center mt-4">
-            <div></div>
+            <div>
+              ${this.submitted && this.hasBlockingErrors()
+                ? html`<p class="text-sm text-destructive" role="alert">
+                    Please correct the fields marked above.
+                  </p>`
+                : nothing}
+            </div>
             <div class="space-x-2">
               <ecc-utils-design-button
                 type="button"
@@ -1094,6 +1134,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                 !this.formData.url ||
                 !this.formData.organization.name ||
                 !this.formData.organization.url ||
+                !this.formData.type.group ||
                 !this.formData.type.artifact ||
                 !this.formData.type.version ||
                 !this.formData.version}
