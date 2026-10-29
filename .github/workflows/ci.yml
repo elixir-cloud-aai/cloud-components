@@ -121,7 +121,8 @@ jobs:
   # The only required check of this workflow: passes if every other job
   # passed, fails on any other result (failure, cancelled, skipped). Add
   # every new job to `needs`. Uses the shared gate action of
-  # elixir-cloud-aai/.github, pinned to a commit on `main`
+  # elixir-cloud-aai/.github, pinned to the commit of a release (Dependabot
+  # bumps it to new releases)
   passed:
     name: CI passed
     runs-on: ubuntu-latest
@@ -131,6 +132,6 @@ jobs:
     permissions: {}
     steps:
       - name: Check results of all jobs
-        uses: elixir-cloud-aai/.github/actions/gate@397a1c8a82d72af2a3a5908c546a9ad1101de32d # gate
+        uses: elixir-cloud-aai/.github/actions/gate@743e82d290a53768454999e413756a924e383259 # v1.0.0
         with:
           needs: ${{ toJSON(needs) }}
