@@ -30,7 +30,8 @@ describes what is specific to this repository.
    `npm run build` and `npm test` (and
    `node --test scripts/release.test.js` after changes to
    `scripts/release.js`) locally before you push. CI runs the tests with
-   coverage (`npm test -- -- --coverage`, Chromium only; each package's
+   coverage (`npm run test -- -- --coverage`, which passes `--coverage`
+   through npm and turbo to the test runner; Chromium only; each package's
    report is in its `coverage/` folder) and reports it to
    [Codecov](https://app.codecov.io/gh/elixir-cloud-aai/cloud-components);
    coverage of the whole code must not drop by more than 1 %
