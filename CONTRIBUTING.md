@@ -34,7 +34,7 @@ describes what is specific to this repository.
    through npm and turbo to the test runner; Chromium only; each package's
    report is in its `coverage/` folder) and reports it to
    [Codecov](https://app.codecov.io/gh/elixir-cloud-aai/cloud-components);
-   coverage of the whole code must not drop by more than 1 %
+   coverage of the packages with tests must not drop by more than 1 %
    (`codecov.yml`).
 4. Add or update tests and the documentation (`apps/documentation`) for
    changed behaviour.

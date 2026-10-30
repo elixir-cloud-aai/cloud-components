@@ -179,7 +179,8 @@ jobs:
           fi
           for report in "${reports[@]}"; do
             dir="${report%/coverage/lcov.info}"
-            sed "s|^SF:|SF:${dir}/|" "${report}"
+            # The directory goes in as data (environment), not as code
+            DIR="${dir}" awk '/^SF:/ { $0 = "SF:" ENVIRON["DIR"] "/" substr($0, 4) } { print }' "${report}"
           done > lcov.info
 
       # As in the org's other repositories: outside the upstream repository
