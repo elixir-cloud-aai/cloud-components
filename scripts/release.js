@@ -287,9 +287,9 @@ const versionTags = () => {
 };
 
 // Sets the version with `npm version`, which also updates the lock file
-const setVersion = (version) => {
+const setVersion = (version, base = root) => {
   parseVersion(version);
-  const workspaces = releasedPackages().flatMap(({ dir }) => [
+  const workspaces = releasedPackages(base).flatMap(({ dir }) => [
     "--workspace",
     dir,
   ]);
@@ -304,7 +304,7 @@ const setVersion = (version) => {
       "--include-workspace-root",
       ...workspaces,
     ],
-    { cwd: root, stdio: "inherit" }
+    { cwd: base, stdio: "inherit" }
   );
 };
 
@@ -341,7 +341,7 @@ const setRelease = (
   parseVersion(version);
   const date = releaseDate(options, now);
   const citation = citationWithRelease(version, date, base);
-  bumpVersions(version);
+  bumpVersions(version, base);
   fs.writeFileSync(path.join(base, citationFile), citation);
   return date;
 };

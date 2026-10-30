@@ -420,6 +420,30 @@ test("setRelease bumps the versions and sets the citation", (t) => {
   );
 });
 
+// With `npm version`, in a fixture without dependencies (offline)
+test("setRelease sets the versions of the root and released packages", (t) => {
+  const base = fixture(t);
+  writeJson(path.join(base, "package.json"), {
+    ...readJson(path.join(base, "package.json")),
+    private: true,
+    workspaces: ["packages/*"],
+  });
+  // Only dependencies between the workspaces, which need no registry
+  ["a-wes", "b-design"].forEach((dir) => {
+    const file = path.join(base, "packages", dir, "package.json");
+    const { name, version } = readJson(file);
+    writeJson(file, { name, version });
+  });
+  fs.writeFileSync(path.join(base, "CITATION.cff"), citation());
+  setRelease("2.0.0-alpha.50", ["--date", "2026-10-30"], { base, now: today });
+  assert.deepStrictEqual(versionMismatches("2.0.0-alpha.50", base), []);
+  assert.strictEqual(
+    readJson(path.join(base, "packages", "c-ro-crate", "package.json")).version,
+    "0.1.0"
+  );
+  assert.deepStrictEqual(citationErrors("2.0.0-alpha.50", today, base), []);
+});
+
 // The command line, run on this repository
 const run = (...args) =>
   spawnSync(process.execPath, [path.join(__dirname, "release.js"), ...args], {
