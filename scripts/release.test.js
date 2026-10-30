@@ -8,10 +8,12 @@ const { spawnSync } = require("child_process");
 const { test } = require("node:test");
 
 const {
+  citationErrors,
   distTag,
   parseVersion,
   pinInternalDependencies,
   releasedPackages,
+  setCitation,
   versionMismatches,
 } = require("./release.js");
 
@@ -163,6 +165,123 @@ test("pinInternalDependencies pins dependencies on released packages only", (t) 
   assert.deepStrictEqual(pinInternalDependencies("2.0.0-alpha.49", base), []);
 });
 
+// A citation file with the release's keys after others, as in the repository
+const citation = (version = "2.0.0-alpha.49", date = "2026-10-27") =>
+  [
+    "cff-version: 1.2.0",
+    "title: Cloud Components",
+    "abstract: >-",
+    "  Web components; version: 1.0.0 in a folded value is no key",
+    "authors:",
+    "  - given-names: Ada",
+    `    version: "0.0.1"`,
+    `version: "${version}"`,
+    `date-released: "${date}"`,
+    "",
+  ].join("\n");
+
+const citationFixture = (t, text = citation()) => {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), "release-test-"));
+  t.after(() => fs.rmSync(base, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(base, "CITATION.cff"), text);
+  return base;
+};
+
+const today = new Date("2026-10-30T12:00:00Z");
+
+test("citationErrors is empty for the release version and a past date", (t) => {
+  assert.deepStrictEqual(
+    citationErrors("2.0.0-alpha.49", today, citationFixture(t)),
+    []
+  );
+  // Plain, single-quoted and with a comment; on the day of the release
+  const plain = citation()
+    .replace(`version: "2.0.0-alpha.49"`, "version: 2.0.0-alpha.49 # release")
+    .replace(`date-released: "2026-10-27"`, "date-released: '2026-10-30'");
+  assert.deepStrictEqual(
+    citationErrors("2.0.0-alpha.49", today, citationFixture(t, plain)),
+    []
+  );
+});
+
+test("citationErrors names a wrong version and a future or bad date", (t) => {
+  assert.deepStrictEqual(
+    citationErrors("2.0.0-alpha.50", today, citationFixture(t)),
+    [
+      "CITATION.cff has version 2.0.0-alpha.49, not 2.0.0-alpha.50" +
+        " (run `node scripts/release.js set 2.0.0-alpha.50`)",
+    ]
+  );
+  const future = citationFixture(t, citation("2.0.0-alpha.49", "2026-10-31"));
+  assert.deepStrictEqual(citationErrors("2.0.0-alpha.49", today, future), [
+    "CITATION.cff has date-released 2026-10-31, which is in the future (UTC)",
+  ]);
+  const invalid = citationFixture(t, citation("2.0.0-alpha.49", "2026-02-30"));
+  assert.deepStrictEqual(citationErrors("2.0.0-alpha.49", today, invalid), [
+    "CITATION.cff has date-released 2026-02-30, which is not a date (YYYY-MM-DD)",
+  ]);
+  assert.throws(
+    () => citationErrors("v2.0.0", today, citationFixture(t)),
+    /Not a version/
+  );
+});
+
+test("citationErrors names missing, repeated and unsupported keys", (t) => {
+  const missing = citationFixture(t, "cff-version: 1.2.0\n");
+  assert.deepStrictEqual(citationErrors("2.0.0-alpha.49", today, missing), [
+    "CITATION.cff has no version",
+    "CITATION.cff has no date-released",
+  ]);
+  const repeated = citationFixture(t, `${citation()}version: "2.0.0"\n`);
+  assert.deepStrictEqual(citationErrors("2.0.0-alpha.49", today, repeated), [
+    "CITATION.cff has version more than once",
+  ]);
+  const multiline = citationFixture(
+    t,
+    citation().replace(`version: "2.0.0-alpha.49"`, "version: >-\n  2.0.0")
+  );
+  assert.deepStrictEqual(citationErrors("2.0.0-alpha.49", today, multiline), [
+    'CITATION.cff has an unsupported version: use `version: "<value>"`',
+  ]);
+  const noFile = fs.mkdtempSync(path.join(os.tmpdir(), "release-test-"));
+  t.after(() => fs.rmSync(noFile, { recursive: true, force: true }));
+  assert.deepStrictEqual(citationErrors("2.0.0-alpha.49", today, noFile), [
+    "CITATION.cff is missing",
+  ]);
+});
+
+test("setCitation sets the version and date, keeping the rest", (t) => {
+  const base = citationFixture(t);
+  setCitation("2.0.0-alpha.50", "2026-10-30", base);
+  assert.strictEqual(
+    fs.readFileSync(path.join(base, "CITATION.cff"), "utf8"),
+    citation("2.0.0-alpha.50", "2026-10-30")
+  );
+  assert.deepStrictEqual(citationErrors("2.0.0-alpha.50", today, base), []);
+});
+
+test("setCitation appends missing keys and rejects bad input", (t) => {
+  const base = citationFixture(t, "cff-version: 1.2.0");
+  setCitation("2.0.0", "2026-10-30", base);
+  assert.strictEqual(
+    fs.readFileSync(path.join(base, "CITATION.cff"), "utf8"),
+    'cff-version: 1.2.0\nversion: "2.0.0"\ndate-released: "2026-10-30"\n'
+  );
+  assert.throws(
+    () => setCitation("v2.0.0", "2026-10-30", base),
+    /Not a version/
+  );
+  assert.throws(
+    () => setCitation("2.0.0", "30.10.2026", base),
+    /not a date \(YYYY-MM-DD\)/
+  );
+  const repeated = citationFixture(t, `${citation()}version: "2.0.0"\n`);
+  assert.throws(
+    () => setCitation("2.0.0", "2026-10-30", repeated),
+    /version more than once/
+  );
+});
+
 // The command line, run on this repository
 const run = (...args) =>
   spawnSync(process.execPath, [path.join(__dirname, "release.js"), ...args], {
@@ -175,6 +294,16 @@ test("the command line prints the released packages", () => {
   const dirs = packagesRun.stdout.trim().split("\n");
   assert.ok(dirs.includes(path.join("packages", "ecc-utils-design")));
   assert.ok(!dirs.includes(path.join("packages", "ecc-client-ga4gh-tes")));
+});
+
+// The citation metadata of the repository has the version of the packages
+test("the command line checks the versions of this repository", () => {
+  const { version } = readJson(path.join(__dirname, "..", "package.json"));
+  const checkRun = run("check", version);
+  assert.strictEqual(checkRun.status, 0, checkRun.stderr);
+  const otherRun = run("check", "999.0.0");
+  assert.strictEqual(otherRun.status, 1);
+  assert.match(otherRun.stderr, /CITATION\.cff has version .*, not 999\.0\.0/);
 });
 
 test("the command line fails on bad versions and commands", () => {

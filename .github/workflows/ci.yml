@@ -1,9 +1,11 @@
 # Everything that must pass on pull requests and pushes to `dev`: conflict
-# markers, linting (includes the build) with the tests of the release script,
-# and tests on all supported Node.js versions. The gate `passed` ("CI
-# passed") is the only check that branch rules need to require from this
-# workflow; the PR title is checked in
-# `pr-title.yml`. No `paths:` filters, so that the gate always reports.
+# markers, linting (includes the build) with the tests of the release script
+# and the validation of the citation metadata, and tests on all supported
+# Node.js versions. The gate `passed` ("CI passed") is the only check that
+# branch rules need to require from this workflow; the PR title is checked
+# in `pr-title.yml`. No `paths:` filters, so that the gate always reports.
+# The release workflow requires a successful run for a push of the release
+# commit.
 
 name: CI
 
@@ -63,6 +65,12 @@ jobs:
 
       - name: Test the release script
         run: node --test scripts/release.test.js
+
+      # In its own environment, as cffconvert pins an old jsonschema. 2.0.0
+      # is the latest stable release (not bumped by Dependabot; update
+      # manually)
+      - name: Validate citation metadata
+        run: pipx run --spec cffconvert==2.0.0 cffconvert --validate -i CITATION.cff
 
       - name: Run linters
         run: npm run lint
