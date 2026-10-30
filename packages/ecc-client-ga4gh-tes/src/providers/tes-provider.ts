@@ -10,7 +10,7 @@ const StateEnum = {
   CANCELED: "CANCELED",
   PREEMPTED: "PREEMPTED",
   CANCELING: "CANCELING",
-};
+} as const;
 
 type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 
@@ -150,7 +150,6 @@ export interface ListTasksParams {
   view?: TaskView;
   namePrefix?: string;
   state?: State;
-  // An empty value matches any value for that key.
   tags?: Record<string, string>;
 }
 

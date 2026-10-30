@@ -1,0 +1,61 @@
+import { Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+
+# EccClientGa4ghTesRuns Component
+
+<ComponentName
+  tagName='ecc-client-ga4gh-tes-runs'
+  reactTagName='ECCClientGa4ghTesRuns'
+  version='2.0.0-alpha.0'
+/>
+
+## Overview
+
+Displays a paginated table of tasks from a GA4GH Task Execution Service (TES), with name-prefix search, a state filter, and a delete (cancel) action for active tasks.
+
+## Usage
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="runs.tsx"
+    import { ECCClientGa4ghTesRuns } from '@elixir-cloud/tes/react';
+
+    export default function Runs() {
+      return (
+        <ECCClientGa4ghTesRuns
+          baseUrl="https://protes.rahtiapp.fi/ga4gh/tes/v1"
+          pageSize={10}
+          onEccRunsSelected={(e) => console.log(e.detail.runId)}
+        />
+      );
+    }
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="runs.html"
+    <script type="module" src="https://esm.sh/@elixir-cloud/tes"></script>
+
+    <ecc-client-ga4gh-tes-runs
+      baseUrl="https://protes.rahtiapp.fi/ga4gh/tes/v1"
+      pageSize="10"
+    ></ecc-client-ga4gh-tes-runs>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property   | Type          | Default | Description |
+|------------|---------------|---------|-------------|
+| `baseUrl`  | `string`      | `""`    | Base URL of the TES API. |
+| `provider` | `TesProvider` | `undefined` | Custom provider; overrides `baseUrl` (see [Providers](/docs/tes/providers)). |
+| `pageSize` | `number`      | `10`    | Tasks per page. |
+| `search`   | `boolean`     | `true`  | Show the name-prefix search field. |
+| `filter`   | `boolean`     | `true`  | Show the state filter (applies to the current page). |
+
+## Events
+
+| Event               | Detail                | Description |
+|---------------------|-----------------------|-------------|
+| `ecc-runs-changed`  | `{ runs: Task[] }`    | Task list was (re)loaded. |
+| `ecc-runs-selected` | `{ runId: string }`   | A task was selected. |

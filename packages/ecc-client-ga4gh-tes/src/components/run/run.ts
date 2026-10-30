@@ -51,8 +51,8 @@ export class ECCClientGa4ghTesRun extends LitElement {
   @state() private loading = false;
   @state() private error: string | null = null;
 
+  private requestGeneration = 0;
   private _provider: TesProvider | null = null;
-
   private initialized = false;
 
   protected firstUpdated(): void {
@@ -87,8 +87,13 @@ export class ECCClientGa4ghTesRun extends LitElement {
   }
 
   private async loadTask(): Promise<void> {
+    this.requestGeneration += 1;
+    const generation = this.requestGeneration;
+
     if (!this._provider) return;
     if (!this.runId) {
+      this.loading = false;
+      this.task = null;
       this.error = "Please provide a run ID.";
       return;
     }
@@ -98,7 +103,10 @@ export class ECCClientGa4ghTesRun extends LitElement {
     this.task = null;
 
     try {
-      this.task = await this._provider.getTask(this.runId, "FULL");
+      const task = await this._provider.getTask(this.runId, "FULL");
+      if (generation !== this.requestGeneration) return;
+
+      this.task = task;
       this.dispatchEvent(
         new CustomEvent("ecc-run-log-changed", {
           detail: { task: this.task },
@@ -107,6 +115,7 @@ export class ECCClientGa4ghTesRun extends LitElement {
         })
       );
     } catch (err) {
+      if (generation !== this.requestGeneration) return;
       this.error =
         err instanceof Error ? err.message : "Failed to load task details";
       console.error({
@@ -114,7 +123,7 @@ export class ECCClientGa4ghTesRun extends LitElement {
         breakPoint: "ECCClientGa4ghTesRun.loadTask",
       });
     } finally {
-      this.loading = false;
+      if (generation === this.requestGeneration) this.loading = false;
     }
   }
 
@@ -516,7 +525,7 @@ export class ECCClientGa4ghTesRun extends LitElement {
 
     return html`
       <div class="space-y-4">
-        <slot name="header">${this.renderHeader(this.task)}</slot>
+        <div>${this.renderHeader(this.task)}</div>
 
         <ecc-utils-design-tabs
           default-value="overview"
@@ -547,9 +556,7 @@ export class ECCClientGa4ghTesRun extends LitElement {
             ${ECCClientGa4ghTesRun.renderInputsOutputs(this.task)}
           </ecc-utils-design-tabs-content>
           <ecc-utils-design-tabs-content value="logs">
-            <slot name="logs"
-              >${ECCClientGa4ghTesRun.renderLogs(this.task)}</slot
-            >
+            ${ECCClientGa4ghTesRun.renderLogs(this.task)}
           </ecc-utils-design-tabs-content>
         </ecc-utils-design-tabs>
       </div>
