@@ -94,7 +94,7 @@ const versionMismatches = (version, base = root) => {
 // Zenodo archives each GitHub release with the file of the tagged commit,
 // so its `version` and `date-released` are set in the version bump pull
 // request and checked by the release workflow. Both are top-level keys
-// with a plain or quoted single-line value (as `setCitation` writes them);
+// with a plain or quoted single-line value (as `set` writes them);
 // the rest of the file is kept as is (CI validates the whole file)
 const citationFile = "CITATION.cff";
 
@@ -106,9 +106,9 @@ const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const anyKeyPattern = (name) => new RegExp(`^["']?${name}["']?[ \\t]*:`, "gm");
 const keyPattern = (name) =>
   new RegExp(
-    `^${name}:[ \\t]*(["']?)(?<value>[0-9A-Za-z._+-]+)\\1(?:[ \\t]+#.*)?[ \\t]*\\r?(?![^\\n])` +
-      // The line ends (LF or CRLF; JS ends lines at CR, too), and no indented
-      // line follows, after blank lines if any
+    `^${name}:[ \\t]+(["']?)(?<value>[0-9A-Za-z._+-]+)\\1(?<comment>[ \\t]+#.*)?[ \\t]*\\r?(?![^\\n])` +
+      // The line ends (LF or CRLF), and no indented line follows, also not
+      // after blank lines
       `(?!(?:\\n[ \\t]*\\r?)*\\n[ \\t]+[^ \\t#\\r\\n])`,
     "m"
   );
@@ -200,21 +200,17 @@ const citationWithRelease = (version, date, base = root) => {
   ].forEach(([name, value]) => {
     const line = `${name}: "${value}"`;
     if (citationValue(text, name) === undefined) {
-      text = `${text.replace(/\n*$/, "")}\n${line}\n`;
+      const eol = text.includes("\r\n") ? "\r\n" : "\n";
+      text = `${text.replace(/(?:\r?\n)*$/, "")}${eol}${line}${eol}`;
     } else {
-      // Keeps the line ending (CRLF)
-      text = text.replace(keyPattern(name), (match) =>
-        match.endsWith("\r") ? `${line}\r` : line
-      );
+      // Keeps a comment and the line ending (CRLF)
+      text = text.replace(keyPattern(name), (match, ...args) => {
+        const { comment = "" } = args[args.length - 1];
+        return `${line}${comment}${match.endsWith("\r") ? "\r" : ""}`;
+      });
     }
   });
   return text;
-};
-
-// Sets `version` and `date-released` (YYYY-MM-DD) in `CITATION.cff`
-const setCitation = (version, date, base = root) => {
-  const text = citationWithRelease(version, date, base);
-  fs.writeFileSync(path.join(base, citationFile), text);
 };
 
 // Prereleases of this major version are published as `latest` until its
@@ -303,6 +299,8 @@ const setVersion = (version) => {
       "version",
       version,
       "--no-git-tag-version",
+      // `set` can be run again, e.g. to update `CITATION.cff`
+      "--allow-same-version",
       "--include-workspace-root",
       ...workspaces,
     ],
@@ -331,19 +329,29 @@ const releaseDate = (options, now = new Date()) => {
   return date;
 };
 
+// `set`: checks the version, the date (see `releaseDate`) and
+// `CITATION.cff` before anything is changed, then sets the versions of the
+// packages (`bumpVersions`) and the version and date in `CITATION.cff`;
+// returns the date
+const setRelease = (
+  version,
+  options,
+  { base = root, now = new Date(), bumpVersions = setVersion } = {}
+) => {
+  parseVersion(version);
+  const date = releaseDate(options, now);
+  const citation = citationWithRelease(version, date, base);
+  bumpVersions(version);
+  fs.writeFileSync(path.join(base, citationFile), citation);
+  return date;
+};
+
 const main = (args) => {
   const [command, version, ...options] = args;
   switch (command) {
-    case "set": {
-      // The version, the date and the citation file are checked before
-      // anything is changed
-      parseVersion(version);
-      const date = releaseDate(options);
-      const citation = citationWithRelease(version, date);
-      setVersion(version);
-      fs.writeFileSync(path.join(root, citationFile), citation);
+    case "set":
+      setRelease(version, options);
       return 0;
-    }
     case "check": {
       const mismatches = [
         ...versionMismatches(version),
@@ -385,6 +393,6 @@ module.exports = {
   pinInternalDependencies,
   releaseDate,
   releasedPackages,
-  setCitation,
+  setRelease,
   versionMismatches,
 };

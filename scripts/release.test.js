@@ -14,7 +14,7 @@ const {
   pinInternalDependencies,
   releaseDate,
   releasedPackages,
-  setCitation,
+  setRelease,
   versionMismatches,
 } = require("./release.js");
 
@@ -190,6 +190,14 @@ const citationFixture = (t, text = citation()) => {
 
 const today = new Date("2026-10-30T12:00:00Z");
 
+// `set` without the version bump of the packages
+const setCitation = (version, date, base) =>
+  setRelease(version, ["--date", date], {
+    base,
+    now: today,
+    bumpVersions: () => undefined,
+  });
+
 test("citationErrors is empty for the release version and a past date", (t) => {
   assert.deepStrictEqual(
     citationErrors("2.0.0-alpha.49", today, citationFixture(t)),
@@ -277,6 +285,34 @@ test("citationErrors and setCitation handle CRLF line endings", (t) => {
   );
 });
 
+test("setCitation appends missing keys with CRLF in CRLF files", (t) => {
+  const base = citationFixture(t, "cff-version: 1.2.0\r\ntitle: X\r\n");
+  setCitation("2.0.0", "2026-10-30", base);
+  assert.strictEqual(
+    fs.readFileSync(path.join(base, "CITATION.cff"), "utf8"),
+    'cff-version: 1.2.0\r\ntitle: X\r\nversion: "2.0.0"\r\ndate-released: "2026-10-30"\r\n'
+  );
+});
+
+test("setCitation keeps comments; a key without a space is unsupported", (t) => {
+  const commented = citationFixture(
+    t,
+    citation().replace(`version: "2.0.0-alpha.49"`, "version: 2.0.0 # release")
+  );
+  setCitation("2.0.0-alpha.50", "2026-10-30", commented);
+  assert.match(
+    fs.readFileSync(path.join(commented, "CITATION.cff"), "utf8"),
+    /^version: "2\.0\.0-alpha\.50" # release$/m
+  );
+  const noSpace = citationFixture(
+    t,
+    citation().replace(`version: "2.0.0-alpha.49"`, "version:2.0.0")
+  );
+  assert.deepStrictEqual(citationErrors("2.0.0", today, noSpace), [
+    'CITATION.cff has an unsupported version: use `version: "<value>"`',
+  ]);
+});
+
 test("setCitation sets the version and date, keeping the rest", (t) => {
   const base = citationFixture(t);
   setCitation("2.0.0-alpha.50", "2026-10-30", base);
@@ -340,6 +376,50 @@ test("releaseDate is today (UTC) or an earlier --date", () => {
   );
 });
 
+test("setRelease checks everything before it changes anything", (t) => {
+  const bumped = [];
+  const bumpVersions = (version) => bumped.push(version);
+  const repeated = `${citation()}version: "2.0.0"\n`;
+  const base = citationFixture(t, repeated);
+  [
+    ["2.0.0", [], /version more than once/],
+    ["v2.0.0", [], /Not a version/],
+    ["2.0.0", ["--date", "2026-10-31"], /in the future/],
+  ].forEach(([version, options, error]) => {
+    assert.throws(
+      () => setRelease(version, options, { base, now: today, bumpVersions }),
+      error
+    );
+  });
+  const noFile = fs.mkdtempSync(path.join(os.tmpdir(), "release-test-"));
+  t.after(() => fs.rmSync(noFile, { recursive: true, force: true }));
+  assert.throws(
+    () => setRelease("2.0.0", [], { base: noFile, now: today, bumpVersions }),
+    /ENOENT/
+  );
+  assert.deepStrictEqual(bumped, []);
+  assert.strictEqual(
+    fs.readFileSync(path.join(base, "CITATION.cff"), "utf8"),
+    repeated
+  );
+});
+
+test("setRelease bumps the versions and sets the citation", (t) => {
+  const bumped = [];
+  const base = citationFixture(t);
+  const date = setRelease("2.0.0-alpha.50", [], {
+    base,
+    now: today,
+    bumpVersions: (version) => bumped.push(version),
+  });
+  assert.strictEqual(date, "2026-10-30");
+  assert.deepStrictEqual(bumped, ["2.0.0-alpha.50"]);
+  assert.strictEqual(
+    fs.readFileSync(path.join(base, "CITATION.cff"), "utf8"),
+    citation("2.0.0-alpha.50", "2026-10-30")
+  );
+});
+
 // The command line, run on this repository
 const run = (...args) =>
   spawnSync(process.execPath, [path.join(__dirname, "release.js"), ...args], {
@@ -371,26 +451,6 @@ test("the command line fails on bad versions and commands", () => {
   const missingVersion = run("pin");
   assert.strictEqual(missingVersion.status, 1);
   assert.match(missingVersion.stderr, /Not a version/);
-  // `set` changes nothing on bad input
-  const before = spawnSync("git", ["status", "--porcelain"], {
-    cwd: __dirname,
-    encoding: "utf8",
-  }).stdout;
-  [
-    ["set", "v2.0.0", "--date", "2026-10-27"],
-    ["set", "2.0.0", "--date", "2099-01-01"],
-    ["set", "2.0.0", "--date", "x"],
-  ].forEach((args) => {
-    const setRun = run(...args);
-    assert.strictEqual(setRun.status, 1);
-  });
-  assert.strictEqual(
-    spawnSync("git", ["status", "--porcelain"], {
-      cwd: __dirname,
-      encoding: "utf8",
-    }).stdout,
-    before
-  );
   const badCommand = run("publish");
   assert.strictEqual(badCommand.status, 2);
   assert.match(badCommand.stderr, /Usage/);
