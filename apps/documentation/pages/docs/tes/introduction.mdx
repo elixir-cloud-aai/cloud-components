@@ -1,0 +1,22 @@
+# TES (Task Execution Service)
+
+The `TES` package provides web components for interacting with GA4GH Task Execution Service APIs. It allows you to create, monitor and manage tasks in federated cloud environments.
+
+## Package Information
+
+- **Package**: `@elixir-cloud/tes`
+- **Version**: `2.0.0-alpha.0`
+- **Standard**: [GA4GH TES v1.x](https://github.com/ga4gh/task-execution-schemas)
+
+## Features
+
+- **Task Creation**: Submit new tasks with executors, inputs, outputs and resources.
+- **Task Monitoring**: Browse tasks with pagination, name search and state filtering.
+- **Task Details**: Inspect overview, executors, inputs/outputs and logs of a task.
+- **Providers**: Use `baseUrl` for a TES endpoint or inject a custom `TesProvider`.
+
+## Available Components
+
+- [`<ecc-client-ga4gh-tes-runs>`](./components/runs): A component to list and filter execution tasks.
+- [`<ecc-client-ga4gh-tes-run>`](./components/run): A component to display details of a specific execution task.
+- [`<ecc-client-ga4gh-tes-run-create>`](./components/run-create): A component for creating new execution tasks.

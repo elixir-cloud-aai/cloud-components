@@ -173,10 +173,7 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
         stdout: ex.stdout.trim(),
         stderr: ex.stderr.trim(),
       }),
-      command: ex.command
-        .split("\n")
-        .map((arg) => arg.trim())
-        .filter(Boolean),
+      command: ex.command.split(/\r?\n/),
       env: ex.env.some((e) => e.key?.trim()) ? toRecord(ex.env) : undefined,
       ...(ex.ignoreError ? { ignore_error: true } : {}),
     })) as Executor[];
@@ -355,7 +352,6 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
     `;
   }
 
-  // Generic editor for lists of rows made of text fields
   private renderRows(
     title: string,
     key: ListKey,

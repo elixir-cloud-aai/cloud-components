@@ -65,7 +65,7 @@ export class ECCClientGa4ghTesRuns extends LitElement {
   ]);
 
   private _provider: TesProvider | null = null;
-
+  private requestGeneration = 0;
   private searchTimer?: ReturnType<typeof setTimeout>;
 
   private initialized = false;
@@ -113,6 +113,8 @@ export class ECCClientGa4ghTesRuns extends LitElement {
   }
 
   private async loadData(): Promise<void> {
+    this.requestGeneration += 1;
+    const generation = this.requestGeneration;
     if (!this._provider) return;
 
     this.loading = true;
@@ -126,10 +128,15 @@ export class ECCClientGa4ghTesRuns extends LitElement {
         namePrefix: this.namePrefix || undefined,
         state: (this.stateFilter as State) || undefined,
       });
+      if (generation !== this.requestGeneration) return;
 
       this.runs = response.tasks;
       if (response.next_page_token) {
         this.pageTokens.set(this.currentPage + 1, response.next_page_token);
+      } else {
+        for (const page of this.pageTokens.keys()) {
+          if (page > this.currentPage) this.pageTokens.delete(page);
+        }
       }
 
       this.dispatchEvent(
@@ -140,13 +147,15 @@ export class ECCClientGa4ghTesRuns extends LitElement {
         })
       );
     } catch (err) {
-      this.error = err instanceof Error ? err.message : "Failed to load tasks";
+      if (generation !== this.requestGeneration) return;
+      this.error =
+        err instanceof Error ? err.message : "Failed to load task details";
       console.error({
         error: this.error,
-        breakPoint: "ECCClientGa4ghTesRuns.loadData",
+        breakPoint: "ECCClientGa4ghTesRun.loadTask",
       });
     } finally {
-      this.loading = false;
+      if (generation === this.requestGeneration) this.loading = false;
     }
   }
 
@@ -334,19 +343,17 @@ export class ECCClientGa4ghTesRuns extends LitElement {
     return html`
       <ecc-utils-design-table-row>
         <ecc-utils-design-table-cell class="w-5/12">
-          <slot name=${`run-name-${run.id}`}>
-            <div class="flex flex-col gap-1">
-              ${run.name ? html`<span>${run.name}</span>` : ""}
-              <ecc-utils-design-button
-                class="part:font-mono part:text-sm part:w-fit part:cursor-pointer part:p-0"
-                variant="link"
-                title=${run.id}
-                @click=${() => this.handleViewDetails(run.id)}
-              >
-                ${ECCClientGa4ghTesRuns.formatRunId(run.id)}
-              </ecc-utils-design-button>
-            </div>
-          </slot>
+          <div class="flex flex-col gap-1">
+            ${run.name ? html`<span>${run.name}</span>` : ""}
+            <ecc-utils-design-button
+              class="part:font-mono part:text-sm part:w-fit part:cursor-pointer part:p-0"
+              variant="link"
+              title=${run.id}
+              @click=${() => this.handleViewDetails(run.id)}
+            >
+              ${ECCClientGa4ghTesRuns.formatRunId(run.id)}
+            </ecc-utils-design-button>
+          </div>
         </ecc-utils-design-table-cell>
         <ecc-utils-design-table-cell class="w-2/12">
           <ecc-utils-design-badge variant=${info.variant}>
@@ -357,28 +364,26 @@ export class ECCClientGa4ghTesRuns extends LitElement {
           ${ECCClientGa4ghTesRuns.formatDateTime(run.creation_time)}
         </ecc-utils-design-table-cell>
         <ecc-utils-design-table-cell class="w-3/12">
-          <slot name=${`actions-${run.id}`}>
-            <div class="flex gap-2">
-              <ecc-utils-design-button
-                size="sm"
-                variant="outline"
-                @click=${() => this.handleViewDetails(run.id)}
-              >
-                View Details
-              </ecc-utils-design-button>
-              ${CANCELLABLE_STATES.includes(run.state)
-                ? html`
-                    <ecc-utils-design-button
-                      size="sm"
-                      variant="destructive"
-                      @click=${() => this.handleDelete(run.id)}
-                    >
-                      Delete
-                    </ecc-utils-design-button>
-                  `
-                : ""}
-            </div>
-          </slot>
+          <div class="flex gap-2">
+            <ecc-utils-design-button
+              size="sm"
+              variant="outline"
+              @click=${() => this.handleViewDetails(run.id)}
+            >
+              View Details
+            </ecc-utils-design-button>
+            ${CANCELLABLE_STATES.includes(run.state)
+              ? html`
+                  <ecc-utils-design-button
+                    size="sm"
+                    variant="destructive"
+                    @click=${() => this.handleDelete(run.id)}
+                  >
+                    Delete
+                  </ecc-utils-design-button>
+                `
+              : ""}
+          </div>
         </ecc-utils-design-table-cell>
       </ecc-utils-design-table-row>
     `;

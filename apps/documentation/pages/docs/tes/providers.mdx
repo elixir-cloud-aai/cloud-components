@@ -1,0 +1,479 @@
+import { Callout, Tabs } from 'nextra/components';
+
+# TES Providers
+
+The `@elixir-cloud/tes` package provides providers for connecting to GA4GH Task Execution Service (TES) APIs. The main provider is `RestTesProvider` which implements the `TesProvider` interface for REST-based TES endpoints.
+
+<Callout type='info'>
+  **Quick Start**: Create a `RestTesProvider` with your TES server URL and pass it to TES components
+  to start submitting and monitoring tasks. Components also accept a `baseUrl` instead, in which
+  case a `RestTesProvider` is created for you. If both are set, `provider` wins.
+</Callout>
+
+## TesProvider Interface
+
+The `TesProvider` interface defines the operations that all TES providers must implement:
+
+```typescript
+export interface TesProvider {
+  // Service information
+  getServiceInfo(): Promise<ServiceInfo>;
+
+  // Task management
+  listTasks(params?: ListTasksParams): Promise<TaskListResponse>;
+  getTask(taskId: string, view?: TaskView): Promise<Task>;
+  createTask(request: TaskRequest): Promise<TaskId>;
+  cancelTask(taskId: string): Promise<void>;
+}
+```
+
+## RestTesProvider
+
+The `RestTesProvider` is the main implementation that communicates with TES APIs using REST/HTTP.
+
+### Constructor
+
+```typescript
+constructor(baseUrl: string)
+```
+
+**Parameters:**
+
+- `baseUrl`: The base URL of the TES API endpoint (e.g., `https://protes.rahtiapp.fi/ga4gh/tes/v1`)
+
+### Basic Usage
+
+<Tabs items={['React', 'HTML', 'Next.js']}>
+  <Tabs.Tab>
+    ```tsx copy
+    import { RestTesProvider } from '@elixir-cloud/tes/providers';
+    import { ECCClientGa4ghTesRuns } from '@elixir-cloud/tes/react';
+
+    function TaskApp() {
+      const provider = new RestTesProvider(
+        'https://protes.rahtiapp.fi/ga4gh/tes/v1'
+      );
+
+      return (
+        <div>
+          <h2>Tasks</h2>
+          <ECCClientGa4ghTesRuns provider={provider} />
+        </div>
+      );
+    }
+    ```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <script type="module" src="https://esm.sh/@elixir-cloud/tes@latest"></script>
+    </head>
+    <body>
+      <ecc-client-ga4gh-tes-runs></ecc-client-ga4gh-tes-runs>
+
+      <script type="module">
+        import { RestTesProvider } from 'https://esm.sh/@elixir-cloud/tes@latest/providers';
+
+        const provider = new RestTesProvider('https://protes.rahtiapp.fi/ga4gh/tes/v1');
+        document.querySelector('ecc-client-ga4gh-tes-runs').provider = provider;
+      </script>
+    </body>
+    </html>
+    ```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```tsx copy
+    // pages/tasks.tsx
+    import { RestTesProvider } from '@elixir-cloud/tes/providers';
+    import { ECCClientGa4ghTesRuns } from '@elixir-cloud/tes/react';
+
+    export default function TasksPage() {
+      const provider = new RestTesProvider(
+        process.env.NEXT_PUBLIC_TES_URL || 'https://protes.rahtiapp.fi/ga4gh/tes/v1'
+      );
+
+      return (
+        <div>
+          <h1>Task Management</h1>
+          <ECCClientGa4ghTesRuns provider={provider} />
+        </div>
+      );
+    }
+    ```
+
+  </Tabs.Tab>
+</Tabs>
+
+## Provider Methods
+
+### getServiceInfo()
+
+Retrieves information about the TES service.
+
+```typescript
+getServiceInfo(): Promise<ServiceInfo>
+```
+
+### listTasks()
+
+Retrieves a list of tasks with optional pagination, view and filters.
+
+```typescript
+listTasks(params?: ListTasksParams): Promise<TaskListResponse>
+```
+
+### getTask()
+
+Gets a specific task. `view` defaults to `FULL` and controls how much of the task is returned.
+
+```typescript
+getTask(taskId: string, view?: TaskView): Promise<Task>
+```
+
+### createTask()
+
+Submits a new task for execution.
+
+```typescript
+createTask(request: TaskRequest): Promise<TaskId>
+```
+
+### cancelTask()
+
+Cancels a task.
+
+```typescript
+cancelTask(taskId: string): Promise<void>
+```
+
+## Type Definitions
+
+### State
+
+```typescript
+type State =
+  | 'UNKNOWN'
+  | 'QUEUED'
+  | 'INITIALIZING'
+  | 'RUNNING'
+  | 'PAUSED'
+  | 'COMPLETE'
+  | 'EXECUTOR_ERROR'
+  | 'SYSTEM_ERROR'
+  | 'CANCELED'
+  | 'PREEMPTED'
+  | 'CANCELING';
+```
+
+### TaskView
+
+```typescript
+// MINIMAL: id and state only. BASIC: everything except large log/content fields.
+type TaskView = 'MINIMAL' | 'BASIC' | 'FULL';
+```
+
+### Executor
+
+```typescript
+interface Executor {
+  image: string;
+  command: string[];
+  workdir?: string;
+  stdin?: string;
+  stdout?: string;
+  stderr?: string;
+  env?: Record<string, string>;
+  ignore_error?: boolean;
+}
+```
+
+### Input
+
+```typescript
+interface Input {
+  name?: string;
+  description?: string;
+  url?: string; // required unless `content` is set
+  path: string;
+  type?: 'FILE' | 'DIRECTORY';
+  content?: string;
+  streamable?: boolean;
+}
+```
+
+### Output
+
+```typescript
+interface Output {
+  name?: string;
+  description?: string;
+  url: string;
+  path: string;
+  path_prefix?: string; // required by the server when `path` contains wildcards
+  type?: 'FILE' | 'DIRECTORY';
+}
+```
+
+### Resources
+
+```typescript
+interface Resources {
+  cpu_cores?: number;
+  preemptible?: boolean;
+  ram_gb?: number;
+  disk_gb?: number;
+  zones?: string[];
+  backend_parameters?: Record<string, string>;
+  backend_parameters_strict?: boolean;
+}
+```
+
+### TaskRequest
+
+```typescript
+interface TaskRequest {
+  name?: string;
+  description?: string;
+  inputs?: Input[];
+  outputs?: Output[];
+  resources?: Resources;
+  executors: Executor[];
+  volumes?: string[];
+  tags?: Record<string, string>;
+}
+```
+
+### TaskId
+
+```typescript
+interface TaskId {
+  id: string;
+}
+```
+
+### ExecutorLog
+
+```typescript
+interface ExecutorLog {
+  start_time?: string;
+  end_time?: string;
+  stdout?: string;
+  stderr?: string;
+  exit_code: number;
+}
+```
+
+### OutputFileLog
+
+```typescript
+interface OutputFileLog {
+  url: string;
+  path: string;
+  size_bytes: string;
+}
+```
+
+### TaskLog
+
+```typescript
+interface TaskLog {
+  logs: ExecutorLog[];
+  metadata?: Record<string, string>;
+  start_time?: string;
+  end_time?: string;
+  outputs: OutputFileLog[];
+  system_logs?: string[];
+}
+```
+
+### Task
+
+```typescript
+interface Task extends Partial<TaskRequest> {
+  id: string;
+  state: State;
+  logs?: TaskLog[];
+  creation_time?: string;
+}
+```
+
+### ListTasksParams
+
+```typescript
+interface ListTasksParams {
+  pageSize?: number;
+  pageToken?: string;
+  view?: TaskView;
+  namePrefix?: string;
+  state?: State;
+  tags?: Record<string, string>;
+}
+```
+
+### TaskListResponse
+
+```typescript
+interface TaskListResponse {
+  tasks: Task[];
+  next_page_token?: string;
+}
+```
+
+### ServiceInfo
+
+```typescript
+interface ServiceInfo {
+  id: string;
+  name: string;
+  type: { group: string; artifact: 'tes' | string; version: string };
+  description?: string;
+  organization: { name: string; url: string };
+  contactUrl?: string;
+  documentationUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  environment?: string;
+  version: string;
+  storage?: string[];
+  tesResources_backend_parameters?: string[];
+}
+```
+
+## Using with Components
+
+### Task Submission
+
+```tsx copy
+import { RestTesProvider } from '@elixir-cloud/tes/providers';
+import { ECCClientGa4ghTesRunCreate } from '@elixir-cloud/tes/react';
+
+function TaskSubmitter() {
+  const provider = new RestTesProvider('https://protes.rahtiapp.fi/ga4gh/tes/v1');
+
+  return (
+    <ECCClientGa4ghTesRunCreate
+      provider={provider}
+      onEccRunSubmitted={(event) => {
+        console.log('Task submitted:', event.detail.runId);
+      }}
+      onEccRunCreateFailed={(event) => {
+        console.error('Submission failed:', event.detail.error);
+      }}
+    />
+  );
+}
+```
+
+### Task Monitoring
+
+```tsx copy
+import { RestTesProvider } from '@elixir-cloud/tes/providers';
+import { ECCClientGa4ghTesRun } from '@elixir-cloud/tes/react';
+
+function TaskMonitor({ runId }) {
+  const provider = new RestTesProvider('https://protes.rahtiapp.fi/ga4gh/tes/v1');
+
+  return (
+    <ECCClientGa4ghTesRun
+      provider={provider}
+      runId={runId}
+      onEccRunLogChanged={(event) => {
+        console.log('Task state:', event.detail.task.state);
+      }}
+    />
+  );
+}
+```
+
+## Custom Providers
+
+For custom use cases, you can extend `RestTesProvider` or implement the `TesProvider` interface directly. This is useful for:
+
+- Adding custom authentication
+- Implementing caching or offline support
+- Connecting to non-standard or non-REST APIs
+- Adding custom error handling or retry logic
+
+```tsx copy
+// Example: Custom provider implementing the interface directly
+import type { TesProvider } from '@elixir-cloud/tes/providers';
+
+const provider: TesProvider = {
+  getServiceInfo: async () => ({}),
+  listTasks: async () => ({ tasks: [] }),
+  getTask: async (id) => ({ id, state: 'QUEUED' }),
+  createTask: async () => ({ id: 'my-task' }),
+  cancelTask: async () => {},
+};
+```
+
+
+```tsx copy
+// Example: Custom provider with authentication
+import { RestTesProvider } from '@elixir-cloud/tes/providers';
+
+class AuthTesProvider extends RestTesProvider {
+  private token: string;
+
+  constructor(baseUrl: string, token: string) {
+    super(baseUrl);
+    this.token = token;
+  }
+
+  protected fetch(input: RequestInfo | URL, init: RequestInit = {}) {
+    const headers = new Headers(init.headers);
+    headers.set('Authorization', `Bearer ${this.token}`);
+    return super.fetch(input, { ...init, headers });
+  }
+}
+
+const provider = new AuthTesProvider(
+  'https://protes.rahtiapp.fi/ga4gh/tes/v1',
+  'your-access-token'
+);
+```
+
+<Callout type='warning'>
+  Tokens used in browser code are visible to users. Prefer short-lived tokens, and never embed long-lived secrets in client-side bundles.
+</Callout>
+
+For comprehensive patterns and examples, see the [Providers Overview](/docs/providers) documentation.
+
+## Testing
+
+Test your TES provider setup:
+
+```tsx copy
+async function testTesProvider(provider) {
+  try {
+    console.log('Testing TES provider...');
+
+    // Test service info
+    const serviceInfo = await provider.getServiceInfo();
+    console.log('Service info:', serviceInfo.name);
+
+    // Test listing tasks
+    const tasks = await provider.listTasks({ pageSize: 5, view: 'MINIMAL' });
+    console.log(`Found ${tasks.tasks.length} recent tasks`);
+
+    console.log('TES provider is working correctly!');
+    return true;
+  } catch (error) {
+    console.error('TES provider test failed:', error);
+    return false;
+  }
+}
+
+// Usage
+const provider = new RestTesProvider('https://protes.rahtiapp.fi/ga4gh/tes/v1');
+testTesProvider(provider);
+```
+
+<Callout type='tip'>
+  **Next Steps**: Check the [Providers Overview](/docs/providers) for patterns on authentication,
+  error handling, caching, and environment configuration that you can apply to your TES provider.
+</Callout>

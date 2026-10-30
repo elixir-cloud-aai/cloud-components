@@ -21,6 +21,15 @@ export class RestTesProvider implements TesProvider {
     this.baseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
   }
 
+  /**
+   * Sends every request of this provider. Override it in a subclass to add
+   * headers (e.g. `Authorization`) or otherwise change requests.
+   */
+  // eslint-disable-next-line class-methods-use-this
+  protected fetch(input: RequestInfo | URL, init?: RequestInit) {
+    return fetch(input, init);
+  }
+
   private static async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
@@ -39,7 +48,7 @@ export class RestTesProvider implements TesProvider {
   }
 
   async getServiceInfo(): Promise<ServiceInfo> {
-    const response = await fetch(`${this.baseUrl}/service-info`);
+    const response = await this.fetch(`${this.baseUrl}/service-info`);
     return RestTesProvider.handleResponse<ServiceInfo>(response);
   }
 
@@ -59,7 +68,9 @@ export class RestTesProvider implements TesProvider {
     });
 
     const qs = query.toString();
-    const response = await fetch(`${this.baseUrl}/tasks${qs ? `?${qs}` : ""}`);
+    const response = await this.fetch(
+      `${this.baseUrl}/tasks${qs ? `?${qs}` : ""}`
+    );
     const body = await RestTesProvider.handleResponse<TaskListResponse>(
       response
     );
@@ -67,14 +78,14 @@ export class RestTesProvider implements TesProvider {
   }
 
   async getTask(taskId: string, view: TaskView = "FULL"): Promise<Task> {
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/tasks/${encodeURIComponent(taskId)}?view=${view}`
     );
     return RestTesProvider.handleResponse<Task>(response);
   }
 
   async createTask(request: TaskRequest): Promise<TaskId> {
-    const response = await fetch(`${this.baseUrl}/tasks`, {
+    const response = await this.fetch(`${this.baseUrl}/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
@@ -83,7 +94,7 @@ export class RestTesProvider implements TesProvider {
   }
 
   async cancelTask(taskId: string): Promise<void> {
-    const response = await fetch(
+    const response = await this.fetch(
       `${this.baseUrl}/tasks/${encodeURIComponent(taskId)}:cancel`,
       { method: "POST" }
     );
