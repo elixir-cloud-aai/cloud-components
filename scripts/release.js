@@ -17,7 +17,7 @@
 //                                            and the release date in
 //                                            `CITATION.cff` is not in the
 //                                            future (UTC)
-//   node scripts/release.js packages        print the directories of the
+//   node scripts/release.js packages         print the directories of the
 //                                            released packages, one per line
 //   node scripts/release.js dist-tag <version>
 //                                            print the npm dist-tag for
@@ -106,7 +106,10 @@ const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const anyKeyPattern = (name) => new RegExp(`^["']?${name}["']?[ \\t]*:`, "gm");
 const keyPattern = (name) =>
   new RegExp(
-    `^${name}:[ \\t]*(["']?)(?<value>[0-9A-Za-z._+-]+)\\1(?:[ \\t]+#.*)?[ \\t]*$(?!\\n[ \\t]+[^ \\t#\\n])`,
+    `^${name}:[ \\t]*(["']?)(?<value>[0-9A-Za-z._+-]+)\\1(?:[ \\t]+#.*)?[ \\t]*\\r?(?![^\\n])` +
+      // The line ends (LF or CRLF; JS ends lines at CR, too), and no indented
+      // line follows, after blank lines if any
+      `(?!(?:\\n[ \\t]*\\r?)*\\n[ \\t]+[^ \\t#\\r\\n])`,
     "m"
   );
 
@@ -182,15 +185,15 @@ const citationErrors = (version, now = new Date(), base = root) => {
   return errors;
 };
 
-// Sets `version` and `date-released` (YYYY-MM-DD) in `CITATION.cff`,
-// appending the keys if they are missing
-const setCitation = (version, date, base = root) => {
+// The text of `CITATION.cff` with `version` and `date-released`
+// (YYYY-MM-DD) set, appending the keys if they are missing; throws on bad
+// input or a missing file before anything is written
+const citationWithRelease = (version, date, base = root) => {
   parseVersion(version);
   if (!parseDate(date)) {
     throw new Error(`'${date}' is not a date (YYYY-MM-DD)`);
   }
-  const file = path.join(base, citationFile);
-  let text = fs.readFileSync(file, "utf8");
+  let text = fs.readFileSync(path.join(base, citationFile), "utf8");
   [
     ["version", version],
     ["date-released", date],
@@ -199,10 +202,19 @@ const setCitation = (version, date, base = root) => {
     if (citationValue(text, name) === undefined) {
       text = `${text.replace(/\n*$/, "")}\n${line}\n`;
     } else {
-      text = text.replace(keyPattern(name), line);
+      // Keeps the line ending (CRLF)
+      text = text.replace(keyPattern(name), (match) =>
+        match.endsWith("\r") ? `${line}\r` : line
+      );
     }
   });
-  fs.writeFileSync(file, text);
+  return text;
+};
+
+// Sets `version` and `date-released` (YYYY-MM-DD) in `CITATION.cff`
+const setCitation = (version, date, base = root) => {
+  const text = citationWithRelease(version, date, base);
+  fs.writeFileSync(path.join(base, citationFile), text);
 };
 
 // Prereleases of this major version are published as `latest` until its
@@ -298,11 +310,11 @@ const setVersion = (version) => {
   );
 };
 
-// The release date of `set`: `--date YYYY-MM-DD`, not later than today, or
-// today (UTC)
-const releaseDate = (options) => {
+// The release date of `set`, checked: `--date YYYY-MM-DD`, not later than
+// the day of `now` (UTC), or that day
+const releaseDate = (options, now = new Date()) => {
   if (options.length === 0) {
-    return utcDate();
+    return utcDate(now);
   }
   if (options.length !== 2 || options[0] !== "--date") {
     throw new Error(
@@ -310,7 +322,10 @@ const releaseDate = (options) => {
     );
   }
   const [, date] = options;
-  if (parseDate(date) && date > utcDate()) {
+  if (!parseDate(date)) {
+    throw new Error(`'${date}' is not a date (YYYY-MM-DD)`);
+  }
+  if (date > utcDate(now)) {
     throw new Error(`'${date}' is in the future (UTC)`);
   }
   return date;
@@ -320,14 +335,13 @@ const main = (args) => {
   const [command, version, ...options] = args;
   switch (command) {
     case "set": {
-      const date = releaseDate(options);
-      // Checks the version and date before anything is changed
+      // The version, the date and the citation file are checked before
+      // anything is changed
       parseVersion(version);
-      if (!parseDate(date)) {
-        throw new Error(`'${date}' is not a date (YYYY-MM-DD)`);
-      }
+      const date = releaseDate(options);
+      const citation = citationWithRelease(version, date);
       setVersion(version);
-      setCitation(version, date);
+      fs.writeFileSync(path.join(root, citationFile), citation);
       return 0;
     }
     case "check": {
@@ -369,6 +383,7 @@ module.exports = {
   distTag,
   parseVersion,
   pinInternalDependencies,
+  releaseDate,
   releasedPackages,
   setCitation,
   versionMismatches,

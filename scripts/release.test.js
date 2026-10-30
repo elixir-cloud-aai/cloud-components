@@ -12,6 +12,7 @@ const {
   distTag,
   parseVersion,
   pinInternalDependencies,
+  releaseDate,
   releasedPackages,
   setCitation,
   versionMismatches,
@@ -250,6 +251,32 @@ test("citationErrors names missing, repeated and unsupported keys", (t) => {
   ]);
 });
 
+test("citationErrors rejects values continued on later lines", (t) => {
+  // YAML reads `2.0.0 -alpha.1`, after a blank line too, also with CRLF
+  ["\n  -alpha.1\n", "\n\n  -alpha.1\n", "\r\n  -alpha.1\r\n"].forEach(
+    (continuation) => {
+      const text = citation("2.0.0").replace(
+        `version: "2.0.0"\n`,
+        `version: 2.0.0${continuation}`
+      );
+      assert.deepStrictEqual(
+        citationErrors("2.0.0", today, citationFixture(t, text)),
+        ['CITATION.cff has an unsupported version: use `version: "<value>"`']
+      );
+    }
+  );
+});
+
+test("citationErrors and setCitation handle CRLF line endings", (t) => {
+  const base = citationFixture(t, citation().replace(/\n/g, "\r\n"));
+  assert.deepStrictEqual(citationErrors("2.0.0-alpha.49", today, base), []);
+  setCitation("2.0.0-alpha.50", "2026-10-30", base);
+  assert.strictEqual(
+    fs.readFileSync(path.join(base, "CITATION.cff"), "utf8"),
+    citation("2.0.0-alpha.50", "2026-10-30").replace(/\n/g, "\r\n")
+  );
+});
+
 test("setCitation sets the version and date, keeping the rest", (t) => {
   const base = citationFixture(t);
   setCitation("2.0.0-alpha.50", "2026-10-30", base);
@@ -279,6 +306,37 @@ test("setCitation appends missing keys and rejects bad input", (t) => {
   assert.throws(
     () => setCitation("2.0.0", "2026-10-30", repeated),
     /version more than once/
+  );
+});
+
+test("releaseDate is today (UTC) or an earlier --date", () => {
+  assert.strictEqual(releaseDate([], today), "2026-10-30");
+  // 23:30 in UTC-10 is the next day in UTC
+  assert.strictEqual(
+    releaseDate([], new Date("2026-10-30T23:30:00-10:00")),
+    "2026-10-31"
+  );
+  assert.strictEqual(
+    releaseDate(["--date", "2026-10-27"], today),
+    "2026-10-27"
+  );
+  assert.strictEqual(
+    releaseDate(["--date", "2026-10-30"], today),
+    "2026-10-30"
+  );
+  assert.throws(
+    () => releaseDate(["--date", "2026-10-31"], today),
+    /'2026-10-31' is in the future \(UTC\)/
+  );
+  assert.throws(
+    () => releaseDate(["--date", "2026-02-30"], today),
+    /not a date \(YYYY-MM-DD\)/
+  );
+  assert.throws(() => releaseDate(["--date"], today), /Usage/);
+  assert.throws(() => releaseDate(["--dat", "2026-10-27"], today), /Usage/);
+  assert.throws(
+    () => releaseDate(["--date", "2026-10-27", "x"], today),
+    /Usage/
   );
 });
 
@@ -313,6 +371,26 @@ test("the command line fails on bad versions and commands", () => {
   const missingVersion = run("pin");
   assert.strictEqual(missingVersion.status, 1);
   assert.match(missingVersion.stderr, /Not a version/);
+  // `set` changes nothing on bad input
+  const before = spawnSync("git", ["status", "--porcelain"], {
+    cwd: __dirname,
+    encoding: "utf8",
+  }).stdout;
+  [
+    ["set", "v2.0.0", "--date", "2026-10-27"],
+    ["set", "2.0.0", "--date", "2099-01-01"],
+    ["set", "2.0.0", "--date", "x"],
+  ].forEach((args) => {
+    const setRun = run(...args);
+    assert.strictEqual(setRun.status, 1);
+  });
+  assert.strictEqual(
+    spawnSync("git", ["status", "--porcelain"], {
+      cwd: __dirname,
+      encoding: "utf8",
+    }).stdout,
+    before
+  );
   const badCommand = run("publish");
   assert.strictEqual(badCommand.status, 2);
   assert.match(badCommand.stderr, /Usage/);
