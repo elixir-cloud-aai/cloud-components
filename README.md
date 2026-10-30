@@ -4,6 +4,7 @@ Cloud Components (ECC) are lightweight, fast and reusable Web Components for ope
 
 [![License][badge-license-image]][badge-license-url]
 [![Chat][badge-chat-image]][badge-chat-url]
+[![Coverage][badge-coverage-image]][badge-coverage-url]
 
 ## Documentation
 
@@ -134,6 +135,8 @@ To get in touch with use, please use one of the following routes:
 
 [badge-license-image]: https://img.shields.io/badge/license-Apache%202.0-blue.svg
 [badge-license-url]: http://www.apache.org/licenses/LICENSE-2.0
+[badge-coverage-image]: https://codecov.io/gh/elixir-cloud-aai/cloud-components/branch/dev/graph/badge.svg?branch=dev
+[badge-coverage-url]: https://codecov.io/gh/elixir-cloud-aai/cloud-components?branch=dev
 [badge-chat-image]: https://img.shields.io/static/v1?label=chat&message=Slack&color=ff6994
 [badge-chat-url]: https://join.slack.com/t/elixir-cloud/shared_invite/enQtNzA3NTQ5Mzg2NjQ3LTZjZGI1OGQ5ZTRiOTRkY2ExMGUxNmQyODAxMDdjM2EyZDQ1YWM0ZGFjOTJhNzg5NjE0YmJiZTZhZDVhOWE4MWM
 [email]: mailto:alexander.kanitz@alumni.ethz.ch

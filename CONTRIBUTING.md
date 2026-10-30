@@ -20,14 +20,21 @@ describes what is specific to this repository.
    fast-forward it after a release.
 2. Title the pull request as a [Conventional
    Commit](https://www.conventionalcommits.org/):
-   `<type>[(<scope>)][!]: <description>`, where the description starts in
-   lower case and has at most 50 characters (the `PR title` check enforces
-   this). Pull requests are squash-merged, so the title becomes the commit
-   message on `dev`.
-3. Keep the checks green: `CI passed` sums up linting, tests (Node.js 22 and
-   24) and the other CI jobs. Run `npm run lint`, `npm run build` and
-   `npm test` (and `node --test scripts/release.test.js` after changes to
-   `scripts/release.js`) locally before you push.
+   `<type>[(<scope>)][!]: <description>`, at most 50 characters in total,
+   where the description doesn't start with a capitalised word and has no
+   trailing period (the CI job `PR title` checks this, also after you edit
+   the title). Pull requests are squash-merged, so the title becomes the
+   commit message on `dev`.
+3. Keep the checks green: `CI passed` sums up the PR title, linting, tests
+   (Node.js 22 and 24) and the other CI jobs. Run `npm run lint`,
+   `npm run build` and `npm test` (and
+   `node --test scripts/release.test.js` after changes to
+   `scripts/release.js`) locally before you push. CI runs the tests with
+   coverage (`npm test -- -- --coverage`, Chromium only; each package's
+   report is in its `coverage/` folder) and reports it to
+   [Codecov](https://app.codecov.io/gh/elixir-cloud-aai/cloud-components);
+   coverage of the whole code must not drop by more than 1 %
+   (`codecov.yml`).
 4. Add or update tests and the documentation (`apps/documentation`) for
    changed behaviour.
 5. The code owners (see `.github/CODEOWNERS`) are requested for review

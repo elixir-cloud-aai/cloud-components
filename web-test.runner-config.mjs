@@ -17,6 +17,15 @@ export default {
       retries: 1,
     },
   },
+  // With `--coverage` (as in CI): the coverage of the package's sources in
+  // Chromium (the only browser that reports it), written to
+  // `coverage/lcov.info` in the package, which CI uploads to Codecov
+  coverageConfig: {
+    include: ["src/**"],
+    exclude: ["**/*.test.ts", "**/node_modules/**"],
+    reportDir: "coverage",
+    reporters: ["lcov"],
+  },
   plugins: [
     esbuildPlugin({
       ts: true,
