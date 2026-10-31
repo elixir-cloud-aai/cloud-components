@@ -1,152 +1,113 @@
+<a href="https://elixir-on.cloud/">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="images/logo_elixir_on_cloud_night.png">
+    <img src="images/logo_elixir_on_cloud.png" alt="ELIXIR On-Cloud">
+  </picture>
+</a>
+
 # Cloud Components
 
-Cloud Components (ECC) are lightweight, fast and reusable Web Components for operationalizing various [ELIXIR Cloud & AAI](https://elixir-cloud.dcc.sib.swiss/) and [GA4GH](https://ga4gh.org/) [Cloud](https://www.ga4gh.org/work_stream/cloud/) services.
+[![License][badge-license]][badge-url-license]
+[![Build_status][badge-build-status]][badge-url-build-status]
+[![Coverage][badge-coverage]][badge-url-coverage]
+[![Docs][badge-docs]][badge-url-docs]
+[![GitHub_tag][badge-github-tag]][badge-url-github-tag]
+[![npm_release][badge-npm]][badge-url-npm]
 
-[![License][badge-license-image]][badge-license-url]
-[![Chat][badge-chat-image]][badge-chat-url]
-[![Coverage][badge-coverage-image]][badge-coverage-url]
+Web components for front ends of [GA4GH](https://www.ga4gh.org/) APIs and
+the services built on them, brought to you by [ELIXIR
+On-Cloud](https://elixir-on.cloud/). Built with [Lit](https://lit.dev/) and
+TypeScript, they work in any web framework or in plain HTML, and come with
+React wrappers and providers that connect them to your API endpoints. They
+are published as npm packages:
 
-## Documentation
+| Package | Components for |
+| --- | --- |
+| `@elixir-cloud/design` | The design system and utility components that the other packages use |
+| `@elixir-cloud/service-registry` | The GA4GH Service Registry API |
+| `@elixir-cloud/cloud-registry` | Cloud Registry, a GA4GH Service Registry with service management |
+| `@elixir-cloud/trs` | The GA4GH Tool Registry Service (TRS) API |
+| `@elixir-cloud/trs-filer` | TRS-Filer, a GA4GH TRS implementation with tool management |
+| `@elixir-cloud/wes` | The GA4GH Workflow Execution Service (WES) API |
+| `@elixir-cloud/drs` | The GA4GH Data Repository Service (DRS) API |
+| `@elixir-cloud/drs-filer` | DRS-Filer, a GA4GH DRS implementation with object management |
 
-For comprehensive guides, API references, and examples, visit our documentation:
+**Read the [documentation][docs]** for the installation, the components and
+providers of each package, customisation and the versions.
 
-**[https://cloud-components.2.rahtiapp.fi/](https://cloud-components.2.rahtiapp.fi/)**
+## Quick start
 
-## Quick Start for Developers
-
-### Prerequisites
-
-- Node.js 22 or later (CI tests 22 and 24)
-- npm or yarn
-
-### Development Setup
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/elixir-cloud-aai/cloud-components.git
-   cd cloud-components
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Start development:**
-   ```bash
-   # Run the design package first (required by all other packages)
-   npm run dev --workspace=@elixir-cloud/design
-
-   # In another terminal, run a specific package:
-   npm run dev --workspace=@elixir-cloud/<package-name>
-   ```
-
-### Available Packages
-
-| Package | Description |
-|---------|-------------|
-| `@elixir-cloud/design` | Design system and utility components |
-| `@elixir-cloud/service-registry` | GA4GH Service Registry components |
-| `@elixir-cloud/cloud-registry` | ELIXIR Cloud Registry components |
-| `@elixir-cloud/trs` | GA4GH Tool Registry Service components |
-| `@elixir-cloud/trs-filer` | TRS-Filer service components |
-| `@elixir-cloud/wes` | GA4GH Workflow Execution Service components |
-
-## Development Commands
+Install the package for your API with `npm`, e.g., for the GA4GH Service
+Registry API:
 
 ```bash
-# Install dependencies
-npm install
-
-# Run specific package in development mode
-npm run dev --workspace=@elixir-cloud/<package-name>
-
-# Build all packages
-npm run build
-
-# Run tests
-npm test
-
-# Lint code
-npm run lint
-
-# Format code
-npm run format
+npm install @elixir-cloud/service-registry
 ```
 
-## Architecture
+Then import it in your app to register its components, and give them a
+provider for your API endpoint:
 
-ECC is built on modern web standards:
+```javascript
+import "@elixir-cloud/service-registry";
+import { RestServiceRegistryProvider } from "@elixir-cloud/service-registry/providers";
 
-- **Web Components**: Platform-agnostic, framework-independent components
-- **TypeScript**: Type-safe development with excellent IDE support
-- **Lit**: Efficient web component library for building reactive UIs
-- **Vite**: Fast build tool and development server
-- **Monorepo**: Organized workspace with shared dependencies and tooling
+const services = document.createElement("ecc-client-ga4gh-service-registry-services");
+services.provider = new RestServiceRegistryProvider(
+  "https://registry.example.com/ga4gh/registry/v1",
+);
+document.body.append(services);
+```
+
+See [Installation][docs-installation] for React, loading the components from a
+CDN and the other packages.
+
+## Development
+
+With [Node.js](https://nodejs.org/) 22 or later installed, clone the
+repository, install the dependencies and start the design package, which all
+other packages need:
+
+```bash
+git clone https://github.com/elixir-cloud-aai/cloud-components.git
+cd cloud-components
+npm install
+npm run dev --workspace=@elixir-cloud/design
+```
+
+The design package keeps running; start the package you work on in a second
+terminal:
+
+```bash
+npm run dev --workspace=@elixir-cloud/<package>
+```
+
+`npm run lint`, `npm run build` and `npm test` run the checks of CI; the
+documentation app is in [`apps/documentation/`](apps/documentation/).
+
+## Citation
+
+If you use Cloud Components, please cite them with the metadata in
+[`CITATION.cff`](CITATION.cff): on GitHub, "Cite this repository" in the
+sidebar of the repository formats it as APA or BibTeX.
 
 ## Contributing
 
-This project is a community effort and lives off _your_ contributions, be it in
-the form of bug reports, feature requests, discussions, fixes or any other form
-of contribution!
+Contributions are welcome! See [`CONTRIBUTING.md`](CONTRIBUTING.md) for pull
+requests and releases, the organisation's contributor guide and our code of
+conduct. For anything else, write to
+[cloud-service@elixir-europe.org](mailto:cloud-service@elixir-europe.org).
 
-Please refer to the guidelines available at [`CONTRIBUTING.md`][contributing] if
-you are interested in contributing.
-
-## Code of Conduct
-
-Please mind the [code of conduct][code-of-conduct] of ELIXIR Cloud & AAI for
-all interactions with the community. Please be nice to one another! :)
-
-If you experience any unacceptable behavior by any member of the community,
-please report the incident to the community moderators as described in the
-[code of conduct][code-of-conduct].
-
-## Versioning
-
-The project adopts the [semantic versioning](https://semver.org/) scheme for versioning.
-Currently the service is in a pre-release stage, so changes to the API,
-including breaking changes, may occur at any time without further notice.
-
-## License
-
-This project is distributed under the [Apache License 2.0][badge-license-url], a
-copy of which is also available in [`LICENSE`][license].
-
-## Contact
-
-The project is maintained by [ELIXIR Cloud & AAI][elixir-cloud-aai], a Driver
-Project of the [Global Alliance for Genomics and Health (GA4GH)][ga4gh], under
-the umbrella of the [ELIXIR][elixir] [Compute Platform][elixir-compute].
-
-To get in touch with use, please use one of the following routes:
-
-- For filing bug reports, feature requests or other code-related issues, please
-  make use of the project's [issue tracker](https://github.com/elixir-cloud-aai/cloud-components/issues).
-- For private/personal issues, more involved communication, or if you would
-  like to join our team as a regular contributor, you can either join our
-  [chat board][badge-chat-url] or [email] the community
-  leaders.
-
----
-
-[![logo-elixir][logo-elixir]][elixir]
-[![logo-elixir-cloud-aai][logo-elixir-cloud-aai]][elixir-cloud-aai]
-
-[badge-license-image]: https://img.shields.io/badge/license-Apache%202.0-blue.svg
-[badge-license-url]: http://www.apache.org/licenses/LICENSE-2.0
-[badge-coverage-image]: https://codecov.io/gh/elixir-cloud-aai/cloud-components/branch/dev/graph/badge.svg?branch=dev
-[badge-coverage-url]: https://codecov.io/gh/elixir-cloud-aai/cloud-components?branch=dev
-[badge-chat-image]: https://img.shields.io/static/v1?label=chat&message=Slack&color=ff6994
-[badge-chat-url]: https://join.slack.com/t/elixir-cloud/shared_invite/enQtNzA3NTQ5Mzg2NjQ3LTZjZGI1OGQ5ZTRiOTRkY2ExMGUxNmQyODAxMDdjM2EyZDQ1YWM0ZGFjOTJhNzg5NjE0YmJiZTZhZDVhOWE4MWM
-[email]: mailto:alexander.kanitz@alumni.ethz.ch
-[code-of-conduct]: https://github.com/elixir-cloud-aai/.github/blob/main/CODE_OF_CONDUCT.md
-[contributing]: CONTRIBUTING.md
-[contributors]: CONTRIBUTORS.md
-[elixir]: https://elixir-europe.org/
-[elixir-cloud-aai]: https://elixir-cloud.dcc.sib.swiss/
-[elixir-compute]: https://elixir-europe.org/platforms/compute
-[ga4gh]: https://ga4gh.org/
-[license]: LICENSE
-[logo-elixir]: images/logo-elixir.svg
-[logo-elixir-cloud-aai]: images/logo-elixir-cloud-aai.svg
+[badge-build-status]: <https://github.com/elixir-cloud-aai/cloud-components/actions/workflows/ci.yml/badge.svg?branch=dev>
+[badge-coverage]: <https://codecov.io/gh/elixir-cloud-aai/cloud-components/branch/dev/graph/badge.svg>
+[badge-docs]: <https://img.shields.io/readthedocs/cloud-components>
+[badge-github-tag]: <https://img.shields.io/github/v/tag/elixir-cloud-aai/cloud-components?color=C39BD3>
+[badge-license]: <https://img.shields.io/badge/license-Apache%202.0-blue.svg>
+[badge-npm]: <https://img.shields.io/npm/v/@elixir-cloud/design?color=C39BD3>
+[badge-url-build-status]: <https://github.com/elixir-cloud-aai/cloud-components/actions/workflows/ci.yml?query=branch%3Adev>
+[badge-url-coverage]: <https://codecov.io/gh/elixir-cloud-aai/cloud-components/tree/dev>
+[badge-url-docs]: <https://cloud-components.readthedocs.io/en/latest/>
+[badge-url-github-tag]: <https://github.com/elixir-cloud-aai/cloud-components/releases>
+[badge-url-license]: <https://www.apache.org/licenses/LICENSE-2.0>
+[badge-url-npm]: <https://www.npmjs.com/package/@elixir-cloud/design>
+[docs]: <https://cloud-components.readthedocs.io/en/latest/>
+[docs-installation]: <https://cloud-components.readthedocs.io/en/latest/docs/installation/>
