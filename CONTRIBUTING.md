@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in ELIXIR Cloud Components! Bug reports, feature
+Thanks for your interest in Cloud Components! Bug reports, feature
 requests, discussions, documentation and code are all welcome. The project
 follows the [contributor guide of ELIXIR
 On-Cloud](https://elixir-cloud-aai.github.io/contribute/); this file only
@@ -49,26 +49,39 @@ released together (currently `2.0.0-alpha.N`, until 2.0.0).
 and not released.
 
 The `Release` workflow (`.github/workflows/release.yml`) runs on tags
-`v<version>`. It pushes nothing to any branch; it checks that all versions
-equal the tag's version and that the tag is on `dev`, lints, builds the
-packages from the tag, stages them on npm with
-[trusted publishing](https://docs.npmjs.com/trusted-publishers) (OpenID
-Connect, with provenance) and creates a GitHub release for the tag, with
-generated notes (a prerelease for versions such as `2.0.0-alpha.49`).
-Staged versions become public only when a maintainer approves them on
-npmjs.com.
+`v<version>` and pushes nothing to any branch. Its jobs:
+
+- `prepare` ("Prepare release") holds all checks: the versions of the root,
+  the released packages and `CITATION.cff` equal the tag's version, the
+  release date in `CITATION.cff` is not in the future (UTC), the tag is on
+  `dev`, the `CI` workflow passed for a push of the tagged commit (if CI
+  hasn't finished yet or failed, re-run the release once it passed), and the
+  linters pass. The other jobs need it.
+- `npm` ("Release packages") builds the packages from the tag and stages
+  them on npm with
+  [trusted publishing](https://docs.npmjs.com/trusted-publishers) (OpenID
+  Connect, with provenance), once the `npm` environment is approved. Staged
+  versions become public only when a maintainer approves them on
+  npmjs.com.
+- `publish` ("Publish release") creates the GitHub release for the tag,
+  with generated notes (a prerelease for versions such as
+  `2.0.0-alpha.49`).
 
 To release `<version>` (e.g. `2.0.0-alpha.49`), maintainers:
 
 1. **Bump the version** in a pull request to `dev` (title
    `chore: release <version>`): run `node scripts/release.js set <version>`,
-   which sets the version of the root and of all released packages and
-   updates `package-lock.json`, commit the changes and merge the pull request
-   once CI has passed.
-2. **Tag** the merge commit on `dev` and push the tag:
+   which sets the version of the root and of all released packages, updates
+   `package-lock.json`, and sets `version` and `date-released` (today, UTC;
+   or `--date YYYY-MM-DD`, not in the future) in `CITATION.cff`. Commit the
+   changes and merge the pull request once CI has passed.
+2. **Tag** the merge commit on `dev` once CI has passed for it (the run for
+   the push to `dev`), and push the tag:
    `git tag -s v<version> -m v<version> <commit>`, then
-   `git push origin v<version>`. Tags are immutable: check the commit first.
-3. **Approve the `npm` environment**: the job `Release packages` of the
+   `git push origin v<version>`. Tags are immutable: check the commit first,
+   e.g. with `node scripts/release.js check <version>` on it, which runs the
+   version checks of the release workflow.
+3. **Approve the `npm` environment**: the job "Release packages" of the
    `Release` run waits for a required reviewer of the GitHub environment
    `npm` (Actions → the run → "Review deployments").
 4. **Approve the staged versions on npm**: the job stages each package with
@@ -99,6 +112,23 @@ don't approve any staged version yet: re-run the failed jobs of the run.
 Packages already on npm are skipped, and versions staged by the earlier
 attempt count as staged. If a package can't be staged at all, reject the
 staged versions (`npm stage reject <stage-id>`) and release a new version.
+
+### Citation metadata
+
+Cloud Components are cited with the metadata in `CITATION.cff`
+([Citation File Format](https://citation-file-format.github.io/)), which
+GitHub ("Cite this repository") and Zenodo use; Zenodo archives each GitHub
+release with the file of the tagged commit. Its authors are the people who
+committed at least 100 lines (lines added) to `main`, the release branch,
+not counting bots, lock files and images. They are ordered by lines, then by
+commits; equal contributors are listed alphabetically by family name and
+marked with an asterisk (*). Affiliations come from public ORCID records
+only. To add or correct your entry (e.g. your name, [ORCID
+iD](https://orcid.org/) or affiliation), open a pull request that changes
+only your entry; don't add e-mail addresses. CI validates the file
+(`cffconvert --validate`). `node scripts/release.js set <version>` sets its
+`version` and `date-released` for each release, and the release workflow
+fails if they don't match the release (see "Releases").
 
 ### Documentation versions
 
