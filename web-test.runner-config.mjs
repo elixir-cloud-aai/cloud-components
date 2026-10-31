@@ -2,6 +2,8 @@ import { esbuildPlugin } from "@web/dev-server-esbuild";
 import fg from "fast-glob";
 import { playwrightLauncher } from "@web/test-runner-playwright";
 
+// Packages run tests in parallel (turbo --parallel), so each package's test
+// scripts pass a unique --port: design 8000, wes 8001.
 export default {
   rootDir: ".",
   files: "src/**/*.test.ts", // "default" group
@@ -15,10 +17,22 @@ export default {
       retries: 1,
     },
   },
+  // With `--coverage` (as in CI): the coverage of the package's sources in
+  // Chromium (the only browser that reports it), written to
+  // `coverage/lcov.info` in the package, which CI uploads to Codecov
+  coverageConfig: {
+    include: ["src/**"],
+    exclude: ["**/*.test.ts", "**/node_modules/**"],
+    reportDir: "coverage",
+    reporters: ["lcov"],
+  },
   plugins: [
     esbuildPlugin({
       ts: true,
       target: "es2020",
+      // Lit decorators need the package's experimentalDecorators setting
+      // (relative to the working directory: run tests from the package)
+      tsconfig: "./tsconfig.json",
     }),
   ],
   browsers: [

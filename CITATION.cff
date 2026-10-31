@@ -1,0 +1,47 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite it using the metadata from this file.
+  Authors are listed by the number of lines they committed, then by the
+  number of their commits; equal contributors, if any, are listed
+  alphabetically by family name and marked with an asterisk (*) after their
+  family names. See "Citation metadata" in CONTRIBUTING.md for who is an
+  author and how to add or correct your entry.
+title: Cloud Components
+abstract: >-
+  Cloud Components are lightweight, fast and reusable web components by the
+  ELIXIR Cloud & AAI community for managing and accessing GA4GH and ELIXIR
+  cloud services, such as the GA4GH Service Registry, TES, WES, TRS and DRS
+  APIs, published as npm packages and usable with any web framework.
+type: software
+authors:
+  - given-names: Anurag
+    family-names: Gupta
+  - given-names: Javed
+    family-names: Habib
+  - given-names: Assel
+    family-names: Abzalova
+  - given-names: Salihu
+    alias: SalihuDickson
+  - given-names: Alexander
+    family-names: Kanitz
+    orcid: "https://orcid.org/0000-0002-3468-0652"
+    affiliation: >-
+      Biozentrum, University of Basel, Basel, Switzerland; SIB Swiss Institute
+      of Bioinformatics, Lausanne, Switzerland
+  - given-names: Shivang
+    family-names: Bagri
+  - given-names: Pratiksha
+    family-names: Sankhe
+  - given-names: Tanya
+    family-names: Kumari
+repository-code: "https://github.com/elixir-cloud-aai/cloud-components"
+url: "https://cloud-components.readthedocs.io/"
+keywords:
+  - web components
+  - GA4GH
+  - ELIXIR
+  - Lit
+  - user interface
+license: Apache-2.0
+version: "2.0.0-alpha.49"
+date-released: "2026-10-27"
