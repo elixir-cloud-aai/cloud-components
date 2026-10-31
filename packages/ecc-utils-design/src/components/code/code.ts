@@ -3,8 +3,7 @@ import { property, state } from "lit/decorators.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 import "ace-builds/src-noconflict/ace.js";
-import "ace-builds/src-noconflict/theme-cloud9_day.js";
-import "ace-builds/src-noconflict/theme-cloud9_night.js";
+import { ACE_THEME } from "./ace-theme.js";
 
 // Pre-load common modes to ensure they're available
 import "ace-builds/src-noconflict/mode-javascript.js";
@@ -634,7 +633,6 @@ export class EccUtilsDesignCode extends LitElement {
 
   firstUpdated() {
     this.initializeAceEditor();
-    this.setupThemeObserver();
   }
 
   // Set language based on extension if provided
@@ -645,40 +643,31 @@ export class EccUtilsDesignCode extends LitElement {
     }
   }
 
+  /**
+   * @deprecated The editor theme follows design tokens and dark mode via CSS,
+   * so there is nothing to observe; this only re-applies the token-driven
+   * theme, like `updateEditorTheme()`.
+   */
   setupThemeObserver() {
-    // Set up mutation observer to watch for theme changes
-    const observer = new MutationObserver(() => {
-      this.updateEditorTheme();
-    });
-
-    // Observe changes to the document element and body
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    observer.observe(document.body, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
+    this.updateEditorTheme();
   }
 
+  /**
+   * @deprecated Dark mode is applied via CSS (`dark` attribute; a `.dark`
+   * class or `dark` attribute on an ancestor where `:host-context()` is
+   * supported). Returns whether this component currently renders with a
+   * dark color scheme.
+   */
   isDarkMode() {
-    return (
-      document.documentElement.classList.contains("dark") ||
-      document.body.classList.contains("dark") ||
-      this.matches(":host-context(.dark)") ||
-      this.matches(":host-context([dark])")
-    );
+    return getComputedStyle(this).getPropertyValue("color-scheme") === "dark";
   }
 
+  /**
+   * @deprecated The editor theme follows design tokens and dark mode via CSS;
+   * this only re-applies the token-driven theme.
+   */
   updateEditorTheme() {
-    if (this.editor) {
-      const theme = this.isDarkMode()
-        ? "ace/theme/cloud9_night"
-        : "ace/theme/cloud9_day";
-      this.editor.setTheme(theme);
-    }
+    this.editor?.setTheme(ACE_THEME);
   }
 
   async initializeAceEditor() {
@@ -691,8 +680,8 @@ export class EccUtilsDesignCode extends LitElement {
       );
       this.editor = ace.edit(editorElement);
 
-      // Set initial theme based on current mode
-      this.updateEditorTheme();
+      // Token-driven theme: follows --ecc-* overrides and dark mode via CSS
+      this.editor.setTheme(ACE_THEME);
 
       this.editor.session.setUseWorker(true);
       this.editor.renderer.attachToShadowRoot();

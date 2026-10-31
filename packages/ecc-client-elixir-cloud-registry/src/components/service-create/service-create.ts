@@ -9,6 +9,8 @@ import {
   ServiceType,
   ServiceTypeRegister,
 } from "../../providers/index.js";
+import { nonBlankString } from "../../providers/errors.js";
+import type { EccServiceCreateFailedEvent } from "../../events/index.js";
 import "@elixir-cloud/design/components/button/index.js";
 import "@elixir-cloud/design/components/input/index.js";
 import "@elixir-cloud/design/components/select/index.js";
@@ -17,14 +19,46 @@ import "@elixir-cloud/design/components/textarea/index.js";
 import "@elixir-cloud/design/components/collapsible/index.js";
 
 /**
+ * Detail of `ecc-service-create-failed` for an error that a provider threw:
+ * its message, and the status and problem details if it has them. They are
+ * read from the error's fields, as `CloudRegistryError` has them, so that
+ * errors of custom providers with the same fields work too.
+ * @param err The error
+ * @param action The failed action, e.g. "Failed to create service"
+ * @param prefix Whether the message starts with the action
+ * @returns The event's detail
+ */
+const failureDetail = (
+  err: unknown,
+  action: string,
+  prefix = false
+): EccServiceCreateFailedEvent["detail"] => {
+  const fields =
+    err && typeof err === "object" ? (err as Record<string, unknown>) : {};
+  const detail = nonBlankString(fields.detail);
+  const message =
+    nonBlankString(fields.message) ?? detail ?? nonBlankString(err);
+  let error = message ?? action;
+  if (prefix && message) error = `${action}: ${message}`;
+  return {
+    error,
+    status: typeof fields.status === "number" ? fields.status : undefined,
+    title: nonBlankString(fields.title),
+    detail,
+    serviceId: nonBlankString(fields.serviceId),
+    cause: err,
+  };
+};
+
+/**
  * @summary Component for creating new services in Cloud Registry
  * @since 2.0.0
  *
  * @property {string} baseUrl - Base URL of the Cloud Registry instance/gateway
- * @property {CloudRegistryProvider} provider - Custom data provider (optional, overrides baseUrl)
+ * @property {CloudRegistryProvider} provider - Custom data provider (optional, overrides baseUrl); replacing it makes later requests use the new one
  *
  * @fires ecc-service-created - Fired when a service is successfully created (includes serviceId, serviceData, and success message)
- * @fires ecc-service-create-failed - Fired when service creation fails
+ * @fires ecc-service-create-failed - Fired when service creation or loading the service types fails (includes the error message and, if the registry sent them, the status and problem details)
  * @fires ecc-service-create-validation-failed - Fired when there are validation errors during service creation
  */
 export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
@@ -93,9 +127,16 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     useCustomId: false,
   };
 
+  /** The provider in use: `provider`, else `restProvider`. */
   private _provider: CloudRegistryProvider | null = null;
 
-  protected async firstUpdated(): Promise<void> {
+  /** The provider for `baseUrl`, used if `provider` isn't set. */
+  private restProvider: RestCloudRegistryProvider | null = null;
+
+  /** Number of the latest request for service types. */
+  private typesRequest = 0;
+
+  protected firstUpdated(): void {
     if (!this.baseUrl && !this.provider) {
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-validation-failed", {
@@ -107,39 +148,61 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           composed: true,
         })
       );
-      return;
-    }
-
-    if (this.provider) {
-      this._provider = this.provider;
-    } else if (this.baseUrl) {
-      this._provider = new RestCloudRegistryProvider(this.baseUrl);
-    } else {
-      this._provider = null;
-    }
-
-    if (this._provider) {
-      await this.loadServiceTypes();
     }
   }
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
-    if (changedProperties.has("baseUrl") && this.baseUrl) {
-      this._provider = new RestCloudRegistryProvider(this.baseUrl);
-      this.loadServiceTypes();
+    if (changedProperties.has("provider") || changedProperties.has("baseUrl")) {
+      this.useProvider();
     }
   }
 
+  /**
+   * Uses `provider` or, without one, a REST provider for `baseUrl`, and
+   * loads its service types. Apps may replace either property at any time,
+   * e.g. once the user's token is known or has changed.
+   */
+  private useProvider(): void {
+    const provider = this.currentProvider();
+    if (provider === this._provider) return;
+
+    // the types shown stay until those of the new provider are loaded
+    this._provider = provider;
+    if (provider) this.loadServiceTypes();
+    else this.serviceTypes = [];
+  }
+
+  /**
+   * The provider to use now: `provider`, else a REST provider for `baseUrl`
+   * (also right after an app set them, before the component updated).
+   */
+  private currentProvider(): CloudRegistryProvider | null {
+    if (this.baseUrl && this.restProvider?.baseUrl !== this.baseUrl) {
+      this.restProvider = new RestCloudRegistryProvider(this.baseUrl);
+    } else if (!this.baseUrl) {
+      this.restProvider = null;
+    }
+    return this.provider ?? this.restProvider;
+  }
+
   private async loadServiceTypes(): Promise<void> {
-    if (!this._provider) return;
+    const provider = this._provider;
+    if (!provider) return;
+    // only the latest request counts, also if a provider comes back
+    this.typesRequest += 1;
+    const request = this.typesRequest;
 
     try {
-      this.serviceTypes = await this._provider.getServiceTypes();
+      const serviceTypes = await provider.getServiceTypes();
+      if (request === this.typesRequest) this.serviceTypes = serviceTypes;
     } catch (error) {
+      if (request !== this.typesRequest) return;
+      // not those of a replaced provider
+      this.serviceTypes = [];
       console.error("Failed to load service types:", error);
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-failed", {
-          detail: { error: "Failed to load service types" },
+          detail: failureDetail(error, "Failed to load service types", true),
           bubbles: true,
           composed: true,
         })
@@ -169,7 +232,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   }
 
   private async handleSubmit(): Promise<void> {
-    if (!this._provider || !this._provider.createService) {
+    const provider = this.currentProvider();
+    if (!provider || !provider.createService) {
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-failed", {
           detail: {
@@ -232,12 +296,12 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
       let serviceId: string;
       if (this.formData.useCustomId && this.formData.customServiceId) {
-        serviceId = await this._provider.createServiceWithId!(
+        serviceId = await provider.createServiceWithId!(
           this.formData.customServiceId,
           serviceData
         );
       } else {
-        serviceId = await this._provider.createService(serviceData);
+        serviceId = await provider.createService(serviceData);
       }
 
       const successMessage = `Service created successfully with ID: ${serviceId}`;
@@ -254,13 +318,10 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       // Reset form
       this.resetForm();
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to create service";
-
       // Emit error event
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-failed", {
-          detail: { error: errorMessage },
+          detail: failureDetail(err, "Failed to create service"),
           bubbles: true,
           composed: true,
         })

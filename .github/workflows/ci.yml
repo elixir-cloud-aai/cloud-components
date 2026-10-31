@@ -1,9 +1,13 @@
-# Everything that must pass on pull requests and pushes to `dev`: conflict
-# markers, linting (includes the build) with the tests of the release script,
-# and tests on all supported Node.js versions. The gate `passed` ("CI
-# passed") is the only check that branch rules need to require from this
-# workflow; the PR title is checked in
-# `pr-title.yml`. No `paths:` filters, so that the gate always reports.
+# Everything that must pass on pull requests and pushes to `dev`: the pull
+# request title, conflict markers, linting (includes the build) with the
+# tests of the release script and the validation of the citation metadata,
+# and tests on all supported Node.js versions, with coverage reported to
+# Codecov. The gate `passed` ("CI passed") is the only check that branch
+# rules need to require. No `paths:` filters, so that the gate always
+# reports. Runs also when a pull request is edited, so that the title check
+# follows the title; all jobs run then, as a run that skipped the tests
+# would report "CI passed" for the commit. The release workflow requires a
+# successful run for a push of the release commit.
 
 name: CI
 
@@ -11,18 +15,46 @@ on:
   push:
     branches: [dev]
   pull_request:
+    types: [opened, synchronize, reopened, edited]
     branches: [dev]
 
 permissions:
   contents: read
 
 # Cancel superseded runs of a pull request; runs for pushes get their own
-# group, so that runs for successive pushes are not dropped
+# group, so that runs for successive pushes are not dropped. Runs for edits
+# that leave the title unchanged (e.g. of the description, also by bots)
+# share a group of their own, so that they cancel each other but not the
+# run for the pull request's commit
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name == 'push' && github.sha || github.ref }}
+  group: >-
+    ${{ github.workflow }}-${{
+      github.event_name == 'push' && github.sha ||
+      github.event.action == 'edited' && !github.event.changes.title &&
+        format('{0}-edited', github.ref) ||
+      github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+
+  # Pull request titles become the commit messages on `dev` (squash merges):
+  # Conventional Commits, at most 50 characters (shared action of
+  # elixir-cloud-aai/.github, pinned to the commit of a release). Skipped on
+  # pushes and for Dependabot, whose titles can't be configured to pass,
+  # unless someone else edits the title
+  title:
+    name: PR title
+    if: >-
+      github.event_name == 'pull_request' && (
+        github.event.pull_request.user.login != 'dependabot[bot]' ||
+        github.event.changes.title &&
+        github.event.sender.login != 'dependabot[bot]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Check PR title
+        uses: elixir-cloud-aai/.github/actions/pr-title@743e82d290a53768454999e413756a924e383259 # v1.0.0
 
   conflicts:
     name: Conflict markers
@@ -64,6 +96,12 @@ jobs:
       - name: Test the release script
         run: node --test scripts/release.test.js
 
+      # In its own environment, as cffconvert pins an old jsonschema. 2.0.0
+      # is the latest stable release (not bumped by Dependabot; update
+      # manually)
+      - name: Validate citation metadata
+        run: pipx run --spec cffconvert==2.0.0 cffconvert --validate -i CITATION.cff
+
       - name: Run linters
         run: npm run lint
 
@@ -76,6 +114,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Coverage is collected and uploaded on 24 (three steps below)
         node: ["22", "24"]
 
     steps:
@@ -115,27 +154,65 @@ jobs:
       - name: Build
         run: npm run build
 
+      # With coverage (in Chromium, in `coverage/lcov.info` of each package
+      # with tests; see `web-test.runner-config.mjs`) for the uploaded run
       - name: Run tests
-        run: npm run test
+        env:
+          NODE: ${{ matrix.node }}
+        run: |
+          if [[ "${NODE}" == "24" ]]; then
+            npm run test -- -- --coverage
+          else
+            npm run test
+          fi
 
-  # The only required check of this workflow: passes if every other job
-  # passed, fails on any other result (failure, cancelled, skipped). Add
-  # every new job to `needs`
+      # One report with paths from the repository root, as the packages'
+      # reports name their files relative to the package (`src/...`)
+      - name: Collect coverage
+        if: matrix.node == '24'
+        run: |
+          shopt -s nullglob
+          reports=(packages/*/coverage/lcov.info)
+          if [[ "${#reports[@]}" -eq 0 ]]; then
+            echo "::error::No coverage reports found"
+            exit 1
+          fi
+          for report in "${reports[@]}"; do
+            dir="${report%/coverage/lcov.info}"
+            # The directory goes in as data (environment), not as code
+            DIR="${dir}" awk '/^SF:/ { $0 = "SF:" ENVIRON["DIR"] "/" substr($0, 4) } { print }' "${report}"
+          done > lcov.info
+
+      # As in the org's other repositories: outside the upstream repository
+      # (forks, which have no Codecov token), upload errors don't fail CI.
+      # Upstream runs, Dependabot's included (`CODECOV_TOKEN` is also a
+      # Dependabot secret of the organization), upload with the token; pull
+      # requests from forks upload without one; both fail on errors
+      - name: Upload coverage to Codecov
+        if: matrix.node == '24'
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./lcov.info
+          disable_search: true
+          fail_ci_if_error: ${{ github.repository_owner == 'elixir-cloud-aai' }}
+
+  # The only required check: passes if every other job passed, fails on any
+  # other result (failure, cancelled, skipped), except that `title` may be
+  # skipped (pushes, Dependabot). Add every new job to `needs`. Uses the
+  # shared gate action of
+  # elixir-cloud-aai/.github, pinned to the commit of a release (Dependabot
+  # bumps it to new releases)
   passed:
     name: CI passed
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: always()
-    needs: [conflicts, lint, test]
+    needs: [title, conflicts, lint, test]
+    permissions: {}
     steps:
       - name: Check results of all jobs
-        env:
-          NEEDS: ${{ toJSON(needs) }}
-        run: |
-          failed="$(jq -r 'to_entries[]
-            | select(.value.result != "success")
-            | "\(.key): \(.value.result)"' <<< "${NEEDS}")"
-          if [[ -n "${failed}" ]]; then
-            echo "::error::Jobs did not pass: ${failed//$'\n'/, }"
-            exit 1
-          fi
+        uses: elixir-cloud-aai/.github/actions/gate@743e82d290a53768454999e413756a924e383259 # v1.0.0
+        with:
+          needs: ${{ toJSON(needs) }}
+          allow-skipped: title
