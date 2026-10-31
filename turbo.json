@@ -12,6 +12,7 @@
     },
     "test": {
       "inputs": [],
+      "outputs": ["coverage/**"],
       "dependsOn": ["topo"]
     },
     "lint": {

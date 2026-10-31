@@ -155,6 +155,40 @@ Creates or updates the service registry's own service information.
 createOrUpdateServiceInfo?(service: ServiceRegister): Promise<void>
 ```
 
+## Errors
+
+If the registry answers with an error status, the methods of `RestCloudRegistryProvider` reject with a `CloudRegistryError`. It extends `Error` and carries the status and the [problem details](https://www.rfc-editor.org/rfc/rfc9457) that the registry sends:
+
+| Property    | Type                          | Description                                                                 |
+|-------------|-------------------------------|-----------------------------------------------------------------------------|
+| `message`   | `string`                      | The problem's `detail` (else a `message` field, as some servers send), or the failed action and the status, e.g. "Failed to create service (502)" |
+| `status`    | `number`                      | HTTP status, e.g. `401` (log in) or `403` (no role on the service)          |
+| `title`     | `string \| undefined`         | Short summary of the problem type, e.g. "Conflict"                          |
+| `detail`    | `string \| undefined`         | Explanation of this occurrence, e.g. which field is invalid                 |
+| `serviceId` | `string \| undefined`         | ID of the existing service, for duplicate registrations (`409`)             |
+| `problem`   | `ProblemDetails \| undefined` | The whole response body, if it was a JSON object                            |
+
+```typescript
+import {
+  CloudRegistryError,
+  RestCloudRegistryProvider,
+} from '@elixir-cloud/cloud-registry/providers';
+
+const provider = new RestCloudRegistryProvider(
+  'https://cloud-registry.example.com/ga4gh/registry/v1'
+);
+
+try {
+  await provider.createService(service);
+} catch (error) {
+  if (error instanceof CloudRegistryError && error.status === 401) {
+    // ask the user to log in
+  } else if (error instanceof CloudRegistryError && error.status === 409) {
+    console.log('Already registered as', error.serviceId);
+  }
+}
+```
+
 
 
 ## Type Definitions
@@ -230,8 +264,10 @@ interface RegistrationRules {
 import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
 import { EccClientElixirCloudRegistryServiceCreate } from '@elixir-cloud/cloud-registry';
 
+// created once: a new provider makes the components load their data again
+const provider = new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
+
 function ServiceRegistration() {
-  const provider = new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
 
   return (
     <EccClientElixirCloudRegistryServiceCreate 
@@ -260,8 +296,10 @@ import {
   EccClientElixirCloudRegistryServiceCreate 
 } from '@elixir-cloud/cloud-registry';
 
+// created once: a new provider makes the components load their data again
+const provider = new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
+
 function ServiceManagement() {
-  const provider = new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
   const [view, setView] = useState('list');
 
   return (

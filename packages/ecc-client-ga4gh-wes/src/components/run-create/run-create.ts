@@ -33,8 +33,8 @@ import "@elixir-cloud/design/components/code/index.js";
  */
 export class ECCClientGa4ghWesRunCreate extends LitElement {
   static styles = [
-    GlobalStyles,
     TailwindStyles,
+    GlobalStyles,
     css`
       :host {
         display: block;
@@ -42,7 +42,7 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
       }
 
       .error-message {
-        color: hsl(var(--destructive));
+        color: var(--destructive);
         font-size: 0.875rem;
         margin-top: 0.5rem;
       }
