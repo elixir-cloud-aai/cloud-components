@@ -9,16 +9,19 @@ import { RestCloudRegistryProvider } from "../../../providers/index.js";
 const BASE_URL = "https://registry.example.org/ga4gh/registry/v1";
 
 type Internals = {
+  typeChoice: string;
   formData: Record<string, unknown>;
   handleSubmit(): Promise<void>;
 };
 
 /**
  * Fills in the required fields of the component's private form state, so
- * that a submit reaches the provider.
+ * that a submit reaches the provider; the type as a new one ("Add new
+ * service type"), whichever types are listed.
  */
 const fillForm = (el: ECCClientElixirCloudRegistryServiceCreate) => {
   const state = el as unknown as Internals;
+  state.typeChoice = "new";
   state.formData = {
     ...state.formData,
     name: "My TES",

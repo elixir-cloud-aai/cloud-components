@@ -58,6 +58,7 @@ const settle = async (el: ECCClientElixirCloudRegistryServiceCreate) => {
  */
 type Internals = {
   serviceTypes: ServiceType[];
+  typeChoice: string;
   formData: Record<string, unknown>;
   handleSubmit(): Promise<void>;
 };
@@ -65,9 +66,13 @@ type Internals = {
 const internals = (el: ECCClientElixirCloudRegistryServiceCreate) =>
   el as unknown as Internals;
 
-/** Fills in the required fields, so that a submit reaches the provider. */
+/**
+ * Fills in the required fields, so that a submit reaches the provider; the
+ * type as a new one ("Add new service type"), whichever types are listed.
+ */
 const fillForm = (el: ECCClientElixirCloudRegistryServiceCreate) => {
   const state = internals(el);
+  state.typeChoice = "new";
   state.formData = {
     ...state.formData,
     name: "My TES",
@@ -114,10 +119,12 @@ describe("ecc-client-elixir-cloud-registry-service-create provider", () => {
     await el.updateComplete;
     await waitUntil(() => internals(el).serviceTypes[0] === TYPE_B);
 
+    expect(second.getServiceTypes.callCount).to.equal(1);
     fillForm(el);
     await internals(el).handleSubmit();
 
-    expect(second.getServiceTypes.callCount).to.equal(1);
+    // reloaded after the create, to list a type that the service added
+    expect(second.getServiceTypes.callCount).to.equal(2);
     expect(second.createService.callCount).to.equal(1);
     expect(first.createService.callCount).to.equal(0);
   });
@@ -133,10 +140,12 @@ describe("ecc-client-elixir-cloud-registry-service-create provider", () => {
     el.baseUrl = OTHER_URL;
     await el.updateComplete;
 
+    expect(provider.getServiceTypes.callCount).to.equal(1);
     fillForm(el);
     await internals(el).handleSubmit();
 
-    expect(provider.getServiceTypes.callCount).to.equal(1);
+    // reloaded after the create, to list a type that the service added
+    expect(provider.getServiceTypes.callCount).to.equal(2);
     expect(provider.createService.callCount).to.equal(1);
     expect(fetchStub.callCount).to.equal(0);
   });
