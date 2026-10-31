@@ -405,7 +405,7 @@ export class ECCClientGa4ghWesRuns extends LitElement {
     if (!this.baseUrl && !this.provider) {
       return html`
         <div
-          class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+          class="p-4 border border-destructive rounded-md text-destructive bg-destructive/10"
         >
           Please provide either a base URL for the WES API or a custom provider.
         </div>
@@ -417,7 +417,7 @@ export class ECCClientGa4ghWesRuns extends LitElement {
         ${this.error
           ? html`
               <div
-                class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10 my-4"
+                class="p-4 border border-destructive rounded-md text-destructive bg-destructive/10 my-4"
               >
                 ${this.error}
               </div>

@@ -717,7 +717,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
     if (!this.baseUrl && !this.provider) {
       return html`
         <div
-          class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+          class="p-4 border border-destructive rounded-md text-destructive bg-destructive/10"
         >
           Please provide either a base URL for the WES API or a custom provider.
         </div>
@@ -727,7 +727,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
     if (!this.runId) {
       return html`
         <div
-          class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+          class="p-4 border border-destructive rounded-md text-destructive bg-destructive/10"
         >
           Please provide a run ID.
         </div>
@@ -737,7 +737,7 @@ export class ECCClientGa4ghWesRun extends LitElement {
     if (this.error) {
       return html`
         <div
-          class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+          class="p-4 border border-destructive rounded-md text-destructive bg-destructive/10"
         >
           ${this.error}
         </div>
