@@ -1,440 +1,467 @@
-/* eslint-disable lit/no-classfield-shadowing */
-import { html, css, LitElement, render } from "lit";
+import { LitElement, html, css } from "lit";
 import { property, state } from "lit/decorators.js";
-import "@elixir-cloud/design/dist/components/collection/index.js";
-import EccUtilsDesignCollection, {
-  FilterProp,
-  ItemProp,
-} from "@elixir-cloud/design/dist/components/collection";
-import EccUtilsDesignDetails, {
-  Field,
-  Action,
-} from "@elixir-cloud/design/dist/components/details";
-import { deleteTask, fetchTask, fetchTasks } from "../../API/Task/tesGet.js";
+import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
+import { GlobalStyles } from "../../global.js";
+import {
+  TesProvider,
+  Task,
+  State,
+  STATE_INFO,
+  CANCELLABLE_STATES,
+} from "../../providers/tes-provider.js";
+import { RestTesProvider } from "../../providers/rest-tes-provider.js";
+import "@elixir-cloud/design/components/table/index.js";
+import "@elixir-cloud/design/components/input/index.js";
+import "@elixir-cloud/design/components/select/index.js";
+import "@elixir-cloud/design/components/pagination/index.js";
+import "@elixir-cloud/design/components/button/index.js";
+import "@elixir-cloud/design/components/badge/index.js";
+import "@elixir-cloud/design/components/skeleton/index.js";
+
+const NO_SOURCE_ERROR =
+  "Please provide either a base URL for the TES API or a custom provider.";
 
 /**
- * @summary This component is used to display data from task runs using TES API.
- * @since 1.0.0
+ * @summary Component for listing tasks from a TES service
+ * @since 0.1.0
  *
- * @property {number} pageSize - Number of runs per page
  * @property {string} baseUrl - Base URL of the TES instance/gateway
- * @property {boolean} filter - Determines if the runs filter field should be rendered
- * @property {boolean} search - Determines if the search field should be rendered
- * @property {array} fields - Configuration for what fields to display
- * @property {boolean} extendFields - Extend default fields instead of overriding
+ * @property {number} pageSize - Number of tasks per page
+ * @property {boolean} search - Show the task name prefix search field
+ * @property {boolean} filter - Show the state filter (applied server-side)
+ * @property {TesProvider} provider - Custom data provider (optional, overrides baseUrl)
  *
+ * @fires ecc-runs-changed - Fired when the list of tasks changes
+ * @fires ecc-runs-selected - Fired when a task is selected
  */
-export default class ECCClientGa4ghTesRuns extends LitElement {
-  static styles = css``;
-  static defaultFields: Field[] = [
-    {
-      key: "name",
-      path: "name",
-      tab: "Overview",
-      label: "Name",
-      copy: true,
-    },
-    {
-      key: "description",
-      path: "description",
-      tab: "Overview",
-      label: "Description",
-    },
-    {
-      key: "resources",
-      path: "resources",
-      tab: "Overview",
-      label: "Resources",
-    },
-    {
-      key: "tags",
-      path: "tags",
-      tab: "Overview",
-      label: "Tags",
-    },
-    {
-      key: "executors",
-      path: "executors",
-      tab: "Overview",
-      label: "Executor",
-    },
-    {
-      key: "executors*",
-      path: "executors[*]",
-      arrayOptions: {
-        labelOptions: {
-          path: "image",
-        },
-      },
-    },
-    {
-      key: "executors*command",
-      path: "executors[*].command",
-      arrayOptions: {
-        type: "tag",
-      },
-    },
-    {
-      key: "volumes",
-      path: "volumes",
-      tab: "Overview",
-      label: "Volumes",
-    },
-    {
-      key: "creation_time",
-      path: "creation_time",
-      tab: "Overview",
-      label: "Creation time",
-    },
-    {
-      key: "logs",
-      path: "logs",
-      tab: "Logs",
-      label: "Logs",
-      copy: true,
-    },
-    {
-      key: "logs[*].logs[*].stderr",
-      path: "logs[*].logs[*].stderr",
-      label: "STDERR",
-      copy: true,
-    },
-    {
-      key: "logs[*].logs[*].stdout",
-      path: "logs[*].logs[*].stdout",
-      label: "STDOUT",
-      copy: true,
-    },
-    {
-      key: "logs[*]",
-      path: "logs[*]",
-      arrayOptions: {
-        labelOptions: {
-          path: "start_time",
-          prefix: "Start time: ",
-        },
-      },
-      copy: true,
-    },
-    {
-      key: "logs[*].logs[*]",
-      path: "logs[*].logs[*]",
-      arrayOptions: {
-        labelOptions: {
-          path: "start_time",
-          prefix: "Start time: ",
-        },
-      },
-      copy: true,
-    },
-    {
-      key: "outputs",
-      path: "outputs",
-      tab: "Output",
-      label: "Output",
-      copy: true,
-    },
-    {
-      key: "inputs",
-      path: "inputs",
-      tab: "Inputs",
-      label: "Input",
-      copy: true,
-    },
-    {
-      key: "inputs",
-      path: "inputs[*]",
-      arrayOptions: {
-        labelOptions: {
-          path: "path",
-        },
-      },
-      copy: true,
-    },
-  ];
-
-  @property({ type: Number, reflect: true }) pageSize = 5;
-  @property({ type: String, reflect: true }) baseURL =
-    "https://protes.rahtiapp.fi/ga4gh/tes/v1";
-
-  @property({ type: Boolean, reflect: true }) filter = true;
-  @property({ type: Boolean, reflect: true }) search = true;
-  @property({ type: Array, reflect: true }) fields: Field[] = [];
-  @property({ type: Boolean, reflect: true }) extendFields = false;
-
-  @state() private filters: FilterProp[] = [
-    {
-      key: "search",
-      type: "search",
-      placeholder: "Search by prefix",
-    },
-    {
-      key: "tag",
-      type: "select",
-      options: [
-        "UNKNOWN",
-        "QUEUED",
-        "INITIALIZING",
-        "RUNNING",
-        "PAUSED",
-        "COMPLETE",
-        "EXECUTOR_ERROR",
-        "SYSTEM_ERROR",
-        "CANCELED",
-        "PREEMPTED",
-        "CANCELING",
-      ],
-      placeholder: "Filter by status",
-      selectConfig: {
-        multiple: false,
-      },
-    },
-  ];
-
-  @state() private items: ItemProp[] = [];
-  @state() private nextPageToken: string[] = [""];
-  @state() private view: "MINIMAL" | "BASIC" | "FULL" = "MINIMAL";
-  @state() private namePrefix = "";
-  @state() private cache = new Map();
-
-  private tagType: Record<string, string> = {
-    UNKNOWN: "neutral",
-    QUEUED: "warning",
-    INITIALIZING: "primary",
-    RUNNING: "primary",
-    PAUSED: "warning",
-    COMPLETE: "success",
-    EXECUTOR_ERROR: "danger",
-    SYSTEM_ERROR: "danger",
-    CANCELED: "danger",
-    PREEMPTED: "danger",
-    CANCELING: "danger",
-  };
-
-  protected updated(changedProperties: Map<PropertyKey, unknown>): void {
-    const eccUtilsDesignCollection =
-      this.shadowRoot?.querySelector<EccUtilsDesignCollection>(
-        "ecc-utils-design-collection"
-      );
-
-    if (!eccUtilsDesignCollection) {
-      console.error({
-        error: "ecc-utils-design-collection not found",
-        breakPoint: "ECCClientGa4ghTesRuns.fetchData",
-      });
-      return;
-    }
-
-    eccUtilsDesignCollection.pageSize = this.pageSize;
-    if (changedProperties.has("pageSize")) {
-      this._fetchData(1);
-    }
-
-    // Handle filter render
-    if (changedProperties.has("filter") || changedProperties.has("search")) {
-      this.filters = this.getUpdatedFilters();
-    }
-
-    // extend the default fields
-    if (changedProperties.has("extendFields")) {
-      if (this.extendFields) {
-        const fields = ECCClientGa4ghTesRuns.defaultFields;
-        this.fields = [...this.fields, ...fields];
-      } else if (this.fields.length === 0 && this.extendFields === false) {
-        this.fields = ECCClientGa4ghTesRuns.defaultFields;
+export class ECCClientGa4ghTesRuns extends LitElement {
+  static styles = [
+    TailwindStyles,
+    GlobalStyles,
+    css`
+      :host {
+        display: block;
+        width: 100%;
       }
+    `,
+  ];
+
+  @property({ type: String, reflect: true }) baseUrl = "";
+  @property({ type: Number, reflect: true }) pageSize = 10;
+  @property({ type: Boolean, reflect: true }) search = true;
+  @property({ type: Boolean, reflect: true }) filter = true;
+  @property({ attribute: false }) provider?: TesProvider;
+
+  @state() private currentPage = 1;
+  @state() private runs: Task[] = [];
+  @state() private loading = false;
+  @state() private error: string | null = null;
+  @state() private namePrefix = "";
+  @state() private stateFilter = "";
+
+  // Token needed to fetch page N; page 1 has none.
+  private pageTokens: Map<number, string | undefined> = new Map([
+    [1, undefined],
+  ]);
+
+  private _provider: TesProvider | null = null;
+  private requestGeneration = 0;
+  private searchTimer?: ReturnType<typeof setTimeout>;
+
+  private initialized = false;
+
+  protected firstUpdated(): void {
+    this.initializeProvider();
+    this.reset();
+  }
+
+  protected updated(changed: Map<PropertyKey, unknown>): void {
+    const isFirstUpdate = !this.initialized;
+    this.initialized = true;
+    if (isFirstUpdate) return;
+
+    if (
+      changed.has("provider") ||
+      changed.has("baseUrl") ||
+      changed.has("pageSize")
+    ) {
+      this.initializeProvider();
+      this.reset();
     }
   }
 
-  private getUpdatedFilters(): FilterProp[] {
-    let updatedFilters = [...this.filters];
-
-    // Modify the array based on the conditions
-    if (!this.filter) {
-      updatedFilters = updatedFilters.filter(
-        (filter) => filter.type !== "select"
-      );
-    }
-    if (!this.search) {
-      updatedFilters = updatedFilters.filter(
-        (filter) => filter.type !== "search"
-      );
-    }
-
-    return updatedFilters;
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    clearTimeout(this.searchTimer);
   }
 
-  private async _fetchData(page = 1) {
+  private initializeProvider(): void {
+    if (this.provider) {
+      this._provider = this.provider;
+    } else if (this.baseUrl) {
+      this._provider = new RestTesProvider(this.baseUrl);
+    } else {
+      this.error =
+        "Please provide either a base URL for the TES API or a custom provider.";
+    }
+  }
+
+  private reset(): void {
+    this.pageTokens = new Map([[1, undefined]]);
+    this.currentPage = 1;
+    this.loadData();
+  }
+
+  private async loadData(): Promise<void> {
+    this.requestGeneration += 1;
+    const generation = this.requestGeneration;
+    if (!this._provider) return;
+
+    this.loading = true;
+    this.error = null;
+
     try {
-      const data = await fetchTasks(
-        this.baseURL,
-        this.pageSize,
-        this.nextPageToken[page - 1],
-        this.view,
-        this.namePrefix
-      );
+      const response = await this._provider.listTasks({
+        pageSize: this.pageSize,
+        pageToken: this.pageTokens.get(this.currentPage),
+        view: "BASIC",
+        namePrefix: this.namePrefix || undefined,
+        state: (this.stateFilter as State) || undefined,
+      });
+      if (generation !== this.requestGeneration) return;
 
-      const convertedData: ItemProp[] = data.tasks?.map(
-        (task: { id: string; state: string }, index: number) => ({
-          index: (page - 1) * this.pageSize + (index + 1),
-          name: task.id,
-          key: `${task.id}`,
-          lazy: true,
-          tag: {
-            name: task.state,
-            type: this.tagType[task.state] as
-              | "primary"
-              | "success"
-              | "neutral"
-              | "warning"
-              | "danger",
-          },
+      this.runs = response.tasks;
+      if (response.next_page_token) {
+        this.pageTokens.set(this.currentPage + 1, response.next_page_token);
+      } else {
+        for (const page of this.pageTokens.keys()) {
+          if (page > this.currentPage) this.pageTokens.delete(page);
+        }
+      }
+
+      this.dispatchEvent(
+        new CustomEvent("ecc-runs-changed", {
+          detail: { runs: this.runs },
+          bubbles: true,
+          composed: true,
         })
       );
-
-      // remove old items with the same index as the new items to be added
-      this.items = this.items.filter(
-        (item) => !convertedData.some((newItem) => newItem.index === item.index)
-      );
-
-      this.items = [...this.items, ...convertedData];
-
-      if (data.next_page_token === "" || data.tasks.length < this.pageSize) {
-        const eccUtilsDesignCollection =
-          this.shadowRoot?.querySelector<EccUtilsDesignCollection>(
-            "ecc-utils-design-collection"
-          );
-
-        if (!eccUtilsDesignCollection) {
-          console.error({
-            error: "ecc-utils-design-collection not found",
-            breakPoint: "ECCClientGa4ghTesRuns.fetchData",
-          });
-          return;
-        }
-
-        eccUtilsDesignCollection.totalItems = this.items.length;
-      } else this.nextPageToken[page] = data.next_page_token;
-    } catch (error) {
+    } catch (err) {
+      if (generation !== this.requestGeneration) return;
+      this.error =
+        err instanceof Error ? err.message : "Failed to load task details";
       console.error({
-        error,
-        breakPoint: "ECCClientGa4ghTesRuns.fetchData",
+        error: this.error,
+        breakPoint: "ECCClientGa4ghTesRun.loadTask",
       });
+    } finally {
+      if (generation === this.requestGeneration) this.loading = false;
     }
   }
 
-  private async _handleExpandItem(event: CustomEvent) {
-    const eccUtilsDesignCollection =
-      this.shadowRoot?.querySelector<EccUtilsDesignCollection>(
-        "ecc-utils-design-collection"
-      );
+  private goToPage(page: number): void {
+    if (page < 1 || page === this.currentPage) return;
+    if (!this.pageTokens.has(page)) return;
+    this.currentPage = page;
+    this.loadData();
+  }
 
-    if (!eccUtilsDesignCollection) {
-      console.error({
-        error: "ecc-utils-design-collection not found",
-        breakPoint: "ECCClientGa4ghTesRuns.handleExpandItem",
-      });
-      return;
-    }
+  private handleSearch(value: string): void {
+    clearTimeout(this.searchTimer);
+    this.searchTimer = setTimeout(() => {
+      this.namePrefix = value.trim();
+      this.reset();
+    }, 300);
+  }
 
-    const { target, detail } = event;
-
-    if (!target || !(target instanceof HTMLElement)) {
-      eccUtilsDesignCollection.error("Target is null or not an HTMLElement");
-      return;
-    }
-
-    const { key } = detail;
-    const children = target!.shadowRoot?.querySelectorAll(
-      `slot[name='${key}']`
+  private handleViewDetails(runId: string): void {
+    this.dispatchEvent(
+      new CustomEvent("ecc-runs-selected", {
+        detail: { runId },
+        bubbles: true,
+        composed: true,
+      })
     );
+  }
 
-    const runData = await fetchTask(this.baseURL, detail.key);
-    this.cache.set(key, runData);
+  private async handleDelete(runId: string): Promise<void> {
+    if (!this._provider) return;
 
-    if (children?.length) {
-      try {
-        const child = document.createElement("div");
-        child.setAttribute("slot", key);
-
-        const button: Action[] = [
-          {
-            key,
-            label: "Delete",
-            type: "button",
-            buttonOptions: {
-              variant: "danger",
-              icon: {
-                url: "https://cdn.iconscout.com/icon/free/png-256/free-delete-2902143-2411575.png",
-              },
-            },
-          },
-        ];
-
-        const detailsComponent = html`<ecc-utils-design-details
-          class="details"
-          id=${key}
-          .data=${runData}
-          .fields=${this.fields}
-          .actions=${button}
-        >
-        </ecc-utils-design-details>`;
-
-        // Render the details component using Lit's render function
-        // Append the child to the target
-        render(detailsComponent, child);
-        target.appendChild(child);
-
-        // Add button event
-        const detailsElement = child.querySelector<EccUtilsDesignDetails>(
-          "ecc-utils-design-details"
-        );
-        if (detailsElement) {
-          detailsElement.addEventListener(
-            "ecc-utils-button-click",
-            async (buttonEvent: Event) => {
-              const customEvent = buttonEvent as CustomEvent<{ key: string }>;
-              const { key: buttonKey } = customEvent.detail;
-              try {
-                if (buttonKey === key) {
-                  // 0 is the index of the button as there is only one button
-                  const resp = (await deleteTask(this.baseURL, key)) as any;
-
-                  // If the response doesn't have run ID that means the run wasn't canceled.
-                  if (!resp.id) throw new Error();
-                }
-              } catch (error) {
-                eccUtilsDesignCollection.error(`Failed to cancel run: ${key}`);
-              }
-            }
-          );
-        } else {
-          eccUtilsDesignCollection.error(
-            `Failed to find ecc-utils-design-details element for run: ${key}`
-          );
-        }
-      } catch (error) {
-        eccUtilsDesignCollection.error(`Failed to fetch data for run: ${key}`);
-      }
+    try {
+      await this._provider.cancelTask(runId);
+      await this.loadData();
+    } catch (err) {
+      this.error = `Failed to cancel task ${runId}: ${
+        err instanceof Error ? err.message : String(err)
+      }`;
     }
   }
 
-  /* TODO: Add @ecc-utils-filter when backend implements filtering */
-  render() {
+  private static getStateInfo(taskState: State) {
+    return STATE_INFO[taskState] || { variant: "outline", label: taskState };
+  }
+
+  private static formatRunId(runId: string): string {
+    if (runId.length > 20) {
+      return `${runId.substring(0, 8)}...${runId.substring(runId.length - 8)}`;
+    }
+    return runId;
+  }
+
+  private static formatDateTime(dateTime?: string): string {
+    if (!dateTime) return "N/A";
+
+    try {
+      const date = new Date(dateTime);
+      return Number.isNaN(date.getTime()) ? dateTime : date.toLocaleString();
+    } catch {
+      return dateTime;
+    }
+  }
+
+  private renderToolbar() {
+    if (!this.search && !this.filter) return html``;
+
     return html`
-      <ecc-utils-design-collection
-        id="collection"
-        .items=${this.items}
-        @ecc-utils-page-change=${(event: CustomEvent) => {
-          this._fetchData(event.detail.page);
-        }}
-        @ecc-utils-expand=${(event: CustomEvent) => {
-          if (!this.cache.has(event.detail.key)) {
-            this._handleExpandItem(event);
-          }
-        }}
-      >
-      </ecc-utils-design-collection>
+      <div class="flex flex-col gap-2 md:flex-row">
+        ${this.search
+          ? html`
+              <ecc-utils-design-input
+                class="flex-1"
+                placeholder="Search by name prefix"
+                .value=${this.namePrefix}
+                @ecc-input-changed=${(e: CustomEvent) =>
+                  this.handleSearch(e.detail.value)}
+              ></ecc-utils-design-input>
+            `
+          : ""}
+        ${this.filter
+          ? html`
+              <ecc-utils-design-select
+                class="md:w-56"
+                .value=${this.stateFilter}
+                @ecc-input-changed=${(e: CustomEvent) => {
+                  this.stateFilter = e.detail.value;
+                  this.reset();
+                }}
+              >
+                <ecc-utils-design-select-trigger>
+                  <ecc-utils-design-select-value
+                    placeholder="Filter by status"
+                  ></ecc-utils-design-select-value>
+                </ecc-utils-design-select-trigger>
+                <ecc-utils-design-select-content>
+                  <ecc-utils-design-select-item value="">
+                    All
+                  </ecc-utils-design-select-item>
+                  ${(Object.keys(STATE_INFO) as State[]).map(
+                    (s) => html`
+                      <ecc-utils-design-select-item value=${s}>
+                        ${STATE_INFO[s].label}
+                      </ecc-utils-design-select-item>
+                    `
+                  )}
+                </ecc-utils-design-select-content>
+              </ecc-utils-design-select>
+            `
+          : ""}
+      </div>
+    `;
+  }
+
+  private renderPagination() {
+    const hasPrevious = this.currentPage > 1;
+    const hasNext = this.pageTokens.has(this.currentPage + 1);
+    const link = (page: number) => html`
+      <ecc-utils-design-pagination-item>
+        <ecc-utils-design-pagination-link
+          @ecc-button-clicked=${() => this.goToPage(page)}
+          >${page}</ecc-utils-design-pagination-link
+        >
+      </ecc-utils-design-pagination-item>
+    `;
+
+    return html`
+      <ecc-utils-design-pagination>
+        <ecc-utils-design-pagination-content>
+          <ecc-utils-design-pagination-item>
+            <ecc-utils-design-pagination-previous
+              ?disabled=${!hasPrevious}
+              @ecc-button-clicked=${() => this.goToPage(this.currentPage - 1)}
+            ></ecc-utils-design-pagination-previous>
+          </ecc-utils-design-pagination-item>
+          ${hasPrevious ? link(this.currentPage - 1) : ""}
+          <ecc-utils-design-pagination-item>
+            <ecc-utils-design-pagination-link isActive>
+              ${this.currentPage}
+            </ecc-utils-design-pagination-link>
+          </ecc-utils-design-pagination-item>
+          ${hasNext ? link(this.currentPage + 1) : ""}
+          <ecc-utils-design-pagination-item>
+            <ecc-utils-design-pagination-next
+              ?disabled=${!hasNext}
+              @ecc-button-clicked=${() => this.goToPage(this.currentPage + 1)}
+            ></ecc-utils-design-pagination-next>
+          </ecc-utils-design-pagination-item>
+        </ecc-utils-design-pagination-content>
+      </ecc-utils-design-pagination>
+    `;
+  }
+
+  private renderSkeletonRows() {
+    return Array.from({ length: this.pageSize }).map(
+      () => html`
+        <ecc-utils-design-table-row>
+          <ecc-utils-design-table-cell>
+            <ecc-utils-design-skeleton
+              class="part:h-5 part:w-64"
+            ></ecc-utils-design-skeleton>
+          </ecc-utils-design-table-cell>
+          <ecc-utils-design-table-cell>
+            <ecc-utils-design-skeleton
+              class="part:h-6 part:w-20 part:rounded-full"
+            ></ecc-utils-design-skeleton>
+          </ecc-utils-design-table-cell>
+          <ecc-utils-design-table-cell>
+            <ecc-utils-design-skeleton
+              class="part:h-4 part:w-32"
+            ></ecc-utils-design-skeleton>
+          </ecc-utils-design-table-cell>
+          <ecc-utils-design-table-cell>
+            <ecc-utils-design-skeleton
+              class="part:h-8 part:w-8 part:rounded"
+            ></ecc-utils-design-skeleton>
+          </ecc-utils-design-table-cell>
+        </ecc-utils-design-table-row>
+      `
+    );
+  }
+
+  private renderRow(run: Task) {
+    const info = ECCClientGa4ghTesRuns.getStateInfo(run.state);
+
+    return html`
+      <ecc-utils-design-table-row>
+        <ecc-utils-design-table-cell class="w-5/12">
+          <div class="flex flex-col gap-1">
+            ${run.name ? html`<span>${run.name}</span>` : ""}
+            <ecc-utils-design-button
+              class="part:font-mono part:text-sm part:w-fit part:cursor-pointer part:p-0"
+              variant="link"
+              title=${run.id}
+              @click=${() => this.handleViewDetails(run.id)}
+            >
+              ${ECCClientGa4ghTesRuns.formatRunId(run.id)}
+            </ecc-utils-design-button>
+          </div>
+        </ecc-utils-design-table-cell>
+        <ecc-utils-design-table-cell class="w-2/12">
+          <ecc-utils-design-badge variant=${info.variant}>
+            ${info.label}
+          </ecc-utils-design-badge>
+        </ecc-utils-design-table-cell>
+        <ecc-utils-design-table-cell class="w-2/12">
+          ${ECCClientGa4ghTesRuns.formatDateTime(run.creation_time)}
+        </ecc-utils-design-table-cell>
+        <ecc-utils-design-table-cell class="w-3/12">
+          <div class="flex gap-2">
+            <ecc-utils-design-button
+              size="sm"
+              variant="outline"
+              @click=${() => this.handleViewDetails(run.id)}
+            >
+              View Details
+            </ecc-utils-design-button>
+            ${CANCELLABLE_STATES.includes(run.state)
+              ? html`
+                  <ecc-utils-design-button
+                    size="sm"
+                    variant="destructive"
+                    @click=${() => this.handleDelete(run.id)}
+                  >
+                    Delete
+                  </ecc-utils-design-button>
+                `
+              : ""}
+          </div>
+        </ecc-utils-design-table-cell>
+      </ecc-utils-design-table-row>
+    `;
+  }
+
+  private renderRows() {
+    if (this.loading) return this.renderSkeletonRows();
+
+    const visible = this.runs;
+
+    if (visible.length === 0) {
+      return html`
+        <ecc-utils-design-table-row>
+          <ecc-utils-design-table-cell
+            colspan="4"
+            class="part:text-center part:py-8 part:text-muted-foreground"
+          >
+            No tasks found
+          </ecc-utils-design-table-cell>
+        </ecc-utils-design-table-row>
+      `;
+    }
+
+    return visible.map((run) => this.renderRow(run));
+  }
+
+  render() {
+    if (!this.baseUrl && !this.provider) {
+      return html`
+        <div
+          class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+        >
+          ${NO_SOURCE_ERROR}
+        </div>
+      `;
+    }
+
+    return html`
+      <div class="flex flex-col gap-4">
+        ${this.error
+          ? html`
+              <div
+                class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+              >
+                ${this.error}
+              </div>
+            `
+          : ""}
+        ${this.renderToolbar()}
+
+        <ecc-utils-design-table>
+          <ecc-utils-design-table-header>
+            <ecc-utils-design-table-row>
+              <ecc-utils-design-table-head class="w-5/12"
+                >Task</ecc-utils-design-table-head
+              >
+              <ecc-utils-design-table-head class="w-2/12"
+                >State</ecc-utils-design-table-head
+              >
+              <ecc-utils-design-table-head class="w-2/12"
+                >Created</ecc-utils-design-table-head
+              >
+              <ecc-utils-design-table-head
+                class="w-3/12"
+              ></ecc-utils-design-table-head>
+            </ecc-utils-design-table-row>
+          </ecc-utils-design-table-header>
+          <ecc-utils-design-table-body>
+            ${this.renderRows()}
+          </ecc-utils-design-table-body>
+        </ecc-utils-design-table>
+
+        ${!this.loading && (this.runs.length > 0 || this.currentPage > 1)
+          ? this.renderPagination()
+          : ""}
+      </div>
     `;
   }
 }
+
+export default ECCClientGa4ghTesRuns;

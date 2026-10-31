@@ -1,29 +1,25 @@
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <style>
-      body {
-        background: #fafafa;
-      }
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TES Tasks Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="../../dist/index.js"></script>
   </head>
-  <title>ecc-client-ga4gh-tes-runs</title>
-  <body>
-    <div id="demo"></div>
+  <body class="p-8">
+    <h1 class="text-2xl font-bold mb-4">Tasks</h1>
+    <ecc-client-ga4gh-tes-runs
+      baseUrl="http://127.0.0.1:6010/ga4gh/tes/v1"
+      pageSize="5"
+    ></ecc-client-ga4gh-tes-runs>
 
-    <script type="module">
-      import { html, render } from "lit";
-      import "../../dist/components/runs/index.js";
-
-      // const baseURL = "http://localhost:8080/ga4gh/tes/v1";
-      // .baseURL="${baseURL}"
-      const pageSize = 10;
-
-      render(
-        html`<ecc-client-ga4gh-tes-runs .pageSize="${pageSize}" />`,
-        document.querySelector("#demo")
-      );
+    <script>
+      document.addEventListener("ecc-runs-selected", (event) => {
+        window.location.href = `../run/index.html?runId=${encodeURIComponent(
+          event.detail.runId
+        )}`;
+      });
     </script>
   </body>
 </html>
