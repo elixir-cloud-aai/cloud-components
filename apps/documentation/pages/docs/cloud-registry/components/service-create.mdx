@@ -125,6 +125,7 @@ This example demonstrates the basic service creation form with default settings.
 | Property   | Type                    | Default | Description                                                                    |
 |------------|-------------------------|---------|--------------------------------------------------------------------------------|
 | `provider` | `CloudRegistryProvider` | `null`  | Data provider for service creation operations (see [Providers](/docs/cloud-registry/providers)) |
+| `environments` | `(string \| EnvironmentOption)[]` | `prod`, `test`, `dev`, `staging` | Environments to offer if the registry doesn't publish its own |
 
 ### `provider`
 The data provider responsible for creating services in the registry. You must provide a provider that implements the `CloudRegistryProvider` interface, which extends the base `ServiceRegistryProvider` with creation capabilities. See the [Providers documentation](/docs/cloud-registry/providers) for detailed information about available providers and how to create custom ones.
@@ -158,6 +159,27 @@ You can replace the provider at any time, e.g. when the user's token changes: th
       document.querySelector('ecc-client-elixir-cloud-registry-service-create').provider = provider;
     </script>
     <ecc-client-elixir-cloud-registry-service-create></ecc-client-elixir-cloud-registry-service-create>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `environments`
+The environments that the form offers for `environment`, as values or `{ value, label }` objects (`EnvironmentOption`); an empty list allows any value, and the form then shows a text field. The default is the GA4GH suggestion: `prod`, `test`, `dev` and `staging`.
+
+Cloud Registry 0.6.0 and later publish the environments they allow (`registration_rules.environments` of `GET /service-info`, configured with `custom.endpoints.services.environments`). The form reads them and offers these instead, with the labels given in `environments` (or the default labels); `environments` applies only to registries and providers without these rules. A registry that allows any environment (an empty list) gets a text field, whatever `environments` says. A chosen environment that is no longer offered is cleared. As an attribute, `environments` takes a JSON list.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientElixirCloudRegistryServiceCreate
+      provider={provider}
+      environments={[{ value: 'prod', label: 'Production' }, 'qa']}
+    />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-client-elixir-cloud-registry-service-create environments='["prod", "qa"]'></ecc-client-elixir-cloud-registry-service-create>
     ```
   </Tabs.Tab>
 </Tabs>
