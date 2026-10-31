@@ -3,7 +3,7 @@ import fg from "fast-glob";
 import { playwrightLauncher } from "@web/test-runner-playwright";
 
 // Packages run tests in parallel (turbo --parallel), so each package's test
-// scripts pass a unique --port: design 8000, wes 8001.
+// scripts pass a unique --port: design 8000, wes 8001, tes 8002.
 export default {
   rootDir: ".",
   files: "src/**/*.test.ts", // "default" group
