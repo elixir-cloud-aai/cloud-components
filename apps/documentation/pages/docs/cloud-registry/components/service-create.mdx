@@ -125,6 +125,8 @@ This example demonstrates the basic service creation form with default settings.
 | Property   | Type                    | Default | Description                                                                    |
 |------------|-------------------------|---------|--------------------------------------------------------------------------------|
 | `provider` | `CloudRegistryProvider` | `null`  | Data provider for service creation operations (see [Providers](/docs/cloud-registry/providers)) |
+| `urlSchemes` | `string[]`            | `['https']` | Schemes allowed in service URLs if the registry doesn't publish its own |
+| `environments` | `(string \| EnvironmentOption)[]` | `prod`, `test`, `dev`, `staging` | Environments to offer if the registry doesn't publish its own |
 
 ### `provider`
 The data provider responsible for creating services in the registry. You must provide a provider that implements the `CloudRegistryProvider` interface, which extends the base `ServiceRegistryProvider` with creation capabilities. See the [Providers documentation](/docs/cloud-registry/providers) for detailed information about available providers and how to create custom ones.
@@ -162,13 +164,48 @@ You can replace the provider at any time, e.g. when the user's token changes: th
   </Tabs.Tab>
 </Tabs>
 
+### `environments`
+The environments that the form offers for `environment`, as values or `{ value, label }` objects (`EnvironmentOption`); an empty list allows any value, and the form then shows a text field. The default is the GA4GH suggestion: `prod`, `test`, `dev` and `staging`.
+
+Cloud Registry 0.6.0 and later publish the environments they allow (`registration_rules.environments` of `GET /service-info`, configured with `custom.endpoints.services.environments`). The form reads them and offers these instead, with the labels given in `environments` (or the default labels); `environments` applies only to registries and providers without these rules. A registry that allows any environment (an empty list) gets a text field, whatever `environments` says. A chosen environment that is no longer offered is cleared. As an attribute, `environments` takes a JSON list.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientElixirCloudRegistryServiceCreate
+      provider={provider}
+      environments={[{ value: 'prod', label: 'Production' }, 'qa']}
+    />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-client-elixir-cloud-registry-service-create environments='["prod", "qa"]'></ecc-client-elixir-cloud-registry-service-create>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `urlSchemes`
+The schemes allowed in service URLs (`url`): `https` and, if the registry allows it, `http` (`custom.endpoints.services.url_schemes`). Cloud Registry 0.6.0 and later publish them (`registration_rules.url_schemes` of `GET /service-info`), and the form uses those instead: the property applies only to registries and providers without these rules. Values are case-insensitive; anything other than `http` or `https` is ignored, and without any, the default applies. Rules published by the registry replace the property completely. As an attribute, it takes a list separated by commas or spaces, e.g. `url-schemes="https,http"`.
+
+## Validation
+
+The form checks its fields as Cloud Registry checks registrations, and shows what is wrong at each field while users type (missing required fields once a submission was tried, until the form is reset):
+
+- URLs (service, organization, contact and documentation URLs) must be HTTP(S) URLs with a host, without user info, whitespace, control characters, characters that URLs only allow percent-encoded (e.g. `<`, `|`) or malformed percent-encodings, and at most 2048 characters. Service URLs must use one of the allowed schemes (see `urlSchemes`). Contact URLs can also be `mailto:` URLs with email addresses; a plain email address asks for `mailto:`.
+- Maximum lengths: 1024 characters for the service and organization names, 4096 for the description, 256 for the version, the environment and the parts of the service type.
+- "Created At" and "Updated At" must be RFC 3339 date-times (e.g. `2024-01-01T00:00:00Z`). Invalid timestamps are flagged but don't keep the form from being sent, as the registry ignores timestamps unless an admin sends them (it then rejects invalid ones): they are sent as typed, and no `ecc-service-create-validation-failed` is fired if they are the only invalid fields.
+- A custom service ID must not be `.`, `..` or `types`, and must not contain slashes, commas or line breaks.
+
+If a field other than the timestamps is invalid when the form is submitted, the form sends nothing, shows a note at the submit button, expands "Advanced Configuration" if one of its fields is invalid, and fires `ecc-service-create-validation-failed` with all messages. The registry remains the authority: it reports anything the form doesn't catch (`ecc-service-create-failed`).
+
 ## Events
 
 | Event Name                          | React Event Name                     | Detail Type                                              | Description                                          |
 |-------------------------------------|--------------------------------------|----------------------------------------------------------|------------------------------------------------------|
 | `ecc-service-created`               | `onEccServiceCreated`                | `{ serviceId: string, serviceData: object, message: string }` | Fired when a service is successfully created        |
 | `ecc-service-create-failed`         | `onEccServiceCreateFailed`           | `{ error: string, status?: number, title?: string, detail?: string, serviceId?: string, cause?: unknown }` | Fired when service creation or loading the service types fails |
-| `ecc-service-create-validation-failed` | `onEccServiceCreateValidationFailed` | `{ error: string }`                                      | Fired when there are validation errors              |
+| `ecc-service-create-validation-failed` | `onEccServiceCreateValidationFailed` | `{ error: string, errors?: Record<string, string> }`     | Fired when a submission has invalid fields (nothing is sent) |
 
 ### `ecc-service-created`
 Emitted when a service is successfully created in the registry, providing the new service ID, the submitted service data, and a success message.
@@ -235,7 +272,7 @@ The component reads `status`, `title`, `detail` and `serviceId` from the error t
 </Tabs>
 
 ### `ecc-service-create-validation-failed`
-Emitted when there are validation errors in the form data before submission or when the component is misconfigured.
+Emitted when the form is submitted with invalid fields (see [Validation](#validation)); the form then sends nothing; `error` holds the messages of all invalid fields, and `errors` the message by field (the ID of its input, e.g. `service-url`). The form also shows them at the fields. Also emitted when the component is misconfigured (no `baseUrl` or `provider`).
 
 <Tabs items={['React', 'JavaScript']}>
   <Tabs.Tab>
