@@ -125,6 +125,7 @@ This example demonstrates the basic service creation form with default settings.
 | Property   | Type                    | Default | Description                                                                    |
 |------------|-------------------------|---------|--------------------------------------------------------------------------------|
 | `provider` | `CloudRegistryProvider` | `null`  | Data provider for service creation operations (see [Providers](/docs/cloud-registry/providers)) |
+| `dirty`    | `boolean` (read-only)   | `false` | Whether the form has unsaved input (see `ecc-service-form-changed`) |
 
 ### `provider`
 The data provider responsible for creating services in the registry. You must provide a provider that implements the `CloudRegistryProvider` interface, which extends the base `ServiceRegistryProvider` with creation capabilities. See the [Providers documentation](/docs/cloud-registry/providers) for detailed information about available providers and how to create custom ones.
@@ -169,6 +170,7 @@ You can replace the provider at any time, e.g. when the user's token changes: th
 | `ecc-service-created`               | `onEccServiceCreated`                | `{ serviceId: string, serviceData: object, message: string }` | Fired when a service is successfully created        |
 | `ecc-service-create-failed`         | `onEccServiceCreateFailed`           | `{ error: string, status?: number, title?: string, detail?: string, serviceId?: string, cause?: unknown }` | Fired when service creation or loading the service types fails |
 | `ecc-service-create-validation-failed` | `onEccServiceCreateValidationFailed` | `{ error: string }`                                      | Fired when there are validation errors              |
+| `ecc-service-form-changed`          | `onEccServiceFormChanged`            | `{ dirty: boolean }`                                     | Fired when the form's values change (`dirty`: whether they differ from the empty form) |
 
 ### `ecc-service-created`
 Emitted when a service is successfully created in the registry, providing the new service ID, the submitted service data, and a success message.
@@ -259,4 +261,27 @@ Emitted when there are validation errors in the form data before submission or w
     });
     ```
   </Tabs.Tab>
-</Tabs> 
+</Tabs>
+
+### `ecc-service-form-changed`
+Emitted whenever the form's values change, e.g. to warn users before they leave a form with unsaved input. `dirty` tells whether the values differ from those of the empty form; it is `false` again after "Reset" and after a successful create. The read-only property `dirty` of the element always holds the current value; it is already `false` while `ecc-service-created` is handled.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    const [unsaved, setUnsaved] = useState(false);
+
+    <EccClientElixirCloudRegistryServiceCreate
+      onEccServiceFormChanged={(event) => setUnsaved(event.detail.dirty)}
+    />
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    window.addEventListener('beforeunload', (event) => {
+      if (element.dirty) event.preventDefault();
+    });
+    ```
+  </Tabs.Tab>
+</Tabs>

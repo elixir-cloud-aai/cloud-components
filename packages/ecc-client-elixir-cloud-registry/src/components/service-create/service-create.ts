@@ -56,10 +56,12 @@ const failureDetail = (
  *
  * @property {string} baseUrl - Base URL of the Cloud Registry instance/gateway
  * @property {CloudRegistryProvider} provider - Custom data provider (optional, overrides baseUrl); replacing it makes later requests use the new one
+ * @property {boolean} dirty - Whether the form has unsaved input (read-only)
  *
  * @fires ecc-service-created - Fired when a service is successfully created (includes serviceId, serviceData, and success message)
  * @fires ecc-service-create-failed - Fired when service creation or loading the service types fails (includes the error message and, if the registry sent them, the status and problem details)
  * @fires ecc-service-create-validation-failed - Fired when there are validation errors during service creation
+ * @fires ecc-service-form-changed - Fired when the form's values change (includes dirty: whether they differ from the empty form; false again after Reset or a successful create)
  */
 export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   static styles = [
@@ -136,6 +138,21 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   /** Number of the latest request for service types. */
   private typesRequest = 0;
 
+  // Values of the empty form (declared after `formData`, which it copies),
+  // and the values of the last `ecc-service-form-changed`; snapshots as JSON,
+  // as every change keeps the order of the keys
+  private readonly emptyValues = JSON.stringify(this.formData);
+  private lastValues = this.emptyValues;
+
+  /**
+   * Whether the form has unsaved input: values that differ from the empty
+   * form. False again after Reset or a successful create (already while
+   * `ecc-service-created` is handled).
+   */
+  get dirty(): boolean {
+    return JSON.stringify(this.formData) !== this.emptyValues;
+  }
+
   protected firstUpdated(): void {
     if (!this.baseUrl && !this.provider) {
       this.dispatchEvent(
@@ -152,9 +169,29 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   }
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
+    if (changedProperties.has("formData")) {
+      this.notifyChange();
+    }
     if (changedProperties.has("provider") || changedProperties.has("baseUrl")) {
       this.useProvider();
     }
+  }
+
+  /**
+   * Fire `ecc-service-form-changed` if the values have changed since it was
+   * last fired; after each update, and right away on resets
+   */
+  private notifyChange(): void {
+    const values = JSON.stringify(this.formData);
+    if (values === this.lastValues) return;
+    this.lastValues = values;
+    this.dispatchEvent(
+      new CustomEvent("ecc-service-form-changed", {
+        detail: { dirty: this.dirty },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
   /**
@@ -306,6 +343,9 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
       const successMessage = `Service created successfully with ID: ${serviceId}`;
 
+      // Reset form, first, so that it isn't dirty for listeners of the event
+      this.resetForm();
+
       // Emit success event with comprehensive data
       this.dispatchEvent(
         new CustomEvent("ecc-service-created", {
@@ -314,9 +354,6 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           composed: true,
         })
       );
-
-      // Reset form
-      this.resetForm();
     } catch (err) {
       // Emit error event
       this.dispatchEvent(
@@ -354,6 +391,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       customServiceId: "",
       useCustomId: false,
     };
+    this.notifyChange();
   }
 
   private renderBasicFields() {
