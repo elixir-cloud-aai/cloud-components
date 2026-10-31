@@ -35,10 +35,12 @@ This example demonstrates the basic service creation form with default settings.
     import { EccClientElixirCloudRegistryServiceCreate } from '@elixir-cloud/cloud-registry/react/service-create';
     import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
 
+    // created once: a new provider makes the component load the types again
+    const provider = new RestCloudRegistryProvider(
+      'https://cloud-registry.example.com/ga4gh/registry/v1'
+    );
+
     export default function ServiceCreateBasic() {
-      const provider = new RestCloudRegistryProvider(
-        'https://cloud-registry.example.com/ga4gh/registry/v1'
-      );
 
       const handleServiceCreated = (event) => {
         console.log('Service created successfully:', event.detail);
@@ -129,6 +131,12 @@ The data provider responsible for creating services in the registry. You must pr
 
 <Callout type='warning'>
   The provider must support service creation operations. If no provider is provided, the component will emit a validation error.
+</Callout>
+
+You can replace the provider at any time, e.g. when the user's token changes: the component then loads the service types from the new provider and sends all later requests through it. It keeps the form's input. `provider` takes precedence over `baseUrl`; if you remove it, the component uses `baseUrl` again.
+
+<Callout type='info'>
+  Each new provider object makes the component load the service types again. In React, create the provider only when its inputs change, e.g. with `useMemo(() => new RestCloudRegistryProvider(url), [url])`, not on every render.
 </Callout>
 
 <Tabs items={['React', 'HTML']}>
