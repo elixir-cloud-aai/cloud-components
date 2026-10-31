@@ -9,6 +9,7 @@
 
 [![License][badge-license]][badge-url-license]
 [![Build_status][badge-build-status]][badge-url-build-status]
+[![Coverage][badge-coverage]][badge-url-coverage]
 [![Docs][badge-docs]][badge-url-docs]
 [![GitHub_tag][badge-github-tag]][badge-url-github-tag]
 [![npm_release][badge-npm]][badge-url-npm]
@@ -97,11 +98,13 @@ conduct. For anything else, write to
 [cloud-service@elixir-europe.org](mailto:cloud-service@elixir-europe.org).
 
 [badge-build-status]: <https://github.com/elixir-cloud-aai/cloud-components/actions/workflows/ci.yml/badge.svg?branch=dev>
+[badge-coverage]: <https://codecov.io/gh/elixir-cloud-aai/cloud-components/branch/dev/graph/badge.svg>
 [badge-docs]: <https://img.shields.io/readthedocs/cloud-components>
 [badge-github-tag]: <https://img.shields.io/github/v/tag/elixir-cloud-aai/cloud-components?color=C39BD3>
 [badge-license]: <https://img.shields.io/badge/license-Apache%202.0-blue.svg>
 [badge-npm]: <https://img.shields.io/npm/v/@elixir-cloud/design?color=C39BD3>
 [badge-url-build-status]: <https://github.com/elixir-cloud-aai/cloud-components/actions/workflows/ci.yml?query=branch%3Adev>
+[badge-url-coverage]: <https://codecov.io/gh/elixir-cloud-aai/cloud-components/tree/dev>
 [badge-url-docs]: <https://cloud-components.readthedocs.io/en/latest/>
 [badge-url-github-tag]: <https://github.com/elixir-cloud-aai/cloud-components/releases>
 [badge-url-license]: <https://www.apache.org/licenses/LICENSE-2.0>
