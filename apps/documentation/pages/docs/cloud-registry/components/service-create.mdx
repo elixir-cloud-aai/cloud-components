@@ -35,10 +35,12 @@ This example demonstrates the basic service creation form with default settings.
     import { EccClientElixirCloudRegistryServiceCreate } from '@elixir-cloud/cloud-registry/react/service-create';
     import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
 
+    // created once: a new provider makes the component load the types again
+    const provider = new RestCloudRegistryProvider(
+      'https://cloud-registry.example.com/ga4gh/registry/v1'
+    );
+
     export default function ServiceCreateBasic() {
-      const provider = new RestCloudRegistryProvider(
-        'https://cloud-registry.example.com/ga4gh/registry/v1'
-      );
 
       const handleServiceCreated = (event) => {
         console.log('Service created successfully:', event.detail);
@@ -132,6 +134,12 @@ The data provider responsible for creating services in the registry. You must pr
   The provider must support service creation operations. If no provider is provided, the component will emit a validation error.
 </Callout>
 
+You can replace the provider at any time, e.g. when the user's token changes: the component then loads the service types from the new provider and sends all later requests through it. It keeps the form's input. `provider` takes precedence over `baseUrl`; if you remove it, the component uses `baseUrl` again.
+
+<Callout type='info'>
+  Each new provider object makes the component load the service types again. In React, create the provider only when its inputs change, e.g. with `useMemo(() => new RestCloudRegistryProvider(url), [url])`, not on every render.
+</Callout>
+
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>
     ```tsx copy
@@ -176,7 +184,7 @@ The form offers the registered service types (`GET /services/types`) as one list
 | Event Name                          | React Event Name                     | Detail Type                                              | Description                                          |
 |-------------------------------------|--------------------------------------|----------------------------------------------------------|------------------------------------------------------|
 | `ecc-service-created`               | `onEccServiceCreated`                | `{ serviceId: string, serviceData: object, message: string }` | Fired when a service is successfully created        |
-| `ecc-service-create-failed`         | `onEccServiceCreateFailed`           | `{ error: string }`                                      | Fired when service creation fails                   |
+| `ecc-service-create-failed`         | `onEccServiceCreateFailed`           | `{ error: string, status?: number, title?: string, detail?: string, serviceId?: string, cause?: unknown }` | Fired when service creation or loading the service types fails |
 | `ecc-service-create-validation-failed` | `onEccServiceCreateValidationFailed` | `{ error: string }`                                      | Fired when there are validation errors              |
 
 ### `ecc-service-created`
@@ -209,7 +217,15 @@ Emitted when a service is successfully created in the registry, providing the ne
 </Tabs>
 
 ### `ecc-service-create-failed`
-Emitted when service creation fails due to server errors, network issues, or other runtime problems.
+Emitted when service creation or loading the service types fails due to server errors, network issues, or other runtime problems.
+
+- `error`: what went wrong, e.g. the registry's explanation (the problem's `detail`); if the service types can't be loaded, it starts with "Failed to load service types";
+- `status`: the HTTP status of the failed request, if there was one, e.g. `401` (log in) or `403` (no role on the service);
+- `title`, `detail`: the problem details that the registry sent, if any;
+- `serviceId`: the ID of the existing service, for duplicate registrations (`409`);
+- `cause`: the error that the provider threw.
+
+The component reads `status`, `title`, `detail` and `serviceId` from the error that the provider throws, a `CloudRegistryError` for `RestCloudRegistryProvider` (see [Errors](/docs/cloud-registry/providers#errors)). Custom providers can throw errors with the same fields.
 
 <Tabs items={['React', 'JavaScript']}>
   <Tabs.Tab>

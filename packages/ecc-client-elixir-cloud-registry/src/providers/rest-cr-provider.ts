@@ -6,10 +6,14 @@ import {
   ExternalServiceRegister,
   ServiceRegister,
 } from "./cr-provider.js";
+import { CloudRegistryError } from "./errors.js";
 
 /**
  * Implementation of the CloudRegistryProvider interface using direct REST API calls
  * This class combines the functionality of ServiceRegistryAPI and RestCloudRegistryProvider
+ *
+ * Methods reject with a {@link CloudRegistryError} if the registry answers
+ * with an error status; it carries the status and the problem details.
  */
 export class RestCloudRegistryProvider implements CloudRegistryProvider {
   // eslint-disable-next-line no-useless-constructor
@@ -32,7 +36,10 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
     const url = `${this.baseUrl}/services`;
     const response = await this.fetch(url);
     if (!response.ok) {
-      throw new Error(`Failed to fetch services: ${response.statusText}`);
+      throw await CloudRegistryError.fromResponse(
+        response,
+        "Failed to fetch services"
+      );
     }
     return response.json();
   }
@@ -47,7 +54,10 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
     const url = `${this.baseUrl}/services/${encodedServiceId}`;
     const response = await this.fetch(url);
     if (!response.ok) {
-      throw new Error(`Failed to fetch service: ${response.statusText}`);
+      throw await CloudRegistryError.fromResponse(
+        response,
+        "Failed to fetch service"
+      );
     }
     return response.json();
   }
@@ -60,7 +70,10 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
     const url = `${this.baseUrl}/services/types`;
     const response = await this.fetch(url);
     if (!response.ok) {
-      throw new Error(`Failed to fetch service types: ${response.statusText}`);
+      throw await CloudRegistryError.fromResponse(
+        response,
+        "Failed to fetch service types"
+      );
     }
     return response.json();
   }
@@ -73,7 +86,10 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
     const url = `${this.baseUrl}/service-info`;
     const response = await this.fetch(url);
     if (!response.ok) {
-      throw new Error(`Failed to fetch service info: ${response.statusText}`);
+      throw await CloudRegistryError.fromResponse(
+        response,
+        "Failed to fetch service info"
+      );
     }
     return response.json();
   }
@@ -94,7 +110,10 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to create service: ${response.statusText}`);
+      throw await CloudRegistryError.fromResponse(
+        response,
+        "Failed to create service"
+      );
     }
 
     return response.json();
@@ -121,8 +140,9 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to create service with ID: ${response.statusText}`
+      throw await CloudRegistryError.fromResponse(
+        response,
+        "Failed to create service with ID"
       );
     }
 
@@ -150,7 +170,10 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to update service: ${response.statusText}`);
+      throw await CloudRegistryError.fromResponse(
+        response,
+        "Failed to update service"
+      );
     }
 
     return response.json();
@@ -169,7 +192,10 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to delete service: ${response.statusText}`);
+      throw await CloudRegistryError.fromResponse(
+        response,
+        "Failed to delete service"
+      );
     }
 
     return response.json();
@@ -191,8 +217,9 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to create/update service info: ${response.statusText}`
+      throw await CloudRegistryError.fromResponse(
+        response,
+        "Failed to create/update service info"
       );
     }
   }
