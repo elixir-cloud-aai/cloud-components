@@ -239,7 +239,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
       <div class="flex flex-col gap-4">
         ${this.error
           ? html`<div
-              class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+              class="p-4 border border-destructive rounded-md text-destructive bg-destructive/10"
             >
               ${this.error}
             </div>`

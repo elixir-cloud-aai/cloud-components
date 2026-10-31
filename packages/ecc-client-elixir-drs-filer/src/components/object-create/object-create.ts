@@ -301,7 +301,7 @@ export class ECCClientElixirDrsFilerObjectCreate extends LitElement {
         ${this.error
           ? html`
               <div
-                class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+                class="p-4 border border-destructive rounded-md text-destructive bg-destructive/10"
               >
                 ${this.error}
               </div>
@@ -804,7 +804,7 @@ export class ECCClientElixirDrsFilerObjectCreate extends LitElement {
     if (!this.baseUrl && !this.provider) {
       return html`
         <div
-          class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+          class="p-4 border border-destructive rounded-md text-destructive bg-destructive/10"
         >
           Please provide either a base URL for the DRS API or a custom provider.
         </div>
