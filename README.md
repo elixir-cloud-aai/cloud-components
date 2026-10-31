@@ -63,14 +63,20 @@ CDN and the other packages.
 ## Development
 
 With [Node.js](https://nodejs.org/) 22 or later installed, clone the
-repository, install the dependencies and start the design package (which all
-other packages need), then, in another terminal, the package you work on:
+repository, install the dependencies and start the design package, which all
+other packages need:
 
 ```bash
 git clone https://github.com/elixir-cloud-aai/cloud-components.git
 cd cloud-components
 npm install
 npm run dev --workspace=@elixir-cloud/design
+```
+
+The design package keeps running; start the package you work on in a second
+terminal:
+
+```bash
 npm run dev --workspace=@elixir-cloud/<package>
 ```
 
