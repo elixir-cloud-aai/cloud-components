@@ -14,3 +14,6 @@ export { default as EccUtilsDesignCard } from "./card/index.js";
 export { default as EccUtilsDesignSeparator } from "./separator/index.js";
 export { default as EccUtilsDesignCode } from "./code/index.js";
 export { default as EccUtilsDesignTextarea } from "./textarea/index.js";
+export { default as EccUtilsDesignCookieConsent } from "./cookie-consent/index.js";
+export { default as EccUtilsDesignComplianceFooter } from "./compliance-footer/index.js";
+export * from "./cookie-consent/consent.js";
