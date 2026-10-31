@@ -286,7 +286,7 @@ describe("ecc-client-elixir-cloud-registry-service-create provider", () => {
     el.provider = second;
     const { detail } = await failed;
 
-    expect(detail.error).to.equal("Failed to load service types");
+    expect(detail.error).to.equal("Failed to load service types: unauthorized");
     expect(internals(el).serviceTypes).to.deep.equal([]);
   });
 

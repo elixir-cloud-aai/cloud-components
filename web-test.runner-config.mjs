@@ -22,6 +22,7 @@ export default {
       ts: true,
       target: "es2020",
       // Lit decorators need the package's experimentalDecorators setting
+      // (relative to the working directory: run tests from the package)
       tsconfig: "./tsconfig.json",
     }),
   ],
