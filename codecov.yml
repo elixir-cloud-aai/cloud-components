@@ -1,0 +1,14 @@
+# Codecov settings (https://docs.codecov.com/docs/codecov-yaml). CI uploads
+# the test coverage of the packages with tests (Chromium; see `ci.yml`).
+# Their coverage must not drop by more than 1 % (packages without tests
+# aren't uploaded, so they don't count); the coverage of a pull request's
+# changes is reported, but doesn't fail, until all packages have tests
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        informational: true

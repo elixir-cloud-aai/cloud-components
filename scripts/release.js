@@ -4,11 +4,19 @@
 // root `package.json` and are released together.
 //
 // Usage:
-//   node scripts/release.js set <version>    set the version of the root and
-//                                            of all released packages (for
-//                                            the version bump pull request)
-//   node scripts/release.js check <version>  fail unless the root and all
-//                                            released packages have <version>
+//   node scripts/release.js set <version> [--date YYYY-MM-DD]
+//                                            set the version of the root and
+//                                            of all released packages, and
+//                                            the version and release date
+//                                            (default: today, UTC) in
+//                                            `CITATION.cff` (for the version
+//                                            bump pull request)
+//   node scripts/release.js check <version>  fail unless the root, all
+//                                            released packages and
+//                                            `CITATION.cff` have <version>
+//                                            and the release date in
+//                                            `CITATION.cff` is not in the
+//                                            future (UTC)
 //   node scripts/release.js packages         print the directories of the
 //                                            released packages, one per line
 //   node scripts/release.js dist-tag <version>
@@ -80,6 +88,129 @@ const versionMismatches = (version, base = root) => {
       ({ dir, manifest }) =>
         `${manifest.name} (${dir}) has version ${manifest.version}, not ${version}`
     );
+};
+
+// Citation metadata (Citation File Format), which GitHub and Zenodo read;
+// Zenodo archives each GitHub release with the file of the tagged commit,
+// so its `version` and `date-released` are set in the version bump pull
+// request and checked by the release workflow. Both are top-level keys
+// with a plain or quoted single-line value (as `set` writes them);
+// the rest of the file is kept as is (CI validates the whole file)
+const citationFile = "CITATION.cff";
+
+const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+
+// Lines of a top-level key, in any form, and the supported form, whose
+// group `value` is the value without quotes (not continued on the next
+// line, as YAML continues plain values)
+const anyKeyPattern = (name) => new RegExp(`^["']?${name}["']?[ \\t]*:`, "gm");
+const keyPattern = (name) =>
+  new RegExp(
+    `^${name}:[ \\t]+(["']?)(?<value>[0-9A-Za-z._+-]+)\\1(?<comment>[ \\t]+#.*)?[ \\t]*\\r?(?![^\\n])` +
+      // The line ends (LF or CRLF), and no indented line follows, also not
+      // after blank lines
+      `(?!(?:\\n[ \\t]*\\r?)*\\n[ \\t]+[^ \\t#\\r\\n])`,
+    "m"
+  );
+
+// The value of a top-level key, or `undefined` if it is missing; throws if
+// it occurs more than once or has an unsupported form
+const citationValue = (text, name) => {
+  const lines = text.match(anyKeyPattern(name)) || [];
+  if (lines.length > 1) {
+    throw new Error(`${citationFile} has ${name} more than once`);
+  }
+  const match = keyPattern(name).exec(text);
+  if (lines.length === 1 && !match) {
+    throw new Error(
+      `${citationFile} has an unsupported ${name}: use \`${name}: "<value>"\``
+    );
+  }
+  return match ? match.groups.value : undefined;
+};
+
+// A date (YYYY-MM-DD) as a `Date` at midnight UTC, or `undefined` if it is
+// none (e.g. 2026-02-30)
+const parseDate = (value) => {
+  if (!datePattern.test(value)) {
+    return undefined;
+  }
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) &&
+    date.toISOString().slice(0, 10) === value
+    ? date
+    : undefined;
+};
+
+// Today (UTC) as YYYY-MM-DD
+const utcDate = (now = new Date()) => now.toISOString().slice(0, 10);
+
+// Messages for what in `CITATION.cff` doesn't fit the release of `version`
+// on the day `now` (UTC): its version and its release date, which must not
+// be later
+const citationErrors = (version, now = new Date(), base = root) => {
+  parseVersion(version);
+  const file = path.join(base, citationFile);
+  if (!fs.existsSync(file)) {
+    return [`${citationFile} is missing`];
+  }
+  const text = fs.readFileSync(file, "utf8");
+  const errors = [];
+  const check = (name, test) => {
+    try {
+      const value = citationValue(text, name);
+      if (value === undefined) {
+        errors.push(`${citationFile} has no ${name}`);
+      } else {
+        const error = test(value);
+        if (error) {
+          errors.push(`${citationFile} has ${name} ${value}, ${error}`);
+        }
+      }
+    } catch (error) {
+      errors.push(error.message);
+    }
+  };
+  check("version", (value) =>
+    value === version
+      ? undefined
+      : `not ${version} (run \`node scripts/release.js set ${version}\`)`
+  );
+  check("date-released", (value) => {
+    if (!parseDate(value)) {
+      return "which is not a date (YYYY-MM-DD)";
+    }
+    return value > utcDate(now) ? "which is in the future (UTC)" : undefined;
+  });
+  return errors;
+};
+
+// The text of `CITATION.cff` with `version` and `date-released`
+// (YYYY-MM-DD) set, appending the keys if they are missing; throws on bad
+// input or a missing file before anything is written
+const citationWithRelease = (version, date, base = root) => {
+  parseVersion(version);
+  if (!parseDate(date)) {
+    throw new Error(`'${date}' is not a date (YYYY-MM-DD)`);
+  }
+  let text = fs.readFileSync(path.join(base, citationFile), "utf8");
+  [
+    ["version", version],
+    ["date-released", date],
+  ].forEach(([name, value]) => {
+    const line = `${name}: "${value}"`;
+    if (citationValue(text, name) === undefined) {
+      const eol = text.includes("\r\n") ? "\r\n" : "\n";
+      text = `${text.replace(/(?:\r?\n)*$/, "")}${eol}${line}${eol}`;
+    } else {
+      // Keeps a comment and the line ending (CRLF)
+      text = text.replace(keyPattern(name), (match, ...args) => {
+        const { comment = "" } = args[args.length - 1];
+        return `${line}${comment}${match.endsWith("\r") ? "\r" : ""}`;
+      });
+    }
+  });
+  return text;
 };
 
 // Prereleases of this major version are published as `latest` until its
@@ -156,9 +287,9 @@ const versionTags = () => {
 };
 
 // Sets the version with `npm version`, which also updates the lock file
-const setVersion = (version) => {
+const setVersion = (version, base = root) => {
   parseVersion(version);
-  const workspaces = releasedPackages().flatMap(({ dir }) => [
+  const workspaces = releasedPackages(base).flatMap(({ dir }) => [
     "--workspace",
     dir,
   ]);
@@ -168,21 +299,64 @@ const setVersion = (version) => {
       "version",
       version,
       "--no-git-tag-version",
+      // `set` can be run again, e.g. to update `CITATION.cff`
+      "--allow-same-version",
       "--include-workspace-root",
       ...workspaces,
     ],
-    { cwd: root, stdio: "inherit" }
+    { cwd: base, stdio: "inherit" }
   );
 };
 
+// The release date of `set`, checked: `--date YYYY-MM-DD`, not later than
+// the day of `now` (UTC), or that day
+const releaseDate = (options, now = new Date()) => {
+  if (options.length === 0) {
+    return utcDate(now);
+  }
+  if (options.length !== 2 || options[0] !== "--date") {
+    throw new Error(
+      "Usage: node scripts/release.js set <version> [--date YYYY-MM-DD]"
+    );
+  }
+  const [, date] = options;
+  if (!parseDate(date)) {
+    throw new Error(`'${date}' is not a date (YYYY-MM-DD)`);
+  }
+  if (date > utcDate(now)) {
+    throw new Error(`'${date}' is in the future (UTC)`);
+  }
+  return date;
+};
+
+// `set`: checks the version, the date (see `releaseDate`) and
+// `CITATION.cff` before anything is changed, then sets the versions of the
+// packages (`bumpVersions`) and the version and date in `CITATION.cff`;
+// returns the date
+const setRelease = (
+  version,
+  options,
+  { base = root, now = new Date(), bumpVersions = setVersion } = {}
+) => {
+  parseVersion(version);
+  const date = releaseDate(options, now);
+  const citation = citationWithRelease(version, date, base);
+  bumpVersions(version, base);
+  fs.writeFileSync(path.join(base, citationFile), citation);
+  return date;
+};
+
 const main = (args) => {
-  const [command, version] = args;
+  const [command, version, ...options] = args;
   switch (command) {
     case "set":
-      setVersion(version);
+      setRelease(version, options);
       return 0;
     case "check": {
-      const mismatches = versionMismatches(version);
+      const mismatches = [
+        ...versionMismatches(version),
+        ...citationErrors(version),
+      ];
       mismatches.forEach((message) => console.error(message));
       return mismatches.length === 0 ? 0 : 1;
     }
@@ -213,9 +387,12 @@ if (require.main === module) {
 }
 
 module.exports = {
+  citationErrors,
   distTag,
   parseVersion,
   pinInternalDependencies,
+  releaseDate,
   releasedPackages,
+  setRelease,
   versionMismatches,
 };
