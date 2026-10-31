@@ -93,7 +93,8 @@ sidebar of the repository formats it as APA or BibTeX.
 
 Contributions are welcome! See [`CONTRIBUTING.md`](CONTRIBUTING.md) for pull
 requests and releases, the organisation's contributor guide and our code of
-conduct.
+conduct. For anything else, write to
+[cloud-service@elixir-europe.org](mailto:cloud-service@elixir-europe.org).
 
 [badge-build-status]: <https://github.com/elixir-cloud-aai/cloud-components/actions/workflows/ci.yml/badge.svg?branch=dev>
 [badge-docs]: <https://img.shields.io/readthedocs/cloud-components>
