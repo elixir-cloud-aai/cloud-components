@@ -19,6 +19,15 @@ import "@elixir-cloud/design/components/textarea/index.js";
 import "@elixir-cloud/design/components/collapsible/index.js";
 
 /**
+ * Attribute converter of boolean properties that default to `true`:
+ * `type: Boolean` can't turn them off from HTML (any attribute value is
+ * `true`), so only `"false"` (in any case) does
+ */
+const trueUnlessFalse = {
+  fromAttribute: (value: string | null) => value?.toLowerCase() !== "false",
+};
+
+/**
  * Value of the choice "Add new service type" in the type list; keys of
  * listed types are JSON arrays (cf. `typeKey()`), so they never equal it
  */
@@ -72,6 +81,7 @@ const failureDetail = (
  *
  * @property {string} baseUrl - Base URL of the Cloud Registry instance/gateway
  * @property {CloudRegistryProvider} provider - Custom data provider (optional, overrides baseUrl); replacing it makes later requests use the new one
+ * @property {boolean} admin - Whether to offer the admin-only fields (custom service ID, timestamps); default `true`, set `admin="false"` for other users
  * @property {boolean} allowNewType - Whether users may add a new service type instead of choosing a listed one; default `true`, set `allow-new-type="false"` to offer listed types only
  *
  * @fires ecc-service-created - Fired when a service is successfully created (includes serviceId, serviceData, and success message)
@@ -95,6 +105,16 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   provider?: CloudRegistryProvider;
 
   /**
+   * Whether to offer the fields that only admins may set: a custom service
+   * ID and the timestamps (`createdAt`, `updatedAt`), which Cloud Registry
+   * sets itself for other users. If `false`, the form hides them, and with
+   * them "Advanced Configuration", and never sends them. Defaults to `true`
+   * for compatibility; as an attribute, `admin="false"` turns it off.
+   */
+  @property({ converter: trueUnlessFalse })
+  admin = true;
+
+  /**
    * Whether users may add a new service type instead of choosing one of the
    * registered types (`GET /services/types`): the type list then ends with
    * "Add new service type", which shows fields for the group, artifact and
@@ -102,14 +122,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
    * `GET /me`. Defaults to `true` for compatibility; as an attribute,
    * `allow-new-type="false"` turns it off.
    */
-  @property({
-    attribute: "allow-new-type",
-    // `type: Boolean` can't turn a property that defaults to `true` off from
-    // HTML (any attribute value is `true`), hence the converter
-    converter: {
-      fromAttribute: (value: string | null) => value?.toLowerCase() !== "false",
-    },
-  })
+  @property({ attribute: "allow-new-type", converter: trueUnlessFalse })
   allowNewType = true;
 
   @state() private serviceTypes: ServiceType[] = [];
@@ -425,12 +438,19 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
         contactUrl: this.formData.contactUrl || undefined,
         documentationUrl: this.formData.documentationUrl || undefined,
         environment: this.formData.environment || undefined,
-        createdAt: this.formData.createdAt || undefined,
-        updatedAt: this.formData.updatedAt || undefined,
       };
+      // admin-only fields (cf. `admin`), sent by admins only
+      if (this.admin) {
+        serviceData.createdAt = this.formData.createdAt || undefined;
+        serviceData.updatedAt = this.formData.updatedAt || undefined;
+      }
 
       let serviceId: string;
-      if (this.formData.useCustomId && this.formData.customServiceId) {
+      if (
+        this.admin &&
+        this.formData.useCustomId &&
+        this.formData.customServiceId
+      ) {
         serviceId = await provider.createServiceWithId!(
           this.formData.customServiceId,
           serviceData
@@ -637,6 +657,43 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           </div>
         </div>
 
+        <!-- Contact and Documentation URLs -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid gap-2">
+            <ecc-utils-design-label
+              for="contact-url"
+              class="text-sm font-medium"
+            >
+              Contact URL
+            </ecc-utils-design-label>
+            <ecc-utils-design-input
+              id="contact-url"
+              .value=${this.formData.contactUrl}
+              @ecc-input-changed=${(e: CustomEvent) =>
+                this.handleInputChange("contactUrl", e.detail.value)}
+              placeholder="mailto:support@example.com or https://contact.example.com"
+              class="h-10"
+            ></ecc-utils-design-input>
+          </div>
+
+          <div class="grid gap-2">
+            <ecc-utils-design-label
+              for="documentation-url"
+              class="text-sm font-medium"
+            >
+              Documentation URL
+            </ecc-utils-design-label>
+            <ecc-utils-design-input
+              id="documentation-url"
+              .value=${this.formData.documentationUrl}
+              @ecc-input-changed=${(e: CustomEvent) =>
+                this.handleInputChange("documentationUrl", e.detail.value)}
+              placeholder="https://docs.example.com"
+              class="h-10"
+            ></ecc-utils-design-input>
+          </div>
+        </div>
+
         <!-- Description spans full width -->
         <div class="grid gap-2">
           <ecc-utils-design-label for="description" class="text-sm font-medium">
@@ -774,6 +831,9 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   }
 
   private renderAdvancedFields() {
+    // "Advanced Configuration" holds admin-only fields only
+    if (!this.admin) return html``;
+
     return html`
       <div class="space-y-6">
         <ecc-utils-design-collapsible>
@@ -825,46 +885,6 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   placeholder="org.example.my-service (optional)"
                   class="h-10"
                 ></ecc-utils-design-input>
-              </div>
-
-              <!-- Contact and Documentation URLs -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="grid gap-2">
-                  <ecc-utils-design-label
-                    for="contact-url"
-                    class="text-sm font-medium"
-                  >
-                    Contact URL
-                  </ecc-utils-design-label>
-                  <ecc-utils-design-input
-                    id="contact-url"
-                    .value=${this.formData.contactUrl}
-                    @ecc-input-changed=${(e: CustomEvent) =>
-                      this.handleInputChange("contactUrl", e.detail.value)}
-                    placeholder="mailto:support@example.com or https://contact.example.com"
-                    class="h-10"
-                  ></ecc-utils-design-input>
-                </div>
-
-                <div class="grid gap-2">
-                  <ecc-utils-design-label
-                    for="documentation-url"
-                    class="text-sm font-medium"
-                  >
-                    Documentation URL
-                  </ecc-utils-design-label>
-                  <ecc-utils-design-input
-                    id="documentation-url"
-                    .value=${this.formData.documentationUrl}
-                    @ecc-input-changed=${(e: CustomEvent) =>
-                      this.handleInputChange(
-                        "documentationUrl",
-                        e.detail.value
-                      )}
-                    placeholder="https://docs.example.com"
-                    class="h-10"
-                  ></ecc-utils-design-input>
-                </div>
               </div>
 
               <!-- Creation and Update timestamps -->
