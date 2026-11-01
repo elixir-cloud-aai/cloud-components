@@ -1,6 +1,6 @@
 {
   "name": "elixir-cloud-components",
-  "version": "2.0.0-alpha.49",
+  "version": "2.0.0-alpha.50",
   "description": "Cloud Components are lightweight, fast and reusable web components by the ELIXIR On-Cloud community for managing and accessing various services.",
   "repository": {
     "type": "git",
