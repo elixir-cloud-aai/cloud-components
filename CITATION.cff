@@ -35,6 +35,13 @@ authors:
     family-names: Sankhe
   - given-names: Tanya
     family-names: Kumari
+doi: 10.5281/zenodo.23858158
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23858158
+    description: >-
+      Concept DOI of all versions on Zenodo; it always resolves to the latest
+      version
 repository-code: "https://github.com/elixir-cloud-aai/cloud-components"
 url: "https://cloud-components.readthedocs.io/"
 keywords:
