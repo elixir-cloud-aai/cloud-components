@@ -312,3 +312,62 @@ describe("ecc-client-elixir-cloud-registry-service-create provider", () => {
     expect(fetchStub.callCount).to.equal(0);
   });
 });
+
+/** Entries of the type list as shown: labels of items, `---` for separators */
+const typeListEntries = (el: ECCClientElixirCloudRegistryServiceCreate) =>
+  Array.from(
+    el.shadowRoot?.querySelector(
+      "#service-type ecc-utils-design-select-content"
+    )?.children ?? []
+  ).map((entry) =>
+    entry.localName === "ecc-utils-design-select-separator"
+      ? "---"
+      : entry.textContent?.replace(/\s+/g, " ").trim()
+  );
+
+describe("ecc-client-elixir-cloud-registry-service-create type list", () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it("offers a new type first, apart from the registered types", async () => {
+    const el = await fixture<ECCClientElixirCloudRegistryServiceCreate>(
+      html`<ecc-client-elixir-cloud-registry-service-create
+        .provider=${stubProvider([TYPE_A, TYPE_B])}
+      ></ecc-client-elixir-cloud-registry-service-create>`
+    );
+    await waitUntil(() => internals(el).serviceTypes.length === 2);
+    await el.updateComplete;
+
+    expect(typeListEntries(el)).to.deep.equal([
+      "Add new service type",
+      "---",
+      "org.ga4gh · tes · 1.1.0",
+      "org.ga4gh · wes · 1.2.0",
+    ]);
+  });
+
+  it("offers only the registered types if adding is off", async () => {
+    const el = await fixture<ECCClientElixirCloudRegistryServiceCreate>(
+      html`<ecc-client-elixir-cloud-registry-service-create
+        .provider=${stubProvider([TYPE_A])}
+        .allowNewType=${false}
+      ></ecc-client-elixir-cloud-registry-service-create>`
+    );
+    await waitUntil(() => internals(el).serviceTypes.length === 1);
+    await el.updateComplete;
+
+    expect(typeListEntries(el)).to.deep.equal(["org.ga4gh · tes · 1.1.0"]);
+  });
+
+  it("sets nothing apart while no types are listed", async () => {
+    const el = await fixture<ECCClientElixirCloudRegistryServiceCreate>(
+      html`<ecc-client-elixir-cloud-registry-service-create
+        .provider=${stubProvider([])}
+      ></ecc-client-elixir-cloud-registry-service-create>`
+    );
+    await el.updateComplete;
+
+    expect(typeListEntries(el)).to.deep.equal(["Add new service type"]);
+  });
+});

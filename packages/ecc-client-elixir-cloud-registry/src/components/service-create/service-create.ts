@@ -116,7 +116,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
   /**
    * Whether users may add a new service type instead of choosing one of the
-   * registered types (`GET /services/types`): the type list then ends with
+   * registered types (`GET /services/types`): the type list then starts with
    * "Add new service type", which shows fields for the group, artifact and
    * version. Apps set it from `may_add_service_types` of the registry's
    * `GET /me`. Defaults to `true` for compatibility; as an attribute,
@@ -745,6 +745,33 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   ></ecc-utils-design-select-value>
                 </ecc-utils-design-select-trigger>
                 <ecc-utils-design-select-content>
+                  ${this.allowNewType
+                    ? html`
+                        <!-- first and set apart, so that long lists don't hide it -->
+                        <ecc-utils-design-select-item value=${NEW_TYPE}>
+                          <span class="flex items-center gap-2 font-medium">
+                            <svg
+                              class="w-4 h-4 shrink-0"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              aria-hidden="true"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 5v14M5 12h14"
+                              ></path>
+                            </svg>
+                            Add new service type
+                          </span>
+                        </ecc-utils-design-select-item>
+                        ${this.serviceTypes.length > 0
+                          ? html`<ecc-utils-design-select-separator></ecc-utils-design-select-separator>`
+                          : ""}
+                      `
+                    : ""}
                   ${this.serviceTypes.map(
                     (type) => html`
                       <ecc-utils-design-select-item value=${typeKey(type)}
@@ -752,13 +779,6 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                       >
                     `
                   )}
-                  ${this.allowNewType
-                    ? html`
-                        <ecc-utils-design-select-item value=${NEW_TYPE}
-                          >Add new service type</ecc-utils-design-select-item
-                        >
-                      `
-                    : ""}
                 </ecc-utils-design-select-content>
               </ecc-utils-design-select>
             `}
