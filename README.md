@@ -13,6 +13,7 @@
 [![Docs][badge-docs]][badge-url-docs]
 [![GitHub_tag][badge-github-tag]][badge-url-github-tag]
 [![npm_release][badge-npm]][badge-url-npm]
+[![DOI][badge-doi]][badge-url-doi]
 
 Web components for front ends of [GA4GH](https://www.ga4gh.org/) APIs and
 the services built on them, brought to you by [ELIXIR
@@ -86,7 +87,10 @@ documentation app is in [`apps/documentation/`](apps/documentation/).
 
 ## Citation
 
-If you use Cloud Components, please cite them with the metadata in
+If you use Cloud Components, please cite them with their DOI
+[10.5281/zenodo.23858158](https://doi.org/10.5281/zenodo.23858158), which
+always resolves to the latest version on [Zenodo](https://zenodo.org/); the
+Zenodo record lists the DOI of each version, too. The citation metadata is in
 [`CITATION.cff`](CITATION.cff): on GitHub, "Cite this repository" in the
 sidebar of the repository formats it as APA or BibTeX.
 
@@ -101,6 +105,7 @@ page of the documentation for local checks and releases, and mind our
 
 [badge-build-status]: <https://github.com/elixir-cloud-aai/cloud-components/actions/workflows/ci.yml/badge.svg?branch=dev>
 [badge-coverage]: <https://codecov.io/gh/elixir-cloud-aai/cloud-components/branch/dev/graph/badge.svg>
+[badge-doi]: <https://zenodo.org/badge/DOI/10.5281/zenodo.23858158.svg>
 [badge-docs]: <https://img.shields.io/readthedocs/cloud-components>
 [badge-github-tag]: <https://img.shields.io/github/v/tag/elixir-cloud-aai/cloud-components?color=C39BD3>
 [badge-license]: <https://img.shields.io/badge/license-Apache%202.0-blue.svg>
@@ -108,6 +113,7 @@ page of the documentation for local checks and releases, and mind our
 [badge-url-build-status]: <https://github.com/elixir-cloud-aai/cloud-components/actions/workflows/ci.yml?query=branch%3Adev>
 [badge-url-coverage]: <https://codecov.io/gh/elixir-cloud-aai/cloud-components/tree/dev>
 [badge-url-docs]: <https://cloud-components.readthedocs.io/en/latest/>
+[badge-url-doi]: <https://doi.org/10.5281/zenodo.23858158>
 [badge-url-github-tag]: <https://github.com/elixir-cloud-aai/cloud-components/releases>
 [badge-url-license]: <https://www.apache.org/licenses/LICENSE-2.0>
 [badge-url-npm]: <https://www.npmjs.com/package/@elixir-cloud/design>
