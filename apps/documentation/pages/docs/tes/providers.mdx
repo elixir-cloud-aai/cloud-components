@@ -142,6 +142,12 @@ Submits a new task for execution.
 createTask(request: TaskRequest): Promise<TaskId>
 ```
 
+<Callout type='info'>
+  `RestTesProvider` sends a standard TES request and does not assume that a particular idempotency
+  mechanism is supported. If exactly-once submission is required, provide a custom `TesProvider`
+  that uses the backend's idempotency or recovery mechanism and verifies ambiguous outcomes before
+  retrying.
+</Callout>
 ### cancelTask()
 
 Cancels a task.
@@ -397,13 +403,20 @@ For custom use cases, you can extend `RestTesProvider` or implement the `TesProv
 - Implementing caching or offline support
 - Connecting to non-standard or non-REST APIs
 - Adding custom error handling or retry logic
+- Adding backend-specific idempotency and recovery for ambiguous task creation
 
 ```tsx copy
 // Example: Custom provider implementing the interface directly
 import type { TesProvider } from '@elixir-cloud/tes/providers';
 
 const provider: TesProvider = {
-  getServiceInfo: async () => ({}),
+  getServiceInfo: async () => ({
+    id: 'org.example.tes',
+    name: 'My TES',
+    type: { group: 'org.ga4gh', artifact: 'tes', version: '1.1.0' },
+    organization: { name: 'Example Org', url: 'https://example.org' },
+    version: '1.0.0',
+  }),
   listTasks: async () => ({ tasks: [] }),
   getTask: async (id) => ({ id, state: 'QUEUED' }),
   createTask: async () => ({ id: 'my-task' }),

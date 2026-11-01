@@ -93,6 +93,19 @@ const compact = <T extends object>(obj: T): T =>
     Object.entries(obj).filter(([, v]) => v !== "" && v !== undefined)
   ) as T;
 
+const cleanRow = (row: Row): Row => {
+  const out: Row = {};
+  Object.entries(row).forEach(([k, v]) => {
+    // Inline `content` is data, so it is the only value kept untrimmed.
+    const value = k === "content" ? v : v?.trim();
+    if (value) out[k] = value;
+  });
+  return out;
+};
+
+const hasWildcardMarker = (path: string): boolean =>
+  path.includes("*") || path.includes("?") || path.includes("[");
+
 /**
  * @summary Component for creating tasks on a TES service
  * @since 2.0.0
@@ -204,10 +217,10 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
     };
 
     const inputs = form.inputs
-      .map(compact)
-      .filter((r) => r.path || r.url) as unknown as Input[];
+      .map(cleanRow)
+      .filter((r) => r.path || r.url || r.content) as unknown as Input[];
     const outputs = form.outputs
-      .map(compact)
+      .map(cleanRow)
       .filter((r) => r.path || r.url) as unknown as Output[];
     const volumes = form.volumes.map((v) => v.value?.trim()).filter(Boolean);
 
@@ -237,14 +250,22 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
     }
 
     const rows = (key: "inputs" | "outputs") =>
-      this.form[key].filter((r) => r.path?.trim() || r.url?.trim());
+      this.form[key].filter(
+        (r) =>
+          r.path?.trim() || r.url?.trim() || (key === "inputs" && r.content)
+      );
     for (const [i, r] of rows("inputs").entries()) {
       if (!r.path?.trim()) return `Input ${i + 1}: path is required`;
-      if (!r.url?.trim()) return `Input ${i + 1}: url is required`;
+      if (!r.url?.trim() && !r.content) {
+        return `Input ${i + 1}: url or content is required`;
+      }
     }
     for (const [i, r] of rows("outputs").entries()) {
       if (!r.path?.trim()) return `Output ${i + 1}: path is required`;
       if (!r.url?.trim()) return `Output ${i + 1}: url is required`;
+      if (hasWildcardMarker(r.path) && !r.path_prefix?.trim()) {
+        return `Output ${i + 1}: path prefix is required for wildcard paths`;
+      }
     }
     const badType = [...rows("inputs"), ...rows("outputs")].find(
       (r) => r.type && !["FILE", "DIRECTORY"].includes(r.type.trim())
@@ -636,6 +657,10 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
             ${this.renderRows("Inputs", "inputs", [
               { name: "path", placeholder: "Path in container" },
               { name: "url", placeholder: "URL" },
+              {
+                name: "content",
+                placeholder: "Inline content (instead of URL)",
+              },
               { name: "type", placeholder: "Type (FILE or DIRECTORY)" },
             ])}
             ${this.renderRows("Outputs", "outputs", [
@@ -671,12 +696,7 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
         : ``;
 
     return html`
-      <form
-        @submit=${(e: Event) => {
-          e.preventDefault();
-          this.handleSubmit();
-        }}
-      >
+      <form>
         ${renderNoSourceErr()}
         <div class="space-y-6">
           <div class="grid gap-4">

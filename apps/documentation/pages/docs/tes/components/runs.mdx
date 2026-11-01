@@ -51,7 +51,7 @@ Displays a paginated table of tasks from a GA4GH Task Execution Service (TES), w
 | `provider` | `TesProvider` | `undefined` | Custom provider; overrides `baseUrl` (see [Providers](/docs/tes/providers)). |
 | `pageSize` | `number`      | `10`    | Tasks per page. |
 | `search`   | `boolean`     | `true`  | Show the name-prefix search field. |
-| `filter`   | `boolean`     | `true`  | Show the state filter (applies to the current page). |
+| `filter`   | `boolean`     | `true`  | Show the state filter. The selected state is sent to the provider and reloads the task list. |
 
 ## Events
 

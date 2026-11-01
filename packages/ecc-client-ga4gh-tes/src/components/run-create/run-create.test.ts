@@ -212,9 +212,9 @@ describe("ecc-client-ga4gh-tes-run-create", () => {
           ignoreError: true,
         }),
       ],
-      inputs: [{ path: "/in", url: "s3://a", type: "FILE" }, {}],
+      inputs: [{ path: " /in ", url: " s3://a ", type: " FILE " }, {}],
       outputs: [
-        { path: "/o", url: "s3://b", path_prefix: "", type: "DIRECTORY" },
+        { path: "/o", url: "s3://b", path_prefix: "", type: " DIRECTORY" },
       ],
       volumes: [{ value: "/vol" }, { value: " " }],
       tags: [{ key: "t", value: "v" }],
@@ -327,11 +327,32 @@ describe("ecc-client-ga4gh-tes-run-create", () => {
     it("rejects resource values that are not numbers", () =>
       rejects({ cpuCores: "two" }, "Resource values must be numbers"));
 
-    it("rejects inputs without url", () =>
-      rejects({ inputs: [{ path: "/in" }] }, "Input 1: url is required"));
+    it("rejects inputs without url or content", () =>
+      rejects(
+        { inputs: [{ path: "/in" }] },
+        "Input 1: url or content is required"
+      ));
 
     it("rejects outputs without path", () =>
       rejects({ outputs: [{ url: "s3://b" }] }, "Output 1: path is required"));
+
+    it("rejects wildcard markers in output paths without a path prefix", async () => {
+      await Promise.all(
+        [
+          "/out/*.txt",
+          "/out/?.txt",
+          "/out/[ab].txt",
+          "/out/[[:alpha:]].txt",
+          "/out/\\*.txt",
+          "/out/file[abc",
+        ].map((path) =>
+          rejects(
+            { outputs: [{ path, url: "s3://b" }] },
+            "Output 1: path prefix is required for wildcard paths"
+          )
+        )
+      );
+    });
 
     it("rejects an input type other than FILE or DIRECTORY", () =>
       rejects(
@@ -425,7 +446,7 @@ describe("ecc-client-ga4gh-tes-run-create", () => {
 
   [
     { title: "Environment", fields: 2 },
-    { title: "Inputs", fields: 3 },
+    { title: "Inputs", fields: 4 },
     { title: "Outputs", fields: 4 },
     { title: "Tags", fields: 2 },
     { title: "Volumes", fields: 1 },
@@ -479,7 +500,8 @@ describe("ecc-client-ga4gh-tes-run-create", () => {
     await fillRow("Environment", ["A", "1"]);
     await fillRow("Environment", ["B", "2"], 1);
     await removeRow(sectionOf(el, "Environment"), 1);
-    await fillRow("Inputs", ["/in", "s3://a", "FILE"]);
+    await fillRow("Inputs", ["/in", "s3://a", "", "FILE"]);
+    await fillRow("Inputs", ["/note.txt", "", " hello\n", "FILE"], 1);
     await fillRow("Outputs", ["/out", "s3://b", "", "DIRECTORY"]);
     await fillRow("Tags", ["team", "bio"]);
     await fillRow("Volumes", ["/vol"]);
@@ -506,7 +528,10 @@ describe("ecc-client-ga4gh-tes-run-create", () => {
           ignore_error: true,
         },
       ],
-      inputs: [{ path: "/in", url: "s3://a", type: "FILE" }],
+      inputs: [
+        { path: "/in", url: "s3://a", type: "FILE" },
+        { path: "/note.txt", content: " hello\n", type: "FILE" },
+      ],
       outputs: [{ path: "/out", url: "s3://b", type: "DIRECTORY" }],
       tags: { team: "bio" },
       volumes: ["/vol"],
