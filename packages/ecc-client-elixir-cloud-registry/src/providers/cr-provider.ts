@@ -1,6 +1,6 @@
 /* eslint-disable import/named */
 /**
- * Types for the ELIXIR Cloud Registry API based on OpenAPI specification v1.0.0
+ * Types for the Cloud Registry API based on OpenAPI specification v1.0.0
  */
 
 // Import base types from the GA4GH Service Registry package

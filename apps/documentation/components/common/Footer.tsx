@@ -6,8 +6,8 @@ function Footer() {
     <div className='flex justify-center items-center p-1 border-t dark:border-zinc-800 border-zinc-200 rounded-md'>
       <div className='container flex flex-col sm:flex-row justify-between px-4 py-4'>
         <div className='flex justify-center items-center my-2 gap-4'>
-          <a href='https://elixir-cloud.dcc.sib.swiss/' target='_blank' rel='noopener noreferrer'>
-            <Image src={withBasePath('/elixir-cloud/logo.svg')} alt='Elixir Cloud & AAI' width={75} height={75} />
+          <a href='https://elixir-on.cloud/' target='_blank' rel='noopener noreferrer' className='text-sm font-medium'>
+            ELIXIR On-Cloud
           </a>
           <Image
             src={withBasePath('/cloud-sdk/dark.svg')}

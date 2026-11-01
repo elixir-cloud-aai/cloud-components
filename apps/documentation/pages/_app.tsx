@@ -7,7 +7,7 @@ export default function App({ Component, pageProps }) {
   return (
     <main className={inter.className}>
       <DefaultSeo
-        title='Elixir Cloud Component'
+        title='Cloud Components'
         description='GUI for your federated cloud infrastructures.'
       />
       <Component {...pageProps} />
