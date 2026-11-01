@@ -2,7 +2,7 @@ import { Callout, Tabs } from 'nextra/components'
 
 # Cloud Registry Providers
 
-The `@elixir-cloud/cloud-registry` package provides providers for connecting to Elixir Cloud Registry APIs. The main provider is `RestCloudRegistryProvider` which implements the `CloudRegistryProvider` interface for REST-based cloud registry endpoints with both read and write capabilities.
+The `@elixir-cloud/cloud-registry` package provides providers for connecting to Cloud Registry APIs. The main provider is `RestCloudRegistryProvider` which implements the `CloudRegistryProvider` interface for REST-based cloud registry endpoints with both read and write capabilities.
 
 <Callout type='info'>
   **Quick Start**: Create a `RestCloudRegistryProvider` with your cloud registry URL and pass it to Cloud Registry components to start creating and managing services.
@@ -38,7 +38,7 @@ export interface CloudRegistryProvider extends ServiceRegistryProvider {
 
 ## RestCloudRegistryProvider
 
-The `RestCloudRegistryProvider` is the main implementation that communicates with Elixir Cloud Registry APIs using REST/HTTP.
+The `RestCloudRegistryProvider` is the main implementation that communicates with Cloud Registry APIs using REST/HTTP.
 
 ### Constructor
 

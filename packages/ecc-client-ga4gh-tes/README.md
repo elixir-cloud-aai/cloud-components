@@ -5,10 +5,7 @@ These components offer a user-friendly interface for managing task runs within c
 For more detailed information about this package and its components, please visit our [documentation](https://elixir-cloud-components.vercel.app/docs/tes/introduction).
 
 [![logo-elixir][logo-elixir]][elixir]
-[![logo-elixir-cloud-aai][logo-elixir-cloud-aai]][elixir-cloud-aai]
 
 
 [elixir]: https://elixir-europe.org/
-[elixir-cloud-aai]: https://elixir-cloud.dcc.sib.swiss/
 [logo-elixir]: images/logo-elixir.svg
-[logo-elixir-cloud-aai]: images/logo-elixir-cloud-aai.svg
