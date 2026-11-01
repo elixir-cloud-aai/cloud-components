@@ -1,52 +1,27 @@
 # Contributing
 
-Thanks for your interest in Cloud Components! Bug reports, feature
-requests, discussions, documentation and code are all welcome. The project
-follows the [contributor guide of ELIXIR
-On-Cloud](https://elixir-cloud-aai.github.io/contribute/); this file only
-describes what is specific to this repository.
+The general rules for contributing to Cloud Components (getting started,
+issues, branches and pull requests, commit messages and pull request titles,
+pull requests prepared with AI agents) are in the
+[contributing guide of ELIXIR On-Cloud](https://github.com/elixir-cloud-aai/.github/blob/main/CONTRIBUTING.md).
+This page covers what is specific to this repository.
 
-- Follow our [code of
-  conduct](https://github.com/elixir-cloud-aai/.github/blob/main/CODE_OF_CONDUCT.md).
-- Work on [issues](https://github.com/elixir-cloud-aai/cloud-components/issues):
-  open or find one and agree on the approach before you change code.
+## Local checks
 
-## Pull requests
-
-1. Branch off `dev`, the default branch (e.g. `feat/<topic>` or
-   `fix/<topic>`), and open a pull request against `dev` that references the
-   issue it closes (e.g. `Closes #123`, as in the pull request template).
-   `main` points at the latest release; nobody pushes to it except to
-   fast-forward it after a release.
-2. Title the pull request as a [Conventional
-   Commit](https://www.conventionalcommits.org/):
-   `<type>[(<scope>)][!]: <description>`, at most 50 characters in total,
-   where the description doesn't start with a capitalised word and has no
-   trailing period (the CI job `PR title` checks this, also after you edit
-   the title). Pull requests are squash-merged, so the title becomes the
-   commit message on `dev`.
-3. Keep the checks green: `CI passed` sums up the PR title, linting, tests
-   (Node.js 22 and 24) and the other CI jobs. Run `npm run lint`,
-   `npm run build` and `npm test` (and
-   `node --test scripts/release.test.js` after changes to
-   `scripts/release.js`) locally before you push. CI runs the tests with
-   coverage (`npm run test -- -- --coverage`, which passes `--coverage`
-   through npm and turbo to the test runner; Chromium only; each package's
-   report is in its `coverage/` folder) and reports it to
-   [Codecov](https://app.codecov.io/gh/elixir-cloud-aai/cloud-components);
-   coverage of the packages with tests must not drop by more than 1 %
-   (`codecov.yml`).
-4. Add or update tests and the documentation (`apps/documentation`) for
-   changed behaviour.
-5. The code owners (see `.github/CODEOWNERS`) are requested for review
-   automatically. A maintainer merges once the pull request is approved.
+Keep the checks green: `CI passed` sums up the PR title, linting, tests
+(Node.js 22 and 24) and the other CI jobs. Run `npm run lint`,
+`npm run build` and `npm test` (and
+`node --test scripts/release.test.js` after changes to
+`scripts/release.js`) locally before you push. CI runs the tests with
+coverage (`npm run test -- -- --coverage`, which passes `--coverage`
+through npm and turbo to the test runner; Chromium only; each package's
+report is in its `coverage/` folder) and reports it to
+[Codecov](https://app.codecov.io/gh/elixir-cloud-aai/cloud-components);
+coverage of the packages with tests must not drop by more than 1 %
+(`codecov.yml`).
 
 Changesets are not used; versions are set in the version bump pull
 request of each release (see "Releases").
-
-Pull requests prepared with AI agents follow the same rules. They are opened
-as drafts, and a named person is responsible for them and answers review
-comments.
 
 ## Releases
 
@@ -126,14 +101,9 @@ staged versions (`npm stage reject <stage-id>`) and release a new version.
 Cloud Components are cited with the metadata in `CITATION.cff`
 ([Citation File Format](https://citation-file-format.github.io/)), which
 GitHub ("Cite this repository") and Zenodo use; Zenodo archives each GitHub
-release with the file of the tagged commit. Its authors are the people who
-committed at least 100 lines (lines added) to `main`, the release branch,
-not counting bots, lock files and images. They are ordered by lines, then by
-commits; equal contributors are listed alphabetically by family name and
-marked with an asterisk (*). Affiliations come from public ORCID records
-only. To add or correct your entry (e.g. your name, [ORCID
-iD](https://orcid.org/) or affiliation), open a pull request that changes
-only your entry; don't add e-mail addresses. CI validates the file
+release with the file of the tagged commit. Its authors follow the [citation metadata rule of the contributing
+guide](https://github.com/elixir-cloud-aai/.github/blob/main/CONTRIBUTING.md#citation-metadata)
+(not counting lock files and images). CI validates the file
 (`cffconvert --validate`). `node scripts/release.js set <version>` sets its
 `version` and `date-released` for each release, and the release workflow
 fails if they don't match the release (see "Releases").

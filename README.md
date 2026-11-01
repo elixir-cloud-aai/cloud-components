@@ -92,9 +92,11 @@ sidebar of the repository formats it as APA or BibTeX.
 
 ## Contributing
 
-Contributions are welcome! See [`CONTRIBUTING.md`](CONTRIBUTING.md) for pull
-requests and releases, the organisation's contributor guide and our code of
-conduct. For anything else, write to
+Contributions are welcome! See the organisation's [contributing
+guide](https://github.com/elixir-cloud-aai/.github/blob/main/CONTRIBUTING.md)
+and the [Contributing](https://cloud-components.readthedocs.io/en/latest/docs/contributing)
+page of the documentation for local checks and releases, and mind our
+[code of conduct](https://github.com/elixir-cloud-aai/.github/blob/main/CODE_OF_CONDUCT.md). For anything else, write to
 [cloud-service@elixir-europe.org](mailto:cloud-service@elixir-europe.org).
 
 [badge-build-status]: <https://github.com/elixir-cloud-aai/cloud-components/actions/workflows/ci.yml/badge.svg?branch=dev>
