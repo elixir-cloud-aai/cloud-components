@@ -81,7 +81,7 @@ export class ECCClientGa4ghTesRun extends LitElement {
     } else if (this.baseUrl) {
       this._provider = new RestTesProvider(this.baseUrl);
     } else {
-      this._provider = null
+      this._provider = null;
       this.error =
         "Please provide either a base URL for the TES API or a custom provider.";
     }
