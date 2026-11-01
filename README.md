@@ -63,7 +63,7 @@ CDN and the other packages.
 
 ## Development
 
-With [Node.js](https://nodejs.org/) 22 or later installed, clone the
+With [Node.js](https://nodejs.org/) 22.12 or later installed, clone the
 repository, install the dependencies and start the design package, which all
 other packages need:
 
