@@ -16,4 +16,6 @@ export type {
   ServiceTypeRegister,
   ServiceRegister,
   ExternalServiceRegister,
+  RegistrationRules,
+  RegistryServiceInfo,
 } from "./cr-provider.js";
