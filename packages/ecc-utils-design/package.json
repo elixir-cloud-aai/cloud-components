@@ -58,6 +58,7 @@
     "@web/dev-server": "*",
     "@web/dev-server-esbuild": "^0.4.3",
     "@web/test-runner": "^1.0.0",
+    "@web/test-runner-commands": "*",
     "commander": "*",
     "concurrently": "*",
     "custom-element-jet-brains-integration": "*",
