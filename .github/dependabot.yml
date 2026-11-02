@@ -12,3 +12,13 @@ updates:
     groups:
       github-actions:
         patterns: ["*"]
+  # Images in the `Dockerfile`
+  - package-ecosystem: docker
+    directory: /
+    commit-message:
+      prefix: build
+    schedule:
+      interval: monthly
+    groups:
+      docker:
+        patterns: ["*"]
