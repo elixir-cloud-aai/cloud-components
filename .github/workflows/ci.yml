@@ -1,6 +1,6 @@
 # Everything that must pass on pull requests and pushes to `dev`: the pull
 # request title, conflict markers, linting (includes the build) with the
-# tests of the release script and the validation of the citation metadata,
+# tests of the scripts and the validation of the citation metadata,
 # and tests on all supported Node.js versions, with coverage reported to
 # Codecov. The gate `passed` ("CI passed") is the only check that branch
 # rules need to require. No `paths:` filters, so that the gate always
@@ -93,8 +93,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Test the release script
-        run: node --test scripts/release.test.js
+      - name: Test the scripts
+        run: node --test scripts/release.test.js scripts/utils.test.js
 
       # In its own environment, as cffconvert pins an old jsonschema. 2.0.0
       # is the latest stable release (not bumped by Dependabot; update

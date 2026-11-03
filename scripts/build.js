@@ -8,7 +8,7 @@ const { cwd } = require("process");
 const fg = require("fast-glob");
 const tsup = require("tsup");
 const { program } = require("commander");
-const { execSync } = require("child_process");
+const { execFileSync } = require("child_process");
 const fs = require("fs");
 const { npmDir, normalizePath } = require("./utils.js");
 const path = require("path");
@@ -74,15 +74,16 @@ nextTask("verifying dependencies", async () => {
 });
 
 nextTask("Generating CEM config", () => {
-  execSync(`node ${path.join(__dirname, "make-CEMconfig.js")}`, {
+  execFileSync(process.execPath, [path.join(__dirname, "make-CEMconfig.js")], {
     stdio: "inherit",
   });
 });
 
 nextTask("Generating component metadata", () => {
   bundleDirectories.map((dir) =>
-    execSync(
-      `node  ${path.join(__dirname, "make-metadata.js")} --outdir "${dir}"`,
+    execFileSync(
+      process.execPath,
+      [path.join(__dirname, "make-metadata.js"), "--outdir", dir],
       {
         stdio: "inherit",
       }
@@ -91,10 +92,9 @@ nextTask("Generating component metadata", () => {
 });
 
 nextTask("Wrapping components for React", async () => {
-  execSync(
-    `node  ${path.join(__dirname, "make-react.js")} -p "${
-      commanderOpts.prefix
-    }"`,
+  execFileSync(
+    process.execPath,
+    [path.join(__dirname, "make-react.js"), "-p", `${commanderOpts.prefix}`],
     {
       stdio: "inherit",
     }
@@ -102,9 +102,13 @@ nextTask("Wrapping components for React", async () => {
 });
 
 nextTask("Running the TypeScript compiler", () => {
-  execSync(`tsc --project ./tsconfig.prod.json --outdir "${npmDir}"`, {
-    stdio: "inherit",
-  });
+  execFileSync(
+    "tsc",
+    ["--project", "./tsconfig.prod.json", "--outdir", npmDir],
+    {
+      stdio: "inherit",
+    }
+  );
 });
 
 // TODO
