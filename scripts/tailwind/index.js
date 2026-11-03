@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 const fs = require("fs");
 const path = require("path");
-const { execSync, spawn } = require("child_process");
+const { execFileSync, spawn } = require("child_process");
 const glob = require("fast-glob");
 const yargs = require("yargs");
+const { escapeTemplateLiteral } = require("../utils.js");
 
 try {
   const argv = yargs(process.argv.slice(2)).argv;
@@ -105,9 +106,9 @@ try {
               fs.watchFile(componentCssPath, { interval: 1000 }, () => {
                 try {
                   // When CSS file changes, update the Lit template
-                  let cssContent = fs.readFileSync(componentCssPath, "utf8");
-                  cssContent = cssContent.replaceAll("`", "\\`");
-                  cssContent = cssContent.replaceAll("\\", "\\\\");
+                  const cssContent = escapeTemplateLiteral(
+                    fs.readFileSync(componentCssPath, "utf8")
+                  );
 
                   const litTemplate = `
 import { css } from "lit";
@@ -129,9 +130,9 @@ export const ComponentStyles = css\` ${cssContent} \`
 
               // Initial file read once it exists
               try {
-                let cssContent = fs.readFileSync(componentCssPath, "utf8");
-                cssContent = cssContent.replaceAll("`", "\\`");
-                cssContent = cssContent.replaceAll("\\", "\\\\");
+                const cssContent = escapeTemplateLiteral(
+                  fs.readFileSync(componentCssPath, "utf8")
+                );
 
                 const litTemplate = `
 import { css } from "lit";
@@ -163,17 +164,18 @@ export const ComponentStyles = css\` ${cssContent} \`
           setTimeout(setupWatcher, 2000);
         } else {
           // In non-watch mode, process synchronously
-          execSync(
-            `npx @tailwindcss/cli -i ${configPath} -o ${componentCssPath}`,
+          execFileSync(
+            "npx",
+            ["@tailwindcss/cli", "-i", configPath, "-o", componentCssPath],
             {
               stdio: "inherit",
             }
           );
 
           // Convert to Lit template
-          let cssContent = fs.readFileSync(componentCssPath, "utf8");
-          cssContent = cssContent.replaceAll("`", "\\`");
-          cssContent = cssContent.replaceAll("\\", "\\\\");
+          const cssContent = escapeTemplateLiteral(
+            fs.readFileSync(componentCssPath, "utf8")
+          );
 
           const litTemplate = `
 import { css } from "lit";

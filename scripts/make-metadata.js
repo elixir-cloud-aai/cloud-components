@@ -7,10 +7,11 @@
 const { program } = require("commander");
 const options = program.option("-d, --outdir <string>").parse().opts();
 
-const { execSync } = require("child_process");
+const { execFileSync } = require("child_process");
 
-execSync(
-  `custom-elements-manifest analyze --litelement --outdir "${options.outdir}"`,
+execFileSync(
+  "custom-elements-manifest",
+  ["analyze", "--litelement", "--outdir", options.outdir],
   {
     stdio: "inherit",
   }
