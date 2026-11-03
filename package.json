@@ -59,5 +59,14 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "overrides": {
+    "clipboardy": {
+      "cross-spawn": "^6.0.6"
+    },
+    "katex": "^0.18.2",
+    "next": {
+      "postcss": "^8.5.23"
+    }
+  }
 }
