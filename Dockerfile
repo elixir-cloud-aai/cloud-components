@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as the base image
-FROM node:24-alpine AS base
+FROM node:26-alpine AS base
 
 FROM base AS builder
 RUN apk update
@@ -7,7 +7,7 @@ RUN apk add --no-cache libc6-compat
 # Set working directory
 WORKDIR /app
 
-RUN npm install -g turbo@1.13.0
+RUN npm install -g turbo@2.11.10
 
 # Copy package.json and package-lock.json (if available)
 COPY . .
