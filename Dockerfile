@@ -7,7 +7,7 @@ RUN apk add --no-cache libc6-compat
 # Set working directory
 WORKDIR /app
 
-RUN npm install -g turbo@1.13.0
+RUN npm install -g turbo@2.11.10
 
 # Copy package.json and package-lock.json (if available)
 COPY . .
