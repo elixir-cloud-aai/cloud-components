@@ -45,7 +45,7 @@
     "playwright": "^1.56.1",
     "prettier": "^2.8.8",
     "sinon": "^17.0.1",
-    "tsup": "^8.0.2",
+    "tsup": "^8.5.0",
     "turbo": "^2.11.10",
     "typescript": "^5.3.3"
   },

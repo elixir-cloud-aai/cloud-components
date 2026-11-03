@@ -56,7 +56,7 @@
     "@tailwindcss/cli": "4.1.4",
     "@types/ace": "^0.0.52",
     "@web/dev-server": "*",
-    "@web/dev-server-esbuild": "^0.4.3",
+    "@web/dev-server-esbuild": "^2.0.0",
     "@web/test-runner": "^1.0.0",
     "commander": "*",
     "concurrently": "*",
@@ -69,7 +69,6 @@
     "react": "*",
     "tailwindcss": "^4.1.4",
     "tslib": "^2.6.2",
-    "tsup": "^7.2.0",
     "tw-animate-css": "^1.2.5",
     "typescript": "*"
   }
