@@ -92,6 +92,18 @@ const failureDetail = (
 };
 
 /**
+ * Whether a service info has its rules only under the name up to
+ * cloud-registry 1.0.0rc1, which the form doesn't read
+ * @param info The service info
+ * @returns Whether it has `registration_rules`, but no `registrationRules`
+ */
+const hasOnlyFormerRules = (info: RegistryServiceInfo | undefined): boolean =>
+  !info?.registrationRules &&
+  Boolean(
+    (info as { registration_rules?: unknown } | undefined)?.registration_rules
+  );
+
+/**
  * @summary Component for creating new services in Cloud Registry
  * @since 2.0.0
  *
@@ -371,11 +383,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       const info: RegistryServiceInfo | undefined =
         await provider.getServiceInfo();
       environments = info?.registrationRules?.environments;
-      if (
-        !info?.registrationRules &&
-        (info as { registration_rules?: unknown } | undefined)
-          ?.registration_rules !== undefined
-      ) {
+      if (hasOnlyFormerRules(info)) {
         console.warn(
           "Ignoring `registration_rules` (Cloud Registry before 1.0.0rc2): the form reads `registrationRules` and otherwise uses its properties"
         );

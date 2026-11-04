@@ -469,17 +469,41 @@ describe("ecc-client-elixir-cloud-registry-service-create registration rules", (
     expect(warn.called).to.equal(false);
   });
 
-  it("offers its defaults if the service info fails", async () => {
-    sinon.stub(console, "warn");
-    const provider = stubProvider([TYPE_A]);
+  [undefined, null].forEach((former) => {
+    it(`doesn't warn of a former name that is ${former}`, async () => {
+      const warn = sinon.stub(console, "warn");
+      const info = { ...SERVICE_INFO, registration_rules: former };
+
+      expect(values(await formWithInfo(info))).to.deep.equal(DEFAULTS);
+      expect(warn.called).to.equal(false);
+    });
+  });
+
+  it("drops the rules if the next provider's service info fails", async () => {
+    const warn = sinon.stub(console, "warn");
+    const withRules = stubProvider([TYPE_A]);
+    withRules.getServiceInfo.resolves({
+      ...SERVICE_INFO,
+      registrationRules: RULES,
+    });
+    const failing = stubProvider([TYPE_A]);
     const el = await fixture<ECCClientElixirCloudRegistryServiceCreate>(
       html`<ecc-client-elixir-cloud-registry-service-create
-        .provider=${provider}
+        .provider=${withRules}
       ></ecc-client-elixir-cloud-registry-service-create>`
     );
-    await waitUntil(() => provider.getServiceInfo.callCount === 1);
+    await waitUntil(() => withRules.getServiceInfo.callCount === 1);
+    await settle(el);
+    expect(values(rulesInternals(el))).to.deep.equal(["prod", "beta"]);
+
+    el.provider = failing;
+    await el.updateComplete;
+    await waitUntil(() => failing.getServiceInfo.callCount === 1);
     await settle(el);
 
     expect(values(rulesInternals(el))).to.deep.equal(DEFAULTS);
+    expect(
+      warn.calledWithMatch("Failed to load the registration rules")
+    ).to.equal(true);
   });
 });
