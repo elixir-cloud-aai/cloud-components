@@ -5,6 +5,9 @@ import "../index.js";
 import type ECCClientElixirCloudRegistryServiceCreate from "../service-create.js";
 import type {
   CloudRegistryProvider,
+  RegistrationRules,
+  RegistryServiceInfo,
+  Service,
   ServiceType,
 } from "../../../providers/index.js";
 
@@ -369,5 +372,114 @@ describe("ecc-client-elixir-cloud-registry-service-create type list", () => {
     await el.updateComplete;
 
     expect(typeListEntries(el)).to.deep.equal(["Add new service type"]);
+  });
+});
+
+describe("ecc-client-elixir-cloud-registry-service-create registration rules", () => {
+  /** Service info of a registry, without its rules. */
+  const SERVICE_INFO: Service = {
+    id: "org.example.registry",
+    name: "Example registry",
+    type: {
+      group: "org.ga4gh",
+      artifact: "service-registry",
+      version: "1.0.0",
+    },
+    organization: { name: "Example", url: "https://example.org" },
+    version: "1.0.0",
+  };
+
+  /** Environments that the form offers by default. */
+  const DEFAULTS = ["prod", "test", "dev", "staging"];
+
+  const RULES: RegistrationRules = {
+    environments: ["prod", "beta"],
+    urlSchemes: ["https"],
+    serviceTypes: "open",
+    maxUnusedServiceTypes: 10,
+    maxServicesPerUser: 50,
+  };
+
+  const rulesInternals = (el: ECCClientElixirCloudRegistryServiceCreate) =>
+    el as unknown as {
+      anyEnvironment: boolean;
+      environmentOptions: { value: string }[];
+    };
+
+  /** The form, once it has handled the given service info. */
+  const formWithInfo = async (info: unknown) => {
+    const provider = stubProvider([TYPE_A]);
+    provider.getServiceInfo.resolves(info);
+    const el = await fixture<ECCClientElixirCloudRegistryServiceCreate>(
+      html`<ecc-client-elixir-cloud-registry-service-create
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-create>`
+    );
+    await waitUntil(() => provider.getServiceInfo.callCount === 1);
+    await settle(el);
+    return rulesInternals(el);
+  };
+
+  const values = (state: { environmentOptions: { value: string }[] }) =>
+    state.environmentOptions.map(({ value }) => value);
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it("offers the environments of `registrationRules`", async () => {
+    const info: RegistryServiceInfo = {
+      ...SERVICE_INFO,
+      registrationRules: RULES,
+    };
+
+    expect(values(await formWithInfo(info))).to.deep.equal(["prod", "beta"]);
+  });
+
+  it("allows any environment if the registry's list is empty", async () => {
+    const info: RegistryServiceInfo = {
+      ...SERVICE_INFO,
+      registrationRules: { ...RULES, environments: [] },
+    };
+
+    expect((await formWithInfo(info)).anyEnvironment).to.equal(true);
+  });
+
+  it("offers its defaults without rules", async () => {
+    expect(values(await formWithInfo(SERVICE_INFO))).to.deep.equal(DEFAULTS);
+  });
+
+  it("warns of the former name `registration_rules`, unread", async () => {
+    const warn = sinon.stub(console, "warn");
+    const info = { ...SERVICE_INFO, registration_rules: RULES };
+
+    expect(values(await formWithInfo(info))).to.deep.equal(DEFAULTS);
+    expect(warn.calledWithMatch("registration_rules")).to.equal(true);
+  });
+
+  it("doesn't warn if the new name is there too", async () => {
+    const warn = sinon.stub(console, "warn");
+    const info = {
+      ...SERVICE_INFO,
+      registrationRules: RULES,
+      registration_rules: RULES,
+    };
+
+    expect(values(await formWithInfo(info))).to.deep.equal(["prod", "beta"]);
+    expect(warn.called).to.equal(false);
+  });
+
+  it("offers its defaults if the service info fails", async () => {
+    sinon.stub(console, "warn");
+    const provider = stubProvider([TYPE_A]);
+    const el = await fixture<ECCClientElixirCloudRegistryServiceCreate>(
+      html`<ecc-client-elixir-cloud-registry-service-create
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-create>`
+    );
+    await waitUntil(() => provider.getServiceInfo.callCount === 1);
+    await settle(el);
+
+    expect(values(rulesInternals(el))).to.deep.equal(DEFAULTS);
   });
 });

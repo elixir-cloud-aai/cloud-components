@@ -137,7 +137,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
    * Whether users may add a new service type instead of choosing one of the
    * registered types (`GET /services/types`): the type list then starts with
    * "Add new service type", which shows fields for the group, artifact and
-   * version. Apps set it from `may_add_service_types` of the registry's
+   * version. Apps set it from `mayAddServiceTypes` of the registry's
    * `GET /me`. Defaults to `true` for compatibility; as an attribute,
    * `allow-new-type="false"` turns it off.
    */
@@ -147,7 +147,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   /**
    * Environments to offer, as values or `{ value, label }` objects; an empty
    * list allows any value (free text). Registries that publish their rules
-   * (`registration_rules` of `GET /service-info`, cloud-registry 0.6.0 and
+   * (`registrationRules` of `GET /service-info`, cloud-registry 1.0.0rc2 and
    * later) override it with their allowed environments, which take the labels
    * given here. Defaults to `prod`, `test`, `dev` and `staging`.
    */
@@ -367,10 +367,19 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     const request = this.rulesRequest;
     let environments: unknown;
     try {
-      // `registration_rules` is optional, so any service info will do
+      // `registrationRules` is optional, so any service info will do
       const info: RegistryServiceInfo | undefined =
         await provider.getServiceInfo();
-      environments = info?.registration_rules?.environments;
+      environments = info?.registrationRules?.environments;
+      if (
+        !info?.registrationRules &&
+        (info as { registration_rules?: unknown } | undefined)
+          ?.registration_rules !== undefined
+      ) {
+        console.warn(
+          "Ignoring `registration_rules` (Cloud Registry before 1.0.0rc2): the form reads `registrationRules` and otherwise uses its properties"
+        );
+      }
     } catch (error) {
       // without rules, the properties apply
       console.warn("Failed to load the registration rules:", error);

@@ -18,7 +18,7 @@ export interface CloudRegistryProvider extends ServiceRegistryProvider {
   getServices(): Promise<ExternalService[]>;
   getServiceById(id: string): Promise<ExternalService>;
   getServiceTypes(): Promise<ServiceType[]>;
-  // with the registration rules (Cloud Registry 0.6.0 and later)
+  // with the registration rules (Cloud Registry 1.0.0rc2 and later)
   getServiceInfo(): Promise<RegistryServiceInfo>;
   
   // Cloud Registry specific methods for service management
@@ -241,18 +241,19 @@ interface ExternalServiceRegister {
 
 ### RegistryServiceInfo and RegistrationRules
 
-Cloud Registry 0.6.0 and later extend their service info (`getServiceInfo()`) with the rules for registrations, which the create form reads (e.g. the allowed environments). Custom providers can return them from `getServiceInfo()`; without them, the form falls back to its properties.
+Cloud Registry 1.0.0rc2 and later extend their service info (`getServiceInfo()`) with the rules for registrations, which the create form reads (e.g. the allowed environments). Custom providers can return them from `getServiceInfo()`; without them, the form falls back to its properties. Cloud Registry 0.6.0 to 1.0.0rc1, and custom providers written for them, have these rules in snake_case (`registration_rules`). The form doesn't read those: it logs a warning and falls back to its properties, so set `environments` for these registries, and move custom providers to the names below.
 
 ```typescript
 interface RegistryServiceInfo extends Service {
-  registration_rules?: RegistrationRules;
+  registrationRules?: RegistrationRules;
 }
 
 interface RegistrationRules {
   environments: string[]; // empty if any value is allowed
-  url_schemes: string[]; // e.g. ['https']
-  service_types: string; // 'open', 'controlled' or 'moderated'
-  max_unused_service_types?: number;
+  urlSchemes: string[]; // e.g. ['https']
+  serviceTypes: string; // 'open', 'controlled' or 'moderated'
+  maxUnusedServiceTypes?: number;
+  maxServicesPerUser?: number;
 }
 ```
 
