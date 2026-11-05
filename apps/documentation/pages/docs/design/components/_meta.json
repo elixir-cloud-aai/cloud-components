@@ -14,5 +14,7 @@
   "multi-select": "Multi-Select",
   "pagination": "Pagination",
   "tabs": "Tabs",
-  "table": "Table"
+  "table": "Table",
+  "cookie-consent": "Cookie Consent",
+  "compliance-footer": "Compliance Footer"
 }
