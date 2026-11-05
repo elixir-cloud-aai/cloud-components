@@ -24,7 +24,7 @@ This example demonstrates displaying tool details for a specific tool ID.
   <Tabs.Tab>
     <ToolPreview />
     <Callout type="info" emoji="ℹ️">
-      The preview above uses a fixed `toolId`. Since the TRS instance is not production ready, this tool may not exist.
+      The preview above shows a fixed `toolId` of a public TRS instance that is not maintained by this project, so the tool may change or disappear. See [Live previews](/docs/contributing#live-previews) to use another instance.
     </Callout>
   </Tabs.Tab>
 
@@ -36,7 +36,7 @@ This example demonstrates displaying tool details for a specific tool ID.
 
     export default function ToolBasic() {
       const provider = new RestTrsProvider(
-        'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
+        'https://trs.example.com/ga4gh/trs/v2'
       );
 
       return (
@@ -66,7 +66,7 @@ This example demonstrates displaying tool details for a specific tool ID.
           import { RestTrsProvider } from 'https://esm.sh/@elixir-cloud/trs@2.0.0-alpha.6/providers';
           
           const provider = new RestTrsProvider(
-            'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
+            'https://trs.example.com/ga4gh/trs/v2'
           );
           
           document.querySelector('ecc-client-ga4gh-trs-tool').provider = provider;
