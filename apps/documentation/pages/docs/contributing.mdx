@@ -23,6 +23,43 @@ coverage of the packages with tests must not drop by more than 1 %
 Changesets are not used; versions are set in the version bump pull
 request of each release (see "Releases").
 
+## Live previews
+
+The "Preview" tabs of the component pages call real services from the
+reader's browser, without a login. Their endpoints, and the IDs of the
+objects that single-object previews show, are set in one place:
+`apps/documentation/utils/endpoints.ts`. Each value can be overridden at
+build time (also with `npm run dev`) with an environment variable:
+
+| Variable | Used by | Default |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SERVICE_REGISTRY_URL` | Service Registry previews | public instance |
+| `NEXT_PUBLIC_CLOUD_REGISTRY_URL` | Cloud Registry previews | public instance |
+| `NEXT_PUBLIC_TRS_URL` | TRS previews | public instance |
+| `NEXT_PUBLIC_TRS_FILER_URL` | TRS-Filer previews | none |
+| `NEXT_PUBLIC_WES_URL` | WES previews | none |
+| `NEXT_PUBLIC_SERVICE_ID` | Service Registry "Service" preview | placeholder |
+| `NEXT_PUBLIC_TRS_TOOL_ID` | TRS "Tool" preview | a tool of the public instance |
+| `NEXT_PUBLIC_WES_RUN_ID` | WES "Run" preview | placeholder |
+
+What works with the defaults:
+
+- Service Registry and TRS: the previews read from public instances. The
+  "Service" preview shows an error until `NEXT_PUBLIC_SERVICE_ID` names a
+  registered service.
+- Cloud Registry: the form loads its options, but creating a service needs
+  a login, so submitting fails.
+- WES and TRS-Filer: there is no public instance that works without a
+  login, so these previews show a notice instead. To try them, run your own
+  instance and set its endpoint, e.g.
+  `NEXT_PUBLIC_WES_URL=https://wes.example.com/ga4gh/wes/v1 npm run dev`
+  in `apps/documentation/`.
+
+An endpoint must allow anonymous requests and cross-origin requests (CORS)
+from the site that serves the documentation. Services usually allow only
+known origins, so previews may fail on other origins, e.g. on the preview
+builds of pull requests.
+
 ## Releases
 
 All public packages in `packages/` (those without `"private": true` in

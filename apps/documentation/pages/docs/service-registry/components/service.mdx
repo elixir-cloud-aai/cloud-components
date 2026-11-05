@@ -27,6 +27,9 @@ This example demonstrates displaying service details for a specific service ID.
 <Tabs items={['Preview', 'React', 'HTML']}>
   <Tabs.Tab>
     <ServicePreview />
+    <Callout type="info" emoji="ℹ️">
+      The preview above asks a public service registry for a placeholder `serviceId`, so it shows an error unless the documentation is built with the ID of a registered service. See [Live previews](/docs/contributing#live-previews).
+    </Callout>
   </Tabs.Tab>
 
   <Tabs.Tab>
@@ -37,7 +40,7 @@ This example demonstrates displaying service details for a specific service ID.
 
     export default function ServiceBasic() {
       const provider = new RestServiceRegistryProvider(
-        'https://cloud-registry.anuragxd.com/ga4gh/registry/v1'
+        'https://registry.example.com/ga4gh/registry/v1'
       );
 
       const handleServiceChanged = (event) => {
@@ -81,7 +84,7 @@ This example demonstrates displaying service details for a specific service ID.
           import { RestServiceRegistryProvider } from 'https://esm.sh/@elixir-cloud/service-registry@2.0.0-alpha.6/providers';
           
           const provider = new RestServiceRegistryProvider(
-            'https://cloud-registry.anuragxd.com/ga4gh/registry/v1'
+            'https://registry.example.com/ga4gh/registry/v1'
           );
           
           document.querySelector('ecc-client-ga4gh-service-registry-service').provider = provider;
@@ -127,7 +130,7 @@ The data provider responsible for fetching service details from the registry. Yo
     ```tsx copy
     import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
     
-    const provider = new RestServiceRegistryProvider('https://cloud-registry.anuragxd.com/ga4gh/registry/v1');
+    const provider = new RestServiceRegistryProvider('https://registry.example.com/ga4gh/registry/v1');
     
     <EccClientGa4ghServiceRegistryService provider={provider} />
     ```
@@ -137,7 +140,7 @@ The data provider responsible for fetching service details from the registry. Yo
     <script type="module">
       import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
       
-      const provider = new RestServiceRegistryProvider('https://cloud-registry.anuragxd.com/ga4gh/registry/v1');
+      const provider = new RestServiceRegistryProvider('https://registry.example.com/ga4gh/registry/v1');
       document.querySelector('ecc-client-ga4gh-service-registry-service').provider = provider;
     </script>
     <ecc-client-ga4gh-service-registry-service></ecc-client-ga4gh-service-registry-service>

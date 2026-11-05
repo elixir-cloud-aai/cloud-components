@@ -1,18 +1,15 @@
 import React from 'react';
 import { ECCClientGa4ghTrsTools } from '@elixir-cloud/trs/react';
-import { RestTrsProvider } from '@elixir-cloud/trs/providers';
 import PreviewLayout from '@/components/common/PreviewLayout';
+import { endpoints } from '@/utils/endpoints';
 
 export default function ToolsPreview() {
-  const provider = new RestTrsProvider(
-    'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
-  );
-
+  // `baseUrl` rather than `provider`: the component reads `provider` only on
+  // its first update, which runs before React sets it on the server-rendered
+  // element, but it reloads when `baseUrl` changes
   return (
     <PreviewLayout>
-      <ECCClientGa4ghTrsTools 
-        provider={provider}
-      />
+      <ECCClientGa4ghTrsTools baseUrl={endpoints.trs} />
     </PreviewLayout>
   );
-} 
+}

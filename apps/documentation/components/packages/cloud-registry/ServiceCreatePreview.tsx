@@ -2,11 +2,10 @@ import React from 'react';
 import { ECCClientElixirCloudRegistryServiceCreate } from '@elixir-cloud/cloud-registry/react';
 import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
 import PreviewLayout from '@/components/common/PreviewLayout';
+import { endpoints } from '@/utils/endpoints';
 
 export default function ServiceCreatePreview() {
-  const provider = new RestCloudRegistryProvider(
-    'https://cloud-registry.anuragxd.com/ga4gh/registry/v1'
-  );
+  const provider = new RestCloudRegistryProvider(endpoints.cloudRegistry);
 
   const handleServiceCreated = (event: any) => {
     console.log('Service created successfully:', event.detail);

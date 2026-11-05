@@ -32,9 +32,9 @@ This example demonstrates the basic tool creation form.
     import { RestTrsFilerProvider } from '@elixir-cloud/trs-filer/providers';
 
     export default function ToolCreateBasic() {
-      const provider = new RestTrsFilerProvider({
-        url: 'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
-      });
+      const provider = new RestTrsFilerProvider(
+        'https://trs-filer.example.com/ga4gh/trs/v2'
+      );
 
       return (
         <ECCClientElixirTrsToolCreate 
@@ -59,9 +59,9 @@ This example demonstrates the basic tool creation form.
         <script type="module">
           import { RestTrsFilerProvider } from 'https://esm.sh/@elixir-cloud/trs-filer@2.0.0-alpha.4/providers';
           
-          const provider = new RestTrsFilerProvider({
-            url: 'https://trs-filer.anuragxd.com/ga4gh/trs/v2'
-          });
+          const provider = new RestTrsFilerProvider(
+            'https://trs-filer.example.com/ga4gh/trs/v2'
+          );
           
           document.querySelector('ecc-client-elixir-trs-tool-create').provider = provider;
         </script>
