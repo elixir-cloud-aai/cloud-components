@@ -9,19 +9,25 @@
 // Next.js inlines `process.env.NEXT_PUBLIC_*` only where it is written out
 // in full, so each variable is read on its own.
 
+// The providers append paths to the endpoint, so a trailing slash would
+// double the separator
+const trimSlashes = (url: string): string => url.replace(/\/+$/, '');
+
 export const endpoints = {
   // GA4GH Service Registry (read-only previews)
-  serviceRegistry:
+  serviceRegistry: trimSlashes(
     process.env.NEXT_PUBLIC_SERVICE_REGISTRY_URL || 'https://elixir-on.cloud/ga4gh/registry/v1',
+  ),
   // Cloud Registry (form; creating a service needs a login)
-  cloudRegistry:
+  cloudRegistry: trimSlashes(
     process.env.NEXT_PUBLIC_CLOUD_REGISTRY_URL || 'https://elixir-on.cloud/ga4gh/registry/v1',
+  ),
   // GA4GH TRS (read-only previews)
-  trs: process.env.NEXT_PUBLIC_TRS_URL || 'https://workflowhub.eu/ga4gh/trs/v2',
+  trs: trimSlashes(process.env.NEXT_PUBLIC_TRS_URL || 'https://workflowhub.eu/ga4gh/trs/v2'),
   // TRS-Filer (creates tools): no public demo instance
-  trsFiler: process.env.NEXT_PUBLIC_TRS_FILER_URL || '',
+  trsFiler: trimSlashes(process.env.NEXT_PUBLIC_TRS_FILER_URL || ''),
   // GA4GH WES: no public demo instance
-  wes: process.env.NEXT_PUBLIC_WES_URL || '',
+  wes: trimSlashes(process.env.NEXT_PUBLIC_WES_URL || ''),
 };
 
 // IDs of existing objects at the endpoints above, for the previews that show
