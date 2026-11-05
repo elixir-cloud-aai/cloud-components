@@ -20,6 +20,8 @@ const multiSelectState = new Map<
 
 /**
  * EccUtilsDesignMultiSelect - Root multi-select component
+ *
+ * @element ecc-utils-design-multi-select
  */
 export class EccUtilsDesignMultiSelect extends LitElement {
   static styles = [
@@ -140,6 +142,8 @@ export class EccUtilsDesignMultiSelect extends LitElement {
 
 /**
  * EccUtilsDesignMultiSelectTrigger - Trigger component for the multi-select
+ *
+ * @element ecc-utils-design-multi-select-trigger
  */
 export class EccUtilsDesignMultiSelectTrigger extends LitElement {
   static styles = [
@@ -351,6 +355,8 @@ export class EccUtilsDesignMultiSelectTrigger extends LitElement {
 
 /**
  * EccUtilsDesignMultiSelectContent - Content component for the multi-select
+ *
+ * @element ecc-utils-design-multi-select-content
  */
 export class EccUtilsDesignMultiSelectContent extends LitElement {
   static styles = [
@@ -429,6 +435,8 @@ export class EccUtilsDesignMultiSelectContent extends LitElement {
 
 /**
  * EccUtilsDesignMultiSelectItem - Item component for the multi-select
+ *
+ * @element ecc-utils-design-multi-select-item
  */
 export class EccUtilsDesignMultiSelectItem extends LitElement {
   static styles = [

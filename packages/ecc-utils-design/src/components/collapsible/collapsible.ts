@@ -13,6 +13,8 @@ const collapsibleState = new Map<
 
 /**
  * EccUtilsDesignCollapsible - Root collapsible component
+ *
+ * @element ecc-utils-design-collapsible
  */
 export class EccUtilsDesignCollapsible extends LitElement {
   static styles = [
@@ -90,6 +92,8 @@ export class EccUtilsDesignCollapsible extends LitElement {
 
 /**
  * EccUtilsDesignCollapsibleTrigger - Trigger component
+ *
+ * @element ecc-utils-design-collapsible-trigger
  */
 export class EccUtilsDesignCollapsibleTrigger extends LitElement {
   static styles = [
@@ -145,6 +149,8 @@ export class EccUtilsDesignCollapsibleTrigger extends LitElement {
 
 /**
  * EccUtilsDesignCollapsibleContent - Content component
+ *
+ * @element ecc-utils-design-collapsible-content
  */
 export class EccUtilsDesignCollapsibleContent extends LitElement {
   static styles = [

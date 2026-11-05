@@ -19,6 +19,8 @@ const selectState = new Map<
 
 /**
  * EccUtilsDesignSelect - Root select component
+ *
+ * @element ecc-utils-design-select
  */
 export class EccUtilsDesignSelect extends LitElement {
   static styles = [
@@ -120,6 +122,8 @@ export class EccUtilsDesignSelect extends LitElement {
 
 /**
  * EccUtilsDesignSelectTrigger - Trigger component for the select
+ *
+ * @element ecc-utils-design-select-trigger
  */
 export class EccUtilsDesignSelectTrigger extends LitElement {
   static styles = [
@@ -183,6 +187,8 @@ export class EccUtilsDesignSelectTrigger extends LitElement {
 
 /**
  * EccUtilsDesignSelectContent - Content component for the select
+ *
+ * @element ecc-utils-design-select-content
  */
 export class EccUtilsDesignSelectContent extends LitElement {
   static styles = [
@@ -254,6 +260,8 @@ export class EccUtilsDesignSelectContent extends LitElement {
 
 /**
  * EccUtilsDesignSelectItem - Item component for the select
+ *
+ * @element ecc-utils-design-select-item
  */
 export class EccUtilsDesignSelectItem extends LitElement {
   static styles = [
@@ -371,6 +379,8 @@ export class EccUtilsDesignSelectItem extends LitElement {
 
 /**
  * EccUtilsDesignSelectGroup - Group component
+ *
+ * @element ecc-utils-design-select-group
  */
 export class EccUtilsDesignSelectGroup extends LitElement {
   static styles = [
@@ -393,6 +403,8 @@ export class EccUtilsDesignSelectGroup extends LitElement {
 
 /**
  * EccUtilsDesignSelectLabel - Label component
+ *
+ * @element ecc-utils-design-select-label
  */
 export class EccUtilsDesignSelectLabel extends LitElement {
   static styles = [
@@ -412,6 +424,8 @@ export class EccUtilsDesignSelectLabel extends LitElement {
 
 /**
  * EccUtilsDesignSelectSeparator - Separator component
+ *
+ * @element ecc-utils-design-select-separator
  */
 export class EccUtilsDesignSelectSeparator extends LitElement {
   static styles = [
@@ -431,6 +445,8 @@ export class EccUtilsDesignSelectSeparator extends LitElement {
 
 /**
  * EccUtilsDesignSelectValue - Value component for the select
+ *
+ * @element ecc-utils-design-select-value
  */
 export class EccUtilsDesignSelectValue extends LitElement {
   static styles = [
