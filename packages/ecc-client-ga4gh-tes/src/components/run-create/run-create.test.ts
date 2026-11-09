@@ -324,14 +324,49 @@ describe("ecc-client-ga4gh-tes-run-create", () => {
     it("requires at least one executor", () =>
       rejects({ executors: [] }, "At least one executor is required"));
 
-    it("rejects resource values that are not numbers", () =>
-      rejects({ cpuCores: "two" }, "Resource values must be numbers"));
+    it("rejects resource values that are not finite numbers", () =>
+      rejects({ cpuCores: "two" }, "Resource values must be finite numbers"));
+
+    it("rejects non-finite resource values", async () => {
+      await Promise.all(
+        ["Infinity", "-Infinity", "NaN"].map((value) =>
+          rejects({ ramGb: value }, "Resource values must be finite numbers")
+        )
+      );
+    });
+
+    it("requires integer CPU core counts", () =>
+      rejects({ cpuCores: "2.5" }, "CPU core count must be an integer"));
 
     it("rejects inputs without url or content", () =>
       rejects(
         { inputs: [{ path: "/in" }] },
         "Input 1: url or content is required"
       ));
+
+    it("requires absolute input and output paths", async () => {
+      await Promise.all([
+        rejects(
+          { inputs: [{ path: "input.txt", url: "s3://a" }] },
+          "Input 1: path must be absolute"
+        ),
+        rejects(
+          { outputs: [{ path: "output.txt", url: "s3://b" }] },
+          "Output 1: path must be absolute"
+        ),
+      ]);
+    });
+
+    it("requires absolute stdin, stdout, and stderr paths", async () => {
+      await Promise.all(
+        ["stdin", "stdout", "stderr"].map((field) =>
+          rejects(
+            { executors: [executor({ [field]: "relative.txt" })] },
+            `Executor 1: ${field} path must be absolute`
+          )
+        )
+      );
+    });
 
     it("rejects outputs without path", () =>
       rejects({ outputs: [{ url: "s3://b" }] }, "Output 1: path is required"));

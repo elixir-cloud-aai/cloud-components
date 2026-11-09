@@ -135,6 +135,31 @@ describe("ecc-client-ga4gh-tes-runs", () => {
     expect(requested).to.equal(5);
   });
 
+  it("rejects page sizes outside the integer range 1 to 2047", async () => {
+    await Promise.all(
+      [0, 1.5, 2048].map(async (pageSize) => {
+        let calls = 0;
+        const el = await fixture<ECCClientGa4ghTesRuns>(
+          html`<ecc-client-ga4gh-tes-runs
+            .pageSize=${pageSize}
+            .provider=${mockProvider({
+              listTasks: async () => {
+                calls += 1;
+                return { tasks };
+              },
+            })}
+          ></ecc-client-ga4gh-tes-runs>`
+        );
+        await waitUntil(() =>
+          el.shadowRoot!.textContent!.includes(
+            "Page size must be an integer between 1 and 2047"
+          )
+        );
+        expect(calls).to.equal(0);
+      })
+    );
+  });
+
   it("shows an empty state when there are no tasks", async () => {
     const el = await fixture<ECCClientGa4ghTesRuns>(
       html`<ecc-client-ga4gh-tes-runs
@@ -168,11 +193,10 @@ describe("ecc-client-ga4gh-tes-runs", () => {
       ></ecc-client-ga4gh-tes-runs>`
     );
     await waitUntil(() => el.shadowRoot!.textContent!.includes("first"));
-    expect(
-      el.shadowRoot!.querySelectorAll(
-        "ecc-utils-design-button[variant=destructive]"
-      ).length
-    ).to.equal(1);
+    const cancelButtons = el.shadowRoot!.querySelectorAll(
+      "ecc-utils-design-button[variant=destructive]"
+    );
+    expect(cancelButtons.length).to.equal(1);
   });
 
   it("reloads the list after cancelling a task", async () => {
@@ -295,5 +319,30 @@ describe("ecc-client-ga4gh-tes-runs", () => {
 
     expect(requests).to.deep.equal([undefined]);
     expect(el.shadowRoot!.textContent).to.not.contain("third");
+  });
+
+  it("clears old tasks when the new provider fails", async () => {
+    const el = await fixture<ECCClientGa4ghTesRuns>(
+      html`<ecc-client-ga4gh-tes-runs
+        .provider=${mockProvider()}
+      ></ecc-client-ga4gh-tes-runs>`
+    );
+    await waitUntil(() => el.shadowRoot!.textContent!.includes("first"));
+
+    el.provider = mockProvider({
+      listTasks: async () => {
+        throw new Error("new provider failed");
+      },
+    });
+    await waitUntil(() =>
+      el.shadowRoot!.textContent!.includes("new provider failed")
+    );
+
+    expect(el.shadowRoot!.textContent).to.not.contain("first");
+    expect(
+      el.shadowRoot!.querySelector(
+        "ecc-utils-design-button[variant=destructive]"
+      )
+    ).to.equal(null);
   });
 });

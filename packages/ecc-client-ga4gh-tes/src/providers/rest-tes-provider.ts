@@ -12,7 +12,7 @@ import {
 
 /**
  * REST API implementation of TesProvider
- * Handles HTTP requests to GA4GH TES v1.0.0 compliant endpoints
+ * Handles HTTP requests to GA4GH TES v1.1.0 compliant endpoints
  */
 export class RestTesProvider implements TesProvider {
   private baseUrl: string;

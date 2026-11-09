@@ -110,6 +110,8 @@ export class ECCClientGa4ghTesRuns extends LitElement {
   private reset(): void {
     this.pageTokens = new Map([[1, undefined]]);
     this.currentPage = 1;
+    this.runs = [];
+    this.loading = false;
     this.loadData();
   }
 
@@ -117,6 +119,16 @@ export class ECCClientGa4ghTesRuns extends LitElement {
     this.requestGeneration += 1;
     const generation = this.requestGeneration;
     if (!this._provider) return;
+
+    if (
+      !Number.isInteger(this.pageSize) ||
+      this.pageSize < 1 ||
+      this.pageSize >= 2048
+    ) {
+      this.loading = false;
+      this.error = "Page size must be an integer between 1 and 2047";
+      return;
+    }
 
     this.loading = true;
     this.error = null;
@@ -185,7 +197,7 @@ export class ECCClientGa4ghTesRuns extends LitElement {
     );
   }
 
-  private async handleDelete(runId: string): Promise<void> {
+  private async handleCancel(runId: string): Promise<void> {
     if (!this._provider) return;
 
     try {
@@ -378,9 +390,9 @@ export class ECCClientGa4ghTesRuns extends LitElement {
                   <ecc-utils-design-button
                     size="sm"
                     variant="destructive"
-                    @click=${() => this.handleDelete(run.id)}
+                    @click=${() => this.handleCancel(run.id)}
                   >
-                    Delete
+                    Cancel
                   </ecc-utils-design-button>
                 `
               : ""}

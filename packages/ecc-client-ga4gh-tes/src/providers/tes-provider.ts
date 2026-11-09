@@ -157,7 +157,7 @@ export interface ListTasksParams {
 export interface ServiceInfo {
   id: string;
   name: string;
-  type: { group: string; artifact: "tes" | string; version: string };
+  type: { group: string; artifact: "tes"; version: string };
   description?: string;
   organization: { name: string; url: string };
   contactUrl?: string;

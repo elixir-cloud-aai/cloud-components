@@ -8,6 +8,7 @@ import {
   STATE_INFO,
   CANCELLABLE_STATES,
 } from "../../providers/tes-provider.js";
+import type { EccRunLogChangedEvent } from "../../events/ecc-run-log-changed.js";
 import { RestTesProvider } from "../../providers/rest-tes-provider.js";
 import "@elixir-cloud/design/components/button/index.js";
 import "@elixir-cloud/design/components/badge/index.js";
@@ -109,11 +110,14 @@ export class ECCClientGa4ghTesRun extends LitElement {
 
       this.task = task;
       this.dispatchEvent(
-        new CustomEvent("ecc-run-log-changed", {
-          detail: { task: this.task },
-          bubbles: true,
-          composed: true,
-        })
+        new CustomEvent<EccRunLogChangedEvent["detail"]>(
+          "ecc-run-log-changed",
+          {
+            detail: { task },
+            bubbles: true,
+            composed: true,
+          }
+        )
       );
     } catch (err) {
       if (generation !== this.requestGeneration) return;
@@ -128,7 +132,7 @@ export class ECCClientGa4ghTesRun extends LitElement {
     }
   }
 
-  private async handleDelete(): Promise<void> {
+  private async handleCancel(): Promise<void> {
     if (!this._provider || !this.task) return;
 
     try {
@@ -241,9 +245,9 @@ export class ECCClientGa4ghTesRun extends LitElement {
                 <ecc-utils-design-button
                   size="sm"
                   variant="destructive"
-                  @click=${() => this.handleDelete()}
+                  @click=${() => this.handleCancel()}
                 >
-                  Delete
+                  Cancel
                 </ecc-utils-design-button>
               `
             : ""}

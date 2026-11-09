@@ -93,6 +93,11 @@ const compact = <T extends object>(obj: T): T =>
     Object.entries(obj).filter(([, v]) => v !== "" && v !== undefined)
   ) as T;
 
+const optionalNumber = (value: string): number | undefined =>
+  value.trim() ? Number(value) : undefined;
+
+const isAbsolutePath = (path: string): boolean => path.startsWith("/");
+
 const cleanRow = (row: Row): Row => {
   const out: Row = {};
   Object.entries(row).forEach(([k, v]) => {
@@ -192,9 +197,9 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
     })) as Executor[];
 
     const resources = compact({
-      cpu_cores: form.cpuCores ? Number(form.cpuCores) : undefined,
-      ram_gb: form.ramGb ? Number(form.ramGb) : undefined,
-      disk_gb: form.diskGb ? Number(form.diskGb) : undefined,
+      cpu_cores: optionalNumber(form.cpuCores),
+      ram_gb: optionalNumber(form.ramGb),
+      disk_gb: optionalNumber(form.diskGb),
       zones: form.zones
         ? form.zones
             .split(",")
@@ -242,11 +247,34 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
     for (const [i, ex] of this.form.executors.entries()) {
       if (!ex.image.trim()) return `Executor ${i + 1}: image is required`;
       if (!ex.command.trim()) return `Executor ${i + 1}: command is required`;
+      for (const [field, path] of [
+        ["stdin", ex.stdin],
+        ["stdout", ex.stdout],
+        ["stderr", ex.stderr],
+      ] as const) {
+        if (path.trim() && !isAbsolutePath(path.trim())) {
+          return `Executor ${i + 1}: ${field} path must be absolute`;
+        }
+      }
     }
 
-    const numbers = [this.form.cpuCores, this.form.ramGb, this.form.diskGb];
-    if (numbers.some((n) => n && Number.isNaN(Number(n)))) {
-      return "Resource values must be numbers";
+    const resourceValues = [
+      this.form.cpuCores,
+      this.form.ramGb,
+      this.form.diskGb,
+    ];
+    if (
+      resourceValues.some(
+        (value) => value.trim() && !Number.isFinite(Number(value))
+      )
+    ) {
+      return "Resource values must be finite numbers";
+    }
+    if (
+      this.form.cpuCores.trim() &&
+      !Number.isInteger(Number(this.form.cpuCores))
+    ) {
+      return "CPU core count must be an integer";
     }
 
     const rows = (key: "inputs" | "outputs") =>
@@ -256,12 +284,18 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
       );
     for (const [i, r] of rows("inputs").entries()) {
       if (!r.path?.trim()) return `Input ${i + 1}: path is required`;
+      if (!isAbsolutePath(r.path.trim())) {
+        return `Input ${i + 1}: path must be absolute`;
+      }
       if (!r.url?.trim() && !r.content) {
         return `Input ${i + 1}: url or content is required`;
       }
     }
     for (const [i, r] of rows("outputs").entries()) {
       if (!r.path?.trim()) return `Output ${i + 1}: path is required`;
+      if (!isAbsolutePath(r.path.trim())) {
+        return `Output ${i + 1}: path must be absolute`;
+      }
       if (!r.url?.trim()) return `Output ${i + 1}: url is required`;
       if (hasWildcardMarker(r.path) && !r.path_prefix?.trim()) {
         return `Output ${i + 1}: path prefix is required for wildcard paths`;

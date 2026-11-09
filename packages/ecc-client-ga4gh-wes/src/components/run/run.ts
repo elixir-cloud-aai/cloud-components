@@ -8,6 +8,7 @@ import {
   State,
   Log,
 } from "../../providers/wes-provider.js";
+import type { EccRunLogChangedEvent } from "../../events/ecc-run-log-changed.js";
 import { RestWesProvider } from "../../providers/rest-wes-provider.js";
 import "@elixir-cloud/design/components/table/index.js";
 import "@elixir-cloud/design/components/button/index.js";
@@ -27,7 +28,7 @@ import "@elixir-cloud/design/components/collapsible/index.js";
  * @property {string} runId - The ID of the workflow run to display.
  * @property {WesProvider} provider - Custom data provider (optional, overrides baseUrl).
  *
- * @fires ecc-run-log-changed - Fired when the run log data is loaded.
+ * @fires ecc-run-log-changed - Fired when run-log data loads; detail.runLog contains the RunLog.
  */
 export class ECCClientGa4ghWesRun extends LitElement {
   static styles = [
@@ -134,11 +135,14 @@ export class ECCClientGa4ghWesRun extends LitElement {
       const runLog = await this._provider.getRunLog(this.runId);
       this.run = runLog;
       this.dispatchEvent(
-        new CustomEvent("ecc-run-log-changed", {
-          detail: { runLog },
-          bubbles: true,
-          composed: true,
-        })
+        new CustomEvent<EccRunLogChangedEvent["detail"]>(
+          "ecc-run-log-changed",
+          {
+            detail: { runLog },
+            bubbles: true,
+            composed: true,
+          }
+        )
       );
     } catch (err) {
       this.error =
