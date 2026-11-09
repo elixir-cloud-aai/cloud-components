@@ -7,6 +7,7 @@ updates:
     # Pull request titles must be Conventional Commits (PR title check)
     commit-message:
       prefix: ci
+    labels: ["type: dependencies"]
     schedule:
       interval: monthly
     groups:
@@ -17,6 +18,7 @@ updates:
     directory: /
     commit-message:
       prefix: build
+    labels: ["type: dependencies"]
     schedule:
       interval: monthly
     groups:
