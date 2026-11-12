@@ -78,7 +78,7 @@ The `Release` workflow (`.github/workflows/release.yml`) runs on tags
   the `CI` workflow passed for a push of the tagged commit (if CI hasn't
   finished yet or failed, re-run the release once it passed), the curated
   release notes `docs/releases/<version>.md` exist and are in the format
-  below, no published release of the tag exists yet, and the linters
+  below, no release of the tag (not even a draft) exists, and the linters
   pass. The other
   jobs need it.
 - `npm` ("Release packages") builds the packages from the tag and stages
