@@ -71,21 +71,38 @@ and not released.
 The `Release` workflow (`.github/workflows/release.yml`) runs on tags
 `v<version>` and pushes nothing to any branch. Its jobs:
 
-- `prepare` ("Prepare release") holds all checks: the versions of the root,
-  the released packages and `CITATION.cff` equal the tag's version, the
-  release date in `CITATION.cff` is not in the future (UTC), the tag is on
-  `dev`, the `CI` workflow passed for a push of the tagged commit (if CI
-  hasn't finished yet or failed, re-run the release once it passed), and the
-  linters pass. The other jobs need it.
+- `prepare` ("Prepare release") holds all checks: the tag is annotated and
+  has a signature that GitHub verified, the versions of the root, the
+  released packages and `CITATION.cff` equal the tag's version, the release
+  date in `CITATION.cff` is not in the future (UTC), the tag is on `dev`,
+  the `CI` workflow passed for a push of the tagged commit (if CI hasn't
+  finished yet or failed, re-run the release once it passed), the curated
+  release notes `docs/releases/<version>.md` exist and are in the format
+  below, no release of the tag exists yet, and the linters pass. The other
+  jobs need it.
 - `npm` ("Release packages") builds the packages from the tag and stages
   them on npm with
   [trusted publishing](https://docs.npmjs.com/trusted-publishers) (OpenID
   Connect, with provenance), once the `npm` environment is approved. Staged
   versions become public only when a maintainer approves them on
   npmjs.com.
-- `publish` ("Publish release") creates the GitHub release for the tag,
-  with generated notes (a prerelease for versions such as
-  `2.0.0-alpha.49`).
+- `publish` ("Publish release") creates the GitHub release for the tag
+  with the shared action
+  [`publish-release`](https://github.com/elixir-cloud-aai/.github/tree/main/actions/publish-release)
+  of the organization: as a draft (`--verify-tag`), with the curated notes
+  followed by GitHub's generated notes under `## Commits` and the
+  `**Full Changelog**` line, published at the end (a prerelease for
+  versions such as `2.0.0-alpha.49`).
+
+The curated notes, `docs/releases/<version>.md`, are published as written:
+an intro paragraph saying what the release brings (with a link to a
+migration guide if there is one), then the sections that apply, in this
+order: `## Breaking changes`, `## Features`, `## Security`, `## Fixes`,
+`## Documentation`, `## Maintenance`. Sections hold bullets only, each
+ending with its issue and pull request numbers, e.g.
+`- Show run outputs (#571, #580)`. Links must be absolute (`https://…`),
+and the file must not contain `TODO` or `FIXME`, nor a `## Commits` section
+or a `**Full Changelog**` line, which the action adds.
 
 To release `<version>` (e.g. `2.0.0-alpha.49`), maintainers:
 
@@ -93,7 +110,8 @@ To release `<version>` (e.g. `2.0.0-alpha.49`), maintainers:
    `chore: release <version>`): run `node scripts/release.js set <version>`,
    which sets the version of the root and of all released packages, updates
    `package-lock.json`, and sets `version` and `date-released` (today, UTC;
-   or `--date YYYY-MM-DD`, not in the future) in `CITATION.cff`. Commit the
+   or `--date YYYY-MM-DD`, not in the future) in `CITATION.cff`. Add the
+   curated notes `docs/releases/<version>.md` (see above). Commit the
    changes and merge the pull request once CI has passed.
 2. **Tag** the merge commit on `dev` once CI has passed for it (the run for
    the push to `dev`), and push the tag:
@@ -127,7 +145,9 @@ To release `<version>` (e.g. `2.0.0-alpha.49`), maintainers:
 
 A version on npm, staged or public, can't be published again, and tags
 can't be moved. If a release fails before staging, fix the cause in a pull
-request and release a new version. If staging fails for some packages,
+request and release a new version. If only "Publish release" fails, fix
+the cause and re-run it (delete a draft release of the tag that it left
+first). If staging fails for some packages,
 don't approve any staged version yet: re-run the failed jobs of the run.
 Packages already on npm are skipped, and versions staged by the earlier
 attempt count as staged. If a package can't be staged at all, reject the
