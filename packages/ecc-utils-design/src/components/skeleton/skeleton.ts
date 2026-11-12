@@ -15,12 +15,12 @@ function cn(...classes: (string | undefined | false)[]) {
  *
  * @element ecc-utils-design-skeleton
  *
- * @prop {string} class - Additional CSS classes to apply to the skeleton
+ * @attr {string} class - Additional CSS classes to apply to the skeleton
  *
  * @example
  * ```html
  * <!-- Basic usage -->
- * <ecc-utils-design-skeleton class="h-4 w-40"></ecc-utils-design-skeleton>
+ * <ecc-utils-design-skeleton class="w-[100px] h-[20px] rounded-full"></ecc-utils-design-skeleton>
  *
  * <!-- Card skeleton -->
  * <div class="card">
