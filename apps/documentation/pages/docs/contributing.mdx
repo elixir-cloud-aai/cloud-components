@@ -71,21 +71,52 @@ and not released.
 The `Release` workflow (`.github/workflows/release.yml`) runs on tags
 `v<version>` and pushes nothing to any branch. Its jobs:
 
-- `prepare` ("Prepare release") holds all checks: the versions of the root,
-  the released packages and `CITATION.cff` equal the tag's version, the
-  release date in `CITATION.cff` is not in the future (UTC), the tag is on
-  `dev`, the `CI` workflow passed for a push of the tagged commit (if CI
-  hasn't finished yet or failed, re-run the release once it passed), and the
-  linters pass. The other jobs need it.
+- `prepare` ("Prepare release") holds all checks: the tag is annotated and
+  has a signature that GitHub verified, the versions of the root, the
+  released packages and `CITATION.cff` equal the tag's version, the release
+  date in `CITATION.cff` is not in the future (UTC), the tag is on `dev`,
+  the `CI` workflow passed for a push of the tagged commit (if CI hasn't
+  finished yet or failed, re-run the release once it passed), the curated
+  release notes `docs/releases/<version>.md` exist and are in the format
+  below, no release of the tag (not even a draft) exists, and the linters
+  pass. The other
+  jobs need it.
 - `npm` ("Release packages") builds the packages from the tag and stages
   them on npm with
   [trusted publishing](https://docs.npmjs.com/trusted-publishers) (OpenID
   Connect, with provenance), once the `npm` environment is approved. Staged
   versions become public only when a maintainer approves them on
   npmjs.com.
-- `publish` ("Publish release") creates the GitHub release for the tag,
-  with generated notes (a prerelease for versions such as
-  `2.0.0-alpha.49`).
+- `publish` ("Publish release") creates the GitHub release for the tag
+  with the shared action
+  [`publish-release`](https://github.com/elixir-cloud-aai/.github/tree/main/actions/publish-release)
+  of the organization (`--verify-tag`), with the curated notes followed by
+  GitHub's generated notes under `## Commits` and the `**Full Changelog**`
+  line (a prerelease for versions such as `2.0.0-alpha.49`).
+
+The curated notes, `docs/releases/<version>.md`, are published as written:
+an intro paragraph saying what the release brings (with a link to a
+migration guide if there is one), then the sections that apply, in this
+order: `## Breaking changes`, `## Features`, `## Security`, `## Fixes`,
+`## Documentation`, `## Maintenance`. Sections hold bullets only, each
+ending with its issue and pull request numbers. Links must be absolute
+(`https://…`), and the file must not contain `TODO` or `FIXME`, nor a
+`## Commits` section or a `**Full Changelog**` line, which the action adds.
+The action's
+[README](https://github.com/elixir-cloud-aai/.github/blob/main/actions/publish-release/README.md)
+has the complete rules. For example:
+
+```md
+This release adds the run outputs view to the WES components.
+
+## Features
+
+- Show the outputs of a run (#12, #34)
+
+## Fixes
+
+- Keep the run list after a provider change (#56, #78)
+```
 
 To release `<version>` (e.g. `2.0.0-alpha.49`), maintainers:
 
@@ -93,11 +124,13 @@ To release `<version>` (e.g. `2.0.0-alpha.49`), maintainers:
    `chore: release <version>`): run `node scripts/release.js set <version>`,
    which sets the version of the root and of all released packages, updates
    `package-lock.json`, and sets `version` and `date-released` (today, UTC;
-   or `--date YYYY-MM-DD`, not in the future) in `CITATION.cff`. Commit the
+   or `--date YYYY-MM-DD`, not in the future) in `CITATION.cff`. Add the
+   curated notes `docs/releases/<version>.md` (see above). Commit the
    changes and merge the pull request once CI has passed.
 2. **Tag** the merge commit on `dev` once CI has passed for it (the run for
    the push to `dev`), and push the tag:
-   `git tag -s v<version> -m v<version> <commit>`, then
+   `git tag -s v<version> -m v<version> <commit>` (with a key registered
+   with your GitHub account, so that GitHub verifies the signature), then
    `git push origin v<version>`. Tags are immutable: check the commit first,
    e.g. with `node scripts/release.js check <version>` on it, which runs the
    version checks of the release workflow.
@@ -132,6 +165,12 @@ don't approve any staged version yet: re-run the failed jobs of the run.
 Packages already on npm are skipped, and versions staged by the earlier
 attempt count as staged. If a package can't be staged at all, reject the
 staged versions (`npm stage reject <stage-id>`) and release a new version.
+
+If only "Publish release" fails, fix the cause and use "Re-run failed
+jobs" (not "Re-run all jobs": `prepare` fails once a release of the tag
+exists); delete a draft release of the tag first, if there is one. A
+re-run passes without changes if the release exists with the same curated
+notes, title and prerelease flag, and fails otherwise.
 
 ### Citation metadata
 
