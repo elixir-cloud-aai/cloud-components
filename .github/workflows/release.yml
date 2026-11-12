@@ -1,7 +1,8 @@
 # Releases from version tags (see "Releases" in the Contributing page of
-# the documentation): after the version bump pull request, a maintainer pushes a signed `v<version>` on
-# `dev` (tags on other branches fail). `prepare` checks the tag (annotated,
-# with a signature that GitHub verified), the versions of the packages and of
+# the documentation): after the version bump pull request, a maintainer
+# pushes a signed `v<version>` on `dev` (tags on other branches fail).
+# `prepare` checks the tag (annotated, with a signature that GitHub
+# verified), the versions of the packages and of
 # the citation metadata (`CITATION.cff`), that the tag is on `dev`, that CI
 # passed for its commit and the curated release notes
 # (`docs/releases/<version>.md`), and lints; `npm` builds the
