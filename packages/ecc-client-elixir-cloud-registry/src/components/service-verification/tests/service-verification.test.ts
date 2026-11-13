@@ -186,11 +186,81 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     `);
     await settled(el);
 
-    el.service = { ...SERVICE, url: "https://tes.example.org/v2" };
+    el.service = { ...SERVICE, name: "Renamed" };
     await settled(el);
 
     expect(get.calledOnce).to.equal(true);
+    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+  });
+
+  it("loads again when the URL of the service changes", async () => {
+    const { provider, get } = stubProvider();
+    get.onFirstCall().resolves(VERIFICATION);
+    get.onSecondCall().rejects(notFound());
+    get.onThirdCall().rejects(notFound());
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        .service=${SERVICE}
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    el.service = { ...SERVICE, url: "https://tes.example.org/v2" };
+    await settled(el);
+    // back to the verified URL: the registry removed the verification
+    el.service = { ...SERVICE };
+    await settled(el);
+
+    expect(get.calledThrice).to.equal(true);
     expect(part(el, "badge")).to.equal(null);
+  });
+
+  it("loads again when a verify fails without a clear outcome", async () => {
+    const { provider, get, verify } = stubProvider();
+    get.onFirstCall().rejects(notFound());
+    get.onSecondCall().resolves(VERIFICATION);
+    verify.rejects(new TypeError("Failed to fetch"));
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        .service=${SERVICE}
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    const failed = oneEvent(el, "ecc-service-verification-failed");
+    click(part(el, "verify-button"));
+    const { detail } = (await failed) as EccServiceVerificationFailedEvent;
+    await settled(el);
+
+    expect(detail.error).to.equal("Failed to fetch");
+    expect(get.calledTwice).to.equal(true);
+    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+  });
+
+  it("loads again when a remove fails with a server error", async () => {
+    const { provider, get, remove } = stubProvider();
+    get.onFirstCall().resolves(VERIFICATION);
+    get.onSecondCall().rejects(notFound());
+    remove.rejects(new CloudRegistryError("Bad gateway", 502, {}));
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        service-id="service-1"
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    const failed = oneEvent(el, "ecc-service-verification-failed");
+    click(part(el, "remove-button"));
+    await failed;
+    await settled(el);
+
+    expect(get.calledTwice).to.equal(true);
+    expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
   });
 
   it("lets admins verify a service with its URL and API type", async () => {
@@ -544,6 +614,8 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     sinon.stub(other, "getServiceVerification").rejects(notFound());
     el.provider = other;
     await settled(el);
+    // the request to the first registry doesn't block the other one
+    expect(part(el, "verify-button")?.hasAttribute("disabled")).to.equal(false);
     answer(VERIFICATION);
     await settled(el);
 

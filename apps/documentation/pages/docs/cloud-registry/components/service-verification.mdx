@@ -132,7 +132,7 @@ After a verify or remove, the component shows the result for that service until 
 | `admin`        | `boolean`               | `false`     | Whether to offer "Verify" and "Remove verification" |
 
 ### `provider` and `baseUrl`
-The component loads the verification again when `provider`, `baseUrl`, `serviceId` or the ID of `service` changes, also if the app sets them after the first render; if the app passes `verification`, it shows that instead (or the result of a verify or remove since, until the app sets `verification` again). A new object of the same service (e.g. of a reloaded list) needs no new request: the component compares the verification shown with it. In React, create the provider only when its inputs change, e.g. with `useMemo`.
+The component loads the verification again when `provider`, `baseUrl`, `serviceId` or the ID of `service` changes, also if the app sets them after the first render; if the app passes `verification`, it shows that instead (or the result of a verify or remove since, until the app sets `verification` again). A new object of the same service (e.g. of a reloaded list) needs no new request, unless its URL or API type changed: the registry then removes the verification. In React, create the provider only when its inputs change, e.g. with `useMemo`.
 
 Custom providers implement the optional verification methods of `CloudRegistryProvider`; without them, the component fires `ecc-service-verification-failed`.
 
@@ -159,7 +159,7 @@ Emitted when a request fails. Services that aren't verified (`404` when loading)
 - `error`: what went wrong, e.g. the registry's explanation (the problem's `detail`);
 - `status`: the HTTP status, e.g. `403` (not an admin) or `409`;
 - `title`, `detail`: the problem details that the registry sent, if any;
-- `code`: the conflict code of a `409`: `verification-mismatch` if the service has another URL or API type than the one shown (the component then loads the verification again, unless the app passes `verification`), `pending-service` if the service awaits approval;
+- `code`: the conflict code of a `409`: `verification-mismatch` if the service has another URL or API type than the one shown (the component then loads the verification again, unless the app passes `verification`), `pending-service` if the service awaits approval. After a failure without a status (e.g. a lost connection) or with a server error, the component also loads the verification again, as the registry may have applied the change;
 - `cause`: the error that the provider threw.
 
 <Tabs items={['React', 'JavaScript']}>

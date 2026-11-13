@@ -61,6 +61,15 @@ const failureDetail = (
   };
 };
 
+/**
+ * Key of a running verify or remove: the service ID and the registry's base
+ * URL, if the provider has one
+ */
+const pendingKey = (id: string, provider: CloudRegistryProvider): string => {
+  const { baseUrl } = provider as { baseUrl?: unknown };
+  return JSON.stringify([typeof baseUrl === "string" ? baseUrl : "", id]);
+};
+
 /** Date of a verification for people, e.g. "20 Oct 2026"; else as sent */
 const formatDate = (value: string): string => {
   const date = new Date(value);
@@ -160,7 +169,10 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
 
   /** Whether a verify or remove of the service shown is running. */
   private get busy(): boolean {
-    return this.pending.has(this.targetId);
+    const provider = this.currentProvider();
+    return Boolean(
+      provider && this.pending.has(pendingKey(this.targetId, provider))
+    );
   }
 
   /** Whether the service is verified, as far as is known. */
@@ -174,16 +186,24 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
     if (changedProperties.has("verification")) this.own = undefined;
     // a new object of the same service (e.g. of a reloaded list) needs no
-    // new request: the verification shown is compared with it on render
+    // new request, unless its URL or API type changed: the registry then
+    // removes the verification, which must not show again if they change back
     const previous = changedProperties.get("service") as
       | ExternalService
       | undefined;
+    const { service } = this;
+    const serviceChanged =
+      changedProperties.has("service") &&
+      (previous?.id !== service?.id ||
+        !previous ||
+        !service ||
+        !matchesVerification(previous, service));
     if (
       changedProperties.has("provider") ||
       changedProperties.has("baseUrl") ||
       changedProperties.has("serviceId") ||
       changedProperties.has("verification") ||
-      (changedProperties.has("service") && previous?.id !== this.service?.id)
+      serviceChanged
     ) {
       this.load();
     }
@@ -273,11 +293,36 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
   }
 
   /** Marks a verify or remove of a service as running, or as done. */
-  private setPending(id: string, running: boolean): void {
+  private setPending(
+    id: string,
+    provider: CloudRegistryProvider,
+    running: boolean
+  ): void {
     const pending = new Set(this.pending);
-    if (running) pending.add(id);
-    else pending.delete(id);
+    if (running) pending.add(pendingKey(id, provider));
+    else pending.delete(pendingKey(id, provider));
     this.pending = pending;
+  }
+
+  /**
+   * Loads the verification again after a failed verify or remove whose
+   * outcome is unclear (no status, e.g. a lost connection, or a server
+   * error) or that conflicts (`409`), if the component still shows that
+   * service and doesn't use the app's `verification`
+   */
+  private reconcile(
+    err: unknown,
+    id: string,
+    provider: CloudRegistryProvider
+  ): void {
+    const status = statusOf(err);
+    if (
+      (status === undefined || status === 409 || status >= 500) &&
+      this.showsSame(id, provider) &&
+      this.verification === undefined
+    ) {
+      this.load();
+    }
   }
 
   /**
@@ -318,7 +363,7 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
       });
       return;
     }
-    this.setPending(id, true);
+    this.setPending(id, provider, true);
     try {
       const verification = await provider.verifyService(
         id,
@@ -333,18 +378,12 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
             }
           : undefined
       );
-      this.setPending(id, false);
+      this.setPending(id, provider, false);
       this.applied(id, verification, provider);
     } catch (err) {
-      this.setPending(id, false);
+      this.setPending(id, provider, false);
       this.fail(failureDetail(id, "verify", err, "Failed to verify service"));
-      if (
-        statusOf(err) === 409 &&
-        this.showsSame(id, provider) &&
-        this.verification === undefined
-      ) {
-        this.load();
-      }
+      this.reconcile(err, id, provider);
     }
   }
 
@@ -364,19 +403,20 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
       });
       return;
     }
-    this.setPending(id, true);
+    this.setPending(id, provider, true);
     try {
       await provider.deleteServiceVerification(id);
     } catch (err) {
       if (statusOf(err) !== 404) {
-        this.setPending(id, false);
+        this.setPending(id, provider, false);
         this.fail(
           failureDetail(id, "remove", err, "Failed to remove verification")
         );
+        this.reconcile(err, id, provider);
         return;
       }
     }
-    this.setPending(id, false);
+    this.setPending(id, provider, false);
     this.applied(id, null, provider);
   }
 
