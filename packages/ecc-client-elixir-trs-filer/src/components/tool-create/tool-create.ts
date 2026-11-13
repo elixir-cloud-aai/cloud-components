@@ -349,6 +349,16 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
         this.loadToolClasses();
       } else {
         this.toolClasses = [];
+        this.dispatchEvent(
+          new CustomEvent("ecc-tool-create-validation-failed", {
+            detail: {
+              error:
+                "Please provide either a base URL for the TRS API or a custom provider.",
+            },
+            bubbles: true,
+            composed: true,
+          })
+        );
       }
     }
   }

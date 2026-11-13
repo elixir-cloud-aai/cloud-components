@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { expect, fixture, html, waitUntil } from "@open-wc/testing";
+import { expect, fixture, html, oneEvent, waitUntil } from "@open-wc/testing";
 import sinon from "sinon";
 import "../index.js";
 import type { ECCClientElixirTrsToolCreate } from "../tool-create.js";
@@ -141,10 +141,12 @@ describe("ecc-client-elixir-trs-tool-create provider", () => {
       ></ecc-client-elixir-trs-tool-create>`
     );
     await waitUntil(() => offered(el).length === 1);
+    const failed = oneEvent(el, "ecc-tool-create-validation-failed");
 
     el.provider = undefined;
     await el.updateComplete;
 
     expect(offered(el)).to.deep.equal([]);
+    expect((await failed).detail.error).to.contain("Please provide either");
   });
 });

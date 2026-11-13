@@ -84,7 +84,8 @@ describe("ecc-client-ga4gh-service-registry-service provider", () => {
 
   it("loads from a provider that replaces the first one", async () => {
     const first = stubProvider();
-    const second = stubProvider();
+    const replacement = { ...service("a"), name: "Replacement" };
+    const second = stubProvider(Promise.resolve(replacement));
     const el = await fixture<ECCClientGa4ghServiceRegistryService>(
       html`<ecc-client-ga4gh-service-registry-service
         serviceId="a"
@@ -95,8 +96,9 @@ describe("ecc-client-ga4gh-service-registry-service provider", () => {
     const firstCalls = first.getServiceById.callCount;
 
     el.provider = second;
-    await waitUntil(() => second.getServiceById.callCount === 1);
+    await waitUntil(() => shown(el)?.name === "Replacement");
 
+    expect(second.getServiceById.callCount).to.equal(1);
     expect(first.getServiceById.callCount).to.equal(firstCalls);
   });
 
