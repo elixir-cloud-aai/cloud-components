@@ -177,6 +177,32 @@ describe("matchesVerification", () => {
     expect(matchesVerification(service, VERIFICATION)).to.equal(true);
   });
 
+  it("folds capital sharp s and keeps dotless i, as Python does", () => {
+    const type = (group: string) => ({ group, artifact: "tes", version: "1" });
+    const verification = (group: string) => ({
+      ...VERIFICATION,
+      type: type(group),
+    });
+    expect(
+      matchesVerification(
+        { ...SERVICE, type: type("\u1E9E") },
+        verification("ss")
+      )
+    ).to.equal(true);
+    expect(
+      matchesVerification(
+        { ...SERVICE, type: type("t\u0131s") },
+        verification("tis")
+      )
+    ).to.equal(false);
+    expect(
+      matchesVerification(
+        { ...SERVICE, type: type("T\u0131S") },
+        verification("t\u0131s")
+      )
+    ).to.equal(true);
+  });
+
   it("folds the case of special characters", () => {
     const service = {
       ...SERVICE,

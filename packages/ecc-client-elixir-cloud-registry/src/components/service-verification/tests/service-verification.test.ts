@@ -477,7 +477,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     expect(part(el, "remove-button")?.hasAttribute("disabled")).to.equal(false);
   });
 
-  it("ignores a verify answer once the service changed", async () => {
+  it("reports a verify of a previous service, but doesn't show it", async () => {
     const { provider, get, verify } = stubProvider();
     get.rejects(notFound());
     let answer = (value: typeof VERIFICATION): void => {
@@ -505,8 +505,56 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     answer(VERIFICATION);
     await settled(el);
 
-    expect(changed.called).to.equal(false);
+    expect(changed.calledOnce).to.equal(true);
+    expect(changed.firstCall.args[0].detail).to.deep.equal({
+      serviceId: "service-1",
+      verification: VERIFICATION,
+    });
     expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
+  });
+
+  it("keeps a verify when the provider is replaced meanwhile", async () => {
+    const { provider, get, verify } = stubProvider();
+    let answer = (value: typeof VERIFICATION): void => {
+      throw new Error(`No request waits for ${value.url}`);
+    };
+    verify.returns(
+      new Promise((resolve) => {
+        answer = resolve;
+      })
+    );
+    const changed = sinon.spy();
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        .service=${SERVICE}
+        .verification=${null}
+        .provider=${provider}
+        @ecc-service-verification-changed=${changed}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    click(part(el, "verify-button"));
+    el.provider = stubProvider().provider;
+    await settled(el);
+    expect(part(el, "verify-button")?.hasAttribute("disabled")).to.equal(true);
+    answer(VERIFICATION);
+    await settled(el);
+
+    expect(changed.calledOnce).to.equal(true);
+    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+
+    // the app hasn't updated `verification`: the result stays
+    el.provider = stubProvider().provider;
+    await settled(el);
+    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+
+    // until it sets another value (here: of an older URL)
+    el.verification = { ...VERIFICATION, url: "https://tes.example.org/old" };
+    await settled(el);
+    expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
+    expect(get.called).to.equal(false);
   });
 
   it("reports a failed verify without loading again", async () => {

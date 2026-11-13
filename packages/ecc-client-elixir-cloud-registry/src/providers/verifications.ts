@@ -9,9 +9,8 @@
  *
  * The registry compares with Python's `strip().casefold()`: trimming here
  * uses the same white space (JavaScript's `\s` without U+FEFF, plus
- * U+001C-U+001F and U+0085), and case folding is approximated by upper- then
- * lower-casing (e.g. `ß` and `SS` match), which JavaScript lacks a built-in
- * for.
+ * U+001C-U+001F and U+0085), and case folding, which JavaScript lacks a
+ * built-in for, is approximated (see `caseFold()`; e.g. `ß` and `SS` match).
  */
 
 import type {
@@ -38,10 +37,23 @@ function strip(text: string): string {
   return text.slice(start, end);
 }
 
+/**
+ * The text case-folded like Python's `str.casefold()`, approximated by
+ * upper- then lower-casing, except for the two characters where that
+ * differs: capital sharp s (U+1E9E) folds to `ss`, and dotless i (U+0131)
+ * stays as it is (characters added in later Unicode versions may differ)
+ */
+function caseFold(text: string): string {
+  return text
+    .replace(/\u1E9E/g, "ss")
+    .split("\u0131")
+    .map((part) => part.toUpperCase().toLowerCase())
+    .join("\u0131");
+}
+
 /** Whether two texts are equal, trimmed and case-insensitive */
 function sameText(a: string, b: string): boolean {
-  const fold = (text: string) => strip(text).toUpperCase().toLowerCase();
-  return fold(a) === fold(b);
+  return caseFold(strip(a)) === caseFold(strip(b));
 }
 
 /**

@@ -85,17 +85,34 @@ const [services, verifications] = await Promise.all([
   provider.getServices(),
   provider.getVerifications(),
 ]);
-const verified = verifiedServices(services, verifications);
+// e.g. in React state, so that the rows follow verify and remove
+const [verified, setVerified] = useState(
+  () => verifiedServices(services, verifications)
+);
 
 services.map((service) => (
   <EccClientElixirCloudRegistryServiceVerification
     key={service.id}
     provider={provider}
     service={service}
+    admin={me.admin}
     verification={verified.get(service.id) ?? null}
+    onEccServiceVerificationChanged={({ detail }) =>
+      setVerified((current) => {
+        const next = new Map(current);
+        if (detail.verification) {
+          next.set(detail.serviceId, { serviceId: detail.serviceId, ...detail.verification });
+        } else {
+          next.delete(detail.serviceId);
+        }
+        return next;
+      })
+    }
   />
 ));
 ```
+
+After a verify or remove, the component shows the result for that service until the app sets `verification` again, also if the provider changes meanwhile; update your verifications from `ecc-service-verification-changed`, as above.
 
 <Callout type='info'>
   The services list of the GA4GH Service Registry package (`ecc-client-ga4gh-service-registry-services`) doesn't show verifications itself; place the component in a row's `actions-<id>` slot or in your own list.
@@ -113,7 +130,7 @@ services.map((service) => (
 | `admin`        | `boolean`               | `false`     | Whether to offer "Verify" and "Remove verification" |
 
 ### `provider` and `baseUrl`
-The component loads the verification again when `provider`, `baseUrl`, `serviceId`, `verification` or the ID of `service` changes, also if the app sets them after the first render. A new object of the same service (e.g. of a reloaded list) needs no new request: the component compares the verification shown with it. In React, create the provider only when its inputs change, e.g. with `useMemo`.
+The component loads the verification again when `provider`, `baseUrl`, `serviceId` or the ID of `service` changes, also if the app sets them after the first render; if the app passes `verification`, it shows that instead (or the result of a verify or remove since, until the app sets `verification` again). A new object of the same service (e.g. of a reloaded list) needs no new request: the component compares the verification shown with it. In React, create the provider only when its inputs change, e.g. with `useMemo`.
 
 Custom providers implement the optional verification methods of `CloudRegistryProvider`; without them, the component fires `ecc-service-verification-failed`.
 
@@ -131,7 +148,7 @@ Apps take the value from `admin` of the registry's `GET /me`. The property only 
 | `ecc-service-verification-failed`  | `onEccServiceVerificationFailed`   | `{ serviceId: string, action: "load" \| "verify" \| "remove", error: string, status?: number, title?: string, detail?: string, code?: string, cause?: unknown }` | Fired when loading, verifying or removing the verification fails |
 
 ### `ecc-service-verification-changed`
-Emitted after an admin verified the service (`verification`: the new verification) or removed its verification (`null`). A verification that was removed already (`404`) counts as removed. Apps that pass `verification` update it from this event, e.g. in their map of verified services.
+Emitted after an admin verified the service (`verification`: the new verification) or removed its verification (`null`). A verification that was removed already (`404`) counts as removed. The event is fired whenever the registry has applied the change, also if the component shows another service by then (`serviceId` names the service). Apps that pass `verification` update it from this event, e.g. in their map of verified services.
 
 ### `ecc-service-verification-failed`
 Emitted when a request fails. Services that aren't verified (`404` when loading) are no failure.

@@ -140,9 +140,13 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
   /** The provider for `baseUrl`, used if `provider` isn't set. */
   private restProvider: RestCloudRegistryProvider | null = null;
 
-  // Number of the latest load, verify or remove, so that older answers are
-  // ignored (e.g. of a previous service or provider)
-  private request = 0;
+  // Number of the latest load, so that older answers are ignored (e.g. of a
+  // previous service or provider, or read before a verify or remove)
+  private loadRequest = 0;
+
+  // Result of the last verify or remove: shown instead of `verification`
+  // for that service until the app sets `verification` again
+  private own?: { id: string; verification: Verification | null };
 
   /** ID of the service: `serviceId`, else the ID of `service`. */
   private get targetId(): string {
@@ -158,6 +162,7 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
   }
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
+    if (changedProperties.has("verification")) this.own = undefined;
     // a new object of the same service (e.g. of a reloaded list) needs no
     // new request: the verification shown is compared with it on render
     const previous = changedProperties.get("service") as
@@ -198,16 +203,17 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
   }
 
   /**
-   * Shows `verification` if the app set it, else loads the verification of
-   * the service; services that aren't verified (`404`) show none.
+   * Shows `verification` if the app set it (or the result of a verify or
+   * remove since), else loads the verification of the service; services
+   * that aren't verified (`404`) show none.
    */
   private async load(): Promise<void> {
-    this.request += 1;
-    const { request } = this;
+    this.loadRequest += 1;
+    const request = this.loadRequest;
     const id = this.targetId;
-    this.busy = false;
     if (this.verification !== undefined) {
-      this.current = this.verification;
+      this.current =
+        this.own?.id === id ? this.own.verification : this.verification;
       return;
     }
     this.current = undefined;
@@ -223,10 +229,10 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
     }
     try {
       const verification = await provider.getServiceVerification(id);
-      if (request !== this.request) return;
+      if (request !== this.loadRequest) return;
       this.current = verification;
     } catch (err) {
-      if (request !== this.request) return;
+      if (request !== this.loadRequest) return;
       if (statusOf(err) === 404) {
         this.current = null;
         return;
@@ -235,6 +241,21 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
         failureDetail(id, "load", err, "Failed to load the verification")
       );
     }
+  }
+
+  /**
+   * Applies the result of a verify or remove: always reported, as the
+   * registry has applied it, but shown only if the component still shows
+   * that service.
+   */
+  private applied(id: string, verification: Verification | null): void {
+    if (id === this.targetId) {
+      // a load that runs now may have read the state before the change
+      this.loadRequest += 1;
+      this.current = verification;
+      if (this.verification !== undefined) this.own = { id, verification };
+    }
+    this.changed(id, verification);
   }
 
   /**
@@ -254,8 +275,6 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
       });
       return;
     }
-    this.request += 1;
-    const { request } = this;
     this.busy = true;
     try {
       const verification = await provider.verifyService(
@@ -271,15 +290,16 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
             }
           : undefined
       );
-      if (request !== this.request) return;
       this.busy = false;
-      this.current = verification;
-      this.changed(id, verification);
+      this.applied(id, verification);
     } catch (err) {
-      if (request !== this.request) return;
       this.busy = false;
       this.fail(failureDetail(id, "verify", err, "Failed to verify service"));
-      if (statusOf(err) === 409 && this.verification === undefined) {
+      if (
+        statusOf(err) === 409 &&
+        id === this.targetId &&
+        this.verification === undefined
+      ) {
         this.load();
       }
     }
@@ -301,25 +321,20 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
       });
       return;
     }
-    this.request += 1;
-    const { request } = this;
     this.busy = true;
     try {
       await provider.deleteServiceVerification(id);
     } catch (err) {
-      if (request !== this.request) return;
-      this.busy = false;
       if (statusOf(err) !== 404) {
+        this.busy = false;
         this.fail(
           failureDetail(id, "remove", err, "Failed to remove verification")
         );
         return;
       }
     }
-    if (request !== this.request) return;
     this.busy = false;
-    this.current = null;
-    this.changed(id, null);
+    this.applied(id, null);
   }
 
   private changed(serviceId: string, verification: Verification | null) {
