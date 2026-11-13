@@ -81,6 +81,38 @@ export interface RegistryServiceInfo extends Service {
 }
 
 /**
+ * URL and API type of a service that an admin checked, sent to verify it
+ * (`PUT /services/{serviceId}/verification`): the registry only verifies
+ * the service if it still has exactly this URL and API type
+ */
+export interface VerificationRegister {
+  /** URL of the service, exactly as registered */
+  url: string;
+  /** API type of the service; `version` isn't compared */
+  type: ServiceTypeRegister;
+}
+
+/**
+ * Verification of a service by an admin (`GET` and `PUT
+ * /services/{serviceId}/verification`, since cloud-registry 0.4.0), with
+ * the URL and API type of the service that were verified
+ */
+export interface Verification {
+  /** URL of the verified service, as registered */
+  url: string;
+  /** API type of the verified service */
+  type: ServiceType;
+  /** When an admin verified the service (RFC 3339, UTC) */
+  verifiedAt: string;
+}
+
+/** Verification of a service with its ID (`GET /verifications`) */
+export interface ServiceVerification extends Verification {
+  /** ID of the verified service */
+  serviceId: string;
+}
+
+/**
  * Interface defining the operations required for Cloud Registry data providers
  * Extends the base ServiceRegistryProvider with Cloud Registry specific creation and deletion operations
  */
@@ -104,4 +136,14 @@ export interface CloudRegistryProvider extends ServiceRegistryProvider {
   // Service info, with the registration rules of Cloud Registry 1.0.0rc2 and
   // later (optional, so providers returning a plain `Service` still conform)
   getServiceInfo(): Promise<RegistryServiceInfo>;
+
+  // Verification methods (Cloud Registry 0.4.0 and later; optional, so
+  // that providers without them still conform)
+  getVerifications?(): Promise<ServiceVerification[]>;
+  getServiceVerification?(id: string): Promise<Verification>;
+  verifyService?(
+    id: string,
+    verification?: VerificationRegister
+  ): Promise<Verification>;
+  deleteServiceVerification?(id: string): Promise<string>;
 }

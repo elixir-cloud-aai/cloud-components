@@ -33,6 +33,12 @@ export interface CloudRegistryProvider extends ServiceRegistryProvider {
 
   // Service info methods (Cloud Registry specific)
   createOrUpdateServiceInfo?(service: ServiceRegister): Promise<void>;
+
+  // Verification methods (Cloud Registry 0.4.0 and later; see Verifications)
+  getVerifications?(): Promise<ServiceVerification[]>;
+  getServiceVerification?(id: string): Promise<Verification>;
+  verifyService?(id: string, verification?: VerificationRegister): Promise<Verification>;
+  deleteServiceVerification?(id: string): Promise<string>;
 }
 ```
 
@@ -155,6 +161,48 @@ Creates or updates the service registry's own service information.
 createOrUpdateServiceInfo?(service: ServiceRegister): Promise<void>
 ```
 
+### Verifications
+
+Cloud Registry 0.4.0 and later let admins verify services, e.g. after checking that they accept the tokens of the deployment's identity provider. The methods are optional in `CloudRegistryProvider`, so that custom providers without them still conform; `RestCloudRegistryProvider` has them all. The [Service Verification component](/docs/cloud-registry/components/service-verification) uses them.
+
+```typescript
+// GET /verifications: the verified services, sorted by ID
+getVerifications?(): Promise<ServiceVerification[]>
+
+// GET /services/{id}/verification: rejects with status 404 if not verified
+getServiceVerification?(id: string): Promise<Verification>
+
+// PUT /services/{id}/verification (admins): with the URL and API type that
+// were checked, rejects with status 409 (problem `code`
+// `verification-mismatch`) if the service no longer has them; without
+// them, verifies the service as registered
+verifyService?(id: string, verification?: VerificationRegister): Promise<Verification>
+
+// DELETE /services/{id}/verification (admins): rejects with status 404 if
+// not verified; resolves to the service ID
+deleteServiceVerification?(id: string): Promise<string>
+```
+
+A verification only counts while the service still has the verified URL (as written) and API type (`type.group` and `type.artifact`, trimmed and case-insensitive; not `type.version`). The registry removes verifications when these change, but a list of services and a list of verifications loaded one after the other may disagree. Two helpers compare them as the registry does:
+
+```typescript
+import {
+  matchesVerification,
+  verifiedServices,
+} from '@elixir-cloud/cloud-registry/providers';
+
+const [services, verifications] = await Promise.all([
+  provider.getServices(),
+  provider.getVerifications(),
+]);
+
+// Map of service ID to verification, for the services that are verified
+const verified = verifiedServices(services, verifications);
+
+// Whether one verification still matches a service (or form values)
+matchesVerification(service, verification);
+```
+
 ## Errors
 
 If the registry answers with an error status, the methods of `RestCloudRegistryProvider` reject with a `CloudRegistryError`. It extends `Error` and carries the status and the [problem details](https://www.rfc-editor.org/rfc/rfc9457) that the registry sends:
@@ -254,6 +302,28 @@ interface RegistrationRules {
   serviceTypes: string; // 'open', 'controlled' or 'moderated'
   maxUnusedServiceTypes?: number;
   maxServicesPerUser?: number;
+}
+```
+
+### Verification, ServiceVerification and VerificationRegister
+
+```typescript
+// GET and PUT /services/{id}/verification
+interface Verification {
+  url: string; // URL of the verified service, as registered
+  type: ServiceType; // API type of the verified service
+  verifiedAt: string; // when an admin verified it (RFC 3339, UTC)
+}
+
+// GET /verifications
+interface ServiceVerification extends Verification {
+  serviceId: string;
+}
+
+// Body of PUT /services/{id}/verification: what the admin checked
+interface VerificationRegister {
+  url: string; // exactly as registered
+  type: ServiceTypeRegister; // `version` isn't compared
 }
 ```
 
