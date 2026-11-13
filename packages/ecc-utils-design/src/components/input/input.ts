@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { property } from "lit/decorators.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 
@@ -38,10 +39,20 @@ export class EccUtilsDesignInput extends LitElement {
   @property({ type: String }) placeholder = "";
   @property({ type: String }) value = "";
   @property({ type: Boolean, reflect: true }) disabled = false;
+  /**
+   * Whether the value is invalid; also implied by a non-empty `error`.
+   */
+  @property({ type: Boolean, reflect: true }) invalid = false;
+  /** Error message shown under the field, e.g. one returned by an API. */
+  @property({ type: String }) error = "";
 
   render() {
+    const isInvalid = this.invalid || !!this.error;
     const classes = cn(
-      "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+      "flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+      isInvalid
+        ? "border-destructive focus-visible:ring-destructive"
+        : "border-input focus-visible:ring-ring"
     );
 
     return html`
@@ -52,8 +63,18 @@ export class EccUtilsDesignInput extends LitElement {
         placeholder=${this.placeholder}
         .value=${this.value}
         ?disabled=${this.disabled}
+        aria-invalid=${ifDefined(isInvalid ? "true" : undefined)}
+        aria-describedby=${ifDefined(this.error ? "error" : undefined)}
         @input=${this._handleInput}
       />
+      <p
+        id="error"
+        part="error"
+        class=${cn("text-sm text-destructive", !!this.error && "mt-1.5")}
+        aria-live="polite"
+      >
+        ${this.error}
+      </p>
     `;
   }
 

@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { property, state } from "lit/decorators.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 
@@ -21,13 +22,24 @@ export class EccUtilsDesignCheckbox extends LitElement {
   @property({ type: Boolean, reflect: true }) disabled = false;
   @property({ type: String }) name = "";
   @property({ type: String }) value = "";
+  /**
+   * Whether the value is invalid; also implied by a non-empty `error`.
+   */
+  @property({ type: Boolean, reflect: true }) invalid = false;
+  /** Error message shown under the checkbox, e.g. one returned by an API. */
+  @property({ type: String }) error = "";
   @state() private _focused = false;
 
   render() {
+    const isInvalid = this.invalid || !!this.error;
     const checkboxClasses = cn(
-      "peer h-4 w-4 shrink-0 rounded-[4px] border border-primary shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+      "peer h-4 w-4 shrink-0 rounded-[4px] border shadow focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:opacity-50",
+      isInvalid
+        ? "border-destructive focus-visible:ring-destructive"
+        : "border-primary focus-visible:ring-ring",
       this.checked && "bg-primary text-primary-foreground",
-      this._focused && "ring-1 ring-ring"
+      this._focused &&
+        (isInvalid ? "ring-1 ring-destructive" : "ring-1 ring-ring")
     );
 
     const indicatorClasses = cn(
@@ -42,6 +54,8 @@ export class EccUtilsDesignCheckbox extends LitElement {
         role="checkbox"
         aria-checked=${this.checked ? "true" : "false"}
         aria-disabled=${this.disabled ? "true" : "false"}
+        aria-invalid=${ifDefined(isInvalid ? "true" : undefined)}
+        aria-describedby=${ifDefined(this.error ? "error" : undefined)}
         tabindex=${this.disabled ? "-1" : "0"}
         @click=${this._handleClick}
         @keydown=${this._handleKeydown}
@@ -63,6 +77,14 @@ export class EccUtilsDesignCheckbox extends LitElement {
           </svg>
         </div>
       </div>
+      <p
+        id="error"
+        part="error"
+        class=${cn("text-sm text-destructive", !!this.error && "mt-1.5")}
+        aria-live="polite"
+      >
+        ${this.error}
+      </p>
     `;
   }
 
