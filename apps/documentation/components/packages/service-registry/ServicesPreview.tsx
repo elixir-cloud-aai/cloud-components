@@ -13,9 +13,6 @@ export default function ServicesPreview() {
     console.log('Services data updated:', event.detail.services);
   };
 
-  // `baseUrl` rather than `provider`: the component reads `provider` only on
-  // its first update, which runs before React sets it on the server-rendered
-  // element, but it reloads when `baseUrl` changes
   return (
     <PreviewLayout>
       <ECCClientGa4ghServiceRegistryServices
