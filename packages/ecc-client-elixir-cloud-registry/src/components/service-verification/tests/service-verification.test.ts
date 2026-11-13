@@ -438,4 +438,164 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     expect(get.secondCall.args[0]).to.equal("service-2");
     expect(part(el, "badge")).to.equal(null);
   });
+
+  it("verifies once while a request runs, and shows that it runs", async () => {
+    const { provider, get, verify } = stubProvider();
+    get.rejects(notFound());
+    let answer = (value: typeof VERIFICATION): void => {
+      throw new Error(`No request waits for ${value.url}`);
+    };
+    verify.returns(
+      new Promise((resolve) => {
+        answer = resolve;
+      })
+    );
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        .service=${SERVICE}
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    const button = part(el, "verify-button");
+    button?.click();
+    await el.updateComplete;
+    button?.click();
+    await el.updateComplete;
+
+    expect(verify.calledOnce).to.equal(true);
+    expect(button?.textContent?.trim()).to.equal("Verifying...");
+    expect(button?.hasAttribute("disabled")).to.equal(true);
+
+    const changed = oneEvent(el, "ecc-service-verification-changed");
+    answer(VERIFICATION);
+    await changed;
+    await el.updateComplete;
+
+    expect(part(el, "remove-button")?.hasAttribute("disabled")).to.equal(false);
+  });
+
+  it("ignores a verify answer once the service changed", async () => {
+    const { provider, get, verify } = stubProvider();
+    get.rejects(notFound());
+    let answer = (value: typeof VERIFICATION): void => {
+      throw new Error(`No request waits for ${value.url}`);
+    };
+    verify.returns(
+      new Promise((resolve) => {
+        answer = resolve;
+      })
+    );
+    const changed = sinon.spy();
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        service-id="service-1"
+        .provider=${provider}
+        @ecc-service-verification-changed=${changed}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    click(part(el, "verify-button"));
+    el.serviceId = "service-2";
+    await settled(el);
+    answer(VERIFICATION);
+    await settled(el);
+
+    expect(changed.called).to.equal(false);
+    expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
+  });
+
+  it("reports a failed verify without loading again", async () => {
+    const { provider, get, verify } = stubProvider();
+    get.rejects(notFound());
+    verify.rejects(new CloudRegistryError("Admins only.", 403, {}));
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        service-id="service-1"
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    const failed = oneEvent(el, "ecc-service-verification-failed");
+    click(part(el, "verify-button"));
+    const { detail } = (await failed) as EccServiceVerificationFailedEvent;
+    await settled(el);
+
+    expect(detail.action).to.equal("verify");
+    expect(detail.status).to.equal(403);
+    expect(detail.code).to.equal(undefined);
+    expect(get.calledOnce).to.equal(true);
+    expect(part(el, "verify-button")?.hasAttribute("disabled")).to.equal(false);
+  });
+
+  it("leaves a mismatch with a verification of the app to the app", async () => {
+    const { provider, get, verify } = stubProvider();
+    verify.rejects(conflict());
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        .service=${SERVICE}
+        .verification=${null}
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    const failed = oneEvent(el, "ecc-service-verification-failed");
+    click(part(el, "verify-button"));
+    const { detail } = (await failed) as EccServiceVerificationFailedEvent;
+    await settled(el);
+
+    expect(detail.code).to.equal("verification-mismatch");
+    expect(get.called).to.equal(false);
+  });
+
+  it("shows nothing to other users for a verification of `null`", async () => {
+    const { provider, get } = stubProvider();
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        .service=${SERVICE}
+        .verification=${null}
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    expect(get.called).to.equal(false);
+    expect(part(el, "badge")).to.equal(null);
+    expect(part(el, "verify-button")).to.equal(null);
+  });
+
+  ["verify", "remove"].forEach((action) => {
+    it(`reports providers that can't ${action}`, async () => {
+      const provider = {
+        getServiceVerification: sinon
+          .stub()
+          .resolves(action === "remove" ? VERIFICATION : null),
+      } as unknown as CloudRegistryProvider;
+      const el = await fixture<El>(html`
+        <ecc-client-elixir-cloud-registry-service-verification
+          admin
+          service-id="service-1"
+          .provider=${provider}
+        ></ecc-client-elixir-cloud-registry-service-verification>
+      `);
+      await settled(el);
+
+      const failed = oneEvent(el, "ecc-service-verification-failed");
+      click(part(el, `${action}-button`));
+      const { detail } = (await failed) as EccServiceVerificationFailedEvent;
+
+      expect(detail.action).to.equal(action);
+      expect(detail.error).to.equal(
+        "The provider doesn't support verifications."
+      );
+    });
+  });
 });

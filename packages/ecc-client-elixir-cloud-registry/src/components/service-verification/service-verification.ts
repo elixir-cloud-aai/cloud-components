@@ -28,9 +28,8 @@ const statusOf = (err: unknown): number | undefined => {
 /**
  * Detail of `ecc-service-verification-failed` for an error that a provider
  * threw: its message, and the status and problem details if it has them.
- * They are read from the error's fields, as `CloudRegistryError` has them
- * (`code` from its `problem`), so that errors of custom providers with the
- * same fields work too.
+ * They are read from the error's fields, as `CloudRegistryError` has them,
+ * so that errors of custom providers with the same fields work too.
  * @param serviceId ID of the service
  * @param action What failed
  * @param err The error
@@ -45,10 +44,6 @@ const failureDetail = (
 ): FailureDetail => {
   const fields =
     err && typeof err === "object" ? (err as Record<string, unknown>) : {};
-  const problem =
-    fields.problem && typeof fields.problem === "object"
-      ? (fields.problem as Record<string, unknown>)
-      : {};
   const detail = nonBlankString(fields.detail);
   return {
     serviceId,
@@ -61,7 +56,7 @@ const failureDetail = (
     status: statusOf(err),
     title: nonBlankString(fields.title),
     detail,
-    code: nonBlankString(fields.code) ?? nonBlankString(problem.code),
+    code: nonBlankString(fields.code),
     cause: err,
   };
 };
@@ -348,7 +343,9 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
       ? html`<ecc-utils-design-badge
           part="badge"
           variant="secondary"
-          title=${`Verified on ${formatDate(current?.verifiedAt ?? "")}`}
+          title=${current?.verifiedAt
+            ? `Verified on ${formatDate(current.verifiedAt)}`
+            : "Verified"}
         >
           <svg
             class="mr-1 h-3 w-3"

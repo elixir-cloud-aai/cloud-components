@@ -214,6 +214,7 @@ If the registry answers with an error status, the methods of `RestCloudRegistryP
 | `title`     | `string \| undefined`         | Short summary of the problem type, e.g. "Conflict"                          |
 | `detail`    | `string \| undefined`         | Explanation of this occurrence, e.g. which field is invalid                 |
 | `serviceId` | `string \| undefined`         | ID of the existing service, for duplicate registrations (`409`)             |
+| `code`      | `string \| undefined`         | Why a request conflicts (`409`), e.g. `verification-mismatch`; treat unknown codes as a general conflict |
 | `problem`   | `ProblemDetails \| undefined` | The whole response body, if it was a JSON object                            |
 
 ```typescript

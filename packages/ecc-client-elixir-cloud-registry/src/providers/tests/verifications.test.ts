@@ -136,7 +136,7 @@ describe("RestCloudRegistryProvider verifications", () => {
     )) as CloudRegistryError;
 
     expect(err.status).to.equal(409);
-    expect(err.problem?.code).to.equal("verification-mismatch");
+    expect(err.code).to.equal("verification-mismatch");
     expect(err.message).to.equal("The service has another URL.");
   });
 
