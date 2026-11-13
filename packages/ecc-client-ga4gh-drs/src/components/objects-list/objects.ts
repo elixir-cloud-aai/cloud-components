@@ -52,6 +52,9 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
 
   private _provider: DrsProvider | null = null;
 
+  /** The REST provider for `baseUrl`, used without a custom provider */
+  private restProvider: RestDrsProvider | null = null;
+
   protected async firstUpdated(): Promise<void> {
     if (!this.baseUrl && !this.provider) {
       this.error =
@@ -62,7 +65,8 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
     if (this.provider) {
       this._provider = this.provider;
     } else if (this.baseUrl) {
-      this._provider = new RestDrsProvider(this.baseUrl);
+      this.restProvider = new RestDrsProvider(this.baseUrl);
+      this._provider = this.restProvider;
     } else {
       this._provider = null;
     }
@@ -89,6 +93,13 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
       } else {
         this.objects = [];
         this.loading = false;
+        this.dispatchEvent(
+          new CustomEvent("ecc-objects-changed", {
+            detail: { objects: [] },
+            bubbles: true,
+            composed: true,
+          })
+        );
         this.error =
           "Please provide either a base URL for the DRS API or a custom provider.";
       }
@@ -103,11 +114,10 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
   private useProvider(): boolean {
     let provider: DrsProvider | null = this.provider ?? null;
     if (!provider && this.baseUrl) {
-      provider =
-        this._provider instanceof RestDrsProvider &&
-        this._provider.baseUrl === this.baseUrl
-          ? this._provider
-          : new RestDrsProvider(this.baseUrl);
+      if (this.restProvider?.baseUrl !== this.baseUrl) {
+        this.restProvider = new RestDrsProvider(this.baseUrl);
+      }
+      provider = this.restProvider;
     }
     if (provider === this._provider) return false;
     this._provider = provider;
@@ -163,6 +173,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
       );
     } catch (err) {
       if (provider !== this._provider) return;
+      this.objects = [];
       this.error =
         err instanceof Error ? err.message : "Failed to load objects";
     } finally {

@@ -77,6 +77,9 @@ export class ECCClientGa4ghTrsTools extends LitElement {
 
   private _provider: TrsProvider | null = null;
 
+  /** The REST provider for `baseUrl`, used without a custom provider */
+  private restProvider: RestTrsProvider | null = null;
+
   protected async firstUpdated(): Promise<void> {
     if (!this.baseUrl && !this.provider) {
       this.error =
@@ -87,7 +90,8 @@ export class ECCClientGa4ghTrsTools extends LitElement {
     if (this.provider) {
       this._provider = this.provider;
     } else if (this.baseUrl) {
-      this._provider = new RestTrsProvider(this.baseUrl);
+      this.restProvider = new RestTrsProvider(this.baseUrl);
+      this._provider = this.restProvider;
     } else {
       this._provider = null;
     }
@@ -117,6 +121,14 @@ export class ECCClientGa4ghTrsTools extends LitElement {
         this.tools = [];
         this.loading = false;
         this.toolClasses = [];
+        this.toolClassMap = {};
+        this.dispatchEvent(
+          new CustomEvent("ecc-tools-changed", {
+            detail: { tools: [] },
+            bubbles: true,
+            composed: true,
+          })
+        );
         this.error =
           "Please provide either a base URL for the TRS API or a custom provider.";
       }
@@ -131,11 +143,10 @@ export class ECCClientGa4ghTrsTools extends LitElement {
   private useProvider(): boolean {
     let provider: TrsProvider | null = this.provider ?? null;
     if (!provider && this.baseUrl) {
-      provider =
-        this._provider instanceof RestTrsProvider &&
-        this._provider.baseUrl === this.baseUrl
-          ? this._provider
-          : new RestTrsProvider(this.baseUrl);
+      if (this.restProvider?.baseUrl !== this.baseUrl) {
+        this.restProvider = new RestTrsProvider(this.baseUrl);
+      }
+      provider = this.restProvider;
     }
     if (provider === this._provider) return false;
     this._provider = provider;
@@ -157,6 +168,10 @@ export class ECCClientGa4ghTrsTools extends LitElement {
         this.toolClasses.map((tc) => [tc.name, tc.id])
       );
     } catch (error) {
+      if (provider === this._provider) {
+        this.toolClasses = [];
+        this.toolClassMap = {};
+      }
       console.error("Failed to load tool classes:", error);
     }
   }
@@ -215,6 +230,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
       }
     } catch (err) {
       if (provider !== this._provider) return;
+      this.tools = [];
       this.error = err instanceof Error ? err.message : "Failed to load tools";
       console.error({
         error: this.error,

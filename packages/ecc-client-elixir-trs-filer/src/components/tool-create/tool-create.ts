@@ -227,6 +227,9 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
 
   private _provider: TrsFilerProvider | null = null;
 
+  /** The REST provider for `baseUrl`, used without a custom provider */
+  private restProvider: RestTrsFilerProvider | null = null;
+
   @state() private activeFileIndex: { [versionIndex: number]: number } = {};
   @state() private activeDescriptorType: {
     [versionIndex: number]: DescriptorType | "ALL";
@@ -253,7 +256,8 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
     if (this.provider) {
       this._provider = this.provider;
     } else if (this.baseUrl) {
-      this._provider = new RestTrsFilerProvider(this.baseUrl);
+      this.restProvider = new RestTrsFilerProvider(this.baseUrl);
+      this._provider = this.restProvider;
     } else {
       this._provider = null;
     }
@@ -357,11 +361,10 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
   private useProvider(): boolean {
     let provider: TrsFilerProvider | null = this.provider ?? null;
     if (!provider && this.baseUrl) {
-      provider =
-        this._provider instanceof RestTrsFilerProvider &&
-        this._provider.baseUrl === this.baseUrl
-          ? this._provider
-          : new RestTrsFilerProvider(this.baseUrl);
+      if (this.restProvider?.baseUrl !== this.baseUrl) {
+        this.restProvider = new RestTrsFilerProvider(this.baseUrl);
+      }
+      provider = this.restProvider;
     }
     if (provider === this._provider) return false;
     this._provider = provider;
@@ -378,6 +381,8 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
       if (provider !== this._provider) return;
       this.toolClasses = toolClasses;
     } catch (error) {
+      if (provider !== this._provider) return;
+      this.toolClasses = [];
       console.error("Failed to load tool classes:", error);
       this.dispatchEvent(
         new CustomEvent("ecc-tool-create-failed", {

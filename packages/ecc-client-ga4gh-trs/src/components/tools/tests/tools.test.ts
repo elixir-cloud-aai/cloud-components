@@ -156,6 +156,14 @@ describe("ecc-client-ga4gh-trs-tools provider", () => {
         .getCalls()
         .some((call) => call.args[0] === `${OTHER_URL}/toolClasses`)
     );
+
+    const urls = fetchStub.getCalls().map((call) => String(call.args[0]));
+    expect(urls.some((url) => url.startsWith(`${BASE_URL}/tools?`))).to.equal(
+      true
+    );
+    expect(urls.some((url) => url.startsWith(`${OTHER_URL}/tools?`))).to.equal(
+      true
+    );
   });
 
   it("shows an error once the provider is removed without a base URL", async () => {

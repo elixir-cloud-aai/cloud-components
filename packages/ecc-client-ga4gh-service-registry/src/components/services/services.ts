@@ -56,6 +56,9 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
 
   private _provider: ServiceRegistryProvider | null = null;
 
+  /** The REST provider for `baseUrl`, used without a custom provider */
+  private restProvider: RestServiceRegistryProvider | null = null;
+
   protected async firstUpdated(): Promise<void> {
     if (!this.baseUrl && !this.provider) {
       this.error =
@@ -66,7 +69,8 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     if (this.provider) {
       this._provider = this.provider;
     } else if (this.baseUrl) {
-      this._provider = new RestServiceRegistryProvider(this.baseUrl);
+      this.restProvider = new RestServiceRegistryProvider(this.baseUrl);
+      this._provider = this.restProvider;
     } else {
       this._provider = null;
     }
@@ -89,6 +93,13 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
         this.services = [];
         this.loading = false;
         this.serviceTypes = [];
+        this.dispatchEvent(
+          new CustomEvent("ecc-services-changed", {
+            detail: { services: [] },
+            bubbles: true,
+            composed: true,
+          })
+        );
         this.error =
           "Please provide either a base URL for the Service Registry API or a custom provider.";
       }
@@ -103,11 +114,10 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   private useProvider(): boolean {
     let provider: ServiceRegistryProvider | null = this.provider ?? null;
     if (!provider && this.baseUrl) {
-      provider =
-        this._provider instanceof RestServiceRegistryProvider &&
-        this._provider.baseUrl === this.baseUrl
-          ? this._provider
-          : new RestServiceRegistryProvider(this.baseUrl);
+      if (this.restProvider?.baseUrl !== this.baseUrl) {
+        this.restProvider = new RestServiceRegistryProvider(this.baseUrl);
+      }
+      provider = this.restProvider;
     }
     if (provider === this._provider) return false;
     this._provider = provider;
@@ -124,6 +134,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
       if (provider !== this._provider) return;
       this.serviceTypes = serviceTypes;
     } catch (error) {
+      if (provider === this._provider) this.serviceTypes = [];
       console.error("Failed to load service types:", error);
     }
   }
@@ -151,6 +162,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
       );
     } catch (err) {
       if (provider !== this._provider) return;
+      this.services = [];
       this.error =
         err instanceof Error ? err.message : "Failed to load services";
       console.error({

@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { expect, fixture, html, waitUntil } from "@open-wc/testing";
+import { expect, fixture, html, oneEvent, waitUntil } from "@open-wc/testing";
 import sinon from "sinon";
 import "../index.js";
 import type { ECCClientGa4ghServiceRegistryServices } from "../services.js";
@@ -7,6 +7,7 @@ import type {
   ExternalService,
   ServiceRegistryProvider,
 } from "../../../providers/index.js";
+import { RestServiceRegistryProvider } from "../../../providers/rest-sr-provider.js";
 
 const BASE_URL = "https://registry.example.org/ga4gh/registry/v1";
 const OTHER_URL = "https://other.example.org/ga4gh/registry/v1";
@@ -164,6 +165,32 @@ describe("ecc-client-ga4gh-service-registry-services provider", () => {
     expect(provider.getServices.callCount).to.equal(1);
   });
 
+  it("uses a REST provider of its own once a custom REST provider is removed", async () => {
+    // a custom provider that is a REST provider for the same base URL
+    class CustomProvider extends RestServiceRegistryProvider {
+      requests = 0;
+
+      protected fetch(input: RequestInfo | URL, init?: RequestInit) {
+        this.requests += 1;
+        return super.fetch(input, init);
+      }
+    }
+    const provider = new CustomProvider(BASE_URL);
+    const el = await fixture<ECCClientGa4ghServiceRegistryServices>(
+      html`<ecc-client-ga4gh-service-registry-services
+        .provider=${provider}
+        .baseUrl=${BASE_URL}
+      ></ecc-client-ga4gh-service-registry-services>`
+    );
+    await waitUntil(() => fetchStub.callCount === 2);
+    const { requests } = provider;
+
+    el.provider = undefined;
+    await waitUntil(() => fetchStub.callCount === 4);
+
+    expect(provider.requests).to.equal(requests);
+  });
+
   it("shows an error once the provider is removed without a base URL", async () => {
     const provider = stubProvider();
     const el = await fixture<ECCClientGa4ghServiceRegistryServices>(
@@ -172,6 +199,7 @@ describe("ecc-client-ga4gh-service-registry-services provider", () => {
       ></ecc-client-ga4gh-service-registry-services>`
     );
     await waitUntil(() => shown(el).length === 1);
+    const changed = oneEvent(el, "ecc-services-changed");
 
     el.provider = undefined;
     await el.updateComplete;
@@ -179,5 +207,25 @@ describe("ecc-client-ga4gh-service-registry-services provider", () => {
 
     expect(shown(el)).to.deep.equal([]);
     expect(el.shadowRoot?.textContent).to.contain(MISSING);
+    expect((await changed).detail.services).to.deep.equal([]);
+  });
+
+  it("shows no services of a replaced provider when the new one fails", async () => {
+    const first = stubProvider();
+    const second = stubProvider();
+    second.getServices.callsFake(async () => {
+      throw new Error("Unavailable");
+    });
+    const el = await fixture<ECCClientGa4ghServiceRegistryServices>(
+      html`<ecc-client-ga4gh-service-registry-services
+        .provider=${first}
+      ></ecc-client-ga4gh-service-registry-services>`
+    );
+    await waitUntil(() => shown(el).length === 1);
+
+    el.provider = second;
+    await waitUntil(() => el.shadowRoot?.textContent?.includes("Unavailable"));
+
+    expect(shown(el)).to.deep.equal([]);
   });
 });
