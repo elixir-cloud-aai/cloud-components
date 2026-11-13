@@ -116,6 +116,8 @@ This example shows an input field associated with a label.
 | `placeholder` | `string`   | `""`     | Placeholder text for the input.            |
 | `value`       | `string`   | `""`     | The current value of the input.            |
 | `disabled`    | `boolean`  | `false`  | When `true`, disables the input.           |
+| `invalid` | `boolean` | `false` | When `true`, marks the input as invalid (also implied by `error`). |
+| `error`   | `string`  | `""`    | Error message shown under the input, e.g. from an API. |
 
 ### `type`
 Specifies the input type, determining the data format and keyboard layout on mobile devices.
@@ -177,6 +179,22 @@ When `true`, the input is non-interactive and visually de-emphasized.
   <Tabs.Tab>
     ```html copy
     <ecc-utils-design-input disabled="true"></ecc-utils-design-input>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `invalid` and `error`
+`error` shows a message under the input, e.g. one that an API returned for this field (see [Field errors](/docs/design/field-errors)), and marks the input as invalid: it gets a red border, `aria-invalid="true"` and `aria-describedby` pointing to the message, and screen readers announce the message (`aria-live="polite"`). `invalid` marks the input as invalid without a message, e.g. when the message is shown elsewhere. Clear both when the user changes the value or submits again. The message has the part `error` for styling (`ecc-utils-design-input::part(error)`).
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignInput error="Must be a valid URI." />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-input error="Must be a valid URI."></ecc-utils-design-input>
     ```
   </Tabs.Tab>
 </Tabs>
