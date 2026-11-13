@@ -44,6 +44,8 @@ describe("normalizePointer()", () => {
     expect(normalizePointer("organization/url")).to.equal(undefined);
     expect(normalizePointer("#organization")).to.equal(undefined);
     expect(normalizePointer("#/%E0%A4%A")).to.equal(undefined);
+    expect(normalizePointer("/a~2b")).to.equal(undefined);
+    expect(normalizePointer("/a~")).to.equal(undefined);
   });
 });
 
@@ -94,6 +96,12 @@ describe("parseProblemDetails()", () => {
     expect(problem?.errors[0].parameter).to.equal("limit");
     expect(problem?.errors[0].pointer).to.equal(undefined);
     expect(problem?.errors[1].pointer).to.equal("/url");
+  });
+
+  it("recognizes problem details by any standard member", () => {
+    expect(parseProblemDetails({ instance: "/requests/1" })?.instance).to.equal(
+      "/requests/1"
+    );
   });
 
   it("defaults the type and ignores members of the wrong type", () => {
@@ -148,9 +156,12 @@ describe("readProblemDetails()", () => {
       response(body, "application/problem+json; charset=utf-8")
     );
     expect(problem?.errors).to.have.length(2);
-    expect(
-      await readProblemDetails(response(body, "application/json"))
-    ).to.not.equal(undefined);
+    const json = await readProblemDetails(response(body, "application/json"));
+    expect(json?.title).to.equal(RFC_EXAMPLE.title);
+    expect(json?.errors.map((e) => e.pointer)).to.deep.equal([
+      "/age",
+      "/profile/color",
+    ]);
   });
 
   it("returns undefined for other bodies", async () => {
@@ -300,6 +311,36 @@ describe("mapFieldErrors()", () => {
     );
     expect(mapped.fieldErrors.toString).to.equal("A.");
     expect(mapped.fieldErrors.constructor).to.equal("B.");
+  });
+
+  it("names the member with the empty key", () => {
+    const mapped = mapBody(
+      { errors: [{ detail: "E.", pointer: "#/" }] },
+      fields
+    );
+    expect(mapped.generalError).to.equal("/: E.");
+  });
+
+  it("keeps __proto__ as data", () => {
+    const problem = parseProblemDetails(
+      JSON.parse(
+        '{"title": "T", "__proto__": {"polluted": 1}, ' +
+          '"errors": [{"detail": "P.", "pointer": "#/__proto__"}]}'
+      )
+    );
+    expect(Object.getPrototypeOf(problem?.extensions)).to.equal(
+      Object.prototype
+    );
+    expect(Object.keys(problem!.extensions)).to.deep.equal(["__proto__"]);
+    // A field key `__proto__` (from JSON, as an own member)
+    const fieldsOfForm = JSON.parse('{"__proto__": "/__proto__"}');
+    const mapped = mapFieldErrors(problem, fieldsOfForm);
+    expect(
+      Object.getOwnPropertyDescriptor(mapped.fieldErrors, "__proto__")?.value
+    ).to.equal("P.");
+    expect(Object.getPrototypeOf(mapped.fieldErrors)).to.equal(
+      Object.prototype
+    );
   });
 
   it("returns the problem details it was given", () => {

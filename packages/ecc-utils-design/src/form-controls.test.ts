@@ -79,6 +79,7 @@ describe("form controls: invalid state and error message", () => {
         await el.updateComplete;
         const control = el.shadowRoot!.querySelector(selector)!;
         expect(control.hasAttribute("aria-invalid")).to.equal(false);
+        expect(control.hasAttribute("aria-describedby")).to.equal(false);
         expect(errorElement(el).textContent?.trim()).to.equal("");
         expect(control.className).to.not.contain("border-destructive");
       });
@@ -138,6 +139,10 @@ describe("form controls: invalid state and error message", () => {
         );
         expect(button().getAttribute("aria-invalid")).to.equal("true");
         const describedBy = button().getAttribute("aria-describedby")!;
+        // Hidden, so that the message isn't read twice
+        expect(
+          trigger.shadowRoot!.getElementById(describedBy)!.hidden
+        ).to.equal(true);
         expect(
           trigger.shadowRoot!.getElementById(describedBy)!.textContent?.trim()
         ).to.equal("Must be one of: a, b.");
@@ -147,6 +152,7 @@ describe("form controls: invalid state and error message", () => {
         await el.updateComplete;
         await trigger.updateComplete;
         expect(button().hasAttribute("aria-invalid")).to.equal(false);
+        expect(button().hasAttribute("aria-describedby")).to.equal(false);
         expect(button().className).to.not.contain("border-destructive");
 
         el.invalid = true;

@@ -103,7 +103,12 @@ export class ServiceForm extends LitElement {
   @state() private fieldErrors: Record<string, string> = {};
   @state() private generalError = '';
 
+  // Only the latest submission shows its errors
+  private submission = 0;
+
   private async submit(body: unknown) {
+    this.submission += 1;
+    const submission = this.submission;
     this.fieldErrors = {};
     this.generalError = '';
     let response: Response;
@@ -114,12 +119,16 @@ export class ServiceForm extends LitElement {
         body: JSON.stringify(body),
       });
     } catch {
-      this.generalError = 'The registry could not be reached.';
+      if (submission === this.submission) {
+        this.generalError = 'The registry could not be reached.';
+      }
       return;
     }
     if (response.ok) return;
+    const problem = await readProblemDetails(response);
+    if (submission !== this.submission) return;
     const mapped = mapFieldErrors(
-      await readProblemDetails(response),
+      problem,
       FIELDS,
       `The service could not be registered (${response.status}).`,
     );

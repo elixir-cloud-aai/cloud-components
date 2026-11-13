@@ -81,14 +81,15 @@ export interface MappedFieldErrors {
   generalError: string | undefined;
 }
 
-const STANDARD_MEMBERS = new Set([
+const STANDARD_MEMBERS_LIST = [
   "type",
   "title",
   "status",
   "detail",
   "instance",
   "errors",
-]);
+];
+const STANDARD_MEMBERS = new Set(STANDARD_MEMBERS_LIST);
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -116,7 +117,19 @@ export function normalizePointer(pointer: string): string | undefined {
     }
   }
   if (plain !== "" && !plain.startsWith("/")) return undefined;
+  // `~` only as `~0` or `~1` (RFC 6901)
+  if (/~(?![01])/.test(plain)) return undefined;
   return plain;
+}
+
+// Set a member as own data, also for keys like `__proto__`
+function setOwn(target: Record<string, unknown>, key: string, value: unknown) {
+  Object.defineProperty(target, key, {
+    value,
+    enumerable: true,
+    writable: true,
+    configurable: true,
+  });
 }
 
 function parseFieldError(entry: unknown): ProblemFieldError | undefined {
@@ -149,11 +162,10 @@ function parseFieldError(entry: unknown): ProblemFieldError | undefined {
  */
 export function parseProblemDetails(body: unknown): ProblemDetails | undefined {
   if (!isObject(body)) return undefined;
-  if (!["type", "title", "status", "detail", "errors"].some((m) => m in body))
-    return undefined;
+  if (!STANDARD_MEMBERS_LIST.some((member) => member in body)) return undefined;
   const extensions: Record<string, unknown> = {};
   Object.keys(body).forEach((key) => {
-    if (!STANDARD_MEMBERS.has(key)) extensions[key] = body[key];
+    if (!STANDARD_MEMBERS.has(key)) setOwn(extensions, key, body[key]);
   });
   const errors = Array.isArray(body.errors)
     ? body.errors
@@ -247,14 +259,16 @@ function findField(
 
 function describeUnmatched(error: ProblemFieldError): string {
   // E.g. `organization/url`, with keys unescaped (RFC 6901)
-  const location =
-    error.parameter ??
-    error.pointer
-      ?.slice(1)
-      .split("/")
-      .map((key) => key.replace(/~1/g, "/").replace(/~0/g, "~"))
-      .join("/");
-  return location ? `${location}: ${error.detail}` : error.detail;
+  if (error.parameter) return `${error.parameter}: ${error.detail}`;
+  // No location for the whole body (`""`)
+  if (!error.pointer) return error.detail;
+  const location = error.pointer
+    .slice(1)
+    .split("/")
+    .map((key) => key.replace(/~1/g, "/").replace(/~0/g, "~"))
+    .join("/");
+  // `/` points to the member with the empty key
+  return `${location || error.pointer}: ${error.detail}`;
 }
 
 /**
@@ -298,9 +312,13 @@ export function mapFieldErrors(
     const key = findField(error, locations);
     if (key === undefined) unmatched.push(error);
     else
-      fieldErrors[key] = Object.prototype.hasOwnProperty.call(fieldErrors, key)
-        ? `${fieldErrors[key]} ${error.detail}`
-        : error.detail;
+      setOwn(
+        fieldErrors,
+        key,
+        Object.prototype.hasOwnProperty.call(fieldErrors, key)
+          ? `${fieldErrors[key]} ${error.detail}`
+          : error.detail
+      );
   });
   return {
     problem,
