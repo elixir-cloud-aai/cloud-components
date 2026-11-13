@@ -18,16 +18,43 @@ import "@elixir-cloud/design/components/badge/index.js";
 import "@elixir-cloud/design/components/skeleton/index.js";
 
 /**
+ * Renders the actions of a row from its service: a Lit template, a DOM node,
+ * a string, or nothing (`null` or `undefined`) for a row without actions.
+ */
+export type RowActionsRenderer = (service: ExternalService) => unknown;
+
+/** The selected values of the filters; empty for "All". */
+interface ServiceFilters {
+  type: string;
+  organization: string;
+  environment: string;
+}
+
+/** The value of a service type in the type filter. */
+const typeKey = (type: ServiceType): string =>
+  `${type.group}:${type.artifact}:${type.version}`;
+
+/** The distinct, non-empty values, sorted. */
+const uniqueSorted = (values: (string | undefined)[]): string[] =>
+  [...new Set(values.filter((value): value is string => !!value))].sort(
+    (a, b) => a.localeCompare(b)
+  );
+
+/**
  * @summary This component is used to display data from Service Registry API.
  * @since 1.0.0
  *
  * @property {string} baseUrl - Base URL of the Service Registry instance
- * @property {boolean} filter - Determines if the service filter field should be rendered
+ * @property {boolean} filter - Determines if the type, organization and environment filters should be rendered
  * @property {boolean} search - Determines if the search field should be rendered
+ * @property {number} pageSize - Number of services per page (attribute `page-size`); 0 or less shows all services on one page
  * @property {ServiceRegistryProvider} provider - Custom data provider (optional, overrides baseUrl)
+ * @property {RowActionsRenderer} rowActions - Renders the actions of each row (e.g. Edit and Delete buttons) from its service
+ *
+ * @slot actions-<id> - Actions of the row of the service with this ID, instead of those of `rowActions` or the "View Details" button
  *
  * @fires ecc-services-changed - Fired when services data changes
- * @fires ecc-service-selected - Fired when a service is clicked
+ * @fires ecc-service-selected - Fired when a service or its row is clicked
  */
 export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   static styles = [
@@ -44,15 +71,26 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   @property({ type: String, reflect: true }) baseUrl = "";
   @property({ type: Boolean, reflect: true }) filter = true;
   @property({ type: Boolean, reflect: true }) search = true;
+  @property({ type: Number, attribute: "page-size", reflect: true })
+  pageSize = 10;
+
   @property({ attribute: false, reflect: true })
   provider?: ServiceRegistryProvider;
+
+  @property({ attribute: false }) rowActions?: RowActionsRenderer;
 
   @state() private searchQuery = "";
   @state() private services: ExternalService[] = [];
   @state() private loading = false;
   @state() private error: string | null = null;
   @state() private serviceTypes: ServiceType[] = [];
-  @state() private searchTimeout: ReturnType<typeof setTimeout> | null = null;
+  @state() private filters: ServiceFilters = {
+    type: "",
+    organization: "",
+    environment: "",
+  };
+
+  @state() private currentPage = 1;
 
   private _provider: ServiceRegistryProvider | null = null;
 
@@ -125,52 +163,75 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     }
   }
 
-  private handleSearch(e: CustomEvent): void {
-    this.searchQuery = e.detail.value;
-
-    // Clear any existing timeout
-    if (this.searchTimeout) {
-      clearTimeout(this.searchTimeout);
-    }
-
-    // Set a new timeout for debouncing
-    this.searchTimeout = setTimeout(() => {
-      this.filterServices();
-    }, 500);
+  private handleSearch(e: CustomEvent<{ value?: string }>): void {
+    this.searchQuery = e.detail.value ?? "";
+    this.currentPage = 1;
   }
 
-  private filterServices(): void {
-    if (!this.searchQuery) {
-      this.loadData();
-      return;
-    }
+  private handleFilterChange(key: keyof ServiceFilters, e: Event): void {
+    const { value } = (e as CustomEvent<{ value?: string }>).detail;
+    this.filters = { ...this.filters, [key]: value ?? "" };
+    this.currentPage = 1;
+  }
 
-    const query = this.searchQuery.toLowerCase();
-    if (!this._provider) return;
+  /** The loaded services that match the search query and the filters. */
+  private get filteredServices(): ExternalService[] {
+    const query = this.searchQuery.trim().toLowerCase();
+    const { type, organization, environment } = this.filters;
+    return this.services.filter(
+      (service) =>
+        (!type || (!!service.type && typeKey(service.type) === type)) &&
+        (!organization || service.organization?.name === organization) &&
+        (!environment || service.environment === environment) &&
+        (!query ||
+          [
+            service.id,
+            service.name,
+            service.description,
+            service.url,
+            service.organization?.name,
+            service.type?.group,
+            service.type?.artifact,
+          ].some((field) => field?.toLowerCase().includes(query)))
+    );
+  }
 
-    this.loading = true;
-    this.error = null;
+  /** The types to filter by: the registry's, or else those of the services. */
+  private get typeOptions(): ServiceType[] {
+    const types = this.serviceTypes.length
+      ? this.serviceTypes
+      : this.services.map((service) => service.type).filter(Boolean);
+    return [...new Map(types.map((type) => [typeKey(type), type])).values()];
+  }
 
-    try {
-      // For now, we'll just filter client-side
-      // In a real implementation, you might want to do this on the server
-      this._provider.getServices().then((services) => {
-        this.services = services.filter(
-          (service) =>
-            service.id.toLowerCase().includes(query) ||
-            service.name.toLowerCase().includes(query) ||
-            service.description?.toLowerCase().includes(query) ||
-            service.organization.name.toLowerCase().includes(query) ||
-            service.type.group.toLowerCase().includes(query) ||
-            service.type.artifact.toLowerCase().includes(query)
-        );
-        this.loading = false;
-      });
-    } catch (err) {
-      this.error =
-        err instanceof Error ? err.message : "Failed to filter services";
-      this.loading = false;
-    }
+  private get organizationOptions(): string[] {
+    return uniqueSorted(
+      this.services.map((service) => service.organization?.name)
+    );
+  }
+
+  private get environmentOptions(): string[] {
+    return uniqueSorted(this.services.map((service) => service.environment));
+  }
+
+  private pageCount(total: number): number {
+    if (!(this.pageSize >= 1)) return 1;
+    return Math.max(1, Math.ceil(total / this.pageSize));
+  }
+
+  private goToPage(page: number, pageCount: number): void {
+    this.currentPage = Math.min(Math.max(page, 1), pageCount);
+  }
+
+  private handleRowClick(e: MouseEvent, serviceId: string): void {
+    // Clicks on the actions of a row (slotted content included) are theirs
+    const onActions = e
+      .composedPath()
+      .some(
+        (node) =>
+          node instanceof HTMLElement && node.hasAttribute("data-actions")
+      );
+    if (!onActions) this.handleViewDetails(serviceId);
   }
 
   private handleViewDetails(serviceId: string): void {
@@ -234,7 +295,239 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     return "default"; // Default style for other services
   }
 
+  private renderFilterSelect(
+    key: keyof ServiceFilters,
+    label: string,
+    options: { value: string; label: string }[]
+  ) {
+    return html`
+      <div class="flex flex-col gap-1">
+        <ecc-utils-design-label>${label}</ecc-utils-design-label>
+        <ecc-utils-design-select
+          class="part:w-48"
+          data-filter=${key}
+          .value=${this.filters[key]}
+          @ecc-input-changed=${(e: Event) => this.handleFilterChange(key, e)}
+        >
+          <ecc-utils-design-select-trigger>
+            <ecc-utils-design-select-value
+              placeholder="All"
+            ></ecc-utils-design-select-value>
+          </ecc-utils-design-select-trigger>
+          <ecc-utils-design-select-content>
+            <ecc-utils-design-select-item value=""
+              >All</ecc-utils-design-select-item
+            >
+            ${options.map(
+              (option) =>
+                html`<ecc-utils-design-select-item value=${option.value}
+                  >${option.label}</ecc-utils-design-select-item
+                >`
+            )}
+          </ecc-utils-design-select-content>
+        </ecc-utils-design-select>
+      </div>
+    `;
+  }
+
+  private renderFilters() {
+    if (!this.filter) return "";
+
+    const environments = this.environmentOptions;
+    return html`
+      <div class="flex flex-wrap gap-3 items-end">
+        ${this.renderFilterSelect(
+          "type",
+          "Type",
+          this.typeOptions.map((type) => ({
+            value: typeKey(type),
+            label: `${type.artifact}@${type.version} (${type.group})`,
+          }))
+        )}
+        ${this.renderFilterSelect(
+          "organization",
+          "Organization",
+          this.organizationOptions.map((name) => ({ value: name, label: name }))
+        )}
+        ${environments.length
+          ? this.renderFilterSelect(
+              "environment",
+              "Environment",
+              environments.map((name) => ({ value: name, label: name }))
+            )
+          : ""}
+      </div>
+    `;
+  }
+
+  private renderPageLink(page: number, current: number, pageCount: number) {
+    return html`
+      <ecc-utils-design-pagination-item>
+        <ecc-utils-design-pagination-link
+          data-page=${page}
+          ?isActive=${page === current}
+          @ecc-button-clicked=${(e: CustomEvent) => {
+            if (e.detail.variant === "link") this.goToPage(page, pageCount);
+          }}
+          >${page}</ecc-utils-design-pagination-link
+        >
+      </ecc-utils-design-pagination-item>
+    `;
+  }
+
+  private static renderEllipsis() {
+    return html`
+      <ecc-utils-design-pagination-item>
+        <ecc-utils-design-pagination-ellipsis></ecc-utils-design-pagination-ellipsis>
+      </ecc-utils-design-pagination-item>
+    `;
+  }
+
+  /** Previous, the first, last and nearby pages, and next. */
+  private renderPagination(current: number, pageCount: number) {
+    if (pageCount <= 1) return "";
+
+    const nearby = [current - 1, current, current + 1].filter(
+      (page) => page > 1 && page < pageCount
+    );
+    const pages = [1, ...nearby, pageCount];
+    return html`
+      <ecc-utils-design-pagination>
+        <ecc-utils-design-pagination-content>
+          <ecc-utils-design-pagination-item>
+            <ecc-utils-design-pagination-previous
+              ?disabled=${current === 1}
+              @ecc-button-clicked=${(e: CustomEvent) => {
+                if (e.detail.variant === "previous") {
+                  this.goToPage(current - 1, pageCount);
+                }
+              }}
+            ></ecc-utils-design-pagination-previous>
+          </ecc-utils-design-pagination-item>
+          ${pages.map(
+            (page, i) => html`
+              ${i > 0 && page - pages[i - 1] > 1
+                ? ECCClientGa4ghServiceRegistryServices.renderEllipsis()
+                : ""}
+              ${this.renderPageLink(page, current, pageCount)}
+            `
+          )}
+          <ecc-utils-design-pagination-item>
+            <ecc-utils-design-pagination-next
+              ?disabled=${current === pageCount}
+              @ecc-button-clicked=${(e: CustomEvent) => {
+                if (e.detail.variant === "next") {
+                  this.goToPage(current + 1, pageCount);
+                }
+              }}
+            ></ecc-utils-design-pagination-next>
+          </ecc-utils-design-pagination-item>
+        </ecc-utils-design-pagination-content>
+      </ecc-utils-design-pagination>
+    `;
+  }
+
+  private renderActions(service: ExternalService) {
+    return this.rowActions
+      ? this.rowActions(service)
+      : html`<ecc-utils-design-button
+          size="sm"
+          @click=${() => this.handleViewDetails(service.id)}
+        >
+          View Details
+        </ecc-utils-design-button>`;
+  }
+
+  private renderRow(service: ExternalService) {
+    return html`
+      <ecc-utils-design-table-row
+        class="cursor-pointer"
+        data-service-id=${service.id}
+        @click=${(e: MouseEvent) => this.handleRowClick(e, service.id)}
+      >
+        <ecc-utils-design-table-cell class="w-7/12">
+          <div class="flex flex-col w-full">
+            <div class="flex items-center gap-2">
+              <ecc-utils-design-button
+                class="part:font-medium part:text-primary part:w-fit part:cursor-pointer part:p-0"
+                variant="link"
+              >
+                ${service.name || "-"}
+              </ecc-utils-design-button>
+              ${service.version
+                ? html`<ecc-utils-design-badge variant="outline">
+                    v${service.version}
+                  </ecc-utils-design-badge>`
+                : ""}
+            </div>
+            ${service.description
+              ? html`<div
+                  class="text-xs text-muted-foreground line-clamp-3 break-all whitespace-normal overflow-hidden max-w-full"
+                >
+                  ${service.description}
+                </div>`
+              : ""}
+          </div>
+        </ecc-utils-design-table-cell>
+        <ecc-utils-design-table-cell class="w-2/12">
+          <ecc-utils-design-badge
+            variant=${ECCClientGa4ghServiceRegistryServices.getServiceTypeVariant(
+              service.type
+            )}
+          >
+            ${service.type.artifact}@${service.type.version}
+          </ecc-utils-design-badge>
+        </ecc-utils-design-table-cell>
+        <ecc-utils-design-table-cell class="w-2/12">
+          ${service.organization.url
+            ? html`<ecc-utils-design-button
+                class="part:font-medium part:text-primary part:w-fit part:cursor-pointer part:p-0"
+                variant="link"
+                data-actions
+                @click=${() => window.open(service.organization.url, "_blank")}
+              >
+                ${service.organization.name}
+              </ecc-utils-design-button>`
+            : html`${service.organization.name}`}
+        </ecc-utils-design-table-cell>
+        <ecc-utils-design-table-cell class="w-1/12" data-actions>
+          <slot name=${`actions-${service.id}`}
+            >${this.renderActions(service)}</slot
+          >
+        </ecc-utils-design-table-cell>
+      </ecc-utils-design-table-row>
+    `;
+  }
+
+  private renderRows(services: ExternalService[]) {
+    if (this.loading) {
+      return ECCClientGa4ghServiceRegistryServices.renderSkeletonRows();
+    }
+    if (services.length === 0) {
+      return html`
+        <ecc-utils-design-table-row>
+          <ecc-utils-design-table-cell
+            colspan="4"
+            class="part:text-center part:py-8 part:text-muted-foreground"
+          >
+            No services found
+          </ecc-utils-design-table-cell>
+        </ecc-utils-design-table-row>
+      `;
+    }
+    return services.map((service) => this.renderRow(service));
+  }
+
   render() {
+    const filtered = this.filteredServices;
+    const pageCount = this.pageCount(filtered.length);
+    // The page may be past the end after the list or the page size changed
+    const page = Math.min(this.currentPage, pageCount);
+    const shown =
+      this.pageSize >= 1
+        ? filtered.slice((page - 1) * this.pageSize, page * this.pageSize)
+        : filtered;
+
     return html`
       <div class="flex flex-col gap-4">
         ${this.error
@@ -250,12 +543,14 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
                 <ecc-utils-design-label>Search Services</ecc-utils-design-label>
                 <ecc-utils-design-input
                   class="part:w-full"
-                  placeholder="Search by name, type, organization..."
+                  data-search
+                  placeholder="Search by name, type, organization, URL..."
                   @ecc-input-changed=${this.handleSearch}
                 ></ecc-utils-design-input>
               </div>
             `
           : ""}
+        ${this.renderFilters()}
 
         <ecc-utils-design-table>
           <ecc-utils-design-table-header>
@@ -275,87 +570,10 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
             </ecc-utils-design-table-row>
           </ecc-utils-design-table-header>
           <ecc-utils-design-table-body>
-            ${(() => {
-              if (this.loading) {
-                return ECCClientGa4ghServiceRegistryServices.renderSkeletonRows();
-              }
-              if (this.services.length === 0) {
-                return html`
-                  <ecc-utils-design-table-row>
-                    <ecc-utils-design-table-cell
-                      colspan="4"
-                      class="part:text-center part:py-8 part:text-muted-foreground"
-                    >
-                      No services found
-                    </ecc-utils-design-table-cell>
-                  </ecc-utils-design-table-row>
-                `;
-              }
-              return this.services.map(
-                (service) => html`
-                  <ecc-utils-design-table-row>
-                    <ecc-utils-design-table-cell class="w-7/12">
-                      <div class="flex flex-col w-full">
-                        <div class="flex items-center gap-2">
-                          <ecc-utils-design-button
-                            class="part:font-medium part:text-primary part:w-fit part:cursor-pointer part:p-0"
-                            variant="link"
-                            @click=${() => this.handleViewDetails(service.id)}
-                          >
-                            ${service.name || "-"}
-                          </ecc-utils-design-button>
-                          ${service.version
-                            ? html`<ecc-utils-design-badge variant="outline">
-                                v${service.version}
-                              </ecc-utils-design-badge>`
-                            : ""}
-                        </div>
-                        ${service.description
-                          ? html`<div
-                              class="text-xs text-muted-foreground line-clamp-3 break-all whitespace-normal overflow-hidden max-w-full"
-                            >
-                              ${service.description}
-                            </div>`
-                          : ""}
-                      </div>
-                    </ecc-utils-design-table-cell>
-                    <ecc-utils-design-table-cell class="w-2/12">
-                      <ecc-utils-design-badge
-                        variant=${ECCClientGa4ghServiceRegistryServices.getServiceTypeVariant(
-                          service.type
-                        )}
-                      >
-                        ${service.type.artifact}@${service.type.version}
-                      </ecc-utils-design-badge>
-                    </ecc-utils-design-table-cell>
-                    <ecc-utils-design-table-cell class="w-2/12">
-                      ${service.organization.url
-                        ? html`<ecc-utils-design-button
-                            class="part:font-medium part:text-primary part:w-fit part:cursor-pointer part:p-0"
-                            variant="link"
-                            @click=${() =>
-                              window.open(service.organization.url, "_blank")}
-                          >
-                            ${service.organization.name}
-                          </ecc-utils-design-button>`
-                        : html`${service.organization.name}`}
-                    </ecc-utils-design-table-cell>
-                    <ecc-utils-design-table-cell class="w-1/12">
-                      <slot name=${`actions-${service.id}`}>
-                        <ecc-utils-design-button
-                          size="sm"
-                          @click=${() => this.handleViewDetails(service.id)}
-                        >
-                          View Details
-                        </ecc-utils-design-button>
-                      </slot>
-                    </ecc-utils-design-table-cell>
-                  </ecc-utils-design-table-row>
-                `
-              );
-            })()}
+            ${this.renderRows(shown)}
           </ecc-utils-design-table-body>
         </ecc-utils-design-table>
+        ${this.loading ? "" : this.renderPagination(page, pageCount)}
       </div>
     `;
   }
