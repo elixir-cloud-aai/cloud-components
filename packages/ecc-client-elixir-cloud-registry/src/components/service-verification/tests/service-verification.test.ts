@@ -502,6 +502,8 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     click(part(el, "verify-button"));
     el.serviceId = "service-2";
     await settled(el);
+    // the request for service-1 doesn't block service-2
+    expect(part(el, "verify-button")?.hasAttribute("disabled")).to.equal(false);
     answer(VERIFICATION);
     await settled(el);
 
@@ -510,6 +512,42 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
       serviceId: "service-1",
       verification: VERIFICATION,
     });
+    expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
+  });
+
+  it("doesn't show a verify of another registry", async () => {
+    const { provider, get, verify } = stubProvider();
+    get.rejects(notFound());
+    let answer = (value: typeof VERIFICATION): void => {
+      throw new Error(`No request waits for ${value.url}`);
+    };
+    verify.returns(
+      new Promise((resolve) => {
+        answer = resolve;
+      })
+    );
+    const changed = sinon.spy();
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        service-id="service-1"
+        .provider=${provider}
+        @ecc-service-verification-changed=${changed}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    click(part(el, "verify-button"));
+    const other = new RestCloudRegistryProvider(
+      "https://other.example.org/ga4gh/registry/v1"
+    );
+    sinon.stub(other, "getServiceVerification").rejects(notFound());
+    el.provider = other;
+    await settled(el);
+    answer(VERIFICATION);
+    await settled(el);
+
+    expect(changed.calledOnce).to.equal(true);
     expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
   });
 
@@ -645,5 +683,69 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
         "The provider doesn't support verifications."
       );
     });
+  });
+
+  it("reports a remove of a previous service, but doesn't show it", async () => {
+    const { provider, get, remove } = stubProvider();
+    get.onFirstCall().resolves(VERIFICATION);
+    get.onSecondCall().resolves(VERIFICATION);
+    let answer = (value: string): void => {
+      throw new Error(`No request waits for ${value}`);
+    };
+    remove.returns(
+      new Promise((resolve) => {
+        answer = resolve;
+      })
+    );
+    const changed = sinon.spy();
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        service-id="service-1"
+        .provider=${provider}
+        @ecc-service-verification-changed=${changed}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    click(part(el, "remove-button"));
+    el.serviceId = "service-2";
+    await settled(el);
+    expect(part(el, "remove-button")?.hasAttribute("disabled")).to.equal(false);
+    answer("service-1");
+    await settled(el);
+
+    expect(changed.firstCall.args[0].detail).to.deep.equal({
+      serviceId: "service-1",
+      verification: null,
+    });
+    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+  });
+
+  it("drops a result of its own for another registry", async () => {
+    const { provider, verify } = stubProvider();
+    verify.resolves(VERIFICATION);
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        .service=${SERVICE}
+        .verification=${null}
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    const changed = oneEvent(el, "ecc-service-verification-changed");
+    click(part(el, "verify-button"));
+    await changed;
+    await el.updateComplete;
+    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+
+    el.provider = new RestCloudRegistryProvider(
+      "https://other.example.org/ga4gh/registry/v1"
+    );
+    await settled(el);
+
+    expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
   });
 });
