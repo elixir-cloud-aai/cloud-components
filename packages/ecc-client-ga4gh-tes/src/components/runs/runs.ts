@@ -355,7 +355,7 @@ export class ECCClientGa4ghTesRuns extends LitElement {
 
     return html`
       <ecc-utils-design-table-row>
-        <ecc-utils-design-table-cell class="w-5/12">
+        <ecc-utils-design-table-cell class="w-4/12">
           <div class="flex flex-col gap-1">
             ${run.name ? html`<span>${run.name}</span>` : ""}
             <ecc-utils-design-button
@@ -376,8 +376,8 @@ export class ECCClientGa4ghTesRuns extends LitElement {
         <ecc-utils-design-table-cell class="w-2/12">
           ${ECCClientGa4ghTesRuns.formatDateTime(run.creation_time)}
         </ecc-utils-design-table-cell>
-        <ecc-utils-design-table-cell class="w-3/12">
-          <div class="flex gap-2">
+        <ecc-utils-design-table-cell class="w-4/12">
+          <div class="flex flex-wrap gap-2">
             <ecc-utils-design-button
               size="sm"
               variant="outline"
@@ -427,7 +427,7 @@ export class ECCClientGa4ghTesRuns extends LitElement {
     if (!this.baseUrl && !this.provider) {
       return html`
         <div
-          class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+          class="p-4 border border-destructive rounded-md text-destructive bg-destructive/10"
         >
           ${NO_SOURCE_ERROR}
         </div>
@@ -439,7 +439,7 @@ export class ECCClientGa4ghTesRuns extends LitElement {
         ${this.error
           ? html`
               <div
-                class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+                class="p-4 border border-destructive rounded-md text-destructive bg-destructive/10"
               >
                 ${this.error}
               </div>
@@ -450,7 +450,7 @@ export class ECCClientGa4ghTesRuns extends LitElement {
         <ecc-utils-design-table>
           <ecc-utils-design-table-header>
             <ecc-utils-design-table-row>
-              <ecc-utils-design-table-head class="w-5/12"
+              <ecc-utils-design-table-head class="w-4/12"
                 >Task</ecc-utils-design-table-head
               >
               <ecc-utils-design-table-head class="w-2/12"
@@ -460,7 +460,7 @@ export class ECCClientGa4ghTesRuns extends LitElement {
                 >Created</ecc-utils-design-table-head
               >
               <ecc-utils-design-table-head
-                class="w-3/12"
+                class="w-4/12"
               ></ecc-utils-design-table-head>
             </ecc-utils-design-table-row>
           </ecc-utils-design-table-header>
