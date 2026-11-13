@@ -47,44 +47,51 @@ export class EccUtilsDesignCheckbox extends LitElement {
       !this.checked && "opacity-0"
     );
 
+    // The message is positioned under the box without taking space, so
+    // that it neither widens nor shifts the box next to its label
     return html`
-      <div
-        part="base"
-        class=${checkboxClasses}
-        role="checkbox"
-        aria-checked=${this.checked ? "true" : "false"}
-        aria-disabled=${this.disabled ? "true" : "false"}
-        aria-invalid=${ifDefined(isInvalid ? "true" : undefined)}
-        aria-describedby=${ifDefined(this.error ? "error" : undefined)}
-        tabindex=${this.disabled ? "-1" : "0"}
-        @click=${this._handleClick}
-        @keydown=${this._handleKeydown}
-        @focus=${this._handleFocus}
-        @blur=${this._handleBlur}
-      >
-        <div class=${indicatorClasses}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="h-4 w-4"
-          >
-            <path d="M20 6 9 17l-5-5" />
-          </svg>
+      <div class="relative">
+        <div
+          part="base"
+          class=${checkboxClasses}
+          role="checkbox"
+          aria-checked=${this.checked ? "true" : "false"}
+          aria-disabled=${this.disabled ? "true" : "false"}
+          aria-invalid=${ifDefined(isInvalid ? "true" : undefined)}
+          aria-describedby=${ifDefined(this.error ? "error" : undefined)}
+          tabindex=${this.disabled ? "-1" : "0"}
+          @click=${this._handleClick}
+          @keydown=${this._handleKeydown}
+          @focus=${this._handleFocus}
+          @blur=${this._handleBlur}
+        >
+          <div class=${indicatorClasses}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-4 w-4"
+            >
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+          </div>
         </div>
+        <p
+          id="error"
+          part="error"
+          class=${cn(
+            "absolute left-0 top-full whitespace-nowrap text-sm text-destructive",
+            !!this.error && "mt-1.5"
+          )}
+          aria-live="polite"
+        >
+          ${this.error}
+        </p>
       </div>
-      <p
-        id="error"
-        part="error"
-        class=${cn("text-sm text-destructive", !!this.error && "mt-1.5")}
-        aria-live="polite"
-      >
-        ${this.error}
-      </p>
     `;
   }
 

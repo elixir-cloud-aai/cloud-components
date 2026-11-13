@@ -164,6 +164,13 @@ describe("readProblemDetails()", () => {
 });
 
 describe("mapFieldErrors()", () => {
+  // Maps a response body, parsed as the docs show
+  const mapBody = (
+    body: unknown,
+    fieldsOfForm: Parameters<typeof mapFieldErrors>[1],
+    fallback?: string
+  ) => mapFieldErrors(parseProblemDetails(body), fieldsOfForm, fallback);
+
   const fields = {
     age: "#/age",
     color: "/profile/color",
@@ -173,7 +180,7 @@ describe("mapFieldErrors()", () => {
   };
 
   it("maps errors to fields by pointer", () => {
-    const mapped = mapFieldErrors(RFC_EXAMPLE, fields);
+    const mapped = mapBody(RFC_EXAMPLE, fields);
     expect(mapped.fieldErrors).to.deep.equal({
       age: "must be a positive integer",
       color: "must be 'green', 'red' or 'blue'",
@@ -184,7 +191,7 @@ describe("mapFieldErrors()", () => {
   });
 
   it("maps parameters, object locations and contained fields", () => {
-    const mapped = mapFieldErrors(
+    const mapped = mapBody(
       {
         errors: [
           { detail: "Too large.", parameter: "limit" },
@@ -204,7 +211,7 @@ describe("mapFieldErrors()", () => {
   });
 
   it("prefers the closest containing field", () => {
-    const mapped = mapFieldErrors(
+    const mapped = mapBody(
       { errors: [{ detail: "Bad.", pointer: "#/a/b/c" }] },
       { a: "/a", ab: "/a/b", abc2: "/a/bc" }
     );
@@ -212,7 +219,7 @@ describe("mapFieldErrors()", () => {
   });
 
   it("reports unknown pointers and parameters as a general error", () => {
-    const mapped = mapFieldErrors(
+    const mapped = mapBody(
       {
         detail: "Invalid fields",
         errors: [
@@ -233,7 +240,7 @@ describe("mapFieldErrors()", () => {
   });
 
   it("doesn't map body errors to parameters or vice versa", () => {
-    const mapped = mapFieldErrors(
+    const mapped = mapBody(
       {
         errors: [
           { detail: "A.", pointer: "#/limit" },
@@ -247,7 +254,7 @@ describe("mapFieldErrors()", () => {
   });
 
   it("ignores fields with invalid locations", () => {
-    const mapped = mapFieldErrors(
+    const mapped = mapBody(
       { errors: [{ detail: "A.", pointer: "#/age" }] },
       { age: "age", other: { pointer: "x" } }
     );
@@ -257,24 +264,45 @@ describe("mapFieldErrors()", () => {
 
   it("falls back to detail, title or the fallback without errors", () => {
     expect(
-      mapFieldErrors({ title: "Bad Request", detail: "No." }, fields)
-        .generalError
+      mapBody({ title: "Bad Request", detail: "No." }, fields).generalError
     ).to.equal("No.");
     expect(
-      mapFieldErrors({ title: "Bad Request", errors: [] }, fields).generalError
+      mapBody({ title: "Bad Request", errors: [] }, fields).generalError
     ).to.equal("Bad Request");
-    expect(mapFieldErrors({ status: 500 }, fields).generalError).to.equal(
+    expect(mapBody({ status: 500 }, fields).generalError).to.equal(
       "The request failed."
     );
-    const notProblem = mapFieldErrors("Internal Server Error", fields, "Oops.");
+    const notProblem = mapBody("Internal Server Error", fields, "Oops.");
     expect(notProblem.problem).to.equal(undefined);
     expect(notProblem.generalError).to.equal("Oops.");
-    expect(mapFieldErrors(undefined, fields).generalError).to.equal(
+    expect(mapBody(undefined, fields).generalError).to.equal(
       "The request failed."
     );
   });
 
-  it("accepts problem details parsed already", () => {
+  it("unescapes keys in the locations of the general error", () => {
+    const mapped = mapBody(
+      { errors: [{ detail: "F.", pointer: "#/a~1b/c~0d" }] },
+      fields
+    );
+    expect(mapped.generalError).to.equal("a/b/c~d: F.");
+  });
+
+  it("handles field keys that are names of object members", () => {
+    const mapped = mapBody(
+      {
+        errors: [
+          { detail: "A.", pointer: "#/toString" },
+          { detail: "B.", pointer: "#/constructor" },
+        ],
+      },
+      { toString: "/toString", constructor: "/constructor" }
+    );
+    expect(mapped.fieldErrors.toString).to.equal("A.");
+    expect(mapped.fieldErrors.constructor).to.equal("B.");
+  });
+
+  it("returns the problem details it was given", () => {
     const problem = parseProblemDetails(RFC_EXAMPLE);
     const mapped = mapFieldErrors(problem, fields);
     expect(mapped.problem).to.equal(problem);

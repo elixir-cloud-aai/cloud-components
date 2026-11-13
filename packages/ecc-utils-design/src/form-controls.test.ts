@@ -126,9 +126,12 @@ describe("form controls: invalid state and error message", () => {
         const trigger = el.querySelector(triggerTag) as LitElement;
         const button = () => trigger.shadowRoot!.querySelector("button")!;
         expect(button().hasAttribute("aria-invalid")).to.equal(false);
+        expect(errorElement(el).textContent?.trim()).to.equal("");
+        expect(errorElement(el).getAttribute("aria-live")).to.equal("polite");
 
         el.error = "Must be one of: a, b.";
         await el.updateComplete;
+        expect(el.hasAttribute("invalid")).to.equal(false);
         await trigger.updateComplete;
         expect(errorElement(el).textContent?.trim()).to.equal(
           "Must be one of: a, b."
@@ -149,8 +152,25 @@ describe("form controls: invalid state and error message", () => {
         el.invalid = true;
         await el.updateComplete;
         await trigger.updateComplete;
+        expect(el.hasAttribute("invalid")).to.equal(true);
         expect(button().getAttribute("aria-invalid")).to.equal("true");
         expect(button().hasAttribute("aria-describedby")).to.equal(false);
+      });
+
+      it("takes the error from the attribute", async () => {
+        const el = await create();
+        el.setAttribute("error", "Is required.");
+        await el.updateComplete;
+        expect(errorElement(el).textContent?.trim()).to.equal("Is required.");
+      });
+
+      it("has a valid trigger without a select", async () => {
+        const trigger = await fixture<LitElement>(
+          `<${triggerTag}></${triggerTag}>`
+        );
+        const button = trigger.shadowRoot!.querySelector("button")!;
+        expect(button.hasAttribute("aria-invalid")).to.equal(false);
+        expect(button.className).to.contain("border-input");
       });
     });
   });

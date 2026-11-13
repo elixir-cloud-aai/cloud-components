@@ -195,7 +195,7 @@ The value attribute, used when submitting the checkbox as part of a form.
 </Tabs>
 
 ### `invalid` and `error`
-`error` shows a message under the checkbox, e.g. one that an API returned for this field (see [Field errors](/docs/design/field-errors)), and marks the checkbox as invalid: it gets a red border, `aria-invalid="true"` and `aria-describedby` pointing to the message, and screen readers announce the message (`aria-live="polite"`). `invalid` marks the checkbox as invalid without a message, e.g. when the message is shown elsewhere. Clear both when the user changes the value or submits again. The message has the part `error` for styling (`ecc-utils-design-checkbox::part(error)`).
+`error` shows a message under the checkbox, e.g. one that an API returned for this field (see [Field errors](/docs/design/field-errors)), and marks the checkbox as invalid: it gets a red border, `aria-invalid="true"` and `aria-describedby` pointing to the message, and screen readers announce the message (`aria-live="polite"`). `invalid` marks the checkbox as invalid without a message, e.g. when the message is shown elsewhere. Clear both when the user changes the value or submits again. The message has the part `error` for styling (`ecc-utils-design-checkbox::part(error)`). Unlike the other controls' messages, it is positioned under the box without taking space (so that it doesn't widen or shift the box next to its label): leave room below the checkbox, e.g. with a margin.
 
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>

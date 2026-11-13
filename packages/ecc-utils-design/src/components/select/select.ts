@@ -179,10 +179,10 @@ export class EccUtilsDesignSelectTrigger extends LitElement {
       this.disabled && "opacity-50 cursor-not-allowed"
     );
 
-    // The select shows the error; the trigger has a copy for screen
-    // readers, as `aria-describedby` can't refer to another shadow root
+    // The select shows the error; the trigger has a hidden copy for
+    // `aria-describedby`, which can't refer to another shadow root
     return html`
-      <span id="error" class="sr-only">${error}</span>
+      <span id="error" hidden>${error}</span>
       <button
         part="base"
         type="button"

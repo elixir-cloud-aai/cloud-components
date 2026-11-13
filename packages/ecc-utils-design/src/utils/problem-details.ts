@@ -81,16 +81,6 @@ export interface MappedFieldErrors {
   generalError: string | undefined;
 }
 
-// Problem details returned by `parseProblemDetails()`, so that
-// `mapFieldErrors()` can tell them from response bodies
-const parsedProblems = new WeakSet<object>();
-
-function isParsedProblem(value: unknown): value is ProblemDetails {
-  return (
-    typeof value === "object" && value !== null && parsedProblems.has(value)
-  );
-}
-
 const STANDARD_MEMBERS = new Set([
   "type",
   "title",
@@ -179,7 +169,6 @@ export function parseProblemDetails(body: unknown): ProblemDetails | undefined {
     errors,
     extensions,
   };
-  parsedProblems.add(problem);
   return problem;
 }
 
@@ -257,7 +246,14 @@ function findField(
 }
 
 function describeUnmatched(error: ProblemFieldError): string {
-  const location = error.parameter ?? error.pointer?.slice(1);
+  // E.g. `organization/url`, with keys unescaped (RFC 6901)
+  const location =
+    error.parameter ??
+    error.pointer
+      ?.slice(1)
+      .split("/")
+      .map((key) => key.replace(/~1/g, "/").replace(/~0/g, "~"))
+      .join("/");
   return location ? `${location}: ${error.detail}` : error.detail;
 }
 
@@ -270,21 +266,19 @@ function describeUnmatched(error: ProblemFieldError): string {
  * details without field errors and responses that aren't problem details
  * give a general error instead.
  *
- * @param body - The parsed JSON body of the response, or problem details
- *   parsed already (e.g. by `readProblemDetails()`); `undefined` if there is
- *   no body.
+ * @param problem - Problem details, as returned by `readProblemDetails()` or
+ *   `parseProblemDetails()`; `undefined` if the response has none.
  * @param fields - The form's fields: their keys (e.g. the names the
  *   component uses for them) and their locations in the request.
- * @param fallback - General error for responses that aren't problem details
- *   or have neither `detail` nor `title`.
+ * @param fallback - General error for responses without problem details or
+ *   with neither `detail` nor `title`.
  * @returns The messages per field and the general error.
  */
 export function mapFieldErrors(
-  body: unknown,
+  problem: ProblemDetails | undefined,
   fields: Record<string, FieldLocation>,
   fallback = "The request failed."
 ): MappedFieldErrors {
-  const problem = isParsedProblem(body) ? body : parseProblemDetails(body);
   const fieldErrors: Record<string, string> = {};
   const unmatched: ProblemFieldError[] = [];
   if (!problem || problem.errors.length === 0) {
@@ -304,7 +298,7 @@ export function mapFieldErrors(
     const key = findField(error, locations);
     if (key === undefined) unmatched.push(error);
     else
-      fieldErrors[key] = fieldErrors[key]
+      fieldErrors[key] = Object.prototype.hasOwnProperty.call(fieldErrors, key)
         ? `${fieldErrors[key]} ${error.detail}`
         : error.detail;
   });
