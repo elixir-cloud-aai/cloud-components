@@ -19,6 +19,8 @@ export class EccUtilsDesignTextarea extends LitElement {
   ];
 
   @property({ type: String }) placeholder = "";
+  /** Accessible name for the native control (forwarded as aria-label) */
+  @property({ type: String }) label?: string;
   @property({ type: String }) value = "";
   @property({ type: Boolean, reflect: true }) disabled = false;
   /**
@@ -41,6 +43,7 @@ export class EccUtilsDesignTextarea extends LitElement {
 
     return html`
       <textarea
+        aria-label=${ifDefined(this.label || undefined)}
         part="base"
         class=${classes}
         placeholder=${this.placeholder}

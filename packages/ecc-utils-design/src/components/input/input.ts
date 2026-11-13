@@ -37,6 +37,8 @@ export class EccUtilsDesignInput extends LitElement {
 
   @property({ type: String }) type: InputType = "text";
   @property({ type: String }) placeholder = "";
+  /** Accessible name for the native control (forwarded as aria-label) */
+  @property({ type: String }) label?: string;
   @property({ type: String }) value = "";
   @property({ type: Boolean, reflect: true }) disabled = false;
   /**
@@ -57,6 +59,7 @@ export class EccUtilsDesignInput extends LitElement {
 
     return html`
       <input
+        aria-label=${ifDefined(this.label || undefined)}
         type=${this.type}
         part="base"
         class=${classes}
