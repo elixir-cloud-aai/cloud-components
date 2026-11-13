@@ -3,6 +3,7 @@ import { property } from "lit/decorators.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
+import { AttrForwardingController } from "../../attribute-forwarding.js";
 
 function cn(...classes: (string | undefined | false)[]) {
   return classes.filter(Boolean).join(" ");
@@ -25,6 +26,15 @@ export class EccUtilsDesignTextarea extends LitElement {
   @property({ type: Boolean, reflect: true }) disabled = false;
   @property({ type: Number }) rows = 3;
   @property({ type: Number }) cols?: number;
+
+  private _aria = new AttrForwardingController(this, "textarea", [
+    "name",
+    "required",
+    "readonly",
+    "autocomplete",
+    "minlength",
+    "maxlength",
+  ]);
 
   render() {
     const classes = cn(
