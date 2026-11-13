@@ -4,7 +4,7 @@ import { playwrightLauncher } from "@web/test-runner-playwright";
 
 // Packages run tests in parallel (turbo --parallel), so each package's test
 // scripts pass a unique --port: design 8000, wes 8001, cloud registry 8002,
-// service registry 8003, trs 8004, trs-filer 8005, drs 8006.
+// tes 8003, service registry 8004, trs 8005, trs-filer 8006, drs 8007.
 export default {
   rootDir: ".",
   files: "src/**/*.test.ts", // "default" group
