@@ -84,7 +84,7 @@ export class EccUtilsDesignCheckbox extends LitElement {
           id="error"
           part="error"
           class=${cn(
-            "absolute left-0 top-full whitespace-nowrap text-sm text-destructive",
+            "pointer-events-none absolute left-0 top-full whitespace-nowrap text-sm text-destructive",
             !!this.error && "mt-1.5"
           )}
           aria-live="polite"

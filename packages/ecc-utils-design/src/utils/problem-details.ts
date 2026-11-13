@@ -281,7 +281,7 @@ export function mapFieldErrors(
 ): MappedFieldErrors {
   const fieldErrors: Record<string, string> = {};
   const unmatched: ProblemFieldError[] = [];
-  if (!problem || problem.errors.length === 0) {
+  if (!problem || !Array.isArray(problem.errors) || !problem.errors.length) {
     return {
       problem,
       fieldErrors,
