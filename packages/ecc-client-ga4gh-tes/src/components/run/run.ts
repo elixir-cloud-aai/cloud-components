@@ -332,21 +332,30 @@ export class ECCClientGa4ghTesRun extends LitElement {
       <div class="mt-4 space-y-2">
         ${task.executors.map(
           (executor, index) => html`
-            <ecc-utils-design-collapsible>
+            <ecc-utils-design-collapsible
+              class="block border rounded-lg overflow-hidden"
+            >
               <ecc-utils-design-collapsible-trigger class="part:w-full">
                 <div
-                  class="flex items-center justify-between font-medium p-2 border rounded-md"
+                  class="flex items-center justify-between gap-4 h-11 px-4 text-sm font-medium bg-muted/60 hover:bg-muted cursor-pointer transition-colors"
                 >
                   <span>${executor.image || `Executor ${index + 1}`}</span>
-                  <span class="text-sm text-muted-foreground"
-                    >Click to expand</span
+                  <svg
+                    class="w-4 h-4 text-muted-foreground shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
                   >
+                    <path d="m6 9 6 6 6-6"></path>
+                  </svg>
                 </div>
               </ecc-utils-design-collapsible-trigger>
               <ecc-utils-design-collapsible-content>
-                <div
-                  class="p-4 border border-t-0 rounded-b-md flex flex-col gap-3 text-sm"
-                >
+                <div class="p-4 border-t flex flex-col gap-3 text-sm">
                   <dl class="flex flex-col gap-2">
                     ${ECCClientGa4ghTesRun.renderRow("Image", executor.image)}
                     ${ECCClientGa4ghTesRun.renderRow(
@@ -417,10 +426,12 @@ export class ECCClientGa4ghTesRun extends LitElement {
       <div class="mt-4 space-y-2">
         ${task.logs.map(
           (log, index) => html`
-            <ecc-utils-design-collapsible>
+            <ecc-utils-design-collapsible
+              class="block border rounded-lg overflow-hidden"
+            >
               <ecc-utils-design-collapsible-trigger class="part:w-full">
                 <div
-                  class="flex items-center justify-between font-medium p-2 border rounded-md"
+                  class="flex items-center justify-between gap-4 h-11 px-4 text-sm font-medium bg-muted/60 hover:bg-muted cursor-pointer transition-colors"
                 >
                   <span
                     >Attempt ${index + 1}
@@ -430,15 +441,22 @@ export class ECCClientGa4ghTesRun extends LitElement {
                         )}`
                       : ""}</span
                   >
-                  <span class="text-sm text-muted-foreground"
-                    >Click to Expand</span
+                  <svg
+                    class="w-4 h-4 text-muted-foreground shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
                   >
+                    <path d="m6 9 6 6 6-6"></path>
+                  </svg>
                 </div>
               </ecc-utils-design-collapsible-trigger>
               <ecc-utils-design-collapsible-content>
-                <div
-                  class="p-4 border border-t-0 rounded-b-md flex flex-col gap-4 text-sm"
-                >
+                <div class="p-4 border-t flex flex-col gap-4 text-sm">
                   <dl class="flex flex-col gap-2">
                     ${ECCClientGa4ghTesRun.renderRow(
                       "Start Time",
@@ -509,7 +527,7 @@ export class ECCClientGa4ghTesRun extends LitElement {
   private static renderError(message: string) {
     return html`
       <div
-        class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+        class="p-4 border border-destructive rounded-md text-destructive bg-destructive/10"
       >
         ${message}
       </div>

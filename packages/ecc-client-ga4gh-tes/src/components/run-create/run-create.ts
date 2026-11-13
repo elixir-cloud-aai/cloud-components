@@ -124,12 +124,20 @@ const hasWildcardMarker = (path: string): boolean =>
  */
 export class ECCClientGa4ghTesRunCreate extends LitElement {
   static styles = [
-    GlobalStyles,
     TailwindStyles,
+    GlobalStyles,
     css`
       :host {
         display: block;
         width: 100%;
+      }
+
+      .success-message {
+        color: var(--ecc-success, #15803d);
+        font-size: 0.875rem;
+      }
+      :host([dark]) .success-message {
+        color: var(--ecc-success, #86efac);
       }
     `,
   ];
@@ -401,9 +409,23 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
         variant="ghost"
         size="sm"
         class="part:h-9 part:w-9 part:p-0"
+        title="Remove"
         @click=${onClick}
-        >×</ecc-utils-design-button
       >
+        <span class="sr-only">Remove</span>
+        <svg
+          class="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M18 6 6 18M6 6l12 12"></path>
+        </svg>
+      </ecc-utils-design-button>
     `;
   }
 
@@ -428,11 +450,13 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
         </div>
         ${this.form[key].map(
           (row, index) => html`
-            <div class="flex gap-2 items-center">
+            <div
+              class="grid grid-cols-1 md:grid-cols-2 xl:flex gap-2 items-center"
+            >
               ${fields.map(
                 (field) => html`
                   <ecc-utils-design-input
-                    class="flex-1 h-9"
+                    class="flex-1 min-w-0 w-full h-9"
                     placeholder=${field.placeholder}
                     .value=${row[field.name] ?? ""}
                     @ecc-input-changed=${(e: CustomEvent) =>
@@ -455,9 +479,14 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
       this.updateExecutor(index, patch);
 
     return html`
-      <div class="grid gap-4 p-4 border rounded-md">
-        <div class="flex items-center justify-between">
-          <div class="font-medium text-sm">Executor ${index + 1}</div>
+      <section
+        class="border rounded-lg overflow-hidden"
+        aria-label="Executor ${index + 1}"
+      >
+        <div
+          class="flex items-center justify-between h-11 px-4 border-b bg-muted/60"
+        >
+          <div class="text-sm font-medium">Executor ${index + 1}</div>
           ${this.form.executors.length > 1
             ? ECCClientGa4ghTesRunCreate.renderRemoveButton(() =>
                 this.setField(
@@ -467,137 +496,143 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
               )
             : ""}
         </div>
-        ${ECCClientGa4ghTesRunCreate.renderText(
-          "Image",
-          executor.image,
-          (image) => set({ image }),
-          {
-            required: true,
-            placeholder: "ubuntu:latest",
-          }
-        )}
-        <div class="grid gap-2">
-          <ecc-utils-design-label class="text-sm font-medium">
-            Command (one argument per line)
-            <span class="text-destructive">*</span>
-          </ecc-utils-design-label>
-          <ecc-utils-design-textarea
-            .value=${executor.command}
-            placeholder="echo&#10;hello world"
-            @ecc-input-changed=${(e: CustomEvent) =>
-              set({ command: e.detail.value })}
-          ></ecc-utils-design-textarea>
-        </div>
-        <ecc-utils-design-collapsible>
-          <ecc-utils-design-collapsible-trigger>
-            <div
-              class="flex items-center justify-between w-full py-2 text-left hover:bg-muted/50 focus:outline-none focus:ring-1 focus:ring-ring rounded-t cursor-pointer transition-colors px-2"
-            >
-              <div class="space-y-0.5">
-                <h4 class="text-sm font-medium text-muted-foreground">
-                  Advanced executor options
-                </h4>
-              </div>
-              <svg
-                class="w-4 h-4 text-muted-foreground/60 transition-transform duration-200 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        <div class="grid gap-4 p-4">
+          ${ECCClientGa4ghTesRunCreate.renderText(
+            "Image",
+            executor.image,
+            (image) => set({ image }),
+            {
+              required: true,
+              placeholder: "ubuntu:latest",
+            }
+          )}
+          <div class="grid gap-2">
+            <ecc-utils-design-label class="text-sm font-medium">
+              Command (one argument per line)
+              <span class="text-destructive">*</span>
+            </ecc-utils-design-label>
+            <ecc-utils-design-textarea
+              .value=${executor.command}
+              placeholder="echo&#10;hello world"
+              @ecc-input-changed=${(e: CustomEvent) =>
+                set({ command: e.detail.value })}
+            ></ecc-utils-design-textarea>
+          </div>
+          <ecc-utils-design-collapsible>
+            <ecc-utils-design-collapsible-trigger>
+              <div
+                class="flex items-center justify-between w-full py-2 text-left hover:bg-muted/50 focus:outline-none focus:ring-1 focus:ring-ring rounded-md cursor-pointer transition-colors"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 9l-7 7-7-7"
-                ></path>
-              </svg>
-            </div>
-          </ecc-utils-design-collapsible-trigger>
-          <ecc-utils-design-collapsible-content>
-            <div class="grid gap-4 pt-2">
-              ${ECCClientGa4ghTesRunCreate.renderText(
-                "Workdir",
-                executor.workdir,
-                (workdir) => set({ workdir })
-              )}
-              ${ECCClientGa4ghTesRunCreate.renderText(
-                "Stdin",
-                executor.stdin,
-                (stdin) => set({ stdin })
-              )}
-              ${ECCClientGa4ghTesRunCreate.renderText(
-                "Stdout",
-                executor.stdout,
-                (stdout) => set({ stdout })
-              )}
-              ${ECCClientGa4ghTesRunCreate.renderText(
-                "Stderr",
-                executor.stderr,
-                (stderr) => set({ stderr })
-              )}
-              <div class="flex items-center gap-2">
-                <ecc-utils-design-checkbox
-                  ?checked=${executor.ignoreError}
-                  @ecc-input-changed=${(e: CustomEvent) =>
-                    set({ ignoreError: e.detail.checked })}
-                ></ecc-utils-design-checkbox>
-                <ecc-utils-design-label class="text-sm font-medium">
-                  Ignore error (continue to next executor on failure)
-                </ecc-utils-design-label>
-              </div>
-              <div class="grid gap-2">
-                <div class="flex items-center justify-between">
-                  <ecc-utils-design-label class="text-sm font-medium">
-                    Environment
-                  </ecc-utils-design-label>
-                  <ecc-utils-design-button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    @click=${() => set({ env: [...executor.env, {}] })}
-                    >Add</ecc-utils-design-button
-                  >
+                <div class="space-y-0.5">
+                  <h4 class="text-sm font-medium text-muted-foreground">
+                    Advanced executor options
+                  </h4>
                 </div>
-                ${executor.env.map(
-                  (row, envIndex) => html`
-                    <div class="flex gap-2 items-center">
-                      <ecc-utils-design-input
-                        class="flex-1 h-9"
-                        placeholder="Name"
-                        .value=${row.key ?? ""}
-                        @ecc-input-changed=${(e: CustomEvent) =>
-                          set({
-                            env: executor.env.map((r, i) =>
-                              i === envIndex ? { ...r, key: e.detail.value } : r
-                            ),
-                          })}
-                      ></ecc-utils-design-input>
-                      <ecc-utils-design-input
-                        class="flex-1 h-9"
-                        placeholder="Value"
-                        .value=${row.value ?? ""}
-                        @ecc-input-changed=${(e: CustomEvent) =>
-                          set({
-                            env: executor.env.map((r, i) =>
-                              i === envIndex
-                                ? { ...r, value: e.detail.value }
-                                : r
-                            ),
-                          })}
-                      ></ecc-utils-design-input>
-                      ${ECCClientGa4ghTesRunCreate.renderRemoveButton(() =>
-                        set({
-                          env: executor.env.filter((_, i) => i !== envIndex),
-                        })
-                      )}
-                    </div>
-                  `
-                )}
+                <svg
+                  class="w-4 h-4 text-muted-foreground/60 transition-transform duration-200 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  ></path>
+                </svg>
               </div>
-            </div>
-          </ecc-utils-design-collapsible-content>
-        </ecc-utils-design-collapsible>
-      </div>
+            </ecc-utils-design-collapsible-trigger>
+            <ecc-utils-design-collapsible-content>
+              <div class="grid gap-4 pt-2">
+                ${ECCClientGa4ghTesRunCreate.renderText(
+                  "Workdir",
+                  executor.workdir,
+                  (workdir) => set({ workdir })
+                )}
+                ${ECCClientGa4ghTesRunCreate.renderText(
+                  "Stdin",
+                  executor.stdin,
+                  (stdin) => set({ stdin })
+                )}
+                ${ECCClientGa4ghTesRunCreate.renderText(
+                  "Stdout",
+                  executor.stdout,
+                  (stdout) => set({ stdout })
+                )}
+                ${ECCClientGa4ghTesRunCreate.renderText(
+                  "Stderr",
+                  executor.stderr,
+                  (stderr) => set({ stderr })
+                )}
+                <div class="flex items-center gap-2">
+                  <ecc-utils-design-checkbox
+                    ?checked=${executor.ignoreError}
+                    @ecc-input-changed=${(e: CustomEvent) =>
+                      set({ ignoreError: e.detail.checked })}
+                  ></ecc-utils-design-checkbox>
+                  <ecc-utils-design-label class="text-sm font-medium">
+                    Ignore error (continue to next executor on failure)
+                  </ecc-utils-design-label>
+                </div>
+                <div class="grid gap-2">
+                  <div class="flex items-center justify-between">
+                    <ecc-utils-design-label class="text-sm font-medium">
+                      Environment
+                    </ecc-utils-design-label>
+                    <ecc-utils-design-button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      @click=${() => set({ env: [...executor.env, {}] })}
+                      >Add</ecc-utils-design-button
+                    >
+                  </div>
+                  ${executor.env.map(
+                    (row, envIndex) => html`
+                      <div
+                        class="grid grid-cols-1 md:grid-cols-2 xl:flex gap-2 items-center"
+                      >
+                        <ecc-utils-design-input
+                          class="flex-1 min-w-0 w-full h-9"
+                          placeholder="Name"
+                          .value=${row.key ?? ""}
+                          @ecc-input-changed=${(e: CustomEvent) =>
+                            set({
+                              env: executor.env.map((r, i) =>
+                                i === envIndex
+                                  ? { ...r, key: e.detail.value }
+                                  : r
+                              ),
+                            })}
+                        ></ecc-utils-design-input>
+                        <ecc-utils-design-input
+                          class="flex-1 min-w-0 w-full h-9"
+                          placeholder="Value"
+                          .value=${row.value ?? ""}
+                          @ecc-input-changed=${(e: CustomEvent) =>
+                            set({
+                              env: executor.env.map((r, i) =>
+                                i === envIndex
+                                  ? { ...r, value: e.detail.value }
+                                  : r
+                              ),
+                            })}
+                        ></ecc-utils-design-input>
+                        ${ECCClientGa4ghTesRunCreate.renderRemoveButton(() =>
+                          set({
+                            env: executor.env.filter((_, i) => i !== envIndex),
+                          })
+                        )}
+                      </div>
+                    `
+                  )}
+                </div>
+              </div>
+            </ecc-utils-design-collapsible-content>
+          </ecc-utils-design-collapsible>
+        </div>
+      </section>
     `;
   }
 
@@ -722,7 +757,7 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
       !this.baseUrl && !this.provider
         ? html`
             <div
-              class="p-4 border border-destructive rounded-md text-destructive-foreground bg-destructive/10"
+              class="p-4 border border-destructive rounded-md text-destructive bg-destructive/10"
             >
               ${NO_SOURCE_ERROR}
             </div>
@@ -771,7 +806,9 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
           ? html`<div class="text-sm text-destructive mt-4">${this.error}</div>`
           : ""}
         ${this.success
-          ? html`<div class="text-sm mt-4">${this.success}</div>`
+          ? html`<div class="success-message mt-4" role="status">
+              ${this.success}
+            </div>`
           : ""}
 
         <div class="flex justify-end gap-2 mt-6">
@@ -785,7 +822,12 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
           </ecc-utils-design-button>
           <ecc-utils-design-button
             type="submit"
-            ?disabled=${this.submitting}
+            ?disabled=${this.submitting ||
+            !this.activeProvider ||
+            this.form.executors.length === 0 ||
+            this.form.executors.some(
+              (executor) => !executor.image.trim() || !executor.command.trim()
+            )}
             @click=${this.handleSubmit}
           >
             ${this.submitting ? "Submitting..." : "Submit Task"}

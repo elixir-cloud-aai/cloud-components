@@ -47,8 +47,12 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
         margin-top: 0.5rem;
       }
 
+      :host([dark]) .success-message {
+        color: var(--ecc-success, #86efac);
+      }
+
       .success-message {
-        color: hsl(var(--success));
+        color: var(--ecc-success, #15803d);
         font-size: 0.875rem;
         margin-top: 0.5rem;
       }
@@ -748,7 +752,11 @@ export class ECCClientGa4ghWesRunCreate extends LitElement {
             ? html` <div class="error-message mt-4">${this.error}</div> `
             : ""}
           ${this.success
-            ? html` <div class="success-message mt-4">${this.success}</div> `
+            ? html`
+                <div class="success-message mt-4" role="status">
+                  ${this.success}
+                </div>
+              `
             : ""}
 
           <!-- Submit Button -->
