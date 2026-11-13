@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies, @typescript-eslint/no-non-null-assertion */
 import { expect, fixture, html } from "@open-wc/testing";
-import "./components/index.js";
+import "./index.js";
 
 describe("TES design consistency", () => {
   for (const tag of ["runs", "run", "run-create"]) {
@@ -22,5 +22,28 @@ describe("TES design consistency", () => {
       "ecc-utils-design-button[type=submit]"
     )!;
     expect(button.hasAttribute("disabled")).to.equal(true);
+  });
+
+  it("gives every form control an accessible name", async () => {
+    const el = await fixture(
+      html`<ecc-client-ga4gh-tes-run-create></ecc-client-ga4gh-tes-run-create>`
+    );
+    const hosts = el.shadowRoot!.querySelectorAll(
+      "ecc-utils-design-input, ecc-utils-design-textarea"
+    );
+    expect(hosts.length).to.be.greaterThan(0);
+    await Promise.all(
+      [...hosts].map(
+        (h) =>
+          (h as unknown as { updateComplete: Promise<unknown> }).updateComplete
+      )
+    );
+    for (const host of hosts) {
+      const control = host.shadowRoot!.querySelector("input, textarea")!;
+      expect(
+        control.getAttribute("aria-label") ?? "",
+        host.outerHTML
+      ).to.not.equal("");
+    }
   });
 });

@@ -392,6 +392,7 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
             : ""}
         </ecc-utils-design-label>
         <ecc-utils-design-input
+          label=${label}
           .value=${current}
           type=${options.type ?? "text"}
           placeholder=${options.placeholder ?? ""}
@@ -457,6 +458,7 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
                 (field) => html`
                   <ecc-utils-design-input
                     class="flex-1 min-w-0 w-full h-9"
+                    label="${title} ${index + 1}: ${field.placeholder}"
                     placeholder=${field.placeholder}
                     .value=${row[field.name] ?? ""}
                     @ecc-input-changed=${(e: CustomEvent) =>
@@ -512,6 +514,7 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
               <span class="text-destructive">*</span>
             </ecc-utils-design-label>
             <ecc-utils-design-textarea
+              label="Executor ${index + 1} command"
               .value=${executor.command}
               placeholder="echo&#10;hello world"
               @ecc-input-changed=${(e: CustomEvent) =>
@@ -595,6 +598,7 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
                       >
                         <ecc-utils-design-input
                           class="flex-1 min-w-0 w-full h-9"
+                          label="Environment variable ${envIndex + 1} name"
                           placeholder="Name"
                           .value=${row.key ?? ""}
                           @ecc-input-changed=${(e: CustomEvent) =>
@@ -608,6 +612,7 @@ export class ECCClientGa4ghTesRunCreate extends LitElement {
                         ></ecc-utils-design-input>
                         <ecc-utils-design-input
                           class="flex-1 min-w-0 w-full h-9"
+                          label="Environment variable ${envIndex + 1} value"
                           placeholder="Value"
                           .value=${row.value ?? ""}
                           @ecc-input-changed=${(e: CustomEvent) =>

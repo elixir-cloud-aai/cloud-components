@@ -241,6 +241,7 @@ export class ECCClientGa4ghTesRuns extends LitElement {
           ? html`
               <ecc-utils-design-input
                 class="flex-1"
+                label="Search tasks by name prefix"
                 placeholder="Search by name prefix"
                 .value=${this.namePrefix}
                 @ecc-input-changed=${(e: CustomEvent) =>
