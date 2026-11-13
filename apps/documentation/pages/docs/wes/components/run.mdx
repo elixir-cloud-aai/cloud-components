@@ -24,7 +24,7 @@ This example shows the details for a specific workflow run ID.
   <Tabs.Tab>
     <RunPreview />
     <Callout type="info" emoji="ℹ️">
-      The preview above uses a fixed `runId`. Since the WES instance is not production ready, this run may not exist.
+      The preview above needs your own WES instance and the ID of a run there. See [Live previews](/docs/contributing#live-previews).
     </Callout>
   </Tabs.Tab>
 
@@ -36,7 +36,7 @@ This example shows the details for a specific workflow run ID.
 
     export default function RunBasic() {
       const provider = new RestWesProvider(
-        'https://weskit.anuragxd.com/ga4gh/wes/v1'
+        'https://wes.example.com/ga4gh/wes/v1'
       );
 
       return (
@@ -66,7 +66,7 @@ This example shows the details for a specific workflow run ID.
           import { RestWesProvider } from 'https://esm.sh/@elixir-cloud/wes@2.0.0-alpha.1/providers';
           
           const provider = new RestWesProvider(
-            'https://weskit.anuragxd.com/ga4gh/wes/v1'
+            'https://wes.example.com/ga4gh/wes/v1'
           );
           
           document.querySelector('ecc-client-ga4gh-wes-run').provider = provider;

@@ -40,6 +40,16 @@ function normalizePath(filename) {
   return filename.split(path.win32.sep).join(path.posix.sep);
 }
 
+// Escapes text for a template literal, so that it evaluates to the same text.
+// Backslashes go first: escaping them last would also escape the backslashes
+// that the other replacements add
+function escapeTemplateLiteral(text) {
+  return text
+    .replaceAll("\\", "\\\\")
+    .replaceAll("`", "\\`")
+    .replaceAll("${", "\\${");
+}
+
 module.exports = {
   componentsPrefix,
   npmDir,
@@ -47,4 +57,5 @@ module.exports = {
   pascalCase,
   reactDir: path.join(cwd(), ".", "src", "react"),
   normalizePath,
+  escapeTemplateLiteral,
 };

@@ -29,7 +29,10 @@ export default /** @type {import("@web/test-runner").TestRunnerConfig} */ ({
 
   port: 8003,
 
-  plugins: [esbuildPlugin({ ts: true, target: "es2020" })],
+  // Lit decorators need the package's experimentalDecorators setting
+  plugins: [
+    esbuildPlugin({ ts: true, target: "es2020", tsconfig: "./tsconfig.json" }),
+  ],
 
   /** Compile JS for older browsers. Requires @web/dev-server-esbuild plugin */
   // esbuildTarget: 'auto',

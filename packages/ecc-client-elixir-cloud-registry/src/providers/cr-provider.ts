@@ -59,22 +59,25 @@ export interface ExternalServiceRegister {
 
 /**
  * Rules for registrations that Cloud Registry publishes in its service info
- * (`registration_rules` of `GET /service-info`, since cloud-registry 0.6.0)
+ * (`registrationRules` of `GET /service-info`, since cloud-registry 1.0.0rc2;
+ * earlier versions name it and its fields in snake_case, which isn't read)
  */
 export interface RegistrationRules {
   /** Values allowed for `environment`; empty if any value is allowed */
   environments: string[];
   /** Schemes allowed in service URLs (`url`), e.g. `["https"]` */
-  url_schemes: string[];
+  urlSchemes: string[];
   /** Who may add service types: `open`, `controlled` or `moderated` */
-  service_types: string;
+  serviceTypes: string;
   /** How many unused types a user other than an admin may add; unset if any */
-  max_unused_service_types?: number;
+  maxUnusedServiceTypes?: number;
+  /** How many services a user other than an admin may have; unset if any */
+  maxServicesPerUser?: number;
 }
 
 /** Service info of Cloud Registry: a GA4GH service with registration rules */
 export interface RegistryServiceInfo extends Service {
-  registration_rules?: RegistrationRules;
+  registrationRules?: RegistrationRules;
 }
 
 /**
@@ -98,7 +101,7 @@ export interface CloudRegistryProvider extends ServiceRegistryProvider {
   // Service info methods (Cloud Registry specific)
   createOrUpdateServiceInfo?(service: ServiceRegister): Promise<void>;
 
-  // Service info, with the registration rules of Cloud Registry 0.6.0 and
+  // Service info, with the registration rules of Cloud Registry 1.0.0rc2 and
   // later (optional, so providers returning a plain `Service` still conform)
   getServiceInfo(): Promise<RegistryServiceInfo>;
 }

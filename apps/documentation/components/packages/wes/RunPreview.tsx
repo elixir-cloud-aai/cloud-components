@@ -1,18 +1,22 @@
 import React from 'react';
 import { ECCClientGa4ghWesRun } from '@elixir-cloud/wes/react';
 import { RestWesProvider } from '@elixir-cloud/wes/providers';
+import MissingEndpoint from '@/components/common/MissingEndpoint';
 import PreviewLayout from '@/components/common/PreviewLayout';
+import { endpoints, sampleIds } from '@/utils/endpoints';
 
 export default function RunPreview() {
-  const provider = new RestWesProvider(
-    'https://weskit.anuragxd.com/ga4gh/wes/v1'
-  );
+  if (!endpoints.wes) {
+    return <MissingEndpoint service='WES' variable='NEXT_PUBLIC_WES_URL' />;
+  }
+
+  const provider = new RestWesProvider(endpoints.wes);
 
   return (
     <PreviewLayout>
       <ECCClientGa4ghWesRun 
         provider={provider}
-        runId="b855ca2a-4af8-45a1-a964-910dc02c6bba"
+        runId={sampleIds.wesRun}
       />
     </PreviewLayout>
   );

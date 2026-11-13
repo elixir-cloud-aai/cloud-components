@@ -7,8 +7,20 @@ updates:
     # Pull request titles must be Conventional Commits (PR title check)
     commit-message:
       prefix: ci
+    labels: ["type: dependencies"]
     schedule:
       interval: monthly
     groups:
       github-actions:
+        patterns: ["*"]
+  # Images in the `Dockerfile`
+  - package-ecosystem: docker
+    directory: /
+    commit-message:
+      prefix: build
+    labels: ["type: dependencies"]
+    schedule:
+      interval: monthly
+    groups:
+      docker:
         patterns: ["*"]

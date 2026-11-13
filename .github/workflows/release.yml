@@ -1,12 +1,17 @@
-# Releases from version tags (see "Releases" in the Contributing page of the documentation): after the
-# version bump pull request, a maintainer pushes `v<version>` on `dev` (tags
-# on other branches fail). `prepare` checks the tag, the versions of the
-# packages and of the citation metadata (`CITATION.cff`), that the tag is on
-# `dev` and that CI passed for its commit, and lints; `npm` builds the
+# Releases from version tags (see "Releases" in the Contributing page of
+# the documentation): after the version bump pull request, a maintainer
+# pushes a signed `v<version>` on `dev` (tags on other branches fail).
+# `prepare` checks the tag (annotated, with a signature that GitHub
+# verified), the versions of the packages and of
+# the citation metadata (`CITATION.cff`), that the tag is on `dev`, that CI
+# passed for its commit and the curated release notes
+# (`docs/releases/<version>.md`), and lints; `npm` builds the
 # packages from the tag and stages them on npm with trusted publishing
 # (OIDC, with provenance) once the `npm` environment is approved; `publish`
 # creates the GitHub release for the tag. Staged versions become public only
-# when a maintainer approves them on npmjs.com.
+# when a maintainer approves them on npmjs.com. The release's notes are the
+# curated notes followed by GitHub's generated notes (shared action
+# `elixir-cloud-aai/.github/actions/publish-release`).
 # The workflow pushes nothing. The trusted publishers on npmjs.com name this
 # file (`release.yml`) and the environment (`npm`): keep both names, or
 # change them together with the trusted publishers.
@@ -57,6 +62,27 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # Annotated (`git tag -s`), with a signature that GitHub verified; from
+      # the API, not the checkout, which holds the commit
+      - name: Check the tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          read -r type object < <(gh api "repos/${REPOSITORY}/git/ref/tags/${TAG}" \
+            --jq '"\(.object.type) \(.object.sha)"')
+          if [[ "${type}" != "tag" ]]; then
+            echo "::error::Tag ${TAG} is not annotated: tag with git tag -s"
+            exit 1
+          fi
+          read -r verified reason < <(gh api "repos/${REPOSITORY}/git/tags/${object}" \
+            --jq '"\(.verification.verified) \(.verification.reason)"')
+          if [[ "${verified}" != "true" ]]; then
+            echo "::error::Tag ${TAG} has no signature that GitHub verified (${reason}): sign it with git tag -s and a key registered with GitHub"
+            exit 1
+          fi
+
       # The versions of the root, the released packages and `CITATION.cff`
       # (whose release date must not be in the future): Zenodo archives the
       # release with the citation metadata of the tagged commit
@@ -100,6 +126,16 @@ jobs:
             echo "::error::No successful run of the CI workflow (ci.yml) for a push of ${GITHUB_SHA}; once CI passed for it, re-run this workflow"
             exit 1
           fi
+
+      # The curated notes (intro, then grouped sections; see "Releases" in
+      # the Contributing page of the documentation), the tags and the
+      # existing releases, before anything is published
+      - name: Check the release notes
+        uses: elixir-cloud-aai/.github/actions/publish-release@31f22fccc1f3c597ed7c1d1f75b2f85522155348 # v1.1.0
+        with:
+          notes: docs/releases/${{ steps.version.outputs.version }}.md
+          commit: ${{ github.sha }}
+          check-only: "true"
 
       - name: Use Node.js 24.x
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -242,38 +278,29 @@ jobs:
           fi
           [ "${#failed[@]}" -eq 0 ]
 
-  # A GitHub release for the tag, with notes generated from the previous
-  # version tag on (a prerelease for versions such as `2.0.0-alpha.49`).
-  # Skipped if the release exists already, so that the job can be re-run
+  # The GitHub release of the tag, last, once the packages are staged: the
+  # curated notes, then GitHub's generated notes under `## Commits` (a
+  # prerelease for versions such as `2.0.0-alpha.49`). The shared action
+  # creates it with `--verify-tag`; it fails if a draft of the tag exists
+  # (delete it and re-run). A re-run passes without changes if a release of
+  # the tag with the same curated notes, title and prerelease flag exists,
+  # and fails otherwise
   publish:
     name: Publish release
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    needs: npm
+    needs: [prepare, npm]
     permissions:
       contents: write # create the release
     steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
       - name: Create release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPOSITORY: ${{ github.repository }}
-          TAG: ${{ github.ref_name }}
-        run: |
-          if gh release view "${TAG}" --repo "${REPOSITORY}" > /dev/null 2>&1; then
-            echo "::notice::Release ${TAG} exists already"
-            exit 0
-          fi
-          args=(--repo "${REPOSITORY}" --verify-tag --title "${TAG}" --generate-notes)
-          # The version tag before this one, in semver order: `sort -V` puts
-          # `v2.0.0` before `v2.0.0-alpha.1`, so versions without a suffix get
-          # a temporary `_`, which sorts after `-`
-          previous="$(gh api --paginate "repos/${REPOSITORY}/tags" --jq '.[].name' \
-            | grep -E '^v[0-9]' | sed '/-/!s/$/_/' | sort -V | sed 's/_$//' \
-            | awk -v tag="${TAG}" '$0 == tag { print prev; exit } { prev = $0 }')"
-          if [ -n "${previous}" ]; then
-            args+=(--notes-start-tag "${previous}")
-          fi
-          if [[ "${TAG}" == *-* ]]; then
-            args+=(--prerelease)
-          fi
-          gh release create "${TAG}" "${args[@]}"
+        uses: elixir-cloud-aai/.github/actions/publish-release@31f22fccc1f3c597ed7c1d1f75b2f85522155348 # v1.1.0
+        with:
+          notes: docs/releases/${{ needs.prepare.outputs.version }}.md
+          commit: ${{ github.sha }}

@@ -70,7 +70,6 @@
     "react": "*",
     "tailwindcss": "^4.1.4",
     "tslib": "^2.3.1",
-    "tsup": "^7.2.0",
     "tw-animate-css": "^1.2.6",
     "typescript": "*"
   }
