@@ -119,7 +119,8 @@ This example demonstrates a basic service registry table with search and filteri
 | `filter`     | `filter`    | `boolean`                               | `true`      | Whether to display the type, organization and environment filters                        |
 | `pageSize`   | `page-size` | `number`                                | `10`        | Number of services per page; `0` or less shows all services on one page                  |
 | `rowActions` | -           | `(service: ExternalService) => unknown` | `undefined` | Renders the actions of each row (see [`rowActions`](#rowactions))                        |
-| `provider`   | -           | `ServiceRegistryProvider`               | `null`      | Data provider for fetching services (see [Providers](/docs/service-registry/providers))  |
+| `baseUrl`    | `baseurl`   | `string`                                | `""`        | Base URL of the Service Registry API, used if no `provider` is set                       |
+| `provider`   | -           | `ServiceRegistryProvider`               | `undefined` | Data provider for fetching services (see [Providers](/docs/service-registry/providers))  |
 
 ### `provider`
 The data provider responsible for fetching services from the registry. You must provide a provider that implements the `ServiceRegistryProvider` interface. See the [Providers documentation](/docs/service-registry/providers) for detailed information about available providers and how to create custom ones.

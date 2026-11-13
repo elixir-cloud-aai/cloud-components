@@ -198,6 +198,21 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       ]);
     });
 
+    it("offers the services' types if the registry lists none", async () => {
+      const provider = stubProvider([service("s1"), service("s2")]);
+      provider.getServiceTypes.resolves([]);
+      const el = await renderLoaded(provider);
+
+      const values = Array.from(
+        find(
+          el,
+          'ecc-utils-design-select[data-filter="type"]'
+        ).querySelectorAll("ecc-utils-design-select-item")
+      ).map((item) => item.getAttribute("value"));
+
+      expect(values).to.deep.equal(["", "org.ga4gh:tes:1.1.0"]);
+    });
+
     it("filters by organization", async () => {
       const el = await renderLoaded();
 
@@ -506,20 +521,24 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       ).to.equal(true);
     });
 
-    it("opens only web URLs of organizations", async () => {
+    it("links only web URLs of organizations", async () => {
       const el = await renderLoaded(
         stubProvider([
           service("s1", {
             // eslint-disable-next-line no-script-url
             organization: { name: "Org X", url: "javascript:alert(1)" },
           }),
+          service("s2", {
+            organization: { name: "Org Y", url: "www.example.org" },
+          }),
         ])
       );
-      const open = sinon.stub(window, "open");
 
-      find(el, "ecc-utils-design-button[data-no-select]").click();
-
-      expect(open.called).to.equal(false);
+      expect(
+        root(el).querySelectorAll("ecc-utils-design-button[data-no-select]")
+      ).to.have.length(0);
+      expect(rows(el)[0].textContent).to.contain("Org X");
+      expect(rows(el)[1].textContent).to.contain("Org Y");
     });
 
     it("shows the error if the services can't be loaded", async () => {

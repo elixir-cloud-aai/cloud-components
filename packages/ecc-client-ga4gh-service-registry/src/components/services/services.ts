@@ -43,20 +43,20 @@ type FilterOptions = Record<keyof ServiceFilters, FilterOption[]>;
 const typeKey = (type: ServiceType): string =>
   `${type.group}:${type.artifact}:${type.version}`;
 
-/**
- * Opens a URL from the registry in a new tab, without access to this page,
- * if it is a web URL (`http:` or `https:`).
- */
-const openExternal = (url: string): void => {
-  let protocol = "";
+/** Whether a URL from the registry is a web URL (`http:` or `https:`). */
+const isWebUrl = (url: string | undefined): url is string => {
+  if (!url) return false;
   try {
-    ({ protocol } = new URL(url));
+    const { protocol } = new URL(url);
+    return protocol === "http:" || protocol === "https:";
   } catch {
-    return;
+    return false;
   }
-  if (protocol === "http:" || protocol === "https:") {
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
+};
+
+/** Opens a web URL in a new tab, without access to this page. */
+const openExternal = (url: string): void => {
+  window.open(url, "_blank", "noopener,noreferrer");
 };
 
 /** The distinct, non-empty values, sorted. */
@@ -537,7 +537,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
           </ecc-utils-design-badge>
         </ecc-utils-design-table-cell>
         <ecc-utils-design-table-cell class="w-2/12">
-          ${service.organization.url
+          ${isWebUrl(service.organization.url)
             ? html`<ecc-utils-design-button
                 class="part:font-medium part:text-primary part:w-fit part:cursor-pointer part:p-0"
                 variant="link"
