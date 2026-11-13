@@ -115,6 +115,8 @@ This example shows a textarea with a corresponding label.
 | `placeholder` | `string`  | `""`    | Placeholder text for the textarea.        |
 | `value`       | `string`  | `""`    | The current value of the textarea.        |
 | `disabled`    | `boolean` | `false` | When `true`, disables the textarea.       |
+| `invalid` | `boolean` | `false` | When `true`, marks the textarea as invalid (also implied by `error`). |
+| `error`   | `string`  | `""`    | Error message shown under the textarea, e.g. from an API. |
 | `rows`        | `number`  | `3`     | The number of visible text lines.         |
 | `cols`        | `number`  | `undefined` | The visible width of the text control.  |
 
@@ -194,6 +196,22 @@ Specifies the visible width of the textarea in average character widths.
   <Tabs.Tab>
     ```html copy
     <ecc-utils-design-textarea cols="50" placeholder="Wider textarea"></ecc-utils-design-textarea>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `invalid` and `error`
+`error` shows a message under the textarea, e.g. one that an API returned for this field (see [Field errors](/docs/design/field-errors)), and marks the textarea as invalid: it gets a red border, `aria-invalid="true"` and `aria-describedby` pointing to the message, and screen readers announce the message (`aria-live="polite"`). `invalid` marks the textarea as invalid without a message, e.g. when the message is shown elsewhere. Clear both when the user changes the value or submits again. The message has the part `error` for styling (`ecc-utils-design-textarea::part(error)`).
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignTextarea error="Must be at most 300 characters long." />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-textarea error="Must be at most 300 characters long."></ecc-utils-design-textarea>
     ```
   </Tabs.Tab>
 </Tabs>

@@ -219,6 +219,8 @@ The `Select` is built by combining these components:
 |-------------|-----------|---------|-------------------------------------------|
 | `value`     | `string`  | `""`    | The value of the currently selected option. |
 | `disabled`  | `boolean` | `false` | When `true`, disables the select.         |
+| `invalid` | `boolean` | `false` | When `true`, marks the select as invalid (also implied by `error`). |
+| `error`   | `string`  | `""`    | Error message shown under the select, e.g. from an API. |
 
 #### `value`
 Controls the currently selected option. Should match the `value` of one of the SelectItem components.
@@ -254,6 +256,26 @@ When `true`, disables the entire select, preventing user interaction.
   <Tabs.Tab>
     ```html copy
     <ecc-utils-design-select disabled="true">
+      ...
+    </ecc-utils-design-select>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+#### `invalid` and `error`
+`error` shows a message under the select, e.g. one that an API returned for this field (see [Field errors](/docs/design/field-errors)), and marks the select as invalid: its trigger gets a red border, `aria-invalid="true"` and `aria-describedby` pointing to the message, and screen readers announce the message (`aria-live="polite"`). `invalid` marks the select as invalid without a message, e.g. when the message is shown elsewhere. Clear both when the user changes the value or submits again. The message has the part `error` for styling (`ecc-utils-design-select::part(error)`).
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignSelect error="Must be one of: a, b.">
+      ...
+    </EccUtilsDesignSelect>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-select error="Must be one of: a, b.">
       ...
     </ecc-utils-design-select>
     ```

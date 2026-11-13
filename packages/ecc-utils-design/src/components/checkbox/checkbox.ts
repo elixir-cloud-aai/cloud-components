@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { property, state } from "lit/decorators.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 
@@ -21,13 +22,24 @@ export class EccUtilsDesignCheckbox extends LitElement {
   @property({ type: Boolean, reflect: true }) disabled = false;
   @property({ type: String }) name = "";
   @property({ type: String }) value = "";
+  /**
+   * Whether the value is invalid; also implied by a non-empty `error`.
+   */
+  @property({ type: Boolean, reflect: true }) invalid = false;
+  /** Error message shown under the checkbox, e.g. one returned by an API. */
+  @property({ type: String }) error = "";
   @state() private _focused = false;
 
   render() {
+    const isInvalid = this.invalid || !!this.error;
     const checkboxClasses = cn(
-      "peer h-4 w-4 shrink-0 rounded-[4px] border border-primary shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+      "peer h-4 w-4 shrink-0 rounded-[4px] border shadow focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:opacity-50",
+      isInvalid
+        ? "border-destructive focus-visible:ring-destructive"
+        : "border-primary focus-visible:ring-ring",
       this.checked && "bg-primary text-primary-foreground",
-      this._focused && "ring-1 ring-ring"
+      this._focused &&
+        (isInvalid ? "ring-1 ring-destructive" : "ring-1 ring-ring")
     );
 
     const indicatorClasses = cn(
@@ -35,33 +47,50 @@ export class EccUtilsDesignCheckbox extends LitElement {
       !this.checked && "opacity-0"
     );
 
+    // The message is positioned under the box without taking space, so
+    // that it neither widens nor shifts the box next to its label
     return html`
-      <div
-        part="base"
-        class=${checkboxClasses}
-        role="checkbox"
-        aria-checked=${this.checked ? "true" : "false"}
-        aria-disabled=${this.disabled ? "true" : "false"}
-        tabindex=${this.disabled ? "-1" : "0"}
-        @click=${this._handleClick}
-        @keydown=${this._handleKeydown}
-        @focus=${this._handleFocus}
-        @blur=${this._handleBlur}
-      >
-        <div class=${indicatorClasses}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="h-4 w-4"
-          >
-            <path d="M20 6 9 17l-5-5" />
-          </svg>
+      <div class="relative">
+        <div
+          part="base"
+          class=${checkboxClasses}
+          role="checkbox"
+          aria-checked=${this.checked ? "true" : "false"}
+          aria-disabled=${this.disabled ? "true" : "false"}
+          aria-invalid=${ifDefined(isInvalid ? "true" : undefined)}
+          aria-describedby=${ifDefined(this.error ? "error" : undefined)}
+          tabindex=${this.disabled ? "-1" : "0"}
+          @click=${this._handleClick}
+          @keydown=${this._handleKeydown}
+          @focus=${this._handleFocus}
+          @blur=${this._handleBlur}
+        >
+          <div class=${indicatorClasses}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-4 w-4"
+            >
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+          </div>
         </div>
+        <p
+          id="error"
+          part="error"
+          class=${cn(
+            "pointer-events-none absolute left-0 top-full whitespace-nowrap text-sm text-destructive",
+            !!this.error && "mt-1.5"
+          )}
+          aria-live="polite"
+        >
+          ${this.error}
+        </p>
       </div>
     `;
   }

@@ -1,0 +1,160 @@
+import { Callout } from 'nextra/components';
+
+# Field errors
+
+When an API rejects a request, components that submit data can show its
+messages at the fields they belong to, instead of one general error. The
+design package has the two parts for this:
+
+- The form controls ([input](/docs/design/components/input),
+  [textarea](/docs/design/components/textarea),
+  [checkbox](/docs/design/components/checkbox),
+  [select](/docs/design/components/select) and
+  [multi-select](/docs/design/components/multi-select)) have the properties
+  `error` and `invalid`: `error` shows a message under the control and marks it
+  as invalid (red border, `aria-invalid`, `aria-describedby`, announced to
+  screen readers), `invalid` marks it as invalid without a message.
+- Utilities that read the errors of a response in the standard format,
+  problem details ([RFC 9457](https://www.rfc-editor.org/rfc/rfc9457),
+  `application/problem+json`), and map them to the component's fields.
+
+Components don't need validation rules of their own: the API keeps the final
+say, and the components show what it says.
+
+## Response format
+
+Field errors are read in the form of the example of
+[RFC 9457, section 3](https://www.rfc-editor.org/rfc/rfc9457#section-3): an
+extension member `errors`, each entry with a readable `detail` and the
+location of the field, a JSON Pointer
+([RFC 6901](https://www.rfc-editor.org/rfc/rfc6901)) to the field in the
+request body (`pointer`, e.g. `#/organization/url`) or the name of a request
+parameter (`parameter`, e.g. `limit`):
+
+```json
+{
+  "type": "https://foca.readthedocs.io/en/latest/problems/invalid-request/",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "Invalid fields: #/name (too-long); #/organization/url (invalid-format)",
+  "code": "invalid-request",
+  "errors": [
+    { "detail": "Must be at most 3 characters long.", "pointer": "#/name", "code": "too-long" },
+    { "detail": "Must be a valid URI.", "pointer": "#/organization/url", "code": "invalid-format" }
+  ]
+}
+```
+
+Pointers in URI fragment form (`#/organization/url`, percent-encoded) and plain
+pointers (`/organization/url`) are both accepted. Nothing is specific to one
+server: the example is the response of an API built with
+[FOCA](https://github.com/elixir-cloud-aai/foca), which reports invalid
+fields in this format (see FOCA's
+[invalid request](https://foca.readthedocs.io/en/latest/problems/invalid-request/)
+problem type), and any other API can respond the same way.
+
+## Utilities
+
+All are exported by `@elixir-cloud/design`:
+
+| Function                                     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `readProblemDetails(response)`               | Reads the problem details of a `fetch` response (JSON bodies only; consumes the body). Returns `undefined` if the body isn't problem details.                                                                                                                                                                                                                                                                                                                            |
+| `parseProblemDetails(body)`                  | Parses a JSON body that was read already. Returns the standard members (`type`, `title`, `status`, `detail`, `instance`), the field errors (`errors`, each with `detail`, `pointer` or `parameter`, `code` and the entry as received in `raw`) and the other members in `extensions` (e.g. `code`), or `undefined` if the body isn't problem details.                                                                                                                    |
+| `mapFieldErrors(problem, fields, fallback?)` | Maps the field errors to the component's fields. `problem` is the result of `readProblemDetails()` or `parseProblemDetails()` (`undefined` for responses without problem details). `fields` maps the component's keys for its fields to their locations: a pointer (`"/organization/url"` or `"#/organization/url"`) or `{ parameter: "limit" }`. Returns `fieldErrors` (a message per key), `unmatched` (the errors that match no field), `generalError` and `problem`. |
+| `normalizePointer(pointer)`                  | Converts a pointer in URI fragment form to a plain pointer.                                                                                                                                                                                                                                                                                                                                                                                                              |
+
+A field error belongs to the field with the same pointer or parameter or,
+failing that, to the closest field that contains it (e.g. an error at
+`/tags/0` to a field at `/tags`). Several messages for the same field are
+joined. Errors are not passed down: an error at an object (e.g.
+`#/organization`, "Is required.") doesn't mark the fields inside it (e.g.
+`/organization/url`); give the object a field key of its own to show it
+somewhere, or it becomes part of the general error.
+
+`generalError` is the message to show above or below the form, or `undefined`
+if every error is shown at a field:
+
+- errors that match no field, each with its location (e.g.
+  `organization/url: Must be a valid URI.`);
+- for problem details without field errors, their `detail`, or else their
+  `title`;
+- for responses that aren't problem details, the `fallback`
+  (default: `The request failed.`).
+
+## Example
+
+A component that registers a service shows the errors of a rejected request
+at its fields:
+
+```ts copy filename="service-form.ts"
+import { html, LitElement } from 'lit';
+import { state } from 'lit/decorators.js';
+import { mapFieldErrors, readProblemDetails } from '@elixir-cloud/design';
+
+// The component's fields and their locations in the request body
+const FIELDS = {
+  name: '/name',
+  url: '/url',
+  organizationUrl: '/organization/url',
+};
+
+export class ServiceForm extends LitElement {
+  @state() private fieldErrors: Record<string, string> = {};
+  @state() private generalError = '';
+
+  // Only the latest submission shows its errors
+  private submission = 0;
+
+  private async submit(body: unknown) {
+    this.submission += 1;
+    const submission = this.submission;
+    this.fieldErrors = {};
+    this.generalError = '';
+    let response: Response;
+    try {
+      response = await fetch('/ga4gh/registry/v1/services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+    } catch {
+      if (submission === this.submission) {
+        this.generalError = 'The registry could not be reached.';
+      }
+      return;
+    }
+    if (response.ok) return;
+    const problem = await readProblemDetails(response);
+    if (submission !== this.submission) return;
+    const mapped = mapFieldErrors(
+      problem,
+      FIELDS,
+      `The service could not be registered (${response.status}).`,
+    );
+    this.fieldErrors = mapped.fieldErrors;
+    this.generalError = mapped.generalError ?? '';
+  }
+
+  render() {
+    return html`
+      <ecc-utils-design-input .error=${this.fieldErrors.name ?? ''}></ecc-utils-design-input>
+      <ecc-utils-design-input
+        type="url"
+        .error=${this.fieldErrors.url ?? ''}
+      ></ecc-utils-design-input>
+      <ecc-utils-design-input
+        type="url"
+        .error=${this.fieldErrors.organizationUrl ?? ''}
+      ></ecc-utils-design-input>
+      ${this.generalError ? html`<p role="alert">${this.generalError}</p>` : ''}
+    `;
+  }
+}
+```
+
+<Callout type='info'>
+  Components that call their API through a provider can read the problem details there, e.g. with
+  `readProblemDetails()`, and pass them on, e.g. in the error they throw, so that the component can
+  call `mapFieldErrors()`.
+</Callout>
