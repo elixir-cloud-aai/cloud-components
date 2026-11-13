@@ -81,13 +81,23 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
       (changedProperties.has("provider") || changedProperties.has("baseUrl")) &&
       this.useProvider()
     ) {
-      this.loadData();
+      // another provider starts on its first page
+      this.currentPage = 1;
+      this.totalPages = 0;
+      if (this._provider) {
+        this.loadData();
+      } else {
+        this.objects = [];
+        this.error =
+          "Please provide either a base URL for the DRS API or a custom provider.";
+      }
     }
   }
 
   /**
    * Switches to the custom provider or, without one, to a REST provider for
-   * the base URL; returns whether the provider in use changed
+   * the base URL (to none without either); returns whether the provider in
+   * use changed
    */
   private useProvider(): boolean {
     let provider: DrsProvider | null = this.provider ?? null;
@@ -98,23 +108,26 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
           ? this._provider
           : new RestDrsProvider(this.baseUrl);
     }
-    if (!provider || provider === this._provider) return false;
+    if (provider === this._provider) return false;
     this._provider = provider;
     return true;
   }
 
   private async loadData(): Promise<void> {
-    if (!this._provider) return;
+    const provider = this._provider;
+    if (!provider) return;
 
     this.loading = true;
     this.error = null;
 
     try {
       // API treats offset as page number, not actual offset
-      const result = await this._provider.getObjects(
+      const result = await provider.getObjects(
         this.pageSize,
         this.currentPage - 1
       );
+      // a load from a provider that was replaced in the meantime is dropped
+      if (provider !== this._provider) return;
       this.objects = result.objects;
 
       // Update total objects and pages from API response
@@ -148,10 +161,11 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
         })
       );
     } catch (err) {
+      if (provider !== this._provider) return;
       this.error =
         err instanceof Error ? err.message : "Failed to load objects";
     } finally {
-      this.loading = false;
+      if (provider === this._provider) this.loading = false;
     }
   }
 

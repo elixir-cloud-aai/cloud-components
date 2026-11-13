@@ -107,14 +107,25 @@ export class ECCClientGa4ghTrsTools extends LitElement {
       (changedProperties.has("provider") || changedProperties.has("baseUrl")) &&
       this.useProvider()
     ) {
-      this.loadData();
-      this.loadToolClasses();
+      // another provider starts on its first page
+      this.currentPage = 1;
+      this.lastPage = -1;
+      if (this._provider) {
+        this.loadData();
+        this.loadToolClasses();
+      } else {
+        this.tools = [];
+        this.toolClasses = [];
+        this.error =
+          "Please provide either a base URL for the TRS API or a custom provider.";
+      }
     }
   }
 
   /**
    * Switches to the custom provider or, without one, to a REST provider for
-   * the base URL; returns whether the provider in use changed
+   * the base URL (to none without either); returns whether the provider in
+   * use changed
    */
   private useProvider(): boolean {
     let provider: TrsProvider | null = this.provider ?? null;
@@ -125,16 +136,20 @@ export class ECCClientGa4ghTrsTools extends LitElement {
           ? this._provider
           : new RestTrsProvider(this.baseUrl);
     }
-    if (!provider || provider === this._provider) return false;
+    if (provider === this._provider) return false;
     this._provider = provider;
     return true;
   }
 
   private async loadToolClasses(): Promise<void> {
-    if (!this._provider) return;
+    const provider = this._provider;
+    if (!provider) return;
 
     try {
-      this.toolClasses = await this._provider.getToolClasses();
+      const toolClasses = await provider.getToolClasses();
+      // a load from a provider that was replaced in the meantime is dropped
+      if (provider !== this._provider) return;
+      this.toolClasses = toolClasses;
 
       // Store a mapping of name to ID for lookup during filtering
       this.toolClassMap = Object.fromEntries(
@@ -146,7 +161,8 @@ export class ECCClientGa4ghTrsTools extends LitElement {
   }
 
   private async loadData(): Promise<void> {
-    if (!this._provider) return;
+    const provider = this._provider;
+    if (!provider) return;
 
     this.loading = true;
     this.error = null;
@@ -164,12 +180,14 @@ export class ECCClientGa4ghTrsTools extends LitElement {
       // We want to send the tool class name directly to the API, not the ID
       // No conversion needed here, the name is already stored in filterParams.toolClass
 
-      const tools = await this._provider.getToolsList(
+      const tools = await provider.getToolsList(
         this.pageSize < 0 ? 0 : this.pageSize,
         offset < 0 ? 0 : offset,
         apiFilterParams,
         this.searchQuery
       );
+      // a load from a provider that was replaced in the meantime is dropped
+      if (provider !== this._provider) return;
 
       this.tools = tools;
 
@@ -195,13 +213,14 @@ export class ECCClientGa4ghTrsTools extends LitElement {
         this.loadData();
       }
     } catch (err) {
+      if (provider !== this._provider) return;
       this.error = err instanceof Error ? err.message : "Failed to load tools";
       console.error({
         error: this.error,
         breakPoint: "ECCClientGa4ghTrs.loadData",
       });
     } finally {
-      this.loading = false;
+      if (provider === this._provider) this.loading = false;
     }
   }
 

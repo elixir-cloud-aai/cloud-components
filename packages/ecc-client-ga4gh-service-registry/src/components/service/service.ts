@@ -77,7 +77,11 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
     const providerChanged =
       (changedProperties.has("provider") || changedProperties.has("baseUrl")) &&
       this.useProvider();
-    if (
+    if (providerChanged && !this._provider) {
+      this.service = null;
+      this.error =
+        "Please provide either a base URL for the Service Registry API or a custom provider.";
+    } else if (
       (providerChanged ||
         (changedProperties.has("serviceId") && this.serviceId)) &&
       this.serviceId &&
@@ -89,7 +93,8 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
 
   /**
    * Switches to the custom provider or, without one, to a REST provider for
-   * the base URL; returns whether the provider in use changed
+   * the base URL (to none without either); returns whether the provider in
+   * use changed
    */
   private useProvider(): boolean {
     let provider: ServiceRegistryProvider | null = this.provider ?? null;
@@ -100,19 +105,26 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
           ? this._provider
           : new RestServiceRegistryProvider(this.baseUrl);
     }
-    if (!provider || provider === this._provider) return false;
+    if (provider === this._provider) return false;
     this._provider = provider;
     return true;
   }
 
   private async loadData(): Promise<void> {
-    if (!this._provider || !this.serviceId) return;
+    const provider = this._provider;
+    const { serviceId } = this;
+    if (!provider || !serviceId) return;
+    // a load for a provider or service that was replaced in the meantime is
+    // dropped
+    const replaced = () =>
+      provider !== this._provider || serviceId !== this.serviceId;
 
     this.loading = true;
     this.error = null;
 
     try {
-      const service = await this._provider.getServiceById(this.serviceId);
+      const service = await provider.getServiceById(serviceId);
+      if (replaced()) return;
       this.service = service;
 
       // Emit an event with the updated service data
@@ -124,6 +136,7 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
         })
       );
     } catch (err) {
+      if (replaced()) return;
       this.error =
         err instanceof Error ? err.message : "Failed to load service";
       console.error({
@@ -131,7 +144,7 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
         breakPoint: "ECCClientGa4ghServiceRegistryService.loadData",
       });
     } finally {
-      this.loading = false;
+      if (!replaced()) this.loading = false;
     }
   }
 

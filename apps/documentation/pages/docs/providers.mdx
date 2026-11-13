@@ -46,7 +46,8 @@ const provider = new RestProvider('https://api.example.com');
 You can set or replace a component's provider at any time, also after the
 component has rendered (as with React, which sets it on a server-rendered
 element only after the first update): the component then loads its data from
-the new provider. Create the provider once and pass the same instance on every
+the new provider, and a load that the previous provider has not finished yet
+is dropped. Create the provider once and pass the same instance on every
 render (e.g. with `useMemo` in React), as each new instance makes the component
 load its data again.
 
