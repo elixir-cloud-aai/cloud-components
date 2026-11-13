@@ -177,7 +177,12 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   /** The loaded services that match the search query and the filters. */
   private get filteredServices(): ExternalService[] {
     const query = this.searchQuery.trim().toLowerCase();
-    const { type, organization, environment } = this.filters;
+    // Only the filters on display apply, so that each one can be cleared
+    const shown = this.filter;
+    const type = shown ? this.filters.type : "";
+    const organization = shown ? this.filters.organization : "";
+    const environment =
+      shown && this.environmentOptions.length ? this.filters.environment : "";
     return this.services.filter(
       (service) =>
         (!type || (!!service.type && typeKey(service.type) === type)) &&

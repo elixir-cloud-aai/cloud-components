@@ -217,6 +217,17 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       expect(filterSelect(el, "type")).to.equal(null);
       expect(filterSelect(el, "organization")).to.equal(null);
     });
+
+    it("ignores the selected filters once they are hidden", async () => {
+      const el = await renderLoaded();
+      await change(el, filterSelect(el, "organization"), "Org B");
+      expect(shownIds(el)).to.deep.equal(["s2"]);
+
+      el.filter = false;
+      await el.updateComplete;
+
+      expect(shownIds(el)).to.deep.equal(["s1", "s2", "s3"]);
+    });
   });
 
   describe("pagination", () => {
