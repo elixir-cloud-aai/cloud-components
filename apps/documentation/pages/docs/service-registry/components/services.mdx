@@ -117,7 +117,7 @@ This example demonstrates a basic service registry table with search and filteri
 |--------------|-------------|-----------------------------------------|-------------|------------------------------------------------------------------------------------------|
 | `search`     | `search`    | `boolean`                               | `true`      | Whether to display the search input field                                                |
 | `filter`     | `filter`    | `boolean`                               | `true`      | Whether to display the type, organization and environment filters                        |
-| `pageSize`   | `page-size` | `number`                                | `10`        | Number of services per page; `0` or less shows all services on one page                  |
+| `pageSize`   | `page-size` | `number`                                | `10`        | Number of services per page, rounded down; `0` or less (or not a number) shows all services on one page |
 | `rowActions` | -           | `(service: ExternalService) => unknown` | `undefined` | Renders the actions of each row (see [`rowActions`](#rowactions))                        |
 | `baseUrl`    | `baseurl`   | `string`                                | `""`        | Base URL of the Service Registry API, used if no `provider` is set                       |
 | `provider`   | -           | `ServiceRegistryProvider`               | `undefined` | Data provider for fetching services (see [Providers](/docs/service-registry/providers))  |
@@ -149,7 +149,7 @@ The data provider responsible for fetching services from the registry. You must 
 </Tabs>
 
 ### `search`
-Controls whether the search input field is displayed. The search matches the ID, name, description, URL, organization and type of each service, case-insensitively, in the list that is already loaded. While the field is hidden, its query doesn't apply.
+Controls whether the search input field is displayed. The search matches the ID, name, description, URL, organization and type (group, artifact and version) of each service, case-insensitively, in the list that is already loaded. While the field is hidden, its query doesn't apply.
 
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>
@@ -201,7 +201,7 @@ The number of services per page. The pagination is shown when the services that 
 </Tabs>
 
 ### `rowActions`
-A function that renders the actions of a row from its service, e.g. Edit and Delete buttons for the services that the user may change. It can return a Lit template, a DOM node, a string, or `null` for a row without actions; without the function, each row shows a "View Details" button. Clicks on the actions don't select the row. Set a new function when what it renders changes, e.g. after the user's roles changed, so that the rows are rendered again.
+A function that renders the actions of a row from its service, e.g. Edit and Delete buttons for the services that the user may change. It can return a Lit template, a DOM node, a string, or `null` for a row without actions; without the function, each row shows a "View Details" button, which selects the service (`ecc-service-selected`). Clicks on the actions of `rowActions` don't select the row. Set a new function when what it renders changes, e.g. after the user's roles changed, so that the rows are rendered again.
 
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>

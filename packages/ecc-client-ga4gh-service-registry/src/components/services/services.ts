@@ -1,4 +1,4 @@
-import { LitElement, html, css } from "lit";
+import { LitElement, html, css, TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
@@ -21,7 +21,9 @@ import "@elixir-cloud/design/components/skeleton/index.js";
  * Renders the actions of a row from its service: a Lit template, a DOM node,
  * a string, or nothing (`null` or `undefined`) for a row without actions.
  */
-export type RowActionsRenderer = (service: ExternalService) => unknown;
+export type RowActionsRenderer = (
+  service: ExternalService
+) => TemplateResult | Node | string | null | undefined;
 
 /** The selected values of the filters; empty for "All". */
 interface ServiceFilters {
@@ -39,9 +41,12 @@ interface FilterOption {
 /** The options of each filter, besides "All". */
 type FilterOptions = Record<keyof ServiceFilters, FilterOption[]>;
 
-/** The value of a service type in the type filter. */
+/**
+ * The value of a service type in the type filter; JSON, so that no two
+ * distinct types share one (as they could with a separator in their fields).
+ */
 const typeKey = (type: ServiceType): string =>
-  `${type.group}:${type.artifact}:${type.version}`;
+  JSON.stringify([type.group, type.artifact, type.version]);
 
 /** Whether a URL from the registry is a web URL (`http:` or `https:`). */
 const isWebUrl = (url: string | undefined): url is string => {
@@ -274,13 +279,24 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
             service.organization.name,
             service.type.group,
             service.type.artifact,
+            service.type.version,
           ].some((field) => field?.toLowerCase().includes(query)))
     );
   }
 
+  /**
+   * The number of services per page, as a whole number, or 0 for all on one
+   * page (for 0, negative and invalid values, such as a malformed attribute).
+   */
+  private get effectivePageSize(): number {
+    const size = Math.floor(this.pageSize);
+    return Number.isFinite(size) && size >= 1 ? size : 0;
+  }
+
   private pageCount(total: number): number {
-    if (!(this.pageSize >= 1)) return 1;
-    return Math.max(1, Math.ceil(total / this.pageSize));
+    const size = this.effectivePageSize;
+    if (!size) return 1;
+    return Math.max(1, Math.ceil(total / size));
   }
 
   private goToPage(page: number, pageCount: number): void {
@@ -578,13 +594,13 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
 
   render() {
     const filtered = this.filterServices();
+    const size = this.effectivePageSize;
     const pageCount = this.pageCount(filtered.length);
     // The page may be past the end after the list or the page size changed
     const page = Math.min(this.currentPage, pageCount);
-    const shown =
-      this.pageSize >= 1
-        ? filtered.slice((page - 1) * this.pageSize, page * this.pageSize)
-        : filtered;
+    const shown = size
+      ? filtered.slice((page - 1) * size, page * size)
+      : filtered;
 
     return html`
       <div class="flex flex-col gap-4">

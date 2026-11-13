@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { expect, fixture, html, oneEvent, waitUntil } from "@open-wc/testing";
+import { expect, fixture, html, waitUntil } from "@open-wc/testing";
 import { html as litHtml } from "lit";
 import sinon from "sinon";
 import "../index.js";
@@ -20,6 +20,15 @@ const WES: ServiceType = {
   artifact: "wes",
   version: "1.1.0",
 };
+const DRS: ServiceType = {
+  group: "org.ga4gh",
+  artifact: "drs",
+  version: "1.4.0",
+};
+
+/** The value of a type in the type filter. */
+const key = (type: ServiceType) =>
+  JSON.stringify([type.group, type.artifact, type.version]);
 
 /** A service with the given fields; the rest are defaults. */
 const service = (
@@ -118,6 +127,14 @@ const find = <T extends Element = HTMLElement>(el: El, selector: string): T => {
   return found;
 };
 
+/** The values of the type filter's options. */
+const typeValues = (el: El) =>
+  Array.from(
+    root(el).querySelectorAll(
+      'ecc-utils-design-select[data-filter="type"] ecc-utils-design-select-item'
+    )
+  ).map((item) => item.getAttribute("value"));
+
 const filterSelect = (el: El, name: string) =>
   root(el).querySelector(`ecc-utils-design-select[data-filter="${name}"]`);
 
@@ -136,6 +153,16 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
 
       expect(shownIds(el)).to.deep.equal(["s2"]);
       expect(provider.getServices.callCount).to.equal(1);
+    });
+
+    it("matches the type version", async () => {
+      const el = await renderLoaded(
+        stubProvider([service("s1"), service("s2", { type: DRS })])
+      );
+
+      await change(el, searchInput(el), "1.4.0");
+
+      expect(shownIds(el)).to.deep.equal(["s2"]);
     });
 
     it("matches the service URL", async () => {
@@ -176,41 +203,52 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
     it("filters by type", async () => {
       const el = await renderLoaded();
 
-      await change(el, filterSelect(el, "type"), "org.ga4gh:wes:1.1.0");
+      await change(el, filterSelect(el, "type"), key(WES));
+
+      expect(shownIds(el)).to.deep.equal(["s2"]);
+    });
+
+    it("keeps types apart whose fields contain separators", async () => {
+      const a: ServiceType = { group: "x:y", artifact: "z", version: "1" };
+      const b: ServiceType = { group: "x", artifact: "y:z", version: "1" };
+      const provider = stubProvider([
+        service("s1", { type: a }),
+        service("s2", { type: b }),
+      ]);
+      provider.getServiceTypes.resolves([a, b]);
+      const el = await renderLoaded(provider);
+      await waitUntil(() => typeValues(el).length === 3, "types not listed");
+
+      await change(el, filterSelect(el, "type"), key(b));
 
       expect(shownIds(el)).to.deep.equal(["s2"]);
     });
 
     it("offers the types the registry lists", async () => {
-      const el = await renderLoaded();
+      const provider = stubProvider();
+      provider.getServiceTypes.resolves([TES, WES, DRS]);
+      const el = await renderLoaded(provider);
 
-      const values = Array.from(
-        find(
-          el,
-          'ecc-utils-design-select[data-filter="type"]'
-        ).querySelectorAll("ecc-utils-design-select-item")
-      ).map((item) => item.getAttribute("value"));
-
-      expect(values).to.deep.equal([
-        "",
-        "org.ga4gh:tes:1.1.0",
-        "org.ga4gh:wes:1.1.0",
-      ]);
+      // DRS is listed by the registry only, not by any loaded service
+      await waitUntil(
+        () => typeValues(el).includes(key(DRS)),
+        "registry types not offered"
+      );
+      expect(provider.getServiceTypes.calledOnce).to.equal(true);
+      expect(typeValues(el)).to.deep.equal(["", key(TES), key(WES), key(DRS)]);
     });
 
     it("offers the services' types if the registry lists none", async () => {
       const provider = stubProvider([service("s1"), service("s2")]);
       provider.getServiceTypes.resolves([]);
       const el = await renderLoaded(provider);
+      await waitUntil(
+        () => provider.getServiceTypes.calledOnce,
+        "registry types not requested"
+      );
+      await el.updateComplete;
 
-      const values = Array.from(
-        find(
-          el,
-          'ecc-utils-design-select[data-filter="type"]'
-        ).querySelectorAll("ecc-utils-design-select-item")
-      ).map((item) => item.getAttribute("value"));
-
-      expect(values).to.deep.equal(["", "org.ga4gh:tes:1.1.0"]);
+      expect(typeValues(el)).to.deep.equal(["", key(TES)]);
     });
 
     it("filters by organization", async () => {
@@ -329,10 +367,10 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
         })
       );
       await el.updateComplete;
-      await change(el, searchInput(el), "Service s1");
+      // Matches all 12 services, more than one page
+      await change(el, searchInput(el), "example.org");
 
-      // s1, s10, s11, s12
-      expect(shownIds(el)).to.deep.equal(["s1", "s10", "s11", "s12"]);
+      expect(shownIds(el)).to.deep.equal(["s1", "s2", "s3", "s4", "s5"]);
     });
 
     it("renders no pagination for a single page", async () => {
@@ -413,6 +451,18 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       expect(shownIds(el)).to.deep.equal(["s6", "s7"]);
     });
 
+    it("rounds a fractional page-size down", async () => {
+      const el = await renderLoaded(stubProvider(many), "page-size=2.5");
+
+      expect(shownIds(el)).to.deep.equal(["s1", "s2"]);
+    });
+
+    it("shows all services if page-size is invalid", async () => {
+      const el = await renderLoaded(stubProvider(many), "page-size=abc");
+
+      expect(rows(el)).to.have.length(12);
+    });
+
     it("shows all services if page-size is 0", async () => {
       const el = await renderLoaded(stubProvider(many), "page-size=0");
 
@@ -458,10 +508,15 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
     it("selects a service when its row is clicked", async () => {
       const el = await renderLoaded();
 
-      setTimeout(() => rows(el)[1].click());
-      const event = (await oneEvent(el, "ecc-service-selected")) as CustomEvent;
+      const selected = sinon.spy();
+      el.addEventListener("ecc-service-selected", selected);
 
-      expect(event.detail).to.deep.equal({ serviceId: "s2" });
+      rows(el)[1].click();
+
+      expect(selected.callCount).to.equal(1);
+      expect((selected.firstCall.args[0] as CustomEvent).detail).to.deep.equal({
+        serviceId: "s2",
+      });
     });
 
     it("doesn't select a service for clicks on its actions", async () => {
@@ -554,7 +609,13 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
         "error not shown"
       );
 
+      await el.updateComplete;
+
       expect(rows(el)).to.have.length(0);
+      // Loading has ended: no skeleton rows
+      expect(
+        root(el).querySelectorAll("ecc-utils-design-skeleton")
+      ).to.have.length(0);
       expect(root(el).querySelector("ecc-utils-design-pagination")).to.equal(
         null
       );
