@@ -12,7 +12,7 @@ import ServicesPreview from '@/components/packages/service-registry/ServicesPrev
 
 ## Overview
 
-The `ecc-client-ga4gh-service-registry-services` component displays a table of services from a GA4GH-compliant Service Registry. It provides built-in search functionality, service type filtering, and pagination for browsing large service collections.
+The `ecc-client-ga4gh-service-registry-services` component displays a table of services from a GA4GH-compliant Service Registry. It provides search, filters by type, organization and environment, pagination, and actions for each row. Search, filters and pagination work on the list loaded from the registry, without further requests.
 
 <Callout type='info'>
   This component implements the GA4GH Service Registry API specification and can connect to any compliant service registry endpoint.
@@ -113,11 +113,14 @@ This example demonstrates a basic service registry table with search and filteri
 
 ## Properties
 
-| Property   | Type                      | Default | Description                                                                    |
-|------------|---------------------------|---------|--------------------------------------------------------------------------------|
-| `search`   | `boolean`                 | `true`  | Whether to display the search input field                                      |
-| `filter`   | `boolean`                 | `true`  | Whether to display the service type filter dropdown                           |
-| `provider` | `ServiceRegistryProvider` | `null`  | Data provider for fetching services (see [Providers](/docs/service-registry/providers))  |
+| Property     | Attribute   | Type                                    | Default     | Description                                                                              |
+|--------------|-------------|-----------------------------------------|-------------|------------------------------------------------------------------------------------------|
+| `search`     | `search`    | `boolean`                               | `true`      | Whether to display the search input field                                                |
+| `filter`     | `filter`    | `boolean`                               | `true`      | Whether to display the type, organization and environment filters                        |
+| `pageSize`   | `page-size` | `number`                                | `10`        | Number of services per page, rounded down; `0` or less (or not a number) shows all services on one page |
+| `rowActions` | -           | `(service: ExternalService) => unknown` | `undefined` | Renders the actions of each row (see [`rowActions`](#rowactions))                        |
+| `baseUrl`    | `baseurl`   | `string`                                | `""`        | Base URL of the Service Registry API, used if no `provider` is set                       |
+| `provider`   | -           | `ServiceRegistryProvider`               | `undefined` | Data provider for fetching services (see [Providers](/docs/service-registry/providers))  |
 
 ### `provider`
 The data provider responsible for fetching services from the registry. You must provide a provider that implements the `ServiceRegistryProvider` interface. See the [Providers documentation](/docs/service-registry/providers) for detailed information about available providers and how to create custom ones.
@@ -146,7 +149,7 @@ The data provider responsible for fetching services from the registry. You must 
 </Tabs>
 
 ### `search`
-Controls whether the search input field is displayed, allowing users to filter services by name, description, or organization.
+Controls whether the search input field is displayed. The search matches the ID, name, description, URL, organization and type (group, artifact and version) of each service, case-insensitively, in the list that is already loaded. While the field is hidden, its query doesn't apply.
 
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>
@@ -162,7 +165,11 @@ Controls whether the search input field is displayed, allowing users to filter s
 </Tabs>
 
 ### `filter`
-Controls whether the service type filter dropdown is displayed, allowing users to filter services by their type.
+Controls whether the filters are displayed: by type (the types the registry lists at `/services/types`, or else those of the loaded services), by organization, and by environment (only if a service has one). The filters, the search and the page combine; changing the search or a filter goes back to the first page. Only filters on display apply, and only with a value that is still among their options (e.g. after a reload from another registry), so the list never narrows without a visible reason.
+
+<Callout type="info">
+  The GA4GH Service Registry API doesn't describe whether a service is verified, so there is no filter for it yet.
+</Callout>
 
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>
@@ -177,15 +184,74 @@ Controls whether the service type filter dropdown is displayed, allowing users t
   </Tabs.Tab>
 </Tabs>
 
+### `pageSize`
+The number of services per page. The pagination is shown when the services that match the search and the filters fill more than one page. Set it to `0` to show all services on one page.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientGa4ghServiceRegistryServices pageSize={20} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-client-ga4gh-service-registry-services page-size="20"></ecc-client-ga4gh-service-registry-services>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `rowActions`
+A function that renders the actions of a row from its service, e.g. Edit and Delete buttons for the services that the user may change. It can return a Lit template, a DOM node, a string, or `null` for a row without actions; without the function, each row shows a "View Details" button, which selects the service (`ecc-service-selected`). Clicks on the actions of `rowActions` don't select the row. Set a new function when what it renders changes, e.g. after the user's roles changed, so that the rows are rendered again.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    const rowActions = useCallback(
+      (service) => {
+        if (!canEdit(service)) return null;
+        const button = document.createElement('button');
+        button.textContent = 'Edit';
+        button.addEventListener('click', () => navigate(`/services/${service.id}/edit`));
+        return button;
+      },
+      [canEdit, navigate]
+    );
+
+    <EccClientGa4ghServiceRegistryServices rowActions={rowActions} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <script type="module">
+      const list = document.querySelector('ecc-client-ga4gh-service-registry-services');
+      list.rowActions = (service) => {
+        const button = document.createElement('button');
+        button.textContent = 'Edit';
+        button.addEventListener('click', () => {
+          window.location.href = `/services/${service.id}/edit`;
+        });
+        return button;
+      };
+    </script>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Slots
+
+| Slot           | Description                                                                                                        |
+|----------------|--------------------------------------------------------------------------------------------------------------------|
+| `actions-<id>` | Actions of the row of the service with the ID `<id>`; replaces those of `rowActions` or the "View Details" button  |
+
 ## Events
 
 | Event Name             | React Event Name        | Detail Type                    | Description                                    |
 |------------------------|------------------------|--------------------------------|------------------------------------------------|
 | `ecc-services-changed` | `onEccServicesChanged` | `{ services: ExternalService[] }` | Fired when the services data is updated       |
-| `ecc-service-selected` | `onEccServiceSelected` | `{ serviceId: string }`        | Fired when a user clicks on a service row     |
+| `ecc-service-selected` | `onEccServiceSelected` | `{ serviceId: string }`        | Fired when a user clicks on a service row, except on its actions or organization link |
 
 ### `ecc-services-changed`
-Emitted whenever the services data is loaded or updated, providing the current list of services.
+Emitted whenever the services data is loaded or updated, providing all loaded services (not only those that match the search and the filters).
 
 <Tabs items={['React', 'JavaScript']}>
   <Tabs.Tab>
