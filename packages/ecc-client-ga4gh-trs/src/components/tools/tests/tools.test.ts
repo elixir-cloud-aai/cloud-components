@@ -42,7 +42,12 @@ const deferred = <T>() => {
 
 /** The component's private state that the tests read and set. */
 const internals = (el: ECCClientGa4ghTrsTools) =>
-  el as unknown as { tools: Tool[]; currentPage: number; lastPage: number };
+  el as unknown as {
+    tools: Tool[];
+    currentPage: number;
+    lastPage: number;
+    loading: boolean;
+  };
 
 describe("ecc-client-ga4gh-trs-tools provider", () => {
   let fetchStub: sinon.SinonStub;
@@ -168,5 +173,25 @@ describe("ecc-client-ga4gh-trs-tools provider", () => {
 
     expect(internals(el).tools).to.deep.equal([]);
     expect(el.shadowRoot?.textContent).to.contain(MISSING);
+  });
+
+  it("stops loading once the provider is removed during a load", async () => {
+    const slow = deferred<Tool[]>();
+    const { provider } = stubProvider(slow.promise);
+    const el = await fixture<ECCClientGa4ghTrsTools>(
+      html`<ecc-client-ga4gh-trs-tools
+        .provider=${provider}
+      ></ecc-client-ga4gh-trs-tools>`
+    );
+    expect(internals(el).loading).to.equal(true);
+
+    el.provider = undefined;
+    await el.updateComplete;
+    slow.resolve([tool("a")]);
+    await slow.promise;
+    await el.updateComplete;
+
+    expect(internals(el).loading).to.equal(false);
+    expect(internals(el).tools).to.deep.equal([]);
   });
 });

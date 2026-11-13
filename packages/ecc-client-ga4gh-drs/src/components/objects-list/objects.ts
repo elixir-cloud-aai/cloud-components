@@ -88,6 +88,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
         this.loadData();
       } else {
         this.objects = [];
+        this.loading = false;
         this.error =
           "Please provide either a base URL for the DRS API or a custom provider.";
       }

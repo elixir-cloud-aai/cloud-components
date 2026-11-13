@@ -115,6 +115,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
         this.loadToolClasses();
       } else {
         this.tools = [];
+        this.loading = false;
         this.toolClasses = [];
         this.error =
           "Please provide either a base URL for the TRS API or a custom provider.";

@@ -79,8 +79,13 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
       this.useProvider();
     if (providerChanged && !this._provider) {
       this.service = null;
+      this.loading = false;
       this.error =
         "Please provide either a base URL for the Service Registry API or a custom provider.";
+    } else if (changedProperties.has("serviceId") && !this.serviceId) {
+      this.service = null;
+      this.loading = false;
+      this.error = "Please provide a service ID.";
     } else if (
       (providerChanged ||
         (changedProperties.has("serviceId") && this.serviceId)) &&

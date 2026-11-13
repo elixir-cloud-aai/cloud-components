@@ -87,6 +87,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
         this.loadServiceTypes();
       } else {
         this.services = [];
+        this.loading = false;
         this.serviceTypes = [];
         this.error =
           "Please provide either a base URL for the Service Registry API or a custom provider.";
@@ -182,7 +183,8 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     }
 
     const query = this.searchQuery.toLowerCase();
-    if (!this._provider) return;
+    const provider = this._provider;
+    if (!provider) return;
 
     this.loading = true;
     this.error = null;
@@ -190,7 +192,9 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     try {
       // For now, we'll just filter client-side
       // In a real implementation, you might want to do this on the server
-      this._provider.getServices().then((services) => {
+      provider.getServices().then((services) => {
+        // a load from a provider that was replaced in the meantime is dropped
+        if (provider !== this._provider) return;
         this.services = services.filter(
           (service) =>
             service.id.toLowerCase().includes(query) ||
