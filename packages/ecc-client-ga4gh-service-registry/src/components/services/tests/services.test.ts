@@ -68,6 +68,15 @@ const rows = (el: El) =>
 
 const shownIds = (el: El) => rows(el).map((row) => row.dataset.serviceId);
 
+/**
+ * Replaces the loaded services, as a reload (e.g. from another registry)
+ * does; the lifecycle that reloads is out of scope here.
+ */
+const setServices = (el: El, services: ExternalService[]) => {
+  const internals = el as unknown as { services: ExternalService[] };
+  internals.services = services;
+};
+
 /** Renders the component and waits until the services are listed. */
 const renderLoaded = async (
   provider: ServiceRegistryProvider = stubProvider(),
@@ -144,6 +153,22 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       await change(el, searchInput(el), "");
 
       expect(shownIds(el)).to.deep.equal(["s1", "s2", "s3"]);
+    });
+
+    it("ignores the query while the search is hidden", async () => {
+      const el = await renderLoaded();
+      await change(el, searchInput(el), "s3.example.org");
+
+      el.search = false;
+      await el.updateComplete;
+      expect(shownIds(el)).to.deep.equal(["s1", "s2", "s3"]);
+
+      el.search = true;
+      await el.updateComplete;
+      expect(shownIds(el)).to.deep.equal(["s3"]);
+      expect(
+        (searchInput(el) as HTMLElement & { value: string }).value
+      ).to.equal("s3.example.org");
     });
   });
 
@@ -228,6 +253,17 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
 
       expect(shownIds(el)).to.deep.equal(["s1", "s2", "s3"]);
     });
+
+    it("ignores a selected value that is no longer an option", async () => {
+      const el = await renderLoaded();
+      await change(el, filterSelect(el, "organization"), "Org B");
+
+      // As after a reload from another registry
+      setServices(el, [service("s4"), service("s5")]);
+      await el.updateComplete;
+
+      expect(shownIds(el)).to.deep.equal(["s4", "s5"]);
+    });
   });
 
   describe("pagination", () => {
@@ -292,6 +328,76 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       );
     });
 
+    it("shows 10 services per page by default", async () => {
+      const el = await renderLoaded(stubProvider(many));
+
+      expect(rows(el)).to.have.length(10);
+    });
+
+    it("links the first, last and nearby pages", async () => {
+      const lots = Array.from({ length: 50 }, (_, i) => service(`s${i + 1}`));
+      const el = await renderLoaded(stubProvider(lots), "page-size=5");
+      find(
+        el,
+        'ecc-utils-design-pagination-link[data-page="10"]'
+      ).dispatchEvent(
+        new CustomEvent("ecc-button-clicked", {
+          detail: { variant: "link" },
+          bubbles: true,
+          composed: true,
+        })
+      );
+      await el.updateComplete;
+      const pages = () =>
+        Array.from(
+          root(el).querySelectorAll<HTMLElement>(
+            "ecc-utils-design-pagination-link"
+          )
+        ).map((link) => link.dataset.page);
+      const ellipses = () =>
+        root(el).querySelectorAll("ecc-utils-design-pagination-ellipsis")
+          .length;
+
+      expect(pages()).to.deep.equal(["1", "9", "10"]);
+      expect(ellipses()).to.equal(1);
+
+      find(el, 'ecc-utils-design-pagination-link[data-page="9"]').dispatchEvent(
+        new CustomEvent("ecc-button-clicked", {
+          detail: { variant: "link" },
+          bubbles: true,
+          composed: true,
+        })
+      );
+      await el.updateComplete;
+      find(el, "ecc-utils-design-pagination-previous").dispatchEvent(
+        new CustomEvent("ecc-button-clicked", {
+          detail: { variant: "previous" },
+          bubbles: true,
+          composed: true,
+        })
+      );
+      await el.updateComplete;
+      expect(pages()).to.deep.equal(["1", "7", "8", "9", "10"]);
+      expect(ellipses()).to.equal(1);
+    });
+
+    it("shows the last page if the list shrinks below the page", async () => {
+      const el = await renderLoaded(stubProvider(many), "page-size=5");
+      find(el, 'ecc-utils-design-pagination-link[data-page="3"]').dispatchEvent(
+        new CustomEvent("ecc-button-clicked", {
+          detail: { variant: "link" },
+          bubbles: true,
+          composed: true,
+        })
+      );
+      await el.updateComplete;
+
+      setServices(el, many.slice(0, 7));
+      await el.updateComplete;
+
+      expect(shownIds(el)).to.deep.equal(["s6", "s7"]);
+    });
+
     it("shows all services if page-size is 0", async () => {
       const el = await renderLoaded(stubProvider(many), "page-size=0");
 
@@ -353,6 +459,86 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       find(el, "button.edit").click();
 
       expect(selected.called).to.equal(false);
+    });
+
+    it("renders no actions for rows where rowActions returns null", async () => {
+      const el = await renderLoaded();
+      el.rowActions = () => null;
+      await el.updateComplete;
+
+      expect(
+        root(el).querySelectorAll(
+          'slot[name^="actions-"] ecc-utils-design-button'
+        )
+      ).to.have.length(0);
+    });
+
+    it("renders the rows again with a new rowActions", async () => {
+      const el = await renderLoaded();
+      el.rowActions = () => litHtml`<button class="edit">Edit</button>`;
+      await el.updateComplete;
+
+      el.rowActions = () => litHtml`<button class="delete">Delete</button>`;
+      await el.updateComplete;
+
+      expect(root(el).querySelectorAll("button.edit")).to.have.length(0);
+      expect(root(el).querySelectorAll("button.delete")).to.have.length(3);
+    });
+
+    it("opens the organization link without selecting the row", async () => {
+      const el = await renderLoaded();
+      const open = sinon.stub(window, "open");
+      const selected = sinon.spy();
+      el.addEventListener("ecc-service-selected", selected);
+
+      find(
+        el,
+        '[data-service-id="s1"] ecc-utils-design-button[data-no-select]'
+      ).click();
+
+      expect(selected.called).to.equal(false);
+      expect(
+        open.calledOnceWith(
+          "https://a.example.org",
+          "_blank",
+          "noopener,noreferrer"
+        )
+      ).to.equal(true);
+    });
+
+    it("opens only web URLs of organizations", async () => {
+      const el = await renderLoaded(
+        stubProvider([
+          service("s1", {
+            // eslint-disable-next-line no-script-url
+            organization: { name: "Org X", url: "javascript:alert(1)" },
+          }),
+        ])
+      );
+      const open = sinon.stub(window, "open");
+
+      find(el, "ecc-utils-design-button[data-no-select]").click();
+
+      expect(open.called).to.equal(false);
+    });
+
+    it("shows the error if the services can't be loaded", async () => {
+      const provider = stubProvider();
+      provider.getServices.rejects(new Error("registry down"));
+      const el = await fixture<El>(
+        html`<ecc-client-ga4gh-service-registry-services
+          .provider=${provider}
+        ></ecc-client-ga4gh-service-registry-services>`
+      );
+      await waitUntil(
+        () => root(el).textContent?.includes("registry down"),
+        "error not shown"
+      );
+
+      expect(rows(el)).to.have.length(0);
+      expect(root(el).querySelector("ecc-utils-design-pagination")).to.equal(
+        null
+      );
     });
 
     it("keeps the actions slot of each row", async () => {

@@ -148,7 +148,7 @@ The data provider responsible for fetching services from the registry. You must 
 </Tabs>
 
 ### `search`
-Controls whether the search input field is displayed. The search matches the ID, name, description, URL, organization and type of each service, case-insensitively, in the list that is already loaded.
+Controls whether the search input field is displayed. The search matches the ID, name, description, URL, organization and type of each service, case-insensitively, in the list that is already loaded. While the field is hidden, its query doesn't apply.
 
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>
@@ -164,7 +164,7 @@ Controls whether the search input field is displayed. The search matches the ID,
 </Tabs>
 
 ### `filter`
-Controls whether the filters are displayed: by type (the types the registry lists at `/services/types`, or else those of the loaded services), by organization, and by environment (only if a service has one). The filters, the search and the page combine; changing the search or a filter goes back to the first page.
+Controls whether the filters are displayed: by type (the types the registry lists at `/services/types`, or else those of the loaded services), by organization, and by environment (only if a service has one). The filters, the search and the page combine; changing the search or a filter goes back to the first page. Only filters on display apply, and only with a value that is still among their options (e.g. after a reload from another registry), so the list never narrows without a visible reason.
 
 <Callout type="info">
   The GA4GH Service Registry API doesn't describe whether a service is verified, so there is no filter for it yet.

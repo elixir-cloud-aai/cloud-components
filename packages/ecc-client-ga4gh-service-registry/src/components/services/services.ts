@@ -30,9 +30,34 @@ interface ServiceFilters {
   environment: string;
 }
 
+/** An option of a filter. */
+interface FilterOption {
+  value: string;
+  label: string;
+}
+
+/** The options of each filter, besides "All". */
+type FilterOptions = Record<keyof ServiceFilters, FilterOption[]>;
+
 /** The value of a service type in the type filter. */
 const typeKey = (type: ServiceType): string =>
   `${type.group}:${type.artifact}:${type.version}`;
+
+/**
+ * Opens a URL from the registry in a new tab, without access to this page,
+ * if it is a web URL (`http:` or `https:`).
+ */
+const openExternal = (url: string): void => {
+  let protocol = "";
+  try {
+    ({ protocol } = new URL(url));
+  } catch {
+    return;
+  }
+  if (protocol === "http:" || protocol === "https:") {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+};
 
 /** The distinct, non-empty values, sorted. */
 const uniqueSorted = (values: (string | undefined)[]): string[] =>
@@ -91,6 +116,13 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   };
 
   @state() private currentPage = 1;
+
+  /** Derived from the services and types in `willUpdate`. */
+  private filterOptions: FilterOptions = {
+    type: [],
+    organization: [],
+    environment: [],
+  };
 
   private _provider: ServiceRegistryProvider | null = null;
 
@@ -174,19 +206,64 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     this.currentPage = 1;
   }
 
+  protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+    if (
+      changedProperties.has("services") ||
+      changedProperties.has("serviceTypes")
+    ) {
+      this.filterOptions = this.computeFilterOptions();
+    }
+  }
+
+  /**
+   * The options of each filter: the registry's types (or else those of the
+   * services), and the organizations and environments of the services.
+   */
+  private computeFilterOptions(): FilterOptions {
+    const types = this.serviceTypes.length
+      ? this.serviceTypes
+      : this.services.map((service) => service.type);
+    const uniqueTypes = [
+      ...new Map(types.map((type) => [typeKey(type), type])).values(),
+    ];
+    const asOptions = (values: string[]) =>
+      values.map((value) => ({ value, label: value }));
+    return {
+      type: uniqueTypes.map((type) => ({
+        value: typeKey(type),
+        label: `${type.artifact}@${type.version} (${type.group})`,
+      })),
+      organization: asOptions(
+        uniqueSorted(this.services.map((service) => service.organization.name))
+      ),
+      environment: asOptions(
+        uniqueSorted(this.services.map((service) => service.environment))
+      ),
+    };
+  }
+
+  /**
+   * The value of a filter that applies: only filters on display with a value
+   * among their options do, so that the list never narrows invisibly.
+   */
+  private activeFilter(key: keyof ServiceFilters): string {
+    const value = this.filters[key];
+    return this.filter &&
+      this.filterOptions[key].some((option) => option.value === value)
+      ? value
+      : "";
+  }
+
   /** The loaded services that match the search query and the filters. */
-  private get filteredServices(): ExternalService[] {
-    const query = this.searchQuery.trim().toLowerCase();
-    // Only the filters on display apply, so that each one can be cleared
-    const shown = this.filter;
-    const type = shown ? this.filters.type : "";
-    const organization = shown ? this.filters.organization : "";
-    const environment =
-      shown && this.environmentOptions.length ? this.filters.environment : "";
+  private filterServices(): ExternalService[] {
+    const query = this.search ? this.searchQuery.trim().toLowerCase() : "";
+    const type = this.activeFilter("type");
+    const organization = this.activeFilter("organization");
+    const environment = this.activeFilter("environment");
     return this.services.filter(
       (service) =>
-        (!type || (!!service.type && typeKey(service.type) === type)) &&
-        (!organization || service.organization?.name === organization) &&
+        (!type || typeKey(service.type) === type) &&
+        (!organization || service.organization.name === organization) &&
         (!environment || service.environment === environment) &&
         (!query ||
           [
@@ -194,29 +271,11 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
             service.name,
             service.description,
             service.url,
-            service.organization?.name,
-            service.type?.group,
-            service.type?.artifact,
+            service.organization.name,
+            service.type.group,
+            service.type.artifact,
           ].some((field) => field?.toLowerCase().includes(query)))
     );
-  }
-
-  /** The types to filter by: the registry's, or else those of the services. */
-  private get typeOptions(): ServiceType[] {
-    const types = this.serviceTypes.length
-      ? this.serviceTypes
-      : this.services.map((service) => service.type).filter(Boolean);
-    return [...new Map(types.map((type) => [typeKey(type), type])).values()];
-  }
-
-  private get organizationOptions(): string[] {
-    return uniqueSorted(
-      this.services.map((service) => service.organization?.name)
-    );
-  }
-
-  private get environmentOptions(): string[] {
-    return uniqueSorted(this.services.map((service) => service.environment));
   }
 
   private pageCount(total: number): number {
@@ -229,14 +288,15 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   }
 
   private handleRowClick(e: MouseEvent, serviceId: string): void {
-    // Clicks on the actions of a row (slotted content included) are theirs
-    const onActions = e
+    // Clicks on the actions of a row (slotted content included) and on the
+    // organization link are theirs, not the row's
+    const ownClick = e
       .composedPath()
       .some(
         (node) =>
-          node instanceof HTMLElement && node.hasAttribute("data-actions")
+          node instanceof HTMLElement && node.hasAttribute("data-no-select")
       );
-    if (!onActions) this.handleViewDetails(serviceId);
+    if (!ownClick) this.handleViewDetails(serviceId);
   }
 
   private handleViewDetails(serviceId: string): void {
@@ -303,7 +363,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   private renderFilterSelect(
     key: keyof ServiceFilters,
     label: string,
-    options: { value: string; label: string }[]
+    options: FilterOption[]
   ) {
     return html`
       <div class="flex flex-col gap-1">
@@ -338,27 +398,20 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   private renderFilters() {
     if (!this.filter) return "";
 
-    const environments = this.environmentOptions;
+    const options = this.filterOptions;
     return html`
       <div class="flex flex-wrap gap-3 items-end">
-        ${this.renderFilterSelect(
-          "type",
-          "Type",
-          this.typeOptions.map((type) => ({
-            value: typeKey(type),
-            label: `${type.artifact}@${type.version} (${type.group})`,
-          }))
-        )}
+        ${this.renderFilterSelect("type", "Type", options.type)}
         ${this.renderFilterSelect(
           "organization",
           "Organization",
-          this.organizationOptions.map((name) => ({ value: name, label: name }))
+          options.organization
         )}
-        ${environments.length
+        ${options.environment.length
           ? this.renderFilterSelect(
               "environment",
               "Environment",
-              environments.map((name) => ({ value: name, label: name }))
+              options.environment
             )
           : ""}
       </div>
@@ -488,14 +541,14 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
             ? html`<ecc-utils-design-button
                 class="part:font-medium part:text-primary part:w-fit part:cursor-pointer part:p-0"
                 variant="link"
-                data-actions
-                @click=${() => window.open(service.organization.url, "_blank")}
+                data-no-select
+                @click=${() => openExternal(service.organization.url)}
               >
                 ${service.organization.name}
               </ecc-utils-design-button>`
             : html`${service.organization.name}`}
         </ecc-utils-design-table-cell>
-        <ecc-utils-design-table-cell class="w-1/12" data-actions>
+        <ecc-utils-design-table-cell class="w-1/12" data-no-select>
           <slot name=${`actions-${service.id}`}
             >${this.renderActions(service)}</slot
           >
@@ -524,7 +577,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   }
 
   render() {
-    const filtered = this.filteredServices;
+    const filtered = this.filterServices();
     const pageCount = this.pageCount(filtered.length);
     // The page may be past the end after the list or the page size changed
     const page = Math.min(this.currentPage, pageCount);
@@ -549,6 +602,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
                 <ecc-utils-design-input
                   class="part:w-full"
                   data-search
+                  .value=${this.searchQuery}
                   placeholder="Search by name, type, organization, URL..."
                   @ecc-input-changed=${this.handleSearch}
                 ></ecc-utils-design-input>
