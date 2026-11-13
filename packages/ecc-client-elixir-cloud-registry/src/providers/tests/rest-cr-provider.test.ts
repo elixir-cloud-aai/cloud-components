@@ -32,6 +32,13 @@ const METHODS: [string, (provider: RestCloudRegistryProvider) => unknown][] = [
     "createOrUpdateServiceInfo",
     (p) => p.createOrUpdateServiceInfo({ ...SERVICE, id: "registry" }),
   ],
+  ["getVerifications", (p) => p.getVerifications()],
+  ["getServiceVerification", (p) => p.getServiceVerification("service-1")],
+  ["verifyService", (p) => p.verifyService("service-1")],
+  [
+    "deleteServiceVerification",
+    (p) => p.deleteServiceVerification("service-1"),
+  ],
 ];
 
 /** The error that a call rejects with. */
