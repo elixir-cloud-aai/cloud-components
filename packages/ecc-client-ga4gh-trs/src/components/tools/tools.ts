@@ -103,11 +103,31 @@ export class ECCClientGa4ghTrsTools extends LitElement {
       this.loadData();
     }
 
-    if (changedProperties.has("baseUrl") && this.baseUrl) {
-      this._provider = new RestTrsProvider(this.baseUrl);
+    if (
+      (changedProperties.has("provider") || changedProperties.has("baseUrl")) &&
+      this.useProvider()
+    ) {
       this.loadData();
       this.loadToolClasses();
     }
+  }
+
+  /**
+   * Switches to the custom provider or, without one, to a REST provider for
+   * the base URL; returns whether the provider in use changed
+   */
+  private useProvider(): boolean {
+    let provider: TrsProvider | null = this.provider ?? null;
+    if (!provider && this.baseUrl) {
+      provider =
+        this._provider instanceof RestTrsProvider &&
+        this._provider.baseUrl === this.baseUrl
+          ? this._provider
+          : new RestTrsProvider(this.baseUrl);
+    }
+    if (!provider || provider === this._provider) return false;
+    this._provider = provider;
+    return true;
   }
 
   private async loadToolClasses(): Promise<void> {

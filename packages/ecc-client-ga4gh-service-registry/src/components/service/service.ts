@@ -74,17 +74,35 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
   }
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
+    const providerChanged =
+      (changedProperties.has("provider") || changedProperties.has("baseUrl")) &&
+      this.useProvider();
     if (
-      (changedProperties.has("baseUrl") && this.baseUrl) ||
-      (changedProperties.has("serviceId") && this.serviceId)
+      (providerChanged ||
+        (changedProperties.has("serviceId") && this.serviceId)) &&
+      this.serviceId &&
+      this._provider
     ) {
-      if (this.baseUrl) {
-        this._provider = new RestServiceRegistryProvider(this.baseUrl);
-      }
-      if (this.serviceId && this._provider) {
-        this.loadData();
-      }
+      this.loadData();
     }
+  }
+
+  /**
+   * Switches to the custom provider or, without one, to a REST provider for
+   * the base URL; returns whether the provider in use changed
+   */
+  private useProvider(): boolean {
+    let provider: ServiceRegistryProvider | null = this.provider ?? null;
+    if (!provider && this.baseUrl) {
+      provider =
+        this._provider instanceof RestServiceRegistryProvider &&
+        this._provider.baseUrl === this.baseUrl
+          ? this._provider
+          : new RestServiceRegistryProvider(this.baseUrl);
+    }
+    if (!provider || provider === this._provider) return false;
+    this._provider = provider;
+    return true;
   }
 
   private async loadData(): Promise<void> {

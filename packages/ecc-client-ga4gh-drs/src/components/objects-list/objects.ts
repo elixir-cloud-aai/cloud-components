@@ -77,10 +77,30 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
       this.loadData();
     }
 
-    if (changedProperties.has("baseUrl") && this.baseUrl) {
-      this._provider = new RestDrsProvider(this.baseUrl);
+    if (
+      (changedProperties.has("provider") || changedProperties.has("baseUrl")) &&
+      this.useProvider()
+    ) {
       this.loadData();
     }
+  }
+
+  /**
+   * Switches to the custom provider or, without one, to a REST provider for
+   * the base URL; returns whether the provider in use changed
+   */
+  private useProvider(): boolean {
+    let provider: DrsProvider | null = this.provider ?? null;
+    if (!provider && this.baseUrl) {
+      provider =
+        this._provider instanceof RestDrsProvider &&
+        this._provider.baseUrl === this.baseUrl
+          ? this._provider
+          : new RestDrsProvider(this.baseUrl);
+    }
+    if (!provider || provider === this._provider) return false;
+    this._provider = provider;
+    return true;
   }
 
   private async loadData(): Promise<void> {
