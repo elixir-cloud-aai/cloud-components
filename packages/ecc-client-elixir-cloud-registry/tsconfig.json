@@ -21,6 +21,9 @@
     "paths": {
       "@elixir-cloud/service-registry/components/*": [
         "../../node_modules/@elixir-cloud/service-registry/dist/components/*"
+      ],
+      "@elixir-cloud/service-registry/events": [
+        "../../node_modules/@elixir-cloud/service-registry/dist/events/index"
       ]
     }
   },

@@ -9,4 +9,4 @@ export type { EccServiceVerificationFailedEvent } from "./ecc-service-verificati
 export type {
   EccServiceSelectedEvent,
   EccServicesChangedEvent,
-} from "@elixir-cloud/service-registry/dist/events/index.js";
+} from "@elixir-cloud/service-registry/events";

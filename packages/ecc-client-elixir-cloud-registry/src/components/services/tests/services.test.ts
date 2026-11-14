@@ -327,4 +327,89 @@ describe("ecc-client-elixir-cloud-registry-services", () => {
       "Please provide either a base URL"
     );
   });
+
+  it("ignores services of a replaced list", async () => {
+    const el = await renderLoaded(stubProvider().provider);
+    const old = list(el);
+    el.provider = stubProvider([]).provider;
+    await el.updateComplete;
+    await waitUntil(() => !!badge(el, "s1"), "verifications not shown");
+
+    old.dispatchEvent(
+      new CustomEvent("ecc-services-changed", {
+        detail: { services: [service("other")] },
+      })
+    );
+    await el.updateComplete;
+
+    expect(list(el)).to.not.equal(old);
+    const internals = el as unknown as { services: ExternalService[] };
+    expect(internals.services.map((svc) => svc.id)).to.deep.equal([
+      "s1",
+      "s2",
+      "s3",
+    ]);
+  });
+
+  it("ignores verification changes before the verifications load", async () => {
+    const stubs = stubProvider();
+    stubs.verifications.returns(
+      new Promise(() => {
+        // never settles
+      })
+    );
+    const el = await fixture<El>(
+      html`<ecc-client-elixir-cloud-registry-services
+        .provider=${stubs.provider}
+      ></ecc-client-elixir-cloud-registry-services>`
+    );
+
+    list(el).dispatchEvent(
+      new CustomEvent("ecc-service-verification-changed", {
+        detail: { serviceId: "s1", verification: null },
+      })
+    );
+    await el.updateComplete;
+
+    const internals = el as unknown as { verifications?: unknown };
+    expect(internals.verifications).to.equal(undefined);
+  });
+
+  it("creates a new provider when baseUrl changes", async () => {
+    const el = await fixture<El>(
+      html`<ecc-client-elixir-cloud-registry-services
+        baseUrl=${BASE_URL}
+      ></ecc-client-elixir-cloud-registry-services>`
+    );
+    const first = list(el).provider;
+    el.baseUrl = `${BASE_URL}/other`;
+    await el.updateComplete;
+
+    const provider = list(el).provider as RestCloudRegistryProvider;
+    expect(provider).to.not.equal(first);
+    expect(provider.baseUrl).to.equal(`${BASE_URL}/other`);
+    el.baseUrl = "";
+    await el.updateComplete;
+    expect(list(el).provider).to.equal(undefined);
+  });
+
+  it("passes the status of a failed load on", async () => {
+    const stubs = stubProvider();
+    const error = Object.assign(new Error("Forbidden"), { status: 403 });
+    stubs.verifications.rejects(error);
+    const el = document.createElement(
+      "ecc-client-elixir-cloud-registry-services"
+    );
+    const failed = oneEvent(
+      el,
+      "ecc-service-verification-failed"
+    ) as Promise<EccServiceVerificationFailedEvent>;
+    el.provider = stubs.provider;
+    document.body.append(el);
+
+    const { detail } = await failed;
+    expect(detail.status).to.equal(403);
+    expect(detail.cause).to.equal(error);
+    el.remove();
+  });
 });

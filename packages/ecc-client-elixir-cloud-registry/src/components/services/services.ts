@@ -176,6 +176,9 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
   private handleServicesChanged(
     e: CustomEvent<{ services: ExternalService[] }>
   ): void {
+    // A replaced list (of a previous provider) may still answer
+    const list = e.currentTarget as { provider?: unknown } | null;
+    if (list?.provider !== this.shownProvider) return;
     this.services = e.detail.services;
   }
 
