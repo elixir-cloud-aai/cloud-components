@@ -65,8 +65,7 @@ builds of pull requests.
 All public packages in `packages/` (those without `"private": true` in
 their `package.json`) share the version of the root `package.json` and are
 released together (currently `2.0.0-alpha.N`, until 2.0.0).
-`@elixir-cloud/ro-crate` and the deprecated `@elixir-cloud/tes` are private
-and not released.
+`@elixir-cloud/ro-crate` is private and not released.
 
 The `Release` workflow (`.github/workflows/release.yml`) runs on tags
 `v<version>` and pushes nothing to any branch. Its jobs:
