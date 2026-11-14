@@ -2,6 +2,7 @@
   "introduction": "Introduction",
   "installation": "Installation",
   "versions": "Versions",
+  "contributing": "Contributing",
   "customization": "Customization",
   "providers": "Providers",
   "-- Supported Services": {
@@ -34,6 +35,12 @@
   },
   "wes": {
     "title": "Workflow Execution Service (WES)",
+    "theme": {
+      "collapsed": true
+    }
+  },
+  "tes": {
+    "title": "Task Execution Service (TES)",
     "theme": {
       "collapsed": true
     }

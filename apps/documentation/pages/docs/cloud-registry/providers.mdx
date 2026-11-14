@@ -2,7 +2,7 @@ import { Callout, Tabs } from 'nextra/components'
 
 # Cloud Registry Providers
 
-The `@elixir-cloud/cloud-registry` package provides providers for connecting to Elixir Cloud Registry APIs. The main provider is `RestCloudRegistryProvider` which implements the `CloudRegistryProvider` interface for REST-based cloud registry endpoints with both read and write capabilities.
+The `@elixir-cloud/cloud-registry` package provides providers for connecting to Cloud Registry APIs. The main provider is `RestCloudRegistryProvider` which implements the `CloudRegistryProvider` interface for REST-based cloud registry endpoints with both read and write capabilities.
 
 <Callout type='info'>
   **Quick Start**: Create a `RestCloudRegistryProvider` with your cloud registry URL and pass it to Cloud Registry components to start creating and managing services.
@@ -18,7 +18,8 @@ export interface CloudRegistryProvider extends ServiceRegistryProvider {
   getServices(): Promise<ExternalService[]>;
   getServiceById(id: string): Promise<ExternalService>;
   getServiceTypes(): Promise<ServiceType[]>;
-  getServiceInfo(): Promise<Service>;
+  // with the registration rules (Cloud Registry 1.0.0rc2 and later)
+  getServiceInfo(): Promise<RegistryServiceInfo>;
   
   // Cloud Registry specific methods for service management
   createService(service: ExternalServiceRegister): Promise<string>;
@@ -37,7 +38,7 @@ export interface CloudRegistryProvider extends ServiceRegistryProvider {
 
 ## RestCloudRegistryProvider
 
-The `RestCloudRegistryProvider` is the main implementation that communicates with Elixir Cloud Registry APIs using REST/HTTP.
+The `RestCloudRegistryProvider` is the main implementation that communicates with Cloud Registry APIs using REST/HTTP.
 
 ### Constructor
 
@@ -235,6 +236,24 @@ interface ExternalServiceRegister {
   environment?: string;
   version: string;
   url: string;
+}
+```
+
+### RegistryServiceInfo and RegistrationRules
+
+Cloud Registry 1.0.0rc2 and later extend their service info (`getServiceInfo()`) with the rules for registrations, which the create form reads (e.g. the allowed environments). Custom providers can return them from `getServiceInfo()`; without them, the form falls back to its properties.
+
+```typescript
+interface RegistryServiceInfo extends Service {
+  registrationRules?: RegistrationRules;
+}
+
+interface RegistrationRules {
+  environments: string[]; // empty if any value is allowed
+  urlSchemes: string[]; // e.g. ['https']
+  serviceTypes: string; // 'open', 'controlled' or 'moderated'
+  maxUnusedServiceTypes?: number;
+  maxServicesPerUser?: number;
 }
 ```
 

@@ -55,7 +55,7 @@ const services = [
   {
     id: 'cloud-registry',
     label: 'Cloud Registry',
-    description: 'Elixir Cloud service registration and management',
+    description: 'Cloud Registry service registration and management',
     components: [
       { name: 'Create Service', component: ServiceCreatePreview }
     ],

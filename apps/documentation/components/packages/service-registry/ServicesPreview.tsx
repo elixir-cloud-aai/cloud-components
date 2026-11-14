@@ -1,13 +1,9 @@
 import React from 'react';
 import { ECCClientGa4ghServiceRegistryServices } from '@elixir-cloud/service-registry/react';
-import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
 import PreviewLayout from '@/components/common/PreviewLayout';
+import { endpoints } from '@/utils/endpoints';
 
 export default function ServicesPreview() {
-  const provider = new RestServiceRegistryProvider(
-    'https://cloud-registry.anuragxd.com/ga4gh/registry/v1'
-  );
-
   const handleServiceSelected = (event: any) => {
     console.log('Service selected:', event.detail.serviceId);
     // Navigate to service details or perform other actions
@@ -17,10 +13,13 @@ export default function ServicesPreview() {
     console.log('Services data updated:', event.detail.services);
   };
 
+  // `baseUrl` rather than `provider`: the component reads `provider` only on
+  // its first update, which runs before React sets it on the server-rendered
+  // element, but it reloads when `baseUrl` changes
   return (
     <PreviewLayout>
-      <ECCClientGa4ghServiceRegistryServices 
-        provider={provider}
+      <ECCClientGa4ghServiceRegistryServices
+        baseUrl={endpoints.serviceRegistry}
         search={true}
         filter={true}
         onEccServiceSelected={handleServiceSelected}

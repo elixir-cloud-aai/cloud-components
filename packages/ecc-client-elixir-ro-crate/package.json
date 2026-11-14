@@ -31,7 +31,7 @@
     "@elixir-cloud/eslint-config": "*",
     "@lit/react": "*",
     "@web/dev-server": "^0.4.6",
-    "@web/test-runner": "^0.18.3",
+    "@web/test-runner": "^1.0.0",
     "commander": "*",
     "custom-element-jet-brains-integration": "*",
     "custom-element-vs-code-integration": "*",

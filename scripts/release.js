@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Release helper (see "Releases" in CONTRIBUTING.md). All public packages in
+// Release helper (see "Releases" in the Contributing page of the documentation). All public packages in
 // `packages/*` (those without `"private": true`) share the version of the
 // root `package.json` and are released together.
 //

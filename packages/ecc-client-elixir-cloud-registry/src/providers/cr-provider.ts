@@ -1,6 +1,6 @@
 /* eslint-disable import/named */
 /**
- * Types for the ELIXIR Cloud Registry API based on OpenAPI specification v1.0.0
+ * Types for the Cloud Registry API based on OpenAPI specification v1.0.0
  */
 
 // Import base types from the GA4GH Service Registry package
@@ -58,6 +58,29 @@ export interface ExternalServiceRegister {
 }
 
 /**
+ * Rules for registrations that Cloud Registry publishes in its service info
+ * (`registrationRules` of `GET /service-info`, since cloud-registry 1.0.0rc2;
+ * earlier versions name it and its fields in snake_case, which isn't read)
+ */
+export interface RegistrationRules {
+  /** Values allowed for `environment`; empty if any value is allowed */
+  environments: string[];
+  /** Schemes allowed in service URLs (`url`), e.g. `["https"]` */
+  urlSchemes: string[];
+  /** Who may add service types: `open`, `controlled` or `moderated` */
+  serviceTypes: string;
+  /** How many unused types a user other than an admin may add; unset if any */
+  maxUnusedServiceTypes?: number;
+  /** How many services a user other than an admin may have; unset if any */
+  maxServicesPerUser?: number;
+}
+
+/** Service info of Cloud Registry: a GA4GH service with registration rules */
+export interface RegistryServiceInfo extends Service {
+  registrationRules?: RegistrationRules;
+}
+
+/**
  * Interface defining the operations required for Cloud Registry data providers
  * Extends the base ServiceRegistryProvider with Cloud Registry specific creation and deletion operations
  */
@@ -77,4 +100,8 @@ export interface CloudRegistryProvider extends ServiceRegistryProvider {
 
   // Service info methods (Cloud Registry specific)
   createOrUpdateServiceInfo?(service: ServiceRegister): Promise<void>;
+
+  // Service info, with the registration rules of Cloud Registry 1.0.0rc2 and
+  // later (optional, so providers returning a plain `Service` still conform)
+  getServiceInfo(): Promise<RegistryServiceInfo>;
 }

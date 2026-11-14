@@ -33,7 +33,7 @@ This example shows the basic form for creating a new workflow run.
 
     export default function RunCreateBasic() {
       const provider = new RestWesProvider(
-        'https://weskit.anuragxd.com/ga4gh/wes/v1'
+        'https://wes.example.com/ga4gh/wes/v1'
       );
 
       return (
@@ -60,7 +60,7 @@ This example shows the basic form for creating a new workflow run.
           import { RestWesProvider } from 'https://esm.sh/@elixir-cloud/wes@2.0.0-alpha.1/providers';
           
           const provider = new RestWesProvider(
-            'https://weskit.anuragxd.com/ga4gh/wes/v1'
+            'https://wes.example.com/ga4gh/wes/v1'
           );
           
           document.querySelector('ecc-client-ga4gh-wes-run-create').provider = provider;

@@ -455,7 +455,7 @@ test("the command line prints the released packages", () => {
   assert.strictEqual(packagesRun.status, 0);
   const dirs = packagesRun.stdout.trim().split("\n");
   assert.ok(dirs.includes(path.join("packages", "ecc-utils-design")));
-  assert.ok(!dirs.includes(path.join("packages", "ecc-client-ga4gh-tes")));
+  assert.ok(dirs.includes(path.join("packages", "ecc-client-ga4gh-tes")));
 });
 
 // The citation metadata of the repository has the version of the packages

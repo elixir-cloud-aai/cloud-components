@@ -1,18 +1,21 @@
+<!-- markdownlint-disable MD033 MD041 -- logo first; <picture> for dark mode -->
 <a href="https://elixir-on.cloud/">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="images/logo_elixir_on_cloud_night.png">
     <img src="images/logo_elixir_on_cloud.png" alt="ELIXIR On-Cloud">
   </picture>
 </a>
+<!-- markdownlint-enable MD033 MD041 -->
 
 # Cloud Components
 
 [![License][badge-license]][badge-url-license]
 [![Build_status][badge-build-status]][badge-url-build-status]
-[![Coverage][badge-coverage]][badge-url-coverage]
 [![Docs][badge-docs]][badge-url-docs]
+[![Coverage][badge-coverage]][badge-url-coverage]
 [![GitHub_tag][badge-github-tag]][badge-url-github-tag]
 [![npm_release][badge-npm]][badge-url-npm]
+[![DOI][badge-doi]][badge-url-doi]
 
 Web components for front ends of [GA4GH](https://www.ga4gh.org/) APIs and
 the services built on them, brought to you by [ELIXIR
@@ -63,7 +66,7 @@ CDN and the other packages.
 
 ## Development
 
-With [Node.js](https://nodejs.org/) 22 or later installed, clone the
+With [Node.js](https://nodejs.org/) 22.12 or later installed, clone the
 repository, install the dependencies and start the design package, which all
 other packages need:
 
@@ -86,26 +89,33 @@ documentation app is in [`apps/documentation/`](apps/documentation/).
 
 ## Citation
 
-If you use Cloud Components, please cite them with the metadata in
+If you use Cloud Components, please cite them with their DOI
+[10.5281/zenodo.23858158](https://doi.org/10.5281/zenodo.23858158), which
+always resolves to the latest version on [Zenodo](https://zenodo.org/); the
+Zenodo record lists the DOI of each version, too. The citation metadata is in
 [`CITATION.cff`](CITATION.cff): on GitHub, "Cite this repository" in the
 sidebar of the repository formats it as APA or BibTeX.
 
 ## Contributing
 
-Contributions are welcome! See [`CONTRIBUTING.md`](CONTRIBUTING.md) for pull
-requests and releases, the organisation's contributor guide and our code of
-conduct. For anything else, write to
+Contributions are welcome! See the organisation's [contributing
+guide](https://github.com/elixir-cloud-aai/.github/blob/main/CONTRIBUTING.md)
+and the [Contributing](https://cloud-components.readthedocs.io/en/latest/docs/contributing)
+page of the documentation for local checks and releases, and mind our
+[code of conduct](https://github.com/elixir-cloud-aai/.github/blob/main/CODE_OF_CONDUCT.md). For anything else, write to
 [cloud-service@elixir-europe.org](mailto:cloud-service@elixir-europe.org).
 
 [badge-build-status]: <https://github.com/elixir-cloud-aai/cloud-components/actions/workflows/ci.yml/badge.svg?branch=dev>
-[badge-coverage]: <https://codecov.io/gh/elixir-cloud-aai/cloud-components/branch/dev/graph/badge.svg>
+[badge-coverage]: <https://codecov.io/gh/elixir-cloud-aai/cloud-components/branch/dev/graph/badge.svg?branch=dev>
+[badge-doi]: <https://zenodo.org/badge/DOI/10.5281/zenodo.23858158.svg>
 [badge-docs]: <https://img.shields.io/readthedocs/cloud-components>
 [badge-github-tag]: <https://img.shields.io/github/v/tag/elixir-cloud-aai/cloud-components?color=C39BD3>
 [badge-license]: <https://img.shields.io/badge/license-Apache%202.0-blue.svg>
 [badge-npm]: <https://img.shields.io/npm/v/@elixir-cloud/design?color=C39BD3>
 [badge-url-build-status]: <https://github.com/elixir-cloud-aai/cloud-components/actions/workflows/ci.yml?query=branch%3Adev>
-[badge-url-coverage]: <https://codecov.io/gh/elixir-cloud-aai/cloud-components/tree/dev>
+[badge-url-coverage]: <https://codecov.io/gh/elixir-cloud-aai/cloud-components?branch=dev>
 [badge-url-docs]: <https://cloud-components.readthedocs.io/en/latest/>
+[badge-url-doi]: <https://doi.org/10.5281/zenodo.23858158>
 [badge-url-github-tag]: <https://github.com/elixir-cloud-aai/cloud-components/releases>
 [badge-url-license]: <https://www.apache.org/licenses/LICENSE-2.0>
 [badge-url-npm]: <https://www.npmjs.com/package/@elixir-cloud/design>

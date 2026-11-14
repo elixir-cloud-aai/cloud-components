@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { property } from "lit/decorators.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 
@@ -36,6 +37,8 @@ export class EccUtilsDesignInput extends LitElement {
 
   @property({ type: String }) type: InputType = "text";
   @property({ type: String }) placeholder = "";
+  /** Accessible name for the native control (forwarded as aria-label) */
+  @property({ type: String }) label?: string;
   @property({ type: String }) value = "";
   @property({ type: Boolean, reflect: true }) disabled = false;
 
@@ -46,6 +49,7 @@ export class EccUtilsDesignInput extends LitElement {
 
     return html`
       <input
+        aria-label=${ifDefined(this.label || undefined)}
         type=${this.type}
         part="base"
         class=${classes}

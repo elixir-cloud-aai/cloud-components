@@ -12,10 +12,10 @@ import ServiceCreatePreview from '@/components/packages/cloud-registry/ServiceCr
 
 ## Overview
 
-The `ecc-client-elixir-cloud-registry-service-create` component provides a comprehensive form interface for creating new service registrations in the Elixir Cloud Registry. It includes validation, error handling, and support for both basic and advanced service metadata.
+The `ecc-client-elixir-cloud-registry-service-create` component provides a comprehensive form interface for creating new service registrations in the Cloud Registry. It includes validation, error handling, and support for both basic and advanced service metadata.
 
 <Callout type='info'>
-  This component extends the GA4GH Service Registry specification with additional features specific to the Elixir Cloud ecosystem.
+  This component extends the GA4GH Service Registry specification with additional features specific to the ELIXIR On-Cloud ecosystem.
 </Callout>
 
 ## Usage
@@ -27,6 +27,9 @@ This example demonstrates the basic service creation form with default settings.
 <Tabs items={['Preview', 'React', 'HTML']}>
   <Tabs.Tab>
     <ServiceCreatePreview />
+    <Callout type="info" emoji="ℹ️">
+      The preview above loads the service types from a public Cloud Registry without a login. Creating a service there needs a login, so submitting the form fails with an error. See [Live previews](/docs/contributing#live-previews) to use another registry.
+    </Callout>
   </Tabs.Tab>
 
   <Tabs.Tab>
@@ -124,7 +127,12 @@ This example demonstrates the basic service creation form with default settings.
 
 | Property   | Type                    | Default | Description                                                                    |
 |------------|-------------------------|---------|--------------------------------------------------------------------------------|
+| `baseUrl`  | `string`                | `""`    | Base URL of the Cloud Registry API, if no `provider` is set |
 | `provider` | `CloudRegistryProvider` | `null`  | Data provider for service creation operations (see [Providers](/docs/cloud-registry/providers)) |
+| `admin`    | `boolean`               | `true`  | Whether to offer the fields that only admins may set (custom service ID, timestamps) |
+| `allowNewType` | `boolean`           | `true`  | Whether users may add a new service type instead of choosing a registered one |
+| `environments` | `(string \| EnvironmentOption)[]` | `prod`, `test`, `dev`, `staging` | Environments to offer if the registry doesn't publish its own |
+| `dirty`    | `boolean` (read-only)   | `false` | Whether the form has unsaved input (see `ecc-service-form-changed`) |
 
 ### `provider`
 The data provider responsible for creating services in the registry. You must provide a provider that implements the `CloudRegistryProvider` interface, which extends the base `ServiceRegistryProvider` with creation capabilities. See the [Providers documentation](/docs/cloud-registry/providers) for detailed information about available providers and how to create custom ones.
@@ -162,6 +170,59 @@ You can replace the provider at any time, e.g. when the user's token changes: th
   </Tabs.Tab>
 </Tabs>
 
+### `admin`
+Whether the form offers the fields that only admins of the registry may set: a custom service ID and the timestamps (`createdAt`, `updatedAt`). Cloud Registry sets the timestamps itself, and only admins may register a service with an ID of their choice. Set `admin` to `false` for all other users: the form then hides these fields, and with them the "Advanced Configuration" section, and never sends them. Apps can take the value from `admin` of the registry's `GET /me`. As an attribute, only `admin="false"` (in any case) turns it off. The property only changes the form: the registry checks permissions itself.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientElixirCloudRegistryServiceCreate provider={provider} admin={me.admin} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-client-elixir-cloud-registry-service-create admin="false"></ecc-client-elixir-cloud-registry-service-create>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `allowNewType`
+The form offers the registered service types (`GET /services/types`) as one list, labelled `group · artifact · version` (e.g. `org.ga4gh · tes · 1.1.0`). If `allowNewType` is `true`, the list starts with "Add new service type", set apart from the registered types, which shows required fields for the group, artifact and version of a new type; if no types are registered yet, the form shows these fields right away. If it is `false`, users can only choose a listed type; if none is registered, the form says so and can't be submitted. The list reloads after a service is created, so that a new type shows up. Cloud Registry may let only admins add types (`custom.access_control.service_types: controlled`): apps take the value from `mayAddServiceTypes` of the registry's `GET /me`. As an attribute, `allow-new-type="false"` (in any case) turns it off. The property only changes the form: the registry checks permissions itself. In the example, `me` is the response of `GET /me`.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientElixirCloudRegistryServiceCreate provider={provider} allowNewType={me.mayAddServiceTypes} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-client-elixir-cloud-registry-service-create allow-new-type="false"></ecc-client-elixir-cloud-registry-service-create>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `environments`
+The environments that the form offers for `environment`, as values or `{ value, label }` objects (`EnvironmentOption`); an empty list allows any value, and the form then shows a text field. The default is the GA4GH suggestion: `prod`, `test`, `dev` and `staging`.
+
+Cloud Registry 1.0.0rc2 and later publish the environments they allow (`registrationRules.environments` of `GET /service-info`, configured with `custom.endpoints.services.environments`). The form reads them and offers these instead, with the labels given in `environments` (or the default labels); `environments` applies only to registries and providers without these rules. A registry that allows any environment (an empty list) gets a text field, whatever `environments` says. A chosen environment that is no longer offered is cleared. As an attribute, `environments` takes a JSON list.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccClientElixirCloudRegistryServiceCreate
+      provider={provider}
+      environments={[{ value: 'prod', label: 'Production' }, 'qa']}
+    />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-client-elixir-cloud-registry-service-create environments='["prod", "qa"]'></ecc-client-elixir-cloud-registry-service-create>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
 ## Events
 
 | Event Name                          | React Event Name                     | Detail Type                                              | Description                                          |
@@ -169,6 +230,7 @@ You can replace the provider at any time, e.g. when the user's token changes: th
 | `ecc-service-created`               | `onEccServiceCreated`                | `{ serviceId: string, serviceData: object, message: string }` | Fired when a service is successfully created        |
 | `ecc-service-create-failed`         | `onEccServiceCreateFailed`           | `{ error: string, status?: number, title?: string, detail?: string, serviceId?: string, cause?: unknown }` | Fired when service creation or loading the service types fails |
 | `ecc-service-create-validation-failed` | `onEccServiceCreateValidationFailed` | `{ error: string }`                                      | Fired when there are validation errors              |
+| `ecc-service-form-changed`          | `onEccServiceFormChanged`            | `{ dirty: boolean }`                                     | Fired when the form's values change (`dirty`: whether they differ from the empty form) |
 
 ### `ecc-service-created`
 Emitted when a service is successfully created in the registry, providing the new service ID, the submitted service data, and a success message.
@@ -259,4 +321,27 @@ Emitted when there are validation errors in the form data before submission or w
     });
     ```
   </Tabs.Tab>
-</Tabs> 
+</Tabs>
+
+### `ecc-service-form-changed`
+Emitted whenever the form's values change, e.g. to warn users before they leave a form with unsaved input. `dirty` tells whether the values differ from those of the empty form; it is `false` again after "Reset" and after a successful create. The read-only property `dirty` of the element always holds the current value; it is already `false` while `ecc-service-created` is handled.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    const [unsaved, setUnsaved] = useState(false);
+
+    <EccClientElixirCloudRegistryServiceCreate
+      onEccServiceFormChanged={(event) => setUnsaved(event.detail.dirty)}
+    />
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    window.addEventListener('beforeunload', (event) => {
+      if (element.dirty) event.preventDefault();
+    });
+    ```
+  </Tabs.Tab>
+</Tabs>
