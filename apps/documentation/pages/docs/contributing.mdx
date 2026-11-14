@@ -10,10 +10,10 @@ This page covers what is specific to this repository.
 
 Keep the checks green: `CI passed` sums up the PR title, linting, tests
 (Node.js 22 and 24) and the other CI jobs. Run `npm run lint`,
-`npm run build` and `npm test` (and
-`node --test scripts/release.test.js` after changes to
-`scripts/release.js`, `node --test scripts/utils.test.js` after changes to
-`scripts/utils.js` or `scripts/build.js`) locally before you push. CI runs the tests with
+`npm run build` and `npm test` locally before you push. After changes to
+`scripts/release.js`, also run `node --test scripts/release.test.js`; after
+changes to `scripts/utils.js` or `scripts/build.js`, also run
+`node --test scripts/utils.test.js`. CI runs the tests with
 coverage (`npm run test -- -- --coverage`, which passes `--coverage`
 through npm and turbo to the test runner; Chromium only; each package's
 report is in its `coverage/` folder) and reports it to
