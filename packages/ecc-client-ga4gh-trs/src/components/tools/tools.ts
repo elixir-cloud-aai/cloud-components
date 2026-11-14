@@ -77,6 +77,9 @@ export class ECCClientGa4ghTrsTools extends LitElement {
 
   private _provider: TrsProvider | null = null;
 
+  /** The REST provider for `baseUrl`, used without a custom provider */
+  private restProvider: RestTrsProvider | null = null;
+
   protected async firstUpdated(): Promise<void> {
     if (!this.baseUrl && !this.provider) {
       this.error =
@@ -87,7 +90,8 @@ export class ECCClientGa4ghTrsTools extends LitElement {
     if (this.provider) {
       this._provider = this.provider;
     } else if (this.baseUrl) {
-      this._provider = new RestTrsProvider(this.baseUrl);
+      this.restProvider = new RestTrsProvider(this.baseUrl);
+      this._provider = this.restProvider;
     } else {
       this._provider = null;
     }
@@ -103,30 +107,78 @@ export class ECCClientGa4ghTrsTools extends LitElement {
       this.loadData();
     }
 
-    if (changedProperties.has("baseUrl") && this.baseUrl) {
-      this._provider = new RestTrsProvider(this.baseUrl);
-      this.loadData();
-      this.loadToolClasses();
+    if (
+      (changedProperties.has("provider") || changedProperties.has("baseUrl")) &&
+      this.useProvider()
+    ) {
+      // another provider starts on its first page
+      this.currentPage = 1;
+      this.lastPage = -1;
+      if (this._provider) {
+        this.loadData();
+        this.loadToolClasses();
+      } else {
+        this.tools = [];
+        this.loading = false;
+        this.toolClasses = [];
+        this.toolClassMap = {};
+        this.dispatchEvent(
+          new CustomEvent("ecc-tools-changed", {
+            detail: { tools: [] },
+            bubbles: true,
+            composed: true,
+          })
+        );
+        this.error =
+          "Please provide either a base URL for the TRS API or a custom provider.";
+      }
     }
   }
 
+  /**
+   * Switches to the custom provider or, without one, to a REST provider for
+   * the base URL (to none without either); returns whether the provider in
+   * use changed
+   */
+  private useProvider(): boolean {
+    let provider: TrsProvider | null = this.provider ?? null;
+    if (!provider && this.baseUrl) {
+      if (this.restProvider?.baseUrl !== this.baseUrl) {
+        this.restProvider = new RestTrsProvider(this.baseUrl);
+      }
+      provider = this.restProvider;
+    }
+    if (provider === this._provider) return false;
+    this._provider = provider;
+    return true;
+  }
+
   private async loadToolClasses(): Promise<void> {
-    if (!this._provider) return;
+    const provider = this._provider;
+    if (!provider) return;
 
     try {
-      this.toolClasses = await this._provider.getToolClasses();
+      const toolClasses = await provider.getToolClasses();
+      // a load from a provider that was replaced in the meantime is dropped
+      if (provider !== this._provider) return;
+      this.toolClasses = toolClasses;
 
       // Store a mapping of name to ID for lookup during filtering
       this.toolClassMap = Object.fromEntries(
         this.toolClasses.map((tc) => [tc.name, tc.id])
       );
     } catch (error) {
+      if (provider === this._provider) {
+        this.toolClasses = [];
+        this.toolClassMap = {};
+      }
       console.error("Failed to load tool classes:", error);
     }
   }
 
   private async loadData(): Promise<void> {
-    if (!this._provider) return;
+    const provider = this._provider;
+    if (!provider) return;
 
     this.loading = true;
     this.error = null;
@@ -144,12 +196,14 @@ export class ECCClientGa4ghTrsTools extends LitElement {
       // We want to send the tool class name directly to the API, not the ID
       // No conversion needed here, the name is already stored in filterParams.toolClass
 
-      const tools = await this._provider.getToolsList(
+      const tools = await provider.getToolsList(
         this.pageSize < 0 ? 0 : this.pageSize,
         offset < 0 ? 0 : offset,
         apiFilterParams,
         this.searchQuery
       );
+      // a load from a provider that was replaced in the meantime is dropped
+      if (provider !== this._provider) return;
 
       this.tools = tools;
 
@@ -175,13 +229,15 @@ export class ECCClientGa4ghTrsTools extends LitElement {
         this.loadData();
       }
     } catch (err) {
+      if (provider !== this._provider) return;
+      this.tools = [];
       this.error = err instanceof Error ? err.message : "Failed to load tools";
       console.error({
         error: this.error,
         breakPoint: "ECCClientGa4ghTrs.loadData",
       });
     } finally {
-      this.loading = false;
+      if (provider === this._provider) this.loading = false;
     }
   }
 

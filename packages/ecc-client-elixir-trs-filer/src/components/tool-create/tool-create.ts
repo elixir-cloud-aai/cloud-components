@@ -227,6 +227,9 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
 
   private _provider: TrsFilerProvider | null = null;
 
+  /** The REST provider for `baseUrl`, used without a custom provider */
+  private restProvider: RestTrsFilerProvider | null = null;
+
   @state() private activeFileIndex: { [versionIndex: number]: number } = {};
   @state() private activeDescriptorType: {
     [versionIndex: number]: DescriptorType | "ALL";
@@ -253,7 +256,8 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
     if (this.provider) {
       this._provider = this.provider;
     } else if (this.baseUrl) {
-      this._provider = new RestTrsFilerProvider(this.baseUrl);
+      this.restProvider = new RestTrsFilerProvider(this.baseUrl);
+      this._provider = this.restProvider;
     } else {
       this._provider = null;
     }
@@ -337,18 +341,58 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
       this.initializeFormWithDefaults();
     }
 
-    if (changedProperties.has("baseUrl") && this.baseUrl) {
-      this._provider = new RestTrsFilerProvider(this.baseUrl);
-      this.loadToolClasses();
+    if (
+      (changedProperties.has("provider") || changedProperties.has("baseUrl")) &&
+      this.useProvider()
+    ) {
+      if (this._provider) {
+        this.loadToolClasses();
+      } else {
+        this.toolClasses = [];
+        this.dispatchEvent(
+          new CustomEvent("ecc-tool-create-validation-failed", {
+            detail: {
+              error:
+                "Please provide either a base URL for the TRS API or a custom provider.",
+            },
+            bubbles: true,
+            composed: true,
+          })
+        );
+      }
     }
   }
 
+  /**
+   * Switches to the custom provider or, without one, to a REST provider for
+   * the base URL (to none without either); returns whether the provider in
+   * use changed
+   */
+  private useProvider(): boolean {
+    let provider: TrsFilerProvider | null = this.provider ?? null;
+    if (!provider && this.baseUrl) {
+      if (this.restProvider?.baseUrl !== this.baseUrl) {
+        this.restProvider = new RestTrsFilerProvider(this.baseUrl);
+      }
+      provider = this.restProvider;
+    }
+    if (provider === this._provider) return false;
+    this._provider = provider;
+    return true;
+  }
+
   private async loadToolClasses(): Promise<void> {
-    if (!this._provider) return;
+    const provider = this._provider;
+    if (!provider) return;
 
     try {
-      this.toolClasses = await this._provider.getToolClasses();
+      const toolClasses = await provider.getToolClasses();
+      // a load from a provider that was replaced in the meantime is dropped
+      if (provider !== this._provider) return;
+      this.toolClasses = toolClasses;
     } catch (error) {
+      if (provider !== this._provider) return;
+      this.toolClasses = [];
       console.error("Failed to load tool classes:", error);
       this.dispatchEvent(
         new CustomEvent("ecc-tool-create-failed", {
