@@ -471,6 +471,14 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       expect(rows(el)).to.have.length(10);
     });
 
+    it("shows 10 services per page if page-size is empty", async () => {
+      const el = await renderLoaded(stubProvider(many), "page-size=5");
+      el.setAttribute("page-size", "");
+      await el.updateComplete;
+
+      expect(rows(el)).to.have.length(10);
+    });
+
     it("shows all services if page-size is 0", async () => {
       const el = await renderLoaded(stubProvider(many), "page-size=0");
 
@@ -569,15 +577,42 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       const el = await renderLoaded();
       const selected = sinon.spy();
       el.addEventListener("ecc-service-selected", selected);
-      // A drag across the row's text leaves a selection when the click fires
-      sinon.stub(window, "getSelection").returns({
+      // A drag across the row's text selects it between mousedown and click
+      const getSelection = sinon.stub(window, "getSelection");
+      getSelection.returns(null);
+      const row = rows(el)[0];
+      row.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+      getSelection.returns({
         isCollapsed: false,
         toString: () => "Service s1",
       } as unknown as Selection);
 
-      rows(el)[0].click();
+      row.click();
 
       expect(selected.called).to.equal(false);
+    });
+
+    it("selects a service despite a selection made before", async () => {
+      const el = await renderLoaded();
+      const selected = sinon.spy();
+      el.addEventListener("ecc-service-selected", selected);
+      const outside = document.createElement("p");
+      outside.textContent = "Some text outside the list";
+      document.body.append(outside);
+      const range = document.createRange();
+      range.selectNodeContents(outside);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+
+      // A click on a button keeps the selection
+      const row = rows(el)[0];
+      row.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+      row.click();
+      selection?.removeAllRanges();
+      outside.remove();
+
+      expect(selected.callCount).to.equal(1);
     });
 
     it("doesn't select a service for clicks on its actions", async () => {

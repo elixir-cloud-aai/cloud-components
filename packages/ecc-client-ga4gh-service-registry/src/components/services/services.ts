@@ -80,7 +80,7 @@ const DEFAULT_PAGE_SIZE = 10;
  * @property {string} baseUrl - Base URL of the Service Registry instance
  * @property {boolean} filter - Determines if the type, organization and environment filters should be rendered
  * @property {boolean} search - Determines if the search field should be rendered
- * @property {number} pageSize - Number of services per page (attribute `page-size`, default 10); 0 or less shows all services on one page, a missing or invalid value 10
+ * @property {number} pageSize - Number of services per page (attribute `page-size`, default 10); 0 or less shows all services on one page, a missing, empty or invalid value 10
  * @property {ServiceRegistryProvider} provider - Custom data provider (optional, overrides baseUrl)
  * @property {RowActionsRenderer} rowActions - Renders the actions of each row (e.g. Edit and Delete buttons) from its service
  *
@@ -104,7 +104,16 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   @property({ type: String, reflect: true }) baseUrl = "";
   @property({ type: Boolean, reflect: true }) filter = true;
   @property({ type: Boolean, reflect: true }) search = true;
-  @property({ type: Number, attribute: "page-size", reflect: true })
+  @property({
+    type: Number,
+    attribute: "page-size",
+    reflect: true,
+    // An empty attribute is missing, not 0
+    converter: {
+      fromAttribute: (value: string | null) =>
+        value === null || value.trim() === "" ? null : Number(value),
+    },
+  })
   pageSize = DEFAULT_PAGE_SIZE;
 
   @property({ attribute: false, reflect: true })
@@ -124,6 +133,9 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   };
 
   @state() private currentPage = 1;
+
+  /** The selected text when the mouse button went down on a row. */
+  private selectionAtMouseDown = "";
 
   /** Derived from the services and types in `willUpdate`. */
   private filterOptions: FilterOptions = {
@@ -311,22 +323,39 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     this.currentPage = Math.min(Math.max(page, 1), pageCount);
   }
 
-  /** Whether the user has selected text, e.g. by dragging across a row. */
-  private hasSelectedText(): boolean {
+  /**
+   * The selected text, e.g. after a drag across a row, or "" if there is
+   * none. Chromium exposes selections in shadow trees only on the shadow root.
+   */
+  private selectedText(): string {
     const shadowRoot = this.shadowRoot as
       | (ShadowRoot & { getSelection?: () => Selection | null })
       | null;
-    return [shadowRoot?.getSelection?.(), window.getSelection()].some(
-      (selection) =>
-        !!selection && !selection.isCollapsed && !!selection.toString()
-    );
+    for (const selection of [
+      shadowRoot?.getSelection?.(),
+      window.getSelection(),
+    ]) {
+      if (selection && !selection.isCollapsed) {
+        const text = selection.toString();
+        if (text) return text;
+      }
+    }
+    return "";
+  }
+
+  private handleRowMouseDown(): void {
+    this.selectionAtMouseDown = this.selectedText();
   }
 
   private handleRowClick(e: MouseEvent, serviceId: string): void {
     // Clicks with a modifier key and clicks that end a text selection don't
-    // select the service
+    // select the service; a selection that was already there before the
+    // click (e.g. elsewhere on the page) doesn't count
     if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
-    if (this.hasSelectedText()) return;
+    const text = this.selectedText();
+    const { selectionAtMouseDown } = this;
+    this.selectionAtMouseDown = "";
+    if (text && text !== selectionAtMouseDown) return;
     // Clicks on the actions of a row (slotted content included) and on the
     // organization link are theirs, not the row's; elements outside the row
     // don't count
@@ -543,6 +572,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
       <ecc-utils-design-table-row
         class="cursor-pointer"
         data-service-id=${service.id}
+        @mousedown=${this.handleRowMouseDown}
         @click=${(e: MouseEvent) => this.handleRowClick(e, service.id)}
       >
         <ecc-utils-design-table-cell class="w-7/12">
