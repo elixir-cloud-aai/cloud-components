@@ -8,12 +8,14 @@ design package has the two parts for this:
 
 - The form controls ([input](/docs/design/components/input),
   [textarea](/docs/design/components/textarea),
-  [checkbox](/docs/design/components/checkbox),
   [select](/docs/design/components/select) and
   [multi-select](/docs/design/components/multi-select)) have the properties
   `error` and `invalid`: `error` shows a message under the control and marks it
   as invalid (red border, `aria-invalid`, `aria-describedby`, announced to
-  screen readers), `invalid` marks it as invalid without a message.
+  screen readers), `invalid` marks it as invalid without a message. The
+  [checkbox](/docs/design/components/checkbox) has only `invalid`, as a
+  message under the box wouldn't wrap next to its label: show the checkbox's
+  message elsewhere, e.g. with the general error.
 - Utilities that read the errors of a response in the standard format,
   problem details ([RFC 9457](https://www.rfc-editor.org/rfc/rfc9457),
   `application/problem+json`), and map them to the component's fields.
@@ -55,7 +57,13 @@ problem type), and any other API can respond the same way.
 
 ## Utilities
 
-All are exported by `@elixir-cloud/design`:
+Import them from `@elixir-cloud/design/utils`, which loads only the
+utilities. The package root (`@elixir-cloud/design`) exports them too, but
+importing it registers every component (including the code editor):
+
+```ts
+import { mapFieldErrors, readProblemDetails } from '@elixir-cloud/design/utils';
+```
 
 | Function                                     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -90,7 +98,8 @@ at its fields:
 ```ts copy filename="service-form.ts"
 import { html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
-import { mapFieldErrors, readProblemDetails } from '@elixir-cloud/design';
+import { mapFieldErrors, readProblemDetails } from '@elixir-cloud/design/utils';
+import '@elixir-cloud/design/components/input/index.js';
 
 // The component's fields and their locations in the request body
 const FIELDS = {
