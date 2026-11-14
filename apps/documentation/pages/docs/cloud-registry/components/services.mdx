@@ -63,14 +63,14 @@ It loads all verifications with one request (`GET /verifications`, Cloud Registr
 | `admin`      | `boolean`                               | `false`     | Whether to offer "Verify" and "Remove verification" in each row |
 | `filter`     | `boolean`                               | `true`      | Whether to show the type, organization and environment filters |
 | `search`     | `boolean`                               | `true`      | Whether to show the search field |
-| `pageSize`   | `number`                                | `10`        | Services per page (attribute `page-size`); 0 or less shows all services on one page |
+| `pageSize`   | `number`                                | `10`        | Services per page (attribute `page-size`); 0 or less shows all services on one page, an empty attribute 10 |
 | `rowActions` | `(service: ExternalService) => unknown` | `undefined` | Renders the actions of each row after the badge; without it, each row has a "View Details" button |
 
 ### `provider` and `baseUrl`
 Replacing the provider (or changing `baseUrl`) renders a new list, which loads the services and the verifications again. In React, create the provider only when its inputs change, e.g. with `useMemo`. Custom providers implement the optional `getVerifications()` of `CloudRegistryProvider`; without it, the list shows no badges and fires `ecc-service-verification-failed`.
 
 ### `admin`
-Apps take the value from `admin` of the registry's `GET /me`. Admins see "Not verified" and "Verify" for unverified services and "Remove verification" for verified ones. The list follows their changes without loading the verifications again. The registry checks permissions itself.
+Apps take the value from `admin` of the registry's `GET /me`. Admins see "Not verified" and "Verify" for unverified services and "Remove verification" for verified ones. The list follows their changes without loading the verifications again, also for rows that are no longer shown by then (e.g. on another page). After a failed verify or remove, it loads the verifications again, as the registry may have applied the change. The registry checks permissions itself.
 
 ### `filter`, `search` and `pageSize`
 As in the [services list](/docs/service-registry/components/services) of the GA4GH Service Registry package, which this component passes them to.

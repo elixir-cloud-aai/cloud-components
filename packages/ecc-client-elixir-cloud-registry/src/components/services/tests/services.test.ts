@@ -204,8 +204,13 @@ describe("ecc-client-elixir-cloud-registry-services", () => {
     );
     await waitUntil(() => !!badge(el, "s1"), "verifications not shown");
 
-    expect(row(el, "s1")?.querySelector('[data-edit="s1"]')).to.not.equal(null);
+    const edit = row(el, "s1")?.querySelector('[data-edit="s1"]');
+    expect(edit).to.not.equal(null);
     expect(row(el, "s1")?.querySelector("[data-view-details]")).to.equal(null);
+    // the badge comes first
+    const cells = Array.from(edit?.parentElement?.children ?? []);
+    expect(cells.indexOf(badge(el, "s1") as Element)).to.equal(0);
+    expect(cells.indexOf(edit as Element)).to.equal(1);
   });
 
   it("keeps the View Details button without row actions", async () => {
@@ -351,28 +356,70 @@ describe("ecc-client-elixir-cloud-registry-services", () => {
     ]);
   });
 
-  it("ignores verification changes before the verifications load", async () => {
-    const stubs = stubProvider();
-    stubs.verifications.returns(
-      new Promise(() => {
-        // never settles
-      })
-    );
-    const el = await fixture<El>(
-      html`<ecc-client-elixir-cloud-registry-services
-        .provider=${stubs.provider}
-      ></ecc-client-elixir-cloud-registry-services>`
-    );
+  it("ignores verification changes of a replaced list", async () => {
+    const el = await renderLoaded(stubProvider().provider);
+    const old = badge(el, "s1");
+    el.provider = stubProvider([]).provider;
+    await el.updateComplete;
+    await waitUntil(() => !!badge(el, "s1"), "verifications not shown");
 
-    list(el).dispatchEvent(
+    old?.dispatchEvent(
       new CustomEvent("ecc-service-verification-changed", {
-        detail: { serviceId: "s1", verification: null },
+        detail: { serviceId: "s2", verification: verificationOf(SERVICES[1]) },
       })
     );
     await el.updateComplete;
+    await list(el).updateComplete;
 
-    const internals = el as unknown as { verifications?: unknown };
-    expect(internals.verifications).to.equal(undefined);
+    expect(badge(el, "s2")?.verification).to.equal(null);
+  });
+
+  it("follows a change of a row that is no longer shown", async () => {
+    const el = await renderLoaded(stubProvider([]).provider);
+    const offPage = badge(el, "s3");
+    el.pageSize = 1;
+    await el.updateComplete;
+    await list(el).updateComplete;
+    expect(row(el, "s3")).to.equal(null);
+
+    offPage?.dispatchEvent(
+      new CustomEvent("ecc-service-verification-changed", {
+        detail: { serviceId: "s3", verification: verificationOf(SERVICES[2]) },
+      })
+    );
+    el.pageSize = 10;
+    await el.updateComplete;
+    await list(el).updateComplete;
+
+    expect(badge(el, "s3")?.verification).to.not.equal(null);
+  });
+
+  it("loads the verifications again after a failed verify", async () => {
+    const stubs = stubProvider();
+    const el = await renderLoaded(stubs.provider);
+
+    badge(el, "s2")?.dispatchEvent(
+      new CustomEvent("ecc-service-verification-failed", {
+        detail: { serviceId: "s2", action: "verify", error: "Lost" },
+      })
+    );
+    badge(el, "s2")?.dispatchEvent(
+      new CustomEvent("ecc-service-verification-failed", {
+        detail: { serviceId: "s2", action: "load", error: "Lost" },
+      })
+    );
+
+    expect(stubs.verifications.callCount).to.equal(2);
+  });
+
+  it("uses the default page size for an empty attribute", async () => {
+    const el = await fixture<El>(
+      html`<ecc-client-elixir-cloud-registry-services
+        page-size=""
+      ></ecc-client-elixir-cloud-registry-services>`
+    );
+
+    expect(el.pageSize).to.equal(10);
   });
 
   it("creates a new provider when baseUrl changes", async () => {

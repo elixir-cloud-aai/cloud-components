@@ -85,7 +85,17 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
   @property({ type: Boolean }) admin = false;
   @property({ type: Boolean }) filter = true;
   @property({ type: Boolean }) search = true;
-  @property({ type: Number, attribute: "page-size" })
+  @property({
+    type: Number,
+    attribute: "page-size",
+    // An empty attribute is missing, not 0 (which shows all services)
+    converter: {
+      fromAttribute: (value: string | null) =>
+        value === null || value.trim() === ""
+          ? DEFAULT_PAGE_SIZE
+          : Number(value),
+    },
+  })
   pageSize = DEFAULT_PAGE_SIZE;
 
   @property({ attribute: false }) rowActions?: RowActionsRenderer;
@@ -101,6 +111,13 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
 
   /** The provider shown, whose verifications count. */
   private shownProvider: CloudRegistryProvider | null = null;
+
+  /**
+   * Number of the list shown: it changes with the provider, so that
+   * answers and events of a previous list (also of an earlier use of the
+   * same provider) are ignored
+   */
+  private generation = 0;
 
   /** Verifications by service ID, matched against the services. */
   private verified = new Map<string, ServiceVerification>();
@@ -125,11 +142,14 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
     const provider = this.currentProvider();
     if (provider !== this.shownProvider) {
       this.shownProvider = provider;
+      this.generation += 1;
       this.services = [];
       this.verifications = undefined;
-      if (provider) this.loadVerifications(provider);
+      if (provider) this.loadVerifications(provider, this.generation);
     }
     if (
+      changedProperties.has("provider") ||
+      changedProperties.has("baseUrl") ||
       changedProperties.has("services") ||
       changedProperties.has("verifications") ||
       changedProperties.has("admin") ||
@@ -142,16 +162,17 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
 
   /** Loads the verifications of all services with one request. */
   private async loadVerifications(
-    provider: CloudRegistryProvider
+    provider: CloudRegistryProvider,
+    generation: number
   ): Promise<void> {
     try {
       if (!provider.getVerifications) {
         throw new Error("The provider doesn't support verifications.");
       }
       const verifications = await provider.getVerifications();
-      if (provider === this.shownProvider) this.verifications = verifications;
+      if (generation === this.generation) this.verifications = verifications;
     } catch (err) {
-      if (provider !== this.shownProvider) return;
+      if (generation !== this.generation) return;
       const detail: EccServiceVerificationFailedEvent["detail"] = {
         serviceId: "",
         action: "load",
@@ -177,16 +198,23 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
     e: CustomEvent<{ services: ExternalService[] }>
   ): void {
     // A replaced list (of a previous provider) may still answer
-    const list = e.currentTarget as { provider?: unknown } | null;
-    if (list?.provider !== this.shownProvider) return;
+    const list = this.shadowRoot?.querySelector(
+      "ecc-client-ga4gh-service-registry-services"
+    );
+    if (e.currentTarget !== list) return;
     this.services = e.detail.services;
   }
 
-  /** Updates the verifications after an admin verified or removed one. */
+  /**
+   * Updates the verifications after an admin verified or removed one. The
+   * badge reports it also if its row is no longer shown (e.g. on another
+   * page), as the listener is on the badge.
+   */
   private handleVerificationChanged(
-    e: EccServiceVerificationChangedEvent
+    e: EccServiceVerificationChangedEvent,
+    generation: number
   ): void {
-    if (!this.verifications) return;
+    if (generation !== this.generation || !this.verifications) return;
     const { serviceId, verification } = e.detail;
     const others = this.verifications.filter(
       (item) => item.serviceId !== serviceId
@@ -194,6 +222,21 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
     this.verifications = verification
       ? [...others, { serviceId, ...verification }]
       : others;
+  }
+
+  /**
+   * Loads the verifications again after a verify or remove failed, as the
+   * registry may have applied it (e.g. if the answer was lost)
+   */
+  private handleVerificationFailed(
+    e: EccServiceVerificationFailedEvent,
+    generation: number
+  ): void {
+    const provider = this.shownProvider;
+    if (generation !== this.generation || !provider) return;
+    if (e.detail.action !== "load") {
+      this.loadVerifications(provider, generation);
+    }
   }
 
   private handleViewDetails(serviceId: string): void {
@@ -213,6 +256,7 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
   private createRowActions(): RowActionsRenderer {
     const { verified, verifications, admin, rowActions } = this;
     const provider = this.shownProvider;
+    const { generation } = this;
     return (service: ExternalService) => html`
       <div class="flex items-center gap-2">
         ${verifications && provider
@@ -221,6 +265,12 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
               .service=${service}
               .verification=${verified.get(service.id) ?? null}
               ?admin=${admin}
+              @ecc-service-verification-changed=${(
+                e: EccServiceVerificationChangedEvent
+              ) => this.handleVerificationChanged(e, generation)}
+              @ecc-service-verification-failed=${(
+                e: EccServiceVerificationFailedEvent
+              ) => this.handleVerificationFailed(e, generation)}
             ></ecc-client-elixir-cloud-registry-service-verification>`
           : nothing}
         ${rowActions
@@ -239,7 +289,7 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
   render() {
     // A new provider needs a new list, which reads it when it first renders
     return html`${keyed(
-      this.shownProvider,
+      this.generation,
       html`<ecc-client-ga4gh-service-registry-services
         part="list"
         .provider=${this.shownProvider ?? undefined}
@@ -248,7 +298,6 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
         .pageSize=${this.pageSize}
         .rowActions=${this.renderRowActions}
         @ecc-services-changed=${this.handleServicesChanged}
-        @ecc-service-verification-changed=${this.handleVerificationChanged}
       ></ecc-client-ga4gh-service-registry-services>`
     )}`;
   }
