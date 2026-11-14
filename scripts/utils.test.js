@@ -36,9 +36,11 @@ test("backslashes are escaped before backticks", () => {
   assert.strictEqual(escapeTemplateLiteral("\\`"), "\\\\\\`");
 });
 
-// A source directory with the given (empty) files, paths relative to it
-function makeSourceDir(files) {
+// A source directory with the given (empty) files, paths relative to it,
+// removed after the test
+function makeSourceDir(t, files) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "build-entries-"));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   files.forEach((file) => {
     fs.mkdirSync(path.dirname(path.join(dir, file)), { recursive: true });
     fs.writeFileSync(path.join(dir, file), "");
@@ -53,8 +55,8 @@ function relativeEntries(dir) {
     .sort();
 }
 
-test("build entries: root, components, providers, react and utils", () => {
-  const dir = makeSourceDir([
+test("build entries: root, components, providers, react and utils", (t) => {
+  const dir = makeSourceDir(t, [
     "index.ts",
     "components/input/index.ts",
     "components/input/input.ts",
@@ -67,43 +69,35 @@ test("build entries: root, components, providers, react and utils", () => {
     "utils/problem-details.ts",
     "utils/problem-details.test.ts",
   ]);
-  try {
-    assert.deepStrictEqual(relativeEntries(dir), [
-      "components/input/index.ts",
-      "components/input/input.ts",
-      "index.ts",
-      "providers/api.ts",
-      "react/input.ts",
-      "utils/index.ts",
-    ]);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
+  assert.deepStrictEqual(relativeEntries(dir), [
+    "components/input/index.ts",
+    "components/input/input.ts",
+    "index.ts",
+    "providers/api.ts",
+    "react/input.ts",
+    "utils/index.ts",
+  ]);
 });
 
-test("build entries: no utils entry without utils/index.ts", () => {
-  const dir = makeSourceDir(["index.ts", "components/a/index.ts"]);
-  try {
-    assert.deepStrictEqual(relativeEntries(dir), [
-      "components/a/index.ts",
-      "index.ts",
-    ]);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
+test("build entries: no utils entry without utils/index.ts", (t) => {
+  const dir = makeSourceDir(t, ["index.ts", "components/a/index.ts"]);
+  assert.deepStrictEqual(relativeEntries(dir), [
+    "components/a/index.ts",
+    "index.ts",
+  ]);
 });
 
 // Apps import the utilities from `@elixir-cloud/design/utils` without
-// registering the components
-test("design package exports ./utils", () => {
-  const packageJson = path.join(
-    __dirname,
-    "..",
-    "packages",
-    "ecc-utils-design",
-    "package.json"
+// registering the components; CI checks the built subpath after the build
+// (`scripts/check-design-utils.mjs`)
+test("design package builds and exports ./utils", () => {
+  const packageDir = path.join(__dirname, "..", "packages", "ecc-utils-design");
+  assert.ok(
+    relativeEntries(path.join(packageDir, "src")).includes("utils/index.ts")
   );
-  const { exports } = JSON.parse(fs.readFileSync(packageJson, "utf-8"));
+  const { exports } = JSON.parse(
+    fs.readFileSync(path.join(packageDir, "package.json"), "utf-8")
+  );
   assert.deepStrictEqual(exports["./utils"], {
     types: "./dist/utils/index.d.ts",
     import: "./dist/utils/index.js",
