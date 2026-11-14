@@ -592,6 +592,20 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       expect(selected.called).to.equal(false);
     });
 
+    it("selects a service for a click from code despite a selection", async () => {
+      const el = await renderLoaded();
+      const selected = sinon.spy();
+      el.addEventListener("ecc-service-selected", selected);
+      sinon.stub(window, "getSelection").returns({
+        isCollapsed: false,
+        toString: () => "Some text outside the list",
+      } as unknown as Selection);
+
+      rows(el)[0].click();
+
+      expect(selected.callCount).to.equal(1);
+    });
+
     it("selects a service despite a selection made before", async () => {
       const el = await renderLoaded();
       const selected = sinon.spy();

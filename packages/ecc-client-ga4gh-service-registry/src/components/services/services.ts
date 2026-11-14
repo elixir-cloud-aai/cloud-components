@@ -134,8 +134,11 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
 
   @state() private currentPage = 1;
 
-  /** The selected text when the mouse button went down on a row. */
-  private selectionAtMouseDown = "";
+  /**
+   * The selected text when the mouse button went down on a row, or `null`
+   * if it didn't (e.g. for a click from code).
+   */
+  private selectionAtMouseDown: string | null = null;
 
   /** Derived from the services and types in `willUpdate`. */
   private filterOptions: FilterOptions = {
@@ -354,8 +357,14 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
     const text = this.selectedText();
     const { selectionAtMouseDown } = this;
-    this.selectionAtMouseDown = "";
-    if (text && text !== selectionAtMouseDown) return;
+    this.selectionAtMouseDown = null;
+    if (
+      selectionAtMouseDown !== null &&
+      text &&
+      text !== selectionAtMouseDown
+    ) {
+      return;
+    }
     // Clicks on the actions of a row (slotted content included) and on the
     // organization link are theirs, not the row's; elements outside the row
     // don't count
