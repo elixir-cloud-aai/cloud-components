@@ -27,7 +27,7 @@ export default /** @type {import("@web/test-runner").TestRunnerConfig} */ ({
     return true;
   },
 
-  port: 8001,
+  port: 8003,
 
   // Lit decorators need the package's experimentalDecorators setting
   plugins: [

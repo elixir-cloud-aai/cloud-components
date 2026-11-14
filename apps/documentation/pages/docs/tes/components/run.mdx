@@ -1,0 +1,57 @@
+import { Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+
+# EccClientGa4ghTesRun Component
+
+<ComponentName
+  tagName='ecc-client-ga4gh-tes-run'
+  reactTagName='ECCClientGa4ghTesRun'
+  version='2.0.0-alpha.0'
+/>
+
+## Overview
+
+Displays a single TES task in tabs: Overview, Executors, Inputs / Outputs and Logs. Active tasks can be deleted (cancelled) from the header.
+
+## Usage
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="run.tsx"
+    import { ECCClientGa4ghTesRun } from '@elixir-cloud/tes/react';
+
+    export default function Run({ id }: { id: string }) {
+      return (
+        <ECCClientGa4ghTesRun
+          baseUrl="https://protes.rahtiapp.fi/ga4gh/tes/v1"
+          runId={id}
+        />
+      );
+    }
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="run.html"
+    <script type="module" src="https://esm.sh/@elixir-cloud/tes"></script>
+
+    <ecc-client-ga4gh-tes-run
+      baseUrl="https://protes.rahtiapp.fi/ga4gh/tes/v1"
+      runId="TASK_ID"
+    ></ecc-client-ga4gh-tes-run>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property   | Type          | Default | Description |
+|------------|---------------|---------|-------------|
+| `baseUrl`  | `string`      | `""`    | Base URL of the TES API. |
+| `provider` | `TesProvider` | `undefined` | Custom provider; overrides `baseUrl`. |
+| `runId`    | `string`      | `""`    | ID of the task to display. |
+
+## Events
+
+| Event                 | Detail            | Description |
+|-----------------------|-------------------|-------------|
+| `ecc-run-log-changed` | `{ task: Task }`  | Task data was loaded. |
