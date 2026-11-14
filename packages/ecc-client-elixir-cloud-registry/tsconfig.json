@@ -16,7 +16,13 @@
     "rootDir": "./",
     "declaration": true,
     "emitDeclarationOnly": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@elixir-cloud/service-registry/components/*": [
+        "../../node_modules/@elixir-cloud/service-registry/dist/components/*"
+      ]
+    }
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"]
