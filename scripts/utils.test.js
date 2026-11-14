@@ -95,11 +95,13 @@ test("design package builds and exports ./utils", () => {
   assert.ok(
     relativeEntries(path.join(packageDir, "src")).includes("utils/index.ts")
   );
-  const { exports } = JSON.parse(
+  const { exports, typesVersions } = JSON.parse(
     fs.readFileSync(path.join(packageDir, "package.json"), "utf-8")
   );
   assert.deepStrictEqual(exports["./utils"], {
     types: "./dist/utils/index.d.ts",
     import: "./dist/utils/index.js",
   });
+  // For TypeScript's `node` module resolution, which ignores `exports`
+  assert.deepStrictEqual(typesVersions["*"].utils, ["./dist/utils/index.d.ts"]);
 });

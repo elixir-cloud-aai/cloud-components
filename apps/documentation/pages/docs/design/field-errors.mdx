@@ -14,8 +14,9 @@ design package has the two parts for this:
   as invalid (red border, `aria-invalid`, `aria-describedby`, announced to
   screen readers), `invalid` marks it as invalid without a message. The
   [checkbox](/docs/design/components/checkbox) has only `invalid`, as a
-  message under the box wouldn't wrap next to its label: show the checkbox's
-  message elsewhere, e.g. with the general error.
+  message under the box wouldn't wrap next to its label: give the checkbox a
+  field key, set `invalid` when `fieldErrors` has a message for it, and render
+  that message yourself, e.g. next to the label or above the form.
 - Utilities that read the errors of a response in the standard format,
   problem details ([RFC 9457](https://www.rfc-editor.org/rfc/rfc9457),
   `application/problem+json`), and map them to the component's fields.

@@ -25,7 +25,8 @@ coverage of the packages with tests must not drop by more than 1 %
 `getBuildEntries()` in `scripts/utils.js` lists: `src/index.ts`, the
 components, providers and React wrappers, and `src/utils/index.ts` if a
 package has one. That file is the entry of the package's `./utils` subpath
-(add it to the `exports` of the package's `package.json`): utilities that
+(add it to `exports` and, for TypeScript's `node` module resolution, to
+`typesVersions` in the package's `package.json`): utilities that
 apps can import without registering the components, so it must not import
 them. For the design package, CI checks this after the build
 (`node scripts/check-design-utils.mjs`).

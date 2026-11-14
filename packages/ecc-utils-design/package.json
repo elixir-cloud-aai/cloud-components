@@ -23,6 +23,13 @@
     "./events": "./dist/events/index.js",
     "./events/*": "./dist/events/*"
   },
+  "typesVersions": {
+    "*": {
+      "utils": [
+        "./dist/utils/index.d.ts"
+      ]
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/elixir-cloud-aai/cloud-components.git"
