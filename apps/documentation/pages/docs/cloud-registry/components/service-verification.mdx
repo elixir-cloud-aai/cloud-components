@@ -117,7 +117,7 @@ services.map((service) => (
 After a verify or remove, the component shows the result for that service until the app sets `verification` again, also if the provider is replaced meanwhile by one for the same registry (the same base URL, e.g. with a new token); update your verifications from `ecc-service-verification-changed`, as above. Pass a stable value (e.g. the object from the map, not one built on each render): every new value counts as set again.
 
 <Callout type='info'>
-  The services list of the GA4GH Service Registry package (`ecc-client-ga4gh-service-registry-services`) doesn't show verifications itself; place the component in a row's `actions-<id>` slot or in your own list.
+  For the registry's services list with badges, use [`ecc-client-elixir-cloud-registry-services`](./services), which does all of this. The list of the GA4GH Service Registry package (`ecc-client-ga4gh-service-registry-services`) doesn't show verifications itself.
 </Callout>
 
 ## Properties
