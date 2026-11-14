@@ -457,10 +457,18 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       expect(shownIds(el)).to.deep.equal(["s1", "s2"]);
     });
 
-    it("shows all services if page-size is invalid", async () => {
+    it("shows 10 services per page if page-size is invalid", async () => {
       const el = await renderLoaded(stubProvider(many), "page-size=abc");
 
-      expect(rows(el)).to.have.length(12);
+      expect(rows(el)).to.have.length(10);
+    });
+
+    it("shows 10 services per page if page-size is removed", async () => {
+      const el = await renderLoaded(stubProvider(many), "page-size=5");
+      el.removeAttribute("page-size");
+      await el.updateComplete;
+
+      expect(rows(el)).to.have.length(10);
     });
 
     it("shows all services if page-size is 0", async () => {
@@ -517,6 +525,59 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       expect((selected.firstCall.args[0] as CustomEvent).detail).to.deep.equal({
         serviceId: "s2",
       });
+    });
+
+    it("selects a service inside an element marked data-no-select", async () => {
+      const wrapper = await fixture<HTMLElement>(
+        html`<div data-no-select>
+          <ecc-client-ga4gh-service-registry-services
+            .provider=${stubProvider()}
+          ></ecc-client-ga4gh-service-registry-services>
+        </div>`
+      );
+      const el = wrapper.querySelector(
+        "ecc-client-ga4gh-service-registry-services"
+      ) as El;
+      await waitUntil(() => rows(el).length > 0, "services not listed");
+      const selected = sinon.spy();
+      el.addEventListener("ecc-service-selected", selected);
+
+      rows(el)[0].click();
+
+      expect(selected.callCount).to.equal(1);
+    });
+
+    for (const modifier of ["ctrlKey", "metaKey", "shiftKey", "altKey"]) {
+      it(`doesn't select a service for clicks with ${modifier}`, async () => {
+        const el = await renderLoaded();
+        const selected = sinon.spy();
+        el.addEventListener("ecc-service-selected", selected);
+
+        rows(el)[0].dispatchEvent(
+          new MouseEvent("click", {
+            bubbles: true,
+            composed: true,
+            [modifier]: true,
+          })
+        );
+
+        expect(selected.called).to.equal(false);
+      });
+    }
+
+    it("doesn't select a service when text in its row is selected", async () => {
+      const el = await renderLoaded();
+      const selected = sinon.spy();
+      el.addEventListener("ecc-service-selected", selected);
+      // A drag across the row's text leaves a selection when the click fires
+      sinon.stub(window, "getSelection").returns({
+        isCollapsed: false,
+        toString: () => "Service s1",
+      } as unknown as Selection);
+
+      rows(el)[0].click();
+
+      expect(selected.called).to.equal(false);
     });
 
     it("doesn't select a service for clicks on its actions", async () => {

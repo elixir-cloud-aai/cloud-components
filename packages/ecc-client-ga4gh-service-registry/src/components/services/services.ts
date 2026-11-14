@@ -70,6 +70,9 @@ const uniqueSorted = (values: (string | undefined)[]): string[] =>
     (a, b) => a.localeCompare(b)
   );
 
+/** The number of services per page if `pageSize` is missing or invalid. */
+const DEFAULT_PAGE_SIZE = 10;
+
 /**
  * @summary This component is used to display data from Service Registry API.
  * @since 1.0.0
@@ -77,14 +80,14 @@ const uniqueSorted = (values: (string | undefined)[]): string[] =>
  * @property {string} baseUrl - Base URL of the Service Registry instance
  * @property {boolean} filter - Determines if the type, organization and environment filters should be rendered
  * @property {boolean} search - Determines if the search field should be rendered
- * @property {number} pageSize - Number of services per page (attribute `page-size`); 0 or less shows all services on one page
+ * @property {number} pageSize - Number of services per page (attribute `page-size`, default 10); 0 or less shows all services on one page, a missing or invalid value 10
  * @property {ServiceRegistryProvider} provider - Custom data provider (optional, overrides baseUrl)
  * @property {RowActionsRenderer} rowActions - Renders the actions of each row (e.g. Edit and Delete buttons) from its service
  *
  * @slot actions-<id> - Actions of the row of the service with this ID, instead of those of `rowActions` or the "View Details" button
  *
  * @fires ecc-services-changed - Fired when services data changes
- * @fires ecc-service-selected - Fired when a service or its row is clicked
+ * @fires ecc-service-selected - Fired when a service or its row is clicked (not for clicks with a modifier key or that select text)
  */
 export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   static styles = [
@@ -102,7 +105,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   @property({ type: Boolean, reflect: true }) filter = true;
   @property({ type: Boolean, reflect: true }) search = true;
   @property({ type: Number, attribute: "page-size", reflect: true })
-  pageSize = 10;
+  pageSize = DEFAULT_PAGE_SIZE;
 
   @property({ attribute: false, reflect: true })
   provider?: ServiceRegistryProvider;
@@ -285,12 +288,17 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   }
 
   /**
-   * The number of services per page, as a whole number, or 0 for all on one
-   * page (for 0, negative and invalid values, such as a malformed attribute).
+   * The number of services per page, as a whole number: 0 (all on one page)
+   * for 0 and negative values, and the default of 10 for a missing or invalid
+   * value, such as a removed or malformed attribute.
    */
   private get effectivePageSize(): number {
+    if (this.pageSize === null || this.pageSize === undefined) {
+      return DEFAULT_PAGE_SIZE;
+    }
     const size = Math.floor(this.pageSize);
-    return Number.isFinite(size) && size >= 1 ? size : 0;
+    if (!Number.isFinite(size)) return DEFAULT_PAGE_SIZE;
+    return size >= 1 ? size : 0;
   }
 
   private pageCount(total: number): number {
@@ -303,11 +311,29 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     this.currentPage = Math.min(Math.max(page, 1), pageCount);
   }
 
+  /** Whether the user has selected text, e.g. by dragging across a row. */
+  private hasSelectedText(): boolean {
+    const shadowRoot = this.shadowRoot as
+      | (ShadowRoot & { getSelection?: () => Selection | null })
+      | null;
+    return [shadowRoot?.getSelection?.(), window.getSelection()].some(
+      (selection) =>
+        !!selection && !selection.isCollapsed && !!selection.toString()
+    );
+  }
+
   private handleRowClick(e: MouseEvent, serviceId: string): void {
+    // Clicks with a modifier key and clicks that end a text selection don't
+    // select the service
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+    if (this.hasSelectedText()) return;
     // Clicks on the actions of a row (slotted content included) and on the
-    // organization link are theirs, not the row's
-    const ownClick = e
-      .composedPath()
+    // organization link are theirs, not the row's; elements outside the row
+    // don't count
+    const path = e.composedPath();
+    const rowIndex = path.indexOf(e.currentTarget as EventTarget);
+    const ownClick = path
+      .slice(0, rowIndex === -1 ? path.length : rowIndex)
       .some(
         (node) =>
           node instanceof HTMLElement && node.hasAttribute("data-no-select")

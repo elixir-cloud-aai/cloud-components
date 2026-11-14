@@ -117,7 +117,7 @@ This example demonstrates a basic service registry table with search and filteri
 |--------------|-------------|-----------------------------------------|-------------|------------------------------------------------------------------------------------------|
 | `search`     | `search`    | `boolean`                               | `true`      | Whether to display the search input field                                                |
 | `filter`     | `filter`    | `boolean`                               | `true`      | Whether to display the type, organization and environment filters                        |
-| `pageSize`   | `page-size` | `number`                                | `10`        | Number of services per page, rounded down; `0` or less (or not a number) shows all services on one page |
+| `pageSize`   | `page-size` | `number`                                | `10`        | Number of services per page, rounded down; `0` or less shows all services on one page, a missing or invalid value `10` |
 | `rowActions` | -           | `(service: ExternalService) => unknown` | `undefined` | Renders the actions of each row (see [`rowActions`](#rowactions))                        |
 | `baseUrl`    | `baseurl`   | `string`                                | `""`        | Base URL of the Service Registry API, used if no `provider` is set                       |
 | `provider`   | -           | `ServiceRegistryProvider`               | `undefined` | Data provider for fetching services (see [Providers](/docs/service-registry/providers))  |
@@ -185,7 +185,7 @@ Controls whether the filters are displayed: by type (the types the registry list
 </Tabs>
 
 ### `pageSize`
-The number of services per page. The pagination is shown when the services that match the search and the filters fill more than one page. Set it to `0` to show all services on one page.
+The number of services per page. The pagination is shown when the services that match the search and the filters fill more than one page. Set it to `0` to show all services on one page. A missing or invalid value (e.g. a removed or malformed attribute) falls back to `10`.
 
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>
@@ -248,7 +248,7 @@ A function that renders the actions of a row from its service, e.g. Edit and Del
 | Event Name             | React Event Name        | Detail Type                    | Description                                    |
 |------------------------|------------------------|--------------------------------|------------------------------------------------|
 | `ecc-services-changed` | `onEccServicesChanged` | `{ services: ExternalService[] }` | Fired when the services data is updated       |
-| `ecc-service-selected` | `onEccServiceSelected` | `{ serviceId: string }`        | Fired when a user clicks on a service row, except on its actions or organization link |
+| `ecc-service-selected` | `onEccServiceSelected` | `{ serviceId: string }`        | Fired when a user clicks on a service row, except on its actions or organization link, with a modifier key, or to select text |
 
 ### `ecc-services-changed`
 Emitted whenever the services data is loaded or updated, providing all loaded services (not only those that match the search and the filters).
@@ -274,7 +274,7 @@ Emitted whenever the services data is loaded or updated, providing all loaded se
 </Tabs>
 
 ### `ecc-service-selected`
-Emitted when a user clicks on a service in the table, providing the service ID for navigation or further actions.
+Emitted when a user clicks on a service in the table, providing the service ID for navigation or further actions. Clicks on the row's actions or organization link, clicks with a modifier key (Ctrl, Cmd, Shift or Alt) and clicks that end a text selection don't emit it.
 
 <Tabs items={['React', 'JavaScript']}>
   <Tabs.Tab>
