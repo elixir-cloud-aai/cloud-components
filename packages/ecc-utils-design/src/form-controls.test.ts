@@ -24,12 +24,6 @@ const controls: [string, () => Promise<FormControl>, string][] = [
       fixture(html`<ecc-utils-design-textarea></ecc-utils-design-textarea>`),
     "textarea",
   ],
-  [
-    "checkbox",
-    () =>
-      fixture(html`<ecc-utils-design-checkbox></ecc-utils-design-checkbox>`),
-    "[role=checkbox]",
-  ],
 ];
 
 function errorElement(el: LitElement): HTMLElement {
@@ -83,6 +77,56 @@ describe("form controls: invalid state and error message", () => {
         expect(errorElement(el).textContent?.trim()).to.equal("");
         expect(control.className).to.not.contain("border-destructive");
       });
+    });
+  });
+
+  // Only `invalid`: a message wouldn't wrap next to the box's label
+  describe("checkbox", () => {
+    const create = () =>
+      fixture<FormControl>(
+        html`<ecc-utils-design-checkbox></ecc-utils-design-checkbox>`
+      );
+    const box = (el: LitElement) =>
+      el.shadowRoot!.querySelector("[role=checkbox]")!;
+
+    it("is valid by default", async () => {
+      const el = await create();
+      expect(box(el).hasAttribute("aria-invalid")).to.equal(false);
+      expect(box(el).className).to.contain("border-primary");
+    });
+
+    it("can be marked invalid and valid again", async () => {
+      const el = await create();
+      el.invalid = true;
+      await el.updateComplete;
+      expect(el.hasAttribute("invalid")).to.equal(true);
+      expect(box(el).getAttribute("aria-invalid")).to.equal("true");
+      expect(box(el).className).to.contain("border-destructive");
+
+      el.invalid = false;
+      await el.updateComplete;
+      expect(box(el).hasAttribute("aria-invalid")).to.equal(false);
+      expect(box(el).className).to.not.contain("border-destructive");
+    });
+
+    it("takes the invalid state from the attribute", async () => {
+      const el = await fixture<FormControl>(
+        html`<ecc-utils-design-checkbox invalid></ecc-utils-design-checkbox>`
+      );
+      expect(box(el).getAttribute("aria-invalid")).to.equal("true");
+    });
+
+    it("shows no error message", async () => {
+      const el = await fixture<LitElement>(
+        html`<ecc-utils-design-checkbox
+          error="Is required."
+        ></ecc-utils-design-checkbox>`
+      );
+      expect(el.shadowRoot!.querySelector("[part=error]") === null).to.equal(
+        true
+      );
+      expect(box(el).hasAttribute("aria-invalid")).to.equal(false);
+      expect(box(el).hasAttribute("aria-describedby")).to.equal(false);
     });
   });
 

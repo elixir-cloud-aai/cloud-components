@@ -127,8 +127,7 @@ This example shows a checkbox in a disabled state.
 | `disabled` | `boolean` | `false` | When `true`, disables the checkbox.       |
 | `name`     | `string`  | `""`    | The name of the checkbox for form submission. |
 | `value`    | `string`  | `""`    | The value of the checkbox for form submission. |
-| `invalid` | `boolean` | `false` | When `true`, marks the checkbox as invalid (also implied by `error`). |
-| `error`   | `string`  | `""`    | Error message shown under the checkbox, e.g. from an API. |
+| `invalid` | `boolean` | `false` | When `true`, marks the checkbox as invalid, e.g. after an API rejected its value. |
 
 ### `checked`
 Controls the checked state of the checkbox.
@@ -194,18 +193,18 @@ The value attribute, used when submitting the checkbox as part of a form.
   </Tabs.Tab>
 </Tabs>
 
-### `invalid` and `error`
-`error` shows a message under the checkbox, e.g. one that an API returned for this field (see [Field errors](/docs/design/field-errors)), and marks the checkbox as invalid: it gets a red border, `aria-invalid="true"` and `aria-describedby` pointing to the message, and screen readers announce the message (`aria-live="polite"`). `invalid` marks the checkbox as invalid without a message, e.g. when the message is shown elsewhere. Clear both when the user changes the value or submits again. The message has the part `error` for styling (`ecc-utils-design-checkbox::part(error)`). Unlike the other controls' messages, it is positioned under the box without taking space (so that it doesn't widen or shift the box next to its label): leave room below the checkbox, e.g. with a margin. Long messages don't wrap.
+### `invalid`
+Marks the checkbox as invalid, e.g. when an API rejected its value (see [Field errors](/docs/design/field-errors)): it gets a red border and `aria-invalid="true"`. Clear it when the user changes the value or submits again. Unlike the other form controls, the checkbox has no `error` property: a message under the box wouldn't wrap next to its label, e.g. when the checkbox is at the end of a row. Show the message elsewhere, e.g. with the form's general error or next to the label.
 
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>
     ```tsx copy
-    <EccUtilsDesignCheckbox error="Is required." />
+    <EccUtilsDesignCheckbox invalid={true} />
     ```
   </Tabs.Tab>
   <Tabs.Tab>
     ```html copy
-    <ecc-utils-design-checkbox error="Is required."></ecc-utils-design-checkbox>
+    <ecc-utils-design-checkbox invalid></ecc-utils-design-checkbox>
     ```
   </Tabs.Tab>
 </Tabs>
