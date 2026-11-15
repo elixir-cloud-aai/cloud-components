@@ -151,6 +151,10 @@ export class AttrForwardingController implements ReactiveController {
 
   private extra: Set<string>;
 
+  private ariaDefaults = new Map<string, string | null>();
+
+  private ariaTarget?: Element;
+
   private observer?: MutationObserver;
 
   private referenceRoot?: ReferenceRoot;
@@ -184,6 +188,16 @@ export class AttrForwardingController implements ReactiveController {
     }
   }
 
+  hostUpdate() {
+    const target = this.ariaTarget;
+    if (!target) return;
+    this.ariaDefaults.forEach((value, name) => {
+      if (value === null) target.removeAttribute(name);
+      else target.setAttribute(name, value);
+    });
+    this.ariaDefaults.clear();
+  }
+
   hostUpdated() {
     this.sync();
   }
@@ -191,14 +205,30 @@ export class AttrForwardingController implements ReactiveController {
   sync() {
     const target = this.host.shadowRoot?.querySelector(this.selector);
     if (!target) return;
+    if (this.ariaTarget !== target) {
+      this.ariaDefaults.clear();
+      this.ariaTarget = target;
+    }
+    this.ariaDefaults.forEach((value, name) => {
+      if (this.host.hasAttribute(name)) return;
+      if (value === null) target.removeAttribute(name);
+      else target.setAttribute(name, value);
+      this.ariaDefaults.delete(name);
+    });
     const wanted = new Map<string, string>();
-    // collect and store the attributes
     Array.from(this.host.attributes).forEach((attr) => {
+      if (attr.name.startsWith("aria-") && !this.ariaDefaults.has(attr.name)) {
+        this.ariaDefaults.set(attr.name, target.getAttribute(attr.name));
+      }
       if (this.isForwarded(attr.name)) wanted.set(attr.name, attr.value);
     });
     // remove stale sttributes
     Array.from(target.attributes).forEach((attr) => {
-      if (this.isForwarded(attr.name) && !wanted.has(attr.name)) {
+      if (
+        !attr.name.startsWith("aria-") &&
+        this.isForwarded(attr.name) &&
+        !wanted.has(attr.name)
+      ) {
         target.removeAttribute(attr.name);
       }
     });
@@ -241,7 +271,14 @@ export class AttrForwardingController implements ReactiveController {
     const references: Element[] = [];
 
     Object.entries(IDREFS).forEach(([attr, prop]) => {
-      const refs = (this.host.getAttribute(attr) ?? "")
+      const value = this.host.getAttribute(attr);
+      if (value === null) {
+        shadow.querySelectorAll(`[id^="ecc-ref-${attr}-"]`).forEach((node) => {
+          node.remove();
+        });
+        return;
+      }
+      const refs = value
         .split(/\s+/)
         .filter(Boolean)
         .map((id) => root.getElementById(id))

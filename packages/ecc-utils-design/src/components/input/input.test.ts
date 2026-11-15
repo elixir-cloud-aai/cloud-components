@@ -2,6 +2,8 @@
 import { fixture, expect } from "@open-wc/testing";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { executeServerCommand } from "@web/test-runner-commands";
+import { LitElement, html } from "lit";
+import { AttrForwardingController } from "../../attribute-forwarding.js";
 import "./index.js";
 import "../textarea/index.js";
 
@@ -37,6 +39,125 @@ const tick = () =>
   new Promise((resolve) => {
     setTimeout(resolve, 0);
   });
+
+class AriaDefaultsTestElement extends LitElement {
+  static properties = {
+    defaultLabel: { type: String },
+    defaultDescription: { type: String },
+    defaultReference: { type: String },
+  };
+
+  declare defaultLabel: string;
+
+  declare defaultDescription: string;
+
+  declare defaultReference: string;
+
+  private forwarding = new AttrForwardingController(this, "input");
+
+  constructor() {
+    super();
+    this.defaultLabel = "Default label";
+    this.defaultDescription = "Default description";
+    this.defaultReference = "local-label";
+  }
+
+  render() {
+    return html`
+      <input
+        aria-label=${this.defaultLabel}
+        aria-description=${this.defaultDescription}
+        aria-labelledby=${this.defaultReference}
+      />
+      <span id="local-label">Local label</span>
+      <span id="updated-local-label">Updated local label</span>
+    `;
+  }
+}
+
+customElements.define("aria-defaults-test", AriaDefaultsTestElement);
+
+describe("component ARIA defaults", () => {
+  const create = async () => {
+    const wrapper = await fixture<HTMLElement>(html`
+      <div>
+        <aria-defaults-test></aria-defaults-test>
+        <span id="external-label">External label</span>
+      </div>
+    `);
+    const host = wrapper.querySelector(
+      "aria-defaults-test"
+    ) as AriaDefaultsTestElement;
+    await host.updateComplete;
+    const target = host.shadowRoot?.querySelector("input") as HTMLInputElement;
+    return { wrapper, host, target };
+  };
+
+  it("uses component defaults and forwards host ARIA attributes", async () => {
+    const { wrapper, host, target } = await create();
+    expect(target.getAttribute("aria-label")).to.equal("Default label");
+    expect(target.getAttribute("aria-description")).to.equal(
+      "Default description"
+    );
+    expect(target.getAttribute("aria-labelledby")).to.equal("local-label");
+
+    host.setAttribute("aria-label", "Host label");
+    host.setAttribute("aria-description", "Host description");
+    host.setAttribute("aria-labelledby", "external-label");
+    await tick();
+    expect(target.getAttribute("aria-label")).to.equal("Host label");
+    expect(target.getAttribute("aria-description")).to.equal(
+      "Host description"
+    );
+    expect(target.getAttribute("aria-labelledby")).to.not.equal("local-label");
+    if ("ariaLabelledByElements" in target) {
+      expect(target.ariaLabelledByElements).to.deep.equal([
+        wrapper.querySelector("#external-label"),
+      ]);
+    } else {
+      expect(
+        host.shadowRoot?.getElementById("ecc-ref-aria-labelledby-0")
+          ?.textContent
+      ).to.equal("External label");
+    }
+  });
+
+  it("restores updated defaults when host overrides are removed", async () => {
+    const { host, target } = await create();
+    host.setAttribute("aria-label", "Host label");
+    host.setAttribute("aria-description", "Host description");
+    host.setAttribute("aria-labelledby", "external-label");
+    await tick();
+    host.defaultLabel = "Updated label";
+    host.defaultDescription = "Updated description";
+    host.defaultReference = "updated-local-label";
+    await host.updateComplete;
+    expect(target.getAttribute("aria-label")).to.equal("Host label");
+    expect(target.getAttribute("aria-description")).to.equal(
+      "Host description"
+    );
+    expect(target.getAttribute("aria-labelledby")).to.not.equal(
+      "updated-local-label"
+    );
+
+    host.removeAttribute("aria-labelledby");
+    await tick();
+    expect(target.getAttribute("aria-labelledby")).to.equal(
+      "updated-local-label"
+    );
+    expect(target.getAttribute("aria-label")).to.equal("Host label");
+    host.removeAttribute("aria-label");
+    host.removeAttribute("aria-description");
+    await tick();
+    expect(target.getAttribute("aria-label")).to.equal("Updated label");
+    expect(target.getAttribute("aria-description")).to.equal(
+      "Updated description"
+    );
+    expect(target.getAttribute("aria-labelledby")).to.equal(
+      "updated-local-label"
+    );
+  });
+});
 
 const referencedText = (
   target: Element,
