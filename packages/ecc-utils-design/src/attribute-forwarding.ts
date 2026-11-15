@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from "lit";
+import { computeAccessibleName } from "dom-accessibility-api";
 
 type Host = ReactiveControllerHost & HTMLElement;
 type ReferenceRoot = Document | ShadowRoot;
@@ -20,6 +21,7 @@ function setsEqual<T>(left: Set<T>, right: Set<T>) {
 }
 
 function observeRoot(state: RootState, root: ReferenceRoot) {
+  const pending = state.observer.takeRecords().length > 0;
   state.observer.disconnect();
   state.observer.observe(root, {
     attributes: true,
@@ -29,10 +31,16 @@ function observeRoot(state: RootState, root: ReferenceRoot) {
   });
   state.references.forEach((_, reference) => {
     state.observer.observe(reference, {
+      attributes: true,
       characterData: true,
       subtree: true,
     });
   });
+  if (pending) {
+    queueMicrotask(() => {
+      state.controllers.forEach((controller) => controller.sync());
+    });
+  }
 }
 
 function registerController(
@@ -120,10 +128,21 @@ function updateControllerReferences(
 
 // ID references can't cross the shadow boundary, so they are resolved separately.
 const IDREFS: Record<string, string> = {
+  "aria-activedescendant": "ariaActiveDescendantElement",
+  "aria-controls": "ariaControlsElements",
   "aria-describedby": "ariaDescribedByElements",
+  "aria-details": "ariaDetailsElements",
   "aria-errormessage": "ariaErrorMessageElements",
+  "aria-flowto": "ariaFlowToElements",
   "aria-labelledby": "ariaLabelledByElements",
+  "aria-owns": "ariaOwnsElements",
 };
+
+const TEXT_IDREFS = new Set([
+  "aria-describedby",
+  "aria-errormessage",
+  "aria-labelledby",
+]);
 
 export class AttrForwardingController implements ReactiveController {
   private host: Host;
@@ -135,6 +154,8 @@ export class AttrForwardingController implements ReactiveController {
   private observer?: MutationObserver;
 
   private referenceRoot?: ReferenceRoot;
+
+  private hasSyncedReferences = false;
 
   constructor(host: Host, selector: string, attributes: string[] = []) {
     this.host = host;
@@ -206,14 +227,12 @@ export class AttrForwardingController implements ReactiveController {
       this.host.hasAttribute(attribute)
     );
     if (!hasReferences) {
-      if (this.referenceRoot) {
-        unregisterController(this.referenceRoot, this);
-        this.referenceRoot = undefined;
-      }
-      return;
+      if (!this.hasSyncedReferences) return;
+      if (this.referenceRoot) unregisterController(this.referenceRoot, this);
+      this.referenceRoot = undefined;
     }
 
-    if (this.referenceRoot !== root) {
+    if (hasReferences && this.referenceRoot !== root) {
       if (this.referenceRoot) unregisterController(this.referenceRoot, this);
       registerController(root, this);
       this.referenceRoot = root;
@@ -230,10 +249,21 @@ export class AttrForwardingController implements ReactiveController {
       references.push(...refs);
 
       if (prop in target) {
-        Reflect.set(target, prop, refs.length ? refs : []);
+        Reflect.set(
+          target,
+          prop,
+          attr === "aria-activedescendant" ? refs[0] ?? null : refs
+        );
         return;
       }
 
+      if (!TEXT_IDREFS.has(attr)) {
+        target.removeAttribute(attr);
+        return;
+      }
+
+      const probe = this.host.ownerDocument.createElement("input");
+      Object.defineProperty(probe, "getRootNode", { value: () => root });
       // Fallback: mirror referenced text into shadow-local nodes.
       const ids = refs.map((ref, i) => {
         const id = `ecc-ref-${attr}-${i}`;
@@ -244,7 +274,8 @@ export class AttrForwardingController implements ReactiveController {
           node.hidden = true;
           shadow.append(node);
         }
-        node.textContent = ref.textContent;
+        probe.setAttribute("aria-labelledby", ref.id);
+        node.textContent = computeAccessibleName(probe);
         return id;
       });
       shadow.querySelectorAll(`[id^="ecc-ref-${attr}-"]`).forEach((n) => {
@@ -254,6 +285,7 @@ export class AttrForwardingController implements ReactiveController {
       else target.removeAttribute(attr);
     });
 
-    updateControllerReferences(root, this, references);
+    this.hasSyncedReferences = hasReferences;
+    if (hasReferences) updateControllerReferences(root, this, references);
   }
 }
