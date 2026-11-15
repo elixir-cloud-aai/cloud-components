@@ -57,6 +57,7 @@
   "dependencies": {
     "@lit/react": "^1.0.2",
     "ace-builds": "^1.35.0",
+    "dom-accessibility-api": "^0.7.1",
     "lit": "^2.8.0"
   },
   "devDependencies": {
