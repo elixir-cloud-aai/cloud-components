@@ -239,7 +239,7 @@ A function that renders the actions of a row from its service, e.g. Edit and Del
 </Tabs>
 
 ### `rowBadges`
-A function that renders badges of a row from its service, e.g. a "Verified" badge. They are shown in the name line, after the version badge, so that a row's tags stay together. It can return a Lit template, a DOM node, a string, or `null` for a row without badges. As with `rowActions`, set a new function when what it renders changes. For verifications, render the Cloud Registry package's [service verification](/docs/cloud-registry/components/service-verification) component with `display="badge"` here, or use the Cloud Registry [services list](/docs/cloud-registry/components/services), which does this.
+A function that renders badges of a row from its service, e.g. a "Verified" badge. They are shown in the name line, after the version badge, so that a row's tags stay together. It can return a Lit template, a DOM node, a string, or `null` for a row without badges. Badges are part of the row: clicking them selects the service, as clicking the name does, so put buttons and links in `rowActions` instead. As with `rowActions`, set a new function when what it renders changes. For verifications, render the Cloud Registry package's [service verification](/docs/cloud-registry/components/service-verification) component with `display="badge"` here, or use the Cloud Registry [services list](/docs/cloud-registry/components/services), which does this.
 
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>

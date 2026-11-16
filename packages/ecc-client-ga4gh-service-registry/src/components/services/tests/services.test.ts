@@ -671,6 +671,36 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       ).to.have.length(0);
     });
 
+    it("accepts strings and DOM nodes from rowBadges", async () => {
+      const el = await renderLoaded();
+      el.rowBadges = (s: ExternalService) => {
+        if (s.id === "s1") return "Text badge";
+        const node = document.createElement("span");
+        node.className = "node";
+        return node;
+      };
+      await el.updateComplete;
+
+      const badges = Array.from(root(el).querySelectorAll("[data-row-badges]"));
+      expect(badges[0].textContent).to.include("Text badge");
+      expect(root(el).querySelectorAll("span.node")).to.have.length(2);
+    });
+
+    it("selects a service when one of its badges is clicked", async () => {
+      const el = await renderLoaded();
+      el.rowBadges = () => litHtml`<span class="tag">Tag</span>`;
+      await el.updateComplete;
+      const selected = sinon.spy();
+      el.addEventListener("ecc-service-selected", selected);
+
+      find(el, '[data-service-id="s2"] span.tag').click();
+
+      expect(selected.callCount).to.equal(1);
+      expect(selected.firstCall.args[0].detail).to.deep.equal({
+        serviceId: "s2",
+      });
+    });
+
     it("renders the rows again with a new rowBadges", async () => {
       const el = await renderLoaded();
       el.rowBadges = () => litHtml`<span class="old">Old</span>`;

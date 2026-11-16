@@ -2,10 +2,12 @@
  * Which services are verified. A verification (from `GET /verifications` or
  * `GET /services/{serviceId}/verification`) only counts while the service
  * still has the verified URL and API type (`type.group` and
- * `type.artifact`; not `type.version`). The registry stores them as it read
- * them from the service and removes the verification when either changes,
- * so they are compared exactly; but a list of services and a list of
- * verifications loaded one after the other may disagree.
+ * `type.artifact`; not `type.version`). The registry serves each
+ * verification with the service's current URL and API type, and removes it
+ * when the URL or the API type (trimmed and case-insensitive) changes, so
+ * services and verifications of the same moment match exactly. A list of
+ * services and a list of verifications loaded one after the other may
+ * disagree, e.g. after a change of case only.
  */
 
 import type {

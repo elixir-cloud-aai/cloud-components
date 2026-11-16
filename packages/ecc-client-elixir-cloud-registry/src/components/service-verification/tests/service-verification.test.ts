@@ -882,4 +882,85 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
 
     expect(el.shadowRoot?.querySelector("*")).to.equal(null);
   });
+
+  it("shows the badge and the actions by default, and reflects `display`", async () => {
+    const { provider } = stubProvider();
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        .service=${SERVICE}
+        .verification=${null}
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    expect(el.getAttribute("display")).to.equal("all");
+    expect(part(el, "badge") !== null).to.equal(true);
+    expect(part(el, "verify-button") !== null).to.equal(true);
+
+    el.display = "badge";
+    await settled(el);
+    expect(el.getAttribute("display")).to.equal("badge");
+  });
+
+  it("shows nothing to other users for an unverified service with `display` actions", async () => {
+    const { provider } = stubProvider();
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        display="actions"
+        .service=${SERVICE}
+        .verification=${null}
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    expect(el.shadowRoot?.querySelector("*") === null).to.equal(true);
+  });
+
+  it("leaves the other instance of a row to the app", async () => {
+    const { provider, verify } = stubProvider();
+    verify.resolves(VERIFICATION);
+    const container = await fixture<HTMLDivElement>(html`
+      <div>
+        <ecc-client-elixir-cloud-registry-service-verification
+          admin
+          display="badge"
+          .service=${SERVICE}
+          .verification=${null}
+          .provider=${provider}
+        ></ecc-client-elixir-cloud-registry-service-verification>
+        <ecc-client-elixir-cloud-registry-service-verification
+          admin
+          display="actions"
+          .service=${SERVICE}
+          .verification=${null}
+          .provider=${provider}
+        ></ecc-client-elixir-cloud-registry-service-verification>
+      </div>
+    `);
+    const [badgeEl, actionsEl] = Array.from(
+      container.querySelectorAll<El>(
+        "ecc-client-elixir-cloud-registry-service-verification"
+      )
+    );
+    await settled(badgeEl);
+    await settled(actionsEl);
+
+    const changed = oneEvent(actionsEl, "ecc-service-verification-changed");
+    click(part(actionsEl, "verify-button"));
+    const { detail } = (await changed) as EccServiceVerificationChangedEvent;
+    await settled(actionsEl);
+    expect(part(actionsEl, "remove-button") !== null).to.equal(true);
+    expect(part(badgeEl, "badge")?.textContent?.trim()).to.equal(
+      "Not verified"
+    );
+
+    badgeEl.verification = detail.verification;
+    actionsEl.verification = detail.verification;
+    await settled(badgeEl);
+    expect(part(badgeEl, "badge")?.textContent?.trim()).to.equal("Verified");
+    expect(part(actionsEl, "remove-button") !== null).to.equal(true);
+  });
 });
