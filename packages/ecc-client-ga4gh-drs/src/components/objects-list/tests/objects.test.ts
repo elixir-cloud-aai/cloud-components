@@ -190,4 +190,38 @@ describe("ecc-client-ga4gh-drs-objects provider", () => {
     expect(internals(el).objects).to.deep.equal([]);
     expect(reported).to.deep.equal([[]]);
   });
+
+  it("drops a late failure of an older load from a provider used again", async () => {
+    let failFirst: (error: Error) => void = () => undefined;
+    const first = stubProvider();
+    first.stubs.getObjects.onFirstCall().returns(
+      new Promise<Page>((_resolve, reject) => {
+        failFirst = reject;
+      })
+    );
+    const second = stubProvider({ objects: [object("b")] });
+    const el = await fixture<ECCClientGa4ghDrsObjects>(
+      html`<ecc-client-ga4gh-drs-objects
+        .provider=${first.provider}
+      ></ecc-client-ga4gh-drs-objects>`
+    );
+    el.provider = second.provider;
+    await waitUntil(() => internals(el).objects[0]?.id === "b");
+    el.provider = first.provider;
+    await waitUntil(() => internals(el).objects[0]?.id === "a");
+    const reported: DrsObject[][] = [];
+    el.addEventListener("ecc-objects-changed", (e) =>
+      reported.push((e as CustomEvent).detail.objects)
+    );
+
+    failFirst(new Error("Unavailable"));
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0);
+    });
+    await el.updateComplete;
+
+    expect(internals(el).objects[0]?.id).to.equal("a");
+    expect(el.shadowRoot?.textContent).not.to.contain("Unavailable");
+    expect(reported).to.deep.equal([]);
+  });
 });

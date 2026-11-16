@@ -98,13 +98,16 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
         "Please provide either a base URL for the Service Registry API or a custom provider.";
     } else if (changedProperties.has("serviceId") && !this.serviceId) {
       this.service = null;
-      this.dispatchEvent(
-        new CustomEvent("ecc-service-changed", {
-          detail: { service: null },
-          bubbles: true,
-          composed: true,
-        })
-      );
+      // only a cleared service ID, not a missing one on the first update
+      if (changedProperties.get("serviceId")) {
+        this.dispatchEvent(
+          new CustomEvent("ecc-service-changed", {
+            detail: { service: null },
+            bubbles: true,
+            composed: true,
+          })
+        );
+      }
       this.loading = false;
       this.error = "Please provide a service ID.";
     } else if (

@@ -261,4 +261,37 @@ describe("ecc-client-elixir-trs-tool-create provider", () => {
 
     expect(submitButton(el).disabled).to.equal(true);
   });
+
+  it("drops a late failure of an older load from a provider used again", async () => {
+    let failFirst: (error: Error) => void = () => undefined;
+    const first = stubProvider();
+    first.stubs.getToolClasses.onFirstCall().returns(
+      new Promise<ToolClass[]>((_resolve, reject) => {
+        failFirst = reject;
+      })
+    );
+    const second = stubProvider([{ id: "tool", name: "Tool" }]);
+    const el = await fixture<ECCClientElixirTrsToolCreate>(
+      html`<ecc-client-elixir-trs-tool-create
+        .provider=${first.provider}
+      ></ecc-client-elixir-trs-tool-create>`
+    );
+    el.provider = second.provider;
+    await waitUntil(() => offered(el)[0]?.id === "tool");
+    el.provider = first.provider;
+    await waitUntil(() => offered(el)[0]?.id === "workflow");
+    let failures = 0;
+    el.addEventListener("ecc-tool-create-failed", () => {
+      failures += 1;
+    });
+
+    failFirst(new Error("Unavailable"));
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0);
+    });
+    await el.updateComplete;
+
+    expect(offered(el)[0]?.id).to.equal("workflow");
+    expect(failures).to.equal(0);
+  });
 });

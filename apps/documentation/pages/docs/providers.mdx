@@ -51,12 +51,14 @@ render (e.g. with `useMemo` in React), as each new instance makes the component
 load its data again.
 
 Whenever a load fails (e.g. from a new provider, or for another page), the
-component shows the error, clears its data and fires its `ecc-*-changed` event
-with empty data (e.g. `ecc-services-changed` with no services), so the app can
-drop the old data too. The tool form of TRS-Filer offers no tool classes of
-the previous provider: it keeps its submit button disabled until the new ones
-have loaded, and then selects the default tool class if the new provider
-offers it, or none if it doesn't offer the selected one.
+component shows the error and clears its data; the lists and the service view
+also fire their `ecc-*-changed` event with empty data (e.g.
+`ecc-services-changed` with no services), so the app can drop the old data
+too. The tool form of TRS-Filer fires `ecc-tool-create-failed` instead, and it
+offers no tool classes of the previous provider: its submit button stays
+disabled until the new ones have loaded. A selected tool class that the new
+provider offers stays selected; one that it doesn't offer is replaced by the
+default tool class if the provider offers that, or else cleared.
 
 ## Common Use Cases
 

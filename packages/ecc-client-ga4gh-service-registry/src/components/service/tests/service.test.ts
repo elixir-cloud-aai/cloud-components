@@ -236,4 +236,23 @@ describe("ecc-client-ga4gh-service-registry-service provider", () => {
     expect(shown(el)).to.equal(null);
     expect(reported).to.deep.equal([null]);
   });
+
+  it("reports no cleared service when it starts without a service ID", async () => {
+    const provider = stubProvider();
+    let reports = 0;
+    const el = await fixture<ECCClientGa4ghServiceRegistryService>(
+      html`<ecc-client-ga4gh-service-registry-service
+        .provider=${provider}
+        @ecc-service-changed=${() => {
+          reports += 1;
+        }}
+      ></ecc-client-ga4gh-service-registry-service>`
+    );
+    await el.updateComplete;
+
+    expect(el.shadowRoot?.textContent).to.contain(
+      "Please provide a service ID"
+    );
+    expect(reports).to.equal(0);
+  });
 });
