@@ -5,6 +5,7 @@ import sinon from "sinon";
 import "../index.js";
 import type ECCClientElixirCloudRegistryServices from "../services.js";
 import type ECCClientElixirCloudRegistryServiceVerification from "../../service-verification/service-verification.js";
+import type ECCClientElixirCloudRegistryServiceVerificationBadge from "../../service-verification-badge/service-verification-badge.js";
 import type { EccServiceVerificationFailedEvent } from "../../../events/index.js";
 import {
   CloudRegistryProvider,
@@ -55,7 +56,8 @@ const stubProvider = (
 };
 
 type El = ECCClientElixirCloudRegistryServices;
-type Badge = ECCClientElixirCloudRegistryServiceVerification;
+type Badge = ECCClientElixirCloudRegistryServiceVerificationBadge;
+type Actions = ECCClientElixirCloudRegistryServiceVerification;
 
 /** The services list inside the component. */
 const list = (el: El) =>
@@ -72,14 +74,14 @@ const row = (el: El, id: string) =>
 /** The verification badge in the name line of a service's row. */
 const badge = (el: El, id: string) =>
   row(el, id)?.querySelector(
-    '[data-row-badges] ecc-client-elixir-cloud-registry-service-verification[display="badge"]'
+    "[data-row-badges] ecc-client-elixir-cloud-registry-service-verification-badge"
   ) as Badge | null;
 
 /** The verification actions in the actions column of a service's row. */
 const actions = (el: El, id: string) =>
   row(el, id)?.querySelector(
-    'slot ecc-client-elixir-cloud-registry-service-verification[display="actions"]'
-  ) as Badge | null;
+    "slot ecc-client-elixir-cloud-registry-service-verification"
+  ) as Actions | null;
 
 /** Waits until pending promises have settled and the list has updated. */
 const flush = async (el: El) => {
@@ -181,7 +183,7 @@ describe("ecc-client-elixir-cloud-registry-services", () => {
     await el.updateComplete;
     await list(el).updateComplete;
 
-    expect(badge(el, "s2")?.admin).to.equal(true);
+    expect(badge(el, "s2")?.showUnverified).to.equal(true);
     expect(actions(el, "s2")?.admin).to.equal(true);
   });
 
@@ -367,7 +369,7 @@ describe("ecc-client-elixir-cloud-registry-services", () => {
     el.admin = true;
     await el.updateComplete;
 
-    badge(el, "s2")?.dispatchEvent(
+    actions(el, "s2")?.dispatchEvent(
       new CustomEvent("ecc-service-verification-changed", {
         detail: { serviceId: "s2", verification: fresh },
         bubbles: true,
@@ -383,10 +385,40 @@ describe("ecc-client-elixir-cloud-registry-services", () => {
     });
   });
 
+  it("updates the badge when an admin clicks Verify in the actions", async () => {
+    const stubs = stubProvider([]);
+    const fresh = verificationOf(SERVICES[1]);
+    stubs.verify.resolves(fresh);
+    const el = await renderLoaded(stubs.provider);
+    el.admin = true;
+    await flush(el);
+    expect(shownVerified(el, "s2")).to.equal(false);
+    expect(
+      badge(el, "s2")
+        ?.shadowRoot?.querySelector('[part="badge"]')
+        ?.textContent?.trim()
+    ).to.equal("Not verified");
+
+    const button = actions(el, "s2")
+      ?.shadowRoot?.querySelector('[part="verify-button"]')
+      ?.shadowRoot?.querySelector("button");
+    if (!button) throw new Error("No Verify button.");
+    button.click();
+    await waitUntil(() => shownVerified(el, "s2"), "badge not updated");
+
+    expect(stubs.verify.calledOnce).to.equal(true);
+    expect(stubs.verify.firstCall.args[0]).to.equal("s2");
+    expect(
+      actions(el, "s2")?.shadowRoot?.querySelector('[part="remove-button"]')
+    ).to.not.equal(null);
+    // no reload: the list applies the result
+    expect(stubs.verifications.callCount).to.equal(1);
+  });
+
   it("follows a removed verification", async () => {
     const el = await renderLoaded(stubProvider().provider);
 
-    badge(el, "s1")?.dispatchEvent(
+    actions(el, "s1")?.dispatchEvent(
       new CustomEvent("ecc-service-verification-changed", {
         detail: { serviceId: "s1", verification: null },
         bubbles: true,
@@ -564,7 +596,7 @@ describe("ecc-client-elixir-cloud-registry-services", () => {
 
   it("ignores verification changes of a replaced list", async () => {
     const el = await renderLoaded(stubProvider().provider);
-    const old = badge(el, "s1");
+    const old = actions(el, "s1");
     el.provider = stubProvider([]).provider;
     await el.updateComplete;
     await waitUntil(() => !!badge(el, "s1"), "verifications not shown");
@@ -582,7 +614,7 @@ describe("ecc-client-elixir-cloud-registry-services", () => {
 
   it("follows a change of a row that is no longer shown", async () => {
     const el = await renderLoaded(stubProvider([]).provider);
-    const offPage = badge(el, "s3");
+    const offPage = actions(el, "s3");
     el.pageSize = 1;
     await el.updateComplete;
     await list(el).updateComplete;
@@ -604,12 +636,12 @@ describe("ecc-client-elixir-cloud-registry-services", () => {
     const stubs = stubProvider();
     const el = await renderLoaded(stubs.provider);
 
-    badge(el, "s2")?.dispatchEvent(
+    actions(el, "s2")?.dispatchEvent(
       new CustomEvent("ecc-service-verification-failed", {
         detail: { serviceId: "s2", action: "verify", error: "Lost" },
       })
     );
-    badge(el, "s2")?.dispatchEvent(
+    actions(el, "s2")?.dispatchEvent(
       new CustomEvent("ecc-service-verification-failed", {
         detail: { serviceId: "s2", action: "load", error: "Lost" },
       })

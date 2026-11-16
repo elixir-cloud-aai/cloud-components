@@ -18,6 +18,7 @@ import {
 } from "../../providers/index.js";
 import { verifiedServices } from "../../providers/verifications.js";
 import { ECCClientElixirCloudRegistryServiceVerification } from "../service-verification/service-verification.js";
+import { ECCClientElixirCloudRegistryServiceVerificationBadge } from "../service-verification-badge/service-verification-badge.js";
 import { failureDetail, needsReload } from "../service-verification/failure.js";
 import type {
   EccServiceVerificationChangedEvent,
@@ -38,6 +39,10 @@ if (typeof window !== "undefined" && window.customElements) {
     [
       "ecc-client-elixir-cloud-registry-service-verification",
       ECCClientElixirCloudRegistryServiceVerification,
+    ],
+    [
+      "ecc-client-elixir-cloud-registry-service-verification-badge",
+      ECCClientElixirCloudRegistryServiceVerificationBadge,
     ],
   ];
   elements.forEach(([name, element]) => {
@@ -286,18 +291,27 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
   }
 
   /**
-   * The verification component of a row, once the verifications are loaded:
-   * its badge (`display` `badge`) or its admin actions (`actions`)
+   * The verification badge of a row, once the verifications are loaded:
+   * "Verified", or for admins also "Not verified"
    */
-  private renderVerification(
-    service: ExternalService,
-    display: "badge" | "actions"
-  ) {
+  private renderBadge(service: ExternalService) {
+    const { verified, verifications, admin } = this;
+    if (!verifications || !this.shownProvider) return nothing;
+    return html`<ecc-client-elixir-cloud-registry-service-verification-badge
+      .verification=${verified.get(service.id) ?? null}
+      ?show-unverified=${admin}
+    ></ecc-client-elixir-cloud-registry-service-verification-badge>`;
+  }
+
+  /**
+   * The admin actions of a row, once the verifications are loaded: "Verify"
+   * or "Remove verification" (nothing for other users)
+   */
+  private renderActions(service: ExternalService) {
     const { verified, verifications, admin, generation } = this;
     const provider = this.shownProvider;
     if (!verifications || !provider) return nothing;
     return html`<ecc-client-elixir-cloud-registry-service-verification
-      display=${display}
       .provider=${provider}
       .service=${service}
       .verification=${verified.get(service.id) ?? null}
@@ -318,7 +332,7 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
   private createRowBadges(): RowBadgesRenderer {
     const { rowBadges } = this;
     return (service: ExternalService) =>
-      html`${this.renderVerification(service, "badge")}${rowBadges
+      html`${this.renderBadge(service)}${rowBadges
         ? rowBadges(service) ?? nothing
         : nothing}`;
   }
@@ -331,7 +345,7 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
     const { rowActions } = this;
     return (service: ExternalService) => html`
       <div class="flex items-center gap-2">
-        ${this.renderVerification(service, "actions")}
+        ${this.renderActions(service)}
         ${rowActions
           ? rowActions(service) ?? nothing
           : html`<ecc-utils-design-button
