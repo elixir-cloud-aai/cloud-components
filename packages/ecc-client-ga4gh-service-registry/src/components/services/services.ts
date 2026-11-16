@@ -180,6 +180,9 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
    */
   private actionsObserver?: ResizeObserver;
 
+  /** The actions that `actionsObserver` watches */
+  private observedActions: HTMLElement[] = [];
+
   /** The number of the latest `loadServiceTypes()` call */
   private serviceTypeLoads = 0;
 
@@ -214,7 +217,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     // watch the actions again if the list was moved or kept while detached
-    if (this.hasUpdated) this.observeActions();
+    if (this.hasUpdated) this.observeActions(true);
   }
 
   disconnectedCallback(): void {
@@ -240,9 +243,8 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     const style = getComputedStyle(base);
     const padding =
       parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
-    const widest = Math.max(
-      ...contents.map((content) => content.getBoundingClientRect().width)
-    );
+    // layout widths, not transformed ones (e.g. in a scaled preview)
+    const widest = Math.max(...contents.map((content) => content.offsetWidth));
     // a hidden list (e.g. in an inactive tab) has no widths: keep the last
     // one until the observer reports the actions again
     if (widest === 0) return;
@@ -252,17 +254,28 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     }
   }
 
-  /** Watches the actions of the rows shown and fits the column to them. */
-  private observeActions(): void {
+  /**
+   * Watches the actions of the rows shown and fits the column to them; only
+   * when the rows shown changed (e.g. not on each key press in the search),
+   * or to watch them again after a reconnect
+   */
+  private observeActions(force = false): void {
     if (typeof ResizeObserver === "undefined") return;
+    const contents = Array.from(
+      this.shadowRoot?.querySelectorAll<HTMLElement>(".actions-content") ?? []
+    );
+    const same =
+      contents.length === this.observedActions.length &&
+      contents.every((content, i) => content === this.observedActions[i]);
+    if (same && !force) return;
     if (!this.actionsObserver) {
       this.actionsObserver = new ResizeObserver(() => this.fitActions());
     }
     const observer = this.actionsObserver;
     observer.disconnect();
-    this.shadowRoot
-      ?.querySelectorAll(".actions-content")
-      .forEach((content) => observer.observe(content));
+    contents.forEach((content) => observer.observe(content));
+    this.observedActions = contents;
+    // measured now, so that the first paint has the width
     this.fitActions();
   }
 
@@ -581,9 +594,11 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
                 ></ecc-utils-design-skeleton>
               </ecc-utils-design-table-cell>
               <ecc-utils-design-table-cell class="actions-column">
-                <ecc-utils-design-skeleton
-                  class="part:h-8 part:w-8 part:rounded"
-                ></ecc-utils-design-skeleton>
+                <div class="actions-content">
+                  <ecc-utils-design-skeleton
+                    class="part:h-8 part:w-8 part:rounded"
+                  ></ecc-utils-design-skeleton>
+                </div>
               </ecc-utils-design-table-cell>
             </ecc-utils-design-table-row>
           `

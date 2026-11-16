@@ -594,6 +594,30 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       expectAligned();
     });
 
+    it("fits slotted actions that change after a reconnect", async () => {
+      const el = await renderLoaded();
+      el.style.display = "block";
+      el.style.width = "1280px";
+      const slotted = document.createElement("span");
+      slotted.slot = "actions-s1";
+      slotted.style.whiteSpace = "nowrap";
+      slotted.textContent = "Go";
+      el.appendChild(slotted);
+      await waitUntil(
+        () => el.style.getPropertyValue("--_actions-width"),
+        "actions column not fitted"
+      );
+      const width = () =>
+        parseFloat(el.style.getPropertyValue("--_actions-width"));
+
+      const parent = must(el.parentNode, "parent");
+      el.remove();
+      parent.appendChild(el);
+      const before = width();
+      slotted.textContent = "Remove verification and View Details";
+      await waitUntil(() => width() > before, "actions column not widened");
+    });
+
     it("accepts DOM nodes from rowActions", async () => {
       const el = await renderLoaded();
       el.rowActions = (s: ExternalService) => {
