@@ -48,6 +48,12 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
 
   private _provider: ServiceRegistryProvider | null = null;
 
+  /** The number of the latest `loadData()` call */
+  private dataLoads = 0;
+
+  /** The REST provider for `baseUrl`, used without a custom provider */
+  private restProvider: RestServiceRegistryProvider | null = null;
+
   protected async firstUpdated(): Promise<void> {
     if (!this.baseUrl && !this.provider) {
       this.error =
@@ -63,7 +69,8 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
     if (this.provider) {
       this._provider = this.provider;
     } else if (this.baseUrl) {
-      this._provider = new RestServiceRegistryProvider(this.baseUrl);
+      this.restProvider = new RestServiceRegistryProvider(this.baseUrl);
+      this._provider = this.restProvider;
     } else {
       this._provider = null;
     }
@@ -74,27 +81,82 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
   }
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
-    if (
-      (changedProperties.has("baseUrl") && this.baseUrl) ||
-      (changedProperties.has("serviceId") && this.serviceId)
+    const providerChanged =
+      (changedProperties.has("provider") || changedProperties.has("baseUrl")) &&
+      this.useProvider();
+    if (providerChanged && !this._provider) {
+      this.service = null;
+      this.dispatchEvent(
+        new CustomEvent("ecc-service-changed", {
+          detail: { service: null },
+          bubbles: true,
+          composed: true,
+        })
+      );
+      this.loading = false;
+      this.error =
+        "Please provide either a base URL for the Service Registry API or a custom provider.";
+    } else if (changedProperties.has("serviceId") && !this.serviceId) {
+      this.service = null;
+      // only a cleared service ID, not a missing one on the first update
+      if (changedProperties.get("serviceId")) {
+        this.dispatchEvent(
+          new CustomEvent("ecc-service-changed", {
+            detail: { service: null },
+            bubbles: true,
+            composed: true,
+          })
+        );
+      }
+      this.loading = false;
+      this.error = "Please provide a service ID.";
+    } else if (
+      (providerChanged ||
+        (changedProperties.has("serviceId") && this.serviceId)) &&
+      this.serviceId &&
+      this._provider
     ) {
-      if (this.baseUrl) {
-        this._provider = new RestServiceRegistryProvider(this.baseUrl);
-      }
-      if (this.serviceId && this._provider) {
-        this.loadData();
-      }
+      this.loadData();
     }
   }
 
+  /**
+   * Switches to the custom provider or, without one, to a REST provider for
+   * the base URL (to none without either); returns whether the provider in
+   * use changed
+   */
+  private useProvider(): boolean {
+    let provider: ServiceRegistryProvider | null = this.provider ?? null;
+    if (!provider && this.baseUrl) {
+      if (this.restProvider?.baseUrl !== this.baseUrl) {
+        this.restProvider = new RestServiceRegistryProvider(this.baseUrl);
+      }
+      provider = this.restProvider;
+    }
+    if (provider === this._provider) return false;
+    this._provider = provider;
+    return true;
+  }
+
   private async loadData(): Promise<void> {
-    if (!this._provider || !this.serviceId) return;
+    const provider = this._provider;
+    const { serviceId } = this;
+    if (!provider || !serviceId) return;
+    this.dataLoads += 1;
+    const load = this.dataLoads;
+    // a load for a provider or service that was replaced in the meantime,
+    // or that a newer load replaced, is dropped
+    const replaced = () =>
+      provider !== this._provider ||
+      serviceId !== this.serviceId ||
+      load !== this.dataLoads;
 
     this.loading = true;
     this.error = null;
 
     try {
-      const service = await this._provider.getServiceById(this.serviceId);
+      const service = await provider.getServiceById(serviceId);
+      if (replaced()) return;
       this.service = service;
 
       // Emit an event with the updated service data
@@ -106,6 +168,16 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
         })
       );
     } catch (err) {
+      if (replaced()) return;
+      this.service = null;
+      // the app drops the data of the previous provider too
+      this.dispatchEvent(
+        new CustomEvent("ecc-service-changed", {
+          detail: { service: null },
+          bubbles: true,
+          composed: true,
+        })
+      );
       this.error =
         err instanceof Error ? err.message : "Failed to load service";
       console.error({
@@ -113,7 +185,7 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
         breakPoint: "ECCClientGa4ghServiceRegistryService.loadData",
       });
     } finally {
-      this.loading = false;
+      if (!replaced()) this.loading = false;
     }
   }
 
