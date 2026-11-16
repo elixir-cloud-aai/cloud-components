@@ -345,10 +345,11 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
       (changedProperties.has("provider") || changedProperties.has("baseUrl")) &&
       this.useProvider()
     ) {
+      // the tool classes of the previous provider don't apply to the new one
+      this.toolClasses = [];
       if (this._provider) {
         this.loadToolClasses();
       } else {
-        this.toolClasses = [];
         this.dispatchEvent(
           new CustomEvent("ecc-tool-create-validation-failed", {
             detail: {
@@ -2198,7 +2199,9 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
                 @click=${this.handleSubmit}
                 .disabled=${this.loading ||
                 !this.formData.organization ||
-                !this.formData.toolClassId}
+                !this.toolClasses.some(
+                  (tc) => tc.id === this.formData.toolClassId
+                )}
               >
                 ${this.loading ? "Creating..." : "Create"}
               </ecc-utils-design-button>

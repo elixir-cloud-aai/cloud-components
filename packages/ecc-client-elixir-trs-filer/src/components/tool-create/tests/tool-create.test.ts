@@ -34,6 +34,15 @@ const deferred = <T>() => {
   return { promise, resolve: settleWith };
 };
 
+/** The form's submit button. */
+const submitButton = (el: ECCClientElixirTrsToolCreate) => {
+  const button = el.shadowRoot?.querySelector<
+    HTMLElement & { disabled: boolean }
+  >('ecc-utils-design-button[type="submit"]');
+  if (!button) throw new Error("submit button not found");
+  return button;
+};
+
 /** The tool classes the form offers. */
 const offered = (el: ECCClientElixirTrsToolCreate) =>
   (el as unknown as { toolClasses: ToolClass[] }).toolClasses;
@@ -148,5 +157,80 @@ describe("ecc-client-elixir-trs-tool-create provider", () => {
 
     expect(offered(el)).to.deep.equal([]);
     expect((await failed).detail.error).to.contain("Please provide either");
+  });
+
+  it("offers no tool classes of a replaced provider while the new ones load", async () => {
+    const first = stubProvider();
+    const slow = deferred<ToolClass[]>();
+    const second = stubProvider(slow.promise);
+    const el = await fixture<ECCClientElixirTrsToolCreate>(
+      html`<ecc-client-elixir-trs-tool-create
+        .provider=${first.provider}
+        default-organization="Example"
+        default-tool-class-id="workflow"
+      ></ecc-client-elixir-trs-tool-create>`
+    );
+    await waitUntil(() => offered(el).length === 1);
+    await el.updateComplete;
+    expect(submitButton(el).disabled).to.equal(false);
+
+    el.provider = second.provider;
+    await el.updateComplete;
+    await el.updateComplete;
+
+    expect(offered(el)).to.deep.equal([]);
+    expect(submitButton(el).disabled).to.equal(true);
+
+    slow.resolve([{ id: "workflow", name: "Workflow" }]);
+    await waitUntil(() => offered(el).length === 1);
+    await el.updateComplete;
+
+    expect(submitButton(el).disabled).to.equal(false);
+  });
+
+  it("sends no tool class of a replaced provider to the new one", async () => {
+    const first = stubProvider();
+    const slow = deferred<ToolClass[]>();
+    const second = stubProvider(slow.promise);
+    const createTool = sinon.stub().resolves("tool-1");
+    (second.stubs as unknown as { createTool: sinon.SinonStub }).createTool =
+      createTool;
+    const el = await fixture<ECCClientElixirTrsToolCreate>(
+      html`<ecc-client-elixir-trs-tool-create
+        .provider=${first.provider}
+        default-organization="Example"
+        default-tool-class-id="workflow"
+      ></ecc-client-elixir-trs-tool-create>`
+    );
+    await waitUntil(() => offered(el).length === 1);
+
+    el.provider = second.provider;
+    await el.updateComplete;
+    await (
+      el as unknown as { handleSubmit: () => Promise<void> }
+    ).handleSubmit();
+
+    expect(createTool.callCount).to.equal(0);
+    slow.resolve([]);
+  });
+
+  it("keeps submit disabled when the tool classes fail to load", async () => {
+    const { stubs, provider } = stubProvider();
+    stubs.getToolClasses.callsFake(async () => {
+      throw new Error("Unavailable");
+    });
+    const el = await fixture<ECCClientElixirTrsToolCreate>(
+      html`<ecc-client-elixir-trs-tool-create
+        default-organization="Example"
+        default-tool-class-id="workflow"
+      ></ecc-client-elixir-trs-tool-create>`
+    );
+    const failed = oneEvent(el, "ecc-tool-create-failed");
+
+    el.provider = provider;
+    await failed;
+    await el.updateComplete;
+
+    expect(submitButton(el).disabled).to.equal(true);
   });
 });
