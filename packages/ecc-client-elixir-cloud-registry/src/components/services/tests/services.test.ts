@@ -304,6 +304,24 @@ describe("ecc-client-elixir-cloud-registry-services", () => {
     expect(stubs.verifications.callCount).to.equal(1);
   });
 
+  it("doesn't load again when the provider can't remove", async () => {
+    const stubs = stubProvider();
+    const provider = stubs.provider as CloudRegistryProvider & {
+      deleteServiceVerification?: unknown;
+    };
+    provider.deleteServiceVerification = undefined;
+    const el = await renderLoaded(provider);
+
+    fire(actions(el, "s1"), "ecc-service-verification-failed", {
+      serviceId: "s1",
+      action: "remove",
+      error: "The provider doesn't support verifications.",
+    });
+    await flush(el);
+
+    expect(stubs.verifications.callCount).to.equal(1);
+  });
+
   it("doesn't load again for a change while no load runs", async () => {
     const stubs = stubProvider();
     const el = await renderLoaded(stubs.provider);
@@ -338,7 +356,7 @@ describe("ecc-client-elixir-cloud-registry-services", () => {
     const [detail] = loads;
 
     expect(detail).to.include({ serviceId: "", action: "load", error: "Lost" });
-    expect(badge(el, "s1")?.verification).to.not.equal(null);
+    expect(shownVerified(el, "s1")).to.equal(true);
   });
 
   it("follows a verification by an admin", async () => {
