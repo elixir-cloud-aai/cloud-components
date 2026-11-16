@@ -67,6 +67,12 @@ type El = ECCClientGa4ghServiceRegistryServices;
 
 const root = (el: El) => el.shadowRoot as ShadowRoot;
 
+/** Returns `value`, or fails the test if it is missing. */
+const must = <T>(value: T | null | undefined, what: string): T => {
+  if (value === null || value === undefined) throw new Error(`No ${what}.`);
+  return value;
+};
+
 /** The rows of the table body that show a service. */
 const rows = (el: El) =>
   Array.from(
@@ -517,6 +523,10 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
           litHtml`<button class="wide">Remove verification</button>
             <button class="wide">View Details</button>`;
         await el.updateComplete;
+        await waitUntil(
+          () => el.style.getPropertyValue("--_actions-width"),
+          "actions column not fitted"
+        );
 
         const cells = rows(el).map(
           (row) =>
@@ -552,33 +562,36 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
               ><button>View Details</button>`
           : litHtml`<button>Verify</button>`;
       await el.updateComplete;
-      await waitUntil(() =>
-        el.style.getPropertyValue("--ecc-services-actions-width")
-      );
+      await waitUntil(() => el.style.getPropertyValue("--_actions-width"));
 
-      const lefts = [
-        ...rows(el).map((row) =>
-          row
-            .querySelector("ecc-utils-design-table-cell.actions-column")
-            ?.getBoundingClientRect()
-            .left.toFixed(1)
-        ),
-        root(el)
-          .querySelector("ecc-utils-design-table-head.actions-column")
-          ?.getBoundingClientRect()
-          .left.toFixed(1),
-      ];
-      expect(new Set(lefts).size).to.equal(1);
+      const expectAligned = () => {
+        const lefts = [
+          ...rows(el).map(
+            (row) =>
+              must(
+                row.querySelector("ecc-utils-design-table-cell.actions-column"),
+                "actions cell"
+              ).getBoundingClientRect().left
+          ),
+          must(
+            root(el).querySelector(
+              "ecc-utils-design-table-head.actions-column"
+            ),
+            "actions head"
+          ).getBoundingClientRect().left,
+        ];
+        lefts.forEach((left) => expect(left).to.be.closeTo(lefts[0], 0.5));
+      };
+      expectAligned();
 
       // and narrows again when the wide actions are gone
-      const wide = el.style.getPropertyValue("--ecc-services-actions-width");
+      const width = () =>
+        parseFloat(el.style.getPropertyValue("--_actions-width"));
+      const wide = width();
       el.rowActions = () => litHtml`<button>Verify</button>`;
       await el.updateComplete;
-      await waitUntil(
-        () =>
-          el.style.getPropertyValue("--ecc-services-actions-width") !== wide,
-        "actions column not narrowed"
-      );
+      await waitUntil(() => width() < wide, "actions column not narrowed");
+      expectAligned();
     });
 
     it("accepts DOM nodes from rowActions", async () => {

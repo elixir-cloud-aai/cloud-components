@@ -109,12 +109,12 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
         width: 100%;
       }
       /* The actions column: as wide as the widest actions of the rows
-         shown (see fitActions()), so that the columns stay aligned and the
-         actions stay on one line */
+         shown, so that the columns stay aligned and the actions stay on one
+         line. The width is internal: fitActions() sets it on the host. */
       .actions-column {
         flex-shrink: 0;
         white-space: nowrap;
-        width: var(--ecc-services-actions-width, auto);
+        width: var(--_actions-width, auto);
       }
       .actions-content {
         display: inline-flex;
@@ -174,6 +174,12 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
 
   private _provider: ServiceRegistryProvider | null = null;
 
+  /**
+   * Watches the actions of the rows shown, which may change their size
+   * after they render (e.g. components that load first)
+   */
+  private actionsObserver?: ResizeObserver;
+
   /** The number of the latest `loadServiceTypes()` call */
   private serviceTypeLoads = 0;
 
@@ -205,9 +211,11 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     }
   }
 
-  // Watches the actions of the rows shown, which may change their size
-  // after they render (e.g. components that load first)
-  private actionsObserver?: ResizeObserver;
+  connectedCallback(): void {
+    super.connectedCallback();
+    // watch the actions again if the list was moved or kept while detached
+    if (this.hasUpdated) this.observeActions();
+  }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
@@ -226,7 +234,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     const cell = contents[0]?.closest("ecc-utils-design-table-cell");
     const base = cell?.shadowRoot?.querySelector<HTMLElement>("[part=base]");
     if (!base) {
-      this.style.removeProperty("--ecc-services-actions-width");
+      this.style.removeProperty("--_actions-width");
       return;
     }
     const style = getComputedStyle(base);
@@ -235,9 +243,12 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     const widest = Math.max(
       ...contents.map((content) => content.getBoundingClientRect().width)
     );
+    // a hidden list (e.g. in an inactive tab) has no widths: keep the last
+    // one until the observer reports the actions again
+    if (widest === 0) return;
     const width = `${Math.ceil(widest + padding)}px`;
-    if (this.style.getPropertyValue("--ecc-services-actions-width") !== width) {
-      this.style.setProperty("--ecc-services-actions-width", width);
+    if (this.style.getPropertyValue("--_actions-width") !== width) {
+      this.style.setProperty("--_actions-width", width);
     }
   }
 

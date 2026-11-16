@@ -202,7 +202,7 @@ The number of services per page. The pagination is shown when the services that 
 </Tabs>
 
 ### `rowActions`
-A function that renders the actions of a row from its service, e.g. Edit and Delete buttons for the services that the user may change. It can return a Lit template, a DOM node, a string, or `null` for a row without actions; without the function, each row shows a "View Details" button, which selects the service (`ecc-service-selected`). Clicks on the actions of `rowActions` don't select the row. Set a new function when what it renders changes, e.g. after the user's roles changed, so that the rows are rendered again. The actions stay on one line, and the actions column is as wide as the widest actions of the rows shown (also those of the `actions-<id>` slots), so that the other columns stay aligned and take the rest of the width.
+A function that renders the actions of a row from its service, e.g. Edit and Delete buttons for the services that the user may change. It can return a Lit template, a DOM node, a string, or `null` for a row without actions; without the function, each row shows a "View Details" button, which selects the service (`ecc-service-selected`). Clicks on the actions of `rowActions` don't select the row. Set a new function when what it renders changes, e.g. after the user's roles changed, so that the rows are rendered again. The actions stay on one line, and the actions column is as wide as the widest actions of the rows shown, so that the other columns stay aligned and take the rest of the width.
 
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>
@@ -271,7 +271,7 @@ A function that renders badges of a row from its service, e.g. a "Verified" badg
 
 | Slot           | Description                                                                                                        |
 |----------------|--------------------------------------------------------------------------------------------------------------------|
-| `actions-<id>` | Actions of the row of the service with the ID `<id>`; replaces those of `rowActions` or the "View Details" button  |
+| `actions-<id>` | Actions of the row of the service with the ID `<id>`; replaces those of `rowActions` or the "View Details" button; sizes the actions column as `rowActions` does  |
 
 ## Events
 
