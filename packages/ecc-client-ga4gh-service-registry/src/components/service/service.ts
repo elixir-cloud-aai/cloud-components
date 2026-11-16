@@ -153,6 +153,14 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
     } catch (err) {
       if (replaced()) return;
       this.service = null;
+      // the app drops the data of the previous provider too
+      this.dispatchEvent(
+        new CustomEvent("ecc-service-changed", {
+          detail: { service: null },
+          bubbles: true,
+          composed: true,
+        })
+      );
       this.error =
         err instanceof Error ? err.message : "Failed to load service";
       console.error({

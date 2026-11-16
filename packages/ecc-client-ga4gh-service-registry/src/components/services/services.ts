@@ -179,6 +179,8 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
       (changedProperties.has("provider") || changedProperties.has("baseUrl")) &&
       this.useProvider()
     ) {
+      // another provider starts on its first page
+      this.currentPage = 1;
       if (this._provider) {
         this.loadData();
         this.loadServiceTypes();
@@ -256,6 +258,14 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     } catch (err) {
       if (provider !== this._provider) return;
       this.services = [];
+      // the app drops the data of the previous provider too
+      this.dispatchEvent(
+        new CustomEvent("ecc-services-changed", {
+          detail: { services: [] },
+          bubbles: true,
+          composed: true,
+        })
+      );
       this.error =
         err instanceof Error ? err.message : "Failed to load services";
       console.error({

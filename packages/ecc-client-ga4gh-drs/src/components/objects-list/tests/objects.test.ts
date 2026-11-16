@@ -166,4 +166,28 @@ describe("ecc-client-ga4gh-drs-objects provider", () => {
     expect(internals(el).objects).to.deep.equal([]);
     expect(el.shadowRoot?.textContent).to.contain(MISSING);
   });
+
+  it("reports no objects when a replacing provider fails", async () => {
+    const first = stubProvider();
+    const second = stubProvider();
+    second.stubs.getObjects.callsFake(async () => {
+      throw new Error("Unavailable");
+    });
+    const el = await fixture<ECCClientGa4ghDrsObjects>(
+      html`<ecc-client-ga4gh-drs-objects
+        .provider=${first.provider}
+      ></ecc-client-ga4gh-drs-objects>`
+    );
+    await waitUntil(() => internals(el).objects.length === 1);
+    const reported: DrsObject[][] = [];
+    el.addEventListener("ecc-objects-changed", (e) =>
+      reported.push((e as CustomEvent).detail.objects)
+    );
+
+    el.provider = second.provider;
+    await waitUntil(() => el.shadowRoot?.textContent?.includes("Unavailable"));
+
+    expect(internals(el).objects).to.deep.equal([]);
+    expect(reported).to.deep.equal([[]]);
+  });
 });

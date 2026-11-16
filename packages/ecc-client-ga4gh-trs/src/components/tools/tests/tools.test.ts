@@ -202,4 +202,28 @@ describe("ecc-client-ga4gh-trs-tools provider", () => {
     expect(internals(el).loading).to.equal(false);
     expect(internals(el).tools).to.deep.equal([]);
   });
+
+  it("reports no tools when a replacing provider fails", async () => {
+    const first = stubProvider();
+    const second = stubProvider();
+    second.stubs.getToolsList.callsFake(async () => {
+      throw new Error("Unavailable");
+    });
+    const el = await fixture<ECCClientGa4ghTrsTools>(
+      html`<ecc-client-ga4gh-trs-tools
+        .provider=${first.provider}
+      ></ecc-client-ga4gh-trs-tools>`
+    );
+    await waitUntil(() => internals(el).tools.length === 1);
+    const reported: Tool[][] = [];
+    el.addEventListener("ecc-tools-changed", (e) =>
+      reported.push((e as CustomEvent).detail.tools)
+    );
+
+    el.provider = second.provider;
+    await waitUntil(() => el.shadowRoot?.textContent?.includes("Unavailable"));
+
+    expect(internals(el).tools).to.deep.equal([]);
+    expect(reported).to.deep.equal([[]]);
+  });
 });

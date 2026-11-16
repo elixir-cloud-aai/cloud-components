@@ -231,6 +231,14 @@ export class ECCClientGa4ghTrsTools extends LitElement {
     } catch (err) {
       if (provider !== this._provider) return;
       this.tools = [];
+      // the app drops the data of the previous provider too
+      this.dispatchEvent(
+        new CustomEvent("ecc-tools-changed", {
+          detail: { tools: [] },
+          bubbles: true,
+          composed: true,
+        })
+      );
       this.error = err instanceof Error ? err.message : "Failed to load tools";
       console.error({
         error: this.error,

@@ -190,4 +190,29 @@ describe("ecc-client-ga4gh-service-registry-service provider", () => {
     expect(shown(el)).to.equal(null);
     expect(el.shadowRoot?.textContent).to.contain(MISSING);
   });
+
+  it("reports no service when a replacing provider fails", async () => {
+    const first = stubProvider();
+    const second = stubProvider();
+    second.getServiceById.callsFake(async () => {
+      throw new Error("Unavailable");
+    });
+    const el = await fixture<ECCClientGa4ghServiceRegistryService>(
+      html`<ecc-client-ga4gh-service-registry-service
+        serviceId="a"
+        .provider=${first}
+      ></ecc-client-ga4gh-service-registry-service>`
+    );
+    await waitUntil(() => shown(el)?.id === "a");
+    const reported: (ExternalService | null)[] = [];
+    el.addEventListener("ecc-service-changed", (e) =>
+      reported.push((e as CustomEvent).detail.service)
+    );
+
+    el.provider = second;
+    await waitUntil(() => el.shadowRoot?.textContent?.includes("Unavailable"));
+
+    expect(shown(el)).to.equal(null);
+    expect(reported).to.deep.equal([null]);
+  });
 });

@@ -174,6 +174,14 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
     } catch (err) {
       if (provider !== this._provider) return;
       this.objects = [];
+      // the app drops the data of the previous provider too
+      this.dispatchEvent(
+        new CustomEvent("ecc-objects-changed", {
+          detail: { objects: [] },
+          bubbles: true,
+          composed: true,
+        })
+      );
       this.error =
         err instanceof Error ? err.message : "Failed to load objects";
     } finally {

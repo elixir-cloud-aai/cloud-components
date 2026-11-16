@@ -228,4 +228,45 @@ describe("ecc-client-ga4gh-service-registry-services provider", () => {
 
     expect(shown(el)).to.deep.equal([]);
   });
+
+  it("reports no services when a replacing provider fails", async () => {
+    const first = stubProvider();
+    const second = stubProvider();
+    second.getServices.callsFake(async () => {
+      throw new Error("Unavailable");
+    });
+    const el = await fixture<ECCClientGa4ghServiceRegistryServices>(
+      html`<ecc-client-ga4gh-service-registry-services
+        .provider=${first}
+      ></ecc-client-ga4gh-service-registry-services>`
+    );
+    await waitUntil(() => shown(el).length === 1);
+    const reported: ExternalService[][] = [];
+    el.addEventListener("ecc-services-changed", (e) =>
+      reported.push((e as CustomEvent).detail.services)
+    );
+
+    el.provider = second;
+    await waitUntil(() => el.shadowRoot?.textContent?.includes("Unavailable"));
+
+    expect(reported).to.deep.equal([[]]);
+  });
+
+  it("starts on the first page with a provider that replaces the first one", async () => {
+    const first = stubProvider();
+    const second = stubProvider([service("b")]);
+    const el = await fixture<ECCClientGa4ghServiceRegistryServices>(
+      html`<ecc-client-ga4gh-service-registry-services
+        .provider=${first}
+      ></ecc-client-ga4gh-service-registry-services>`
+    );
+    await waitUntil(() => shown(el).length === 1);
+    const internals = el as unknown as { currentPage: number };
+    internals.currentPage = 3;
+
+    el.provider = second;
+    await waitUntil(() => shown(el)[0]?.id === "b");
+
+    expect(internals.currentPage).to.equal(1);
+  });
 });
