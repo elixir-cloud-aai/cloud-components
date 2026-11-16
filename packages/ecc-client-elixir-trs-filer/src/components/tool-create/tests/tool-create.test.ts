@@ -206,12 +206,40 @@ describe("ecc-client-elixir-trs-tool-create provider", () => {
 
     el.provider = second.provider;
     await el.updateComplete;
+    const failed = oneEvent(el, "ecc-tool-create-failed");
     await (
       el as unknown as { handleSubmit: () => Promise<void> }
     ).handleSubmit();
 
     expect(createTool.callCount).to.equal(0);
+    expect((await failed).detail.error).to.contain("valid tool class");
     slow.resolve([]);
+  });
+
+  it("selects no tool class that a replacing provider doesn't offer", async () => {
+    const first = stubProvider([
+      { id: "workflow", name: "Workflow" },
+      { id: "service", name: "Service" },
+    ]);
+    const second = stubProvider([{ id: "workflow", name: "Workflow" }]);
+    const third = stubProvider([{ id: "tool", name: "Tool" }]);
+    const el = await fixture<ECCClientElixirTrsToolCreate>(
+      html`<ecc-client-elixir-trs-tool-create
+        .provider=${first.provider}
+        default-tool-class-id="workflow"
+      ></ecc-client-elixir-trs-tool-create>`
+    );
+    await waitUntil(() => offered(el).length === 2);
+    const form = el as unknown as { formData: { toolClassId: string } };
+    form.formData = { ...form.formData, toolClassId: "service" };
+
+    el.provider = second.provider;
+    await waitUntil(() => offered(el).length === 1);
+    expect(form.formData.toolClassId).to.equal("workflow");
+
+    el.provider = third.provider;
+    await waitUntil(() => offered(el)[0]?.id === "tool");
+    expect(form.formData.toolClassId).to.equal("");
   });
 
   it("keeps submit disabled when the tool classes fail to load", async () => {

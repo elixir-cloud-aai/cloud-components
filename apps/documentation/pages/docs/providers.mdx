@@ -50,12 +50,13 @@ the new provider. Create the provider once and pass the same instance on every
 render (e.g. with `useMemo` in React), as each new instance makes the component
 load its data again.
 
-The data of the previous provider is gone once the provider changes: if the
-new provider fails to load, the component shows the error and fires its
-`ecc-*-changed` event with empty data (e.g. `ecc-services-changed` with no
-services), so the app can drop the old data too. The tool form of TRS-Filer
-offers no tool classes of the previous provider and keeps its submit button
-disabled until the selected tool class is among those of the new provider.
+Whenever a load fails (e.g. from a new provider, or for another page), the
+component shows the error, clears its data and fires its `ecc-*-changed` event
+with empty data (e.g. `ecc-services-changed` with no services), so the app can
+drop the old data too. The tool form of TRS-Filer offers no tool classes of
+the previous provider: it keeps its submit button disabled until the new ones
+have loaded, and then selects the default tool class if the new provider
+offers it, or none if it doesn't offer the selected one.
 
 ## Common Use Cases
 

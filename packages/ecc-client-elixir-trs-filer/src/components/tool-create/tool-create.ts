@@ -391,6 +391,17 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
       // a load from a provider that was replaced in the meantime is dropped
       if (provider !== this._provider) return;
       this.toolClasses = toolClasses;
+      // a tool class the provider doesn't offer (e.g. one of a replaced
+      // provider) is no longer selected; the default is, if it is offered
+      const offered = (id: string) => toolClasses.some((tc) => tc.id === id);
+      if (!offered(this.formData.toolClassId)) {
+        this.formData = {
+          ...this.formData,
+          toolClassId: offered(this.defaultToolClassId)
+            ? this.defaultToolClassId
+            : "",
+        };
+      }
     } catch (error) {
       if (provider !== this._provider) return;
       this.toolClasses = [];
