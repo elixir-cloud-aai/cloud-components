@@ -724,8 +724,6 @@ describe("EccUtilsDesignDialog", () => {
       const host = find<HTMLElement>(el, "ecc-utils-design-button");
       await (host as HTMLElement & { updateComplete: Promise<unknown> })
         .updateComplete;
-      // Trigger slot changes run after the button has rendered
-      el.requestUpdate();
       await el.updateComplete;
       const inner = find<HTMLButtonElement>(
         must(host.shadowRoot, "button shadow root"),

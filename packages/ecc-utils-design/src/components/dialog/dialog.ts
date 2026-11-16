@@ -407,6 +407,18 @@ export class EccUtilsDesignDialog extends LitElement {
     this.hasDescription = assigned("description");
     this.hasFooter = assigned("footer");
     this.syncTriggers();
+    // Lit-based triggers (e.g. `ecc-utils-design-button`) may render their
+    // control after the slot changed: mark it again once they have rendered
+    const slot =
+      this.shadowRoot?.querySelector<HTMLSlotElement>("slot[name=trigger]");
+    for (const trigger of slot?.assignedElements() ?? []) {
+      const { updateComplete } = trigger as Element & {
+        updateComplete?: Promise<unknown>;
+      };
+      if (updateComplete instanceof Promise) {
+        updateComplete.then(() => this.syncTriggers());
+      }
+    }
   }
 
   firstUpdated() {
