@@ -108,6 +108,20 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
         display: block;
         width: 100%;
       }
+      /* The actions column: as wide as the widest actions of the rows
+         shown (see fitActions()), so that the columns stay aligned and the
+         actions stay on one line */
+      .actions-column {
+        flex-shrink: 0;
+        white-space: nowrap;
+        width: var(--ecc-services-actions-width, auto);
+      }
+      .actions-content {
+        display: inline-flex;
+        flex-shrink: 0;
+        align-items: center;
+        gap: 0.5rem;
+      }
     `,
   ];
 
@@ -191,7 +205,58 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     }
   }
 
+  // Watches the actions of the rows shown, which may change their size
+  // after they render (e.g. components that load first)
+  private actionsObserver?: ResizeObserver;
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.actionsObserver?.disconnect();
+  }
+
+  /**
+   * Sets the width of the actions column to that of the widest actions of
+   * the rows shown (plus the cell's padding), so that the actions fit on
+   * one line and the columns of the header and of all rows stay aligned
+   */
+  private fitActions(): void {
+    const contents = Array.from(
+      this.shadowRoot?.querySelectorAll<HTMLElement>(".actions-content") ?? []
+    );
+    const cell = contents[0]?.closest("ecc-utils-design-table-cell");
+    const base = cell?.shadowRoot?.querySelector<HTMLElement>("[part=base]");
+    if (!base) {
+      this.style.removeProperty("--ecc-services-actions-width");
+      return;
+    }
+    const style = getComputedStyle(base);
+    const padding =
+      parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+    const widest = Math.max(
+      ...contents.map((content) => content.getBoundingClientRect().width)
+    );
+    const width = `${Math.ceil(widest + padding)}px`;
+    if (this.style.getPropertyValue("--ecc-services-actions-width") !== width) {
+      this.style.setProperty("--ecc-services-actions-width", width);
+    }
+  }
+
+  /** Watches the actions of the rows shown and fits the column to them. */
+  private observeActions(): void {
+    if (typeof ResizeObserver === "undefined") return;
+    if (!this.actionsObserver) {
+      this.actionsObserver = new ResizeObserver(() => this.fitActions());
+    }
+    const observer = this.actionsObserver;
+    observer.disconnect();
+    this.shadowRoot
+      ?.querySelectorAll(".actions-content")
+      .forEach((content) => observer.observe(content));
+    this.fitActions();
+  }
+
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
+    this.observeActions();
     if (
       (changedProperties.has("provider") || changedProperties.has("baseUrl")) &&
       this.useProvider()
@@ -504,7 +569,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
                   class="part:h-4 part:w-28"
                 ></ecc-utils-design-skeleton>
               </ecc-utils-design-table-cell>
-              <ecc-utils-design-table-cell class="w-1/12">
+              <ecc-utils-design-table-cell class="actions-column">
                 <ecc-utils-design-skeleton
                   class="part:h-8 part:w-8 part:rounded"
                 ></ecc-utils-design-skeleton>
@@ -719,10 +784,12 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
               </ecc-utils-design-button>`
             : html`${service.organization.name}`}
         </ecc-utils-design-table-cell>
-        <ecc-utils-design-table-cell class="w-1/12" data-no-select>
-          <slot name=${`actions-${service.id}`}
-            >${this.renderActions(service)}</slot
-          >
+        <ecc-utils-design-table-cell class="actions-column" data-no-select>
+          <div class="actions-content">
+            <slot name=${`actions-${service.id}`}
+              >${this.renderActions(service)}</slot
+            >
+          </div>
         </ecc-utils-design-table-cell>
       </ecc-utils-design-table-row>
     `;
@@ -795,7 +862,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
                 >Organization</ecc-utils-design-table-head
               >
               <ecc-utils-design-table-head
-                class="w-1/12"
+                class="actions-column"
               ></ecc-utils-design-table-head>
             </ecc-utils-design-table-row>
           </ecc-utils-design-table-header>

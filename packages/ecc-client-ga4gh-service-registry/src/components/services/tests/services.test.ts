@@ -508,6 +508,79 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       expect(seen).to.include.members(["s1", "s2", "s3"]);
     });
 
+    [1280, 1920].forEach((width) => {
+      it(`fits wide row actions in their cell at ${width} px`, async () => {
+        const el = await renderLoaded();
+        el.style.display = "block";
+        el.style.width = `${width}px`;
+        el.rowActions = () =>
+          litHtml`<button class="wide">Remove verification</button>
+            <button class="wide">View Details</button>`;
+        await el.updateComplete;
+
+        const cells = rows(el).map(
+          (row) =>
+            row.querySelector(
+              "ecc-utils-design-table-cell[data-no-select]"
+            ) as HTMLElement
+        );
+        expect(cells).to.have.length(3);
+        cells.forEach((cell) => {
+          const box = cell.getBoundingClientRect();
+          const buttons = Array.from(cell.querySelectorAll("button.wide"));
+          const tops = buttons.map(
+            (button) => button.getBoundingClientRect().top
+          );
+          // the buttons stay on one line, inside the cell
+          expect(new Set(tops).size).to.equal(1);
+          buttons.forEach((button) => {
+            expect(button.getBoundingClientRect().right).to.be.at.most(
+              box.right + 0.5
+            );
+          });
+        });
+      });
+    });
+
+    it("keeps the columns aligned for actions of different widths", async () => {
+      const el = await renderLoaded();
+      el.style.display = "block";
+      el.style.width = "1280px";
+      el.rowActions = (s: ExternalService) =>
+        s.id === "s2"
+          ? litHtml`<button>Remove verification</button
+              ><button>View Details</button>`
+          : litHtml`<button>Verify</button>`;
+      await el.updateComplete;
+      await waitUntil(() =>
+        el.style.getPropertyValue("--ecc-services-actions-width")
+      );
+
+      const lefts = [
+        ...rows(el).map((row) =>
+          row
+            .querySelector("ecc-utils-design-table-cell.actions-column")
+            ?.getBoundingClientRect()
+            .left.toFixed(1)
+        ),
+        root(el)
+          .querySelector("ecc-utils-design-table-head.actions-column")
+          ?.getBoundingClientRect()
+          .left.toFixed(1),
+      ];
+      expect(new Set(lefts).size).to.equal(1);
+
+      // and narrows again when the wide actions are gone
+      const wide = el.style.getPropertyValue("--ecc-services-actions-width");
+      el.rowActions = () => litHtml`<button>Verify</button>`;
+      await el.updateComplete;
+      await waitUntil(
+        () =>
+          el.style.getPropertyValue("--ecc-services-actions-width") !== wide,
+        "actions column not narrowed"
+      );
+    });
+
     it("accepts DOM nodes from rowActions", async () => {
       const el = await renderLoaded();
       el.rowActions = (s: ExternalService) => {
