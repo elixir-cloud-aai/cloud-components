@@ -19,7 +19,7 @@ The `ecc-client-elixir-cloud-registry-service-verification-badge` component show
 
 ## Usage
 
-Load the verifications with the provider, e.g. all of them with one request for a list (`getVerifications()`, then `verifiedServices()`, which keeps only those that still match their services), and pass each service's verification with `verification`. `null` or `undefined` means that the service isn't verified: the badge then shows nothing, or "Not verified" with `show-unverified` (e.g. for admins, who can verify the service).
+Load the verifications with the provider, e.g. all of them with one request for a list (`getVerifications()`, then `verifiedServices()`, which keeps only those that still match their services), and pass each service's verification with `verification`. The badge doesn't compare the verification with the service: pass only verifications that still match it (from `verifiedServices()`, or checked with `matchesVerification()`). `null` or `undefined` means that the service isn't verified: the badge then shows nothing, or "Not verified" with `show-unverified` (e.g. for admins, who can verify the service).
 
 The badge doesn't change by itself after a verify or remove: update `verification` from the `ecc-service-verification-changed` event of the [Service Verification](/docs/cloud-registry/components/service-verification) component, as its examples show.
 
@@ -55,8 +55,9 @@ The badge doesn't change by itself after a verify or remove: update `verificatio
       try {
         badge.verification = await provider.getServiceVerification('org.example.my-tes');
       } catch (error) {
-        // 404: not verified
-        badge.verification = null;
+        // 404: not verified; other errors leave the state unknown
+        if (error.status === 404) badge.verification = null;
+        else console.error(error);
       }
     </script>
     ```
