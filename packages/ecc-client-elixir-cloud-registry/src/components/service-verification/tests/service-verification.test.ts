@@ -2,6 +2,7 @@
 import { expect, fixture, html, oneEvent, waitUntil } from "@open-wc/testing";
 import sinon from "sinon";
 import "../index.js";
+import "../../service-verification-badge/index.js";
 import type ECCClientElixirCloudRegistryServiceVerification from "../service-verification.js";
 import type {
   EccServiceVerificationChangedEvent,
@@ -35,6 +36,16 @@ type El = ECCClientElixirCloudRegistryServiceVerification;
 
 const part = (el: El, name: string) =>
   el.shadowRoot?.querySelector(`[part="${name}"]`) as HTMLElement | null;
+
+/**
+ * What the actions show: "Remove verification" for a verified service
+ * (`verified`), "Verify" for an unverified one (`unverified`), or nothing
+ */
+const shown = (el: El): "verified" | "unverified" | null => {
+  if (part(el, "remove-button")) return "verified";
+  if (part(el, "verify-button")) return "unverified";
+  return null;
+};
 
 /** Clicks the native button inside a design button, as a user would. */
 const click = (button: HTMLElement | null) => {
@@ -77,7 +88,30 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     sinon.restore();
   });
 
-  it("shows a badge for a verified service, without actions", async () => {
+  it("offers admins to remove the verification of a verified service", async () => {
+    const { provider, get } = stubProvider();
+    get.resolves(VERIFICATION);
+
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        service-id="service-1"
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    expect(get.calledOnceWithExactly("service-1")).to.equal(true);
+    expect(part(el, "remove-button")?.textContent?.trim()).to.equal(
+      "Remove verification"
+    );
+    expect(part(el, "verify-button")).to.equal(null);
+    expect(el.shadowRoot?.querySelector("ecc-utils-design-badge")).to.equal(
+      null
+    );
+  });
+
+  it("shows nothing to other users, and sends no request", async () => {
     const { provider, get } = stubProvider();
     get.resolves(VERIFICATION);
 
@@ -89,12 +123,50 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     `);
     await settled(el);
 
+    expect(get.called).to.equal(false);
+    expect(el.shadowRoot?.querySelector("*")).to.equal(null);
+
+    // loads once the user turns out to be an admin
+    el.admin = true;
+    await settled(el);
     expect(get.calledOnceWithExactly("service-1")).to.equal(true);
-    const badge = part(el, "badge");
-    expect(badge?.textContent?.trim()).to.equal("Verified");
-    expect(badge?.getAttribute("title")).to.match(/^Verified on .*2026/);
-    expect(part(el, "verify-button")).to.equal(null);
-    expect(part(el, "remove-button")).to.equal(null);
+    expect(shown(el)).to.equal("verified");
+
+    // and hides the actions again when the user is no admin any more
+    el.admin = false;
+    await settled(el);
+    expect(el.shadowRoot?.querySelector("*")).to.equal(null);
+  });
+
+  it("drops a load that answers after admin was turned off", async () => {
+    const { provider, get } = stubProvider();
+    let answerFirst = (value: typeof VERIFICATION): void => {
+      throw new Error(`No request waits for ${value.url}`);
+    };
+    get.onFirstCall().returns(
+      new Promise((resolve) => {
+        answerFirst = resolve;
+      })
+    );
+    get.onSecondCall().rejects(notFound());
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        service-id="service-1"
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+
+    el.admin = false;
+    await settled(el);
+    answerFirst(VERIFICATION);
+    await settled(el);
+    expect(el.shadowRoot?.querySelector("*")).to.equal(null);
+
+    el.admin = true;
+    await settled(el);
+    expect(get.calledTwice).to.equal(true);
+    expect(shown(el)).to.equal("unverified");
   });
 
   it("loads with a base URL", async () => {
@@ -106,24 +178,26 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
 
     const el = await fixture<El>(html`
       <ecc-client-elixir-cloud-registry-service-verification
+        admin
         service-id="a/b"
         .baseUrl=${BASE_URL}
       ></ecc-client-elixir-cloud-registry-service-verification>
     `);
-    await waitUntil(() => part(el, "badge"));
+    await waitUntil(() => part(el, "remove-button"));
 
     expect(fetchStub.firstCall.args[0]).to.equal(
       `${BASE_URL}/services/a%2Fb/verification`
     );
   });
 
-  it("shows nothing for an unverified service, without an error", async () => {
+  it("offers Verify for an unverified service, without an error", async () => {
     const { provider, get } = stubProvider();
     get.rejects(notFound());
     const failed = sinon.spy();
 
     const el = await fixture<El>(html`
       <ecc-client-elixir-cloud-registry-service-verification
+        admin
         service-id="service-1"
         .provider=${provider}
         @ecc-service-verification-failed=${failed}
@@ -131,7 +205,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     `);
     await settled(el);
 
-    expect(part(el, "badge")).to.equal(null);
+    expect(shown(el)).to.equal("unverified");
     expect(failed.called).to.equal(false);
   });
 
@@ -140,6 +214,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
 
     const el = await fixture<El>(html`
       <ecc-client-elixir-cloud-registry-service-verification
+        admin
         .service=${SERVICE}
         .verification=${VERIFICATION}
         .provider=${provider}
@@ -148,13 +223,13 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     await settled(el);
 
     expect(get.called).to.equal(false);
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+    expect(shown(el)).to.equal("verified");
 
     el.verification = null;
     await settled(el);
 
     expect(get.called).to.equal(false);
-    expect(part(el, "badge")).to.equal(null);
+    expect(shown(el)).to.equal("unverified");
   });
 
   it("doesn't count a verification of another URL", async () => {
@@ -171,8 +246,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     await settled(el);
 
     expect(get.calledOnceWithExactly("service-1")).to.equal(true);
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
-    expect(part(el, "verify-button")).to.not.equal(null);
+    expect(shown(el)).to.equal("unverified");
   });
 
   it("needs no new request for a new object of the same service", async () => {
@@ -180,6 +254,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     get.resolves(VERIFICATION);
     const el = await fixture<El>(html`
       <ecc-client-elixir-cloud-registry-service-verification
+        admin
         .service=${SERVICE}
         .provider=${provider}
       ></ecc-client-elixir-cloud-registry-service-verification>
@@ -190,7 +265,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     await settled(el);
 
     expect(get.calledOnce).to.equal(true);
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+    expect(shown(el)).to.equal("verified");
   });
 
   it("loads again when the URL of the service changes", async () => {
@@ -200,6 +275,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     get.onThirdCall().rejects(notFound());
     const el = await fixture<El>(html`
       <ecc-client-elixir-cloud-registry-service-verification
+        admin
         .service=${SERVICE}
         .provider=${provider}
       ></ecc-client-elixir-cloud-registry-service-verification>
@@ -213,7 +289,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     await settled(el);
 
     expect(get.calledThrice).to.equal(true);
-    expect(part(el, "badge")).to.equal(null);
+    expect(shown(el)).to.equal("unverified");
   });
 
   it("loads again when a verify fails without a clear outcome", async () => {
@@ -237,7 +313,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
 
     expect(detail.error).to.equal("Failed to fetch");
     expect(get.calledTwice).to.equal(true);
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+    expect(shown(el)).to.equal("verified");
   });
 
   it("loads again when a remove fails with a server error", async () => {
@@ -260,7 +336,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     await settled(el);
 
     expect(get.calledTwice).to.equal(true);
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
+    expect(shown(el)).to.equal("unverified");
   });
 
   it("lets admins verify a service with its URL and API type", async () => {
@@ -275,7 +351,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
       ></ecc-client-elixir-cloud-registry-service-verification>
     `);
     await settled(el);
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
+    expect(shown(el)).to.equal("unverified");
 
     const changed = oneEvent(el, "ecc-service-verification-changed");
     click(part(el, "verify-button"));
@@ -292,7 +368,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
       serviceId: "service-1",
       verification: VERIFICATION,
     });
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+    expect(shown(el)).to.equal("verified");
     expect(part(el, "remove-button")).to.not.equal(null);
   });
 
@@ -367,7 +443,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
       serviceId: "service-1",
       verification: null,
     });
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
+    expect(shown(el)).to.equal("unverified");
     expect(part(el, "verify-button")).to.not.equal(null);
   });
 
@@ -415,7 +491,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     expect(detail.action).to.equal("remove");
     expect(detail.status).to.equal(403);
     expect(detail.error).to.equal("Admins only.");
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+    expect(shown(el)).to.equal("verified");
   });
 
   it("reports a failed load", async () => {
@@ -424,6 +500,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     const el = document.createElement(
       "ecc-client-elixir-cloud-registry-service-verification"
     );
+    el.admin = true;
     el.serviceId = "service-1";
     el.provider = provider;
 
@@ -435,7 +512,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
       expect(detail.action).to.equal("load");
       expect(detail.status).to.equal(500);
       expect(detail.error).to.equal("Server error");
-      expect(part(el, "badge")).to.equal(null);
+      expect(shown(el)).to.equal(null);
     } finally {
       el.remove();
     }
@@ -448,6 +525,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     const el = document.createElement(
       "ecc-client-elixir-cloud-registry-service-verification"
     );
+    el.admin = true;
     el.serviceId = "service-1";
     el.provider = provider;
 
@@ -469,17 +547,18 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     get.resolves(VERIFICATION);
     const el = await fixture<El>(html`
       <ecc-client-elixir-cloud-registry-service-verification
+        admin
         service-id="service-1"
       ></ecc-client-elixir-cloud-registry-service-verification>
     `);
     await settled(el);
-    expect(part(el, "badge")).to.equal(null);
+    expect(shown(el)).to.equal(null);
 
     el.provider = provider;
     await settled(el);
 
     expect(get.calledOnceWithExactly("service-1")).to.equal(true);
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+    expect(shown(el)).to.equal("verified");
   });
 
   it("ignores the answer for a previous service", async () => {
@@ -495,6 +574,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     get.onSecondCall().rejects(notFound());
     const el = await fixture<El>(html`
       <ecc-client-elixir-cloud-registry-service-verification
+        admin
         service-id="service-1"
         .provider=${provider}
       ></ecc-client-elixir-cloud-registry-service-verification>
@@ -506,7 +586,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     await settled(el);
 
     expect(get.secondCall.args[0]).to.equal("service-2");
-    expect(part(el, "badge")).to.equal(null);
+    expect(shown(el)).to.equal("unverified");
   });
 
   it("verifies once while a request runs, and shows that it runs", async () => {
@@ -582,7 +662,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
       serviceId: "service-1",
       verification: VERIFICATION,
     });
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
+    expect(shown(el)).to.equal("unverified");
   });
 
   it("doesn't show a verify of another registry", async () => {
@@ -620,7 +700,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     await settled(el);
 
     expect(changed.calledOnce).to.equal(true);
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
+    expect(shown(el)).to.equal("unverified");
   });
 
   it("keeps a verify when the provider is replaced meanwhile", async () => {
@@ -653,17 +733,17 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     await settled(el);
 
     expect(changed.calledOnce).to.equal(true);
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+    expect(shown(el)).to.equal("verified");
 
     // the app hasn't updated `verification`: the result stays
     el.provider = stubProvider().provider;
     await settled(el);
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+    expect(shown(el)).to.equal("verified");
 
     // until it sets another value (here: of an older URL)
     el.verification = { ...VERIFICATION, url: "https://tes.example.org/old" };
     await settled(el);
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
+    expect(shown(el)).to.equal("unverified");
     expect(get.called).to.equal(false);
   });
 
@@ -714,20 +794,23 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     expect(get.called).to.equal(false);
   });
 
-  it("shows nothing to other users for a verification of `null`", async () => {
+  it("shows nothing to other users for a verification of the app", async () => {
     const { provider, get } = stubProvider();
     const el = await fixture<El>(html`
       <ecc-client-elixir-cloud-registry-service-verification
         .service=${SERVICE}
-        .verification=${null}
+        .verification=${VERIFICATION}
         .provider=${provider}
       ></ecc-client-elixir-cloud-registry-service-verification>
     `);
     await settled(el);
 
     expect(get.called).to.equal(false);
-    expect(part(el, "badge")).to.equal(null);
-    expect(part(el, "verify-button")).to.equal(null);
+    expect(el.shadowRoot?.querySelector("*")).to.equal(null);
+
+    el.verification = null;
+    await settled(el);
+    expect(el.shadowRoot?.querySelector("*")).to.equal(null);
   });
 
   ["verify", "remove"].forEach((action) => {
@@ -791,7 +874,7 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
       serviceId: "service-1",
       verification: null,
     });
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+    expect(shown(el)).to.equal("verified");
   });
 
   it("drops a result of its own for another registry", async () => {
@@ -811,161 +894,62 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     click(part(el, "verify-button"));
     await changed;
     await el.updateComplete;
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+    expect(shown(el)).to.equal("verified");
 
     el.provider = new RestCloudRegistryProvider(
       "https://other.example.org/ga4gh/registry/v1"
     );
     await settled(el);
 
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
+    expect(shown(el)).to.equal("unverified");
   });
 
-  it("shows only the badge, also to admins, with `display` badge", async () => {
-    const { provider } = stubProvider();
-    const el = await fixture<El>(html`
-      <ecc-client-elixir-cloud-registry-service-verification
-        admin
-        display="badge"
-        .service=${SERVICE}
-        .verification=${null}
-        .provider=${provider}
-      ></ecc-client-elixir-cloud-registry-service-verification>
-    `);
-    await settled(el);
-
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
-    expect(part(el, "verify-button")).to.equal(null);
-    expect(part(el, "remove-button")).to.equal(null);
-
-    el.verification = VERIFICATION;
-    await settled(el);
-    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
-    expect(part(el, "remove-button")).to.equal(null);
-  });
-
-  it("shows only the admin actions with `display` actions", async () => {
-    const { provider, verify } = stubProvider();
-    verify.resolves(VERIFICATION);
-    const el = await fixture<El>(html`
-      <ecc-client-elixir-cloud-registry-service-verification
-        admin
-        display="actions"
-        .service=${SERVICE}
-        .verification=${null}
-        .provider=${provider}
-      ></ecc-client-elixir-cloud-registry-service-verification>
-    `);
-    await settled(el);
-    expect(part(el, "badge")).to.equal(null);
-
-    const changed = oneEvent(el, "ecc-service-verification-changed");
-    click(part(el, "verify-button"));
-    await changed;
-    await el.updateComplete;
-
-    expect(part(el, "badge")).to.equal(null);
-    expect(part(el, "remove-button")).to.not.equal(null);
-  });
-
-  it("shows nothing to other users with `display` actions", async () => {
-    const { provider } = stubProvider();
-    const el = await fixture<El>(html`
-      <ecc-client-elixir-cloud-registry-service-verification
-        display="actions"
-        .service=${SERVICE}
-        .verification=${VERIFICATION}
-        .provider=${provider}
-      ></ecc-client-elixir-cloud-registry-service-verification>
-    `);
-    await settled(el);
-
-    expect(el.shadowRoot?.querySelector("*")).to.equal(null);
-  });
-
-  it("shows the badge and the actions by default, and reflects `display`", async () => {
-    const { provider } = stubProvider();
-    const el = await fixture<El>(html`
-      <ecc-client-elixir-cloud-registry-service-verification
-        admin
-        .service=${SERVICE}
-        .verification=${null}
-        .provider=${provider}
-      ></ecc-client-elixir-cloud-registry-service-verification>
-    `);
-    await settled(el);
-
-    expect(el.getAttribute("display")).to.equal("all");
-    expect(part(el, "badge") !== null).to.equal(true);
-    expect(part(el, "verify-button") !== null).to.equal(true);
-
-    el.display = "badge";
-    await settled(el);
-    expect(el.getAttribute("display")).to.equal("badge");
-    expect(part(el, "badge") !== null).to.equal(true);
-    expect(part(el, "verify-button") === null).to.equal(true);
-  });
-
-  it("shows nothing to other users for an unverified service with `display` actions", async () => {
-    const { provider } = stubProvider();
-    const el = await fixture<El>(html`
-      <ecc-client-elixir-cloud-registry-service-verification
-        display="actions"
-        .service=${SERVICE}
-        .verification=${null}
-        .provider=${provider}
-      ></ecc-client-elixir-cloud-registry-service-verification>
-    `);
-    await settled(el);
-
-    expect(el.shadowRoot?.querySelector("*") === null).to.equal(true);
-    el.verification = VERIFICATION;
-    await settled(el);
-    expect(el.shadowRoot?.querySelector("*") === null).to.equal(true);
-  });
-
-  it("leaves the other instance of a row to the app", async () => {
+  it("leaves the badge to the app", async () => {
     const { provider, verify } = stubProvider();
     verify.resolves(VERIFICATION);
     const container = await fixture<HTMLDivElement>(html`
       <div>
-        <ecc-client-elixir-cloud-registry-service-verification
-          admin
-          display="badge"
-          .service=${SERVICE}
+        <ecc-client-elixir-cloud-registry-service-verification-badge
+          show-unverified
           .verification=${null}
-          .provider=${provider}
-        ></ecc-client-elixir-cloud-registry-service-verification>
+        ></ecc-client-elixir-cloud-registry-service-verification-badge>
         <ecc-client-elixir-cloud-registry-service-verification
           admin
-          display="actions"
           .service=${SERVICE}
           .verification=${null}
           .provider=${provider}
         ></ecc-client-elixir-cloud-registry-service-verification>
       </div>
     `);
-    const [badgeEl, actionsEl] = Array.from(
-      container.querySelectorAll<El>(
-        "ecc-client-elixir-cloud-registry-service-verification"
-      )
+    const badgeEl = container.querySelector(
+      "ecc-client-elixir-cloud-registry-service-verification-badge"
     );
-    await settled(badgeEl);
+    const actionsEl = container.querySelector(
+      "ecc-client-elixir-cloud-registry-service-verification"
+    );
+    if (!badgeEl || !actionsEl) throw new Error("Missing elements.");
     await settled(actionsEl);
+    const badgeText = () =>
+      badgeEl.shadowRoot?.querySelector('[part="badge"]')?.textContent?.trim();
+    expect(badgeText()).to.equal("Not verified");
 
     const changed = oneEvent(actionsEl, "ecc-service-verification-changed");
     click(part(actionsEl, "verify-button"));
     const { detail } = (await changed) as EccServiceVerificationChangedEvent;
     await settled(actionsEl);
-    expect(part(actionsEl, "remove-button") !== null).to.equal(true);
-    expect(part(badgeEl, "badge")?.textContent?.trim()).to.equal(
-      "Not verified"
-    );
+    expect(shown(actionsEl)).to.equal("verified");
+    // the badge stays until the app passes the new verification
+    expect(badgeText()).to.equal("Not verified");
+    expect(
+      actionsEl.shadowRoot?.querySelector("ecc-utils-design-badge")
+    ).to.equal(null);
 
+    // the app sets the new verification on both
     badgeEl.verification = detail.verification;
     actionsEl.verification = detail.verification;
-    await settled(badgeEl);
-    expect(part(badgeEl, "badge")?.textContent?.trim()).to.equal("Verified");
-    expect(part(actionsEl, "remove-button") !== null).to.equal(true);
+    await badgeEl.updateComplete;
+    await settled(actionsEl);
+    expect(badgeText()).to.equal("Verified");
+    expect(shown(actionsEl)).to.equal("verified");
   });
 });

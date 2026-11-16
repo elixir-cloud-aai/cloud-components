@@ -15,7 +15,6 @@ import {
   needsReload,
   statusOf,
 } from "./failure.js";
-import "@elixir-cloud/design/components/badge/index.js";
 import "@elixir-cloud/design/components/button/index.js";
 
 /**
@@ -28,39 +27,19 @@ const pendingKey = (id: string, provider: CloudRegistryProvider): string => {
 };
 
 /**
- * What the component shows: the badge and, for admins, the actions
- * (`"all"`), only the badge (`"badge"`), or only the admin actions
- * (`"actions"`), e.g. to place them in different parts of a list row
- */
-export type ServiceVerificationDisplay = "all" | "badge" | "actions";
-
-/** Date of a verification for people, e.g. "20 Oct 2026"; else as sent */
-const formatDate = (value: string): string => {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-};
-
-/**
- * @summary Shows whether a service in Cloud Registry is verified, and lets admins verify it or remove its verification
+ * @summary Lets admins verify a service in Cloud Registry or remove its verification; `ecc-client-elixir-cloud-registry-service-verification-badge` shows whether it is verified
  * @since 2.0.0
  *
  * @property {string} baseUrl - Base URL of the Cloud Registry instance/gateway
  * @property {CloudRegistryProvider} provider - Custom data provider (optional, overrides baseUrl); replacing it loads the verification again
  * @property {string} serviceId - ID of the service
- * @property {ExternalService} service - The service as the app shows it (optional): a verification only counts while it matches the service's URL and API type, and "Verify" sends them as checked
+ * @property {ExternalService} service - The service as the app shows it (optional): a verification only counts while it matches the service's URL and API type (else "Verify" shows), and "Verify" sends them as checked
  * @property {Verification | null} verification - The verification, if the app has loaded it already (optional; `null`: not verified), e.g. from `getVerifications()` for a list; else the component loads it
- * @property {boolean} admin - Whether to offer "Verify" and "Remove verification" (for admins of the registry); default `false`
- * @property {ServiceVerificationDisplay} display - What to show: `all` (default) the badge and, for admins, the actions; `badge` only the badge ("Not verified" also for admins); `actions` only "Verify" or "Remove verification" (admins; nothing for other users)
+ * @property {boolean} admin - Whether to offer "Verify" and "Remove verification" (for admins of the registry); default `false`: the component shows nothing and sends no requests
  *
  * @fires ecc-service-verification-changed - Fired when an admin verified the service or removed its verification (includes the service ID and the new verification, or `null`)
  * @fires ecc-service-verification-failed - Fired when loading, verifying or removing the verification fails (includes the action, the error message and, if the registry sent them, the status, problem details and conflict code)
  *
- * @csspart badge - The "Verified" (or, for admins, "Not verified") badge
  * @csspart verify-button - The "Verify" button (admins)
  * @csspart remove-button - The "Remove verification" button (admins)
  */
@@ -102,21 +81,10 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
   /**
    * Whether to offer "Verify" and "Remove verification". Apps set it from
    * `admin` of the registry's `GET /me`; the registry checks permissions
-   * itself.
+   * itself. For other users, the component shows nothing and sends no
+   * requests.
    */
   @property({ type: Boolean }) admin = false;
-
-  /**
-   * What to show: the badge and, for admins, the actions (`all`, the
-   * default), only the badge (`badge`), or only the admin actions
-   * (`actions`). A list can place the badge next to the version and the
-   * actions in the actions column with one instance each; it must pass
-   * both the same `verification` and update it from
-   * `ecc-service-verification-changed`, as only the instance whose action
-   * ran shows the result by itself.
-   */
-  @property({ type: String, reflect: true })
-  display: ServiceVerificationDisplay = "all";
 
   // The verification shown: `undefined` while it loads or if loading failed
   @state() private current?: Verification | null;
@@ -176,6 +144,7 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
         !service ||
         !matchesVerification(previous, service));
     if (
+      changedProperties.has("admin") ||
       changedProperties.has("provider") ||
       changedProperties.has("baseUrl") ||
       changedProperties.has("serviceId") ||
@@ -210,9 +179,9 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
   }
 
   /**
-   * Shows `verification` if the app set it (or the result of a verify or
-   * remove since), else loads the verification of the service; services
-   * that aren't verified (`404`) show none.
+   * Uses `verification` if the app set it (or the result of a verify or
+   * remove since), else loads the verification of the service for admins;
+   * services that aren't verified (`404`) have none.
    */
   private async load(): Promise<void> {
     this.loadRequest += 1;
@@ -227,6 +196,7 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
       return;
     }
     this.current = undefined;
+    if (!this.admin) return;
     const provider = this.currentProvider();
     if (!provider || !id) return;
     if (!provider.getServiceVerification) {
@@ -406,35 +376,6 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
     );
   }
 
-  private renderBadge() {
-    const { current, verified } = this;
-    return verified
-      ? html`<ecc-utils-design-badge
-          part="badge"
-          variant="secondary"
-          title=${current?.verifiedAt
-            ? `Verified on ${formatDate(current.verifiedAt)}`
-            : "Verified"}
-        >
-          <svg
-            class="mr-1 h-3 w-3"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M20 6 9 17l-5-5"></path>
-          </svg>
-          Verified
-        </ecc-utils-design-badge>`
-      : html`<ecc-utils-design-badge part="badge" variant="outline">
-          Not verified
-        </ecc-utils-design-badge>`;
-  }
-
   private renderAction() {
     return this.verified
       ? html`<ecc-utils-design-button
@@ -457,19 +398,9 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
   }
 
   render() {
-    // nothing while loading, and nothing else for unverified services
-    // unless the user is an admin
-    const { current, verified, admin, display } = this;
-    if (current === undefined) return nothing;
-    if (display === "actions") return admin ? this.renderAction() : nothing;
-    if (!verified && !admin) return nothing;
-    if (display === "badge" || !admin) return this.renderBadge();
-
-    return html`
-      <div class="flex items-center gap-2">
-        ${this.renderBadge()} ${this.renderAction()}
-      </div>
-    `;
+    // nothing while loading, and nothing for other users than admins
+    if (!this.admin || this.current === undefined) return nothing;
+    return this.renderAction();
   }
 }
 

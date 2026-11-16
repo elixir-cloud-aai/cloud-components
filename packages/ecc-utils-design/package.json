@@ -16,8 +16,19 @@
     "./components/*": "./dist/components/*",
     "./react": "./dist/react/index.js",
     "./react/*": "./dist/react/*",
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js"
+    },
     "./events": "./dist/events/index.js",
     "./events/*": "./dist/events/*"
+  },
+  "typesVersions": {
+    "*": {
+      "utils": [
+        "./dist/utils/index.d.ts"
+      ]
+    }
   },
   "repository": {
     "type": "git",

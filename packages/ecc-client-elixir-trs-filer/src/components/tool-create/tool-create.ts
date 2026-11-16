@@ -227,6 +227,12 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
 
   private _provider: TrsFilerProvider | null = null;
 
+  /** The number of the latest `loadToolClasses()` call */
+  private toolClassLoads = 0;
+
+  /** The REST provider for `baseUrl`, used without a custom provider */
+  private restProvider: RestTrsFilerProvider | null = null;
+
   @state() private activeFileIndex: { [versionIndex: number]: number } = {};
   @state() private activeDescriptorType: {
     [versionIndex: number]: DescriptorType | "ALL";
@@ -253,7 +259,8 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
     if (this.provider) {
       this._provider = this.provider;
     } else if (this.baseUrl) {
-      this._provider = new RestTrsFilerProvider(this.baseUrl);
+      this.restProvider = new RestTrsFilerProvider(this.baseUrl);
+      this._provider = this.restProvider;
     } else {
       this._provider = null;
     }
@@ -337,18 +344,75 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
       this.initializeFormWithDefaults();
     }
 
-    if (changedProperties.has("baseUrl") && this.baseUrl) {
-      this._provider = new RestTrsFilerProvider(this.baseUrl);
-      this.loadToolClasses();
+    if (
+      (changedProperties.has("provider") || changedProperties.has("baseUrl")) &&
+      this.useProvider()
+    ) {
+      // the tool classes of the previous provider don't apply to the new one
+      this.toolClasses = [];
+      if (this._provider) {
+        this.loadToolClasses();
+      } else {
+        this.dispatchEvent(
+          new CustomEvent("ecc-tool-create-validation-failed", {
+            detail: {
+              error:
+                "Please provide either a base URL for the TRS API or a custom provider.",
+            },
+            bubbles: true,
+            composed: true,
+          })
+        );
+      }
     }
   }
 
+  /**
+   * Switches to the custom provider or, without one, to a REST provider for
+   * the base URL (to none without either); returns whether the provider in
+   * use changed
+   */
+  private useProvider(): boolean {
+    let provider: TrsFilerProvider | null = this.provider ?? null;
+    if (!provider && this.baseUrl) {
+      if (this.restProvider?.baseUrl !== this.baseUrl) {
+        this.restProvider = new RestTrsFilerProvider(this.baseUrl);
+      }
+      provider = this.restProvider;
+    }
+    if (provider === this._provider) return false;
+    this._provider = provider;
+    return true;
+  }
+
   private async loadToolClasses(): Promise<void> {
-    if (!this._provider) return;
+    const provider = this._provider;
+    if (!provider) return;
+    this.toolClassLoads += 1;
+    const load = this.toolClassLoads;
+    // a load from a provider that was replaced in the meantime, or that a
+    // newer load replaced, is dropped
+    const stale = () =>
+      provider !== this._provider || load !== this.toolClassLoads;
 
     try {
-      this.toolClasses = await this._provider.getToolClasses();
+      const toolClasses = await provider.getToolClasses();
+      if (stale()) return;
+      this.toolClasses = toolClasses;
+      // a tool class the provider doesn't offer (e.g. one of a replaced
+      // provider) is no longer selected; the default is, if it is offered
+      const offered = (id: string) => toolClasses.some((tc) => tc.id === id);
+      if (!offered(this.formData.toolClassId)) {
+        this.formData = {
+          ...this.formData,
+          toolClassId: offered(this.defaultToolClassId)
+            ? this.defaultToolClassId
+            : "",
+        };
+      }
     } catch (error) {
+      if (stale()) return;
+      this.toolClasses = [];
       console.error("Failed to load tool classes:", error);
       this.dispatchEvent(
         new CustomEvent("ecc-tool-create-failed", {
@@ -2154,7 +2218,9 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
                 @click=${this.handleSubmit}
                 .disabled=${this.loading ||
                 !this.formData.organization ||
-                !this.formData.toolClassId}
+                !this.toolClasses.some(
+                  (tc) => tc.id === this.formData.toolClassId
+                )}
               >
                 ${this.loading ? "Creating..." : "Create"}
               </ecc-utils-design-button>
