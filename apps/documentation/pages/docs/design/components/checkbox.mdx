@@ -127,6 +127,7 @@ This example shows a checkbox in a disabled state.
 | `disabled` | `boolean` | `false` | When `true`, disables the checkbox.       |
 | `name`     | `string`  | `""`    | The name of the checkbox for form submission. |
 | `value`    | `string`  | `""`    | The value of the checkbox for form submission. |
+| `invalid` | `boolean` | `false` | When `true`, marks the checkbox as invalid, e.g. after an API rejected its value. |
 
 ### `checked`
 Controls the checked state of the checkbox.
@@ -188,6 +189,22 @@ The value attribute, used when submitting the checkbox as part of a form.
   <Tabs.Tab>
     ```html copy
     <ecc-utils-design-checkbox value="subscribe"></ecc-utils-design-checkbox>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `invalid`
+Marks the checkbox as invalid, e.g. when an API rejected its value (see [Field errors](/docs/design/field-errors)): it gets a red border and `aria-invalid="true"`. Clear it when the user changes the value or submits again. Unlike the other form controls, the checkbox has no `error` property: a message under the box wouldn't wrap next to its label, e.g. when the checkbox is at the end of a row. Render the message yourself, e.g. next to the label or above the form: with `mapFieldErrors()`, set `invalid` when `fieldErrors` has a message for the checkbox's field key, and show that message (it is not part of `generalError`, which holds only the errors that match no field).
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignCheckbox invalid={true} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <ecc-utils-design-checkbox invalid></ecc-utils-design-checkbox>
     ```
   </Tabs.Tab>
 </Tabs>

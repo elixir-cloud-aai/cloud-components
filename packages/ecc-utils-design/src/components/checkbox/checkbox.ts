@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { property, state } from "lit/decorators.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 
@@ -21,13 +22,23 @@ export class EccUtilsDesignCheckbox extends LitElement {
   @property({ type: Boolean, reflect: true }) disabled = false;
   @property({ type: String }) name = "";
   @property({ type: String }) value = "";
+  /**
+   * Whether the value is invalid, e.g. after an API rejected it. Unlike the
+   * other form controls, the checkbox has no `error` message: it wouldn't
+   * wrap next to the box's label, so show the message elsewhere.
+   */
+  @property({ type: Boolean, reflect: true }) invalid = false;
   @state() private _focused = false;
 
   render() {
     const checkboxClasses = cn(
-      "peer h-4 w-4 shrink-0 rounded-[4px] border border-primary shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+      "peer h-4 w-4 shrink-0 rounded-[4px] border shadow focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:opacity-50",
+      this.invalid
+        ? "border-destructive focus-visible:ring-destructive"
+        : "border-primary focus-visible:ring-ring",
       this.checked && "bg-primary text-primary-foreground",
-      this._focused && "ring-1 ring-ring"
+      this._focused &&
+        (this.invalid ? "ring-1 ring-destructive" : "ring-1 ring-ring")
     );
 
     const indicatorClasses = cn(
@@ -42,6 +53,7 @@ export class EccUtilsDesignCheckbox extends LitElement {
         role="checkbox"
         aria-checked=${this.checked ? "true" : "false"}
         aria-disabled=${this.disabled ? "true" : "false"}
+        aria-invalid=${ifDefined(this.invalid ? "true" : undefined)}
         tabindex=${this.disabled ? "-1" : "0"}
         @click=${this._handleClick}
         @keydown=${this._handleKeydown}

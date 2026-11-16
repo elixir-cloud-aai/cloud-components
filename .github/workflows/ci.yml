@@ -160,6 +160,10 @@ jobs:
       - name: Build
         run: npm run build
 
+      # The design package's `./utils` subpath must load without components
+      - name: Check design utils entry
+        run: node scripts/check-design-utils.mjs
+
       # With coverage (in Chromium, in `coverage/lcov.info` of each package
       # with tests; see `web-test.runner-config.mjs`) for the uploaded run
       - name: Run tests
