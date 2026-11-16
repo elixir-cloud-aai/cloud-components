@@ -9,58 +9,14 @@ import {
   Verification,
 } from "../../providers/index.js";
 import { matchesVerification } from "../../providers/verifications.js";
-import { nonBlankString } from "../../providers/errors.js";
-import { needsReload } from "./reload.js";
-import type { EccServiceVerificationFailedEvent } from "../../events/index.js";
+import {
+  FailureDetail,
+  failureDetail,
+  needsReload,
+  statusOf,
+} from "./failure.js";
 import "@elixir-cloud/design/components/badge/index.js";
 import "@elixir-cloud/design/components/button/index.js";
-
-type FailureDetail = EccServiceVerificationFailedEvent["detail"];
-
-/** Status of an error that a provider threw, if it has one */
-const statusOf = (err: unknown): number | undefined => {
-  const status =
-    err && typeof err === "object"
-      ? (err as Record<string, unknown>).status
-      : undefined;
-  return typeof status === "number" ? status : undefined;
-};
-
-/**
- * Detail of `ecc-service-verification-failed` for an error that a provider
- * threw: its message, and the status and problem details if it has them.
- * They are read from the error's fields, as `CloudRegistryError` has them,
- * so that errors of custom providers with the same fields work too.
- * @param serviceId ID of the service
- * @param action What failed
- * @param err The error
- * @param fallback Message if the error has none
- * @returns The event's detail
- */
-const failureDetail = (
-  serviceId: string,
-  action: FailureDetail["action"],
-  err: unknown,
-  fallback: string
-): FailureDetail => {
-  const fields =
-    err && typeof err === "object" ? (err as Record<string, unknown>) : {};
-  const detail = nonBlankString(fields.detail);
-  return {
-    serviceId,
-    action,
-    error:
-      nonBlankString(fields.message) ??
-      detail ??
-      nonBlankString(err) ??
-      fallback,
-    status: statusOf(err),
-    title: nonBlankString(fields.title),
-    detail,
-    code: nonBlankString(fields.code),
-    cause: err,
-  };
-};
 
 /**
  * Key of a running verify or remove: the service ID and the registry's base

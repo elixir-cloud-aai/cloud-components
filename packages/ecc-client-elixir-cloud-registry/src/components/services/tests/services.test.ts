@@ -276,12 +276,69 @@ describe("ecc-client-elixir-cloud-registry-services", () => {
     failWith(400);
     failWith(403);
     failWith(404);
+    await flush(el);
     expect(stubs.verifications.callCount).to.equal(1);
 
     failWith(409);
     failWith(500);
     failWith(undefined);
+    await flush(el);
     expect(stubs.verifications.callCount).to.equal(4);
+  });
+
+  it("doesn't load again when the provider can't verify", async () => {
+    const stubs = stubProvider();
+    const provider = stubs.provider as CloudRegistryProvider & {
+      verifyService?: unknown;
+    };
+    provider.verifyService = undefined;
+    const el = await renderLoaded(provider);
+
+    fire(actions(el, "s2"), "ecc-service-verification-failed", {
+      serviceId: "s2",
+      action: "verify",
+      error: "The provider doesn't support verifications.",
+    });
+    await flush(el);
+
+    expect(stubs.verifications.callCount).to.equal(1);
+  });
+
+  it("doesn't load again for a change while no load runs", async () => {
+    const stubs = stubProvider();
+    const el = await renderLoaded(stubs.provider);
+
+    fire(actions(el, "s1"), "ecc-service-verification-changed", {
+      serviceId: "s1",
+      verification: null,
+    });
+    await flush(el);
+
+    expect(stubs.verifications.callCount).to.equal(1);
+    expect(badge(el, "s1")?.verification).to.equal(null);
+  });
+
+  it("keeps the last verifications if a reload fails", async () => {
+    const stubs = stubProvider();
+    const el = await renderLoaded(stubs.provider);
+    stubs.verifications.onCall(1).rejects(new Error("Lost"));
+    const loads: EccServiceVerificationFailedEvent["detail"][] = [];
+    el.addEventListener("ecc-service-verification-failed", (e) => {
+      const { detail } = e as EccServiceVerificationFailedEvent;
+      if (detail.action === "load") loads.push(detail);
+    });
+
+    fire(actions(el, "s2"), "ecc-service-verification-failed", {
+      serviceId: "s2",
+      action: "verify",
+      error: "Lost",
+    });
+    await waitUntil(() => loads.length > 0, "reload not failed");
+    await flush(el);
+    const [detail] = loads;
+
+    expect(detail).to.include({ serviceId: "", action: "load", error: "Lost" });
+    expect(badge(el, "s1")?.verification).to.not.equal(null);
   });
 
   it("follows a verification by an admin", async () => {

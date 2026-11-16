@@ -18,7 +18,7 @@ import {
 } from "../../providers/index.js";
 import { verifiedServices } from "../../providers/verifications.js";
 import { ECCClientElixirCloudRegistryServiceVerification } from "../service-verification/service-verification.js";
-import { needsReload } from "../service-verification/reload.js";
+import { failureDetail, needsReload } from "../service-verification/failure.js";
 import type {
   EccServiceVerificationChangedEvent,
   EccServiceVerificationFailedEvent,
@@ -202,17 +202,13 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
     } catch (err) {
       if (!latest()) return;
       this.loading = false;
-      const detail: EccServiceVerificationFailedEvent["detail"] = {
-        serviceId: "",
-        action: "load",
-        error:
-          err instanceof Error && err.message
-            ? err.message
-            : "Failed to load the verifications.",
-        cause: err,
-      };
-      const { status } = (err ?? {}) as { status?: unknown };
-      if (typeof status === "number") detail.status = status;
+      // the last verifications loaded stay, e.g. after a reload that failed
+      const detail = failureDetail(
+        "",
+        "load",
+        err,
+        "Failed to load the verifications."
+      );
       this.dispatchEvent(
         new CustomEvent("ecc-service-verification-failed", {
           detail,
@@ -268,7 +264,13 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
   ): void {
     const provider = this.shownProvider;
     if (generation !== this.generation || !provider) return;
-    if (e.detail.action !== "load" && needsReload(e.detail.status)) {
+    const { action, status } = e.detail;
+    // a provider without the method sent no request that could have applied
+    const supported =
+      action === "verify"
+        ? !!provider.verifyService
+        : !!provider.deleteServiceVerification;
+    if (action !== "load" && supported && needsReload(status)) {
       this.loadVerifications(provider, generation);
     }
   }
