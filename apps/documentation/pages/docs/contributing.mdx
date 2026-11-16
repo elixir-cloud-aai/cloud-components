@@ -65,8 +65,7 @@ builds of pull requests.
 All public packages in `packages/` (those without `"private": true` in
 their `package.json`) share the version of the root `package.json` and are
 released together (currently `2.0.0-alpha.N`, until 2.0.0).
-`@elixir-cloud/ro-crate` and the deprecated `@elixir-cloud/tes` are private
-and not released.
+`@elixir-cloud/ro-crate` is private and not released.
 
 The `Release` workflow (`.github/workflows/release.yml`) runs on tags
 `v<version>` and pushes nothing to any branch. Its jobs:
@@ -141,7 +140,12 @@ To release `<version>` (e.g. `2.0.0-alpha.49`), maintainers:
    `npm stage publish` and lists them in the run's summary. An npm
    maintainer approves each one, with two-factor authentication, on the
    package's page on npmjs.com or with `npm stage list <package>` and
-   `npm stage approve <stage-id>`. The dist-tag is `latest` for releases
+   `npm stage approve <stage-id>`. Released packages depend on the exact
+   versions of the others: approve dependencies first
+   (`@elixir-cloud/design`, then `@elixir-cloud/drs`, `@elixir-cloud/trs`
+   and `@elixir-cloud/service-registry`, then the rest), so that no public
+   version depends on one that isn't public yet, and approve all of them
+   in one go. The dist-tag is `latest` for releases
    and `next` for prereleases (e.g. `2.1.0-rc.1` or `3.0.0-alpha.1`), so
    that `latest` holds the newest release and `next` the prerelease
    published last. Until 2.0.0 (or a later release) is tagged, i.e. there

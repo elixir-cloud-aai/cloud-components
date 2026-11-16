@@ -165,62 +165,23 @@ describe("matchesVerification", () => {
     expect(matchesVerification(service, VERIFICATION)).to.equal(true);
   });
 
-  it("compares group and artifact trimmed and case-insensitive", () => {
-    const service = {
-      ...SERVICE,
-      type: {
-        group: " ORG.GA4GH\u00a0\u0085",
-        artifact: "\u001cTES",
-        version: "1",
-      },
-    };
-    expect(matchesVerification(service, VERIFICATION)).to.equal(true);
-  });
-
-  it("folds capital sharp s and keeps dotless i, as Python does", () => {
-    const type = (group: string) => ({ group, artifact: "tes", version: "1" });
-    const verification = (group: string) => ({
-      ...VERIFICATION,
-      type: type(group),
+  it("compares group and artifact exactly, as the registry stores them", () => {
+    const type = (group: string, artifact: string) => ({
+      group,
+      artifact,
+      version: "1",
     });
-    expect(
-      matchesVerification(
-        { ...SERVICE, type: type("\u1E9E") },
-        verification("ss")
-      )
-    ).to.equal(true);
-    expect(
-      matchesVerification(
-        { ...SERVICE, type: type("t\u0131s") },
-        verification("tis")
-      )
-    ).to.equal(false);
-    expect(
-      matchesVerification(
-        { ...SERVICE, type: type("T\u0131S") },
-        verification("t\u0131s")
-      )
-    ).to.equal(true);
-  });
-
-  it("folds the case of special characters", () => {
-    const service = {
-      ...SERVICE,
-      type: { group: "straße", artifact: "tes", version: "1" },
-    };
-    const verification = {
-      ...VERIFICATION,
-      type: { group: "STRASSE", artifact: "tes", version: "1" },
-    };
-    expect(matchesVerification(service, verification)).to.equal(true);
-  });
-
-  it("doesn't trim a byte order mark, as the registry doesn't", () => {
-    const service = {
-      ...SERVICE,
-      type: { ...SERVICE.type, artifact: "tes\uFEFF" },
-    };
-    expect(matchesVerification(service, VERIFICATION)).to.equal(false);
+    const { group, artifact } = VERIFICATION.type;
+    [
+      type(group.toUpperCase(), artifact),
+      type(` ${group}`, artifact),
+      type(group, artifact.toUpperCase()),
+      type(group, `${artifact} `),
+    ].forEach((changed) => {
+      expect(
+        matchesVerification({ ...SERVICE, type: changed }, VERIFICATION)
+      ).to.equal(false);
+    });
   });
 
   it("compares the URL exactly as written", () => {
@@ -238,6 +199,18 @@ describe("matchesVerification", () => {
 });
 
 describe("verifiedServices", () => {
+  it("drops verifications whose API type differs only in case", () => {
+    const service: ExternalService = {
+      ...SERVICE,
+      type: { ...SERVICE.type, artifact: SERVICE.type.artifact.toUpperCase() },
+    };
+    const result = verifiedServices(
+      [service],
+      [{ serviceId: service.id, ...VERIFICATION }]
+    );
+    expect(result.size).to.equal(0);
+  });
+
   it("keeps the verifications that match their services, by ID", () => {
     const other: ExternalService = {
       ...SERVICE,
