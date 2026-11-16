@@ -653,6 +653,36 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       ).to.have.length(0);
     });
 
+    it("renders the badges that rowBadges returns next to the version", async () => {
+      const el = await renderLoaded();
+      el.rowBadges = (s: ExternalService) =>
+        s.id === "s2" ? null : litHtml`<span class="tag">Tag ${s.id}</span>`;
+      await el.updateComplete;
+
+      const tags = Array.from(root(el).querySelectorAll("span.tag"));
+      expect(tags.map((tag) => tag.textContent)).to.deep.equal([
+        "Tag s1",
+        "Tag s3",
+      ]);
+      const line = tags[0].closest("[data-row-badges]")?.parentElement;
+      expect(line?.textContent).to.include(SERVICES[0].name);
+      expect(
+        root(el).querySelectorAll('slot[name^="actions-"] span.tag')
+      ).to.have.length(0);
+    });
+
+    it("renders the rows again with a new rowBadges", async () => {
+      const el = await renderLoaded();
+      el.rowBadges = () => litHtml`<span class="old">Old</span>`;
+      await el.updateComplete;
+
+      el.rowBadges = () => litHtml`<span class="new">New</span>`;
+      await el.updateComplete;
+
+      expect(root(el).querySelectorAll("span.old")).to.have.length(0);
+      expect(root(el).querySelectorAll("span.new")).to.have.length(3);
+    });
+
     it("renders the rows again with a new rowActions", async () => {
       const el = await renderLoaded();
       el.rowActions = () => litHtml`<button class="edit">Edit</button>`;

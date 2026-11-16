@@ -119,6 +119,7 @@ This example demonstrates a basic service registry table with search and filteri
 | `filter`     | `filter`    | `boolean`                               | `true`      | Whether to display the type, organization and environment filters                        |
 | `pageSize`   | `page-size` | `number`                                | `10`        | Number of services per page, rounded down; `0` or less shows all services on one page, a missing, empty or invalid value `10` |
 | `rowActions` | -           | `(service: ExternalService) => unknown` | `undefined` | Renders the actions of each row (see [`rowActions`](#rowactions))                        |
+| `rowBadges`  | -           | `(service: ExternalService) => unknown` | `undefined` | Renders badges of each row next to its version (see [`rowBadges`](#rowbadges))           |
 | `baseUrl`    | `baseurl`   | `string`                                | `""`        | Base URL of the Service Registry API, used if no `provider` is set                       |
 | `provider`   | -           | `ServiceRegistryProvider`               | `undefined` | Data provider for fetching services (see [Providers](/docs/service-registry/providers))  |
 
@@ -231,6 +232,35 @@ A function that renders the actions of a row from its service, e.g. Edit and Del
           window.location.href = `/services/${service.id}/edit`;
         });
         return button;
+      };
+    </script>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### `rowBadges`
+A function that renders badges of a row from its service, e.g. a "Verified" badge. They are shown in the name line, after the version badge, so that a row's tags stay together. It can return a Lit template, a DOM node, a string, or `null` for a row without badges. As with `rowActions`, set a new function when what it renders changes. For verifications, render the Cloud Registry package's [service verification](/docs/cloud-registry/components/service-verification) component with `display="badge"` here.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    const rowBadges = useCallback(
+      (service) => (service.environment === 'prod' ? 'Production' : null),
+      []
+    );
+
+    <EccClientGa4ghServiceRegistryServices rowBadges={rowBadges} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <script type="module">
+      const list = document.querySelector('ecc-client-ga4gh-service-registry-services');
+      list.rowBadges = (service) => {
+        if (service.environment !== 'prod') return null;
+        const badge = document.createElement('ecc-utils-design-badge');
+        badge.textContent = 'Production';
+        return badge;
       };
     </script>
     ```
