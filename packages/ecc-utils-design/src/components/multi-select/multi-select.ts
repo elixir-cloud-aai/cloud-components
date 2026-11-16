@@ -83,9 +83,13 @@ export class EccUtilsDesignMultiSelect extends LitElement {
         (trigger) => trigger.requestUpdate()
       );
     }
-    if (changedProperties.has("value") || changedProperties.has("isOpen")) {
+    const current = multiSelectState.get(this.selectId);
+    if (
+      current &&
+      (changedProperties.has("value") || changedProperties.has("isOpen"))
+    ) {
       multiSelectState.set(this.selectId, {
-        ...multiSelectState.get(this.selectId)!,
+        ...current,
         selectedValues: this.value,
         isOpen: this.isOpen,
       });
@@ -118,8 +122,10 @@ export class EccUtilsDesignMultiSelect extends LitElement {
   }
 
   private _updateState() {
+    const current = multiSelectState.get(this.selectId);
+    if (!current) return;
     multiSelectState.set(this.selectId, {
-      ...multiSelectState.get(this.selectId)!,
+      ...current,
       isOpen: this.isOpen,
       selectedValues: this.value,
     });

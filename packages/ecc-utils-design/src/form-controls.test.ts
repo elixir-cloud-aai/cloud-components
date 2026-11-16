@@ -26,8 +26,16 @@ const controls: [string, () => Promise<FormControl>, string][] = [
   ],
 ];
 
+function shadow(el: LitElement, selector: string): HTMLElement {
+  const found = el.shadowRoot?.querySelector<HTMLElement>(selector);
+  if (!found) {
+    throw new Error(`No ${selector} in ${el.localName}`);
+  }
+  return found;
+}
+
 function errorElement(el: LitElement): HTMLElement {
-  return el.shadowRoot!.querySelector("[part=error]") as HTMLElement;
+  return shadow(el, "[part=error]");
 }
 
 describe("form controls: invalid state and error message", () => {
@@ -35,7 +43,7 @@ describe("form controls: invalid state and error message", () => {
     describe(name, () => {
       it("is valid by default, with an empty live region", async () => {
         const el = await create();
-        const control = el.shadowRoot!.querySelector(selector)!;
+        const control = shadow(el, selector);
         expect(control.hasAttribute("aria-invalid")).to.equal(false);
         expect(control.hasAttribute("aria-describedby")).to.equal(false);
         expect(errorElement(el).textContent?.trim()).to.equal("");
@@ -46,7 +54,7 @@ describe("form controls: invalid state and error message", () => {
         const el = await create();
         el.error = "Must be a valid URI.";
         await el.updateComplete;
-        const control = el.shadowRoot!.querySelector(selector)!;
+        const control = shadow(el, selector);
         const message = errorElement(el);
         expect(message.textContent?.trim()).to.equal("Must be a valid URI.");
         expect(control.getAttribute("aria-invalid")).to.equal("true");
@@ -58,7 +66,7 @@ describe("form controls: invalid state and error message", () => {
         const el = await create();
         el.invalid = true;
         await el.updateComplete;
-        const control = el.shadowRoot!.querySelector(selector)!;
+        const control = shadow(el, selector);
         expect(el.hasAttribute("invalid")).to.equal(true);
         expect(control.getAttribute("aria-invalid")).to.equal("true");
         expect(control.hasAttribute("aria-describedby")).to.equal(false);
@@ -71,7 +79,7 @@ describe("form controls: invalid state and error message", () => {
         await el.updateComplete;
         el.error = "";
         await el.updateComplete;
-        const control = el.shadowRoot!.querySelector(selector)!;
+        const control = shadow(el, selector);
         expect(control.hasAttribute("aria-invalid")).to.equal(false);
         expect(control.hasAttribute("aria-describedby")).to.equal(false);
         expect(errorElement(el).textContent?.trim()).to.equal("");
@@ -86,8 +94,7 @@ describe("form controls: invalid state and error message", () => {
       fixture<FormControl>(
         html`<ecc-utils-design-checkbox></ecc-utils-design-checkbox>`
       );
-    const box = (el: LitElement) =>
-      el.shadowRoot!.querySelector("[role=checkbox]")!;
+    const box = (el: LitElement) => shadow(el, "[role=checkbox]");
 
     it("is valid by default", async () => {
       const el = await create();
@@ -122,7 +129,7 @@ describe("form controls: invalid state and error message", () => {
           error="Is required."
         ></ecc-utils-design-checkbox>`
       );
-      expect(el.shadowRoot!.querySelector("[part=error]") === null).to.equal(
+      expect(el.shadowRoot?.querySelector("[part=error]") === null).to.equal(
         true
       );
       expect(box(el).hasAttribute("aria-invalid")).to.equal(false);
@@ -169,7 +176,7 @@ describe("form controls: invalid state and error message", () => {
       it("shows the error and marks the trigger invalid", async () => {
         const el = await create();
         const trigger = el.querySelector(triggerTag) as LitElement;
-        const button = () => trigger.shadowRoot!.querySelector("button")!;
+        const button = () => shadow(trigger, "button");
         expect(button().hasAttribute("aria-invalid")).to.equal(false);
         expect(errorElement(el).textContent?.trim()).to.equal("");
         expect(errorElement(el).getAttribute("aria-live")).to.equal("polite");
@@ -182,13 +189,13 @@ describe("form controls: invalid state and error message", () => {
           "Must be one of: a, b."
         );
         expect(button().getAttribute("aria-invalid")).to.equal("true");
-        const describedBy = button().getAttribute("aria-describedby")!;
+        const describedBy = button().getAttribute("aria-describedby") ?? "";
         // Hidden, so that the message isn't read twice
+        expect(shadow(trigger, `#${CSS.escape(describedBy)}`).hidden).to.equal(
+          true
+        );
         expect(
-          trigger.shadowRoot!.getElementById(describedBy)!.hidden
-        ).to.equal(true);
-        expect(
-          trigger.shadowRoot!.getElementById(describedBy)!.textContent?.trim()
+          shadow(trigger, `#${CSS.escape(describedBy)}`).textContent?.trim()
         ).to.equal("Must be one of: a, b.");
         expect(button().className).to.contain("border-destructive");
 
@@ -218,7 +225,7 @@ describe("form controls: invalid state and error message", () => {
         const trigger = await fixture<LitElement>(
           `<${triggerTag}></${triggerTag}>`
         );
-        const button = trigger.shadowRoot!.querySelector("button")!;
+        const button = shadow(trigger, "button");
         expect(button.hasAttribute("aria-invalid")).to.equal(false);
         expect(button.className).to.contain("border-input");
       });
