@@ -6,12 +6,12 @@ import ComponentName from '@/components/common/ComponentName'
 <ComponentName
   tagName='ecc-client-elixir-cloud-registry-services'
   reactTagName='EccClientElixirCloudRegistryServices'
-  version='2.0.0-alpha.51'
+  version='2.0.0-alpha.52'
 />
 
 ## Overview
 
-The `ecc-client-elixir-cloud-registry-services` component lists the services of a Cloud Registry and shows a "Verified" badge for the verified ones. It is the [services list](/docs/service-registry/components/services) of the GA4GH Service Registry package (search, filters, pages, row actions) with a [service verification](./service-verification) component in each row.
+The `ecc-client-elixir-cloud-registry-services` component lists the services of a Cloud Registry and shows a "Verified" badge for the verified ones, next to their version. It is the [services list](/docs/service-registry/components/services) of the GA4GH Service Registry package (search, filters, pages, row actions) with a [service verification](./service-verification) component in each row: its badge (`display="badge"`) through the list's [`rowBadges`](/docs/service-registry/components/services#rowbadges) hook, and, for admins, its "Verify" or "Remove verification" button (`display="actions"`) in the actions column.
 
 It loads all verifications with one request (`GET /verifications`, Cloud Registry 0.4.0 and later), not one per row. A verification only counts while the service still has the verified URL and API type (see [Verifications](/docs/cloud-registry/providers#verifications)). Rows show the badge once the verifications are loaded; if loading fails, the list shows no badges and fires `ecc-service-verification-failed`.
 
@@ -64,22 +64,26 @@ It loads all verifications with one request (`GET /verifications`, Cloud Registr
 | `filter`     | `boolean`                               | `true`      | Whether to show the type, organization and environment filters |
 | `search`     | `boolean`                               | `true`      | Whether to show the search field |
 | `pageSize`   | `number`                                | `10`        | Services per page (attribute `page-size`); 0 or less shows all services on one page, an empty attribute 10 |
-| `rowActions` | `(service: ExternalService) => unknown` | `undefined` | Renders the actions of each row after the badge; without it, each row has a "View Details" button |
+| `rowActions` | `(service: ExternalService) => unknown` | `undefined` | Renders the actions of each row after "Verify" or "Remove verification"; without it, each row has a "View Details" button |
+| `rowBadges`  | `(service: ExternalService) => unknown` | `undefined` | Renders more badges of each row after the "Verified" badge, next to the version |
 
 ### `provider` and `baseUrl`
 Replacing the provider (or changing `baseUrl`) renders a new list, which loads the services and the verifications again. In React, create the provider only when its inputs change, e.g. with `useMemo`. Custom providers implement the optional `getVerifications()` of `CloudRegistryProvider`; without it, the list shows no badges and fires `ecc-service-verification-failed`.
 
 ### `admin`
-Apps take the value from `admin` of the registry's `GET /me`. Admins see "Not verified" and "Verify" for unverified services and "Remove verification" for verified ones. The list follows their changes without loading the verifications again, also for rows that are no longer shown by then (e.g. on another page). After a failed verify or remove, it loads the verifications again, as the registry may have applied the change. The registry checks permissions itself.
+Apps take the value from `admin` of the registry's `GET /me`. Admins see a "Not verified" badge for unverified services, and "Verify" or "Remove verification" in the actions column. The list follows their changes without loading the verifications again, also for rows that are no longer shown by then (e.g. on another page). It loads the verifications again after a failed verify or remove whose outcome is unclear (no status, e.g. a lost connection, or a server error) or that conflicts (`409`), as the [service verification](./service-verification#ecc-service-verification-failed) component does; other failures (e.g. `400` or `403`) changed nothing. Only the answer of the latest load counts, and a load that was running when an admin's change arrived is replaced by a new one, so an older answer can't bring back a removed verification. The registry checks permissions itself.
 
 ### `filter`, `search` and `pageSize`
 As in the [services list](/docs/service-registry/components/services) of the GA4GH Service Registry package, which this component passes them to.
 
 ### `rowActions`
-As in the [services list](/docs/service-registry/components/services#rowactions): a function that renders the actions of a row from its service, e.g. Edit and Delete buttons. They follow the badge. Set a new function when what it renders changes.
+As in the [services list](/docs/service-registry/components/services#rowactions): a function that renders the actions of a row from its service, e.g. Edit and Delete buttons. They follow "Verify" or "Remove verification". Set a new function when what it renders changes.
+
+### `rowBadges`
+As in the [services list](/docs/service-registry/components/services#rowbadges): a function that renders badges of a row from its service, next to its version. They follow the "Verified" badge. Set a new function when what it renders changes.
 
 <Callout type='info'>
-  The `actions-<id>` slots of the services list aren't available through this component; use `rowActions` instead.
+  The `actions-<id>` slots of the services list aren't available through this component; use `rowActions` and `rowBadges` instead.
 </Callout>
 
 ## Events

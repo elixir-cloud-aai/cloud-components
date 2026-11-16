@@ -5,6 +5,7 @@ import { keyed } from "lit/directives/keyed.js";
 import {
   ECCClientGa4ghServiceRegistryServices,
   type RowActionsRenderer,
+  type RowBadgesRenderer,
 } from "@elixir-cloud/service-registry/components/services/services.js";
 import "@elixir-cloud/design/components/button/index.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
@@ -17,12 +18,13 @@ import {
 } from "../../providers/index.js";
 import { verifiedServices } from "../../providers/verifications.js";
 import { ECCClientElixirCloudRegistryServiceVerification } from "../service-verification/service-verification.js";
+import { needsReload } from "../service-verification/reload.js";
 import type {
   EccServiceVerificationChangedEvent,
   EccServiceVerificationFailedEvent,
 } from "../../events/index.js";
 
-export type { RowActionsRenderer };
+export type { RowActionsRenderer, RowBadgesRenderer };
 
 // Defines the elements that the list renders, unless they are already, and
 // only in browsers, so that importing this module during server-side
@@ -49,16 +51,17 @@ if (typeof window !== "undefined" && window.customElements) {
 const DEFAULT_PAGE_SIZE = 10;
 
 /**
- * @summary Lists the services of a Cloud Registry, with a "Verified" badge for verified services
+ * @summary Lists the services of a Cloud Registry, with a "Verified" badge for verified services next to their version
  * @since 2.0.0
  *
  * @property {string} baseUrl - Base URL of the Cloud Registry instance/gateway
  * @property {CloudRegistryProvider} provider - Custom data provider (optional, overrides baseUrl); replacing it loads the services and verifications again
- * @property {boolean} admin - Whether to offer "Verify" and "Remove verification" in each row (for admins of the registry); default `false`
+ * @property {boolean} admin - Whether to show "Not verified" badges and offer "Verify" and "Remove verification" in the actions of each row (for admins of the registry); default `false`
  * @property {boolean} filter - Determines if the type, organization and environment filters should be rendered
  * @property {boolean} search - Determines if the search field should be rendered
  * @property {number} pageSize - Number of services per page (attribute `page-size`, default 10); 0 or less shows all services on one page
- * @property {RowActionsRenderer} rowActions - Renders the actions of each row (e.g. Edit and Delete buttons) from its service, after the badge; without it, rows have a "View Details" button
+ * @property {RowActionsRenderer} rowActions - Renders the actions of each row (e.g. Edit and Delete buttons) from its service, after "Verify" or "Remove verification"; without it, rows have a "View Details" button
+ * @property {RowBadgesRenderer} rowBadges - Renders more badges of each row from its service, after the "Verified" badge
  *
  * @fires ecc-services-changed - Fired when services data changes
  * @fires ecc-service-selected - Fired when a service, its row or its "View Details" button is clicked
@@ -99,6 +102,7 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
   pageSize = DEFAULT_PAGE_SIZE;
 
   @property({ attribute: false }) rowActions?: RowActionsRenderer;
+  @property({ attribute: false }) rowBadges?: RowBadgesRenderer;
 
   // The services of the list, from its `ecc-services-changed`
   @state() private services: ExternalService[] = [];
@@ -119,10 +123,22 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
    */
   private generation = 0;
 
+  /**
+   * Number of the latest load of the verifications, so that older answers
+   * are ignored, also those read before a verify or remove
+   */
+  private loadRequest = 0;
+
+  /** Whether a load of the verifications is running. */
+  private loading = false;
+
   /** Verifications by service ID, matched against the services. */
   private verified = new Map<string, ServiceVerification>();
 
-  /** Renders the badge and actions of a row; new when they change. */
+  /** Renders the badges of a row; new when they change. */
+  private renderRowBadges?: RowBadgesRenderer;
+
+  /** Renders the actions of a row; new when they change. */
   private renderRowActions?: RowActionsRenderer;
 
   /**
@@ -153,26 +169,39 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
       changedProperties.has("services") ||
       changedProperties.has("verifications") ||
       changedProperties.has("admin") ||
-      changedProperties.has("rowActions")
+      changedProperties.has("rowActions") ||
+      changedProperties.has("rowBadges")
     ) {
       this.verified = verifiedServices(this.services, this.verifications ?? []);
+      this.renderRowBadges = this.createRowBadges();
       this.renderRowActions = this.createRowActions();
     }
   }
 
-  /** Loads the verifications of all services with one request. */
+  /**
+   * Loads the verifications of all services with one request; only the
+   * answer of the latest load counts.
+   */
   private async loadVerifications(
     provider: CloudRegistryProvider,
     generation: number
   ): Promise<void> {
+    this.loadRequest += 1;
+    const request = this.loadRequest;
+    const latest = () =>
+      generation === this.generation && request === this.loadRequest;
+    this.loading = true;
     try {
       if (!provider.getVerifications) {
         throw new Error("The provider doesn't support verifications.");
       }
       const verifications = await provider.getVerifications();
-      if (generation === this.generation) this.verifications = verifications;
+      if (!latest()) return;
+      this.loading = false;
+      this.verifications = verifications;
     } catch (err) {
-      if (generation !== this.generation) return;
+      if (!latest()) return;
+      this.loading = false;
       const detail: EccServiceVerificationFailedEvent["detail"] = {
         serviceId: "",
         action: "load",
@@ -207,8 +236,10 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
 
   /**
    * Updates the verifications after an admin verified or removed one. The
-   * badge reports it also if its row is no longer shown (e.g. on another
-   * page), as the listener is on the badge.
+   * row reports it also if it is no longer shown (e.g. on another page), as
+   * the listener is on its components. A load that runs meanwhile may have
+   * read the verifications before the change: its answer is ignored, and
+   * they are loaded again.
    */
   private handleVerificationChanged(
     e: EccServiceVerificationChangedEvent,
@@ -222,11 +253,14 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
     this.verifications = verification
       ? [...others, { serviceId, ...verification }]
       : others;
+    const provider = this.shownProvider;
+    if (this.loading && provider) this.loadVerifications(provider, generation);
   }
 
   /**
-   * Loads the verifications again after a verify or remove failed, as the
-   * registry may have applied it (e.g. if the answer was lost)
+   * Loads the verifications again after a verify or remove failed with an
+   * unclear outcome or a conflict, as the registry may have applied it (e.g.
+   * if the answer was lost), with the same rule as the row's component
    */
   private handleVerificationFailed(
     e: EccServiceVerificationFailedEvent,
@@ -234,7 +268,7 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
   ): void {
     const provider = this.shownProvider;
     if (generation !== this.generation || !provider) return;
-    if (e.detail.action !== "load") {
+    if (e.detail.action !== "load" && needsReload(e.detail.status)) {
       this.loadVerifications(provider, generation);
     }
   }
@@ -250,29 +284,52 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
   }
 
   /**
-   * A renderer for the actions of the rows: the badge (once the
-   * verifications are loaded), then the app's actions or "View Details".
+   * The verification component of a row, once the verifications are loaded:
+   * its badge (`display` `badge`) or its admin actions (`actions`)
+   */
+  private renderVerification(
+    service: ExternalService,
+    display: "badge" | "actions"
+  ) {
+    const { verified, verifications, admin, generation } = this;
+    const provider = this.shownProvider;
+    if (!verifications || !provider) return nothing;
+    return html`<ecc-client-elixir-cloud-registry-service-verification
+      display=${display}
+      .provider=${provider}
+      .service=${service}
+      .verification=${verified.get(service.id) ?? null}
+      ?admin=${admin}
+      @ecc-service-verification-changed=${(
+        e: EccServiceVerificationChangedEvent
+      ) => this.handleVerificationChanged(e, generation)}
+      @ecc-service-verification-failed=${(
+        e: EccServiceVerificationFailedEvent
+      ) => this.handleVerificationFailed(e, generation)}
+    ></ecc-client-elixir-cloud-registry-service-verification>`;
+  }
+
+  /**
+   * A renderer for the badges of the rows, next to their version: the
+   * "Verified" (for admins also "Not verified") badge, then the app's.
+   */
+  private createRowBadges(): RowBadgesRenderer {
+    const { rowBadges } = this;
+    return (service: ExternalService) =>
+      html`${this.renderVerification(service, "badge")}${rowBadges
+        ? rowBadges(service) ?? nothing
+        : nothing}`;
+  }
+
+  /**
+   * A renderer for the actions of the rows: "Verify" or "Remove
+   * verification" (admins), then the app's actions or "View Details".
    */
   private createRowActions(): RowActionsRenderer {
-    const { verified, verifications, admin, rowActions } = this;
-    const provider = this.shownProvider;
-    const { generation } = this;
+    const { rowActions } = this;
     return (service: ExternalService) => html`
       <div class="flex items-center gap-2">
-        ${verifications && provider
-          ? html`<ecc-client-elixir-cloud-registry-service-verification
-              .provider=${provider}
-              .service=${service}
-              .verification=${verified.get(service.id) ?? null}
-              ?admin=${admin}
-              @ecc-service-verification-changed=${(
-                e: EccServiceVerificationChangedEvent
-              ) => this.handleVerificationChanged(e, generation)}
-              @ecc-service-verification-failed=${(
-                e: EccServiceVerificationFailedEvent
-              ) => this.handleVerificationFailed(e, generation)}
-            ></ecc-client-elixir-cloud-registry-service-verification>`
-          : nothing}
+        ${this.renderVerification(service, "actions")}
         ${rowActions
           ? rowActions(service) ?? nothing
           : html`<ecc-utils-design-button
@@ -296,6 +353,7 @@ export class ECCClientElixirCloudRegistryServices extends LitElement {
         .filter=${this.filter}
         .search=${this.search}
         .pageSize=${this.pageSize}
+        .rowBadges=${this.renderRowBadges}
         .rowActions=${this.renderRowActions}
         @ecc-services-changed=${this.handleServicesChanged}
       ></ecc-client-ga4gh-service-registry-services>`

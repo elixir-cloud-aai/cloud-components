@@ -69,11 +69,42 @@ const row = (el: El, id: string) =>
     `ecc-utils-design-table-row[data-service-id="${id}"]`
   ) as HTMLElement | null;
 
-/** The verification component in the row of a service. */
+/** The verification badge in the name line of a service's row. */
 const badge = (el: El, id: string) =>
   row(el, id)?.querySelector(
-    "ecc-client-elixir-cloud-registry-service-verification"
+    '[data-row-badges] ecc-client-elixir-cloud-registry-service-verification[display="badge"]'
   ) as Badge | null;
+
+/** The verification actions in the actions column of a service's row. */
+const actions = (el: El, id: string) =>
+  row(el, id)?.querySelector(
+    'slot ecc-client-elixir-cloud-registry-service-verification[display="actions"]'
+  ) as Badge | null;
+
+/** Waits until pending promises have settled and the list has updated. */
+const flush = async (el: El) => {
+  await new Promise((resolve) => {
+    setTimeout(resolve, 0);
+  });
+  await el.updateComplete;
+  await list(el).updateComplete;
+};
+
+/** A promise and the function that resolves it. */
+const deferred = <T>() => {
+  let settle: ((value: T) => void) | undefined;
+  const promise = new Promise<T>((resolve) => {
+    settle = resolve;
+  });
+  return { promise, resolve: (value: T) => settle?.(value) };
+};
+
+/** Fires a verification event as the row's component does. */
+const fire = (target: Element | null, name: string, detail: unknown) => {
+  target?.dispatchEvent(
+    new CustomEvent(name, { detail, bubbles: true, composed: true })
+  );
+};
 
 /** Whether the row of a service shows the "Verified" badge. */
 const shownVerified = (el: El, id: string) => {
@@ -151,6 +182,106 @@ describe("ecc-client-elixir-cloud-registry-services", () => {
     await list(el).updateComplete;
 
     expect(badge(el, "s2")?.admin).to.equal(true);
+    expect(actions(el, "s2")?.admin).to.equal(true);
+  });
+
+  it("puts the badge next to the version and Verify in the actions", async () => {
+    const el = await renderLoaded(stubProvider().provider);
+    el.admin = true;
+    await flush(el);
+
+    const line = badge(el, "s1")?.closest("[data-row-badges]")?.parentElement;
+    expect(line?.textContent).to.include("v1.0.0");
+    expect(actions(el, "s1")).to.not.equal(null);
+    expect(actions(el, "s1")?.verification).to.equal(
+      badge(el, "s1")?.verification
+    );
+    expect(actions(el, "s2")?.verification).to.equal(null);
+  });
+
+  it("renders the app's row badges after the verification badge", async () => {
+    const el = await renderLoaded(stubProvider().provider);
+    el.rowBadges = (svc: ExternalService) =>
+      litHtml`<span data-tag=${svc.id}>Tag</span>`;
+    await flush(el);
+
+    const tag = row(el, "s1")?.querySelector('[data-tag="s1"]');
+    const items = Array.from(tag?.parentElement?.children ?? []);
+    expect(items.indexOf(badge(el, "s1") as Element)).to.equal(0);
+    expect(items.indexOf(tag as Element)).to.equal(1);
+  });
+
+  it("ignores a reload that answers after a later change", async () => {
+    const stubs = stubProvider();
+    const el = await renderLoaded(stubs.provider);
+    const reload = deferred<ServiceVerification[]>();
+    const fresh = deferred<ServiceVerification[]>();
+    stubs.verifications.onCall(1).returns(reload.promise);
+    stubs.verifications.onCall(2).returns(fresh.promise);
+
+    // a verify of s2 fails without a status: the list loads again
+    fire(actions(el, "s2"), "ecc-service-verification-failed", {
+      serviceId: "s2",
+      action: "verify",
+      error: "Lost",
+    });
+    // meanwhile, a remove of s1 succeeds
+    fire(actions(el, "s1"), "ecc-service-verification-changed", {
+      serviceId: "s1",
+      verification: null,
+    });
+    // the reload read the verifications before the remove
+    reload.resolve([verificationOf(SERVICES[0])]);
+    await flush(el);
+    expect(badge(el, "s1")?.verification).to.equal(null);
+
+    // the list loads again after the change, and takes that answer
+    expect(stubs.verifications.callCount).to.equal(3);
+    fresh.resolve([verificationOf(SERVICES[1])]);
+    await flush(el);
+    expect(badge(el, "s1")?.verification).to.equal(null);
+    expect(badge(el, "s2")?.verification).to.not.equal(null);
+  });
+
+  it("ignores a reload that answers after a later reload", async () => {
+    const stubs = stubProvider([]);
+    const el = await renderLoaded(stubs.provider);
+    const first = deferred<ServiceVerification[]>();
+    const second = deferred<ServiceVerification[]>();
+    stubs.verifications.onCall(1).returns(first.promise);
+    stubs.verifications.onCall(2).returns(second.promise);
+    const failed = { serviceId: "s2", action: "verify", error: "Lost" };
+
+    fire(actions(el, "s2"), "ecc-service-verification-failed", failed);
+    fire(actions(el, "s2"), "ecc-service-verification-failed", failed);
+    second.resolve([verificationOf(SERVICES[1])]);
+    await flush(el);
+    first.resolve([]);
+    await flush(el);
+
+    expect(badge(el, "s2")?.verification).to.not.equal(null);
+  });
+
+  it("loads again only after failures with an unclear outcome", async () => {
+    const stubs = stubProvider();
+    const el = await renderLoaded(stubs.provider);
+    const failWith = (status?: number) =>
+      fire(actions(el, "s2"), "ecc-service-verification-failed", {
+        serviceId: "s2",
+        action: "remove",
+        error: "Failed",
+        status,
+      });
+
+    failWith(400);
+    failWith(403);
+    failWith(404);
+    expect(stubs.verifications.callCount).to.equal(1);
+
+    failWith(409);
+    failWith(500);
+    failWith(undefined);
+    expect(stubs.verifications.callCount).to.equal(4);
   });
 
   it("follows a verification by an admin", async () => {
@@ -193,7 +324,7 @@ describe("ecc-client-elixir-cloud-registry-services", () => {
     expect(badge(el, "s1")?.verification).to.equal(null);
   });
 
-  it("renders the app's row actions after the badge", async () => {
+  it("renders the app's row actions after Verify and Remove", async () => {
     const stubs = stubProvider();
     const el = await fixture<El>(
       html`<ecc-client-elixir-cloud-registry-services
@@ -207,9 +338,9 @@ describe("ecc-client-elixir-cloud-registry-services", () => {
     const edit = row(el, "s1")?.querySelector('[data-edit="s1"]');
     expect(edit).to.not.equal(null);
     expect(row(el, "s1")?.querySelector("[data-view-details]")).to.equal(null);
-    // the badge comes first
+    // the verification actions come first
     const cells = Array.from(edit?.parentElement?.children ?? []);
-    expect(cells.indexOf(badge(el, "s1") as Element)).to.equal(0);
+    expect(cells.indexOf(actions(el, "s1") as Element)).to.equal(0);
     expect(cells.indexOf(edit as Element)).to.equal(1);
   });
 

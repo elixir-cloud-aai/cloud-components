@@ -10,6 +10,7 @@ import {
 } from "../../providers/index.js";
 import { matchesVerification } from "../../providers/verifications.js";
 import { nonBlankString } from "../../providers/errors.js";
+import { needsReload } from "./reload.js";
 import type { EccServiceVerificationFailedEvent } from "../../events/index.js";
 import "@elixir-cloud/design/components/badge/index.js";
 import "@elixir-cloud/design/components/button/index.js";
@@ -332,9 +333,8 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
     id: string,
     provider: CloudRegistryProvider
   ): void {
-    const status = statusOf(err);
     if (
-      (status === undefined || status === 409 || status >= 500) &&
+      needsReload(statusOf(err)) &&
       this.showsSame(id, provider) &&
       this.verification === undefined
     ) {
