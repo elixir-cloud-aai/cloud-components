@@ -48,6 +48,9 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
 
   private _provider: ServiceRegistryProvider | null = null;
 
+  /** The number of the latest `loadData()` call */
+  private dataLoads = 0;
+
   /** The REST provider for `baseUrl`, used without a custom provider */
   private restProvider: RestServiceRegistryProvider | null = null;
 
@@ -95,6 +98,13 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
         "Please provide either a base URL for the Service Registry API or a custom provider.";
     } else if (changedProperties.has("serviceId") && !this.serviceId) {
       this.service = null;
+      this.dispatchEvent(
+        new CustomEvent("ecc-service-changed", {
+          detail: { service: null },
+          bubbles: true,
+          composed: true,
+        })
+      );
       this.loading = false;
       this.error = "Please provide a service ID.";
     } else if (
@@ -129,10 +139,14 @@ export class ECCClientGa4ghServiceRegistryService extends LitElement {
     const provider = this._provider;
     const { serviceId } = this;
     if (!provider || !serviceId) return;
-    // a load for a provider or service that was replaced in the meantime is
-    // dropped
+    this.dataLoads += 1;
+    const load = this.dataLoads;
+    // a load for a provider or service that was replaced in the meantime,
+    // or that a newer load replaced, is dropped
     const replaced = () =>
-      provider !== this._provider || serviceId !== this.serviceId;
+      provider !== this._provider ||
+      serviceId !== this.serviceId ||
+      load !== this.dataLoads;
 
     this.loading = true;
     this.error = null;

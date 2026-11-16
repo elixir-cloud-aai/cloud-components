@@ -149,6 +149,12 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
 
   private _provider: ServiceRegistryProvider | null = null;
 
+  /** The number of the latest `loadServiceTypes()` call */
+  private serviceTypeLoads = 0;
+
+  /** The number of the latest `loadData()` call */
+  private dataLoads = 0;
+
   /** The REST provider for `baseUrl`, used without a custom provider */
   private restProvider: RestServiceRegistryProvider | null = null;
 
@@ -222,14 +228,19 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   private async loadServiceTypes(): Promise<void> {
     const provider = this._provider;
     if (!provider) return;
+    this.serviceTypeLoads += 1;
+    const load = this.serviceTypeLoads;
+    // a load from a provider that was replaced in the meantime, or that a
+    // newer load replaced, is dropped
+    const stale = () =>
+      provider !== this._provider || load !== this.serviceTypeLoads;
 
     try {
       const serviceTypes = await provider.getServiceTypes();
-      // a load from a provider that was replaced in the meantime is dropped
-      if (provider !== this._provider) return;
+      if (stale()) return;
       this.serviceTypes = serviceTypes;
     } catch (error) {
-      if (provider === this._provider) this.serviceTypes = [];
+      if (!stale()) this.serviceTypes = [];
       console.error("Failed to load service types:", error);
     }
   }
@@ -237,14 +248,18 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   private async loadData(): Promise<void> {
     const provider = this._provider;
     if (!provider) return;
+    this.dataLoads += 1;
+    const load = this.dataLoads;
+    // a load from a provider that was replaced in the meantime, or that a
+    // newer load replaced, is dropped
+    const stale = () => provider !== this._provider || load !== this.dataLoads;
 
     this.loading = true;
     this.error = null;
 
     try {
       const services = await provider.getServices();
-      // a load from a provider that was replaced in the meantime is dropped
-      if (provider !== this._provider) return;
+      if (stale()) return;
       this.services = services;
 
       // Emit an event with the updated services
@@ -256,7 +271,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
         })
       );
     } catch (err) {
-      if (provider !== this._provider) return;
+      if (stale()) return;
       this.services = [];
       // the app drops the data of the previous provider too
       this.dispatchEvent(
@@ -273,7 +288,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
         breakPoint: "ECCClientGa4ghServiceRegistryServices.loadData",
       });
     } finally {
-      if (provider === this._provider) this.loading = false;
+      if (!stale()) this.loading = false;
     }
   }
 

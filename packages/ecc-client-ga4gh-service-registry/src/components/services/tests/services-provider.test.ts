@@ -269,4 +269,38 @@ describe("ecc-client-ga4gh-service-registry-services provider", () => {
 
     expect(internals.currentPage).to.equal(1);
   });
+
+  it("drops a late failure of an older load from a provider used again", async () => {
+    let failFirst: (error: Error) => void = () => undefined;
+    const first = stubProvider();
+    first.getServices.onFirstCall().returns(
+      new Promise<ExternalService[]>((_resolve, reject) => {
+        failFirst = reject;
+      })
+    );
+    const second = stubProvider([service("b")]);
+    const el = await fixture<ECCClientGa4ghServiceRegistryServices>(
+      html`<ecc-client-ga4gh-service-registry-services
+        .provider=${first}
+      ></ecc-client-ga4gh-service-registry-services>`
+    );
+    el.provider = second;
+    await waitUntil(() => shown(el)[0]?.id === "b");
+    el.provider = first;
+    await waitUntil(() => shown(el)[0]?.id === "a");
+    const reported: ExternalService[][] = [];
+    el.addEventListener("ecc-services-changed", (e) =>
+      reported.push((e as CustomEvent).detail.services)
+    );
+
+    failFirst(new Error("Unavailable"));
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0);
+    });
+    await el.updateComplete;
+
+    expect(shown(el)[0]?.id).to.equal("a");
+    expect(el.shadowRoot?.textContent).not.to.contain("Unavailable");
+    expect(reported).to.deep.equal([]);
+  });
 });

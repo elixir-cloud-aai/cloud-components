@@ -215,4 +215,25 @@ describe("ecc-client-ga4gh-service-registry-service provider", () => {
     expect(shown(el)).to.equal(null);
     expect(reported).to.deep.equal([null]);
   });
+
+  it("reports no service once the service ID is cleared", async () => {
+    const provider = stubProvider();
+    const el = await fixture<ECCClientGa4ghServiceRegistryService>(
+      html`<ecc-client-ga4gh-service-registry-service
+        serviceId="a"
+        .provider=${provider}
+      ></ecc-client-ga4gh-service-registry-service>`
+    );
+    await waitUntil(() => shown(el)?.id === "a");
+    const reported: (ExternalService | null)[] = [];
+    el.addEventListener("ecc-service-changed", (e) =>
+      reported.push((e as CustomEvent).detail.service)
+    );
+
+    el.serviceId = "";
+    await el.updateComplete;
+
+    expect(shown(el)).to.equal(null);
+    expect(reported).to.deep.equal([null]);
+  });
 });

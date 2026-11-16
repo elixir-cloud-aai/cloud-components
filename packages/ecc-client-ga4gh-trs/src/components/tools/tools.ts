@@ -77,6 +77,12 @@ export class ECCClientGa4ghTrsTools extends LitElement {
 
   private _provider: TrsProvider | null = null;
 
+  /** The number of the latest `loadToolClasses()` call */
+  private toolClassLoads = 0;
+
+  /** The number of the latest `loadData()` call */
+  private dataLoads = 0;
+
   /** The REST provider for `baseUrl`, used without a custom provider */
   private restProvider: RestTrsProvider | null = null;
 
@@ -156,11 +162,16 @@ export class ECCClientGa4ghTrsTools extends LitElement {
   private async loadToolClasses(): Promise<void> {
     const provider = this._provider;
     if (!provider) return;
+    this.toolClassLoads += 1;
+    const load = this.toolClassLoads;
+    // a load from a provider that was replaced in the meantime, or that a
+    // newer load replaced, is dropped
+    const stale = () =>
+      provider !== this._provider || load !== this.toolClassLoads;
 
     try {
       const toolClasses = await provider.getToolClasses();
-      // a load from a provider that was replaced in the meantime is dropped
-      if (provider !== this._provider) return;
+      if (stale()) return;
       this.toolClasses = toolClasses;
 
       // Store a mapping of name to ID for lookup during filtering
@@ -168,7 +179,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
         this.toolClasses.map((tc) => [tc.name, tc.id])
       );
     } catch (error) {
-      if (provider === this._provider) {
+      if (!stale()) {
         this.toolClasses = [];
         this.toolClassMap = {};
       }
@@ -179,6 +190,11 @@ export class ECCClientGa4ghTrsTools extends LitElement {
   private async loadData(): Promise<void> {
     const provider = this._provider;
     if (!provider) return;
+    this.dataLoads += 1;
+    const load = this.dataLoads;
+    // a load from a provider that was replaced in the meantime, or that a
+    // newer load replaced, is dropped
+    const stale = () => provider !== this._provider || load !== this.dataLoads;
 
     this.loading = true;
     this.error = null;
@@ -202,8 +218,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
         apiFilterParams,
         this.searchQuery
       );
-      // a load from a provider that was replaced in the meantime is dropped
-      if (provider !== this._provider) return;
+      if (stale()) return;
 
       this.tools = tools;
 
@@ -229,7 +244,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
         this.loadData();
       }
     } catch (err) {
-      if (provider !== this._provider) return;
+      if (stale()) return;
       this.tools = [];
       // the app drops the data of the previous provider too
       this.dispatchEvent(
@@ -245,7 +260,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
         breakPoint: "ECCClientGa4ghTrs.loadData",
       });
     } finally {
-      if (provider === this._provider) this.loading = false;
+      if (!stale()) this.loading = false;
     }
   }
 

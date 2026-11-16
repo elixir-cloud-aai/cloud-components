@@ -226,4 +226,38 @@ describe("ecc-client-ga4gh-trs-tools provider", () => {
     expect(internals(el).tools).to.deep.equal([]);
     expect(reported).to.deep.equal([[]]);
   });
+
+  it("drops a late failure of an older load from a provider used again", async () => {
+    let failFirst: (error: Error) => void = () => undefined;
+    const first = stubProvider();
+    first.stubs.getToolsList.onFirstCall().returns(
+      new Promise<Tool[]>((_resolve, reject) => {
+        failFirst = reject;
+      })
+    );
+    const second = stubProvider([tool("b")]);
+    const el = await fixture<ECCClientGa4ghTrsTools>(
+      html`<ecc-client-ga4gh-trs-tools
+        .provider=${first.provider}
+      ></ecc-client-ga4gh-trs-tools>`
+    );
+    el.provider = second.provider;
+    await waitUntil(() => internals(el).tools[0]?.id === "b");
+    el.provider = first.provider;
+    await waitUntil(() => internals(el).tools[0]?.id === "a");
+    const reported: Tool[][] = [];
+    el.addEventListener("ecc-tools-changed", (e) =>
+      reported.push((e as CustomEvent).detail.tools)
+    );
+
+    failFirst(new Error("Unavailable"));
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0);
+    });
+    await el.updateComplete;
+
+    expect(internals(el).tools[0]?.id).to.equal("a");
+    expect(el.shadowRoot?.textContent).not.to.contain("Unavailable");
+    expect(reported).to.deep.equal([]);
+  });
 });

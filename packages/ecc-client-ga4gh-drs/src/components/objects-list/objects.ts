@@ -52,6 +52,9 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
 
   private _provider: DrsProvider | null = null;
 
+  /** The number of the latest `loadData()` call */
+  private dataLoads = 0;
+
   /** The REST provider for `baseUrl`, used without a custom provider */
   private restProvider: RestDrsProvider | null = null;
 
@@ -127,6 +130,11 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
   private async loadData(): Promise<void> {
     const provider = this._provider;
     if (!provider) return;
+    this.dataLoads += 1;
+    const load = this.dataLoads;
+    // a load from a provider that was replaced in the meantime, or that a
+    // newer load replaced, is dropped
+    const stale = () => provider !== this._provider || load !== this.dataLoads;
 
     this.loading = true;
     this.error = null;
@@ -137,8 +145,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
         this.pageSize,
         this.currentPage - 1
       );
-      // a load from a provider that was replaced in the meantime is dropped
-      if (provider !== this._provider) return;
+      if (stale()) return;
       this.objects = result.objects;
 
       // Update total objects and pages from API response
@@ -172,7 +179,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
         })
       );
     } catch (err) {
-      if (provider !== this._provider) return;
+      if (stale()) return;
       this.objects = [];
       // the app drops the data of the previous provider too
       this.dispatchEvent(
@@ -185,7 +192,7 @@ export class ECCClientGa4ghDrsObjects extends LitElement {
       this.error =
         err instanceof Error ? err.message : "Failed to load objects";
     } finally {
-      if (provider === this._provider) this.loading = false;
+      if (!stale()) this.loading = false;
     }
   }
 

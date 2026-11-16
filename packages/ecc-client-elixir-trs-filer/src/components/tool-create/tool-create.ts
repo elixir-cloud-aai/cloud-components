@@ -227,6 +227,9 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
 
   private _provider: TrsFilerProvider | null = null;
 
+  /** The number of the latest `loadToolClasses()` call */
+  private toolClassLoads = 0;
+
   /** The REST provider for `baseUrl`, used without a custom provider */
   private restProvider: RestTrsFilerProvider | null = null;
 
@@ -385,11 +388,16 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
   private async loadToolClasses(): Promise<void> {
     const provider = this._provider;
     if (!provider) return;
+    this.toolClassLoads += 1;
+    const load = this.toolClassLoads;
+    // a load from a provider that was replaced in the meantime, or that a
+    // newer load replaced, is dropped
+    const stale = () =>
+      provider !== this._provider || load !== this.toolClassLoads;
 
     try {
       const toolClasses = await provider.getToolClasses();
-      // a load from a provider that was replaced in the meantime is dropped
-      if (provider !== this._provider) return;
+      if (stale()) return;
       this.toolClasses = toolClasses;
       // a tool class the provider doesn't offer (e.g. one of a replaced
       // provider) is no longer selected; the default is, if it is offered
@@ -403,7 +411,7 @@ export class ECCClientElixirTrsToolCreate extends LitElement {
         };
       }
     } catch (error) {
-      if (provider !== this._provider) return;
+      if (stale()) return;
       this.toolClasses = [];
       console.error("Failed to load tool classes:", error);
       this.dispatchEvent(
