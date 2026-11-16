@@ -2,6 +2,7 @@
 import { expect, fixture, html, oneEvent, waitUntil } from "@open-wc/testing";
 import { sendKeys } from "@web/test-runner-commands";
 import "../index.js";
+import "../../button/index.js";
 import type { EccUtilsDesignDialog } from "../dialog.js";
 import type { EccDialogOpenChangedEvent } from "../../../events/index.js";
 
@@ -245,6 +246,42 @@ describe("EccUtilsDesignDialog", () => {
       el.open = true;
       await el.updateComplete;
       expect(trigger.getAttribute("aria-expanded")).to.equal("true");
+      el.open = false;
+      await el.updateComplete;
+      expect(trigger.getAttribute("aria-expanded")).to.equal("false");
+    });
+
+    it("reflects `open` to the attribute", async () => {
+      const el = await renderDialog();
+      await clickTrigger(el);
+      expect(el.hasAttribute("open")).to.equal(true);
+      el.close();
+      await el.updateComplete;
+      expect(el.hasAttribute("open")).to.equal(false);
+    });
+
+    it("leaves the trigger of a nested dialog to that dialog", async () => {
+      const { wrapper, el: outer } = await renderIn(
+        html`
+          <div>
+            <ecc-utils-design-dialog id="outer">
+              <ecc-utils-design-dialog id="inner">
+                <button slot="trigger" id="inner-trigger">Open inner</button>
+              </ecc-utils-design-dialog>
+            </ecc-utils-design-dialog>
+          </div>
+        `,
+        "#outer"
+      );
+      const inner = find<EccUtilsDesignDialog>(wrapper, "#inner");
+      outer.open = true;
+      await outer.updateComplete;
+      const events = recordEvents(outer);
+      find<HTMLButtonElement>(wrapper, "#inner-trigger").click();
+      await inner.updateComplete;
+      expect(inner.open).to.equal(true);
+      expect(events.map((e) => e.detail.reason)).to.deep.equal(["trigger"]);
+      expect(events[0].target).to.equal(inner);
     });
   });
 
@@ -291,6 +328,18 @@ describe("EccUtilsDesignDialog", () => {
       await outer.updateComplete;
       expect(inner.open).to.equal(false);
       expect(outer.open).to.equal(true);
+    });
+
+    it("leaves Escape to content that handled it", async () => {
+      const el = await renderDialog(true);
+      const input = find(el, "input");
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") e.preventDefault();
+      });
+      input.focus();
+      await sendKeys({ press: "Escape" });
+      await el.updateComplete;
+      expect(el.open).to.equal(true);
     });
   });
 
@@ -418,6 +467,75 @@ describe("EccUtilsDesignDialog", () => {
       el.open = true;
       await el.updateComplete;
       await waitUntil(() => deepActiveElement()?.id === "b");
+    });
+
+    it("skips hidden, inert and disabled elements", async () => {
+      const { el } = await renderIn(html`
+        <div>
+          <ecc-utils-design-dialog>
+            <input id="hidden" aria-label="Hidden" hidden />
+            <div inert><input id="inert" aria-label="Inert" /></div>
+            <button id="disabled" disabled>Disabled</button>
+            <input id="visible" aria-label="Visible" />
+          </ecc-utils-design-dialog>
+        </div>
+      `);
+      el.open = true;
+      await el.updateComplete;
+      await waitUntil(() => deepActiveElement()?.id === "visible");
+      await sendKeys({ press: "Tab" });
+      expect(deepActiveElement()).to.equal(part(el, "close-button"));
+      await sendKeys({ press: "Tab" });
+      expect(deepActiveElement()?.id).to.equal("visible");
+    });
+
+    it("never gets stuck on elements that can't take focus", async () => {
+      const { el } = await renderIn(html`
+        <div>
+          <ecc-utils-design-dialog hide-close-button>
+            <button id="one">One</button>
+            <fieldset disabled><button id="in-fieldset">In</button></fieldset>
+            <button id="invisible" style="visibility: hidden">Invisible</button>
+            <button id="two">Two</button>
+          </ecc-utils-design-dialog>
+        </div>
+      `);
+      // A link without `href` reports tabIndex 0 but can't take focus
+      const link = document.createElement("a");
+      link.textContent = "Placeholder";
+      find(el, "#one").after(link);
+      el.open = true;
+      await el.updateComplete;
+      await waitUntil(() => deepActiveElement()?.id === "one");
+      await sendKeys({ press: "Tab" });
+      expect(deepActiveElement()?.id).to.equal("two");
+      await sendKeys({ press: "Tab" });
+      expect(deepActiveElement()?.id).to.equal("one");
+      await sendKeys({ press: "Shift+Tab" });
+      expect(deepActiveElement()?.id).to.equal("two");
+    });
+
+    it("keeps Tab inside with the trigger of a closed nested dialog", async () => {
+      const { el: outer } = await renderIn(
+        html`
+          <div>
+            <ecc-utils-design-dialog id="outer" hide-close-button>
+              <button id="outer-button">Outer</button>
+              <ecc-utils-design-dialog id="inner">
+                <button slot="trigger" id="inner-trigger">Open inner</button>
+              </ecc-utils-design-dialog>
+            </ecc-utils-design-dialog>
+          </div>
+        `,
+        "#outer"
+      );
+      outer.open = true;
+      await outer.updateComplete;
+      await waitUntil(() => deepActiveElement()?.id === "outer-button");
+      await sendKeys({ press: "Tab" });
+      expect(deepActiveElement()?.id).to.equal("inner-trigger");
+      await sendKeys({ press: "Tab" });
+      expect(deepActiveElement()?.id).to.equal("outer-button");
     });
 
     it("focuses the content if nothing in it is focusable", async () => {
@@ -593,9 +711,50 @@ describe("EccUtilsDesignDialog", () => {
       expect(dialog.hasAttribute("aria-describedby")).to.equal(false);
     });
 
+    it("marks the focusable control of a custom-element trigger", async () => {
+      const { el } = await renderIn(html`
+        <div>
+          <ecc-utils-design-dialog label="Settings">
+            <ecc-utils-design-button slot="trigger"
+              >Open</ecc-utils-design-button
+            >
+          </ecc-utils-design-dialog>
+        </div>
+      `);
+      const host = find<HTMLElement>(el, "ecc-utils-design-button");
+      await (host as HTMLElement & { updateComplete: Promise<unknown> })
+        .updateComplete;
+      // Trigger slot changes run after the button has rendered
+      el.requestUpdate();
+      await el.updateComplete;
+      const inner = find<HTMLButtonElement>(
+        must(host.shadowRoot, "button shadow root"),
+        "button"
+      );
+      expect(inner.getAttribute("aria-haspopup")).to.equal("dialog");
+      expect(inner.getAttribute("aria-expanded")).to.equal("false");
+      el.open = true;
+      await el.updateComplete;
+      expect(inner.getAttribute("aria-expanded")).to.equal("true");
+    });
+
     it("passes the a11y audit", async () => {
       const el = await renderDialog(true);
       await expect(el).to.be.accessible();
+    });
+  });
+
+  describe("layout", () => {
+    it("scrolls content taller than the window", async () => {
+      const el = await renderDialog(true);
+      expect(getComputedStyle(nativeDialog(el)).overflowY).to.equal("auto");
+      const tall = document.createElement("div");
+      tall.style.height = "5000px";
+      el.append(tall);
+      await waitUntil(
+        () => nativeDialog(el).scrollHeight > nativeDialog(el).clientHeight
+      );
+      expect(nativeDialog(el).clientHeight).to.be.at.most(window.innerHeight);
     });
   });
 });

@@ -3,13 +3,9 @@ import { property, query, state } from "lit/decorators.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 
-/** What opened or closed the dialog */
-export type EccDialogOpenChangeReason =
-  | "trigger"
-  | "escape"
-  | "overlay"
-  | "close-button"
-  | "close";
+import type { EccDialogOpenChangeReason } from "../../events/ecc-dialog-open-changed.js";
+
+export type { EccDialogOpenChangeReason };
 
 const TAG_NAME = "ecc-utils-design-dialog";
 
@@ -31,12 +27,35 @@ function deepActiveElement(): HTMLElement | null {
   return active instanceof HTMLElement ? active : null;
 }
 
+/**
+ * Whether Tab can move focus to the element. `tabIndex` alone isn't enough:
+ * links without `href`, controls in a disabled fieldset and invisible
+ * elements report 0 but can't take focus.
+ */
 function isTabbable(el: HTMLElement): boolean {
+  if (el.tabIndex < 0 || el.matches(":disabled")) return false;
+  if (
+    (el instanceof HTMLAnchorElement || el instanceof HTMLAreaElement) &&
+    !el.hasAttribute("href") &&
+    !el.hasAttribute("tabindex")
+  ) {
+    return false;
+  }
   return (
-    el.tabIndex >= 0 &&
-    !(el as HTMLElement & { disabled?: boolean }).disabled &&
-    el.getClientRects().length > 0
+    el.getClientRects().length > 0 &&
+    getComputedStyle(el).visibility === "visible"
   );
+}
+
+/**
+ * Focuses the first candidate that takes focus, in the order given; returns
+ * whether one did
+ */
+function focusFirst(candidates: HTMLElement[]): boolean {
+  return candidates.some((candidate) => {
+    candidate.focus();
+    return deepActiveElement() === candidate;
+  });
 }
 
 /**
@@ -206,25 +225,34 @@ export class EccUtilsDesignDialog extends LitElement {
    */
   private requestOpenChange(open: boolean, reason: EccDialogOpenChangeReason) {
     if (this.open === open) return;
-    const proceed = this.dispatchEvent(
+    if (this.emitOpenChange(open, reason, true)) this.open = open;
+  }
+
+  /** Fires `ecc-dialog-open-changed`; false if a listener canceled it */
+  private emitOpenChange(
+    open: boolean,
+    reason: EccDialogOpenChangeReason,
+    cancelable: boolean
+  ): boolean {
+    return this.dispatchEvent(
       new CustomEvent("ecc-dialog-open-changed", {
         detail: { open, reason },
         bubbles: true,
         composed: true,
-        cancelable: true,
+        cancelable,
       })
     );
-    if (proceed) this.open = open;
   }
 
   private focusInitial() {
     const elements: HTMLElement[] = [];
     flatTreeElements(this.content, elements);
-    const target =
-      elements.find((el) => el.hasAttribute("autofocus") && isTabbable(el)) ??
-      elements.find(isTabbable) ??
-      this.content;
-    target.focus();
+    const tabbable = elements.filter(isTabbable);
+    const candidates = [
+      ...tabbable.filter((el) => el.hasAttribute("autofocus")),
+      ...tabbable,
+    ];
+    if (!focusFirst(candidates)) this.content.focus();
   }
 
   private restoreFocus() {
@@ -238,21 +266,43 @@ export class EccUtilsDesignDialog extends LitElement {
     const slot =
       this.shadowRoot?.querySelector<HTMLSlotElement>("slot[name=trigger]");
     for (const trigger of slot?.assignedElements() ?? []) {
-      trigger.setAttribute("aria-haspopup", "dialog");
-      trigger.setAttribute("aria-expanded", String(this.open));
+      // A custom element such as `ecc-utils-design-button` takes focus with a
+      // control in its shadow root: the attributes go there, too, so that
+      // assistive technology announces them on the focused control
+      const targets = [trigger];
+      if (trigger instanceof HTMLElement && trigger.tabIndex < 0) {
+        const inner: HTMLElement[] = [];
+        if (trigger.shadowRoot) flatTreeElements(trigger.shadowRoot, inner);
+        const control = inner.find((el) => el.tabIndex >= 0);
+        if (control) targets.push(control);
+      }
+      for (const target of targets) {
+        target.setAttribute("aria-haspopup", "dialog");
+        target.setAttribute("aria-expanded", String(this.open));
+      }
     }
   }
 
-  /** Whether an event's path reached this dialog through another dialog */
+  /**
+   * Whether an event's path reached this dialog through another open dialog,
+   * which handles the event itself (a closed one, e.g. with its trigger in
+   * this dialog, leaves it to this one)
+   */
   private isFromNestedDialog(path: EventTarget[]): boolean {
     const own = path.indexOf(this);
     return path
       .slice(0, own)
-      .some((target) => target instanceof EccUtilsDesignDialog);
+      .some((target) => target instanceof EccUtilsDesignDialog && target.open);
   }
 
   private onKeyDown(event: KeyboardEvent) {
-    if (!this.open || this.isFromNestedDialog(event.composedPath())) return;
+    if (
+      !this.open ||
+      event.defaultPrevented ||
+      this.isFromNestedDialog(event.composedPath())
+    ) {
+      return;
+    }
     if (event.key === "Escape") {
       // Handled here, so the browser doesn't close the dialog by itself and
       // outer dialogs stay open
@@ -288,7 +338,13 @@ export class EccUtilsDesignDialog extends LitElement {
     } else {
       next = (index + (event.shiftKey ? -1 : 1) + count) % count;
     }
-    tabbable[next].focus();
+    // Try the following candidates in the direction of the Tab press if one
+    // refuses focus, so that Tab never gets stuck
+    const step = event.shiftKey ? -1 : 1;
+    const order = tabbable.map(
+      (_, offset) => tabbable[(next + step * offset + count) % count]
+    );
+    if (!focusFirst(order)) this.content.focus();
   }
 
   /** Other close requests than Escape, e.g. the Android back button */
@@ -304,13 +360,9 @@ export class EccUtilsDesignDialog extends LitElement {
     // it was closed because the element was removed
     if (!this.open || this.dialog.open || !this.isConnected) return;
     this.open = false;
-    this.dispatchEvent(
-      new CustomEvent("ecc-dialog-open-changed", {
-        detail: { open: false, reason: "escape" },
-        bubbles: true,
-        composed: true,
-      })
-    );
+    // Browsers close a modal dialog by themselves only on close requests
+    // (e.g. repeated Escape presses), so the reason is `escape`
+    this.emitOpenChange(false, "escape", false);
     this.restoreFocus();
   }
 
@@ -330,12 +382,19 @@ export class EccUtilsDesignDialog extends LitElement {
       }
       return;
     }
-    if (this.isFromNestedDialog(path)) return;
-    const closer = path.find(
+    const closer = path.findIndex(
       (target) =>
         target instanceof Element && target.hasAttribute(CLOSE_ATTRIBUTE)
     );
-    if (closer) this.requestOpenChange(false, "close");
+    // The closest dialog around the element owns it: an element inside a
+    // nested dialog closes that dialog only (which may already be closed
+    // when the click reaches this one)
+    const owner = path
+      .slice(closer + 1)
+      .find((target) => target instanceof EccUtilsDesignDialog);
+    if (closer !== -1 && owner === this) {
+      this.requestOpenChange(false, "close");
+    }
   }
 
   private onSlotChange() {
@@ -362,7 +421,7 @@ export class EccUtilsDesignDialog extends LitElement {
       <dialog
         part="dialog"
         class=${cn(
-          "m-auto w-full max-w-[calc(100%-2rem)] sm:max-w-lg overflow-visible",
+          "m-auto w-full max-w-[calc(100%-2rem)] sm:max-w-lg max-h-[calc(100%-2rem)] overflow-y-auto",
           "rounded-lg border bg-background p-0 text-foreground shadow-lg"
         )}
         aria-modal="true"

@@ -1,4 +1,10 @@
-import type { EccDialogOpenChangeReason } from "../components/dialog/dialog.js";
+/** What opened or closed an `ecc-utils-design-dialog` */
+export type EccDialogOpenChangeReason =
+  | "trigger"
+  | "escape"
+  | "overlay"
+  | "close-button"
+  | "close";
 
 export type EccDialogOpenChangedEvent = CustomEvent<{
   open: boolean;

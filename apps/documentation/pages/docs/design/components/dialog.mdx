@@ -17,7 +17,7 @@ import Input from '@elixir-cloud/design/react/input';
 The `ecc-utils-design-dialog` component is a modal window over the page, like [shadcn/ui's Dialog](https://ui.shadcn.com/docs/components/dialog). It is a generic building block: confirmations, forms, notices, preferences and the like are built from it, together with the other components.
 
 - It opens on a click on its `trigger` slot or when `open` is set.
-- It closes on Escape, on a click on the overlay, on its close button, on a click on an element with the `data-dialog-close` attribute, or when `open` is unset.
+- It closes on Escape (unless content inside handled it and called `preventDefault()`), on a click on the overlay, on its close button, on a click on an element with the `data-dialog-close` attribute, or when `open` is unset.
 - While it is open, the rest of the page is inert. Focus moves into the dialog (to the first element with `autofocus`, else to the first focusable element), Tab and Shift+Tab cycle through the dialog only, and on close focus returns to the element that had it before, e.g. the trigger.
 - It is a `dialog` with `aria-modal="true"`, named by its title (or `label`) and described by its description, so screen readers announce both.
 - User actions fire the cancelable `ecc-dialog-open-changed` event.
@@ -173,7 +173,7 @@ Without a trigger, the app opens and closes the dialog through `open` and follow
 | Slot          | Description                                                                                          |
 |---------------|------------------------------------------------------------------------------------------------------|
 | (default)     | The body of the dialog.                                                                              |
-| `trigger`     | An element that opens the dialog on click, usually a button. It gets `aria-haspopup="dialog"` and `aria-expanded`. |
+| `trigger`     | An element that opens the dialog on click, usually a button. It gets `aria-haspopup="dialog"` and `aria-expanded`; a custom element such as `ecc-utils-design-button` gets them on the control in its shadow root, too. |
 | `title`       | The title. It names the dialog for assistive technology; without it, set `label`.                    |
 | `description` | A description below the title. It describes the dialog for assistive technology.                     |
 | `footer`      | Actions at the bottom, e.g. buttons.                                                                 |
@@ -205,7 +205,7 @@ The header (title and description) and the footer are hidden when their slots ar
 
 ### `ecc-dialog-open-changed`
 
-Fired before the dialog opens or closes because of a user action, not when `open` is changed by code. It bubbles and crosses shadow roots. `detail.open` is the new state, and `detail.reason` says what caused it:
+Fired before the dialog opens or closes because of a user action, not when `open` is changed by code. It bubbles and crosses shadow roots. `detail.open` is the new state, and `detail.reason` says what caused it (type `EccDialogOpenChangeReason`, exported with `EccDialogOpenChangedEvent` from `@elixir-cloud/design/events`):
 
 | Reason         | Cause                                                        |
 |----------------|--------------------------------------------------------------|
@@ -268,5 +268,6 @@ ecc-utils-design-dialog::part(dialog) {
 
 - The dialog is modal: the rest of the page is inert while it is open, and focus stays inside.
 - Give every dialog a title, or a `label` if it has none, so that screen readers announce what it is about.
-- Nested dialogs work: Escape, overlay clicks and `data-dialog-close` close the innermost dialog only.
+- Nested dialogs work: Escape, overlay clicks and `data-dialog-close` close the innermost open dialog only.
+- Content that is taller than the window scrolls inside the dialog.
 - The trigger slot reacts to clicks only. Put a button (or another control that fires a click on Enter and Space) into it, so it works with the keyboard too.
