@@ -106,7 +106,9 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
       "Remove verification"
     );
     expect(part(el, "verify-button")).to.equal(null);
-    expect(part(el, "badge")).to.equal(null);
+    expect(el.shadowRoot?.querySelector("ecc-utils-design-badge")).to.equal(
+      null
+    );
   });
 
   it("shows nothing to other users, and sends no request", async () => {
@@ -129,6 +131,42 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     await settled(el);
     expect(get.calledOnceWithExactly("service-1")).to.equal(true);
     expect(shown(el)).to.equal("verified");
+
+    // and hides the actions again when the user is no admin any more
+    el.admin = false;
+    await settled(el);
+    expect(el.shadowRoot?.querySelector("*")).to.equal(null);
+  });
+
+  it("drops a load that answers after admin was turned off", async () => {
+    const { provider, get } = stubProvider();
+    let answerFirst = (value: typeof VERIFICATION): void => {
+      throw new Error(`No request waits for ${value.url}`);
+    };
+    get.onFirstCall().returns(
+      new Promise((resolve) => {
+        answerFirst = resolve;
+      })
+    );
+    get.onSecondCall().rejects(notFound());
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        service-id="service-1"
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+
+    el.admin = false;
+    await settled(el);
+    answerFirst(VERIFICATION);
+    await settled(el);
+    expect(el.shadowRoot?.querySelector("*")).to.equal(null);
+
+    el.admin = true;
+    await settled(el);
+    expect(get.calledTwice).to.equal(true);
+    expect(shown(el)).to.equal("unverified");
   });
 
   it("loads with a base URL", async () => {
@@ -900,6 +938,11 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     const { detail } = (await changed) as EccServiceVerificationChangedEvent;
     await settled(actionsEl);
     expect(shown(actionsEl)).to.equal("verified");
+    // the badge stays until the app passes the new verification
+    expect(badgeText()).to.equal("Not verified");
+    expect(
+      actionsEl.shadowRoot?.querySelector("ecc-utils-design-badge")
+    ).to.equal(null);
 
     // the app sets the new verification on both
     badgeEl.verification = detail.verification;
