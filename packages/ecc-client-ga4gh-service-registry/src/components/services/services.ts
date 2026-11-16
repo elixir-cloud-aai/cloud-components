@@ -160,6 +160,15 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
 
   private _provider: ServiceRegistryProvider | null = null;
 
+  /** The number of the latest `loadServiceTypes()` call */
+  private serviceTypeLoads = 0;
+
+  /** The number of the latest `loadData()` call */
+  private dataLoads = 0;
+
+  /** The REST provider for `baseUrl`, used without a custom provider */
+  private restProvider: RestServiceRegistryProvider | null = null;
+
   protected async firstUpdated(): Promise<void> {
     if (!this.baseUrl && !this.provider) {
       this.error =
@@ -170,7 +179,8 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
     if (this.provider) {
       this._provider = this.provider;
     } else if (this.baseUrl) {
-      this._provider = new RestServiceRegistryProvider(this.baseUrl);
+      this.restProvider = new RestServiceRegistryProvider(this.baseUrl);
+      this._provider = this.restProvider;
     } else {
       this._provider = null;
     }
@@ -182,31 +192,85 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   }
 
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
-    if (changedProperties.has("baseUrl") && this.baseUrl) {
-      this._provider = new RestServiceRegistryProvider(this.baseUrl);
-      this.loadData();
-      this.loadServiceTypes();
+    if (
+      (changedProperties.has("provider") || changedProperties.has("baseUrl")) &&
+      this.useProvider()
+    ) {
+      // another provider starts on its first page
+      this.currentPage = 1;
+      if (this._provider) {
+        this.loadData();
+        this.loadServiceTypes();
+      } else {
+        this.services = [];
+        this.loading = false;
+        this.serviceTypes = [];
+        this.dispatchEvent(
+          new CustomEvent("ecc-services-changed", {
+            detail: { services: [] },
+            bubbles: true,
+            composed: true,
+          })
+        );
+        this.error =
+          "Please provide either a base URL for the Service Registry API or a custom provider.";
+      }
     }
   }
 
+  /**
+   * Switches to the custom provider or, without one, to a REST provider for
+   * the base URL (to none without either); returns whether the provider in
+   * use changed
+   */
+  private useProvider(): boolean {
+    let provider: ServiceRegistryProvider | null = this.provider ?? null;
+    if (!provider && this.baseUrl) {
+      if (this.restProvider?.baseUrl !== this.baseUrl) {
+        this.restProvider = new RestServiceRegistryProvider(this.baseUrl);
+      }
+      provider = this.restProvider;
+    }
+    if (provider === this._provider) return false;
+    this._provider = provider;
+    return true;
+  }
+
   private async loadServiceTypes(): Promise<void> {
-    if (!this._provider) return;
+    const provider = this._provider;
+    if (!provider) return;
+    this.serviceTypeLoads += 1;
+    const load = this.serviceTypeLoads;
+    // a load from a provider that was replaced in the meantime, or that a
+    // newer load replaced, is dropped
+    const stale = () =>
+      provider !== this._provider || load !== this.serviceTypeLoads;
 
     try {
-      this.serviceTypes = await this._provider.getServiceTypes();
+      const serviceTypes = await provider.getServiceTypes();
+      if (stale()) return;
+      this.serviceTypes = serviceTypes;
     } catch (error) {
+      if (!stale()) this.serviceTypes = [];
       console.error("Failed to load service types:", error);
     }
   }
 
   private async loadData(): Promise<void> {
-    if (!this._provider) return;
+    const provider = this._provider;
+    if (!provider) return;
+    this.dataLoads += 1;
+    const load = this.dataLoads;
+    // a load from a provider that was replaced in the meantime, or that a
+    // newer load replaced, is dropped
+    const stale = () => provider !== this._provider || load !== this.dataLoads;
 
     this.loading = true;
     this.error = null;
 
     try {
-      const services = await this._provider.getServices();
+      const services = await provider.getServices();
+      if (stale()) return;
       this.services = services;
 
       // Emit an event with the updated services
@@ -218,6 +282,16 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
         })
       );
     } catch (err) {
+      if (stale()) return;
+      this.services = [];
+      // the app drops the data of the previous provider too
+      this.dispatchEvent(
+        new CustomEvent("ecc-services-changed", {
+          detail: { services: [] },
+          bubbles: true,
+          composed: true,
+        })
+      );
       this.error =
         err instanceof Error ? err.message : "Failed to load services";
       console.error({
@@ -225,7 +299,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
         breakPoint: "ECCClientGa4ghServiceRegistryServices.loadData",
       });
     } finally {
-      this.loading = false;
+      if (!stale()) this.loading = false;
     }
   }
 

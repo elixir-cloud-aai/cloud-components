@@ -5,12 +5,11 @@
 // TODO
 // Add cleanup function for when an errror is encountered or user terminates process
 const { cwd } = require("process");
-const fg = require("fast-glob");
 const tsup = require("tsup");
 const { program } = require("commander");
 const { execFileSync } = require("child_process");
 const fs = require("fs");
-const { npmDir, normalizePath } = require("./utils.js");
+const { npmDir, getBuildEntries } = require("./utils.js");
 const path = require("path");
 const { reactDir } = require("./utils.js");
 
@@ -119,16 +118,7 @@ nextTask("Building source", async () => {
     format: "esm",
     target: "es2017",
     platform: "browser",
-    entry: [
-      normalizePath(`${sourceDir}/index.ts`),
-      ...(await fg(normalizePath(`${sourceDir}/components/**/!(*.(test)).ts`), {
-        ignore: ["**/tests/**"],
-      })),
-      ...(await fg(normalizePath(`${sourceDir}/providers/**/*.ts`), {
-        ignore: ["**/tests/**"],
-      })),
-      ...(await fg(normalizePath(`${sourceDir}/react/**/*.ts`))),
-    ],
+    entry: getBuildEntries(sourceDir),
     splitting: true,
     treeshake: true,
     bundle: true,
