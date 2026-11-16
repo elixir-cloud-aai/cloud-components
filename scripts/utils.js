@@ -1,4 +1,5 @@
 const path = require("path");
+const fg = require("fast-glob");
 const cwd = require("process").cwd;
 
 const componentsPrefix = "ecc-utils-design-";
@@ -50,8 +51,27 @@ function escapeTemplateLiteral(text) {
     .replaceAll("${", "\\${");
 }
 
+// The entry points that tsup builds from a package's source directory: the
+// root, every component, provider and React wrapper, and the utilities
+// (`utils/index.ts`, if any), which a package exports as a subpath of its
+// own, so that apps can import them without registering the components
+function getBuildEntries(sourceDir) {
+  // fast-glob takes forward slashes only
+  const dir = normalizePath(sourceDir);
+  return [
+    `${dir}/index.ts`,
+    ...fg.sync(`${dir}/components/**/!(*.(test)).ts`, {
+      ignore: ["**/tests/**"],
+    }),
+    ...fg.sync(`${dir}/providers/**/*.ts`, { ignore: ["**/tests/**"] }),
+    ...fg.sync(`${dir}/react/**/*.ts`),
+    ...fg.sync(`${dir}/utils/index.ts`),
+  ];
+}
+
 module.exports = {
   componentsPrefix,
+  getBuildEntries,
   npmDir,
   getAllComponents,
   pascalCase,
