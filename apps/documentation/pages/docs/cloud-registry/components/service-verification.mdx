@@ -116,11 +116,36 @@ services.map((service) => (
 
 After a verify or remove, the component shows the result for that service until the app sets `verification` again, also if the provider is replaced meanwhile by one for the same registry (the same base URL, e.g. with a new token); update your verifications from `ecc-service-verification-changed`, as above. Pass a stable value (e.g. the object from the map, not one built on each render): every new value counts as set again.
 
-To show the badge in one place and the admin actions in another, e.g. the badge next to a service's version and "Verify" or "Remove verification" in the actions column, render the component twice with the same `verification`: once with `display="badge"` and once with `display="actions"`. Only the instance whose action ran shows its result at once; the other one follows when the app sets `verification` from `ecc-service-verification-changed`, as above.
+To show the badge in one place and the admin actions in another, e.g. the badge next to a service's version and "Verify" or "Remove verification" in the actions column, render the component twice: once with `display="badge"` and once with `display="actions"`. Pass both the same `verification` and update it from `ecc-service-verification-changed`, as above: only the instance whose action ran shows its result by itself, and without `verification` each instance would send its own request.
 
-<Callout type='info'>
-  The services list of the GA4GH Service Registry package (`ecc-client-ga4gh-service-registry-services`) doesn't show verifications itself. Render the component with `display="badge"` from its [`rowBadges`](/docs/service-registry/components/services#rowbadges) hook, which places it next to the version, and with `display="actions"` from its [`rowActions`](/docs/service-registry/components/services#rowactions) hook.
-</Callout>
+The services list of the GA4GH Service Registry package (`ecc-client-ga4gh-service-registry-services`) doesn't show verifications itself, but its [`rowBadges`](/docs/service-registry/components/services#rowbadges) hook places the badge next to the version, and its [`rowActions`](/docs/service-registry/components/services#rowactions) hook the actions. `rowActions` replaces the list's "View Details" button, and the actions show nothing to other users than admins, so render your own button there. The hooks take Lit templates (also in React apps) or DOM nodes:
+
+```html copy
+<script type="module">
+  import { html } from 'lit';
+
+  const list = document.querySelector('ecc-client-ga4gh-service-registry-services');
+  // `verified`: verifications by service ID, as above; onChanged() updates
+  // it from the event and calls render() again, so that the list renders
+  // the rows again
+  const render = () => {
+    const verification = (service, display) => html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        display=${display}
+        ?admin=${isAdmin}
+        .provider=${provider}
+        .service=${service}
+        .verification=${verified.get(service.id) ?? null}
+        @ecc-service-verification-changed=${onChanged}
+      ></ecc-client-elixir-cloud-registry-service-verification>`;
+    list.rowBadges = (service) => verification(service, 'badge');
+    list.rowActions = (service) => html`
+      ${verification(service, 'actions')}
+      <button @click=${() => openDetails(service.id)}>View Details</button>`;
+  };
+  render();
+</script>
+```
 
 ## Properties
 

@@ -128,8 +128,9 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
    * The service as the app shows it. A verification only counts while it
    * matches the service's URL and API type (`group`, `artifact`), compared
    * exactly; "Verify" sends them as the ones that the admin checked, so
-   * that a service that changed meanwhile isn't verified (`409`). Without it, the component trusts the registry's
-   * verification and "Verify" verifies the service as it is registered.
+   * that a service that changed meanwhile isn't verified (`409`). Without
+   * it, the component trusts the registry's verification and "Verify"
+   * verifies the service as it is registered.
    */
   @property({ attribute: false }) service?: ExternalService;
 
@@ -152,8 +153,10 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
    * What to show: the badge and, for admins, the actions (`all`, the
    * default), only the badge (`badge`), or only the admin actions
    * (`actions`). A list can place the badge next to the version and the
-   * actions in the actions column with one instance each, passing both the
-   * same `verification`.
+   * actions in the actions column with one instance each; it must pass
+   * both the same `verification` and update it from
+   * `ecc-service-verification-changed`, as only the instance whose action
+   * ran shows the result by itself.
    */
   @property({ type: String, reflect: true })
   display: ServiceVerificationDisplay = "all";
