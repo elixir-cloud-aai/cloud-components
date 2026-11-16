@@ -820,4 +820,66 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
 
     expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
   });
+
+  it("shows only the badge, also to admins, with `display` badge", async () => {
+    const { provider } = stubProvider();
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        display="badge"
+        .service=${SERVICE}
+        .verification=${null}
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    expect(part(el, "badge")?.textContent?.trim()).to.equal("Not verified");
+    expect(part(el, "verify-button")).to.equal(null);
+    expect(part(el, "remove-button")).to.equal(null);
+
+    el.verification = VERIFICATION;
+    await settled(el);
+    expect(part(el, "badge")?.textContent?.trim()).to.equal("Verified");
+    expect(part(el, "remove-button")).to.equal(null);
+  });
+
+  it("shows only the admin actions with `display` actions", async () => {
+    const { provider, verify } = stubProvider();
+    verify.resolves(VERIFICATION);
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        admin
+        display="actions"
+        .service=${SERVICE}
+        .verification=${null}
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+    expect(part(el, "badge")).to.equal(null);
+
+    const changed = oneEvent(el, "ecc-service-verification-changed");
+    click(part(el, "verify-button"));
+    await changed;
+    await el.updateComplete;
+
+    expect(part(el, "badge")).to.equal(null);
+    expect(part(el, "remove-button")).to.not.equal(null);
+  });
+
+  it("shows nothing to other users with `display` actions", async () => {
+    const { provider } = stubProvider();
+    const el = await fixture<El>(html`
+      <ecc-client-elixir-cloud-registry-service-verification
+        display="actions"
+        .service=${SERVICE}
+        .verification=${VERIFICATION}
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-verification>
+    `);
+    await settled(el);
+
+    expect(el.shadowRoot?.querySelector("*")).to.equal(null);
+  });
 });

@@ -70,6 +70,13 @@ const pendingKey = (id: string, provider: CloudRegistryProvider): string => {
   return JSON.stringify([typeof baseUrl === "string" ? baseUrl : "", id]);
 };
 
+/**
+ * What the component shows: the badge and, for admins, the actions
+ * (`"all"`), only the badge (`"badge"`), or only the admin actions
+ * (`"actions"`), e.g. to place them in different parts of a list row
+ */
+export type ServiceVerificationDisplay = "all" | "badge" | "actions";
+
 /** Date of a verification for people, e.g. "20 Oct 2026"; else as sent */
 const formatDate = (value: string): string => {
   const date = new Date(value);
@@ -91,6 +98,7 @@ const formatDate = (value: string): string => {
  * @property {ExternalService} service - The service as the app shows it (optional): a verification only counts while it matches the service's URL and API type, and "Verify" sends them as checked
  * @property {Verification | null} verification - The verification, if the app has loaded it already (optional; `null`: not verified), e.g. from `getVerifications()` for a list; else the component loads it
  * @property {boolean} admin - Whether to offer "Verify" and "Remove verification" (for admins of the registry); default `false`
+ * @property {ServiceVerificationDisplay} display - What to show: `all` (default) the badge and, for admins, the actions; `badge` only the badge ("Not verified" also for admins); `actions` only "Verify" or "Remove verification" (admins; nothing for other users)
  *
  * @fires ecc-service-verification-changed - Fired when an admin verified the service or removed its verification (includes the service ID and the new verification, or `null`)
  * @fires ecc-service-verification-failed - Fired when loading, verifying or removing the verification fails (includes the action, the error message and, if the registry sent them, the status, problem details and conflict code)
@@ -118,10 +126,9 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
 
   /**
    * The service as the app shows it. A verification only counts while it
-   * matches the service's URL (as written) and API type (`group`,
-   * `artifact`), as the registry compares them; "Verify" sends them as the
-   * ones that the admin checked, so that a service that changed meanwhile
-   * isn't verified (`409`). Without it, the component trusts the registry's
+   * matches the service's URL and API type (`group`, `artifact`), compared
+   * exactly; "Verify" sends them as the ones that the admin checked, so
+   * that a service that changed meanwhile isn't verified (`409`). Without it, the component trusts the registry's
    * verification and "Verify" verifies the service as it is registered.
    */
   @property({ attribute: false }) service?: ExternalService;
@@ -140,6 +147,16 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
    * itself.
    */
   @property({ type: Boolean }) admin = false;
+
+  /**
+   * What to show: the badge and, for admins, the actions (`all`, the
+   * default), only the badge (`badge`), or only the admin actions
+   * (`actions`). A list can place the badge next to the version and the
+   * actions in the actions column with one instance each, passing both the
+   * same `verification`.
+   */
+  @property({ type: String, reflect: true })
+  display: ServiceVerificationDisplay = "all";
 
   // The verification shown: `undefined` while it loads or if loading failed
   @state() private current?: Verification | null;
@@ -430,14 +447,9 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
     );
   }
 
-  render() {
-    // nothing while loading, and nothing else for unverified services
-    // unless the user is an admin
+  private renderBadge() {
     const { current, verified } = this;
-    if (current === undefined) return nothing;
-    if (!verified && !this.admin) return nothing;
-
-    const badge = verified
+    return verified
       ? html`<ecc-utils-design-badge
           part="badge"
           variant="secondary"
@@ -462,30 +474,41 @@ export class ECCClientElixirCloudRegistryServiceVerification extends LitElement 
       : html`<ecc-utils-design-badge part="badge" variant="outline">
           Not verified
         </ecc-utils-design-badge>`;
+  }
 
-    if (!this.admin) return badge;
+  private renderAction() {
+    return this.verified
+      ? html`<ecc-utils-design-button
+          part="remove-button"
+          size="sm"
+          variant="outline"
+          .disabled=${this.busy}
+          @click=${this.removeVerification}
+        >
+          ${this.busy ? "Removing..." : "Remove verification"}
+        </ecc-utils-design-button>`
+      : html`<ecc-utils-design-button
+          part="verify-button"
+          size="sm"
+          .disabled=${this.busy}
+          @click=${this.verifyService}
+        >
+          ${this.busy ? "Verifying..." : "Verify"}
+        </ecc-utils-design-button>`;
+  }
+
+  render() {
+    // nothing while loading, and nothing else for unverified services
+    // unless the user is an admin
+    const { current, verified, admin, display } = this;
+    if (current === undefined) return nothing;
+    if (display === "actions") return admin ? this.renderAction() : nothing;
+    if (!verified && !admin) return nothing;
+    if (display === "badge" || !admin) return this.renderBadge();
 
     return html`
       <div class="flex items-center gap-2">
-        ${badge}
-        ${verified
-          ? html`<ecc-utils-design-button
-              part="remove-button"
-              size="sm"
-              variant="outline"
-              .disabled=${this.busy}
-              @click=${this.removeVerification}
-            >
-              ${this.busy ? "Removing..." : "Remove verification"}
-            </ecc-utils-design-button>`
-          : html`<ecc-utils-design-button
-              part="verify-button"
-              size="sm"
-              .disabled=${this.busy}
-              @click=${this.verifyService}
-            >
-              ${this.busy ? "Verifying..." : "Verify"}
-            </ecc-utils-design-button>`}
+        ${this.renderBadge()} ${this.renderAction()}
       </div>
     `;
   }
