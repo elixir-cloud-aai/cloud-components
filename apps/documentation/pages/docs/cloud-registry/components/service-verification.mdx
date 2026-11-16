@@ -128,10 +128,27 @@ The services list of the GA4GH Service Registry package (`ecc-client-ga4gh-servi
 <script type="module">
   import { html } from 'lit';
 
+  import { verifiedServices } from '@elixir-cloud/cloud-registry/providers';
+
+  // the app's own: `provider`, `isAdmin` (from GET /me), `openDetails()`
   const list = document.querySelector('ecc-client-ga4gh-service-registry-services');
-  // `verified`: verifications by service ID, as above; onChanged() updates
-  // it from the event and calls render() again, so that the list renders
-  // the rows again
+  list.provider = provider;
+  const [services, verifications] = await Promise.all([
+    provider.getServices(),
+    provider.getVerifications(),
+  ]);
+  const verified = verifiedServices(services, verifications);
+
+  // follows verify and remove, and renders the rows again
+  const onChanged = ({ detail }) => {
+    if (detail.verification) {
+      verified.set(detail.serviceId, { serviceId: detail.serviceId, ...detail.verification });
+    } else {
+      verified.delete(detail.serviceId);
+    }
+    render();
+  };
+
   const render = () => {
     const verification = (service, display) => html`
       <ecc-client-elixir-cloud-registry-service-verification

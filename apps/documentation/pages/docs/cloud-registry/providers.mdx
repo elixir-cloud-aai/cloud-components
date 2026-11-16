@@ -183,7 +183,7 @@ verifyService?(id: string, verification?: VerificationRegister): Promise<Verific
 deleteServiceVerification?(id: string): Promise<string>
 ```
 
-A verification only counts while the service still has the verified URL and API type (`type.group` and `type.artifact`; not `type.version`). The registry serves each verification with the service's current URL and API type, and removes it when the URL or the API type (trimmed and case-insensitive) changes, so the helpers compare them exactly. A list of services and a list of verifications loaded one after the other may disagree, e.g. after a change of case only; load them again together. Two helpers compare them:
+A verification only counts while the service still has the verified URL and API type (`type.group` and `type.artifact`; not `type.version`). The registry serves each verification with the service's current URL and API type, and removes it when the URL (exactly as written) or the API type (trimmed and case-insensitive) changes, or when the service awaits approval again, so the helpers compare them exactly. A list of services and a list of verifications loaded one after the other may disagree, e.g. after a change of case only; load them again together. Two helpers compare them:
 
 ```typescript
 import {

@@ -4,7 +4,8 @@
  * still has the verified URL and API type (`type.group` and
  * `type.artifact`; not `type.version`). The registry serves each
  * verification with the service's current URL and API type, and removes it
- * when the URL or the API type (trimmed and case-insensitive) changes, so
+ * when the URL (exactly as written) or the API type (trimmed and
+ * case-insensitive) changes, or when the service awaits approval again, so
  * services and verifications of the same moment match exactly. A list of
  * services and a list of verifications loaded one after the other may
  * disagree, e.g. after a change of case only.

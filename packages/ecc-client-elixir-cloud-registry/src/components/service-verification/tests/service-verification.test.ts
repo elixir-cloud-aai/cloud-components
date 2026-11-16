@@ -902,6 +902,8 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     el.display = "badge";
     await settled(el);
     expect(el.getAttribute("display")).to.equal("badge");
+    expect(part(el, "badge") !== null).to.equal(true);
+    expect(part(el, "verify-button") === null).to.equal(true);
   });
 
   it("shows nothing to other users for an unverified service with `display` actions", async () => {
@@ -916,6 +918,9 @@ describe("ecc-client-elixir-cloud-registry-service-verification", () => {
     `);
     await settled(el);
 
+    expect(el.shadowRoot?.querySelector("*") === null).to.equal(true);
+    el.verification = VERIFICATION;
+    await settled(el);
     expect(el.shadowRoot?.querySelector("*") === null).to.equal(true);
   });
 
