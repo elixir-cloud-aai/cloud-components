@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "es2018",
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "Node16",
+    "moduleResolution": "node16",
     "noEmitOnError": true,
     "lib": ["es2017", "dom"],
     "strict": true,
@@ -16,16 +16,7 @@
     "rootDir": "./",
     "declaration": true,
     "emitDeclarationOnly": true,
-    "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@elixir-cloud/service-registry/components/*": [
-        "../../node_modules/@elixir-cloud/service-registry/dist/components/*"
-      ],
-      "@elixir-cloud/service-registry/events": [
-        "../../node_modules/@elixir-cloud/service-registry/dist/events/index"
-      ]
-    }
+    "skipLibCheck": true
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"]
