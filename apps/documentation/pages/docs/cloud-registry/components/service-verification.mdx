@@ -11,7 +11,7 @@ import ComponentName from '@/components/common/ComponentName'
 
 ## Overview
 
-The `ecc-client-elixir-cloud-registry-service-verification` component shows whether a service in the Cloud Registry is verified, i.e. whether an admin of the registry checked it (e.g. that it accepts the tokens of the deployment's identity provider). Verified services get a "Verified" badge; its tooltip says when. For admins, the component also offers "Verify" and "Remove verification".
+The `ecc-client-elixir-cloud-registry-service-verification` component lets admins of the Cloud Registry verify a service, i.e. record that they checked it (e.g. that it accepts the tokens of the deployment's identity provider), or remove its verification: it shows "Verify" for a service that isn't verified and "Remove verification" for one that is. Other users see nothing. To show users whether a service is verified, use the [Service Verification Badge](/docs/cloud-registry/components/service-verification-badge), which takes the verification from the app and sends no requests.
 
 It uses the verification endpoints of Cloud Registry 0.4.0 and later (see [Verifications](/docs/cloud-registry/providers#verifications)):
 
@@ -27,14 +27,15 @@ It uses the verification endpoints of Cloud Registry 0.4.0 and later (see [Verif
 
 ### One service
 
-The component loads the verification of the service and shows the badge if the service is verified; otherwise it shows nothing. Pass the service with `service`, as the app shows it: the badge then only shows while the verification matches the service's URL and API type, and "Verify" sends them to the registry as the ones that the admin checked, so that a service that has changed meanwhile isn't verified.
+The app loads the verification once, passes it to the badge and to the actions, and updates it from `ecc-service-verification-changed`. Pass the service with `service`, as the app shows it: a verification then only counts while it matches the service's URL and API type, and "Verify" sends them to the registry as the ones that the admin checked, so that a service that has changed meanwhile isn't verified.
 
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>
     ```tsx showLineNumbers copy filename="service-verification.tsx"
-    import React, { useMemo } from 'react';
+    import React, { useEffect, useMemo, useState } from 'react';
     import { EccClientElixirCloudRegistryServiceVerification } from '@elixir-cloud/cloud-registry/react/service-verification';
-    import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
+    import { EccClientElixirCloudRegistryServiceVerificationBadge } from '@elixir-cloud/cloud-registry/react/service-verification-badge';
+    import { RestCloudRegistryProvider, matchesVerification } from '@elixir-cloud/cloud-registry/providers';
 
     export default function ServiceHeader({ service, me }) {
       // created once: a new provider makes the component load again
@@ -42,16 +43,32 @@ The component loads the verification of the service and shows the badge if the s
         () => new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1'),
         []
       );
+      // undefined while it loads, null if the service isn't verified
+      const [verification, setVerification] = useState(undefined);
+      useEffect(() => {
+        provider
+          .getServiceVerification(service.id)
+          .then((found) => setVerification(matchesVerification(service, found) ? found : null))
+          .catch(() => setVerification(null)); // e.g. 404: not verified
+      }, [provider, service]);
 
       return (
         <h1>
           {service.name}{' '}
-          <EccClientElixirCloudRegistryServiceVerification
-            provider={provider}
-            service={service}
-            admin={me.admin}
-            onEccServiceVerificationFailed={(event) => console.error(event.detail.error)}
-          />
+          <EccClientElixirCloudRegistryServiceVerificationBadge
+            verification={verification}
+            showUnverified={me.admin}
+          />{' '}
+          {verification !== undefined && (
+            <EccClientElixirCloudRegistryServiceVerification
+              provider={provider}
+              service={service}
+              admin={me.admin}
+              verification={verification}
+              onEccServiceVerificationChanged={(event) => setVerification(event.detail.verification)}
+              onEccServiceVerificationFailed={(event) => console.error(event.detail.error)}
+            />
+          )}
         </h1>
       );
     }
@@ -60,6 +77,7 @@ The component loads the verification of the service and shows the badge if the s
   <Tabs.Tab>
     ```html showLineNumbers copy filename="service-verification.html"
     <ecc-client-elixir-cloud-registry-service-verification
+      admin
       service-id="org.example.my-tes"
     ></ecc-client-elixir-cloud-registry-service-verification>
 
@@ -67,6 +85,7 @@ The component loads the verification of the service and shows the badge if the s
       import '@elixir-cloud/cloud-registry';
       import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
 
+      // without `verification`, the component loads it itself
       document.querySelector('ecc-client-elixir-cloud-registry-service-verification').provider =
         new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
     </script>
@@ -74,9 +93,11 @@ The component loads the verification of the service and shows the badge if the s
   </Tabs.Tab>
 </Tabs>
 
+Without `verification`, the component loads the verification itself (for admins only), e.g. for a page that offers only the actions.
+
 ### A list of services
 
-For a list, load all verifications with one request (`getVerifications()`), keep those that still match their services (`verifiedServices()`), and pass each row's verification with `verification`: the rows then send no requests of their own. `null` means that the service isn't verified.
+For a list, load all verifications with one request (`getVerifications()`), keep those that still match their services (`verifiedServices()`), and pass each row's verification with `verification` to the badge and to the actions: the rows then send no requests of their own. `null` means that the service isn't verified.
 
 ```tsx copy
 import { verifiedServices } from '@elixir-cloud/cloud-registry/providers';
@@ -93,30 +114,34 @@ const [verified, setVerified] = useState(
 // `me` is the response of the registry's GET /me
 
 services.map((service) => (
-  <EccClientElixirCloudRegistryServiceVerification
-    key={service.id}
-    provider={provider}
-    service={service}
-    admin={me.admin}
-    verification={verified.get(service.id) ?? null}
-    onEccServiceVerificationChanged={({ detail }) =>
-      setVerified((current) => {
-        const next = new Map(current);
-        if (detail.verification) {
-          next.set(detail.serviceId, { serviceId: detail.serviceId, ...detail.verification });
-        } else {
-          next.delete(detail.serviceId);
-        }
-        return next;
-      })
-    }
-  />
+  <li key={service.id}>
+    {service.name}{' '}
+    <EccClientElixirCloudRegistryServiceVerificationBadge
+      verification={verified.get(service.id) ?? null}
+      showUnverified={me.admin}
+    />
+    <EccClientElixirCloudRegistryServiceVerification
+      provider={provider}
+      service={service}
+      admin={me.admin}
+      verification={verified.get(service.id) ?? null}
+      onEccServiceVerificationChanged={({ detail }) =>
+        setVerified((current) => {
+          const next = new Map(current);
+          if (detail.verification) {
+            next.set(detail.serviceId, { serviceId: detail.serviceId, ...detail.verification });
+          } else {
+            next.delete(detail.serviceId);
+          }
+          return next;
+        })
+      }
+    />
+  </li>
 ));
 ```
 
-After a verify or remove, the component shows the result for that service until the app sets `verification` again, also if the provider is replaced meanwhile by one for the same registry (the same base URL, e.g. with a new token); update your verifications from `ecc-service-verification-changed`, as above. Pass a stable value (e.g. the object from the map, not one built on each render): every new value counts as set again.
-
-To show the badge in one place and the admin actions in another, e.g. the badge next to a service's version and "Verify" or "Remove verification" in the actions column, render the component twice: once with `display="badge"` and once with `display="actions"`. Pass both the same `verification` and update it from `ecc-service-verification-changed`, as above: only the instance whose action ran shows its result by itself, and without `verification` each instance would send its own request.
+After a verify or remove, the component shows the result for that service until the app sets `verification` again, also if the provider is replaced meanwhile by one for the same registry (the same base URL, e.g. with a new token). The badge shows only what the app passes, so update your verifications from `ecc-service-verification-changed`, as above. Pass a stable value (e.g. the object from the map, not one built on each render): every new value counts as set again.
 
 The services list of the GA4GH Service Registry package (`ecc-client-ga4gh-service-registry-services`) doesn't show verifications itself, but its [`rowBadges`](/docs/service-registry/components/services#rowbadges) hook places the badge next to the version, and its [`rowActions`](/docs/service-registry/components/services#rowactions) hook the actions. `rowActions` replaces the list's "View Details" button, and the actions show nothing to other users than admins, so render your own button there. The hooks take Lit templates (also in React apps) or DOM nodes:
 
@@ -146,18 +171,19 @@ The services list of the GA4GH Service Registry package (`ecc-client-ga4gh-servi
   };
 
   const render = () => {
-    const verification = (service, display) => html`
+    list.rowBadges = (service) => html`
+      <ecc-client-elixir-cloud-registry-service-verification-badge
+        ?show-unverified=${isAdmin}
+        .verification=${verified.get(service.id) ?? null}
+      ></ecc-client-elixir-cloud-registry-service-verification-badge>`;
+    list.rowActions = (service) => html`
       <ecc-client-elixir-cloud-registry-service-verification
-        display=${display}
         ?admin=${isAdmin}
         .provider=${provider}
         .service=${service}
         .verification=${verified.get(service.id) ?? null}
         @ecc-service-verification-changed=${onChanged}
-      ></ecc-client-elixir-cloud-registry-service-verification>`;
-    list.rowBadges = (service) => verification(service, 'badge');
-    list.rowActions = (service) => html`
-      ${verification(service, 'actions')}
+      ></ecc-client-elixir-cloud-registry-service-verification>
       <button @click=${() => openDetails(service.id)}>View Details</button>`;
   };
   render();
@@ -171,24 +197,20 @@ The services list of the GA4GH Service Registry package (`ecc-client-ga4gh-servi
 | `baseUrl`      | `string`                | `""`        | Base URL of the Cloud Registry API, if no `provider` is set |
 | `provider`     | `CloudRegistryProvider` | `undefined` | Data provider (see [Providers](/docs/cloud-registry/providers)); takes precedence over `baseUrl` |
 | `serviceId`    | `string`                | `""`        | ID of the service (attribute `service-id`); defaults to the ID of `service` |
-| `service`      | `ExternalService`       | `undefined` | The service as the app shows it: the badge only shows while the verification matches its URL and API type, and "Verify" sends them as checked |
+| `service`      | `ExternalService`       | `undefined` | The service as the app shows it: a verification only counts while it matches its URL and API type, and "Verify" sends them as checked |
 | `verification` | `Verification \| null`  | `undefined` | The verification if the app has loaded it (`null`: not verified); if `undefined`, the component loads it |
-| `admin`        | `boolean`               | `false`     | Whether to offer "Verify" and "Remove verification" |
-| `display`      | `"all" \| "badge" \| "actions"` | `"all"` | What to show (attribute `display`): the badge and, for admins, the actions (`all`), only the badge (`badge`), or only the admin actions (`actions`) |
+| `admin`        | `boolean`               | `false`     | Whether to offer "Verify" and "Remove verification"; for other users, the component shows nothing and sends no requests |
 
 ### `provider` and `baseUrl`
-The component loads the verification again when `provider`, `baseUrl`, `serviceId` or the ID of `service` changes, also if the app sets them after the first render; if the app passes `verification`, it shows that instead (or the result of a verify or remove since, until the app sets `verification` again). A new object of the same service (e.g. of a reloaded list) needs no new request, unless its URL or API type changed: the registry then removes the verification. In React, create the provider only when its inputs change, e.g. with `useMemo`.
+The component loads the verification again when `admin`, `provider`, `baseUrl`, `serviceId` or the ID of `service` changes, also if the app sets them after the first render; if the app passes `verification`, it uses that instead (or the result of a verify or remove since, until the app sets `verification` again). A new object of the same service (e.g. of a reloaded list) needs no new request, unless its URL or API type changed: the registry then removes the verification. In React, create the provider only when its inputs change, e.g. with `useMemo`.
 
 Custom providers implement the optional verification methods of `CloudRegistryProvider`; without them, the component fires `ecc-service-verification-failed`.
 
 ### `service`
-Without `service`, the component shows the registry's verification as it is, and "Verify" verifies the service as it is registered at the time of the request. With `service`, a verification of another URL or API type (`type.group` and `type.artifact`, compared exactly) doesn't count.
+Without `service`, the component takes the registry's verification as it is, and "Verify" verifies the service as it is registered at the time of the request. With `service`, a verification of another URL or API type (`type.group` and `type.artifact`, compared exactly) doesn't count, so "Verify" shows.
 
 ### `admin`
-Apps take the value from `admin` of the registry's `GET /me`. The property only changes what the component offers: the registry checks permissions itself and answers other users with `403`. For admins, unverified services show a "Not verified" badge and a "Verify" button; verified services show "Remove verification".
-
-### `display`
-By default (`all`), the component shows the badge and, for admins, "Verify" or "Remove verification" next to it. With `badge`, it shows only the badge: "Verified", or for admins also "Not verified". With `actions`, it shows only "Verify" or "Remove verification" to admins, and nothing to other users. See [A list of services](#a-list-of-services) for using both in one row.
+Apps take the value from `admin` of the registry's `GET /me`. The property only changes what the component offers: the registry checks permissions itself and answers other users with `403`. For admins, unverified services show "Verify" and verified services "Remove verification"; other users see nothing, and the component doesn't load the verification for them.
 
 ## Events
 
@@ -198,7 +220,7 @@ By default (`all`), the component shows the badge and, for admins, "Verify" or "
 | `ecc-service-verification-failed`  | `onEccServiceVerificationFailed`   | `{ serviceId: string, action: "load" \| "verify" \| "remove", error: string, status?: number, title?: string, detail?: string, code?: string, cause?: unknown }` | Fired when loading, verifying or removing the verification fails |
 
 ### `ecc-service-verification-changed`
-Emitted after an admin verified the service (`verification`: the new verification) or removed its verification (`null`). A verification that was removed already (`404`) counts as removed. The event is fired whenever the registry has applied the change, also if the component shows another service by then (`serviceId` names the service). Apps that pass `verification` update it from this event, e.g. in their map of verified services.
+Emitted after an admin verified the service (`verification`: the new verification) or removed its verification (`null`). A verification that was removed already (`404`) counts as removed. The event is fired whenever the registry has applied the change, also if the component shows another service by then (`serviceId` names the service). Apps update their verifications from this event, e.g. in their map of verified services, so that the badges follow.
 
 ### `ecc-service-verification-failed`
 Emitted when a request fails. Services that aren't verified (`404` when loading) are no failure.
@@ -237,6 +259,5 @@ Emitted when a request fails. Services that aren't verified (`404` when loading)
 
 | Part            | Description |
 |-----------------|-------------|
-| `badge`         | The "Verified" (for admins also "Not verified") badge |
 | `verify-button` | The "Verify" button (admins) |
 | `remove-button` | The "Remove verification" button (admins) |

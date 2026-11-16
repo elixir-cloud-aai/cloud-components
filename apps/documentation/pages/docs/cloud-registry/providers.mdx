@@ -163,7 +163,7 @@ createOrUpdateServiceInfo?(service: ServiceRegister): Promise<void>
 
 ### Verifications
 
-Cloud Registry 0.4.0 and later let admins verify services, e.g. after checking that they accept the tokens of the deployment's identity provider. The methods are optional in `CloudRegistryProvider`, so that custom providers without them still conform; `RestCloudRegistryProvider` has them all. The [Service Verification component](/docs/cloud-registry/components/service-verification) uses them.
+Cloud Registry 0.4.0 and later let admins verify services, e.g. after checking that they accept the tokens of the deployment's identity provider. The methods are optional in `CloudRegistryProvider`, so that custom providers without them still conform; `RestCloudRegistryProvider` has them all. The [Service Verification component](/docs/cloud-registry/components/service-verification) uses them, and the [Service Verification Badge](/docs/cloud-registry/components/service-verification-badge) shows their results.
 
 ```typescript
 // GET /verifications: the verified services, sorted by ID
