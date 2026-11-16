@@ -73,9 +73,16 @@ function isWithin(node: Node, host: Node): boolean {
 /** Number of open dialogs that lock the page's scrolling */
 let scrollLocks = 0;
 
-/** Inline styles of `body` before the first lock, restored by the last */
-let bodyStyleBeforeLock: { overflow: string; paddingRight: string } | null =
-  null;
+/**
+ * Inline styles of `body` before the first lock, restored by the last, and
+ * the padding that the lock set. The state is per copy of this module: a
+ * page should load the design package once.
+ */
+let bodyStyleBeforeLock: {
+  overflow: string;
+  paddingRight: string;
+  lockedPaddingRight: string;
+} | null = null;
 
 /**
  * Stops the page behind open dialogs from scrolling, as shadcn/ui does;
@@ -87,7 +94,7 @@ function lockScroll() {
   if (scrollLocks > 1) return;
   const { body } = document;
   const scrollbar = window.innerWidth - document.documentElement.clientWidth;
-  bodyStyleBeforeLock = {
+  const before = {
     overflow: body.style.overflow,
     paddingRight: body.style.paddingRight,
   };
@@ -96,6 +103,10 @@ function lockScroll() {
     body.style.paddingRight = `${padding + scrollbar}px`;
   }
   body.style.overflow = "hidden";
+  bodyStyleBeforeLock = {
+    ...before,
+    lockedPaddingRight: body.style.paddingRight,
+  };
 }
 
 /** Releases a lock of `lockScroll()`; the last one restores the page */
@@ -104,8 +115,13 @@ function unlockScroll() {
   scrollLocks -= 1;
   if (scrollLocks > 0 || !bodyStyleBeforeLock) return;
   const { body } = document;
-  body.style.overflow = bodyStyleBeforeLock.overflow;
-  body.style.paddingRight = bodyStyleBeforeLock.paddingRight;
+  // leave values that someone else changed during the lock as they are
+  if (body.style.overflow === "hidden") {
+    body.style.overflow = bodyStyleBeforeLock.overflow;
+  }
+  if (body.style.paddingRight === bodyStyleBeforeLock.lockedPaddingRight) {
+    body.style.paddingRight = bodyStyleBeforeLock.paddingRight;
+  }
   bodyStyleBeforeLock = null;
 }
 
@@ -130,16 +146,17 @@ function flatTreeElements(root: Element | ShadowRoot, out: HTMLElement[]) {
 }
 
 /**
- * The element of a trigger that takes focus: the trigger itself, or, for a
- * custom element such as `ecc-utils-design-button`, the control in its
- * shadow root
+ * The element of a trigger that takes focus: the trigger itself, or the
+ * first focusable element inside it, e.g. the control in the shadow root of
+ * a custom element such as `ecc-utils-design-button`, or a button in a
+ * wrapper; `null` if there is none
  */
 function focusableControl(trigger: Element): HTMLElement | null {
   if (!(trigger instanceof HTMLElement)) return null;
-  if (trigger.tabIndex >= 0 || !trigger.shadowRoot) return trigger;
+  if (trigger.tabIndex >= 0) return trigger;
   const inner: HTMLElement[] = [];
-  flatTreeElements(trigger.shadowRoot, inner);
-  return inner.find((el) => el.tabIndex >= 0) ?? trigger;
+  flatTreeElements(trigger.shadowRoot ?? trigger, inner);
+  return inner.find((el) => el.tabIndex >= 0) ?? null;
 }
 
 /**
@@ -284,6 +301,7 @@ export class EccUtilsDesignDialog extends LitElement {
           target.parentElement === this &&
           target.slot === "trigger"
       );
+    // a click on the trigger of an open dialog changes nothing
     if (!trigger || this.open) return;
     // Safari and Firefox on macOS don't focus buttons on a mouse click:
     // remember the trigger, so that focus returns to it on close

@@ -683,6 +683,55 @@ describe("EccUtilsDesignDialog", () => {
       );
     });
 
+    it("returns focus to a button in a wrapper trigger", async () => {
+      const { el } = await renderIn(html`
+        <div>
+          <button id="outside">Outside</button>
+          <ecc-utils-design-dialog>
+            <span slot="trigger"><button id="trigger">Open</button></span>
+            <span slot="title">Title</span>
+            <input id="first" aria-label="Name" />
+          </ecc-utils-design-dialog>
+        </div>
+      `);
+      find<HTMLButtonElement>(
+        must(el.parentElement, "parent"),
+        "#outside"
+      ).focus();
+      const trigger = find<HTMLButtonElement>(el, "#trigger");
+      trigger.click();
+      await el.updateComplete;
+      await waitUntil(() => deepActiveElement()?.id === "first");
+      await sendKeys({ press: "Escape" });
+      await el.updateComplete;
+      await waitUntil(
+        () => deepActiveElement() === trigger,
+        "focus not returned to the button"
+      );
+    });
+
+    it("forgets a trigger whose opening was canceled", async () => {
+      const el = await renderDialog();
+      const outside = find<HTMLButtonElement>(
+        must(el.parentElement, "parent"),
+        "#outside"
+      );
+      const cancel = (e: Event) => e.preventDefault();
+      el.addEventListener("ecc-dialog-open-changed", cancel);
+      find<HTMLButtonElement>(el, "#trigger").click();
+      await el.updateComplete;
+      expect(el.open).to.equal(false);
+      el.removeEventListener("ecc-dialog-open-changed", cancel);
+
+      outside.focus();
+      el.open = true;
+      await el.updateComplete;
+      await waitUntil(() => deepActiveElement()?.id === "first");
+      el.open = false;
+      await el.updateComplete;
+      await waitUntil(() => deepActiveElement() === outside);
+    });
+
     it("returns focus to the element focused before an opening by code", async () => {
       const el = await renderDialog();
       const outside = find<HTMLButtonElement>(
@@ -714,6 +763,37 @@ describe("EccUtilsDesignDialog", () => {
       el.open = false;
       await el.updateComplete;
       expect(document.body.style.overflow).to.equal("auto");
+    });
+
+    it("keeps the page from shifting when the scrollbar goes", async () => {
+      const spacer = document.createElement("div");
+      spacer.style.height = "300vh";
+      document.body.appendChild(spacer);
+      document.body.style.paddingRight = "8px";
+      try {
+        const scrollbar =
+          window.innerWidth - document.documentElement.clientWidth;
+        const el = await renderDialog();
+        el.open = true;
+        await el.updateComplete;
+        expect(document.body.style.paddingRight).to.equal(
+          scrollbar > 0 ? `${8 + scrollbar}px` : "8px"
+        );
+        el.open = false;
+        await el.updateComplete;
+        expect(document.body.style.paddingRight).to.equal("8px");
+      } finally {
+        spacer.remove();
+      }
+    });
+
+    it("leaves styles that the app changed during the lock", async () => {
+      const el = await renderDialog(true);
+      expect(document.body.style.overflow).to.equal("hidden");
+      document.body.style.overflow = "scroll";
+      el.open = false;
+      await el.updateComplete;
+      expect(document.body.style.overflow).to.equal("scroll");
     });
 
     it("keeps the lock until the last of nested dialogs closes", async () => {

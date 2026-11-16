@@ -205,7 +205,7 @@ The header (title and description) and the footer are hidden when their slots ar
 
 ### `ecc-dialog-open-changed`
 
-Fired before the dialog opens or closes because of a user action, not when `open` is changed by code. It doesn't bubble: listen on the dialog itself (in React, `onEccDialogOpenChanged`). So the listener of an outer dialog doesn't get the events of dialogs nested in it, and setting `open` from `detail.open` is safe. `detail.open` is the new state, and `detail.reason` says what caused it (type `EccDialogOpenChangeReason`, exported with `EccDialogOpenChangedEvent` from `@elixir-cloud/design/events`):
+Fired before the dialog opens or closes because of a user action, not when `open` is changed by code. Unlike the events of the other components, it doesn't bubble: listen on the dialog itself (in React, `onEccDialogOpenChanged`), not on an ancestor. So the listener of an outer dialog doesn't get the events of dialogs nested in it, and setting `open` from `detail.open` is safe. `detail.open` is the new state, and `detail.reason` says what caused it (type `EccDialogOpenChangeReason`, exported with `EccDialogOpenChangedEvent` from `@elixir-cloud/design/events`):
 
 | Reason         | Cause                                                        |
 |----------------|--------------------------------------------------------------|
