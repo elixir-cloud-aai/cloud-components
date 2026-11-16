@@ -224,8 +224,9 @@ describe("EccUtilsDesignDialog", () => {
       const event = await listener;
       await el.updateComplete;
       expect(event.detail).to.deep.equal({ open: true, reason: "trigger" });
-      expect(event.bubbles).to.equal(true);
-      expect(event.composed).to.equal(true);
+      // only the dialog's own listeners get it, not those of outer dialogs
+      expect(event.bubbles).to.equal(false);
+      expect(event.composed).to.equal(false);
       expect(event.cancelable).to.equal(true);
       expect(el.open).to.equal(true);
       expect(nativeDialog(el).open).to.equal(true);
@@ -276,12 +277,16 @@ describe("EccUtilsDesignDialog", () => {
       const inner = find<EccUtilsDesignDialog>(wrapper, "#inner");
       outer.open = true;
       await outer.updateComplete;
-      const events = recordEvents(outer);
+      const outerEvents = recordEvents(outer);
+      const innerEvents = recordEvents(inner);
       find<HTMLButtonElement>(wrapper, "#inner-trigger").click();
       await inner.updateComplete;
       expect(inner.open).to.equal(true);
-      expect(events.map((e) => e.detail.reason)).to.deep.equal(["trigger"]);
-      expect(events[0].target).to.equal(inner);
+      expect(outer.open).to.equal(true);
+      expect(innerEvents.map((e) => e.detail.reason)).to.deep.equal([
+        "trigger",
+      ]);
+      expect(outerEvents).to.deep.equal([]);
     });
   });
 
@@ -319,6 +324,23 @@ describe("EccUtilsDesignDialog", () => {
         { open: false, reason: "escape" },
       ]);
       expect(nativeDialog(el).open).to.equal(false);
+    });
+
+    it("doesn't tell an outer dialog's listener about an inner one", async () => {
+      const { outer, inner } = await renderNested();
+      // a controlled outer dialog, as in the docs
+      outer.addEventListener("ecc-dialog-open-changed", (e) => {
+        outer.open = e.detail.open;
+      });
+      const innerEvents = recordEvents(inner);
+      await sendKeys({ press: "Escape" });
+      await inner.updateComplete;
+      await outer.updateComplete;
+      expect(innerEvents.map((e) => e.detail)).to.deep.equal([
+        { open: false, reason: "escape" },
+      ]);
+      expect(inner.open).to.equal(false);
+      expect(outer.open).to.equal(true);
     });
 
     it("closes only the innermost of nested dialogs", async () => {
@@ -610,6 +632,57 @@ describe("EccUtilsDesignDialog", () => {
       await waitUntil(() => deepActiveElement() === trigger);
     });
 
+    it("returns focus to the trigger after a click that didn't focus it", async () => {
+      // Safari and Firefox on macOS don't focus buttons on a mouse click:
+      // focus stays where it was (here: elsewhere on the page)
+      const el = await renderDialog();
+      const outside = find<HTMLButtonElement>(
+        must(el.parentElement, "parent"),
+        "#outside"
+      );
+      const trigger = find<HTMLButtonElement>(el, "#trigger");
+      outside.focus();
+      trigger.click();
+      await el.updateComplete;
+      await waitUntil(() => deepActiveElement()?.id === "first");
+      await sendKeys({ press: "Escape" });
+      await el.updateComplete;
+      await waitUntil(
+        () => deepActiveElement() === trigger,
+        "focus not returned to the trigger"
+      );
+    });
+
+    it("returns focus to the control of a custom-element trigger", async () => {
+      const { el } = await renderIn(html`
+        <div>
+          <ecc-utils-design-dialog>
+            <ecc-utils-design-button slot="trigger" id="trigger"
+              >Open</ecc-utils-design-button
+            >
+            <span slot="title">Title</span>
+            <input id="first" aria-label="Name" />
+          </ecc-utils-design-dialog>
+        </div>
+      `);
+      const trigger = find<HTMLElement>(el, "#trigger");
+      await (trigger as HTMLElement & { updateComplete: Promise<unknown> })
+        .updateComplete;
+      const control = must(
+        trigger.shadowRoot?.querySelector("button"),
+        "trigger control"
+      );
+      control.click();
+      await el.updateComplete;
+      await waitUntil(() => deepActiveElement()?.id === "first");
+      await sendKeys({ press: "Escape" });
+      await el.updateComplete;
+      await waitUntil(
+        () => deepActiveElement() === control,
+        "focus not returned to the trigger's control"
+      );
+    });
+
     it("returns focus to the element focused before an opening by code", async () => {
       const el = await renderDialog();
       const outside = find<HTMLButtonElement>(
@@ -623,6 +696,49 @@ describe("EccUtilsDesignDialog", () => {
       el.open = false;
       await el.updateComplete;
       await waitUntil(() => deepActiveElement() === outside);
+    });
+  });
+
+  describe("scroll lock", () => {
+    afterEach(() => {
+      document.body.style.removeProperty("overflow");
+      document.body.style.removeProperty("padding-right");
+    });
+
+    it("locks the page's scrolling while open and restores it", async () => {
+      document.body.style.overflow = "auto";
+      const el = await renderDialog();
+      el.open = true;
+      await el.updateComplete;
+      expect(document.body.style.overflow).to.equal("hidden");
+      el.open = false;
+      await el.updateComplete;
+      expect(document.body.style.overflow).to.equal("auto");
+    });
+
+    it("keeps the lock until the last of nested dialogs closes", async () => {
+      const { outer, inner } = await renderNested();
+      expect(document.body.style.overflow).to.equal("hidden");
+      inner.open = false;
+      await inner.updateComplete;
+      expect(document.body.style.overflow).to.equal("hidden");
+      outer.open = false;
+      await outer.updateComplete;
+      expect(document.body.style.overflow).to.equal("");
+    });
+
+    it("unlocks when an open dialog is removed", async () => {
+      const el = await renderDialog(true);
+      expect(document.body.style.overflow).to.equal("hidden");
+      el.remove();
+      expect(document.body.style.overflow).to.equal("");
+    });
+
+    it("unlocks when the browser closes the dialog", async () => {
+      const el = await renderDialog(true);
+      nativeDialog(el).close();
+      await waitUntil(() => !el.open);
+      expect(document.body.style.overflow).to.equal("");
     });
   });
 

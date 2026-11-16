@@ -18,7 +18,7 @@ The `ecc-utils-design-dialog` component is a modal window over the page, like [s
 
 - It opens on a click on its `trigger` slot or when `open` is set.
 - It closes on Escape (unless content inside handled it and called `preventDefault()`), on a click on the overlay, on its close button, on a click on an element with the `data-dialog-close` attribute, or when `open` is unset.
-- While it is open, the rest of the page is inert. Focus moves into the dialog (to the first element with `autofocus`, else to the first focusable element), Tab and Shift+Tab cycle through the dialog only, and on close focus returns to the element that had it before, e.g. the trigger.
+- While it is open, the rest of the page is inert and doesn't scroll. Focus moves into the dialog (to the first element with `autofocus`, else to the first focusable element), Tab and Shift+Tab cycle through the dialog only, and on close focus returns to the trigger that opened it (also in Safari and Firefox on macOS, where a mouse click doesn't focus buttons), or else to the element that had it before.
 - It is a `dialog` with `aria-modal="true"`, named by its title (or `label`) and described by its description, so screen readers announce both.
 - User actions fire the cancelable `ecc-dialog-open-changed` event.
 
@@ -111,7 +111,7 @@ A dialog with a trigger, a title, a description, a body and actions in the foote
 
 ### Controlled Dialog
 
-Without a trigger, the app opens and closes the dialog through `open` and follows the user's actions through `ecc-dialog-open-changed`, like `open` and `onOpenChange` in shadcn/ui. Here the dialog can only be closed through its buttons: the overlay click is turned off and the close button hidden.
+Without a trigger, the app opens and closes the dialog through `open` and follows the user's actions through `ecc-dialog-open-changed`, like `open` and `onOpenChange` in shadcn/ui. The event doesn't bubble, so a controlled dialog only gets its own events, also when other dialogs are nested in it. Here the dialog can only be closed through its buttons: the overlay click is turned off and the close button hidden.
 
 <Tabs items={['React', 'JavaScript']}>
   <Tabs.Tab>
@@ -205,7 +205,7 @@ The header (title and description) and the footer are hidden when their slots ar
 
 ### `ecc-dialog-open-changed`
 
-Fired before the dialog opens or closes because of a user action, not when `open` is changed by code. It bubbles and crosses shadow roots. `detail.open` is the new state, and `detail.reason` says what caused it (type `EccDialogOpenChangeReason`, exported with `EccDialogOpenChangedEvent` from `@elixir-cloud/design/events`):
+Fired before the dialog opens or closes because of a user action, not when `open` is changed by code. It doesn't bubble: listen on the dialog itself (in React, `onEccDialogOpenChanged`). So the listener of an outer dialog doesn't get the events of dialogs nested in it, and setting `open` from `detail.open` is safe. `detail.open` is the new state, and `detail.reason` says what caused it (type `EccDialogOpenChangeReason`, exported with `EccDialogOpenChangedEvent` from `@elixir-cloud/design/events`):
 
 | Reason         | Cause                                                        |
 |----------------|--------------------------------------------------------------|
@@ -266,7 +266,8 @@ ecc-utils-design-dialog::part(dialog) {
 
 ## Accessibility
 
-- The dialog is modal: the rest of the page is inert while it is open, and focus stays inside.
+- The dialog is modal: the rest of the page is inert while it is open, and focus stays inside. On close, focus returns to the trigger that opened it, also after a mouse click in browsers that don't focus buttons on click (Safari, Firefox on macOS).
+- The page behind the dialog doesn't scroll while a dialog is open, as in shadcn/ui; the space of the page's scrollbar is kept, so the page doesn't shift. Nested dialogs share the lock, and the page scrolls again once the last one closes.
 - Give every dialog a title, or a `label` if it has none, so that screen readers announce what it is about.
 - Nested dialogs work: Escape, overlay clicks and `data-dialog-close` close the innermost open dialog only.
 - Content that is taller than the window scrolls inside the dialog.

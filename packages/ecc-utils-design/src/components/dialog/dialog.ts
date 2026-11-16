@@ -58,6 +58,57 @@ function focusFirst(candidates: HTMLElement[]): boolean {
   });
 }
 
+/** Whether `node` is `host` or inside it, also inside its shadow roots */
+function isWithin(node: Node, host: Node): boolean {
+  let current: Node | null = node;
+  while (current) {
+    if (current === host) return true;
+    current =
+      current.parentNode ??
+      (current instanceof ShadowRoot ? current.host : null);
+  }
+  return false;
+}
+
+/** Number of open dialogs that lock the page's scrolling */
+let scrollLocks = 0;
+
+/** Inline styles of `body` before the first lock, restored by the last */
+let bodyStyleBeforeLock: { overflow: string; paddingRight: string } | null =
+  null;
+
+/**
+ * Stops the page behind open dialogs from scrolling, as shadcn/ui does;
+ * nested dialogs share one lock. The scrollbar's width goes to the body's
+ * padding, so that the page doesn't shift when the scrollbar disappears.
+ */
+function lockScroll() {
+  scrollLocks += 1;
+  if (scrollLocks > 1) return;
+  const { body } = document;
+  const scrollbar = window.innerWidth - document.documentElement.clientWidth;
+  bodyStyleBeforeLock = {
+    overflow: body.style.overflow,
+    paddingRight: body.style.paddingRight,
+  };
+  if (scrollbar > 0) {
+    const padding = parseFloat(getComputedStyle(body).paddingRight) || 0;
+    body.style.paddingRight = `${padding + scrollbar}px`;
+  }
+  body.style.overflow = "hidden";
+}
+
+/** Releases a lock of `lockScroll()`; the last one restores the page */
+function unlockScroll() {
+  if (scrollLocks === 0) return;
+  scrollLocks -= 1;
+  if (scrollLocks > 0 || !bodyStyleBeforeLock) return;
+  const { body } = document;
+  body.style.overflow = bodyStyleBeforeLock.overflow;
+  body.style.paddingRight = bodyStyleBeforeLock.paddingRight;
+  bodyStyleBeforeLock = null;
+}
+
 /**
  * Collects the elements below `root` in the order of the flat tree, that is,
  * into shadow roots and through slots to their assigned elements.
@@ -79,6 +130,19 @@ function flatTreeElements(root: Element | ShadowRoot, out: HTMLElement[]) {
 }
 
 /**
+ * The element of a trigger that takes focus: the trigger itself, or, for a
+ * custom element such as `ecc-utils-design-button`, the control in its
+ * shadow root
+ */
+function focusableControl(trigger: Element): HTMLElement | null {
+  if (!(trigger instanceof HTMLElement)) return null;
+  if (trigger.tabIndex >= 0 || !trigger.shadowRoot) return trigger;
+  const inner: HTMLElement[] = [];
+  flatTreeElements(trigger.shadowRoot, inner);
+  return inner.find((el) => el.tabIndex >= 0) ?? trigger;
+}
+
+/**
  * A modal dialog that matches shadcn/ui's Dialog: a window over the page that
  * keeps focus inside until it is closed.
  *
@@ -86,8 +150,10 @@ function flatTreeElements(root: Element | ShadowRoot, out: HTMLElement[]) {
  * Escape, a click on the overlay, the close button or an element with the
  * `data-dialog-close` attribute, or when `open` is unset. Focus moves into
  * the dialog on open (to the first element with `autofocus`, else the first
- * focusable element), stays there on Tab and Shift+Tab, and returns to the
- * element that had it before on close.
+ * focusable element), stays there on Tab and Shift+Tab, and returns on
+ * close to the trigger that opened it (also if a click didn't focus it, as
+ * in Safari) or else to the element that had it before. While it is open,
+ * the page behind it doesn't scroll.
  *
  * @element ecc-utils-design-dialog
  *
@@ -109,7 +175,8 @@ function flatTreeElements(root: Element | ShadowRoot, out: HTMLElement[]) {
  * @fires ecc-dialog-open-changed - When the user opens or closes the dialog
  * (not when `open` is changed by code). `detail` holds `open` (the new state)
  * and `reason` (`trigger`, `escape`, `overlay`, `close-button` or `close`).
- * Cancelable: `preventDefault()` keeps the current state.
+ * Cancelable: `preventDefault()` keeps the current state. It doesn't bubble,
+ * so that listeners of an outer dialog don't get the events of nested ones.
  */
 export class EccUtilsDesignDialog extends LitElement {
   static styles = [
@@ -161,6 +228,12 @@ export class EccUtilsDesignDialog extends LitElement {
   /** The element to focus again on close */
   private returnFocusTo: HTMLElement | null = null;
 
+  /** The trigger whose click is opening the dialog */
+  private openingTrigger: Element | null = null;
+
+  /** Whether this dialog holds a lock of the page's scrolling */
+  private locksScroll = false;
+
   /** Whether the current press started inside the content */
   private pressStartedInside = false;
 
@@ -191,32 +264,63 @@ export class EccUtilsDesignDialog extends LitElement {
     super.disconnectedCallback();
     if (this.dialog?.open) this.dialog.close();
     this.returnFocusTo = null;
+    this.openingTrigger = null;
+    this.releaseScroll();
+  }
+
+  private releaseScroll() {
+    if (!this.locksScroll) return;
+    this.locksScroll = false;
+    unlockScroll();
   }
 
   /** Opens the dialog on a click on an element in the `trigger` slot */
   private onHostClick(event: MouseEvent) {
-    const fromTrigger = event
+    const trigger = event
       .composedPath()
-      .some(
-        (target) =>
+      .find(
+        (target): target is Element =>
           target instanceof Element &&
           target.parentElement === this &&
           target.slot === "trigger"
       );
-    if (fromTrigger) this.requestOpenChange(true, "trigger");
+    if (!trigger || this.open) return;
+    // Safari and Firefox on macOS don't focus buttons on a mouse click:
+    // remember the trigger, so that focus returns to it on close
+    this.openingTrigger = trigger;
+    this.requestOpenChange(true, "trigger");
+    if (!this.open) this.openingTrigger = null;
   }
 
   protected updated() {
     this.syncTriggers();
     if (!this.dialog || !this.isConnected) return;
     if (this.open && !this.dialog.open) {
-      this.returnFocusTo = deepActiveElement();
+      this.returnFocusTo = this.focusToReturnTo();
       this.dialog.showModal();
+      if (!this.locksScroll) {
+        this.locksScroll = true;
+        lockScroll();
+      }
       this.focusInitial();
     } else if (!this.open && this.dialog.open) {
       this.dialog.close();
+      this.releaseScroll();
       this.restoreFocus();
     }
+    this.openingTrigger = null;
+  }
+
+  /**
+   * The element to focus on close: the element that has focus, or, if a
+   * trigger opened the dialog and focus isn't on it (a click that didn't
+   * focus it), the trigger's control
+   */
+  private focusToReturnTo(): HTMLElement | null {
+    const active = deepActiveElement();
+    const trigger = this.openingTrigger;
+    if (!trigger || (active && isWithin(active, trigger))) return active;
+    return focusableControl(trigger) ?? active;
   }
 
   /**
@@ -235,10 +339,12 @@ export class EccUtilsDesignDialog extends LitElement {
     cancelable: boolean
   ): boolean {
     return this.dispatchEvent(
+      // Not bubbling: a listener of an outer dialog (e.g. a controlled one
+      // that sets its `open` from the event) doesn't get those of nested ones
       new CustomEvent("ecc-dialog-open-changed", {
         detail: { open, reason },
-        bubbles: true,
-        composed: true,
+        bubbles: false,
+        composed: false,
         cancelable,
       })
     );
@@ -270,12 +376,8 @@ export class EccUtilsDesignDialog extends LitElement {
       // control in its shadow root: the attributes go there, too, so that
       // assistive technology announces them on the focused control
       const targets = [trigger];
-      if (trigger instanceof HTMLElement && trigger.tabIndex < 0) {
-        const inner: HTMLElement[] = [];
-        if (trigger.shadowRoot) flatTreeElements(trigger.shadowRoot, inner);
-        const control = inner.find((el) => el.tabIndex >= 0);
-        if (control) targets.push(control);
-      }
+      const control = focusableControl(trigger);
+      if (control && control !== trigger) targets.push(control);
       for (const target of targets) {
         target.setAttribute("aria-haspopup", "dialog");
         target.setAttribute("aria-expanded", String(this.open));
@@ -360,6 +462,7 @@ export class EccUtilsDesignDialog extends LitElement {
     // it was closed because the element was removed
     if (!this.open || this.dialog.open || !this.isConnected) return;
     this.open = false;
+    this.releaseScroll();
     // Browsers close a modal dialog by themselves only on close requests
     // (e.g. repeated Escape presses), so the reason is `escape`
     this.emitOpenChange(false, "escape", false);
