@@ -1,5 +1,6 @@
 import { LitElement, html, css, PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 import "../checkbox/index.js";
@@ -47,6 +48,12 @@ export class EccUtilsDesignMultiSelect extends LitElement {
   @property({ type: Array }) value: string[] = [];
   @property({ type: String }) placeholder = "Select options...";
   @property({ type: Boolean }) disabled = false;
+  /**
+   * Whether the value is invalid; also implied by a non-empty `error`.
+   */
+  @property({ type: Boolean, reflect: true }) invalid = false;
+  /** Error message shown under the select, e.g. one returned by an API. */
+  @property({ type: String }) error = "";
   @property({ type: String }) name = "";
 
   @state() private isOpen = false;
@@ -70,6 +77,12 @@ export class EccUtilsDesignMultiSelect extends LitElement {
   }
 
   updated(changedProperties: PropertyValues) {
+    if (changedProperties.has("invalid") || changedProperties.has("error")) {
+      // The trigger shows the invalid state of the select
+      this.querySelectorAll("ecc-utils-design-multi-select-trigger").forEach(
+        (trigger) => trigger.requestUpdate()
+      );
+    }
     if (changedProperties.has("value") || changedProperties.has("isOpen")) {
       multiSelectState.set(this.selectId, {
         ...multiSelectState.get(this.selectId)!,
@@ -134,6 +147,14 @@ export class EccUtilsDesignMultiSelect extends LitElement {
       >
         <slot></slot>
       </div>
+      <p
+        id="error"
+        part="error"
+        class=${cn("text-sm text-destructive", !!this.error && "mt-1.5")}
+        aria-live="polite"
+      >
+        ${this.error}
+      </p>
     `;
   }
 }
@@ -227,20 +248,30 @@ export class EccUtilsDesignMultiSelectTrigger extends LitElement {
   render() {
     const select = this._getParentSelect();
     const placeholder = select?.placeholder || "Select options...";
+    const error = select?.error ?? "";
+    const isInvalid = !!select && (select.invalid || !!error);
 
     const classes = cn(
-      "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+      "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-50",
+      isInvalid
+        ? "border-destructive focus:ring-destructive"
+        : "border-input focus:ring-ring",
       this.disabled && "opacity-50 cursor-not-allowed"
     );
 
     const hasSelection = this.selectedValues.length > 0;
 
+    // The multi-select shows the error; the trigger has a hidden copy for
+    // `aria-describedby`, which can't refer to another shadow root
     return html`
+      <span id="error" hidden>${error}</span>
       <button
         part="base"
         type="button"
         class=${classes}
         ?disabled=${this.disabled}
+        aria-invalid=${ifDefined(isInvalid ? "true" : undefined)}
+        aria-describedby=${ifDefined(error ? "error" : undefined)}
         data-state=${this.isOpen ? "open" : "closed"}
         @click=${this._handleClick}
       >
