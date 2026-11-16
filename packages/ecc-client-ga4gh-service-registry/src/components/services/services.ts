@@ -245,9 +245,15 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
       parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
     // layout widths, not transformed ones (e.g. in a scaled preview)
     const widest = Math.max(...contents.map((content) => content.offsetWidth));
-    // a hidden list (e.g. in an inactive tab) has no widths: keep the last
-    // one until the observer reports the actions again
-    if (widest === 0) return;
+    if (widest === 0) {
+      // a hidden list (e.g. in an inactive tab) has no widths: keep the last
+      // one until the observer reports the actions again; rows without
+      // actions need no width
+      if (this.getClientRects().length > 0) {
+        this.style.removeProperty("--_actions-width");
+      }
+      return;
+    }
     const width = `${Math.ceil(widest + padding)}px`;
     if (this.style.getPropertyValue("--_actions-width") !== width) {
       this.style.setProperty("--_actions-width", width);
