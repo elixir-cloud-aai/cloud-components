@@ -14,9 +14,9 @@ import ServiceInfoPreview from '@/components/packages/service-registry/ServiceIn
 
 The `ecc-client-ga4gh-service-registry-service-info` component displays the service info of a GA4GH Service Registry itself (`GET /service-info`): its name, ID, version, type, organization and description, and the optional environment, contact, documentation and timestamps.
 
-Optional fields are shown only if they are set, so that a registry that sets few of them shows no placeholders, invalid values or dead links:
+Optional fields are shown only if they are set, so that a registry that sets few of them shows no placeholders, invalid values or dead links. Fields that are blank or not strings (from a registry that does not follow the specification) are left out too:
 
-- `environment`, `description`: shown if not empty.
+- `environment` (as a badge next to the type and in the details), `description`: shown if not empty.
 - `contactUrl`: shown as a link if it is an `http:`, `https:` or `mailto:` URL (a `mailto:` link shows the address).
 - `documentationUrl`, `organization.url`: shown as links if they are `http:` or `https:` URLs; without a valid URL, the organization shows its name only.
 - `createdAt`, `updatedAt`: shown in the reader's locale if they are valid timestamps. Since cloud-registry 0.4.0, a fresh deployment sets neither.

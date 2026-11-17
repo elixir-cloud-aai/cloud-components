@@ -166,15 +166,94 @@ describe("ecc-client-ga4gh-service-registry-service-info", () => {
 
   it("shows no undefined values for missing required fields", async () => {
     // A registry that doesn't follow the specification
-    const { type, version, ...rest } = minimal();
-    const el = await render(stubProvider(rest as unknown as Service));
+    const info: Partial<Service> = minimal();
+    delete info.type;
+    delete info.version;
+    const el = await render(stubProvider(info as Service));
     await waitUntil(() => fields(el).length > 0);
 
-    expect(type).to.not.equal(undefined);
-    expect(version).to.not.equal(undefined);
     expect(fields(el)).to.deep.equal(["id", "organization"]);
     expect(el.shadowRoot?.querySelector("[data-type]")).to.equal(null);
     expect(el.shadowRoot?.textContent).not.to.contain("undefined");
+  });
+
+  it("shows only the parts of a type that are set", async () => {
+    const el = await render(
+      stubProvider({
+        ...minimal(),
+        type: { artifact: "service-registry", version: "1.0.0" },
+      } as unknown as Service)
+    );
+    await waitUntil(() => fields(el).length > 0);
+
+    expect(field(el, "type")?.textContent?.trim()).to.contain(
+      "service-registry · 1.0.0"
+    );
+    expect(el.shadowRoot?.textContent).not.to.contain("undefined");
+  });
+
+  it("shows the type badge without a version and none without artifact", async () => {
+    const el = await render(
+      stubProvider({
+        ...minimal(),
+        type: { group: "org.ga4gh", artifact: "service-registry" },
+      } as unknown as Service)
+    );
+    await waitUntil(() => fields(el).length > 0);
+    expect(
+      el.shadowRoot?.querySelector("[data-type]")?.textContent?.trim()
+    ).to.equal("service-registry");
+
+    el.provider = stubProvider({
+      ...minimal(),
+      type: { group: "org.ga4gh", version: "1.0.0" },
+    } as unknown as Service);
+    await waitUntil(() => field(el, "type")?.textContent?.includes("1.0.0"));
+    expect(el.shadowRoot?.querySelector("[data-type]")).to.equal(null);
+    expect(el.shadowRoot?.textContent).not.to.contain("undefined");
+  });
+
+  it("leaves out blank fields and fields of other types", async () => {
+    const el = await render(
+      stubProvider({
+        ...minimal(),
+        id: "",
+        name: " ",
+        environment: " ",
+        description: 1,
+        contactUrl: ["https://example.org/contact"],
+        documentationUrl: 42,
+        createdAt: 0,
+        type: { group: 5, artifact: "service-registry", version: "1.0.0" },
+      } as unknown as Service)
+    );
+    await waitUntil(() => fields(el).length > 0);
+
+    expect(fields(el)).to.deep.equal(["version", "type", "organization"]);
+    expect(el.shadowRoot?.querySelector("h2")?.textContent?.trim()).to.equal(
+      "Service Registry"
+    );
+    expect(el.shadowRoot?.querySelector("[data-description]")).to.equal(null);
+    expect(links(el)).to.deep.equal(["https://example.org"]);
+    expect(
+      el.shadowRoot?.querySelector("[data-type]")?.getAttribute("variant")
+    ).to.equal("default");
+  });
+
+  it("falls back to the base URL once the provider is removed", async () => {
+    const el = await fixture<ECCClientGa4ghServiceRegistryServiceInfo>(
+      html`<ecc-client-ga4gh-service-registry-service-info
+        .baseUrl=${BASE_URL}
+        .provider=${stubProvider(minimal("Custom"))}
+      ></ecc-client-ga4gh-service-registry-service-info>`
+    );
+    await waitUntil(() => shown(el)?.name === "Custom");
+    expect(fetchStub.callCount).to.equal(0);
+
+    el.provider = undefined;
+    await waitUntil(() => shown(el)?.name === "Registry");
+
+    expect(fetchStub.firstCall.args[0]).to.equal(`${BASE_URL}/service-info`);
   });
 
   it("shows the organization URL as its name without one", async () => {

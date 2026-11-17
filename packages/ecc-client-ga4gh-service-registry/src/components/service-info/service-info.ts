@@ -18,11 +18,8 @@ const MISSING_PROVIDER =
  * The URL if it uses one of the protocols, or `null` (e.g. for a missing,
  * relative or `javascript:` URL), so that no dead or unsafe links render.
  */
-const linkable = (
-  url: string | undefined,
-  protocols: string[]
-): string | null => {
-  if (!url) return null;
+const linkable = (url: unknown, protocols: string[]): string | null => {
+  if (typeof url !== "string" || !url) return null;
   try {
     return protocols.includes(new URL(url).protocol) ? url : null;
   } catch {
@@ -32,10 +29,18 @@ const linkable = (
 
 const WEB = ["http:", "https:"];
 
+/**
+ * The value if it is a string with visible text, or `null`, so that fields
+ * that are missing, blank or of another type (from a registry that doesn't
+ * follow the specification) aren't shown.
+ */
+const text = (value: unknown): string | null =>
+  typeof value === "string" && value.trim() ? value : null;
+
 /** A timestamp in the reader's locale, or `null` if it isn't a valid date. */
-const formatDate = (value: string | undefined): string | null => {
-  if (!value) return null;
-  const date = new Date(value);
+const formatDate = (value: unknown): string | null => {
+  if (!text(value)) return null;
+  const date = new Date(value as string);
   return Number.isNaN(date.getTime()) ? null : date.toLocaleString();
 };
 
@@ -202,25 +207,36 @@ export class ECCClientGa4ghServiceRegistryServiceInfo extends LitElement {
   }
 
   private static renderServiceInfo(info: Service) {
-    const { type, organization } = info;
-    const organizationUrl = linkable(organization?.url, WEB);
+    // a registry that doesn't follow the specification may omit fields or
+    // send values of other types; only strings with text are shown
+    const id = text(info.id);
+    const name = text(info.name);
+    const version = text(info.version);
+    const environment = text(info.environment);
+    const description = text(info.description);
+    const group = text(info.type?.group);
+    const artifact = text(info.type?.artifact);
+    const typeVersion = text(info.type?.version);
+    const organizationName = text(info.organization?.name);
+    const organizationUrl = linkable(info.organization?.url, WEB);
     const contactUrl = linkable(info.contactUrl, [...WEB, "mailto:"]);
     const documentationUrl = linkable(info.documentationUrl, WEB);
     const rows = [
       ECCClientGa4ghServiceRegistryServiceInfo.renderRow(
         "id",
         "ID",
-        html`<span class="font-mono">${info.id}</span>`
+        id ? html`<span class="font-mono">${id}</span>` : null
       ),
       ECCClientGa4ghServiceRegistryServiceInfo.renderRow(
         "version",
         "Version",
-        info.version
+        version
       ),
       ECCClientGa4ghServiceRegistryServiceInfo.renderRow(
         "type",
         "Type",
-        type ? `${type.group} · ${type.artifact} · ${type.version}` : null
+        // only the parts that are set
+        [group, artifact, typeVersion].filter((part) => part).join(" · ")
       ),
       ECCClientGa4ghServiceRegistryServiceInfo.renderRow(
         "organization",
@@ -228,14 +244,14 @@ export class ECCClientGa4ghServiceRegistryServiceInfo extends LitElement {
         organizationUrl
           ? ECCClientGa4ghServiceRegistryServiceInfo.renderLink(
               organizationUrl,
-              organization.name || organizationUrl
+              organizationName ?? organizationUrl
             )
-          : organization?.name
+          : organizationName
       ),
       ECCClientGa4ghServiceRegistryServiceInfo.renderRow(
         "environment",
         "Environment",
-        info.environment
+        environment
       ),
       ECCClientGa4ghServiceRegistryServiceInfo.renderRow(
         "contact",
@@ -273,36 +289,36 @@ export class ECCClientGa4ghServiceRegistryServiceInfo extends LitElement {
       <div class="flex flex-col gap-4 text-sm">
         <div class="flex flex-col gap-2">
           <div class="flex flex-col md:flex-row md:items-center gap-2">
-            <h2 class="text-xl truncate">${info.name || info.id}</h2>
-            ${info.version
+            <h2 class="text-xl truncate">
+              ${name ?? id ?? "Service Registry"}
+            </h2>
+            ${version
               ? html`<ecc-utils-design-badge variant="outline">
-                  v${info.version}
+                  v${version}
                 </ecc-utils-design-badge>`
               : ""}
           </div>
           <div class="flex flex-wrap gap-2 items-center">
-            ${type
+            ${artifact
               ? html`<ecc-utils-design-badge
                   data-type
                   variant=${ECCClientGa4ghServiceRegistryServiceInfo.getGroupVariant(
-                    type.group ?? ""
+                    group ?? ""
                   )}
                 >
-                  ${type.artifact}@${type.version}
+                  ${typeVersion ? `${artifact}@${typeVersion}` : artifact}
                 </ecc-utils-design-badge>`
               : ""}
-            ${info.environment
+            ${environment
               ? html`<ecc-utils-design-badge variant="outline">
-                  ${info.environment}
+                  ${environment}
                 </ecc-utils-design-badge>`
               : ""}
           </div>
         </div>
-        ${info.description
+        ${description
           ? html`<div data-description>
-              ${info.description
-                .split("\n")
-                .map((line) => html`<p>${line}</p>`)}
+              ${description.split("\n").map((line) => html`<p>${line}</p>`)}
             </div>`
           : ""}
         <dl class="flex flex-col gap-2">
