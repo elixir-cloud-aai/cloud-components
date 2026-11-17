@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { property, state } from "lit/decorators.js";
+import { live } from "lit/directives/live.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 import {
@@ -330,7 +331,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
           <ecc-utils-design-label>Tool Class</ecc-utils-design-label>
           <ecc-utils-design-select
             class="part:w-40"
-            .value=${String(this.filterParams.toolClass ?? "")}
+            .value=${live(String(this.filterParams.toolClass ?? ""))}
             @ecc-input-changed=${(e: Event) =>
               this.handleSelectChange("toolClass", e)}
           >
