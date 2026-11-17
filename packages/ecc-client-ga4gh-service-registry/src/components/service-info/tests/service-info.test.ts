@@ -164,6 +164,15 @@ describe("ecc-client-ga4gh-service-registry-service-info", () => {
     expect(el.shadowRoot?.textContent).not.to.contain("Invalid Date");
   });
 
+  it("leaves out a mailto: contact without an address", async () => {
+    const el = await render(
+      stubProvider({ ...minimal(), contactUrl: "mailto:?subject=Hello" })
+    );
+    await waitUntil(() => fields(el).length > 0);
+
+    expect(field(el, "contact")).to.equal(null);
+  });
+
   it("shows no undefined values for missing required fields", async () => {
     // A registry that doesn't follow the specification
     const info: Partial<Service> = minimal();

@@ -16,12 +16,15 @@ const MISSING_PROVIDER =
 
 /**
  * The URL if it uses one of the protocols, or `null` (e.g. for a missing,
- * relative or `javascript:` URL), so that no dead or unsafe links render.
+ * relative or `javascript:` URL, or a `mailto:` URL without an address), so
+ * that no dead or unsafe links render.
  */
 const linkable = (url: unknown, protocols: string[]): string | null => {
   if (typeof url !== "string" || !url) return null;
   try {
-    return protocols.includes(new URL(url).protocol) ? url : null;
+    const { protocol, pathname } = new URL(url);
+    if (protocol === "mailto:" && !pathname.trim()) return null;
+    return protocols.includes(protocol) ? url : null;
   } catch {
     return null;
   }
