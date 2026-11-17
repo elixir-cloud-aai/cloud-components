@@ -169,6 +169,10 @@ export default function ServiceList({ provider, me }) {
 
 After a verify or remove, the component shows the result for that service until the app sets `verification` again, also if the provider is replaced meanwhile by one for the same registry (the same base URL, e.g. with a new token). The badge shows only what the app passes, so update your verifications from `ecc-service-verification-changed`, as above. Pass a stable value (e.g. the object from the map, not one built on each render): every new value counts as set again.
 
+<Callout type='info'>
+  For the registry's services list with badges, use [`ecc-client-elixir-cloud-registry-services`](./services), which does all of this.
+</Callout>
+
 The services list of the GA4GH Service Registry package (`ecc-client-ga4gh-service-registry-services`) doesn't show verifications itself, but its [`rowBadges`](/docs/service-registry/components/services#rowbadges) hook places the badge next to the version, and its [`rowActions`](/docs/service-registry/components/services#rowactions) hook the actions. `rowActions` replaces the list's "View Details" button, and the actions show nothing to other users than admins, so render your own button there. The hooks take Lit templates (also in React apps) or DOM nodes:
 
 ```html copy
