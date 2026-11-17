@@ -1,5 +1,10 @@
 import { LitElement, html, css } from "lit";
 import { property, state } from "lit/decorators.js";
+import {
+  mapFieldErrors,
+  parseProblemDetails,
+} from "@elixir-cloud/design/utils";
+import type { FieldLocation } from "@elixir-cloud/design/utils";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 import { RestCloudRegistryProvider } from "../../providers/rest-cr-provider.js";
@@ -59,20 +64,30 @@ function typeLabel({ group, artifact, version }: ServiceTypeRegister): string {
   return `${group} · ${artifact} · ${version}`;
 }
 
+/** Keys of the form's admin-only fields in `fieldErrors` */
+const ADMIN_FIELDS = ["serviceId", "createdAt", "updatedAt"];
+
 /**
  * Detail of `ecc-service-create-failed` for an error that a provider threw:
  * its message, and the status and problem details if it has them. They are
  * read from the error's fields, as `CloudRegistryError` has them, so that
- * errors of custom providers with the same fields work too.
+ * errors of custom providers with the same fields work too: the field
+ * errors from `problem`, the body of the response.
  * @param err The error
  * @param action The failed action, e.g. "Failed to create service"
- * @param prefix Whether the message starts with the action
+ * @param options.prefix Whether the message starts with the action
+ * @param options.locations The form's fields, by their keys in
+ * `fieldErrors`, and their locations in the request; without them, field
+ * errors aren't read
  * @returns The event's detail
  */
 const failureDetail = (
   err: unknown,
   action: string,
-  prefix = false
+  {
+    prefix = false,
+    locations,
+  }: { prefix?: boolean; locations?: Record<string, FieldLocation> } = {}
 ): EccServiceCreateFailedEvent["detail"] => {
   const fields =
     err && typeof err === "object" ? (err as Record<string, unknown>) : {};
@@ -81,12 +96,22 @@ const failureDetail = (
     nonBlankString(fields.message) ?? detail ?? nonBlankString(err);
   let error = message ?? action;
   if (prefix && message) error = `${action}: ${message}`;
+  let fieldErrors: Record<string, string> = {};
+  let generalError: string | undefined = error;
+  const problem = locations ? parseProblemDetails(fields.problem) : undefined;
+  if (locations && problem && problem.errors.length > 0) {
+    const mapped = mapFieldErrors(problem, locations, error);
+    fieldErrors = mapped.fieldErrors;
+    generalError = mapped.generalError;
+  }
   return {
     error,
     status: typeof fields.status === "number" ? fields.status : undefined,
     title: nonBlankString(fields.title),
     detail,
     serviceId: nonBlankString(fields.serviceId),
+    fieldErrors,
+    generalError,
     cause: err,
   };
 };
@@ -115,7 +140,7 @@ const hasOnlyFormerRules = (info: RegistryServiceInfo | undefined): boolean =>
  * @property {boolean} dirty - Whether the form has unsaved input (read-only)
  *
  * @fires ecc-service-created - Fired when a service is successfully created (includes serviceId, serviceData, and success message)
- * @fires ecc-service-create-failed - Fired when service creation or loading the service types fails (includes the error message and, if the registry sent them, the status and problem details)
+ * @fires ecc-service-create-failed - Fired when service creation or loading the service types fails (includes the error message and, if the registry sent them, the status and problem details; the form shows the registry's field errors at its fields, and `generalError` is the rest)
  * @fires ecc-service-create-validation-failed - Fired when there are validation errors during service creation
  * @fires ecc-service-form-changed - Fired when the form's values change (includes dirty: whether they differ from the empty form; false again after Reset or a successful create)
  */
@@ -181,6 +206,10 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   @state() private loading = false;
   @state() private error: string | null = null;
   @state() private success: string | null = null;
+  // The registry's field errors of the last failed create, by field (keys
+  // as in `fieldErrors` of `ecc-service-create-failed`); a field's error is
+  // cleared when the field changes
+  @state() private fieldErrors: Record<string, string> = {};
 
   // Form state
   @state() private formData: {
@@ -315,6 +344,73 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     if (changedProperties.has("provider") || changedProperties.has("baseUrl")) {
       this.useProvider();
     }
+    // errors of admin-only fields would be hidden in the closed section
+    if (
+      changedProperties.has("fieldErrors") &&
+      ADMIN_FIELDS.some((key) => this.fieldError(key))
+    ) {
+      const advanced = this.renderRoot.querySelector(
+        "ecc-utils-design-collapsible"
+      ) as { open: boolean } | null;
+      if (advanced) advanced.open = true;
+    }
+  }
+
+  /**
+   * The registry's error for a field, or `""`
+   * @param key The field's key, as in `fieldErrors`
+   * @returns The message
+   */
+  private fieldError(key: string): string {
+    return Object.prototype.hasOwnProperty.call(this.fieldErrors, key)
+      ? this.fieldErrors[key]
+      : "";
+  }
+
+  /**
+   * Clear the registry's errors of fields that changed
+   * @param keys The fields' keys, as in `fieldErrors`
+   */
+  private clearFieldErrors(...keys: string[]): void {
+    if (!keys.some((key) => this.fieldError(key))) return;
+    const remaining = { ...this.fieldErrors };
+    keys.forEach((key) => {
+      delete remaining[key];
+    });
+    this.fieldErrors = remaining;
+  }
+
+  /**
+   * The form's fields that a create sends, by their keys in `fieldErrors`,
+   * and their locations in the request, for the registry's field errors
+   * @param customId Whether the create sends a custom service ID
+   * @returns The fields
+   */
+  private fieldLocations(customId: boolean): Record<string, FieldLocation> {
+    const locations: Record<string, FieldLocation> = {
+      name: "/name",
+      url: "/url",
+      "organization.name": "/organization/name",
+      "organization.url": "/organization/url",
+      // a listed type shows the errors of its parts too
+      type: "/type",
+      version: "/version",
+      description: "/description",
+      contactUrl: "/contactUrl",
+      documentationUrl: "/documentationUrl",
+      environment: "/environment",
+    };
+    if (this.newType) {
+      locations["type.group"] = "/type/group";
+      locations["type.artifact"] = "/type/artifact";
+      locations["type.version"] = "/type/version";
+    }
+    if (this.admin) {
+      locations.createdAt = "/createdAt";
+      locations.updatedAt = "/updatedAt";
+    }
+    if (customId) locations.serviceId = { parameter: "serviceId" };
+    return locations;
   }
 
   /**
@@ -483,7 +579,9 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       if (!reportErrors) return;
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-failed", {
-          detail: failureDetail(error, "Failed to load service types", true),
+          detail: failureDetail(error, "Failed to load service types", {
+            prefix: true,
+          }),
           bubbles: true,
           composed: true,
         })
@@ -521,6 +619,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
   /** Clear the type choice and the type */
   private clearType(): void {
+    this.clearTypeErrors();
     this.typeChoice = "";
     this.formData = {
       ...this.formData,
@@ -531,6 +630,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   private selectType(choice: string): void {
     // choosing the current choice again keeps what was entered
     if (choice === (this.newType ? NEW_TYPE : this.typeChoice)) return;
+    this.clearTypeErrors();
     this.typeChoice = choice;
     const listed = this.serviceTypes.find((type) => typeKey(type) === choice);
     this.formData = {
@@ -545,10 +645,22 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     };
   }
 
+  /** Clear the registry's errors of the type and its parts */
+  private clearTypeErrors(): void {
+    this.clearFieldErrors(
+      "type",
+      "type.group",
+      "type.artifact",
+      "type.version"
+    );
+  }
+
   private handleInputChange(
     field: keyof typeof this.formData,
     value: string | boolean
   ): void {
+    // the custom ID is sent as the parameter `serviceId`
+    this.clearFieldErrors(field === "customServiceId" ? "serviceId" : field);
     this.formData = { ...this.formData, [field]: value };
   }
 
@@ -557,6 +669,9 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     field: string,
     value: string
   ): void {
+    // a changed part of the type changes the type
+    if (parent === "type") this.clearFieldErrors("type");
+    this.clearFieldErrors(`${parent}.${field}`);
     const parentObject = this.formData[parent];
     if (typeof parentObject === "object" && parentObject !== null) {
       this.formData = {
@@ -569,11 +684,10 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   private async handleSubmit(): Promise<void> {
     const provider = this.currentProvider();
     if (!provider || !provider.createService) {
+      const error = "Service creation is not supported by the current provider";
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-failed", {
-          detail: {
-            error: "Service creation is not supported by the current provider",
-          },
+          detail: { error, fieldErrors: {}, generalError: error },
           bubbles: true,
           composed: true,
         })
@@ -582,6 +696,12 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     }
 
     this.loading = true;
+    this.fieldErrors = {};
+    const customId = Boolean(
+      this.admin && this.formData.useCustomId && this.formData.customServiceId
+    );
+    // the fields as sent, before the user changes the form
+    const locations = this.fieldLocations(customId);
 
     try {
       // Validate required fields
@@ -634,11 +754,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       }
 
       let serviceId: string;
-      if (
-        this.admin &&
-        this.formData.useCustomId &&
-        this.formData.customServiceId
-      ) {
+      if (customId) {
         serviceId = await provider.createServiceWithId!(
           this.formData.customServiceId,
           serviceData
@@ -664,10 +780,14 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       // list a type that the service added
       this.loadServiceTypes(false);
     } catch (err) {
-      // Emit error event
+      const detail = failureDetail(err, "Failed to create service", {
+        locations,
+      });
+      // the registry's field errors show at the fields
+      this.fieldErrors = detail.fieldErrors;
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-failed", {
-          detail: failureDetail(err, "Failed to create service"),
+          detail,
           bubbles: true,
           composed: true,
         })
@@ -678,6 +798,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   }
 
   private resetForm(): void {
+    this.fieldErrors = {};
     this.typeChoice = "";
     this.formData = {
       name: "",
@@ -718,6 +839,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               id="service-name"
+              .error=${this.fieldError("name")}
               .value=${this.formData.name}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("name", e.detail.value)}
@@ -736,6 +858,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               id="service-url"
+              .error=${this.fieldError("url")}
               .value=${this.formData.url}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("url", e.detail.value)}
@@ -754,6 +877,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               id="org-name"
+              .error=${this.fieldError("organization.name")}
               .value=${this.formData.organization.name}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange(
@@ -773,6 +897,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               id="org-url"
+              .error=${this.fieldError("organization.url")}
               .value=${this.formData.organization.url}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleNestedInputChange(
@@ -800,6 +925,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               id="service-version"
+              .error=${this.fieldError("version")}
               .value=${this.formData.version}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("version", e.detail.value)}
@@ -831,6 +957,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               id="contact-url"
+              .error=${this.fieldError("contactUrl")}
               .value=${this.formData.contactUrl}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("contactUrl", e.detail.value)}
@@ -848,6 +975,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
             </ecc-utils-design-label>
             <ecc-utils-design-input
               id="documentation-url"
+              .error=${this.fieldError("documentationUrl")}
               .value=${this.formData.documentationUrl}
               @ecc-input-changed=${(e: CustomEvent) =>
                 this.handleInputChange("documentationUrl", e.detail.value)}
@@ -864,6 +992,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           </ecc-utils-design-label>
           <ecc-utils-design-textarea
             id="description"
+            .error=${this.fieldError("description")}
             .value=${this.formData.description}
             @ecc-input-changed=${(e: CustomEvent) =>
               this.handleInputChange("description", e.detail.value)}
@@ -884,6 +1013,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       return html`
         <ecc-utils-design-input
           id="environment"
+          .error=${this.fieldError("environment")}
           .value=${this.formData.environment}
           @ecc-input-changed=${(e: CustomEvent) =>
             this.handleInputChange("environment", e.detail.value)}
@@ -895,6 +1025,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     return html`
       <ecc-utils-design-select
         id="environment"
+        .error=${this.fieldError("environment")}
         .value=${this.formData.environment}
         @ecc-input-changed=${(e: CustomEvent) =>
           this.handleInputChange("environment", e.detail.value)}
@@ -938,6 +1069,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           : html`
               <ecc-utils-design-select
                 id="service-type"
+                .error=${this.fieldError("type")}
                 .value=${this.newType ? NEW_TYPE : this.typeChoice}
                 @ecc-input-changed=${(e: CustomEvent) =>
                   this.selectType(e.detail.value)}
@@ -1007,6 +1139,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           </ecc-utils-design-label>
           <ecc-utils-design-input
             id="type-group"
+            .error=${this.fieldError("type.group")}
             .value=${this.formData.type.group}
             @ecc-input-changed=${(e: CustomEvent) =>
               this.handleNestedInputChange("type", "group", e.detail.value)}
@@ -1025,6 +1158,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           </ecc-utils-design-label>
           <ecc-utils-design-input
             id="type-artifact"
+            .error=${this.fieldError("type.artifact")}
             .value=${this.formData.type.artifact}
             @ecc-input-changed=${(e: CustomEvent) =>
               this.handleNestedInputChange("type", "artifact", e.detail.value)}
@@ -1043,6 +1177,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
           </ecc-utils-design-label>
           <ecc-utils-design-input
             id="type-version"
+            .error=${this.fieldError("type.version")}
             .value=${this.formData.type.version}
             @ecc-input-changed=${(e: CustomEvent) =>
               this.handleNestedInputChange("type", "version", e.detail.value)}
@@ -1099,6 +1234,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                 </ecc-utils-design-label>
                 <ecc-utils-design-input
                   id="custom-service-id"
+                  .error=${this.fieldError("serviceId")}
                   .value=${this.formData.customServiceId}
                   @ecc-input-changed=${(e: CustomEvent) => {
                     this.handleInputChange("customServiceId", e.detail.value);
@@ -1123,6 +1259,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   </ecc-utils-design-label>
                   <ecc-utils-design-input
                     id="created-at"
+                    .error=${this.fieldError("createdAt")}
                     .value=${this.formData.createdAt}
                     @ecc-input-changed=${(e: CustomEvent) =>
                       this.handleInputChange("createdAt", e.detail.value)}
@@ -1140,6 +1277,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
                   </ecc-utils-design-label>
                   <ecc-utils-design-input
                     id="updated-at"
+                    .error=${this.fieldError("updatedAt")}
                     .value=${this.formData.updatedAt}
                     @ecc-input-changed=${(e: CustomEvent) =>
                       this.handleInputChange("updatedAt", e.detail.value)}
