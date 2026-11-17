@@ -144,6 +144,14 @@ export class ECCClientGa4ghServiceRegistryServiceInfo extends LitElement {
     try {
       const serviceInfo = await provider.getServiceInfo();
       if (stale()) return;
+      // valid JSON of another shape (e.g. `null` or a list) can't be shown
+      if (
+        typeof serviceInfo !== "object" ||
+        serviceInfo === null ||
+        Array.isArray(serviceInfo)
+      ) {
+        throw new Error("Invalid service info: the registry sent no object");
+      }
       this.serviceInfo = serviceInfo;
       this.dispatchChanged(serviceInfo);
     } catch (err) {

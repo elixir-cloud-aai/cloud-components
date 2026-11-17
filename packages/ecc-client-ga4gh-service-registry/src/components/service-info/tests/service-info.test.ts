@@ -235,6 +235,30 @@ describe("ecc-client-ga4gh-service-registry-service-info", () => {
     expect(consoleStub.callCount).to.equal(1);
   });
 
+  for (const [label, response] of [
+    ["null", null],
+    ["a list", [minimal()]],
+    ["a string", "Registry"],
+  ] as const) {
+    it(`shows an error for ${label} as service info`, async () => {
+      const reported: (Service | null)[] = [];
+      sinon.stub(console, "error");
+      const el = await fixture<ECCClientGa4ghServiceRegistryServiceInfo>(
+        html`<ecc-client-ga4gh-service-registry-service-info
+          .provider=${stubProvider(response as unknown as Service)}
+          @ecc-service-info-changed=${(e: CustomEvent) =>
+            reported.push(e.detail.serviceInfo)}
+        ></ecc-client-ga4gh-service-registry-service-info>`
+      );
+      await waitUntil(() =>
+        el.shadowRoot?.textContent?.includes("Invalid service info")
+      );
+
+      expect(shown(el)).to.equal(null);
+      expect(reported).to.deep.equal([null]);
+    });
+  }
+
   it("shows a generic error for a failure without an Error", async () => {
     const provider = stubProvider();
     // eslint-disable-next-line prefer-promise-reject-errors

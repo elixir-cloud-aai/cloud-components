@@ -21,7 +21,7 @@ Optional fields are shown only if they are set, so that a registry that sets few
 - `documentationUrl`, `organization.url`: shown as links if they are `http:` or `https:` URLs; without a valid URL, the organization shows its name only.
 - `createdAt`, `updatedAt`: shown in the reader's locale if they are valid timestamps. Since cloud-registry 0.4.0, a fresh deployment sets neither.
 
-While the service info loads, the component shows placeholders; a failed request shows its error.
+While the service info loads, the component shows placeholders; a failed request, or a response that is not an object, shows its error.
 
 ## Usage
 
