@@ -20,17 +20,17 @@ describe("EccUtilsDesignCode deprecated theme API", () => {
     const el = await fixture<EccUtilsDesignCode>(html`
       <ecc-utils-design-code dark value="{}"></ecc-utils-design-code>
     `);
-    el.editor.setTheme("ace/theme/textmate");
+    el.editor?.setTheme("ace/theme/textmate");
     el.updateEditorTheme();
-    expect(el.editor.getTheme()).to.equal(ACE_THEME);
+    expect(el.editor?.getTheme()).to.equal(ACE_THEME);
   });
 
   it("setupThemeObserver() keeps the token-driven theme", async () => {
     const el = await fixture<EccUtilsDesignCode>(html`
       <ecc-utils-design-code value="{}"></ecc-utils-design-code>
     `);
-    el.editor.setTheme("ace/theme/textmate");
+    el.editor?.setTheme("ace/theme/textmate");
     el.setupThemeObserver();
-    expect(el.editor.getTheme()).to.equal(ACE_THEME);
+    expect(el.editor?.getTheme()).to.equal(ACE_THEME);
   });
 });

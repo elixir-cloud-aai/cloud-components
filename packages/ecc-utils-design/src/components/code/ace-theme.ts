@@ -120,13 +120,24 @@ const cssText = `
 // globalThis rather than window: this module is also evaluated during SSR,
 // where Ace may not have registered itself; skip the theme there (in a
 // browser, a missing Ace still fails in initializeAceEditor)
-const { ace } = globalThis as any;
+// Ace's AMD loader and the part of `ace/lib/dom` used here; ace-builds
+// doesn't type either
+type AceDom = { importCssString: (css: string, id: string) => void };
+type AceDefine = (
+  name: string,
+  deps: string[],
+  factory: (
+    require: (id: "ace/lib/dom") => AceDom,
+    exports: Record<string, unknown>
+  ) => void
+) => void;
+const { ace } = globalThis as { ace?: { define?: AceDefine } };
 
 if (typeof ace?.define === "function") {
   ace.define(
     ACE_THEME,
     ["require", "exports", "module", "ace/lib/dom"],
-    (require: (id: string) => any, exports: Record<string, unknown>) => {
+    (require, exports) => {
       /* eslint-disable no-param-reassign */
       // Always false: colors come from tokens, so Ace's ace_dark artwork is
       // never needed (fold arrows are token-colored masks above).

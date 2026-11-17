@@ -47,7 +47,6 @@ export class EccUtilsDesignCollapsible extends LitElement {
   updated(changedProperties: PropertyValues) {
     if (changedProperties.has("open")) {
       collapsibleState.set(this.collapsibleId, {
-        ...collapsibleState.get(this.collapsibleId)!,
         isOpen: this.open,
       });
     }
@@ -70,7 +69,6 @@ export class EccUtilsDesignCollapsible extends LitElement {
 
   private _updateState() {
     collapsibleState.set(this.collapsibleId, {
-      ...collapsibleState.get(this.collapsibleId)!,
       isOpen: this.open,
     });
   }

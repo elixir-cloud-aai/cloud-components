@@ -1,5 +1,6 @@
-import { LitElement, html, css } from "lit";
+import { LitElement, html, css, PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
+import type { Ace } from "ace-builds";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
 import "ace-builds/src-noconflict/ace.js";
@@ -629,7 +630,7 @@ export class EccUtilsDesignCode extends LitElement {
   @property({ type: String }) extension = "";
   @property({ type: Boolean }) disabled = false;
 
-  @state() editor: any;
+  @state() editor: Ace.Editor | undefined;
 
   firstUpdated() {
     this.initializeAceEditor();
@@ -673,28 +674,30 @@ export class EccUtilsDesignCode extends LitElement {
   async initializeAceEditor() {
     const editorElement = this.shadowRoot?.getElementById("editor");
     if (editorElement) {
-      const { ace } = window as any;
+      // Registered by the side-effect import of ace-builds above
+      const { ace } = window as unknown as { ace: typeof import("ace-builds") };
       ace.config.set(
         "workerPath",
         `https://cdn.jsdelivr.net/npm/ace-builds@${ace.version}/src-min-noconflict`
       );
-      this.editor = ace.edit(editorElement);
+      const editor = ace.edit(editorElement);
+      this.editor = editor;
 
       // Token-driven theme: follows --ecc-* overrides and dark mode via CSS
-      this.editor.setTheme(ACE_THEME);
+      editor.setTheme(ACE_THEME);
 
-      this.editor.session.setUseWorker(true);
-      this.editor.renderer.attachToShadowRoot();
-      this.editor.setValue(this.value);
+      editor.session.setUseWorker(true);
+      editor.renderer.attachToShadowRoot();
+      editor.setValue(this.value);
 
       // Clear selection after setting value
-      this.editor.clearSelection();
+      editor.clearSelection();
 
       this.setEditorLanguage(this.language);
-      if (this.disabled) this.editor.setReadOnly(true);
+      if (this.disabled) editor.setReadOnly(true);
 
-      this.editor.on("change", () => {
-        this.value = this.editor.getValue();
+      editor.on("change", () => {
+        this.value = editor.getValue();
 
         this.dispatchEvent(
           new CustomEvent("ecc-input-changed", {
@@ -713,16 +716,13 @@ export class EccUtilsDesignCode extends LitElement {
     try {
       // Directly set the mode without dynamic import
       this.editor.session.setMode(`ace/mode/${language}`);
-    } catch (error) {
-      console.error(
-        `Failed to set mode for ${language}, falling back to text mode`,
-        error
-      );
+    } catch {
+      // Unknown mode: fall back to plain text
       this.editor.session.setMode("ace/mode/text");
     }
   }
 
-  updated(changedProperties: Map<string, any>) {
+  updated(changedProperties: PropertyValues<this>) {
     if (changedProperties.has("language") && this.editor) {
       this.setEditorLanguage(this.language);
     }

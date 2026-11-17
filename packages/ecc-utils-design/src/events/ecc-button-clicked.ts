@@ -1,4 +1,4 @@
-export type EccButtonClickedEvent = CustomEvent<Record<string, any>>;
+export type EccButtonClickedEvent = CustomEvent<{ variant: string }>;
 
 declare global {
   interface GlobalEventHandlersEventMap {
