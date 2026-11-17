@@ -117,17 +117,19 @@ export class ECCClientGa4ghTrsTools extends LitElement {
       (changedProperties.has("provider") || changedProperties.has("baseUrl")) &&
       this.useProvider()
     ) {
-      // another provider starts on its first page
+      // another provider starts on its first page, without the tool class
+      // filter and the tool classes of the previous one
       this.currentPage = 1;
       this.lastPage = -1;
+      this.filterParams = { ...this.filterParams, toolClass: "" };
+      this.toolClasses = [];
+      this.toolClassMap = {};
       if (this._provider) {
         this.loadData();
         this.loadToolClasses();
       } else {
         this.tools = [];
         this.loading = false;
-        this.toolClasses = [];
-        this.toolClassMap = {};
         this.dispatchEvent(
           new CustomEvent("ecc-tools-changed", {
             detail: { tools: [] },
@@ -328,6 +330,7 @@ export class ECCClientGa4ghTrsTools extends LitElement {
           <ecc-utils-design-label>Tool Class</ecc-utils-design-label>
           <ecc-utils-design-select
             class="part:w-40"
+            .value=${String(this.filterParams.toolClass ?? "")}
             @ecc-input-changed=${(e: Event) =>
               this.handleSelectChange("toolClass", e)}
           >
