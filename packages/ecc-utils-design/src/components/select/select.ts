@@ -71,9 +71,13 @@ export class EccUtilsDesignSelect extends LitElement {
         (trigger) => trigger.requestUpdate()
       );
     }
-    if (changedProperties.has("value") || changedProperties.has("isOpen")) {
+    const current = selectState.get(this.selectId);
+    if (
+      current &&
+      (changedProperties.has("value") || changedProperties.has("isOpen"))
+    ) {
       selectState.set(this.selectId, {
-        ...selectState.get(this.selectId)!,
+        ...current,
         value: this.value,
         isOpen: this.isOpen,
       });
@@ -107,8 +111,10 @@ export class EccUtilsDesignSelect extends LitElement {
   }
 
   private _updateState() {
+    const current = selectState.get(this.selectId);
+    if (!current) return;
     selectState.set(this.selectId, {
-      ...selectState.get(this.selectId)!,
+      ...current,
       isOpen: this.isOpen,
       value: this.value,
     });

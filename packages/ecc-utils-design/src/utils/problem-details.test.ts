@@ -331,7 +331,7 @@ describe("mapFieldErrors()", () => {
     expect(Object.getPrototypeOf(problem?.extensions)).to.equal(
       Object.prototype
     );
-    expect(Object.keys(problem!.extensions)).to.deep.equal(["__proto__"]);
+    expect(Object.keys(problem?.extensions ?? {})).to.deep.equal(["__proto__"]);
     // A field key `__proto__` (from JSON, as an own member)
     const fieldsOfForm = JSON.parse('{"__proto__": "/__proto__"}');
     const mapped = mapFieldErrors(problem, fieldsOfForm);
