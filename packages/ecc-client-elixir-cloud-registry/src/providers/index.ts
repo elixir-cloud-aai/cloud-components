@@ -18,4 +18,9 @@ export type {
   ExternalServiceRegister,
   RegistrationRules,
   RegistryServiceInfo,
+  VerificationRegister,
+  Verification,
+  ServiceVerification,
 } from "./cr-provider.js";
+
+export { matchesVerification, verifiedServices } from "./verifications.js";

@@ -25,6 +25,15 @@ export type RowActionsRenderer = (
   service: ExternalService
 ) => TemplateResult | Node | string | null | undefined;
 
+/**
+ * Renders the badges of a row from its service, next to its version (e.g. a
+ * "Verified" badge): a Lit template, a DOM node, a string, or nothing (`null`
+ * or `undefined`) for a row without badges.
+ */
+export type RowBadgesRenderer = (
+  service: ExternalService
+) => TemplateResult | Node | string | null | undefined;
+
 /** The selected values of the filters; empty for "All". */
 interface ServiceFilters {
   type: string;
@@ -83,6 +92,7 @@ const DEFAULT_PAGE_SIZE = 10;
  * @property {number} pageSize - Number of services per page (attribute `page-size`, default 10); 0 or less shows all services on one page, a missing, empty or invalid value 10
  * @property {ServiceRegistryProvider} provider - Custom data provider (optional, overrides baseUrl)
  * @property {RowActionsRenderer} rowActions - Renders the actions of each row (e.g. Edit and Delete buttons) from its service
+ * @property {RowBadgesRenderer} rowBadges - Renders badges of each row (e.g. "Verified") from its service, next to its version
  *
  * @slot actions-<id> - Actions of the row of the service with this ID, instead of those of `rowActions` or the "View Details" button
  *
@@ -120,6 +130,7 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
   provider?: ServiceRegistryProvider;
 
   @property({ attribute: false }) rowActions?: RowActionsRenderer;
+  @property({ attribute: false }) rowBadges?: RowBadgesRenderer;
 
   @state() private searchQuery = "";
   @state() private services: ExternalService[] = [];
@@ -671,6 +682,11 @@ export class ECCClientGa4ghServiceRegistryServices extends LitElement {
                 ? html`<ecc-utils-design-badge variant="outline">
                     v${service.version}
                   </ecc-utils-design-badge>`
+                : ""}
+              ${this.rowBadges
+                ? html`<span data-row-badges class="flex items-center gap-2"
+                    >${this.rowBadges(service) ?? ""}</span
+                  >`
                 : ""}
             </div>
             ${service.description
