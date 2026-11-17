@@ -81,7 +81,7 @@ While the types load, the table shows placeholder rows; a registry without types
 | `baseUrl`  | `baseurl` | `string`                  | `""`        | Base URL of the Service Registry API, used if no `provider` is set                          |
 | `provider` | -         | `ServiceRegistryProvider` | `undefined` | Data provider for fetching service types (see [Providers](/docs/service-registry/providers)) |
 
-Without either, the component shows an error that asks for one. A `provider` that is set, replaced or removed after the first update loads the types again, and only the latest load applies (see [Providers](/docs/providers)).
+Without either, the component shows an error that asks for one. A `provider` (or `baseUrl`) that is set or replaced after the first update loads the types again, and only the latest load applies (see [Providers](/docs/providers)); removing it clears the types and shows the error.
 
 ### `provider`
 The data provider whose `getServiceTypes()` lists the types. See the [Providers documentation](/docs/service-registry/providers) for the available providers and how to create custom ones.

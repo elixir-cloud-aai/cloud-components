@@ -218,6 +218,27 @@ describe("ecc-client-ga4gh-service-registry-service-types", () => {
     );
   });
 
+  it("reports no service types once the base URL is cleared", async () => {
+    const el = await fixture<ECCClientGa4ghServiceRegistryServiceTypes>(
+      html`<ecc-client-ga4gh-service-registry-service-types
+        .baseUrl=${BASE_URL}
+      ></ecc-client-ga4gh-service-registry-service-types>`
+    );
+    await waitUntil(() => rows(el).length === 1);
+    const reported: ServiceType[][] = [];
+    el.addEventListener("ecc-service-types-changed", (e) =>
+      reported.push((e as CustomEvent).detail.serviceTypes)
+    );
+
+    el.baseUrl = "";
+    await el.updateComplete;
+    await el.updateComplete;
+
+    expect(shown(el)).to.deep.equal([]);
+    expect(reported).to.deep.equal([[]]);
+    expect(el.shadowRoot?.textContent).to.contain(MISSING);
+  });
+
   it("loads from a provider set after the first update", async () => {
     const el = await fixture<ECCClientGa4ghServiceRegistryServiceTypes>(
       html`<ecc-client-ga4gh-service-registry-service-types></ecc-client-ga4gh-service-registry-service-types>`
