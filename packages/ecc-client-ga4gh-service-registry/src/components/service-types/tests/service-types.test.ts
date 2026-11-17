@@ -209,13 +209,39 @@ describe("ecc-client-ga4gh-service-registry-service-types", () => {
     );
     await waitUntil(() => rows(el).length === 1);
     expect(fetchStub.firstCall.args[0]).to.equal(`${BASE_URL}/services/types`);
+    fetchStub.callsFake(
+      async () =>
+        new Response(JSON.stringify([WES, CUSTOM]), {
+          headers: { "Content-Type": "application/json" },
+        })
+    );
 
     el.baseUrl = OTHER_URL;
-    await waitUntil(() =>
-      fetchStub
-        .getCalls()
-        .some((call) => call.args[0] === `${OTHER_URL}/services/types`)
+    await waitUntil(() => rows(el).length === 2);
+
+    expect(fetchStub.lastCall.args[0]).to.equal(`${OTHER_URL}/services/types`);
+    expect(rows(el)).to.deep.equal([
+      "org.ga4gh:wes:1.1.0",
+      "org.example:custom:0.1.0",
+    ]);
+  });
+
+  it("shows an error for a response that isn't a list", async () => {
+    const reported: ServiceType[][] = [];
+    sinon.stub(console, "error");
+    const el = await fixture<ECCClientGa4ghServiceRegistryServiceTypes>(
+      html`<ecc-client-ga4gh-service-registry-service-types
+        .provider=${stubProvider({ types: [TES] } as unknown as ServiceType[])}
+        @ecc-service-types-changed=${(e: CustomEvent) =>
+          reported.push(e.detail.serviceTypes)}
+      ></ecc-client-ga4gh-service-registry-service-types>`
     );
+    await waitUntil(() =>
+      el.shadowRoot?.textContent?.includes("Invalid service types")
+    );
+
+    expect(shown(el)).to.deep.equal([]);
+    expect(reported).to.deep.equal([[]]);
   });
 
   it("reports no service types once the base URL is cleared", async () => {

@@ -119,6 +119,10 @@ export class ECCClientGa4ghServiceRegistryServiceTypes extends LitElement {
     try {
       const serviceTypes = await provider.getServiceTypes();
       if (stale()) return;
+      // valid JSON of another shape would break the table
+      if (!Array.isArray(serviceTypes)) {
+        throw new Error("Invalid service types: the registry sent no list");
+      }
       this.serviceTypes = serviceTypes;
       this.dispatchChanged(serviceTypes);
     } catch (err) {
