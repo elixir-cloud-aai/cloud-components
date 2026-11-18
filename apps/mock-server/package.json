@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "dev": "node --experimental-strip-types --disable-warning=ExperimentalWarning --watch src/main.ts",
+    "dev": "node --experimental-strip-types --disable-warning=ExperimentalWarning --watch-path=src --watch-path=fixtures src/main.ts",
     "start": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/main.ts",
     "test": "node --experimental-strip-types --disable-warning=ExperimentalWarning --test \"test/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",

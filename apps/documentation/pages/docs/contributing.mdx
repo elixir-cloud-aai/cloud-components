@@ -88,7 +88,8 @@ step and without runtime dependencies: Node.js strips the types
 module. In `apps/mock-server/`:
 
 - `npm run dev` starts it on port 8080 (`PORT` sets another one) and
-  restarts it on changes; `npm start` starts it without watching.
+  restarts it on changes of `src/` and `fixtures/`; `npm start` starts it
+  without watching (and lets requests in flight finish on `SIGTERM`).
 - `npm test` runs its integration tests (`node:test`; they start the server
   on a free port and send real HTTP requests); `npm run lint` type-checks
   (`tsc --noEmit`) and lints it. Both run in CI with those of the other
@@ -100,15 +101,18 @@ What it does:
 - `GET /healthz` answers `{"status": "ok"}`; `HEAD` works like `GET`;
   unknown paths and methods get a JSON `404` in the GA4GH error format
   (`{"msg": ..., "status_code": ...}`).
-- CORS: any origin, the methods `GET, POST, PUT, DELETE, OPTIONS`, and
+- CORS: any origin, the methods `GET, HEAD, POST, PUT, DELETE, OPTIONS`, and
   preflight requests (`OPTIONS`) on any path.
 - One log line per request: time, method, path without the query string,
-  status (`aborted` if the client closed the connection first) and
-  duration.
+  status (`aborted` if the client closed the connection first), duration,
+  and the message of an unexpected error (answered with a `500` without
+  details).
 - Limits, since the deployed instance is public and anonymous: request
   bodies above 1 MiB get `413`, and each collection keeps at most 100
   created items and at most 4 MiB of them (as JSON); above that, the oldest
-  created items are dropped (fixtures stay).
+  created items are dropped (fixtures stay), and a single larger item gets
+  `413`. At most 100 connections are open at a time, and a request must
+  arrive within 30 s.
 
 Its data lives in memory and is never written to disk: on start, the
 server loads each `fixtures/<collection>.json` (a JSON array of objects)

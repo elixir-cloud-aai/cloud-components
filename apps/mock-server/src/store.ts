@@ -11,6 +11,8 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { basename, join } from "node:path";
 
+import { HttpError } from "./http.ts";
+
 export type Item = Record<string, unknown>;
 
 export interface StoreOptions {
@@ -18,8 +20,9 @@ export interface StoreOptions {
   // created item is dropped. Fixtures don't count and are never dropped
   maxCreated?: number;
   // Total size of the created items per collection, as JSON (default
-  // 4 MiB); above it, the oldest created items are dropped, but never the
-  // newest. Parsed items take many times their JSON size in memory
+  // 4 MiB); above it, the oldest created items are dropped. A larger item
+  // is rejected (413). Parsed items take many times their JSON size in
+  // memory
   maxCreatedBytes?: number;
 }
 
@@ -131,20 +134,25 @@ export class Store {
   }
 
   // Adds a copy of `item` to the collection (created if needed) and returns
-  // another copy
+  // another copy; 413 if the item alone exceeds `maxCreatedBytes`
   create(name: string, item: Item): Item {
+    const size = Buffer.byteLength(JSON.stringify(item));
+    if (size > this.maxCreatedBytes) {
+      throw new HttpError(
+        413,
+        `The item exceeds the ${this.maxCreatedBytes} bytes of its collection`
+      );
+    }
     let collection = this.#collections.get(name);
     if (!collection) {
       collection = emptyCollection();
       this.#collections.set(name, collection);
     }
-    const size = Buffer.byteLength(JSON.stringify(item));
     collection.created.push({ item: structuredClone(item), size });
     collection.bytes += size;
     while (
-      collection.created.length > 1 &&
-      (collection.created.length > this.maxCreated ||
-        collection.bytes > this.maxCreatedBytes)
+      collection.created.length > this.maxCreated ||
+      collection.bytes > this.maxCreatedBytes
     ) {
       const [oldest] = collection.created.splice(0, 1);
       collection.bytes -= oldest.size;

@@ -15,9 +15,12 @@ server.listen(port, () => {
   console.log(`Mock server listening on port ${port}`);
 });
 
+// Stop accepting connections, let requests in flight finish (at most 10 s),
+// then exit
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.once(signal, () => {
     server.close(() => process.exit(0));
-    server.closeAllConnections();
+    server.closeIdleConnections();
+    setTimeout(() => server.closeAllConnections(), 10_000).unref();
   });
 }

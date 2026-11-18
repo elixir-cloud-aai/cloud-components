@@ -3,6 +3,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { after, before, describe, it } from "node:test";
 
+import { HttpError } from "../src/http.ts";
 import { Store } from "../src/store.ts";
 import { fixturesDir } from "./helpers.ts";
 
@@ -72,13 +73,16 @@ describe("Store", () => {
     );
   });
 
-  it("keeps the newest created item even if it alone exceeds the size cap", () => {
-    const store = Store.load(fixturesDir, { maxCreatedBytes: 10 });
+  it("rejects an item that alone exceeds the size cap", () => {
+    const store = Store.load(fixturesDir, { maxCreatedBytes: 20 });
     store.create("runs", { id: "a" });
-    store.create("runs", { id: "b", data: "x".repeat(100) });
+    assert.throws(
+      () => store.create("runs", { id: "b", data: "x".repeat(100) }),
+      (error: unknown) => error instanceof HttpError && error.status === 413
+    );
     assert.deepEqual(
       store.list("runs").map((item) => item.id),
-      ["b"]
+      ["a"]
     );
   });
 

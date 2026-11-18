@@ -14,6 +14,18 @@ export interface RunningServer {
   close: () => Promise<void>;
 }
 
+// Waits until the server has written `count` log lines (at most 5 s); the
+// line of a request is written when its connection closes
+export const waitForLogs = async (
+  server: RunningServer,
+  count: number
+): Promise<void> => {
+  const deadline = Date.now() + 5000;
+  while (server.logs.length < count && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+};
+
 // Starts a server on a free port of the loopback interface, with the test
 // fixtures (unless `store` is given; `maxCreated` caps its created items)
 // and the log lines collected

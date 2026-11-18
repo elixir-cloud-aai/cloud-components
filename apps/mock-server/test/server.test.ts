@@ -4,9 +4,15 @@ import { connect } from "node:net";
 import { after, before, describe, it } from "node:test";
 
 import { HttpError, parseJson } from "../src/http.ts";
+import { createServer } from "../src/server.ts";
 import type { Router } from "../src/router.ts";
 import { Store } from "../src/store.ts";
-import { fixturesDir, startServer, type RunningServer } from "./helpers.ts";
+import {
+  fixturesDir,
+  startServer,
+  waitForLogs,
+  type RunningServer,
+} from "./helpers.ts";
 
 // Routes that only the tests register: they expose the store the way the
 // API stubs do
@@ -30,6 +36,10 @@ const testRoutes = (router: Router): void => {
     throw new Error("boom");
   });
   router.delete("/things/:id", () => ({ status: 204 }));
+  router.get("/throw-symbol", () => {
+    throw Symbol("odd");
+  });
+  router.get("/unserializable", () => ({ status: 200, body: { n: 1n } }));
 };
 
 // Sends a body in chunks without `Content-Length` (chunked transfer
@@ -106,7 +116,7 @@ describe("mock server", () => {
       assert.equal(res.headers.get("access-control-allow-origin"), "*");
       assert.equal(
         res.headers.get("access-control-allow-methods"),
-        "GET, POST, PUT, DELETE, OPTIONS"
+        "GET, HEAD, POST, PUT, DELETE, OPTIONS"
       );
       assert.equal(
         res.headers.get("access-control-allow-headers"),
@@ -173,11 +183,29 @@ describe("mock server", () => {
     });
 
     it("answers unexpected errors with 500, without details", async () => {
+      const before = server.logs.length;
       const res = await fetch(`${server.url}/fail`);
       assert.equal(res.status, 500);
       const body = await errorOf(res);
       assert.equal(body.status_code, 500);
       assert.doesNotMatch(body.msg, /boom/);
+      // One line, with the error
+      await waitForLogs(server, before + 1);
+      const lines = server.logs.slice(before);
+      assert.equal(lines.length, 1, lines.join("\n"));
+      assert.match(lines[0], /GET \/fail 500 \d+ms error: boom$/);
+    });
+
+    it("answers 500 for any thrown value", async () => {
+      const res = await fetch(`${server.url}/throw-symbol`);
+      assert.equal(res.status, 500);
+      assert.equal((await errorOf(res)).status_code, 500);
+    });
+
+    it("answers 500 for a reply body that isn't serializable", async () => {
+      const res = await fetch(`${server.url}/unserializable`);
+      assert.equal(res.status, 500);
+      assert.equal((await errorOf(res)).status_code, 500);
     });
 
     it("sends no body for 204", async () => {
@@ -226,10 +254,7 @@ describe("mock server", () => {
         socket.on("close", () => resolve());
       });
       // The line is written when the server has seen the connection close
-      const deadline = Date.now() + 5000;
-      while (server.logs.length === before && Date.now() < deadline) {
-        await new Promise((resolve) => setTimeout(resolve, 10));
-      }
+      await waitForLogs(server, before + 1);
       const lines = server.logs.slice(before);
       assert.equal(lines.length, 1, lines.join("\n"));
       assert.match(lines[0], /POST \/things aborted \d+ms$/);
@@ -237,6 +262,41 @@ describe("mock server", () => {
   });
 
   describe("body limit", () => {
+    it("survives a client that leaves while an oversized body is drained", async () => {
+      const limited = await startServer({ maxBodyBytes: 1024 });
+      try {
+        const { port } = new URL(limited.url);
+        await new Promise<void>((resolve) => {
+          const socket = connect(Number(port), "127.0.0.1", () => {
+            socket.write(
+              "POST /healthz HTTP/1.1\r\nHost: x\r\nContent-Length: 4096\r\n\r\nabc"
+            );
+            setTimeout(() => socket.destroy(), 50);
+          });
+          socket.on("error", () => undefined);
+          socket.on("close", () => resolve());
+        });
+        await waitForLogs(limited, 1);
+        const res = await fetch(`${limited.url}/healthz`);
+        assert.equal(res.status, 200);
+      } finally {
+        await limited.close();
+      }
+    });
+
+    it("applies to preflight requests, too", async () => {
+      const limited = await startServer({ maxBodyBytes: 1024 });
+      try {
+        const res = await fetch(`${limited.url}/any`, {
+          method: "OPTIONS",
+          body: Buffer.alloc(2048, "a"),
+        });
+        assert.equal(res.status, 413);
+      } finally {
+        await limited.close();
+      }
+    });
+
     it("rejects a body above the limit by its Content-Length", async () => {
       const limited = await startServer({ maxBodyBytes: 1024 });
       try {
@@ -289,6 +349,13 @@ describe("mock server", () => {
         body: Buffer.alloc(1024 * 1024 + 1, "a"),
       });
       assert.equal(res.status, 413);
+    });
+  });
+
+  describe("connections", () => {
+    it("defaults to at most 100 at a time", async () => {
+      const server = createServer({ store: Store.load(fixturesDir) });
+      assert.equal(server.maxConnections, 100);
     });
   });
 
