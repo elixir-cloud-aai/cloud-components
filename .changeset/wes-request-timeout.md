@@ -1,0 +1,5 @@
+---
+"@elixir-cloud/wes": minor
+---
+
+Time out the requests of `RestWesProvider`: each request rejects with a `RequestTimeoutError` (of `@elixir-cloud/design/utils`) once its deadline expires, 30 s by default, so that the components show an error instead of loading forever when a server never answers. Set the deadline with the new constructor option `timeout` (milliseconds, `0` for none): `new RestWesProvider(baseUrl, { timeout: 10_000 })`. Subclasses that override `fetch()` and call `super.fetch()` keep it. The deadline includes uploading the attachments of `runWorkflow()`: raise it for large attachments.

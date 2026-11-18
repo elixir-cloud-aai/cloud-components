@@ -1,4 +1,9 @@
 import {
+  fetchWithTimeout,
+  resolveRequestTimeout,
+} from "@elixir-cloud/design/utils";
+import type { RestProviderOptions } from "@elixir-cloud/design/utils";
+import {
   WesProvider,
   ServiceInfo,
   RunListResponse,
@@ -16,17 +21,26 @@ import {
 export class RestWesProvider implements WesProvider {
   protected baseUrl: string;
 
-  constructor(baseUrl: string) {
+  /** Deadline of each request in milliseconds, `0` for none. */
+  public readonly timeout: number;
+
+  /**
+   * @param baseUrl Base URL of the WES API
+   * @param options `timeout`: deadline of each request in milliseconds
+   *   (default 30 s, `0` for none)
+   */
+  constructor(baseUrl: string, options: RestProviderOptions = {}) {
     this.baseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+    this.timeout = resolveRequestTimeout(options);
   }
 
   /**
-   * Sends every request of this provider. Override it in a subclass to add
-   * headers (e.g. `Authorization`) or otherwise change requests.
+   * Sends every request of this provider, with the provider's deadline.
+   * Override it in a subclass to add headers (e.g. `Authorization`) or
+   * otherwise change requests; call `super.fetch()` to keep the deadline.
    */
-  // eslint-disable-next-line class-methods-use-this
   protected fetch(input: RequestInfo | URL, init?: RequestInit) {
-    return fetch(input, init);
+    return fetchWithTimeout(input, init, this.timeout);
   }
 
   private static async handleResponse<T>(response: Response): Promise<T> {
