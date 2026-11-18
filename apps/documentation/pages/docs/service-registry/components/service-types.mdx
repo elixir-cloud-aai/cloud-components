@@ -14,7 +14,7 @@ import ServiceTypesPreview from '@/components/packages/service-registry/ServiceT
 
 The `ecc-client-ga4gh-service-registry-service-types` component lists the types of the services in a GA4GH Service Registry (`GET /services/types`): one row per type, with its group, artifact and version, in the order that the registry returns them. Groups of GA4GH and ELIXIR types are highlighted, as in the [Services](/docs/service-registry/components/services) and [Service](/docs/service-registry/components/service) components.
 
-While the types load, the table shows placeholder rows; a registry without types shows "No service types found", and a failed request, or a response that is not a list of types with a `group`, `artifact` and `version` each, shows its error instead of the table.
+While the types load, the table shows placeholder rows; a registry without types shows "No service types found", and a failed request, or a response that is not a list of types with a string `group`, `artifact` and `version` each, shows its error instead of the table.
 
 ## Usage
 

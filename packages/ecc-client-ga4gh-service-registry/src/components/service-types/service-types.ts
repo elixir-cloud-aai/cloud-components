@@ -133,7 +133,7 @@ export class ECCClientGa4ghServiceRegistryServiceTypes extends LitElement {
       }
       if (!serviceTypes.every(isServiceType)) {
         throw new Error(
-          "Invalid service types: a type lacks a group, artifact or version"
+          "Invalid service types: a type lacks a string group, artifact or version"
         );
       }
       this.serviceTypes = serviceTypes;
