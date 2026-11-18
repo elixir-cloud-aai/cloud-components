@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { request } from "node:http";
+import { connect } from "node:net";
 import { after, before, describe, it } from "node:test";
 
 import { HttpError, parseJson } from "../src/http.ts";
@@ -141,6 +142,12 @@ describe("mock server", () => {
       assert.equal((await errorOf(res)).status_code, 404);
     });
 
+    it("answers HEAD like GET, without a body", async () => {
+      const res = await fetch(`${server.url}/healthz`, { method: "HEAD" });
+      assert.equal(res.status, 200);
+      assert.equal(await res.text(), "");
+    });
+
     it("passes decoded path parameters and ignores the query", async () => {
       const res = await fetch(`${server.url}/things/fixture-1?x=%2F`);
       assert.equal(res.status, 200);
@@ -202,6 +209,26 @@ describe("mock server", () => {
       assert.equal(lines.length, 1);
       assert.match(lines[0], /GET \/healthz 200 \d+ms$/);
       assert.doesNotMatch(lines[0], /secret/);
+    });
+  });
+
+  describe("aborted requests", () => {
+    it("logs them as aborted, not as server errors", async () => {
+      const before = server.logs.length;
+      const { port } = new URL(server.url);
+      await new Promise<void>((resolve) => {
+        const socket = connect(Number(port), "127.0.0.1", () => {
+          socket.write(
+            "POST /things HTTP/1.1\r\nHost: x\r\nContent-Length: 500\r\n\r\nabc"
+          );
+          setTimeout(() => socket.destroy(), 50);
+        });
+        socket.on("close", () => resolve());
+      });
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      const lines = server.logs.slice(before);
+      assert.equal(lines.length, 1, lines.join("\n"));
+      assert.match(lines[0], /POST \/things aborted \d+ms$/);
     });
   });
 

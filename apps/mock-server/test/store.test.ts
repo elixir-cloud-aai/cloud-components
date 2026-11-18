@@ -59,6 +59,37 @@ describe("Store", () => {
     );
   });
 
+  it("caps the size of created items per collection, dropping the oldest", () => {
+    const store = Store.load(fixturesDir, { maxCreatedBytes: 100 });
+    const big = (id: string) => ({ id, data: "x".repeat(30) });
+    for (const id of ["a", "b", "c", "d"]) {
+      store.create("runs", big(id));
+    }
+    // Each item serializes to 50 bytes: two fit
+    assert.deepEqual(
+      store.list("runs").map((item) => item.id),
+      ["c", "d"]
+    );
+  });
+
+  it("keeps the newest created item even if it alone exceeds the size cap", () => {
+    const store = Store.load(fixturesDir, { maxCreatedBytes: 10 });
+    store.create("runs", { id: "a" });
+    store.create("runs", { id: "b", data: "x".repeat(100) });
+    assert.deepEqual(
+      store.list("runs").map((item) => item.id),
+      ["b"]
+    );
+  });
+
+  it("defaults to a size cap of 4 MiB", () => {
+    assert.equal(Store.load(fixturesDir).maxCreatedBytes, 4 * 1024 * 1024);
+  });
+
+  it("rejects a size cap below 1", () => {
+    assert.throws(() => Store.load(fixturesDir, { maxCreatedBytes: 0 }), /cap/);
+  });
+
   it("defaults to a cap of 100", () => {
     const store = Store.load(fixturesDir);
     assert.equal(store.maxCreated, 100);

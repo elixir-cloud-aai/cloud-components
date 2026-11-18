@@ -9,7 +9,7 @@
     "start": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/main.ts",
     "test": "node --experimental-strip-types --disable-warning=ExperimentalWarning --test \"test/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",
-    "lint": "tsc --noEmit && npx eslint .",
+    "lint": "npm run typecheck && npx eslint .",
     "lint:fix": "npx eslint . --fix",
     "clean": "rm -rf node_modules"
   },

@@ -92,19 +92,21 @@ module. In `apps/mock-server/`:
 - `npm test` runs its integration tests (`node:test`; they start the server
   on a free port and send real HTTP requests); `npm run lint` type-checks
   (`tsc --noEmit`) and lints it. Both run in CI with those of the other
-  workspaces.
+  workspaces; the coverage reported to Codecov covers the packages only,
+  not the mock server.
 
 What it does:
 
-- `GET /healthz` answers `{"status": "ok"}`; unknown paths and methods get
+- `GET /healthz` answers `{"status": "ok"}`; `HEAD` works like `GET`; unknown paths and methods get
   a JSON `404` in the GA4GH error format (`{"msg": ..., "status_code": ...}`).
 - CORS: any origin, the methods `GET, POST, PUT, DELETE, OPTIONS`, and
   preflight requests (`OPTIONS`) on any path.
 - One log line per request (time, method, path without the query string,
-  status, duration).
+  status, or `aborted` if the client closed the connection first, duration).
 - Limits, since the deployed instance is public and anonymous: request
   bodies above 1 MiB get `413`, and each collection keeps at most 100
-  created items (the oldest created item is dropped; fixtures stay).
+  created items and at most 4 MiB of them (as JSON); above that, the oldest
+  created items are dropped (fixtures stay).
 
 Its data lives in memory and is never written to disk: on start, the
 server loads each `fixtures/<collection>.json` (a JSON array of objects)

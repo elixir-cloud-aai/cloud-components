@@ -28,6 +28,8 @@ export interface ServerOptions {
 
 export const DEFAULT_MAX_BODY_BYTES = 1024 * 1024;
 
+// The methods of the `Router` helpers; add any other method that a stub
+// uses here, too
 const ALLOWED_METHODS = "GET, POST, PUT, DELETE, OPTIONS";
 
 // Reads the body up to `limit` bytes. Above it, the rest is read and
@@ -149,10 +151,12 @@ export const createServer = ({
     const path = queryStart === -1 ? url : url.slice(0, queryStart);
     const queryString = queryStart === -1 ? "" : url.slice(queryStart + 1);
 
-    // Without the query string, which may hold anything
-    res.on("finish", () => {
+    // Without the query string, which may hold anything; "aborted" if the
+    // client closed the connection before the response was sent
+    res.on("close", () => {
+      const status = res.writableFinished ? res.statusCode : "aborted";
       log(
-        `${new Date().toISOString()} ${req.method} ${path} ${res.statusCode} ${
+        `${new Date().toISOString()} ${req.method} ${path} ${status} ${
           Date.now() - start
         }ms`
       );
@@ -162,6 +166,11 @@ export const createServer = ({
     handle(req, res, path, queryString)
       .then((reply) => send(res, reply))
       .catch((error: unknown) => {
+        // The client is gone (e.g. closed the connection while sending the
+        // body): nothing to answer, and not an error of the server
+        if (res.destroyed || req.socket.destroyed) {
+          return;
+        }
         if (error instanceof HttpError) {
           send(res, errorReply(error.status, error.message));
           return;

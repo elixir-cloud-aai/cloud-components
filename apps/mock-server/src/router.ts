@@ -50,12 +50,14 @@ export class Router {
     return this.add("DELETE", pattern, handler);
   }
 
-  // The first route that matches, in the order they were added
+  // The first route that matches, in the order they were added; HEAD
+  // matches the GET routes (Node sends no body for HEAD)
   match(method: string, path: string): Match | undefined {
     const segments = split(path).map(decode);
+    const routeMethod = method === "HEAD" ? "GET" : method;
     for (const route of this.#routes) {
       if (
-        route.method !== method ||
+        route.method !== routeMethod ||
         route.segments.length !== segments.length
       ) {
         continue;
