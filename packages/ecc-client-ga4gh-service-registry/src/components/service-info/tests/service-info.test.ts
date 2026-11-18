@@ -182,6 +182,9 @@ describe("ecc-client-ga4gh-service-registry-service-info", () => {
     "mailto:admin@example.org%00",
     "mailto:admin@example.org%E2%80%8B",
     "mailto:admin@example.org%E2%80%AEgro.live",
+    // also at the ends, where trimming would hide them
+    "mailto:admin@example.org%0A",
+    "mailto:%09admin@example.org",
     // recipients count only in the path
     "mailto:?to=admin@example.org",
   ].forEach((contactUrl) => {
@@ -202,7 +205,7 @@ describe("ecc-client-ga4gh-service-registry-service-info", () => {
       "admin@example.org, help@example.org",
     ],
     [
-      "mailto:admin@example.org,%20help@example.org%0A",
+      "mailto:admin@example.org,%20help@example.org%20",
       "admin@example.org, help@example.org",
     ],
     ["mailto:help@example.org?cc=admin@example.org", "help@example.org"],
@@ -450,6 +453,16 @@ describe("ecc-client-ga4gh-service-registry-service-info", () => {
       expect(reported).to.deep.equal([null]);
     });
   }
+
+  it("shows a generic error for an Error without a message", async () => {
+    const provider = stubProvider();
+    provider.getServiceInfo.callsFake(() => Promise.reject(new Error("")));
+    sinon.stub(console, "error");
+    const el = await render(provider);
+    await waitUntil(() =>
+      el.shadowRoot?.textContent?.includes("Failed to load service info")
+    );
+  });
 
   it("shows a generic error for a failure without an Error", async () => {
     const provider = stubProvider();

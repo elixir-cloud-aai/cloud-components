@@ -17,9 +17,11 @@ const MISSING_PROVIDER =
 /**
  * An email address: a local part and a domain, without spaces or control,
  * format (e.g. bidi overrides), private-use or unassigned characters, so that
- * the label shows the address the link goes to.
+ * the label shows the address the link goes to. Plain spaces around it are
+ * allowed and not part of the captured address; other whitespace (e.g. a
+ * line feed) is rejected, not trimmed away.
  */
-const ADDRESS = /^[^\s@\p{C}]+@[^\s@\p{C}]+$/u;
+const ADDRESS = /^ *([^\s@\p{C}]+@[^\s@\p{C}]+) *$/u;
 
 /** The target of a link and the text it shows. */
 interface Link {
@@ -43,9 +45,9 @@ const toLink = (url: unknown, protocols: string[]): Link | null => {
     if (protocol !== "mailto:") return { href: url, label: url };
     const recipients = decodeURIComponent(pathname)
       .split(",")
-      .map((address) => address.trim());
-    const valid = recipients.every((address) => ADDRESS.test(address));
-    return valid ? { href: url, label: recipients.join(", ") } : null;
+      .map((recipient) => ADDRESS.exec(recipient)?.[1]);
+    if (!recipients.every((address) => address)) return null;
+    return { href: url, label: recipients.join(", ") };
   } catch {
     // not a URL, or a malformed escape in the recipients
     return null;
@@ -217,7 +219,7 @@ export class ECCClientGa4ghServiceRegistryServiceInfo extends LitElement {
       // the app drops the data of the previous provider too
       this.dispatchChanged(null);
       this.error =
-        err instanceof Error ? err.message : "Failed to load service info";
+        (err instanceof Error && err.message) || "Failed to load service info";
       console.error({
         error: this.error,
         breakPoint: "ECCClientGa4ghServiceRegistryServiceInfo.loadData",
