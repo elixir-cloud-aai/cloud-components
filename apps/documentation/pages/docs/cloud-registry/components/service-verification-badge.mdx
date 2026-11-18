@@ -1,0 +1,80 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+
+# EccClientElixirCloudRegistryServiceVerificationBadge Component
+
+<ComponentName
+  tagName='ecc-client-elixir-cloud-registry-service-verification-badge'
+  reactTagName='EccClientElixirCloudRegistryServiceVerificationBadge'
+  version='2.0.0-alpha.52'
+/>
+
+## Overview
+
+The `ecc-client-elixir-cloud-registry-service-verification-badge` component shows a "Verified" badge for a service that an admin of the Cloud Registry has verified (see [Verifications](/docs/cloud-registry/providers#verifications)); its tooltip says when. It only shows what the app passes: it has no provider and sends no requests. Admins verify services and remove verifications with the [Service Verification](/docs/cloud-registry/components/service-verification) component.
+
+<Callout type='info'>
+  Verified doesn't mean trusted: users decide which services to use.
+</Callout>
+
+## Usage
+
+Load the verifications with the provider, e.g. all of them with one request for a list (`getVerifications()`, then `verifiedServices()`, which keeps only those that still match their services), and pass each service's verification with `verification`. The badge doesn't compare the verification with the service: pass only verifications that still match it (from `verifiedServices()`, or checked with `matchesVerification()`). `null` or `undefined` means that the service isn't verified: the badge then shows nothing, or "Not verified" with `show-unverified` (e.g. for admins, who can verify the service).
+
+The badge doesn't change by itself after a verify or remove: update `verification` from the `ecc-service-verification-changed` event of the [Service Verification](/docs/cloud-registry/components/service-verification) component, as its examples show.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="service-verification-badge.tsx"
+    import React from 'react';
+    import { EccClientElixirCloudRegistryServiceVerificationBadge } from '@elixir-cloud/cloud-registry/react/service-verification-badge';
+
+    // `verified`: a Map of the app, from verifiedServices(services, verifications)
+    export default function ServiceName({ service, verified }) {
+      return (
+        <span>
+          {service.name}{' '}
+          <EccClientElixirCloudRegistryServiceVerificationBadge
+            verification={verified.get(service.id) ?? null}
+          />
+        </span>
+      );
+    }
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="service-verification-badge.html"
+    <ecc-client-elixir-cloud-registry-service-verification-badge></ecc-client-elixir-cloud-registry-service-verification-badge>
+
+    <script type="module">
+      import '@elixir-cloud/cloud-registry';
+      import { RestCloudRegistryProvider } from '@elixir-cloud/cloud-registry/providers';
+
+      const provider = new RestCloudRegistryProvider('https://cloud-registry.example.com/ga4gh/registry/v1');
+      const badge = document.querySelector('ecc-client-elixir-cloud-registry-service-verification-badge');
+      try {
+        badge.verification = await provider.getServiceVerification('org.example.my-tes');
+      } catch (error) {
+        // 404: not verified; other errors leave the state unknown
+        if (error.status === 404) badge.verification = null;
+        else console.error(error);
+      }
+    </script>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+In the services list of the GA4GH Service Registry package, render the badge from the list's [`rowBadges`](/docs/service-registry/components/services#rowbadges) hook, next to the version; see [A list of services](/docs/cloud-registry/components/service-verification#a-list-of-services).
+
+## Properties
+
+| Property         | Attribute         | Type                   | Default     | Description |
+|------------------|-------------------|------------------------|-------------|-------------|
+| `verification`   | -                 | `Verification \| null` | `undefined` | The verification of the service, as the app loaded it; `null` or `undefined`: not verified |
+| `showUnverified` | `show-unverified` | `boolean`              | `false`     | Whether to show "Not verified" for a service that isn't verified, e.g. for admins |
+
+## CSS parts
+
+| Part    | Description |
+|---------|-------------|
+| `badge` | The "Verified" (or, with `show-unverified`, "Not verified") badge |

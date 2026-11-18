@@ -119,6 +119,7 @@ This example demonstrates a basic service registry table with search and filteri
 | `filter`     | `filter`    | `boolean`                               | `true`      | Whether to display the type, organization and environment filters                        |
 | `pageSize`   | `page-size` | `number`                                | `10`        | Number of services per page, rounded down; `0` or less shows all services on one page, a missing, empty or invalid value `10` |
 | `rowActions` | -           | `(service: ExternalService) => unknown` | `undefined` | Renders the actions of each row (see [`rowActions`](#rowactions))                        |
+| `rowBadges`  | -           | `(service: ExternalService) => unknown` | `undefined` | Renders badges of each row next to its version (see [`rowBadges`](#rowbadges))           |
 | `baseUrl`    | `baseurl`   | `string`                                | `""`        | Base URL of the Service Registry API, used if no `provider` is set                       |
 | `provider`   | -           | `ServiceRegistryProvider`               | `undefined` | Data provider for fetching services (see [Providers](/docs/service-registry/providers))  |
 
@@ -168,7 +169,7 @@ Controls whether the search input field is displayed. The search matches the ID,
 Controls whether the filters are displayed: by type (the types the registry lists at `/services/types`, or else those of the loaded services), by organization, and by environment (only if a service has one). The filters, the search and the page combine; changing the search or a filter goes back to the first page. Only filters on display apply, and only with a value that is still among their options (e.g. after a reload from another registry), so the list never narrows without a visible reason.
 
 <Callout type="info">
-  The GA4GH Service Registry API doesn't describe whether a service is verified, so there is no filter for it yet.
+  The GA4GH Service Registry API doesn't describe whether a service is verified, so there is no filter for it yet. To show which services of a Cloud Registry are verified, use [`ecc-client-elixir-cloud-registry-services`](/docs/cloud-registry/components/services).
 </Callout>
 
 <Tabs items={['React', 'HTML']}>
@@ -201,7 +202,7 @@ The number of services per page. The pagination is shown when the services that 
 </Tabs>
 
 ### `rowActions`
-A function that renders the actions of a row from its service, e.g. Edit and Delete buttons for the services that the user may change. It can return a Lit template, a DOM node, a string, or `null` for a row without actions; without the function, each row shows a "View Details" button, which selects the service (`ecc-service-selected`). Clicks on the actions of `rowActions` don't select the row. Set a new function when what it renders changes, e.g. after the user's roles changed, so that the rows are rendered again.
+A function that renders the actions of a row from its service, e.g. Edit and Delete buttons for the services that the user may change. It can return a Lit template, a DOM node, a string, or `null` for a row without actions; without the function, each row shows a "View Details" button, which selects the service (`ecc-service-selected`). Clicks on the actions of `rowActions` don't select the row. Set a new function when what it renders changes, e.g. after the user's roles changed, so that the rows are rendered again. The actions stay on one line, and the actions column is as wide as the widest actions of the rows shown, so that the other columns stay aligned and take the rest of the width.
 
 <Tabs items={['React', 'HTML']}>
   <Tabs.Tab>
@@ -237,11 +238,40 @@ A function that renders the actions of a row from its service, e.g. Edit and Del
   </Tabs.Tab>
 </Tabs>
 
+### `rowBadges`
+A function that renders badges of a row from its service, e.g. a "Verified" badge. They are shown in the name line, after the version badge, so that a row's tags stay together. It can return a Lit template, a DOM node, a string, or `null` for a row without badges. Badges are part of the row: clicking them selects the service, as clicking the name does, so put buttons and links in `rowActions` instead. As with `rowActions`, set a new function when what it renders changes. For verifications, render the Cloud Registry package's [service verification badge](/docs/cloud-registry/components/service-verification-badge) here, or use the Cloud Registry [services list](/docs/cloud-registry/components/services), which does this.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    const rowBadges = useCallback(
+      (service) => (service.environment === 'prod' ? 'Production' : null),
+      []
+    );
+
+    <EccClientGa4ghServiceRegistryServices rowBadges={rowBadges} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <script type="module">
+      const list = document.querySelector('ecc-client-ga4gh-service-registry-services');
+      list.rowBadges = (service) => {
+        if (service.environment !== 'prod') return null;
+        const badge = document.createElement('ecc-utils-design-badge');
+        badge.textContent = 'Production';
+        return badge;
+      };
+    </script>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
 ## Slots
 
 | Slot           | Description                                                                                                        |
 |----------------|--------------------------------------------------------------------------------------------------------------------|
-| `actions-<id>` | Actions of the row of the service with the ID `<id>`; replaces those of `rowActions` or the "View Details" button  |
+| `actions-<id>` | Actions of the row of the service with the ID `<id>`; replaces those of `rowActions` or the "View Details" button; sizes the actions column as `rowActions` does  |
 
 ## Events
 
