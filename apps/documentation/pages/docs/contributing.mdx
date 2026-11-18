@@ -97,12 +97,14 @@ module. In `apps/mock-server/`:
 
 What it does:
 
-- `GET /healthz` answers `{"status": "ok"}`; `HEAD` works like `GET`; unknown paths and methods get
-  a JSON `404` in the GA4GH error format (`{"msg": ..., "status_code": ...}`).
+- `GET /healthz` answers `{"status": "ok"}`; `HEAD` works like `GET`;
+  unknown paths and methods get a JSON `404` in the GA4GH error format
+  (`{"msg": ..., "status_code": ...}`).
 - CORS: any origin, the methods `GET, POST, PUT, DELETE, OPTIONS`, and
   preflight requests (`OPTIONS`) on any path.
-- One log line per request (time, method, path without the query string,
-  status, or `aborted` if the client closed the connection first, duration).
+- One log line per request: time, method, path without the query string,
+  status (`aborted` if the client closed the connection first) and
+  duration.
 - Limits, since the deployed instance is public and anonymous: request
   bodies above 1 MiB get `413`, and each collection keeps at most 100
   created items and at most 4 MiB of them (as JSON); above that, the oldest
@@ -117,7 +119,8 @@ fictional. An API stub is a module in `src/routes/` that exports a function
 adding its routes to the router (e.g.
 `router.get("/ga4gh/wes/v1/runs/:runId", handler)`), listed in
 `src/routes/index.ts`; handlers read and write the collections through the
-store (`list`, `find`, `create`) and throw `HttpError` for error replies.
+store (`list`, `find`, `create`, which hand out copies) and throw
+`HttpError` for error replies.
 
 ## Releases
 

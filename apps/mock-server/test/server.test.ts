@@ -225,7 +225,11 @@ describe("mock server", () => {
         });
         socket.on("close", () => resolve());
       });
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      // The line is written when the server has seen the connection close
+      const deadline = Date.now() + 5000;
+      while (server.logs.length === before && Date.now() < deadline) {
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
       const lines = server.logs.slice(before);
       assert.equal(lines.length, 1, lines.join("\n"));
       assert.match(lines[0], /POST \/things aborted \d+ms$/);

@@ -99,12 +99,27 @@ describe("Store", () => {
     assert.throws(() => Store.load(fixturesDir, { maxCreated: 0 }), /cap/);
   });
 
-  it("resets to the fixtures, undoing changes to fixture items", () => {
+  it("hands out copies, so that changes don't reach the store", () => {
+    const store = Store.load(fixturesDir);
+    const input = { id: "created", tags: ["a"] };
+    const created = store.create("things", input);
+    input.tags.push("from input");
+    created.tags = ["from result"];
+    const listed = store.list("things");
+    listed[0].name = "changed";
+    const found = store.find("things", (item) => item.id === "created");
+    assert.ok(found);
+    found.tags = ["from find"];
+    assert.deepEqual(store.list("things"), [
+      { id: "fixture-1", name: "First fixture" },
+      { id: "fixture-2", name: "Second fixture" },
+      { id: "created", tags: ["a"] },
+    ]);
+  });
+
+  it("resets to the fixtures", () => {
     const store = Store.load(fixturesDir);
     store.create("things", { id: "created" });
-    const fixture = store.find("things", (item) => item.id === "fixture-1");
-    assert.ok(fixture);
-    fixture.name = "changed";
     store.reset();
     assert.deepEqual(store.list("things"), [
       { id: "fixture-1", name: "First fixture" },

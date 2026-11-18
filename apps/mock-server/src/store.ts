@@ -3,10 +3,10 @@
 // holds a JSON array of objects: the fixtures of the collection `<name>`.
 // Items created through the API are kept apart from the fixtures and capped
 // per collection, by number and by size, so that a public instance can't be
-// filled up; a restart
-// (or `reset`) drops them. `list`, `find` and `create` hand out the stored
-// items themselves, not copies: a handler that changes an item changes it
-// in the store (until the next reset)
+// filled up; a restart (or `reset`) drops them. `list`, `find` and `create`
+// hand out copies, so that changes by handlers never reach the store (nor
+// bypass its caps); a stub that needs to change stored items adds a method
+// here that measures them again
 
 import { readFileSync, readdirSync } from "node:fs";
 import { basename, join } from "node:path";
@@ -23,13 +23,24 @@ export interface StoreOptions {
   maxCreatedBytes?: number;
 }
 
+interface Created {
+  item: Item;
+  // Size as JSON
+  size: number;
+}
+
 interface Collection {
   fixtures: Item[];
-  created: Item[];
-  // Sizes of the created items, as JSON, and their sum
-  sizes: number[];
+  created: Created[];
+  // Sum of the sizes of the created items
   bytes: number;
 }
+
+const emptyCollection = (fixtures: Item[] = []): Collection => ({
+  fixtures,
+  created: [],
+  bytes: 0,
+});
 
 const checkCap = (name: string, value: number): number => {
   if (!Number.isInteger(value) || value < 1) {
@@ -59,8 +70,7 @@ export class Store {
 
   readonly maxCreatedBytes: number;
 
-  // As loaded, never handed out, so that changes to items don't survive a
-  // reset
+  // As loaded, never handed out
   readonly #fixtures: ReadonlyMap<string, readonly Item[]>;
 
   #collections = new Map<string, Collection>();
@@ -92,12 +102,7 @@ export class Store {
     this.#collections = new Map(
       [...this.#fixtures].map(([name, items]) => [
         name,
-        {
-          fixtures: structuredClone([...items]),
-          created: [],
-          sizes: [],
-          bytes: 0,
-        },
+        emptyCollection(structuredClone([...items])),
       ])
     );
   }
@@ -107,36 +112,43 @@ export class Store {
     return [...this.#collections.keys()].sort();
   }
 
-  // Fixtures first, then created items, oldest first; empty for unknown
-  // collections
+  // Copies of the fixtures, then of the created items, oldest first; empty
+  // for unknown collections
   list(name: string): Item[] {
     const collection = this.#collections.get(name);
-    return collection ? [...collection.fixtures, ...collection.created] : [];
+    if (!collection) {
+      return [];
+    }
+    return structuredClone([
+      ...collection.fixtures,
+      ...collection.created.map(({ item }) => item),
+    ]);
   }
 
+  // A copy of the first item that matches
   find(name: string, predicate: (item: Item) => boolean): Item | undefined {
     return this.list(name).find(predicate);
   }
 
-  // Adds `item` to the collection (created if needed) and returns it
+  // Adds a copy of `item` to the collection (created if needed) and returns
+  // another copy
   create(name: string, item: Item): Item {
     let collection = this.#collections.get(name);
     if (!collection) {
-      collection = { fixtures: [], created: [], sizes: [], bytes: 0 };
+      collection = emptyCollection();
       this.#collections.set(name, collection);
     }
     const size = Buffer.byteLength(JSON.stringify(item));
-    collection.created.push(item);
-    collection.sizes.push(size);
+    collection.created.push({ item: structuredClone(item), size });
     collection.bytes += size;
     while (
       collection.created.length > 1 &&
       (collection.created.length > this.maxCreated ||
         collection.bytes > this.maxCreatedBytes)
     ) {
-      collection.created.shift();
-      collection.bytes -= collection.sizes.shift() ?? 0;
+      const [oldest] = collection.created.splice(0, 1);
+      collection.bytes -= oldest.size;
     }
-    return item;
+    return structuredClone(item);
   }
 }

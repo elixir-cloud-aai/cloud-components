@@ -32,6 +32,10 @@ export const DEFAULT_MAX_BODY_BYTES = 1024 * 1024;
 // uses here, too
 const ALLOWED_METHODS = "GET, POST, PUT, DELETE, OPTIONS";
 
+// The client closed the connection while sending the body: nothing to
+// answer, and not an error of the server
+class ClientGoneError extends Error {}
+
 // Reads the body up to `limit` bytes. Above it, the rest is read and
 // dropped (so that the client gets the 413 instead of a reset connection)
 // and the promise is rejected
@@ -61,7 +65,7 @@ const readBody = (req: IncomingMessage, limit: number): Promise<Buffer> =>
       chunks.push(chunk);
     });
     req.on("end", () => resolve(Buffer.concat(chunks)));
-    req.on("error", reject);
+    req.on("error", () => reject(new ClientGoneError()));
   });
 
 const errorReply = (status: number, msg: string): Reply => ({
@@ -166,9 +170,7 @@ export const createServer = ({
     handle(req, res, path, queryString)
       .then((reply) => send(res, reply))
       .catch((error: unknown) => {
-        // The client is gone (e.g. closed the connection while sending the
-        // body): nothing to answer, and not an error of the server
-        if (res.destroyed || req.socket.destroyed) {
+        if (error instanceof ClientGoneError) {
           return;
         }
         if (error instanceof HttpError) {
