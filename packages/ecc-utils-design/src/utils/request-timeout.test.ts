@@ -200,6 +200,30 @@ describe("fetchWithTimeout()", () => {
     expect(error).to.be.instanceOf(RequestTimeoutError);
   });
 
+  it("rejects with the timeout error where signals drop the abort reason", async () => {
+    // Like browsers without abort reasons: `abort()` ignores its argument
+    const { abort } = AbortController.prototype;
+    sinon
+      .stub(AbortController.prototype, "abort")
+      .callsFake(function abortWithoutReason(this: AbortController) {
+        abort.call(this);
+      });
+    fetchStub.callsFake(
+      (_input, init: RequestInit) =>
+        new Promise((_resolve, reject) => {
+          init.signal?.addEventListener("abort", () =>
+            reject(new DOMException("Aborted", "AbortError"))
+          );
+        })
+    );
+
+    const error = await rejectionOf(
+      fetchWithTimeout("https://api.example.org/things", {}, 20)
+    );
+
+    expect(error).to.be.instanceOf(RequestTimeoutError);
+  });
+
   it("passes other errors on", async () => {
     fetchStub.rejects(new TypeError("Failed to fetch"));
 

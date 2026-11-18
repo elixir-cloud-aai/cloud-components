@@ -11,7 +11,8 @@ ms`); components show it like any other error and fire their events as on a
 failure (lists, for example, their `ecc-*-changed` event with empty data).
 
 The deadline covers the whole request, from sending it until its response
-body has been read. It is **30 seconds** by default, set per provider with the
+body has been read (if it expires while the body is read, browsers without
+abort reasons reject with an `AbortError` instead). It is **30 seconds** by default, set per provider with the
 `timeout` option (in milliseconds; `0` for none):
 
 ```ts

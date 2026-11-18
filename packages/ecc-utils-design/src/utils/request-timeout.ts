@@ -6,7 +6,8 @@
  *
  * The deadline covers the whole request: from sending it until its response
  * body has been read (`response.json()` and the like reject too once it has
- * expired).
+ * expired, with the `RequestTimeoutError` in browsers that support abort
+ * reasons, else with an `AbortError`).
  */
 
 /** `AbortSignal` with its abort reason (newer than TypeScript 4.3's DOM). */
@@ -102,11 +103,15 @@ export function fetchWithTimeout(
     | undefined;
   // Deliberately not cleared when the response arrives, so that the
   // deadline also covers reading the body; aborting afterwards is a no-op
+  // Kept here too, as browsers without abort reasons drop it from the signal
+  let timeoutError: RequestTimeoutError | undefined;
   const timer = setTimeout(() => {
     signal?.removeEventListener("abort", followSignal);
-    controller.abort(new RequestTimeoutError(timeout));
+    timeoutError = new RequestTimeoutError(timeout);
+    controller.abort(timeoutError);
   }, timeout);
-  // Don't keep Node processes (SSR, tests) alive for the deadline
+  // Don't keep Node processes (SSR, tests) alive for the deadline; the cast
+  // is for Node's timer object (in browsers, timers are numbers)
   (timer as { unref?: () => void }).unref?.();
   function followSignal() {
     clearTimeout(timer);
@@ -121,8 +126,7 @@ export function fetchWithTimeout(
     (error: unknown) => {
       // Fetch implementations that reject with a plain `AbortError`
       // instead of the abort reason still reject with the timeout error
-      const { reason } = controller.signal;
-      throw reason instanceof RequestTimeoutError ? reason : error;
+      throw timeoutError ?? error;
     }
   );
 }
