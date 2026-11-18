@@ -1,4 +1,9 @@
 import {
+  fetchWithTimeout,
+  resolveRequestTimeout,
+} from "@elixir-cloud/design/utils";
+import type { RestProviderOptions } from "@elixir-cloud/design/utils";
+import {
   DrsFilerProvider,
   DrsObject,
   AccessURL,
@@ -12,16 +17,28 @@ import {
  * This class provides DRS-Filer specific functionality for object management
  */
 export class RestDrsFilerProvider implements DrsFilerProvider {
-  // eslint-disable-next-line no-useless-constructor
-  constructor(public readonly baseUrl: string) {}
+  /** Deadline of each request in milliseconds, `0` for none. */
+  public readonly timeout: number;
 
   /**
-   * Sends every request of this provider. Override it in a subclass to add
-   * headers (e.g. `Authorization`) or otherwise change requests.
+   * @param baseUrl Base URL of the DRS-Filer API
+   * @param options `timeout`: deadline of each request in milliseconds
+   *   (default 30 s, `0` for none)
    */
-  // eslint-disable-next-line class-methods-use-this
+  constructor(
+    public readonly baseUrl: string,
+    options: RestProviderOptions = {}
+  ) {
+    this.timeout = resolveRequestTimeout(options);
+  }
+
+  /**
+   * Sends every request of this provider, with the provider's deadline.
+   * Override it in a subclass to add headers (e.g. `Authorization`) or
+   * otherwise change requests; call `super.fetch()` to keep the deadline.
+   */
   protected fetch(input: RequestInfo | URL, init?: RequestInit) {
-    return fetch(input, init);
+    return fetchWithTimeout(input, init, this.timeout);
   }
 
   // Base DRS operations (inherited from DrsProvider)
