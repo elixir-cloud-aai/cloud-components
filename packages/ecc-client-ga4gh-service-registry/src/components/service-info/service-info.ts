@@ -15,8 +15,8 @@ const MISSING_PROVIDER =
   "Please provide either a base URL for the Service Registry API or a custom provider.";
 
 /**
- * An email address: a local part and a domain, without spaces or invisible
- * characters (control, format such as bidi overrides, unassigned), so that
+ * An email address: a local part and a domain, without spaces or control,
+ * format (e.g. bidi overrides), private-use or unassigned characters, so that
  * the label shows the address the link goes to.
  */
 const ADDRESS = /^[^\s@\p{C}]+@[^\s@\p{C}]+$/u;

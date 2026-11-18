@@ -231,7 +231,7 @@ describe("ecc-client-ga4gh-service-registry-service-info", () => {
       1767323045000,
     ] as unknown[]
   ).forEach((timestamp) => {
-    it(`leaves out the timestamps ${timestamp}`, async () => {
+    it(`leaves out the timestamps ${JSON.stringify(timestamp)}`, async () => {
       const el = await render(
         stubProvider({
           ...minimal(),
