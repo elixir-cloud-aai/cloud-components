@@ -173,6 +173,75 @@ describe("ecc-client-ga4gh-service-registry-service-info", () => {
     expect(field(el, "contact")).to.equal(null);
   });
 
+  [
+    "mailto:invalid",
+    "mailto:admin@example.org,invalid",
+    "mailto:%E0%A4%A",
+  ].forEach((contactUrl) => {
+    it(`leaves out the contact ${contactUrl} without a valid address`, async () => {
+      const el = await render(stubProvider({ ...minimal(), contactUrl }));
+      await waitUntil(() => fields(el).length > 0);
+
+      expect(fields(el)).not.to.include("contact");
+    });
+  });
+
+  [
+    ["mailto:admin@example.org?subject=Hello", "admin@example.org"],
+    ["MAILTO:admin@example.org", "admin@example.org"],
+    ["mailto:admin%40example.org", "admin@example.org"],
+    [
+      "mailto:admin@example.org,help@example.org",
+      "admin@example.org,help@example.org",
+    ],
+  ].forEach(([contactUrl, label]) => {
+    it(`shows the contact ${contactUrl} as its addresses`, async () => {
+      const el = await render(stubProvider({ ...minimal(), contactUrl }));
+      await waitUntil(() => fields(el).length > 0);
+
+      expect(links(el)).to.include(contactUrl);
+      expect(field(el, "contact")?.querySelector("a")?.textContent).to.equal(
+        label
+      );
+    });
+  });
+
+  [
+    "2026-02-30T00:00:00Z",
+    "2026-13-01T00:00:00Z",
+    "2026-01-01T24:00:00Z",
+    "January 2, 2026",
+    "2026-01-02",
+    "1767323045000",
+  ].forEach((timestamp) => {
+    it(`leaves out the timestamp ${timestamp}`, async () => {
+      const el = await render(
+        stubProvider({ ...minimal(), createdAt: timestamp })
+      );
+      await waitUntil(() => fields(el).length > 0);
+
+      expect(fields(el)).not.to.include("created");
+    });
+  });
+
+  [
+    "2024-02-29T03:04:05Z",
+    "2026-01-02t03:04:05.123z",
+    "2026-01-02T03:04:05+02:00",
+    "2026-01-02 03:04:05",
+  ].forEach((timestamp) => {
+    it(`shows the timestamp ${timestamp}`, async () => {
+      const el = await render(
+        stubProvider({ ...minimal(), createdAt: timestamp })
+      );
+      await waitUntil(() => fields(el).length > 0);
+
+      expect(field(el, "created")?.querySelector("dd")?.textContent).to.equal(
+        new Date(timestamp.toUpperCase().replace(" ", "T")).toLocaleString()
+      );
+    });
+  });
+
   it("shows no undefined values for missing required fields", async () => {
     // A registry that doesn't follow the specification
     const info: Partial<Service> = minimal();
@@ -195,9 +264,9 @@ describe("ecc-client-ga4gh-service-registry-service-info", () => {
     );
     await waitUntil(() => fields(el).length > 0);
 
-    expect(field(el, "type")?.textContent?.trim()).to.contain(
-      "service-registry · 1.0.0"
-    );
+    expect(
+      field(el, "type")?.querySelector("dd")?.textContent?.trim()
+    ).to.equal("service-registry · 1.0.0");
     expect(el.shadowRoot?.textContent).not.to.contain("undefined");
   });
 
