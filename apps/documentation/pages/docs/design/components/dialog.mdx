@@ -1,0 +1,274 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import Dialog from '@elixir-cloud/design/react/dialog';
+import Button from '@elixir-cloud/design/react/button';
+import Input from '@elixir-cloud/design/react/input';
+
+# EccUtilsDesignDialog Component
+
+<ComponentName
+  tagName='ecc-utils-design-dialog'
+  reactTagName='EccUtilsDesignDialog'
+  version='2.0.0-alpha.52'
+/>
+
+## Overview
+
+The `ecc-utils-design-dialog` component is a modal window over the page, like [shadcn/ui's Dialog](https://ui.shadcn.com/docs/components/dialog). It is a generic building block: confirmations, forms, notices, preferences and the like are built from it, together with the other components.
+
+- It opens on a click on its `trigger` slot or when `open` is set.
+- It closes on Escape (unless content inside handled it and called `preventDefault()`), on a click on the overlay, on its close button, on a click on an element with the `data-dialog-close` attribute, or when `open` is unset.
+- While it is open, the rest of the page is inert and doesn't scroll. Focus moves into the dialog (to the first element with `autofocus`, else to the first focusable element), Tab and Shift+Tab cycle through the dialog only, and on close focus returns to the trigger that opened it (also in Safari and Firefox on macOS, where a mouse click doesn't focus buttons), or else to the element that had it before.
+- It is a `dialog` with `aria-modal="true"`, named by its title (or `label`) and described by its description, so screen readers announce both.
+- User actions fire the cancelable `ecc-dialog-open-changed` event.
+
+<Callout type='info'>
+  The dialog uses the browser's native `<dialog>` element (`showModal()`), which all current browsers support.
+</Callout>
+
+## Usage
+
+### Basic Dialog
+
+A dialog with a trigger, a title, a description, a body and actions in the footer. "Cancel" closes the dialog through `data-dialog-close`.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <Dialog>
+      <Button slot="trigger" variant="outline">Edit profile</Button>
+      <span slot="title">Edit profile</span>
+      <span slot="description">Make changes to your profile here. Click save when you're done.</span>
+      <Input label="Name" value="Ada Lovelace" />
+      <div slot="footer" className="flex gap-2">
+        <Button variant="outline" data-dialog-close>Cancel</Button>
+        <Button data-dialog-close>Save changes</Button>
+      </div>
+    </Dialog>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="dialog-basic.tsx"
+    import React from 'react';
+    import { EccUtilsDesignDialog } from '@elixir-cloud/design/react/dialog';
+    import { EccUtilsDesignButton } from '@elixir-cloud/design/react/button';
+    import { EccUtilsDesignInput } from '@elixir-cloud/design/react/input';
+
+    export default function BasicDialog() {
+      return (
+        <EccUtilsDesignDialog>
+          <EccUtilsDesignButton slot="trigger" variant="outline">
+            Edit profile
+          </EccUtilsDesignButton>
+          <span slot="title">Edit profile</span>
+          <span slot="description">
+            Make changes to your profile here. Click save when you're done.
+          </span>
+          <EccUtilsDesignInput label="Name" value="Ada Lovelace" />
+          <div slot="footer" className="flex gap-2">
+            <EccUtilsDesignButton variant="outline" data-dialog-close>
+              Cancel
+            </EccUtilsDesignButton>
+            <EccUtilsDesignButton data-dialog-close>Save changes</EccUtilsDesignButton>
+          </div>
+        </EccUtilsDesignDialog>
+      );
+    }
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="dialog-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.52/components/dialog"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.52/components/button"></script>
+        <script type="module" src="https://esm.sh/@elixir-cloud/design@2.0.0-alpha.52/components/input"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body>
+        <ecc-utils-design-dialog>
+          <ecc-utils-design-button slot="trigger" variant="outline">
+            Edit profile
+          </ecc-utils-design-button>
+          <span slot="title">Edit profile</span>
+          <span slot="description">
+            Make changes to your profile here. Click save when you're done.
+          </span>
+          <ecc-utils-design-input label="Name" value="Ada Lovelace"></ecc-utils-design-input>
+          <div slot="footer" class="flex gap-2">
+            <ecc-utils-design-button variant="outline" data-dialog-close>
+              Cancel
+            </ecc-utils-design-button>
+            <ecc-utils-design-button data-dialog-close>Save changes</ecc-utils-design-button>
+          </div>
+        </ecc-utils-design-dialog>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Controlled Dialog
+
+Without a trigger, the app opens and closes the dialog through `open` and follows the user's actions through `ecc-dialog-open-changed`, like `open` and `onOpenChange` in shadcn/ui. The event doesn't bubble, so a controlled dialog only gets its own events, also when other dialogs are nested in it. Here the dialog can only be closed through its buttons: the overlay click is turned off and the close button hidden.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="dialog-controlled.tsx"
+    import React, { useState } from 'react';
+    import { EccUtilsDesignDialog } from '@elixir-cloud/design/react/dialog';
+    import { EccUtilsDesignButton } from '@elixir-cloud/design/react/button';
+
+    export default function ConfirmDelete({ onDelete }: { onDelete: () => void }) {
+      const [open, setOpen] = useState(false);
+      return (
+        <>
+          <EccUtilsDesignButton variant="destructive" onClick={() => setOpen(true)}>
+            Delete
+          </EccUtilsDesignButton>
+          <EccUtilsDesignDialog
+            open={open}
+            no-overlay-close
+            hide-close-button
+            onEccDialogOpenChanged={(event) => setOpen(event.detail.open)}
+          >
+            <span slot="title">Delete this service?</span>
+            <span slot="description">This can't be undone.</span>
+            <div slot="footer" className="flex gap-2">
+              <EccUtilsDesignButton variant="outline" onClick={() => setOpen(false)}>
+                Cancel
+              </EccUtilsDesignButton>
+              <EccUtilsDesignButton
+                variant="destructive"
+                onClick={() => {
+                  onDelete();
+                  setOpen(false);
+                }}
+              >
+                Delete
+              </EccUtilsDesignButton>
+            </div>
+          </EccUtilsDesignDialog>
+        </>
+      );
+    }
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    const dialog = document.querySelector('ecc-utils-design-dialog');
+    dialog.open = true; // or dialog.show()
+    dialog.addEventListener('ecc-dialog-open-changed', (event) => {
+      console.log('Open:', event.detail.open, 'because of:', event.detail.reason);
+    });
+    dialog.open = false; // or dialog.close()
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Slots
+
+| Slot          | Description                                                                                          |
+|---------------|------------------------------------------------------------------------------------------------------|
+| (default)     | The body of the dialog.                                                                              |
+| `trigger`     | An element that opens the dialog on click, usually a button. It gets `aria-haspopup="dialog"` and `aria-expanded`; a custom element such as `ecc-utils-design-button` gets them on the control in its shadow root, too. |
+| `title`       | The title. It names the dialog for assistive technology; without it, set `label`.                    |
+| `description` | A description below the title. It describes the dialog for assistive technology.                     |
+| `footer`      | Actions at the bottom, e.g. buttons.                                                                 |
+
+The header (title and description) and the footer are hidden when their slots are empty. Any element inside the dialog with the `data-dialog-close` attribute closes it on click, like `DialogClose` in shadcn/ui.
+
+## Properties
+
+| Property          | Attribute           | Type      | Default   | Description                                                   |
+|-------------------|---------------------|-----------|-----------|---------------------------------------------------------------|
+| `open`            | `open`              | `boolean` | `false`   | Whether the dialog is open. Reflected to the attribute.       |
+| `label`           | `label`             | `string`  | `""`      | Accessible name of the dialog, used if the `title` slot is empty. |
+| `closeLabel`      | `close-label`       | `string`  | `"Close"` | Accessible name of the close button, e.g. for translations.   |
+| `hideCloseButton` | `hide-close-button` | `boolean` | `false`   | Hides the close button in the top right corner.               |
+| `noOverlayClose`  | `no-overlay-close`  | `boolean` | `false`   | Keeps the dialog open on a click on the overlay.              |
+
+## Methods
+
+| Method    | Description                          |
+|-----------|--------------------------------------|
+| `show()`  | Opens the dialog, like `open = true`. |
+| `close()` | Closes the dialog, like `open = false`. |
+
+## Events
+
+| Event Name                | React Event Name          | Detail Type                                           | Description |
+|---------------------------|---------------------------|-------------------------------------------------------|-------------|
+| `ecc-dialog-open-changed` | `onEccDialogOpenChanged`  | `{ open: boolean; reason: EccDialogOpenChangeReason }` | Fired when the user opens or closes the dialog. |
+
+### `ecc-dialog-open-changed`
+
+Fired before the dialog opens or closes because of a user action, not when `open` is changed by code. Unlike the events of the other components, it doesn't bubble: listen on the dialog itself (in React, `onEccDialogOpenChanged`), not on an ancestor. So the listener of an outer dialog doesn't get the events of dialogs nested in it, and setting `open` from `detail.open` is safe. `detail.open` is the new state, and `detail.reason` says what caused it (type `EccDialogOpenChangeReason`, exported with `EccDialogOpenChangedEvent` from `@elixir-cloud/design/events`):
+
+| Reason         | Cause                                                        |
+|----------------|--------------------------------------------------------------|
+| `trigger`      | A click on the `trigger` slot.                               |
+| `escape`       | Escape, or another close request of the browser (e.g. the back gesture on Android). |
+| `overlay`      | A click on the overlay.                                      |
+| `close-button` | A click on the close button.                                 |
+| `close`        | A click on an element with `data-dialog-close`.              |
+
+The event is cancelable: `event.preventDefault()` keeps the dialog as it is, e.g. to ask before discarding changes. If the browser closes the dialog by itself (some browsers do on repeated Escape presses without other user input), the dialog fires the event with the reason `escape` after closing, and it can't be canceled.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <EccUtilsDesignDialog
+      onEccDialogOpenChanged={(event) => {
+        if (!event.detail.open && hasUnsavedChanges) {
+          event.preventDefault();
+        }
+      }}
+    >
+      ...
+    </EccUtilsDesignDialog>
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    dialog.addEventListener('ecc-dialog-open-changed', (event) => {
+      if (!event.detail.open && hasUnsavedChanges) {
+        event.preventDefault();
+      }
+    });
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Styling
+
+The dialog's parts can be styled with `::part()`:
+
+| Part           | Element                                         |
+|----------------|-------------------------------------------------|
+| `dialog`       | The native `dialog` element.                    |
+| `content`      | The panel inside the dialog.                    |
+| `header`       | The container of the title and the description. |
+| `title`        | The container of the title.                     |
+| `description`  | The container of the description.               |
+| `body`         | The container of the body.                      |
+| `footer`       | The container of the footer.                    |
+| `close-button` | The close button.                               |
+
+```css copy
+ecc-utils-design-dialog::part(dialog) {
+  max-width: 48rem;
+}
+```
+
+## Accessibility
+
+- The dialog is modal: the rest of the page is inert while it is open, and focus stays inside. On close, focus returns to the trigger that opened it, also after a mouse click in browsers that don't focus buttons on click (Safari, Firefox on macOS).
+- The page behind the dialog doesn't scroll while a dialog is open, as in shadcn/ui; the space of the page's scrollbar is kept, so the page doesn't shift. Nested dialogs share the lock, and the page scrolls again once the last one closes.
+- Give every dialog a title, or a `label` if it has none, so that screen readers announce what it is about.
+- Nested dialogs work: Escape, overlay clicks and `data-dialog-close` close the innermost open dialog only.
+- Content that is taller than the window scrolls inside the dialog.
+- The trigger slot reacts to clicks only. Put a button (or another control that fires a click on Enter and Space) into it, so it works with the keyboard too.
