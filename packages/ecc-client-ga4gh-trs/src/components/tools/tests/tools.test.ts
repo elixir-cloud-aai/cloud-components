@@ -47,7 +47,16 @@ const internals = (el: ECCClientGa4ghTrsTools) =>
     currentPage: number;
     lastPage: number;
     loading: boolean;
+    toolClasses: ToolClass[];
+    toolClassMap: Record<string, string>;
+    filterParams: Record<string, string | undefined | boolean>;
   };
+
+/** The tool class select of the filters. */
+const toolClassSelect = (el: ECCClientGa4ghTrsTools) =>
+  el.shadowRoot?.querySelector("ecc-utils-design-select") as
+    | (HTMLElement & { value: string })
+    | null;
 
 describe("ecc-client-ga4gh-trs-tools provider", () => {
   let fetchStub: sinon.SinonStub;
@@ -259,5 +268,129 @@ describe("ecc-client-ga4gh-trs-tools provider", () => {
     expect(internals(el).tools[0]?.id).to.equal("a");
     expect(el.shadowRoot?.textContent).not.to.contain("Unavailable");
     expect(reported).to.deep.equal([]);
+  });
+
+  it("drops the tool class filter of a replaced provider", async () => {
+    const first = stubProvider();
+    first.stubs.getToolClasses.resolves([{ id: "notebook", name: "Notebook" }]);
+    const second = stubProvider([tool("b")]);
+    const el = await fixture<ECCClientGa4ghTrsTools>(
+      html`<ecc-client-ga4gh-trs-tools
+        .provider=${first.provider}
+      ></ecc-client-ga4gh-trs-tools>`
+    );
+    await waitUntil(() => internals(el).toolClasses.length === 1);
+    const select = toolClassSelect(el);
+    if (!select) throw new Error("No tool class select");
+    select.value = "Notebook";
+    select.dispatchEvent(
+      new CustomEvent("ecc-input-changed", { detail: { value: "Notebook" } })
+    );
+    await waitUntil(() =>
+      first.stubs.getToolsList
+        .getCalls()
+        .some((call) => call.args[2].toolClass === "Notebook")
+    );
+
+    el.provider = second.provider;
+    await waitUntil(() => internals(el).tools[0]?.id === "b");
+    await el.updateComplete;
+
+    expect(second.stubs.getToolsList.firstCall.args[2].toolClass).to.equal("");
+    expect(internals(el).filterParams.toolClass).to.equal("");
+    expect(toolClassSelect(el)?.value).to.equal("");
+  });
+
+  it("offers no tool classes of a replaced provider while the new ones load", async () => {
+    const first = stubProvider();
+    first.stubs.getToolClasses.resolves([{ id: "notebook", name: "Notebook" }]);
+    const slow = deferred<ToolClass[]>();
+    const second = stubProvider([tool("b")]);
+    second.stubs.getToolClasses.returns(slow.promise);
+    const el = await fixture<ECCClientGa4ghTrsTools>(
+      html`<ecc-client-ga4gh-trs-tools
+        .provider=${first.provider}
+      ></ecc-client-ga4gh-trs-tools>`
+    );
+    await waitUntil(() => internals(el).toolClasses.length === 1);
+
+    el.provider = second.provider;
+    await waitUntil(() => internals(el).tools[0]?.id === "b");
+    await el.updateComplete;
+
+    expect(internals(el).toolClasses).to.deep.equal([]);
+    expect(internals(el).toolClassMap).to.deep.equal({});
+    expect(el.shadowRoot?.textContent).not.to.contain("Notebook");
+
+    slow.resolve([TOOL_CLASS]);
+    await waitUntil(() => internals(el).toolClasses.length === 1);
+    expect(internals(el).toolClassMap).to.deep.equal({ Workflow: "workflow" });
+  });
+
+  it("drops a tool class filter picked during a load on a provider switch", async () => {
+    const first = stubProvider();
+    first.stubs.getToolClasses.resolves([{ id: "notebook", name: "Notebook" }]);
+    const second = stubProvider([tool("b")]);
+    const el = await fixture<ECCClientGa4ghTrsTools>(
+      html`<ecc-client-ga4gh-trs-tools
+        .provider=${first.provider}
+      ></ecc-client-ga4gh-trs-tools>`
+    );
+    await waitUntil(() => internals(el).toolClasses.length === 1);
+    // a load that doesn't end: the pick below then changes no state that
+    // renders the component before the switch
+    first.stubs.getToolsList.callsFake(() => deferred<Tool[]>().promise);
+    el.pageSize = 10;
+    await waitUntil(() => internals(el).loading);
+    await el.updateComplete;
+    const select = toolClassSelect(el);
+    if (!select) throw new Error("No tool class select");
+    select.value = "Notebook";
+    select.dispatchEvent(
+      new CustomEvent("ecc-input-changed", { detail: { value: "Notebook" } })
+    );
+    await el.updateComplete;
+
+    el.provider = second.provider;
+    await waitUntil(() => internals(el).tools[0]?.id === "b");
+    await el.updateComplete;
+
+    expect(second.stubs.getToolsList.firstCall.args[2].toolClass).to.equal("");
+    expect(toolClassSelect(el)?.value).to.equal("");
+  });
+
+  it("drops the tool class filter when the base URL changes", async () => {
+    fetchStub.callsFake(
+      async (url: string) =>
+        new Response(
+          JSON.stringify(
+            String(url).endsWith("/toolClasses")
+              ? [{ id: "notebook", name: "Notebook" }]
+              : []
+          ),
+          { headers: { "Content-Type": "application/json" } }
+        )
+    );
+    const el = await fixture<ECCClientGa4ghTrsTools>(
+      html`<ecc-client-ga4gh-trs-tools
+        .baseUrl=${BASE_URL}
+      ></ecc-client-ga4gh-trs-tools>`
+    );
+    await waitUntil(() => internals(el).toolClasses.length === 1);
+    internals(el).filterParams.toolClass = "Notebook";
+
+    el.baseUrl = OTHER_URL;
+    await waitUntil(() =>
+      fetchStub
+        .getCalls()
+        .some((call) => String(call.args[0]).startsWith(`${OTHER_URL}/tools?`))
+    );
+
+    const toolsUrl = fetchStub
+      .getCalls()
+      .map((call) => String(call.args[0]))
+      .find((url) => url.startsWith(`${OTHER_URL}/tools?`));
+    expect(toolsUrl).not.to.contain("Notebook");
+    expect(internals(el).filterParams.toolClass).to.equal("");
   });
 });
