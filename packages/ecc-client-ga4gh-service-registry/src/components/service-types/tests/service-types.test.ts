@@ -244,12 +244,14 @@ describe("ecc-client-ga4gh-service-registry-service-types", () => {
     expect(reported).to.deep.equal([[]]);
   });
 
-  [
-    ["null", null],
-    ["a type without a group", { artifact: "tes", version: "1.1.0" }],
-    ["a type with a numeric artifact", { ...TES, artifact: 1 }],
-    ["a type without a version", { group: "org.ga4gh", artifact: "tes" }],
-  ].forEach(([name, entry]) => {
+  (
+    [
+      ["null", null],
+      ["a type without a group", { artifact: "tes", version: "1.1.0" }],
+      ["a type with a numeric artifact", { ...TES, artifact: 1 }],
+      ["a type without a version", { group: "org.ga4gh", artifact: "tes" }],
+    ] as [string, unknown][]
+  ).forEach(([name, entry]) => {
     it(`shows an error for a list with ${name}`, async () => {
       const reported: ServiceType[][] = [];
       sinon.stub(console, "error");
@@ -261,7 +263,9 @@ describe("ecc-client-ga4gh-service-registry-service-types", () => {
         ></ecc-client-ga4gh-service-registry-service-types>`
       );
       await waitUntil(() =>
-        el.shadowRoot?.textContent?.includes("Invalid service types")
+        el.shadowRoot?.textContent?.includes(
+          "Invalid service types: a type lacks a string group, artifact or version"
+        )
       );
 
       expect(shown(el)).to.deep.equal([]);
