@@ -224,6 +224,57 @@ describe("fetchWithTimeout()", () => {
     expect(error).to.be.instanceOf(RequestTimeoutError);
   });
 
+  it("follows the signal of a Request-like input of another realm", async () => {
+    const caller = new AbortController();
+    // Not an instance of this realm's Request, as from an iframe
+    const input = {
+      url: "https://api.example.org/things",
+      signal: caller.signal,
+    } as unknown as Request;
+    const request = rejectionOf(fetchWithTimeout(input, {}, 1000));
+
+    caller.abort(new Error("cancelled"));
+
+    expect(((await request) as Error).message).to.equal("cancelled");
+  });
+
+  it("ignores the signal of a Request for a signal of null", async () => {
+    const caller = new AbortController();
+    caller.abort(new Error("cancelled"));
+    fetchStub.callsFake(async (_input, init: RequestInit) => {
+      if (init.signal?.aborted) {
+        throw init.signal.reason;
+      }
+      return new Response("ok");
+    });
+
+    const response = await fetchWithTimeout(
+      new Request("https://api.example.org/things", { signal: caller.signal }),
+      { signal: null },
+      1000
+    );
+
+    expect(await response.text()).to.equal("ok");
+  });
+
+  it("releases the timer and the caller's signal when fetch fails", async () => {
+    const caller = new AbortController();
+    const removed = sinon.spy(caller.signal, "removeEventListener");
+    const cleared = sinon.spy(window, "clearTimeout");
+    fetchStub.rejects(new TypeError("Failed to fetch"));
+
+    await rejectionOf(
+      fetchWithTimeout(
+        "https://api.example.org/things",
+        { signal: caller.signal },
+        1000
+      )
+    );
+
+    expect(removed.calledWith("abort")).to.equal(true);
+    expect(cleared.called).to.equal(true);
+  });
+
   it("passes other errors on", async () => {
     fetchStub.rejects(new TypeError("Failed to fetch"));
 

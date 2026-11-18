@@ -97,14 +97,18 @@ export function fetchWithTimeout(
     return fetch(request, init);
   }
   const controller = new AbortController() as AbortControllerWithReason;
-  const signal = (init.signal ??
-    (input instanceof Request ? input.signal : undefined)) as
+  // As in `fetch`, a `signal` in `init` (even `null`) replaces the one of a
+  // `Request`; read without `instanceof`, which misses other realms' requests
+  const requestSignal =
+    typeof input === "object" && "signal" in input ? input.signal : undefined;
+  const signal = ("signal" in init ? init.signal : requestSignal) as
     | AbortSignalWithReason
+    | null
     | undefined;
-  // Deliberately not cleared when the response arrives, so that the
-  // deadline also covers reading the body; aborting afterwards is a no-op
   // Kept here too, as browsers without abort reasons drop it from the signal
   let timeoutError: RequestTimeoutError | undefined;
+  // Deliberately not cleared when the response arrives, so that the
+  // deadline also covers reading the body; aborting afterwards is a no-op
   const timer = setTimeout(() => {
     signal?.removeEventListener("abort", followSignal);
     timeoutError = new RequestTimeoutError(timeout);
@@ -124,6 +128,9 @@ export function fetchWithTimeout(
   }
   return fetch(request, { ...init, signal: controller.signal }).catch(
     (error: unknown) => {
+      // The request is over: release the timer and the caller's signal
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", followSignal);
       // Fetch implementations that reject with a plain `AbortError`
       // instead of the abort reason still reject with the timeout error
       throw timeoutError ?? error;

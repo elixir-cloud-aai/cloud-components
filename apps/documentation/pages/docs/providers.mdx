@@ -278,6 +278,8 @@ function handleProviderError(error, method, args) {
 #### Retry Logic
 
 ```tsx copy
+import { RequestTimeoutError } from '@elixir-cloud/design/utils';
+
 // Retry wrapper for transient failures
 function withRetry(Provider, maxRetries = 3, delay = 1000) {
   return class extends Provider {
@@ -292,6 +294,16 @@ function withRetry(Provider, maxRetries = 3, delay = 1000) {
           
           // Don't retry on client errors
           if (error.status >= 400 && error.status < 500) {
+            throw error;
+          }
+
+          // Don't repeat a timed-out request that may have changed
+          // something: the server may have done it already
+          const method = (options.method ?? 'GET').toUpperCase();
+          if (
+            error instanceof RequestTimeoutError &&
+            !['GET', 'HEAD'].includes(method)
+          ) {
             throw error;
           }
           
