@@ -31,7 +31,13 @@ The REST providers of these packages have the option:
 [Service Registry](/docs/service-registry/providers),
 [TES](/docs/tes/providers), [WES](/docs/wes/providers),
 [TRS](/docs/trs/providers), [TRS-Filer](/docs/trs-filer/providers), DRS
-(`RestDrsProvider`) and DRS-Filer (`RestDrsFilerProvider`).
+and DRS-Filer. DRS and DRS-Filer have no providers page yet; their
+constructors take the same option:
+
+```ts
+new RestDrsProvider(baseUrl: string, options?: { timeout?: number })
+new RestDrsFilerProvider(baseUrl: string, options?: { timeout?: number })
+```
 
 <Callout type='info'>
   A provider that overrides `fetch()` and calls `super.fetch()` (e.g. to add an `Authorization`
@@ -44,6 +50,13 @@ The REST providers of these packages have the option:
   own deadlines. Their methods should reject, not stay pending, when a request can't complete: a
   promise that never settles leaves the component loading. `fetchWithTimeout()` of
   `@elixir-cloud/design/utils` (below) does this for `fetch`.
+</Callout>
+
+<Callout type='warning'>
+  A timed-out request that creates something (e.g. `createTask()` of TES, `runWorkflow()` of WES,
+  the create methods of TRS-Filer and DRS-Filer) may still have succeeded on the server: the client
+  only stops waiting. Check before submitting again, and don't retry such requests automatically on
+  a timeout. Raise the deadline for slow uploads, e.g. large workflow attachments.
 </Callout>
 
 ## Utilities

@@ -311,7 +311,7 @@ const RetryableProvider = withRetry(RestWesProvider, 3, 1000);
 const provider = new RetryableProvider('https://api.example.com');
 ```
 
-Each attempt through `super.fetch()` gets the provider's own request deadline (see below).
+The provider's request deadline (see [Timeouts](#timeouts)) applies to each attempt through `super.fetch()`, not to the retried call as a whole: that can take up to the number of attempts times the deadline, plus the delays. Retry only requests that are safe to repeat: a timed-out request that creates something may still have succeeded on the server.
 
 #### Timeouts
 
