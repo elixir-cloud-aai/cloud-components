@@ -181,4 +181,47 @@ describe("fetchWithTimeout()", () => {
 
     expect(((await request) as Error).message).to.equal("cancelled");
   });
+
+  it("rejects with the timeout error for a plain AbortError", async () => {
+    // Like fetch implementations that ignore the abort reason
+    fetchStub.callsFake(
+      (_input, init: RequestInit) =>
+        new Promise((_resolve, reject) => {
+          init.signal?.addEventListener("abort", () =>
+            reject(new DOMException("Aborted", "AbortError"))
+          );
+        })
+    );
+
+    const error = await rejectionOf(
+      fetchWithTimeout("https://api.example.org/things", {}, 20)
+    );
+
+    expect(error).to.be.instanceOf(RequestTimeoutError);
+  });
+
+  it("passes other errors on", async () => {
+    fetchStub.rejects(new TypeError("Failed to fetch"));
+
+    const error = await rejectionOf(
+      fetchWithTimeout("https://api.example.org/things", {}, 1000)
+    );
+
+    expect(error).to.be.instanceOf(TypeError);
+  });
+
+  it("stops following the caller's signal once the deadline expires", async () => {
+    const caller = new AbortController();
+    const removed = sinon.spy(caller.signal, "removeEventListener");
+
+    await rejectionOf(
+      fetchWithTimeout(
+        "https://api.example.org/things",
+        { signal: caller.signal },
+        20
+      )
+    );
+
+    expect(removed.calledWith("abort")).to.equal(true);
+  });
 });

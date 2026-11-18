@@ -96,24 +96,33 @@ export function fetchWithTimeout(
     return fetch(request, init);
   }
   const controller = new AbortController() as AbortControllerWithReason;
-  const timer = setTimeout(
-    () => controller.abort(new RequestTimeoutError(timeout)),
-    timeout
-  );
   const signal = (init.signal ??
     (input instanceof Request ? input.signal : undefined)) as
     | AbortSignalWithReason
     | undefined;
-  if (signal) {
-    const abort = () => {
-      clearTimeout(timer);
-      controller.abort(signal.reason);
-    };
-    if (signal.aborted) {
-      abort();
-    } else {
-      signal.addEventListener("abort", abort, { once: true });
-    }
+  // Deliberately not cleared when the response arrives, so that the
+  // deadline also covers reading the body; aborting afterwards is a no-op
+  const timer = setTimeout(() => {
+    signal?.removeEventListener("abort", followSignal);
+    controller.abort(new RequestTimeoutError(timeout));
+  }, timeout);
+  // Don't keep Node processes (SSR, tests) alive for the deadline
+  (timer as { unref?: () => void }).unref?.();
+  function followSignal() {
+    clearTimeout(timer);
+    controller.abort(signal?.reason);
   }
-  return fetch(request, { ...init, signal: controller.signal });
+  if (signal?.aborted) {
+    followSignal();
+  } else {
+    signal?.addEventListener("abort", followSignal, { once: true });
+  }
+  return fetch(request, { ...init, signal: controller.signal }).catch(
+    (error: unknown) => {
+      // Fetch implementations that reject with a plain `AbortError`
+      // instead of the abort reason still reject with the timeout error
+      const { reason } = controller.signal;
+      throw reason instanceof RequestTimeoutError ? reason : error;
+    }
+  );
 }
