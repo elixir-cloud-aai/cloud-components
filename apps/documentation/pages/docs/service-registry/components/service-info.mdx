@@ -17,9 +17,9 @@ The `ecc-client-ga4gh-service-registry-service-info` component displays the serv
 Optional fields are shown only if they are set, so that a registry that sets few of them shows no placeholders, invalid values or dead links. Fields that are blank or not strings (from a registry that does not follow the specification) are left out too:
 
 - `environment` (as a badge next to the type and in the details), `description`: shown if not empty.
-- `contactUrl`: shown as a link if it is an `http:` or `https:` URL, or a `mailto:` URL whose recipients are all email addresses (a `mailto:` link shows only the recipients, without the scheme or options such as `?subject=`).
+- `contactUrl`: shown as a link if it is an `http:` or `https:` URL, or a `mailto:` URL whose recipients are all email addresses without invisible characters. The recipients must be in the URL's path (`mailto:help@example.org`), not only in `?to=`. A `mailto:` link shows only these recipients, without the scheme or options such as `?subject=` or `?cc=`.
 - `documentationUrl`, `organization.url`: shown as links if they are `http:` or `https:` URLs; without a valid URL, the organization shows its name only.
-- `createdAt`, `updatedAt`: shown in the reader's locale if they are RFC 3339 timestamps of a real calendar date (such as `2026-01-02T03:04:05Z`; without an offset, the reader's local time); other values are left out. Since cloud-registry 0.4.0, a fresh deployment sets neither.
+- `createdAt`, `updatedAt`: shown in the reader's locale if they are RFC 3339 timestamps of a real calendar date, such as `2026-01-02T03:04:05Z`. A space or a lowercase `t` between date and time and a missing offset (read as the reader's local time) are tolerated; leap seconds aren't, as browsers can't parse them. Other values are left out. Since cloud-registry 0.4.0, a fresh deployment sets neither.
 
 The heading shows the `name`, or else the `id`, or else "Service Registry". The type badge (`artifact@version`) needs a `type.artifact`; the Type row shows the parts of the type that are set.
 

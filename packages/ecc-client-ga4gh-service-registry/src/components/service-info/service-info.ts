@@ -14,40 +14,40 @@ import "@elixir-cloud/design/components/separator/index.js";
 const MISSING_PROVIDER =
   "Please provide either a base URL for the Service Registry API or a custom provider.";
 
-/** An email address: a local part and a domain, without spaces. */
-const ADDRESS = /^[^\s@]+@[^\s@]+$/;
+/**
+ * An email address: a local part and a domain, without spaces or invisible
+ * characters (control, format such as bidi overrides, unassigned), so that
+ * the label shows the address the link goes to.
+ */
+const ADDRESS = /^[^\s@\p{C}]+@[^\s@\p{C}]+$/u;
+
+/** The target of a link and the text it shows. */
+interface Link {
+  href: string;
+  label: string;
+}
 
 /**
- * The recipients of a `mailto:` URL (decoded, without the query), or `null`
- * if there is none or one of them isn't an email address.
+ * A link to the URL if it uses one of the protocols, or `null` (e.g. for a
+ * missing, relative or `javascript:` URL), so that no dead or unsafe links
+ * render. A `mailto:` URL needs recipients in its path (not only in `?to=`)
+ * that are all email addresses; its label shows them decoded, without the
+ * scheme and options such as `?subject=` or `?cc=`. Other links show their
+ * URL.
  */
-const mailRecipients = (url: string): string | null => {
-  try {
-    const { protocol, pathname } = new URL(url);
-    if (protocol !== "mailto:") return null;
-    const recipients = decodeURIComponent(pathname);
-    const valid = recipients
-      .split(",")
-      .every((address) => ADDRESS.test(address.trim()));
-    return valid ? recipients : null;
-  } catch {
-    // not a URL, or a malformed escape in the recipients
-    return null;
-  }
-};
-
-/**
- * The URL if it uses one of the protocols, or `null` (e.g. for a missing,
- * relative or `javascript:` URL, or a `mailto:` URL without valid
- * recipients), so that no dead or unsafe links render.
- */
-const linkable = (url: unknown, protocols: string[]): string | null => {
+const toLink = (url: unknown, protocols: string[]): Link | null => {
   if (typeof url !== "string" || !url) return null;
   try {
-    const { protocol } = new URL(url);
-    if (protocol === "mailto:" && !mailRecipients(url)) return null;
-    return protocols.includes(protocol) ? url : null;
+    const { protocol, pathname } = new URL(url);
+    if (!protocols.includes(protocol)) return null;
+    if (protocol !== "mailto:") return { href: url, label: url };
+    const recipients = decodeURIComponent(pathname)
+      .split(",")
+      .map((address) => address.trim());
+    const valid = recipients.every((address) => ADDRESS.test(address));
+    return valid ? { href: url, label: recipients.join(", ") } : null;
   } catch {
+    // not a URL, or a malformed escape in the recipients
     return null;
   }
 };
@@ -63,8 +63,9 @@ const text = (value: unknown): string | null =>
   typeof value === "string" && value.trim() ? value : null;
 
 /**
- * An RFC 3339 date-time (`T`, `t` or a space between date and time); the
- * offset is optional, for registries that send local times.
+ * An RFC 3339 date-time without leap seconds (which the browsers can't
+ * parse); `T`, `t` or a space between date and time, and the offset is
+ * optional, for registries that send local times.
  */
 const TIMESTAMP =
   /^(\d{4})-(\d{2})-(\d{2})[Tt ](?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)?$/;
@@ -236,13 +237,15 @@ export class ECCClientGa4ghServiceRegistryServiceInfo extends LitElement {
     return "default";
   }
 
-  private static renderLink(url: string, label: string) {
+  /** The link, or `null` without one; `label` replaces the link's own. */
+  private static renderLink(link: Link | null, label?: string | null) {
+    if (!link) return null;
     return html`<a
-      href=${url}
+      href=${link.href}
       target="_blank"
       rel="noopener noreferrer"
       class="text-primary hover:underline break-all"
-      >${label}</a
+      >${label ?? link.label}</a
     >`;
   }
 
@@ -269,9 +272,9 @@ export class ECCClientGa4ghServiceRegistryServiceInfo extends LitElement {
     const artifact = text(info.type?.artifact);
     const typeVersion = text(info.type?.version);
     const organizationName = text(info.organization?.name);
-    const organizationUrl = linkable(info.organization?.url, WEB);
-    const contactUrl = linkable(info.contactUrl, [...WEB, "mailto:"]);
-    const documentationUrl = linkable(info.documentationUrl, WEB);
+    const organizationLink = toLink(info.organization?.url, WEB);
+    const contactLink = toLink(info.contactUrl, [...WEB, "mailto:"]);
+    const documentationLink = toLink(info.documentationUrl, WEB);
     const rows = [
       ECCClientGa4ghServiceRegistryServiceInfo.renderRow(
         "id",
@@ -292,10 +295,10 @@ export class ECCClientGa4ghServiceRegistryServiceInfo extends LitElement {
       ECCClientGa4ghServiceRegistryServiceInfo.renderRow(
         "organization",
         "Organization",
-        organizationUrl
+        organizationLink
           ? ECCClientGa4ghServiceRegistryServiceInfo.renderLink(
-              organizationUrl,
-              organizationName ?? organizationUrl
+              organizationLink,
+              organizationName
             )
           : organizationName
       ),
@@ -307,23 +310,12 @@ export class ECCClientGa4ghServiceRegistryServiceInfo extends LitElement {
       ECCClientGa4ghServiceRegistryServiceInfo.renderRow(
         "contact",
         "Contact",
-        contactUrl
-          ? ECCClientGa4ghServiceRegistryServiceInfo.renderLink(
-              contactUrl,
-              // a `mailto:` link shows its recipients only
-              mailRecipients(contactUrl) ?? contactUrl
-            )
-          : null
+        ECCClientGa4ghServiceRegistryServiceInfo.renderLink(contactLink)
       ),
       ECCClientGa4ghServiceRegistryServiceInfo.renderRow(
         "documentation",
         "Documentation",
-        documentationUrl
-          ? ECCClientGa4ghServiceRegistryServiceInfo.renderLink(
-              documentationUrl,
-              documentationUrl
-            )
-          : null
+        ECCClientGa4ghServiceRegistryServiceInfo.renderLink(documentationLink)
       ),
       ECCClientGa4ghServiceRegistryServiceInfo.renderRow(
         "created",

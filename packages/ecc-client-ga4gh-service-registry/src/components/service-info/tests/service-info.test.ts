@@ -177,6 +177,13 @@ describe("ecc-client-ga4gh-service-registry-service-info", () => {
     "mailto:invalid",
     "mailto:admin@example.org,invalid",
     "mailto:%E0%A4%A",
+    "mailto:admin@example.org,",
+    // invisible characters would make the label differ from the address
+    "mailto:admin@example.org%00",
+    "mailto:admin@example.org%E2%80%8B",
+    "mailto:admin@example.org%E2%80%AEgro.live",
+    // recipients count only in the path
+    "mailto:?to=admin@example.org",
   ].forEach((contactUrl) => {
     it(`leaves out the contact ${contactUrl} without a valid address`, async () => {
       const el = await render(stubProvider({ ...minimal(), contactUrl }));
@@ -192,8 +199,13 @@ describe("ecc-client-ga4gh-service-registry-service-info", () => {
     ["mailto:admin%40example.org", "admin@example.org"],
     [
       "mailto:admin@example.org,help@example.org",
-      "admin@example.org,help@example.org",
+      "admin@example.org, help@example.org",
     ],
+    [
+      "mailto:admin@example.org,%20help@example.org%0A",
+      "admin@example.org, help@example.org",
+    ],
+    ["mailto:help@example.org?cc=admin@example.org", "help@example.org"],
   ].forEach(([contactUrl, label]) => {
     it(`shows the contact ${contactUrl} as its addresses`, async () => {
       const el = await render(stubProvider({ ...minimal(), contactUrl }));
@@ -206,39 +218,62 @@ describe("ecc-client-ga4gh-service-registry-service-info", () => {
     });
   });
 
-  [
-    "2026-02-30T00:00:00Z",
-    "2026-13-01T00:00:00Z",
-    "2026-01-01T24:00:00Z",
-    "January 2, 2026",
-    "2026-01-02",
-    "1767323045000",
-  ].forEach((timestamp) => {
-    it(`leaves out the timestamp ${timestamp}`, async () => {
+  (
+    [
+      "2026-02-30T00:00:00Z",
+      "2025-02-29T00:00:00Z",
+      "1900-02-29T00:00:00Z",
+      "2026-13-01T00:00:00Z",
+      "2026-01-01T24:00:00Z",
+      "January 2, 2026",
+      "2026-01-02",
+      "1767323045000",
+      1767323045000,
+    ] as unknown[]
+  ).forEach((timestamp) => {
+    it(`leaves out the timestamps ${timestamp}`, async () => {
       const el = await render(
-        stubProvider({ ...minimal(), createdAt: timestamp })
+        stubProvider({
+          ...minimal(),
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        } as Service)
       );
       await waitUntil(() => fields(el).length > 0);
 
       expect(fields(el)).not.to.include("created");
+      expect(fields(el)).not.to.include("updated");
     });
   });
 
-  [
-    "2024-02-29T03:04:05Z",
-    "2026-01-02t03:04:05.123z",
-    "2026-01-02T03:04:05+02:00",
-    "2026-01-02 03:04:05",
-  ].forEach((timestamp) => {
-    it(`shows the timestamp ${timestamp}`, async () => {
+  // the instants are fixed, so that the parsing isn't tested against itself
+  (
+    [
+      ["2000-02-29T03:04:05Z", new Date(Date.UTC(2000, 1, 29, 3, 4, 5))],
+      [
+        "2026-01-02t03:04:05.123z",
+        new Date(Date.UTC(2026, 0, 2, 3, 4, 5, 123)),
+      ],
+      ["2026-01-02T03:04:05+02:00", new Date(Date.UTC(2026, 0, 2, 1, 4, 5))],
+      // without an offset, in the reader's local time
+      ["2026-01-02 03:04:05", new Date(2026, 0, 2, 3, 4, 5)],
+    ] as [string, Date][]
+  ).forEach(([timestamp, instant]) => {
+    it(`shows the timestamps ${timestamp}`, async () => {
       const el = await render(
-        stubProvider({ ...minimal(), createdAt: timestamp })
+        stubProvider({
+          ...minimal(),
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        })
       );
       await waitUntil(() => fields(el).length > 0);
 
-      expect(field(el, "created")?.querySelector("dd")?.textContent).to.equal(
-        new Date(timestamp.toUpperCase().replace(" ", "T")).toLocaleString()
-      );
+      ["created", "updated"].forEach((key) => {
+        expect(field(el, key)?.querySelector("dd")?.textContent).to.equal(
+          instant.toLocaleString()
+        );
+      });
     });
   });
 
