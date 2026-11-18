@@ -6,10 +6,13 @@
 const utils = await import("@elixir-cloud/design/utils");
 
 const expected = [
+  "RequestTimeoutError",
+  "fetchWithTimeout",
   "mapFieldErrors",
   "normalizePointer",
   "parseProblemDetails",
   "readProblemDetails",
+  "resolveRequestTimeout",
 ];
 const missing = expected.filter((name) => typeof utils[name] !== "function");
 if (missing.length > 0) {

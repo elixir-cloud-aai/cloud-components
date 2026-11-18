@@ -2,5 +2,6 @@
   "introduction": "Introduction",
   "architecture": "Architecture",
   "components": "Components",
-  "field-errors": "Field errors"
+  "field-errors": "Field errors",
+  "request-timeouts": "Request timeouts"
 }
