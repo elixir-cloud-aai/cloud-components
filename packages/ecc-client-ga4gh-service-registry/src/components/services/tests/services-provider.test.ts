@@ -42,6 +42,12 @@ const deferred = <T>() => {
   return { promise, resolve: settleWith };
 };
 
+/** A `fetch` that settles only when its signal aborts, like a silent server. */
+const neverAnswer = (_input: RequestInfo | URL, init: RequestInit = {}) =>
+  new Promise<Response>((_resolve, reject) => {
+    init.signal?.addEventListener("abort", () => reject(init.signal?.reason));
+  });
+
 /** The services the component shows. */
 const shown = (el: ECCClientGa4ghServiceRegistryServices) =>
   (el as unknown as { services: ExternalService[] }).services;
@@ -250,6 +256,25 @@ describe("ecc-client-ga4gh-service-registry-services provider", () => {
     await waitUntil(() => el.shadowRoot?.textContent?.includes("Unavailable"));
 
     expect(reported).to.deep.equal([[]]);
+  });
+
+  it("shows the error of an expired request and reports no services", async () => {
+    fetchStub.callsFake(neverAnswer);
+    const provider = new RestServiceRegistryProvider(BASE_URL, {
+      timeout: 20,
+    });
+    const el = await fixture<ECCClientGa4ghServiceRegistryServices>(
+      html`<ecc-client-ga4gh-service-registry-services
+        .provider=${provider}
+      ></ecc-client-ga4gh-service-registry-services>`
+    );
+    const changed = oneEvent(el, "ecc-services-changed");
+
+    expect((await changed).detail.services).to.deep.equal([]);
+    await waitUntil(() =>
+      el.shadowRoot?.textContent?.includes("Request timed out after 20 ms")
+    );
+    expect(shown(el)).to.deep.equal([]);
   });
 
   it("starts on the first page with a provider that replaces the first one", async () => {
