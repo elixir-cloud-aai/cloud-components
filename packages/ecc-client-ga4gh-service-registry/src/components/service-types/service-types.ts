@@ -144,7 +144,7 @@ export class ECCClientGa4ghServiceRegistryServiceTypes extends LitElement {
       // the app drops the data of the previous provider too
       this.dispatchChanged([]);
       this.error =
-        err instanceof Error ? err.message : "Failed to load service types";
+        (err instanceof Error && err.message) || "Failed to load service types";
       console.error({
         error: this.error,
         breakPoint: "ECCClientGa4ghServiceRegistryServiceTypes.loadData",

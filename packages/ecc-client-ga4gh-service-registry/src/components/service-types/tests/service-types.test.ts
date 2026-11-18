@@ -177,6 +177,20 @@ describe("ecc-client-ga4gh-service-registry-service-types", () => {
     );
   });
 
+  it("shows a generic error for an Error without a message", async () => {
+    const provider = stubProvider();
+    provider.getServiceTypes.callsFake(() => Promise.reject(new Error("")));
+    sinon.stub(console, "error");
+    const el = await fixture<ECCClientGa4ghServiceRegistryServiceTypes>(
+      html`<ecc-client-ga4gh-service-registry-service-types
+        .provider=${provider}
+      ></ecc-client-ga4gh-service-registry-service-types>`
+    );
+    await waitUntil(() =>
+      el.shadowRoot?.textContent?.includes("Failed to load service types")
+    );
+  });
+
   it("reports the service types it loads", async () => {
     const reported: ServiceType[][] = [];
     const el = await fixture<ECCClientGa4ghServiceRegistryServiceTypes>(
