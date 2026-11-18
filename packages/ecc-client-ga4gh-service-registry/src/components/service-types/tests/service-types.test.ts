@@ -244,6 +244,31 @@ describe("ecc-client-ga4gh-service-registry-service-types", () => {
     expect(reported).to.deep.equal([[]]);
   });
 
+  [
+    ["null", null],
+    ["a type without a group", { artifact: "tes", version: "1.1.0" }],
+    ["a type with a numeric artifact", { ...TES, artifact: 1 }],
+    ["a type without a version", { group: "org.ga4gh", artifact: "tes" }],
+  ].forEach(([name, entry]) => {
+    it(`shows an error for a list with ${name}`, async () => {
+      const reported: ServiceType[][] = [];
+      sinon.stub(console, "error");
+      const el = await fixture<ECCClientGa4ghServiceRegistryServiceTypes>(
+        html`<ecc-client-ga4gh-service-registry-service-types
+          .provider=${stubProvider([TES, entry] as unknown as ServiceType[])}
+          @ecc-service-types-changed=${(e: CustomEvent) =>
+            reported.push(e.detail.serviceTypes)}
+        ></ecc-client-ga4gh-service-registry-service-types>`
+      );
+      await waitUntil(() =>
+        el.shadowRoot?.textContent?.includes("Invalid service types")
+      );
+
+      expect(shown(el)).to.deep.equal([]);
+      expect(reported).to.deep.equal([[]]);
+    });
+  });
+
   it("reports no service types once the base URL is cleared", async () => {
     const el = await fixture<ECCClientGa4ghServiceRegistryServiceTypes>(
       html`<ecc-client-ga4gh-service-registry-service-types

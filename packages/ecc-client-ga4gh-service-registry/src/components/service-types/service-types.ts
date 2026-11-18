@@ -14,6 +14,14 @@ import "@elixir-cloud/design/components/skeleton/index.js";
 const MISSING_PROVIDER =
   "Please provide either a base URL for the Service Registry API or a custom provider.";
 
+/** Whether the value is a service type with the three string parts. */
+const isServiceType = (value: unknown): value is ServiceType =>
+  typeof value === "object" &&
+  value !== null &&
+  ["group", "artifact", "version"].every(
+    (key) => typeof (value as Record<string, unknown>)[key] === "string"
+  );
+
 /**
  * @summary This component is used to list the types of the services in a Service Registry.
  * @since 2.0.0
@@ -122,6 +130,11 @@ export class ECCClientGa4ghServiceRegistryServiceTypes extends LitElement {
       // valid JSON of another shape would break the table
       if (!Array.isArray(serviceTypes)) {
         throw new Error("Invalid service types: the registry sent no list");
+      }
+      if (!serviceTypes.every(isServiceType)) {
+        throw new Error(
+          "Invalid service types: a type lacks a group, artifact or version"
+        );
       }
       this.serviceTypes = serviceTypes;
       this.dispatchChanged(serviceTypes);
