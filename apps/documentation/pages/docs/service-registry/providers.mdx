@@ -35,11 +35,12 @@ The `RestServiceRegistryProvider` is the main implementation that communicates w
 ### Constructor
 
 ```typescript
-constructor(baseUrl: string)
+constructor(baseUrl: string, options?: { timeout?: number })
 ```
 
 **Parameters:**
 - `baseUrl`: The base URL of the Service Registry API endpoint (e.g., `https://registry.example.com/ga4gh/registry/v1`)
+- `options.timeout`: Deadline of each request in milliseconds, until its response has been read (default `30000`, `0` for none). An expired request rejects with a `RequestTimeoutError`, and components show it as an error. See [Request timeouts](/docs/design/request-timeouts).
 
 ### Basic Usage
 
@@ -262,6 +263,8 @@ class CustomServiceRegistryProvider extends RestServiceRegistryProvider {
   }
 }
 ```
+
+Calling `super.fetch()` keeps the provider's request deadline (`timeout`). A provider that implements `ServiceRegistryProvider` directly sets its own deadlines: its methods should reject, not stay pending, when a request can't complete, or the components keep loading (see [Request timeouts](/docs/design/request-timeouts)).
 
 For comprehensive patterns and examples, see the [Providers Overview](/docs/providers) documentation.
 

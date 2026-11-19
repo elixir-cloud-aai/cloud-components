@@ -7,6 +7,13 @@ import type {
   Task,
   ServiceInfo,
 } from "../../providers/tes-provider.js";
+import { RestTesProvider } from "../../providers/rest-tes-provider.js";
+
+/** A `fetch` that settles only when its signal aborts, like a silent server. */
+const neverAnswer = (_input: RequestInfo | URL, init: RequestInit = {}) =>
+  new Promise<Response>((_resolve, reject) => {
+    init.signal?.addEventListener("abort", () => reject(init.signal?.reason));
+  });
 
 const tasks: Task[] = [
   { id: "task-1", name: "first", state: "RUNNING" },
@@ -344,5 +351,24 @@ describe("ecc-client-ga4gh-tes-runs", () => {
         "ecc-utils-design-button[variant=destructive]"
       )
     ).to.equal(null);
+  });
+
+  it("shows the error of an expired request", async () => {
+    const originalFetch = window.fetch;
+    window.fetch = neverAnswer as typeof fetch;
+    try {
+      const el = await fixture<ECCClientGa4ghTesRuns>(
+        html`<ecc-client-ga4gh-tes-runs
+          .provider=${new RestTesProvider("https://tes.example.org/v1", {
+            timeout: 20,
+          })}
+        ></ecc-client-ga4gh-tes-runs>`
+      );
+      await waitUntil(() =>
+        el.shadowRoot!.textContent!.includes("Request timed out after 20 ms")
+      );
+    } finally {
+      window.fetch = originalFetch;
+    }
   });
 });

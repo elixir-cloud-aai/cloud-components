@@ -1,0 +1,87 @@
+import { Callout } from 'nextra/components';
+
+# Request timeouts
+
+The REST providers of the client packages give every request a deadline, so
+that a request that never settles (e.g. to a server that accepts the
+connection but never answers) fails instead of leaving a component loading
+forever. Once the deadline expires, the request is aborted and its promise
+rejects with a `RequestTimeoutError` (message `Request timed out after 30000
+ms`); components show it like any other error and fire their events as on a
+failure (lists, for example, their `ecc-*-changed` event with empty data).
+
+The deadline covers the whole request, from sending it until its response
+body has been read (if it expires while the body is read, browsers without
+abort reasons reject with an `AbortError` instead). It is **30 seconds** by default, set per provider with the
+`timeout` option (in milliseconds; `0` for none):
+
+```ts
+import { RestTrsProvider } from '@elixir-cloud/trs/providers';
+
+// 10 s for each request
+const provider = new RestTrsProvider('https://trs.example.org/ga4gh/trs/v2', {
+  timeout: 10_000,
+});
+```
+
+Components that create their REST provider from `baseUrl` use the default.
+To set another deadline, pass them a provider instead.
+
+The REST providers of these packages have the option:
+[Cloud Registry](/docs/cloud-registry/providers),
+[Service Registry](/docs/service-registry/providers),
+[TES](/docs/tes/providers), [WES](/docs/wes/providers),
+[TRS](/docs/trs/providers), [TRS-Filer](/docs/trs-filer/providers), DRS
+and DRS-Filer. DRS and DRS-Filer have no providers page yet; their
+constructors take the same option:
+
+```ts
+new RestDrsProvider(baseUrl: string, options?: { timeout?: number })
+new RestDrsFilerProvider(baseUrl: string, options?: { timeout?: number })
+```
+
+<Callout type='info'>
+  A provider that overrides `fetch()` and calls `super.fetch()` (e.g. to add an `Authorization`
+  header) keeps the deadline. A `signal` passed in the request options still aborts the request,
+  with its own reason.
+</Callout>
+
+<Callout type='warning'>
+  Custom providers that implement a provider interface without extending a REST provider set their
+  own deadlines. Their methods should reject, not stay pending, when a request can't complete: a
+  promise that never settles leaves the component loading. `fetchWithTimeout()` of
+  `@elixir-cloud/design/utils` (below) does this for `fetch`.
+</Callout>
+
+<Callout type='warning'>
+  A timed-out request that creates something (e.g. `createTask()` of TES, `runWorkflow()` of WES,
+  the create methods of TRS-Filer and DRS-Filer) may still have succeeded on the server: the client
+  only stops waiting. Check before submitting again, and don't retry such requests automatically on
+  a timeout. Raise the deadline for slow uploads, e.g. large workflow attachments.
+</Callout>
+
+## Utilities
+
+`@elixir-cloud/design/utils` (which registers no components) exports what
+the REST providers use:
+
+| Export                                     | Description                                                                                                                                                                                         |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fetchWithTimeout(input, init?, timeout?)` | `fetch` with a deadline in milliseconds (default 30 s, `0` for none); aborts with a `RequestTimeoutError` once it expires. A `signal` in `init` or of a `Request` still aborts with its own reason. |
+| `RequestTimeoutError`                      | The error of an expired request, with `name` `RequestTimeoutError` and the deadline as `timeout`.                                                                                                   |
+| `resolveRequestTimeout(options?)`          | The deadline of provider options (`{ timeout?: number }`): the default if unset; throws a `RangeError` unless it is an integer from `0` to `MAX_REQUEST_TIMEOUT`.                                   |
+| `DEFAULT_REQUEST_TIMEOUT`                  | `30000` (30 s).                                                                                                                                                                                     |
+| `MAX_REQUEST_TIMEOUT`                      | `2147483647` (about 24.8 days), the longest deadline timers support.                                                                                                                                |
+| `RestProviderOptions`                      | Type of the options (`{ timeout?: number }`).                                                                                                                                                       |
+
+```ts
+import { RequestTimeoutError } from '@elixir-cloud/design/utils';
+
+try {
+  await provider.getServiceInfo();
+} catch (error) {
+  if (error instanceof RequestTimeoutError) {
+    // The server didn't answer within error.timeout ms
+  }
+}
+```
