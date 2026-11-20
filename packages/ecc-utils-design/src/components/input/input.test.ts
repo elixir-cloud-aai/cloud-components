@@ -53,7 +53,7 @@ class AriaDefaultsTestElement extends LitElement {
 
   declare defaultReference: string;
 
-  private forwarding = new AttrForwardingController(this, "input");
+  readonly forwarding = new AttrForwardingController(this, "input");
 
   constructor() {
     super();
@@ -120,6 +120,43 @@ describe("component ARIA defaults", () => {
           ?.textContent
       ).to.equal("External label");
     }
+  });
+
+  it("batches host and root mutations into one controller sync", async () => {
+    const { host, target } = await create();
+    host.setAttribute("aria-labelledby", "external-label");
+    await tick();
+    let syncs = 0;
+    const originalSync = host.forwarding.sync.bind(host.forwarding);
+    host.forwarding.sync = () => {
+      syncs += 1;
+      originalSync();
+    };
+
+    host.setAttribute("aria-label", "First label");
+    host.setAttribute("aria-label", "Final label");
+    host.parentElement?.append(document.createElement("span"));
+    await tick();
+
+    expect(syncs).to.equal(1);
+    expect(target.getAttribute("aria-label")).to.equal("Final label");
+  });
+
+  it("cancels queued observer syncs when disconnected", async () => {
+    const { host } = await create();
+    await tick();
+    let syncs = 0;
+    const originalSync = host.forwarding.sync.bind(host.forwarding);
+    host.forwarding.sync = () => {
+      syncs += 1;
+      originalSync();
+    };
+
+    host.setAttribute("aria-label", "Queued label");
+    queueMicrotask(() => host.remove());
+    await tick();
+
+    expect(syncs).to.equal(0);
   });
 
   it("restores updated defaults when host overrides are removed", async () => {
@@ -482,6 +519,36 @@ components.forEach(({ tag, inner, native }) => {
       expect(
         referencedText(target, "aria-describedby", "ariaDescribedByElements")
       ).to.equal("");
+    });
+
+    it("clears native description references while other references remain", async () => {
+      const wrapper = await fixture<HTMLElement>(
+        `<div>
+          <${tag} aria-describedby="hint" aria-labelledby="name"></${tag}>
+          <p id="hint">Helpful text</p>
+          <span id="name">Field name</span>
+        </div>`
+      );
+      const host = wrapper.querySelector(tag) as HTMLElement;
+      const target = host.shadowRoot?.querySelector(inner) as Element;
+
+      if ("ariaDescribedByElements" in target) {
+        expect(Reflect.get(target, "ariaDescribedByElements")).to.deep.equal([
+          wrapper.querySelector("#hint"),
+        ]);
+      }
+      host.removeAttribute("aria-describedby");
+      await tick();
+
+      if ("ariaDescribedByElements" in target) {
+        expect(
+          Reflect.get(target, "ariaDescribedByElements") ?? []
+        ).to.deep.equal([]);
+      }
+      expect(
+        referencedText(target, "aria-describedby", "ariaDescribedByElements")
+      ).to.equal("");
+      expect(host.getAttribute("aria-labelledby")).to.equal("name");
     });
 
     it("forwards allow-listed native attributes but not others", async () => {

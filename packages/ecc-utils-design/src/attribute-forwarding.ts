@@ -13,6 +13,21 @@ type RootState = {
 };
 
 const rootStates = new WeakMap<ReferenceRoot, RootState>();
+const pendingSyncs = new Set<ForwardingController>();
+let syncScheduled = false;
+
+function scheduleSync(controller: ForwardingController) {
+  pendingSyncs.add(controller);
+  if (syncScheduled) return;
+  syncScheduled = true;
+  queueMicrotask(() => {
+    syncScheduled = false;
+    const controllers = [...pendingSyncs];
+    controllers.forEach((currentController) => {
+      if (pendingSyncs.delete(currentController)) currentController.sync();
+    });
+  });
+}
 
 function setsEqual<T>(left: Set<T>, right: Set<T>) {
   return (
@@ -37,9 +52,7 @@ function observeRoot(state: RootState, root: ReferenceRoot) {
     });
   });
   if (pending) {
-    queueMicrotask(() => {
-      state.controllers.forEach((controller) => controller.sync());
-    });
+    state.controllers.forEach(scheduleSync);
   }
 }
 
@@ -54,7 +67,7 @@ function registerController(
     const controllerReferences = new Map<ForwardingController, Set<Element>>();
     state = {
       observer: new MutationObserver(() => {
-        controllers.forEach((currentController) => currentController.sync());
+        controllers.forEach(scheduleSync);
       }),
       controllers,
       references,
@@ -175,13 +188,14 @@ export class AttrForwardingController implements ReactiveController {
   }
 
   hostConnected() {
-    this.observer = new MutationObserver(() => this.sync());
+    this.observer = new MutationObserver(() => scheduleSync(this));
     this.observer.observe(this.host, { attributes: true });
     this.sync();
   }
 
   hostDisconnected() {
     this.observer?.disconnect();
+    pendingSyncs.delete(this);
     if (this.referenceRoot) {
       unregisterController(this.referenceRoot, this);
       this.referenceRoot = undefined;
@@ -203,6 +217,7 @@ export class AttrForwardingController implements ReactiveController {
   }
 
   sync() {
+    pendingSyncs.delete(this);
     const target = this.host.shadowRoot?.querySelector(this.selector);
     if (!target) return;
     if (this.ariaTarget !== target) {
@@ -222,7 +237,7 @@ export class AttrForwardingController implements ReactiveController {
       }
       if (this.isForwarded(attr.name)) wanted.set(attr.name, attr.value);
     });
-    // remove stale sttributes
+    // remove stale attributes
     Array.from(target.attributes).forEach((attr) => {
       if (
         !attr.name.startsWith("aria-") &&
@@ -273,6 +288,11 @@ export class AttrForwardingController implements ReactiveController {
     Object.entries(IDREFS).forEach(([attr, prop]) => {
       const value = this.host.getAttribute(attr);
       if (value === null) {
+        if (prop in target) {
+          const defaultValue = target.getAttribute(attr);
+          Reflect.set(target, prop, null);
+          if (defaultValue !== null) target.setAttribute(attr, defaultValue);
+        }
         shadow.querySelectorAll(`[id^="ecc-ref-${attr}-"]`).forEach((node) => {
           node.remove();
         });
