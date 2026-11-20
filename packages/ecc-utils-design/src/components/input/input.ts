@@ -3,6 +3,7 @@ import { property } from "lit/decorators.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { ComponentStyles as TailwindStyles } from "./tw-styles.js";
 import { GlobalStyles } from "../../global.js";
+import { AttrForwardingController } from "../../attribute-forwarding.js";
 
 type InputType =
   | "text"
@@ -47,6 +48,19 @@ export class EccUtilsDesignInput extends LitElement {
   @property({ type: Boolean, reflect: true }) invalid = false;
   /** Error message shown under the field, e.g. one returned by an API. */
   @property({ type: String }) error = "";
+
+  private _aria = new AttrForwardingController(this, "input", [
+    "name",
+    "required",
+    "readonly",
+    "autocomplete",
+    "minlength",
+    "maxlength",
+    "min",
+    "max",
+    "step",
+    "pattern",
+  ]);
 
   render() {
     const isInvalid = this.invalid || !!this.error;

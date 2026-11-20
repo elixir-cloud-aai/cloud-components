@@ -1,5 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { expect, fixture, html, waitUntil } from "@open-wc/testing";
+import {
+  expect,
+  fixture,
+  fixtureSync,
+  html,
+  waitUntil,
+} from "@open-wc/testing";
 import { html as litHtml } from "lit";
 import sinon from "sinon";
 import "../index.js";
@@ -646,7 +652,7 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
     });
 
     it("selects a service inside an element marked data-no-select", async () => {
-      const wrapper = await fixture<HTMLElement>(
+      const wrapper = fixtureSync<HTMLElement>(
         html`<div data-no-select>
           <ecc-client-ga4gh-service-registry-services
             .provider=${stubProvider()}
