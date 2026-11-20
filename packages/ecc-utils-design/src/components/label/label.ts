@@ -9,6 +9,8 @@ function cn(...classes: (string | undefined | false)[]) {
 
 /**
  * EccUtilsDesignLabel - Label component
+ *
+ * @element ecc-utils-design-label
  */
 export class EccUtilsDesignLabel extends LitElement {
   static styles = [

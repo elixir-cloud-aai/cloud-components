@@ -13,6 +13,8 @@ function cn(...classes: (string | undefined | false)[]) {
  * @summary A separator component that visually or semantically separates content
  * @since 1.0.0
  *
+ * @element ecc-utils-design-separator
+ *
  * @csspart base - The component's base wrapper
  *
  * @slot - Default slot

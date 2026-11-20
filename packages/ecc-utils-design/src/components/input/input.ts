@@ -25,6 +25,11 @@ function cn(...classes: (string | undefined | false)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
+/**
+ * EccUtilsDesignInput - Input component
+ *
+ * @element ecc-utils-design-input
+ */
 export class EccUtilsDesignInput extends LitElement {
   static styles = [
     css`
