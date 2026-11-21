@@ -14,5 +14,6 @@
   "multi-select": "Multi-Select",
   "pagination": "Pagination",
   "tabs": "Tabs",
-  "table": "Table"
+  "table": "Table",
+  "dialog": "Dialog"
 }

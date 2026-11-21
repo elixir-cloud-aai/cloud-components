@@ -1,3 +1,6 @@
 {
-  "service-create": "Service Create"
-} 
+  "service-create": "Service Create",
+  "service-verification": "Service Verification",
+  "service-verification-badge": "Service Verification Badge",
+  "services": "Services"
+}

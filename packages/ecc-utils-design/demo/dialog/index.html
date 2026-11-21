@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="icon"
+      href="../assets/logo-elixir-cloud-aai.svg"
+      type="image/x-icon"
+    />
+    <title>ecc-utils-design Dialog Demo</title>
+    <style>
+      .section {
+        margin-bottom: 2rem;
+      }
+
+      .demo-output {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #f3f4f6;
+        border-radius: 0.375rem;
+        font-family: monospace;
+        font-size: 0.875rem;
+        white-space: pre;
+      }
+    </style>
+    <!-- tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div class="p-10">
+      <h1 class="text-2xl font-bold mb-4">ecc-utils-design Dialog Demo</h1>
+      <div id="demo"></div>
+    </div>
+
+    <script type="module">
+      import "../../../dist/components/dialog/index.js";
+      import "../../../dist/components/button/index.js";
+      import "../../../dist/components/input/index.js";
+      import { html, render } from "lit";
+
+      const eventLog = [];
+      const logEvent = (event) => {
+        const { open, reason } = event.detail;
+        eventLog.push(`${open ? "opened" : "closed"} (${reason})`);
+        document.getElementById("event-log").textContent = eventLog
+          .slice(-5)
+          .join("\n");
+      };
+
+      render(
+        html`
+          <div class="flex flex-col">
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Basic Dialog</h2>
+              <ecc-utils-design-dialog @ecc-dialog-open-changed=${logEvent}>
+                <ecc-utils-design-button slot="trigger" variant="outline">
+                  Edit profile
+                </ecc-utils-design-button>
+                <span slot="title">Edit profile</span>
+                <span slot="description">
+                  Make changes to your profile here. Click save when you're done.
+                </span>
+                <ecc-utils-design-input
+                  label="Name"
+                  value="Ada Lovelace"
+                ></ecc-utils-design-input>
+                <div slot="footer" class="flex gap-2">
+                  <ecc-utils-design-button variant="outline" data-dialog-close>
+                    Cancel
+                  </ecc-utils-design-button>
+                  <ecc-utils-design-button data-dialog-close>
+                    Save changes
+                  </ecc-utils-design-button>
+                </div>
+              </ecc-utils-design-dialog>
+              <div id="event-log" class="demo-output">Events will appear here...</div>
+            </div>
+
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">
+                Controlled, without overlay close and close button
+              </h2>
+              <ecc-utils-design-button
+                variant="destructive"
+                @click=${() => {
+                  document.getElementById("confirm").open = true;
+                }}
+              >
+                Delete
+              </ecc-utils-design-button>
+              <ecc-utils-design-dialog
+                id="confirm"
+                no-overlay-close
+                hide-close-button
+              >
+                <span slot="title">Delete this service?</span>
+                <span slot="description">This can't be undone.</span>
+                <div slot="footer" class="flex gap-2">
+                  <ecc-utils-design-button variant="outline" data-dialog-close>
+                    Cancel
+                  </ecc-utils-design-button>
+                  <ecc-utils-design-button variant="destructive" data-dialog-close>
+                    Delete
+                  </ecc-utils-design-button>
+                </div>
+              </ecc-utils-design-dialog>
+            </div>
+
+            <div class="section">
+              <h2 class="text-xl font-semibold mb-2">Nested Dialogs</h2>
+              <ecc-utils-design-dialog>
+                <ecc-utils-design-button slot="trigger" variant="outline">
+                  Open settings
+                </ecc-utils-design-button>
+                <span slot="title">Settings</span>
+                <p class="text-sm">Escape closes the innermost dialog only.</p>
+                <ecc-utils-design-dialog>
+                  <ecc-utils-design-button slot="trigger">
+                    Open details
+                  </ecc-utils-design-button>
+                  <span slot="title">Details</span>
+                  <p class="text-sm">A dialog inside a dialog.</p>
+                </ecc-utils-design-dialog>
+              </ecc-utils-design-dialog>
+            </div>
+          </div>
+        `,
+        document.getElementById("demo")
+      );
+    </script>
+  </body>
+</html>
