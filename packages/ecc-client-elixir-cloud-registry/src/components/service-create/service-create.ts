@@ -140,7 +140,7 @@ const hasOnlyFormerRules = (info: RegistryServiceInfo | undefined): boolean =>
  * @property {boolean} dirty - Whether the form has unsaved input (read-only)
  *
  * @fires ecc-service-created - Fired when a service is successfully created (includes serviceId, serviceData, and success message)
- * @fires ecc-service-create-failed - Fired when service creation or loading the service types fails (includes the error message and, if the registry sent them, the status and problem details; the form shows the registry's field errors at its fields, and `generalError` is the rest)
+ * @fires ecc-service-create-failed - Fired when service creation or loading the service types fails (includes the error message and, if the registry sent them, the status and problem details; the form shows the registry's field errors at its fields, except those of fields changed while the create ran, and `generalError` is the rest)
  * @fires ecc-service-create-validation-failed - Fired when there are validation errors during service creation
  * @fires ecc-service-form-changed - Fired when the form's values change (includes dirty: whether they differ from the empty form; false again after Reset or a successful create)
  */
@@ -210,12 +210,11 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   // as in `fieldErrors` of `ecc-service-create-failed`); a field's error is
   // cleared when the field changes
   @state() private fieldErrors: Record<string, string> = {};
-  // Fields that changed while a create runs (keys as in `fieldErrors`), so
-  // that its field errors don't show at values that weren't sent; null when
-  // no create runs
-  private changedWhileCreating: Set<string> | null = null;
-  // Number of resets, so that a create's field errors don't show after one
-  private resetCount = 0;
+  // The create that runs, with the fields that changed since it was sent
+  // (keys as in `fieldErrors`), so that its field errors don't show at
+  // values that weren't sent; null when none runs or after a reset, so that
+  // its field errors don't show then at all
+  private runningCreate: { changed: Set<string> } | null = null;
 
   // Form state
   @state() private formData: {
@@ -379,11 +378,12 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   }
 
   /**
-   * Clear the registry's errors of fields that changed
+   * Clear the registry's errors of fields that changed, and note them as
+   * changed for a create that runs (every change of a field calls this)
    * @param keys The fields' keys, as in `fieldErrors`
    */
   private clearFieldErrors(...keys: string[]): void {
-    keys.forEach((key) => this.changedWhileCreating?.add(key));
+    keys.forEach((key) => this.runningCreate?.changed.add(key));
     if (!keys.some((key) => this.fieldError(key))) return;
     const remaining = { ...this.fieldErrors };
     keys.forEach((key) => {
@@ -709,8 +709,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     }
 
     this.loading = true;
-    this.changedWhileCreating = new Set();
-    const resetsBefore = this.resetCount;
+    const run = { changed: new Set<string>() };
+    this.runningCreate = run;
     const customId = Boolean(
       this.admin && this.formData.useCustomId && this.formData.customServiceId
     );
@@ -799,12 +799,11 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       });
       // the registry's field errors show at the fields, unless they changed
       // (or the form was reset) since the request was sent
-      const changed = this.changedWhileCreating;
       this.fieldErrors =
-        resetsBefore === this.resetCount
+        run === this.runningCreate
           ? Object.fromEntries(
               Object.entries(detail.fieldErrors).filter(
-                ([key]) => !changed?.has(key)
+                ([key]) => !run.changed.has(key)
               )
             )
           : {};
@@ -817,12 +816,12 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       );
     } finally {
       this.loading = false;
-      this.changedWhileCreating = null;
+      if (this.runningCreate === run) this.runningCreate = null;
     }
   }
 
   private resetForm(): void {
-    this.resetCount += 1;
+    this.runningCreate = null;
     this.fieldErrors = {};
     this.typeChoice = "";
     this.formData = {

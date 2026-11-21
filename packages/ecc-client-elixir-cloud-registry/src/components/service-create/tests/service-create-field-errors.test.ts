@@ -339,6 +339,29 @@ describe("ecc-client-elixir-cloud-registry-service-create field errors", () => {
     expect(control(el, "org-url").error).to.equal("Must be a valid URI.");
   });
 
+  it("clears the type's error when another type is chosen", async () => {
+    const other: ServiceType = { ...TYPE, version: "1.0.0" };
+    types = [TYPE, other];
+    answer = () =>
+      invalid([{ detail: "Not registered.", pointer: "#/type/version" }]);
+    const el = await create();
+    await waitUntil(() => internals(el).serviceTypes.length === 2);
+    fillForm(el, {}, JSON.stringify([TYPE.group, TYPE.artifact, TYPE.version]));
+    await submit(el);
+    expect(control(el, "service-type").error).to.equal("Not registered.");
+
+    control(el, "service-type").dispatchEvent(
+      new CustomEvent("ecc-input-changed", {
+        detail: {
+          value: JSON.stringify([other.group, other.artifact, other.version]),
+        },
+      })
+    );
+    await el.updateComplete;
+
+    expect(control(el, "service-type").error).to.equal("");
+  });
+
   it("clears the field errors on a new submit and on reset", async () => {
     answer = () => invalid([{ detail: "Too long.", pointer: "#/name" }]);
     const el = await create();
