@@ -346,14 +346,13 @@ describe("ecc-client-elixir-cloud-registry-service-create field errors", () => {
     await submit(el);
     expect(control(el, "service-name").error).to.equal("Too long.");
 
+    // a failure without field errors, so that only the submit clears them
     answer = () =>
-      new Response(JSON.stringify("service-1"), {
-        headers: { "Content-Type": "application/json" },
+      new Response(JSON.stringify({ status: 409, detail: "Exists." }), {
+        status: 409,
+        headers: { "Content-Type": "application/problem+json" },
       });
-    const created = oneEvent(el, "ecc-service-created");
-    internals(el).handleSubmit();
-    await created;
-    await el.updateComplete;
+    await submit(el);
     expect(control(el, "service-name").error).to.equal("");
 
     answer = () => invalid([{ detail: "Too long.", pointer: "#/name" }]);
@@ -363,6 +362,172 @@ describe("ecc-client-elixir-cloud-registry-service-create field errors", () => {
     internals(el).resetForm();
     await el.updateComplete;
     expect(control(el, "service-name").error).to.equal("");
+  });
+
+  it("clears the field errors after a successful create", async () => {
+    answer = () => invalid([{ detail: "Too long.", pointer: "#/name" }]);
+    const el = await create();
+    fillForm(el);
+    await submit(el);
+    expect(control(el, "service-name").error).to.equal("Too long.");
+
+    answer = () =>
+      new Response(JSON.stringify("service-1"), {
+        headers: { "Content-Type": "application/json" },
+      });
+    const created = oneEvent(el, "ecc-service-created");
+    internals(el).handleSubmit();
+    await created;
+    await el.updateComplete;
+    expect(control(el, "service-name").error).to.equal("");
+  });
+
+  /** An error of a custom provider with the given field errors. */
+  const invalidError = (errors: Record<string, unknown>[]) =>
+    Object.assign(new Error("Invalid."), {
+      status: 400,
+      problem: { status: 400, errors },
+    });
+
+  /** A custom provider whose creates fail with the given field errors. */
+  const failingProvider = (errors: Record<string, unknown>[]) => {
+    const provider = new RestCloudRegistryProvider(BASE_URL);
+    sinon.stub(provider, "getServiceTypes").resolves([]);
+    const createService = sinon
+      .stub(provider, "createService")
+      .rejects(invalidError(errors));
+    return { provider, createService };
+  };
+
+  /**
+   * A custom provider whose create fails with the given field errors when
+   * `fail` is called, so that the form can change while it runs.
+   */
+  const pendingProvider = (errors: Record<string, unknown>[]) => {
+    const { provider, createService } = failingProvider(errors);
+    let fail: (() => void) | undefined;
+    createService.callsFake(
+      () =>
+        new Promise((_resolve, reject) => {
+          fail = () => reject(invalidError(errors));
+        })
+    );
+    return { provider, fail: () => fail?.() };
+  };
+
+  const createWith = async (provider: RestCloudRegistryProvider) => {
+    const el = await fixture<ECCClientElixirCloudRegistryServiceCreate>(
+      html`<ecc-client-elixir-cloud-registry-service-create
+        .provider=${provider}
+      ></ecc-client-elixir-cloud-registry-service-create>`
+    );
+    await el.updateComplete;
+    return el;
+  };
+
+  it("clears the field errors when the provider can't create", async () => {
+    const { provider } = failingProvider([
+      { detail: "Too long.", pointer: "/name" },
+    ]);
+    const el = await createWith(provider);
+    fillForm(el);
+    await submit(el);
+    expect(control(el, "service-name").error).to.equal("Too long.");
+
+    (provider as { createService?: unknown }).createService = undefined;
+    const detail = await submit(el);
+
+    expect(detail.fieldErrors).to.deep.equal({});
+    expect(control(el, "service-name").error).to.equal("");
+  });
+
+  it("doesn't show errors of fields edited while the create ran", async () => {
+    const { provider, fail } = pendingProvider([
+      { detail: "Too long.", pointer: "/name" },
+      { detail: "Must be a valid URI.", pointer: "/organization/url" },
+      { detail: "Too long.", pointer: "/type/artifact" },
+    ]);
+    const el = await createWith(provider);
+    fillForm(el);
+    await el.updateComplete;
+
+    const failed = oneEvent(el, "ecc-service-create-failed");
+    internals(el).handleSubmit();
+    await el.updateComplete;
+    control(el, "service-name").dispatchEvent(
+      new CustomEvent("ecc-input-changed", { detail: { value: "TES" } })
+    );
+    control(el, "type-artifact").dispatchEvent(
+      new CustomEvent("ecc-input-changed", { detail: { value: "wes" } })
+    );
+    fail();
+    const { detail } = (await failed) as EccServiceCreateFailedEvent;
+    await el.updateComplete;
+
+    // the event reports what the registry said about the request
+    expect(detail.fieldErrors).to.deep.equal({
+      name: "Too long.",
+      "organization.url": "Must be a valid URI.",
+      "type.artifact": "Too long.",
+    });
+    expect(control(el, "service-name").error).to.equal("");
+    expect(control(el, "type-artifact").error).to.equal("");
+    expect(control(el, "org-url").error).to.equal("Must be a valid URI.");
+  });
+
+  it("doesn't show field errors after a reset while the create ran", async () => {
+    const { provider, fail } = pendingProvider([
+      { detail: "Must be a valid URI.", pointer: "/url" },
+    ]);
+    const el = await createWith(provider);
+    fillForm(el);
+    await el.updateComplete;
+
+    const failed = oneEvent(el, "ecc-service-create-failed");
+    internals(el).handleSubmit();
+    await el.updateComplete;
+    internals(el).resetForm();
+    fail();
+    const { detail } = (await failed) as EccServiceCreateFailedEvent;
+    await el.updateComplete;
+
+    expect(detail.fieldErrors).to.deep.equal({ url: "Must be a valid URI." });
+    expect(control(el, "service-url").error).to.equal("");
+  });
+
+  it("drops the admin fields' errors when admin is turned off", async () => {
+    const { provider } = failingProvider([
+      { detail: "Must be an RFC 3339 date-time.", pointer: "/createdAt" },
+    ]);
+    const el = await createWith(provider);
+    fillForm(el, { createdAt: "yesterday" });
+    await submit(el);
+    expect(control(el, "created-at").error).to.equal(
+      "Must be an RFC 3339 date-time."
+    );
+
+    el.admin = false;
+    await el.updateComplete;
+    el.admin = true;
+    await el.updateComplete;
+
+    expect(control(el, "created-at").error).to.equal("");
+  });
+
+  it("drops the environment's error with an environment no longer offered", async () => {
+    const { provider } = failingProvider([
+      { detail: "Not allowed.", pointer: "/environment" },
+    ]);
+    const el = await createWith(provider);
+    fillForm(el, { environment: "test" });
+    await submit(el);
+    expect(control(el, "environment").error).to.equal("Not allowed.");
+
+    el.environments = ["prod"];
+    await el.updateComplete;
+
+    expect(internals(el).formData.environment).to.equal("");
+    expect(control(el, "environment").error).to.equal("");
   });
 
   it("reads the problem details of errors of custom providers", async () => {

@@ -210,6 +210,12 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   // as in `fieldErrors` of `ecc-service-create-failed`); a field's error is
   // cleared when the field changes
   @state() private fieldErrors: Record<string, string> = {};
+  // Fields that changed while a create runs (keys as in `fieldErrors`), so
+  // that its field errors don't show at values that weren't sent; null when
+  // no create runs
+  private changedWhileCreating: Set<string> | null = null;
+  // Number of resets, so that a create's field errors don't show after one
+  private resetCount = 0;
 
   // Form state
   @state() private formData: {
@@ -293,6 +299,10 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
   }
 
   protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+    // the admin-only fields are hidden, and no longer sent, without `admin`
+    if (changedProperties.has("admin") && !this.admin) {
+      this.clearFieldErrors(...ADMIN_FIELDS);
+    }
     // switching adding types off discards a new type entered so far
     if (
       changedProperties.has("allowNewType") &&
@@ -332,6 +342,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
         !this.anyEnvironment &&
         !options.some((option) => option.value === this.formData.environment)
       ) {
+        this.clearFieldErrors("environment");
         this.formData = { ...this.formData, environment: "" };
       }
     }
@@ -372,6 +383,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
    * @param keys The fields' keys, as in `fieldErrors`
    */
   private clearFieldErrors(...keys: string[]): void {
+    keys.forEach((key) => this.changedWhileCreating?.add(key));
     if (!keys.some((key) => this.fieldError(key))) return;
     const remaining = { ...this.fieldErrors };
     keys.forEach((key) => {
@@ -683,6 +695,7 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
 
   private async handleSubmit(): Promise<void> {
     const provider = this.currentProvider();
+    this.fieldErrors = {};
     if (!provider || !provider.createService) {
       const error = "Service creation is not supported by the current provider";
       this.dispatchEvent(
@@ -696,7 +709,8 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
     }
 
     this.loading = true;
-    this.fieldErrors = {};
+    this.changedWhileCreating = new Set();
+    const resetsBefore = this.resetCount;
     const customId = Boolean(
       this.admin && this.formData.useCustomId && this.formData.customServiceId
     );
@@ -783,8 +797,17 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       const detail = failureDetail(err, "Failed to create service", {
         locations,
       });
-      // the registry's field errors show at the fields
-      this.fieldErrors = detail.fieldErrors;
+      // the registry's field errors show at the fields, unless they changed
+      // (or the form was reset) since the request was sent
+      const changed = this.changedWhileCreating;
+      this.fieldErrors =
+        resetsBefore === this.resetCount
+          ? Object.fromEntries(
+              Object.entries(detail.fieldErrors).filter(
+                ([key]) => !changed?.has(key)
+              )
+            )
+          : {};
       this.dispatchEvent(
         new CustomEvent("ecc-service-create-failed", {
           detail,
@@ -794,10 +817,12 @@ export class ECCClientElixirCloudRegistryServiceCreate extends LitElement {
       );
     } finally {
       this.loading = false;
+      this.changedWhileCreating = null;
     }
   }
 
   private resetForm(): void {
+    this.resetCount += 1;
     this.fieldErrors = {};
     this.typeChoice = "";
     this.formData = {
