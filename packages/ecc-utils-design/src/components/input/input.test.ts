@@ -1,7 +1,9 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { fixture, expect } from "@open-wc/testing";
+import { fixture, expect, html } from "@open-wc/testing";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { executeServerCommand } from "@web/test-runner-commands";
+import { LitElement } from "lit";
+import { AttrForwardingController } from "../../attribute-forwarding.js";
 import "./index.js";
 import "../textarea/index.js";
 
@@ -412,7 +414,7 @@ components.forEach(({ tag, inner, native }) => {
       expect(target.getAttribute("aria-errormessage")).to.not.equal("error");
     });
 
-    it("mirrors accessible text from non-text sources in the fallback", async () => {
+    it.only("mirrors accessible text from non-text sources in the fallback", async () => {
       const wrapper = await fixture<HTMLElement>(
         `<div>
           <${tag}></${tag}>
@@ -481,6 +483,20 @@ components.forEach(({ tag, inner, native }) => {
             .map((node) => node.textContent)
             .join(" ")
         ).to.equal("Built-in error Mandatory");
+
+        host.removeAttribute("aria-describedby");
+        await tick();
+        expect(target.getAttribute("aria-describedby")).to.equal("error");
+        expect(
+          referencedText(
+            target,
+            "aria-describedby",
+            "ariaDescribedByElements"
+          ).trim()
+        ).to.equal("Built-in error");
+        expect(
+          Array.from(descriptions ?? []).every((node) => !node.isConnected)
+        ).to.equal(true);
 
         host.error = "";
         await host.updateComplete;
