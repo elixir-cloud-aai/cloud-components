@@ -35,6 +35,32 @@ function setsEqual<T>(left: Set<T>, right: Set<T>) {
   );
 }
 
+function getAccessibleNameDependencies(references: Element[]) {
+  const dependencies = new Set<Element>();
+  const visited = new Set<Element>();
+
+  function visit(reference: Element) {
+    if (visited.has(reference)) return;
+    visited.add(reference);
+
+    const root = reference.getRootNode();
+    if (!(root instanceof Document) && !(root instanceof ShadowRoot)) return;
+
+    (reference.getAttribute("aria-labelledby") ?? "")
+      .split(/\s+/)
+      .filter(Boolean)
+      .forEach((id) => {
+        const dependency = root.getElementById(id);
+        if (!dependency) return;
+        dependencies.add(dependency);
+        visit(dependency);
+      });
+  }
+
+  references.forEach(visit);
+  return [...dependencies];
+}
+
 function observeRoot(state: RootState, root: ReferenceRoot) {
   const pending = state.observer.takeRecords().length > 0;
   state.observer.disconnect();
@@ -326,7 +352,7 @@ export class AttrForwardingController implements ReactiveController {
         .split(/\s+/)
         .filter(Boolean)
         .map((id) => root.getElementById(id))
-        .filter((el): el is HTMLElement => el !== null);
+        .filter((element): element is HTMLElement => element !== null);
       const refs = [...new Set([...defaultRefs, ...hostRefs])];
       references.push(...refs);
 
@@ -344,6 +370,8 @@ export class AttrForwardingController implements ReactiveController {
         return;
       }
 
+      references.push(...getAccessibleNameDependencies(refs));
+
       // Fallback: mirror referenced text into shadow-local nodes.
       const ids = refs.map((ref, i) => {
         const id = `ecc-ref-${attr}-${i}`;
@@ -360,7 +388,9 @@ export class AttrForwardingController implements ReactiveController {
           value: () => referenceRoot,
         });
         probe.setAttribute("aria-labelledby", ref.id);
-        node.textContent = computeAccessibleName(probe);
+        node.textContent = computeAccessibleName(
+          ref.hasAttribute("aria-labelledby") ? ref : probe
+        );
         return id;
       });
       shadow.querySelectorAll(`[id^="ecc-ref-${attr}-"]`).forEach((n) => {
