@@ -5,6 +5,9 @@ import {
   ExternalServiceRegister,
   ServiceRegister,
   RegistryServiceInfo,
+  ServiceVerification,
+  Verification,
+  VerificationRegister,
 } from "./cr-provider.js";
 import { CloudRegistryError } from "./errors.js";
 
@@ -195,6 +198,105 @@ export class RestCloudRegistryProvider implements CloudRegistryProvider {
       throw await CloudRegistryError.fromResponse(
         response,
         "Failed to delete service"
+      );
+    }
+
+    return response.json();
+  }
+
+  /**
+   * List the verified services (`GET /verifications`). An entry only counts
+   * while the service still has its URL and API type; see
+   * `verifiedServices()`.
+   * @returns Promise resolving to the verifications, sorted by service ID
+   */
+  async getVerifications(): Promise<ServiceVerification[]> {
+    const url = `${this.baseUrl}/verifications`;
+    const response = await this.fetch(url);
+    if (!response.ok) {
+      throw await CloudRegistryError.fromResponse(
+        response,
+        "Failed to fetch verifications"
+      );
+    }
+    return response.json();
+  }
+
+  /**
+   * Get the verification of a service. Rejects with status `404` if the
+   * service isn't verified (or unknown).
+   * @param id Service identifier
+   * @returns Promise resolving to the verification
+   */
+  async getServiceVerification(id: string): Promise<Verification> {
+    const encodedServiceId = encodeURIComponent(id);
+    const url = `${this.baseUrl}/services/${encodedServiceId}/verification`;
+    const response = await this.fetch(url);
+    if (!response.ok) {
+      throw await CloudRegistryError.fromResponse(
+        response,
+        "Failed to fetch verification"
+      );
+    }
+    return response.json();
+  }
+
+  /**
+   * Verify a service (admins only). With the URL and API type that were
+   * checked, the registry only verifies the service if it still has them,
+   * else it rejects with status `409` (problem `code`
+   * `verification-mismatch`); without them, it verifies the service as it
+   * is registered.
+   * @param id Service identifier
+   * @param verification URL and API type that were checked (recommended)
+   * @returns Promise resolving to the verification
+   */
+  async verifyService(
+    id: string,
+    verification?: VerificationRegister
+  ): Promise<Verification> {
+    const encodedServiceId = encodeURIComponent(id);
+    const url = `${this.baseUrl}/services/${encodedServiceId}/verification`;
+    const response = await this.fetch(
+      url,
+      verification
+        ? {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(verification),
+          }
+        : { method: "PUT" }
+    );
+
+    if (!response.ok) {
+      throw await CloudRegistryError.fromResponse(
+        response,
+        "Failed to verify service"
+      );
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Remove the verification of a service (admins only). Rejects with status
+   * `404` if the service isn't verified (or unknown).
+   * @param id Service identifier
+   * @returns Promise resolving to the service identifier
+   */
+  async deleteServiceVerification(id: string): Promise<string> {
+    const encodedServiceId = encodeURIComponent(id);
+    const url = `${this.baseUrl}/services/${encodedServiceId}/verification`;
+    const response = await this.fetch(url, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      throw await CloudRegistryError.fromResponse(
+        response,
+        "Failed to remove verification"
       );
     }
 
