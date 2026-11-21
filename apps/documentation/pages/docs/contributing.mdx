@@ -71,6 +71,61 @@ from the site that serves the documentation. Services usually allow only
 known origins, so previews may fail on other origins, e.g. on the preview
 builds of pull requests.
 
+## Mock server
+
+`apps/mock-server/` is a small HTTP server that will answer the requests of
+the live previews with fixed demo data, so that the previews no longer
+depend on public instances (see
+[#419](https://github.com/elixir-cloud-aai/cloud-components/issues/419)).
+It is for demos and local development only: it has **no authentication**,
+anyone can read and write through it, and it must never hold real or
+personal data. So far it has the scaffold only; the stubs of the
+Service Registry, TRS and WES APIs follow.
+
+It is written in TypeScript and runs on Node.js (>= 22.12) without a build
+step and without runtime dependencies: Node.js strips the types
+(`--experimental-strip-types`), and the server uses Node's built-in `http`
+module. In `apps/mock-server/`:
+
+- `npm run dev` starts it on port 8080 (`PORT` sets another one) and
+  restarts it on changes of `src/` and `fixtures/`; `npm start` starts it
+  without watching (and lets requests in flight finish on `SIGTERM`).
+- `npm test` runs its integration tests (`node:test`; they start the server
+  on a free port and send real HTTP requests); `npm run lint` type-checks
+  (`tsc --noEmit`) and lints it. Both run in CI with those of the other
+  workspaces; the coverage reported to Codecov covers the packages only,
+  not the mock server.
+
+What it does:
+
+- `GET /healthz` answers `{"status": "ok"}`; `HEAD` works like `GET`;
+  unknown paths and methods get a JSON `404` in the GA4GH error format
+  (`{"msg": ..., "status_code": ...}`).
+- CORS: any origin, the methods `GET, HEAD, POST, PUT, DELETE, OPTIONS`, and
+  preflight requests (`OPTIONS`) on any path.
+- One log line per request: time, method, path without the query string,
+  status (`aborted` if the client closed the connection first), duration,
+  and the message of an unexpected error (answered with a `500` without
+  details).
+- Limits, since the deployed instance is public and anonymous: request
+  bodies above 1 MiB get `413`, and each collection keeps at most 100
+  created items and at most 4 MiB of them (as JSON); above that, the oldest
+  created items are dropped (fixtures stay), and a single larger item gets
+  `413`. At most 100 connections are open at a time, and a request must
+  arrive within 30 s.
+
+Its data lives in memory and is never written to disk: on start, the
+server loads each `fixtures/<collection>.json` (a JSON array of objects)
+into the collection `<collection>`; a restart drops everything that was
+created since. To add or change demo data, edit or add a fixture file;
+keep it deterministic (fixed IDs and dates, no random values) and
+fictional. An API stub is a module in `src/routes/` that exports a function
+adding its routes to the router (e.g.
+`router.get("/ga4gh/wes/v1/runs/:runId", handler)`), listed in
+`src/routes/index.ts`; handlers read and write the collections through the
+store (`list`, `find`, `create`, which hand out copies) and throw
+`HttpError` for error replies.
+
 ## Releases
 
 All public packages in `packages/` (those without `"private": true` in

@@ -85,7 +85,9 @@ npm run dev --workspace=@elixir-cloud/<package>
 ```
 
 `npm run lint`, `npm run build` and `npm test` run the checks of CI; the
-documentation app is in [`apps/documentation/`](apps/documentation/).
+documentation app is in [`apps/documentation/`](apps/documentation/), the
+mock server for its live previews in
+[`apps/mock-server/`](apps/mock-server/).
 
 ## Citation
 
