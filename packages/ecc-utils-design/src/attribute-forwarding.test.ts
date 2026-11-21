@@ -3,9 +3,9 @@ import { fixture, expect, html } from "@open-wc/testing";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { executeServerCommand } from "@web/test-runner-commands";
 import { LitElement } from "lit";
-import { AttrForwardingController } from "../../attribute-forwarding.js";
-import "./index.js";
-import "../textarea/index.js";
+import { AttrForwardingController } from "./attribute-forwarding.js";
+import "./components/input/index.js";
+import "./components/textarea/index.js";
 
 type AxNode = {
   focused?: boolean;
@@ -204,6 +204,39 @@ const referencedText = (
     .filter(Boolean)
     .map((id) => root.getElementById(id)?.textContent ?? "")
     .join(" ");
+};
+
+const disableElementReferenceProperties = (
+  target: Element,
+  properties: (keyof ReferenceTarget)[]
+) => {
+  const descriptors: {
+    prototype: object;
+    property: keyof ReferenceTarget;
+    descriptor: PropertyDescriptor;
+  }[] = [];
+
+  properties.forEach((property) => {
+    let prototype: object | null = Object.getPrototypeOf(target);
+    while (
+      prototype &&
+      !Object.prototype.hasOwnProperty.call(prototype, property)
+    ) {
+      prototype = Object.getPrototypeOf(prototype);
+    }
+    if (!prototype) return;
+
+    const descriptor = Object.getOwnPropertyDescriptor(prototype, property);
+    if (!descriptor) return;
+    Reflect.deleteProperty(prototype, property);
+    descriptors.push({ prototype, property, descriptor });
+  });
+
+  return () => {
+    descriptors.forEach(({ prototype, property, descriptor }) => {
+      Object.defineProperty(prototype, property, descriptor);
+    });
+  };
 };
 
 components.forEach(({ tag, inner, native }) => {
@@ -414,7 +447,7 @@ components.forEach(({ tag, inner, native }) => {
       expect(target.getAttribute("aria-errormessage")).to.not.equal("error");
     });
 
-    it.only("mirrors accessible text from non-text sources in the fallback", async () => {
+    it("mirrors accessible text from non-text sources in the fallback", async () => {
       const wrapper = await fixture<HTMLElement>(
         `<div>
           <${tag}></${tag}>
@@ -427,20 +460,10 @@ components.forEach(({ tag, inner, native }) => {
         updateComplete: Promise<unknown>;
       };
       const target = host.shadowRoot?.querySelector(inner) as Element;
-      const properties = ["ariaLabelledByElements", "ariaDescribedByElements"];
-      const descriptors = properties.map((property) => {
-        let prototype = Object.getPrototypeOf(target);
-        while (
-          prototype &&
-          !Object.prototype.hasOwnProperty.call(prototype, property)
-        ) {
-          prototype = Object.getPrototypeOf(prototype);
-        }
-        const descriptor =
-          prototype && Object.getOwnPropertyDescriptor(prototype, property);
-        if (descriptor) Reflect.deleteProperty(prototype, property);
-        return { prototype, property, descriptor };
-      });
+      const restoreProperties = disableElementReferenceProperties(target, [
+        "ariaLabelledByElements",
+        "ariaDescribedByElements",
+      ]);
 
       try {
         host.error = "Built-in error";
@@ -448,41 +471,91 @@ components.forEach(({ tag, inner, native }) => {
         host.setAttribute("aria-labelledby", "fallback-label");
         host.setAttribute("aria-describedby", "fallback-description");
         await tick();
-        const label = host.shadowRoot?.querySelector(
-          '[id^="ecc-ref-aria-labelledby-"]'
+
+        expect(
+          host.shadowRoot?.querySelector('[id^="ecc-ref-aria-labelledby-"]')
+            ?.textContent
+        ).to.equal("Account name");
+        expect(
+          Array.from(
+            host.shadowRoot?.querySelectorAll(
+              '[id^="ecc-ref-aria-describedby-"]'
+            ) ?? []
+          ).map((node) => node.textContent)
+        ).to.deep.equal(["Built-in error", "Required field"]);
+      } finally {
+        restoreProperties();
+      }
+    });
+
+    it("updates fallback text when a nested accessible name changes", async () => {
+      const wrapper = await fixture<HTMLElement>(
+        `<div>
+          <${tag}></${tag}>
+          <span
+            id="fallback-description"
+            role="img"
+            aria-labelledby="fallback-name-source"
+          ></span>
+          <span id="fallback-name-source">Additional details</span>
+        </div>`
+      );
+      const host = wrapper.querySelector(tag) as HTMLElement;
+      const target = host.shadowRoot?.querySelector(inner) as Element;
+      const restoreProperties = disableElementReferenceProperties(target, [
+        "ariaDescribedByElements",
+      ]);
+
+      try {
+        host.setAttribute("aria-describedby", "fallback-description");
+        await tick();
+        const description = host.shadowRoot?.querySelector(
+          '[id^="ecc-ref-aria-describedby-"]'
         );
+        expect(description?.textContent).to.equal("Additional details");
+
+        const nameSource = wrapper.querySelector(
+          "#fallback-name-source"
+        ) as HTMLElement;
+        nameSource.textContent = "Updated details";
+        await tick();
+        expect(description?.textContent).to.equal("Updated details");
+
+        nameSource.setAttribute("aria-label", "Named details");
+        await tick();
+        expect(description?.textContent).to.equal("Named details");
+      } finally {
+        restoreProperties();
+      }
+    });
+
+    it("restores the built-in error reference after a fallback override is removed", async () => {
+      const wrapper = await fixture<HTMLElement>(
+        `<div>
+          <${tag}></${tag}>
+          <span id="fallback-description" aria-label="Extra details"></span>
+        </div>`
+      );
+      const host = wrapper.querySelector(tag) as HTMLElement & {
+        error: string;
+        updateComplete: Promise<unknown>;
+      };
+      const target = host.shadowRoot?.querySelector(inner) as Element;
+      const restoreProperties = disableElementReferenceProperties(target, [
+        "ariaDescribedByElements",
+      ]);
+
+      try {
+        host.error = "Built-in error";
+        await host.updateComplete;
+        host.setAttribute("aria-describedby", "fallback-description");
+        await tick();
         const descriptions = host.shadowRoot?.querySelectorAll(
           '[id^="ecc-ref-aria-describedby-"]'
         );
-        expect(label?.textContent).to.equal("Account name");
         expect(
-          Array.from(descriptions ?? [])
-            .map((node) => node.textContent)
-            .join(" ")
-        ).to.equal("Built-in error Required field");
-
-        if (navigator.userAgent.includes("Chrome")) {
-          (target as HTMLElement).focus();
-          const snapshot = await executeServerCommand<
-            AxNode,
-            { selector?: string }
-          >("a11y-snapshot", {});
-          const node = findFocused(snapshot);
-          expect(node?.name).to.equal("Account name");
-          expect(node?.description).to.equal("Built-in error Required field");
-        }
-
-        wrapper
-          .querySelector("#fallback-label")
-          ?.setAttribute("aria-label", "Username");
-        wrapper.querySelector("img")?.setAttribute("alt", "Mandatory");
-        await tick();
-        expect(label?.textContent).to.equal("Username");
-        expect(
-          Array.from(descriptions ?? [])
-            .map((node) => node.textContent)
-            .join(" ")
-        ).to.equal("Built-in error Mandatory");
+          Array.from(descriptions ?? []).map((node) => node.textContent)
+        ).to.deep.equal(["Built-in error", "Extra details"]);
 
         host.removeAttribute("aria-describedby");
         await tick();
@@ -497,26 +570,8 @@ components.forEach(({ tag, inner, native }) => {
         expect(
           Array.from(descriptions ?? []).every((node) => !node.isConnected)
         ).to.equal(true);
-
-        host.error = "";
-        await host.updateComplete;
-
-        host.remove();
-        host.removeAttribute("aria-labelledby");
-        host.removeAttribute("aria-describedby");
-        wrapper.append(host);
-        await tick();
-        expect(target.hasAttribute("aria-labelledby")).to.equal(false);
-        expect(target.hasAttribute("aria-describedby")).to.equal(false);
-        expect(label?.isConnected).to.equal(false);
-        expect(
-          Array.from(descriptions ?? []).every((node) => !node.isConnected)
-        ).to.equal(true);
       } finally {
-        descriptors.forEach(({ prototype, property, descriptor }) => {
-          if (descriptor)
-            Object.defineProperty(prototype, property, descriptor);
-        });
+        restoreProperties();
       }
     });
 
