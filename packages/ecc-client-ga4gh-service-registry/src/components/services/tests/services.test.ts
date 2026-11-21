@@ -67,6 +67,12 @@ type El = ECCClientGa4ghServiceRegistryServices;
 
 const root = (el: El) => el.shadowRoot as ShadowRoot;
 
+/** Returns `value`, or fails the test if it is missing. */
+const must = <T>(value: T | null | undefined, what: string): T => {
+  if (value === null || value === undefined) throw new Error(`No ${what}.`);
+  return value;
+};
+
 /** The rows of the table body that show a service. */
 const rows = (el: El) =>
   Array.from(
@@ -508,6 +514,110 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
       expect(seen).to.include.members(["s1", "s2", "s3"]);
     });
 
+    [1280, 1920].forEach((width) => {
+      it(`fits wide row actions in their cell at ${width} px`, async () => {
+        const el = await renderLoaded();
+        el.style.display = "block";
+        el.style.width = `${width}px`;
+        el.rowActions = () =>
+          litHtml`<button class="wide">Remove verification</button>
+            <button class="wide">View Details</button>`;
+        await el.updateComplete;
+        await waitUntil(
+          () => el.style.getPropertyValue("--_actions-width"),
+          "actions column not fitted"
+        );
+
+        const cells = rows(el).map(
+          (row) =>
+            row.querySelector(
+              "ecc-utils-design-table-cell[data-no-select]"
+            ) as HTMLElement
+        );
+        expect(cells).to.have.length(3);
+        cells.forEach((cell) => {
+          const box = cell.getBoundingClientRect();
+          const buttons = Array.from(cell.querySelectorAll("button.wide"));
+          const tops = buttons.map(
+            (button) => button.getBoundingClientRect().top
+          );
+          // the buttons stay on one line, inside the cell
+          expect(new Set(tops).size).to.equal(1);
+          buttons.forEach((button) => {
+            expect(button.getBoundingClientRect().right).to.be.at.most(
+              box.right + 0.5
+            );
+          });
+        });
+      });
+    });
+
+    it("keeps the columns aligned for actions of different widths", async () => {
+      const el = await renderLoaded();
+      el.style.display = "block";
+      el.style.width = "1280px";
+      el.rowActions = (s: ExternalService) =>
+        s.id === "s2"
+          ? litHtml`<button>Remove verification</button
+              ><button>View Details</button>`
+          : litHtml`<button>Verify</button>`;
+      await el.updateComplete;
+      await waitUntil(() => el.style.getPropertyValue("--_actions-width"));
+
+      const expectAligned = () => {
+        const lefts = [
+          ...rows(el).map(
+            (row) =>
+              must(
+                row.querySelector("ecc-utils-design-table-cell.actions-column"),
+                "actions cell"
+              ).getBoundingClientRect().left
+          ),
+          must(
+            root(el).querySelector(
+              "ecc-utils-design-table-head.actions-column"
+            ),
+            "actions head"
+          ).getBoundingClientRect().left,
+        ];
+        lefts.forEach((left) => expect(left).to.be.closeTo(lefts[0], 0.5));
+      };
+      expectAligned();
+
+      // and narrows again when the wide actions are gone
+      const width = () =>
+        parseFloat(el.style.getPropertyValue("--_actions-width"));
+      const wide = width();
+      el.rowActions = () => litHtml`<button>Verify</button>`;
+      await el.updateComplete;
+      await waitUntil(() => width() < wide, "actions column not narrowed");
+      expectAligned();
+    });
+
+    it("fits slotted actions that change after a reconnect", async () => {
+      const el = await renderLoaded();
+      el.style.display = "block";
+      el.style.width = "1280px";
+      const slotted = document.createElement("span");
+      slotted.slot = "actions-s1";
+      slotted.style.whiteSpace = "nowrap";
+      slotted.textContent = "Go";
+      el.appendChild(slotted);
+      await waitUntil(
+        () => el.style.getPropertyValue("--_actions-width"),
+        "actions column not fitted"
+      );
+      const width = () =>
+        parseFloat(el.style.getPropertyValue("--_actions-width"));
+
+      const parent = must(el.parentNode, "parent");
+      el.remove();
+      parent.appendChild(el);
+      const before = width();
+      slotted.textContent = "Remove verification and View Details";
+      await waitUntil(() => width() > before, "actions column not widened");
+    });
+
     it("accepts DOM nodes from rowActions", async () => {
       const el = await renderLoaded();
       el.rowActions = (s: ExternalService) => {
@@ -651,6 +761,66 @@ describe("ecc-client-ga4gh-service-registry-services", () => {
           'slot[name^="actions-"] ecc-utils-design-button'
         )
       ).to.have.length(0);
+    });
+
+    it("renders the badges that rowBadges returns next to the version", async () => {
+      const el = await renderLoaded();
+      el.rowBadges = (s: ExternalService) =>
+        s.id === "s2" ? null : litHtml`<span class="tag">Tag ${s.id}</span>`;
+      await el.updateComplete;
+
+      const tags = Array.from(root(el).querySelectorAll("span.tag"));
+      expect(tags.map((tag) => tag.textContent)).to.deep.equal([
+        "Tag s1",
+        "Tag s3",
+      ]);
+      const line = tags[0].closest("[data-row-badges]")?.parentElement;
+      expect(line?.textContent).to.include(SERVICES[0].name);
+      expect(
+        root(el).querySelectorAll('slot[name^="actions-"] span.tag')
+      ).to.have.length(0);
+    });
+
+    it("accepts strings and DOM nodes from rowBadges", async () => {
+      const el = await renderLoaded();
+      el.rowBadges = (s: ExternalService) => {
+        if (s.id === "s1") return "Text badge";
+        const node = document.createElement("span");
+        node.className = "node";
+        return node;
+      };
+      await el.updateComplete;
+
+      const badges = Array.from(root(el).querySelectorAll("[data-row-badges]"));
+      expect(badges[0].textContent).to.include("Text badge");
+      expect(root(el).querySelectorAll("span.node")).to.have.length(2);
+    });
+
+    it("selects a service when one of its badges is clicked", async () => {
+      const el = await renderLoaded();
+      el.rowBadges = () => litHtml`<span class="tag">Tag</span>`;
+      await el.updateComplete;
+      const selected = sinon.spy();
+      el.addEventListener("ecc-service-selected", selected);
+
+      find(el, '[data-service-id="s2"] span.tag').click();
+
+      expect(selected.callCount).to.equal(1);
+      expect(selected.firstCall.args[0].detail).to.deep.equal({
+        serviceId: "s2",
+      });
+    });
+
+    it("renders the rows again with a new rowBadges", async () => {
+      const el = await renderLoaded();
+      el.rowBadges = () => litHtml`<span class="old">Old</span>`;
+      await el.updateComplete;
+
+      el.rowBadges = () => litHtml`<span class="new">New</span>`;
+      await el.updateComplete;
+
+      expect(root(el).querySelectorAll("span.old")).to.have.length(0);
+      expect(root(el).querySelectorAll("span.new")).to.have.length(3);
     });
 
     it("renders the rows again with a new rowActions", async () => {

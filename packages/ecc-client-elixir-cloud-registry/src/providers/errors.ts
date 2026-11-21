@@ -97,6 +97,12 @@ export class CloudRegistryError extends Error {
   /** ID of the existing service, for duplicate registrations (`409`). */
   readonly serviceId?: string;
 
+  /**
+   * Why a request conflicts (`409`), e.g. `verification-mismatch`; the
+   * registry may add codes, so treat unknown ones as a general conflict.
+   */
+  readonly code?: string;
+
   /** The response body, if it was a JSON object. */
   readonly problem?: ProblemDetails;
 
@@ -108,6 +114,7 @@ export class CloudRegistryError extends Error {
     this.title = nonBlankString(problem?.title);
     this.detail = nonBlankString(problem?.detail);
     this.serviceId = nonBlankString(problem?.serviceId);
+    this.code = nonBlankString(problem?.code);
   }
 
   /**
