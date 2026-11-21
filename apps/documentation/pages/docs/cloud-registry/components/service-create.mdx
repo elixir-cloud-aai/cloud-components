@@ -268,8 +268,8 @@ Emitted when service creation or loading the service types fails due to server e
 - `status`: the HTTP status of the failed request, if there was one, e.g. `401` (log in) or `403` (no role on the service);
 - `title`, `detail`: the problem details that the registry sent, if any;
 - `serviceId`: the ID of the existing service, for duplicate registrations (`409`);
-- `fieldErrors`: the registry's field errors that the form shows at its fields, as a message per field (see [Field errors](#field-errors)); empty if there are none;
-- `generalError`: the message to show as a general error, or `undefined` if the form shows every error at a field: `error` if the registry sent no field errors, else the field errors that match no field of the form, each with its location (e.g. `organization: Is required.`);
+- `fieldErrors`: the registry's field errors that match a field of the form, as a message per field (see [Field errors](#field-errors)); empty if there are none;
+- `generalError`: the message to show as a general error, or `undefined` if every field error matches a field of the form: `error` if the registry sent no field errors, else the field errors that match no field of the form, each with its location (e.g. `organization: Is required.`);
 - `cause`: the error that the provider threw.
 
 The component reads `status`, `title`, `detail`, `serviceId` and the problem details (`problem`) from the error that the provider throws, a `CloudRegistryError` for `RestCloudRegistryProvider` (see [Errors](/docs/cloud-registry/providers#errors)). Custom providers can throw errors with the same fields.
