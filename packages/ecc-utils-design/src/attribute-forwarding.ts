@@ -235,7 +235,13 @@ export class AttrForwardingController implements ReactiveController {
       if (attr.name.startsWith("aria-") && !this.ariaDefaults.has(attr.name)) {
         this.ariaDefaults.set(attr.name, target.getAttribute(attr.name));
       }
-      if (this.isForwarded(attr.name)) wanted.set(attr.name, attr.value);
+      if (this.isForwarded(attr.name)) {
+        const isInvalid =
+          attr.name === "aria-invalid" &&
+          (attr.value === "true" ||
+            this.ariaDefaults.get("aria-invalid") === "true");
+        wanted.set(attr.name, isInvalid ? "true" : attr.value);
+      }
     });
     // remove stale attributes
     Array.from(target.attributes).forEach((attr) => {
@@ -290,7 +296,18 @@ export class AttrForwardingController implements ReactiveController {
       if (value === null) {
         if (prop in target) {
           const defaultValue = target.getAttribute(attr);
-          Reflect.set(target, prop, null);
+          const defaultRefs = (defaultValue ?? "")
+            .split(/\s+/)
+            .filter(Boolean)
+            .map((id) => shadow.getElementById(id))
+            .filter((element): element is HTMLElement => element !== null);
+          Reflect.set(
+            target,
+            prop,
+            attr === "aria-activedescendant"
+              ? defaultRefs[0] ?? null
+              : defaultRefs
+          );
           if (defaultValue !== null) target.setAttribute(attr, defaultValue);
         }
         shadow.querySelectorAll(`[id^="ecc-ref-${attr}-"]`).forEach((node) => {
@@ -298,11 +315,19 @@ export class AttrForwardingController implements ReactiveController {
         });
         return;
       }
-      const refs = value
+      const defaultIds =
+        attr === "aria-describedby"
+          ? (this.ariaDefaults.get(attr) ?? "").split(/\s+/).filter(Boolean)
+          : [];
+      const defaultRefs = defaultIds
+        .map((id) => shadow.getElementById(id))
+        .filter((element): element is HTMLElement => element !== null);
+      const hostRefs = value
         .split(/\s+/)
         .filter(Boolean)
         .map((id) => root.getElementById(id))
         .filter((el): el is HTMLElement => el !== null);
+      const refs = [...new Set([...defaultRefs, ...hostRefs])];
       references.push(...refs);
 
       if (prop in target) {
@@ -319,8 +344,6 @@ export class AttrForwardingController implements ReactiveController {
         return;
       }
 
-      const probe = this.host.ownerDocument.createElement("input");
-      Object.defineProperty(probe, "getRootNode", { value: () => root });
       // Fallback: mirror referenced text into shadow-local nodes.
       const ids = refs.map((ref, i) => {
         const id = `ecc-ref-${attr}-${i}`;
@@ -331,6 +354,11 @@ export class AttrForwardingController implements ReactiveController {
           node.hidden = true;
           shadow.append(node);
         }
+        const probe = this.host.ownerDocument.createElement("input");
+        const referenceRoot = ref.getRootNode();
+        Object.defineProperty(probe, "getRootNode", {
+          value: () => referenceRoot,
+        });
         probe.setAttribute("aria-labelledby", ref.id);
         node.textContent = computeAccessibleName(probe);
         return id;

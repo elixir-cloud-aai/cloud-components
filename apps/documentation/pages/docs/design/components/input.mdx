@@ -204,13 +204,13 @@ When `true`, the input is non-interactive and visually de-emphasized.
 Set these attributes on `<ecc-utils-design-input>` to forward them to the native `<input>` inside its shadow root:
 
 - Native attributes: `name`, `required`, `readonly`, `autocomplete`, `minlength`, `maxlength`, `min`, `max`, `step`, and `pattern`.
-- ARIA attributes such as `aria-label`, `aria-description`, `aria-invalid`, and `aria-required`. Explicit host attributes override the component's inner ARIA defaults. Removing an override restores the current component default, if one exists. The `label` property supplies the default `aria-label`.
+- ARIA attributes such as `aria-label`, `aria-description`, `aria-invalid`, and `aria-required`. Host values override component defaults, except `aria-describedby` is combined with the built-in error reference and `aria-invalid` is true if the host says `true` or the component is invalid. Thus `aria-invalid="false"` cannot suppress an active `invalid` state or non-empty `error`. Removing a host override restores the current component default, if one exists. The `label` property supplies the default `aria-label`.
 
 Forwarded attributes are synchronized after rendering and when host attributes change. Removing a forwarded native attribute removes it from the inner control. Properties such as `type`, `placeholder`, `value`, and `disabled` are handled separately by the component. Host attributes such as `id`, `class`, `style`, and `slot` are not copied to the inner control.
 
 ### ARIA References
 
-The controller resolves `aria-activedescendant`, `aria-controls`, `aria-describedby`, `aria-details`, `aria-errormessage`, `aria-flowto`, `aria-labelledby`, and `aria-owns` against IDs in the host's document or containing shadow root. Where supported, native element-reference properties connect the inner control to those elements. References are updated when matching elements are inserted, removed, replaced, or change ID.
+The controller resolves `aria-activedescendant`, `aria-controls`, `aria-describedby`, `aria-details`, `aria-errormessage`, `aria-flowto`, `aria-labelledby`, and `aria-owns` against IDs in the host's document or containing shadow root. For `aria-describedby`, consumer references are added to the component's built-in error reference, so both descriptions are announced. Where supported, native element-reference properties connect the inner control to those elements. References are updated when matching elements are inserted, removed, replaced, or change ID.
 
 If the browser lacks the corresponding property, `aria-labelledby`, `aria-describedby`, and `aria-errormessage` use hidden shadow-local copies of the referenced accessible text, including sources such as `aria-label` and image `alt`. Other unsupported reference attributes are omitted from the inner control rather than forwarding IDs that cannot resolve across the shadow boundary.
 

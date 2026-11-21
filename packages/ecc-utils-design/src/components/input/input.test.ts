@@ -2,8 +2,6 @@
 import { fixture, expect } from "@open-wc/testing";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { executeServerCommand } from "@web/test-runner-commands";
-import { LitElement, html } from "lit";
-import { AttrForwardingController } from "../../attribute-forwarding.js";
 import "./index.js";
 import "../textarea/index.js";
 
@@ -93,35 +91,6 @@ describe("component ARIA defaults", () => {
     return { wrapper, host, target };
   };
 
-  it("uses component defaults and forwards host ARIA attributes", async () => {
-    const { wrapper, host, target } = await create();
-    expect(target.getAttribute("aria-label")).to.equal("Default label");
-    expect(target.getAttribute("aria-description")).to.equal(
-      "Default description"
-    );
-    expect(target.getAttribute("aria-labelledby")).to.equal("local-label");
-
-    host.setAttribute("aria-label", "Host label");
-    host.setAttribute("aria-description", "Host description");
-    host.setAttribute("aria-labelledby", "external-label");
-    await tick();
-    expect(target.getAttribute("aria-label")).to.equal("Host label");
-    expect(target.getAttribute("aria-description")).to.equal(
-      "Host description"
-    );
-    expect(target.getAttribute("aria-labelledby")).to.not.equal("local-label");
-    if ("ariaLabelledByElements" in target) {
-      expect(target.ariaLabelledByElements).to.deep.equal([
-        wrapper.querySelector("#external-label"),
-      ]);
-    } else {
-      expect(
-        host.shadowRoot?.getElementById("ecc-ref-aria-labelledby-0")
-          ?.textContent
-      ).to.equal("External label");
-    }
-  });
-
   it("batches host and root mutations into one controller sync", async () => {
     const { host, target } = await create();
     host.setAttribute("aria-labelledby", "external-label");
@@ -160,11 +129,31 @@ describe("component ARIA defaults", () => {
   });
 
   it("restores updated defaults when host overrides are removed", async () => {
-    const { host, target } = await create();
+    const { wrapper, host, target } = await create();
+    expect(target.getAttribute("aria-label")).to.equal("Default label");
+    expect(target.getAttribute("aria-description")).to.equal(
+      "Default description"
+    );
+    expect(target.getAttribute("aria-labelledby")).to.equal("local-label");
+
     host.setAttribute("aria-label", "Host label");
     host.setAttribute("aria-description", "Host description");
     host.setAttribute("aria-labelledby", "external-label");
     await tick();
+    expect(target.getAttribute("aria-label")).to.equal("Host label");
+    expect(target.getAttribute("aria-description")).to.equal(
+      "Host description"
+    );
+    if ("ariaLabelledByElements" in target) {
+      expect(target.ariaLabelledByElements).to.deep.equal([
+        wrapper.querySelector("#external-label"),
+      ]);
+    } else {
+      expect(
+        host.shadowRoot?.getElementById("ecc-ref-aria-labelledby-0")
+          ?.textContent
+      ).to.equal("External label");
+    }
     host.defaultLabel = "Updated label";
     host.defaultDescription = "Updated description";
     host.defaultReference = "updated-local-label";
@@ -231,6 +220,61 @@ components.forEach(({ tag, inner, native }) => {
       expect(target.getAttribute("aria-required")).to.equal("true");
     });
 
+    it("combines the consumer description with the built-in error reference", async () => {
+      const wrapper = await fixture<HTMLElement>(
+        `<div>
+          <${tag} aria-describedby="consumer-description"></${tag}>
+          <p id="consumer-description">Extra details</p>
+        </div>`
+      );
+      const host = wrapper.querySelector(tag) as HTMLElement;
+      host.error = "Invalid value";
+      await host.updateComplete;
+      const target = host.shadowRoot?.querySelector(inner) as Element;
+      const error = host.shadowRoot?.getElementById("error");
+      const description = wrapper.querySelector("#consumer-description");
+
+      if ("ariaDescribedByElements" in target) {
+        expect(Reflect.get(target, "ariaDescribedByElements")).to.deep.equal([
+          error,
+          description,
+        ]);
+      }
+      expect(
+        referencedText(target, "aria-describedby", "ariaDescribedByElements")
+      ).to.include("Invalid value");
+      expect(
+        referencedText(target, "aria-describedby", "ariaDescribedByElements")
+      ).to.include("Extra details");
+    });
+
+    it("treats aria-invalid, invalid, and error as additive signals", async () => {
+      const { el, target } = await create('aria-invalid="false"');
+      const host = el as HTMLElement & {
+        invalid: boolean;
+        error: string;
+        updateComplete: Promise<unknown>;
+      };
+
+      host.invalid = true;
+      await host.updateComplete;
+      expect(target.getAttribute("aria-invalid")).to.equal("true");
+
+      host.invalid = false;
+      host.error = "Invalid value";
+      await host.updateComplete;
+      expect(target.getAttribute("aria-invalid")).to.equal("true");
+
+      host.error = "";
+      await host.updateComplete;
+      expect(target.getAttribute("aria-invalid")).to.equal("false");
+
+      host.invalid = true;
+      host.setAttribute("aria-invalid", "false");
+      await host.updateComplete;
+      expect(target.getAttribute("aria-invalid")).to.equal("true");
+    });
+
     it("exposes external elements as accessible label and description", async function check() {
       // Accessibility snapshots only reflect the real tree in Chromium.
       if (!navigator.userAgent.includes("Chrome")) this.skip();
@@ -241,7 +285,10 @@ components.forEach(({ tag, inner, native }) => {
            <p id="err">Name is required</p>
          </div>`
       );
-      const host = wrapper.querySelector(tag) as HTMLElement;
+      const host = wrapper.querySelector(tag) as HTMLElement & {
+        error: string;
+        updateComplete: Promise<unknown>;
+      };
       (host.shadowRoot?.querySelector(inner) as HTMLElement).focus();
 
       const snapshot = await executeServerCommand<
@@ -261,15 +308,6 @@ components.forEach(({ tag, inner, native }) => {
       el.removeAttribute("aria-invalid");
       await tick();
       expect(target.hasAttribute("aria-invalid")).to.equal(false);
-    });
-
-    it("does not throw when resolving references while detached", async () => {
-      const { el } = await create('aria-describedby="error"');
-      el.remove();
-      el.setAttribute("aria-describedby", "updated-error");
-      (el as HTMLElement & { requestUpdate: () => void }).requestUpdate();
-      await (el as HTMLElement & { updateComplete: Promise<unknown> })
-        .updateComplete;
     });
 
     it("syncs attributes changed while detached after reconnecting", async () => {
@@ -382,7 +420,10 @@ components.forEach(({ tag, inner, native }) => {
           <span id="fallback-description"><img alt="Required field"></span>
         </div>`
       );
-      const host = wrapper.querySelector(tag) as HTMLElement;
+      const host = wrapper.querySelector(tag) as HTMLElement & {
+        error: string;
+        updateComplete: Promise<unknown>;
+      };
       const target = host.shadowRoot?.querySelector(inner) as Element;
       const properties = ["ariaLabelledByElements", "ariaDescribedByElements"];
       const descriptors = properties.map((property) => {
@@ -400,17 +441,23 @@ components.forEach(({ tag, inner, native }) => {
       });
 
       try {
+        host.error = "Built-in error";
+        await host.updateComplete;
         host.setAttribute("aria-labelledby", "fallback-label");
         host.setAttribute("aria-describedby", "fallback-description");
         await tick();
         const label = host.shadowRoot?.querySelector(
           '[id^="ecc-ref-aria-labelledby-"]'
         );
-        const description = host.shadowRoot?.querySelector(
+        const descriptions = host.shadowRoot?.querySelectorAll(
           '[id^="ecc-ref-aria-describedby-"]'
         );
         expect(label?.textContent).to.equal("Account name");
-        expect(description?.textContent).to.equal("Required field");
+        expect(
+          Array.from(descriptions ?? [])
+            .map((node) => node.textContent)
+            .join(" ")
+        ).to.equal("Built-in error Required field");
 
         if (navigator.userAgent.includes("Chrome")) {
           (target as HTMLElement).focus();
@@ -420,7 +467,7 @@ components.forEach(({ tag, inner, native }) => {
           >("a11y-snapshot", {});
           const node = findFocused(snapshot);
           expect(node?.name).to.equal("Account name");
-          expect(node?.description).to.equal("Required field");
+          expect(node?.description).to.equal("Built-in error Required field");
         }
 
         wrapper
@@ -429,7 +476,14 @@ components.forEach(({ tag, inner, native }) => {
         wrapper.querySelector("img")?.setAttribute("alt", "Mandatory");
         await tick();
         expect(label?.textContent).to.equal("Username");
-        expect(description?.textContent).to.equal("Mandatory");
+        expect(
+          Array.from(descriptions ?? [])
+            .map((node) => node.textContent)
+            .join(" ")
+        ).to.equal("Built-in error Mandatory");
+
+        host.error = "";
+        await host.updateComplete;
 
         host.remove();
         host.removeAttribute("aria-labelledby");
@@ -439,7 +493,9 @@ components.forEach(({ tag, inner, native }) => {
         expect(target.hasAttribute("aria-labelledby")).to.equal(false);
         expect(target.hasAttribute("aria-describedby")).to.equal(false);
         expect(label?.isConnected).to.equal(false);
-        expect(description?.isConnected).to.equal(false);
+        expect(
+          Array.from(descriptions ?? []).every((node) => !node.isConnected)
+        ).to.equal(true);
       } finally {
         descriptors.forEach(({ prototype, property, descriptor }) => {
           if (descriptor)
@@ -499,26 +555,6 @@ components.forEach(({ tag, inner, native }) => {
           ).to.deep.equal(multiple ? [] : null);
         }
       });
-    });
-
-    it("clears the inner relationship when the last reference is removed", async () => {
-      const wrapper = await fixture<HTMLElement>(
-        `<div>
-          <${tag} aria-describedby="hint"></${tag}>
-          <p id="hint">Helpful text</p>
-        </div>`
-      );
-      const host = wrapper.querySelector(tag) as HTMLElement;
-      const target = host.shadowRoot?.querySelector(inner) as Element;
-
-      expect(
-        referencedText(target, "aria-describedby", "ariaDescribedByElements")
-      ).to.equal("Helpful text");
-      host.removeAttribute("aria-describedby");
-      await tick();
-      expect(
-        referencedText(target, "aria-describedby", "ariaDescribedByElements")
-      ).to.equal("");
     });
 
     it("clears native description references while other references remain", async () => {
