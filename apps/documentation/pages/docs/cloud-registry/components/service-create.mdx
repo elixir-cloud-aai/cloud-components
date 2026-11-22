@@ -223,6 +223,16 @@ Cloud Registry 1.0.0rc2 and later publish the environments they allow (`registra
   </Tabs.Tab>
 </Tabs>
 
+## Field errors
+
+Cloud Registry 1.0.0rc2 and later reject an invalid registration with `400` and list the invalid fields in `errors` of the [problem details](https://www.rfc-editor.org/rfc/rfc9457). The form shows each message under its field (see [Field errors](/docs/design/field-errors)). Apart from required fields, the form has no validation rules of its own: the registry decides.
+
+- A field's error clears when the field changes. All errors clear on "Reset" and on the next submit.
+- Errors for the custom service ID or the timestamps open "Advanced Configuration".
+- Errors that match no field of the form aren't shown by it. They are in `generalError` of [`ecc-service-create-failed`](#ecc-service-create-failed), for the app to show.
+
+`fieldErrors` is keyed by the field's path in the request body: `name`, `url`, `organization.name`, `organization.url`, `type`, `type.group`, `type.artifact`, `type.version`, `version`, `description`, `contactUrl`, `documentationUrl`, `environment`, `createdAt`, `updatedAt`, and `serviceId` for the custom service ID.
+
 ## Events
 
 | Event Name                          | React Event Name                     | Detail Type                                              | Description                                          |
@@ -268,13 +278,13 @@ Emitted when service creation or loading the service types fails due to server e
 - `status`: the HTTP status of the failed request, if there was one, e.g. `401` (log in) or `403` (no role on the service);
 - `title`, `detail`: the problem details that the registry sent, if any;
 - `serviceId`: the ID of the existing service, for duplicate registrations (`409`);
-- `fieldErrors`: the registry's field errors that match a field of the form, as a message per field (see [Field errors](#field-errors)); empty if there are none;
-- `generalError`: the message to show as a general error, or `undefined` if every field error matches a field of the form: `error` if the registry sent no field errors, else the field errors that match no field of the form, each with its location (e.g. `organization: Is required.`);
+- `fieldErrors`: the registry's field errors that match a field of the form, by field path (see [Field errors](#field-errors)); empty if there are none;
+- `generalError`: the message for the app to show, or `undefined` if the form shows every error. It is `error` if the registry sent no field errors, else the field errors that match no field (e.g. `organization: Is required.`);
 - `cause`: the error that the provider threw.
 
 The component reads `status`, `title`, `detail`, `serviceId` and the problem details (`problem`) from the error that the provider throws, a `CloudRegistryError` for `RestCloudRegistryProvider` (see [Errors](/docs/cloud-registry/providers#errors)). Custom providers can throw errors with the same fields.
 
-Show `generalError` rather than `error`, so that a message isn't shown twice, at the field and above the form:
+Show `generalError` rather than `error`, so that no message is shown twice:
 
 <Tabs items={['React', 'JavaScript']}>
   <Tabs.Tab>
@@ -303,18 +313,6 @@ Show `generalError` rather than `error`, so that a message isn't shown twice, at
     ```
   </Tabs.Tab>
 </Tabs>
-
-### Field errors
-
-Cloud Registry 1.0.0rc2 and later reject invalid registrations with `400` and list every invalid field in `errors` of the [problem details](https://www.rfc-editor.org/rfc/rfc9457), each with a JSON Pointer to the field (e.g. `#/organization/url`) or the request parameter (`serviceId` of a custom service ID) and a readable `detail`. The form shows these messages under the fields they belong to, using the [field errors](/docs/design/field-errors) of the design package. The form has no validation rules of its own beyond required fields: the registry has the final say.
-
-- An error of a part of a listed service type (e.g. `#/type/version`) shows at the type list; with "Add new service type", errors of the group, artifact and version show at their fields, and an error of the type as a whole (e.g. an unregistered type) at the type list.
-- Errors of the custom service ID and the timestamps show at their fields, and open "Advanced Configuration".
-- A field's error is cleared when the field changes; all are cleared on "Reset" and on the next submit. Errors of the timestamps and the custom service ID are also cleared when `admin` is turned off, and the environment's error when its value is no longer offered.
-- If the user changes a field or resets the form while the create runs, the form doesn't show the errors of the changed fields (or, after a reset, any errors); `fieldErrors` of the event still has them all.
-- Errors that match no field of the form (e.g. `#/organization`, or fields that the form can't send in its current state: the new type's parts with a listed type, the timestamps without `admin`, the custom service ID when none is used) and responses without field errors aren't shown by the form: they are in `generalError` for the app to show. An error of an optional field left blank (e.g. an environment that the registry requires) shows at that field, where the user can fix it.
-
-The keys of `fieldErrors` are the fields' paths in the request body: `name`, `url`, `organization.name`, `organization.url`, `type`, `type.group`, `type.artifact`, `type.version`, `version`, `description`, `contactUrl`, `documentationUrl`, `environment`, `createdAt` and `updatedAt`, and `serviceId` for the custom service ID.
 
 ### `ecc-service-create-validation-failed`
 Emitted when there are validation errors in the form data before submission or when the component is misconfigured.

@@ -292,6 +292,19 @@ describe("ecc-client-elixir-cloud-registry-service-create field errors", () => {
       serviceId: "Can't be stored.",
     });
     expect(collapsible.open).to.equal(true);
+
+    // the trigger announces the section as expanded
+    await (collapsible as HTMLElement & { updateComplete: Promise<unknown> })
+      .updateComplete;
+    const trigger = collapsible.querySelector(
+      "ecc-utils-design-collapsible-trigger"
+    ) as HTMLElement & { updateComplete: Promise<unknown> };
+    await trigger.updateComplete;
+    expect(
+      trigger
+        .shadowRoot!.querySelector('[role="button"]')!
+        .getAttribute("aria-expanded")
+    ).to.equal("true");
   });
 
   it("doesn't map errors of fields that the form didn't send", async () => {
