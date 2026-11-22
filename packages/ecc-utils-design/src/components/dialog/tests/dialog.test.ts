@@ -130,15 +130,19 @@ async function clickTrigger(el: EccUtilsDesignDialog) {
 }
 
 describe("EccUtilsDesignDialog", function dialogSuite() {
-  // WebKit (Playwright's build) sometimes blocks the page for seconds when a
-  // modal dialog leaves the top layer, on busy CI runners. With the global
-  // 3000 ms, a blocked test times out and its retry can get the key presses of
-  // the blocked attempt, and a blocked hook aborts all remaining tests
-  this.timeout(15000);
+  // WebKit (Playwright's build) sometimes blocks the page for seconds (up to
+  // 20 s seen locally) when a modal dialog leaves the top layer, on busy
+  // runners. With the global 3000 ms (`web-test.runner-config.mjs`), a
+  // blocked test times out, and its retry can get the key presses of the
+  // blocked attempt; a blocked hook isn't retried and aborts all remaining
+  // tests. The longer timeouts make both rare, not impossible. (`this.timeout`
+  // needs a `function`, not an arrow function.)
+  this.timeout(10000);
 
-  // Removes the fixtures within this suite's timeout (the cleanup of
+  // Removes the fixtures with a longer timeout than the tests (the cleanup of
   // `@open-wc/testing` runs in the root suite, with the global timeout)
-  afterEach(() => {
+  afterEach(function cleanUp() {
+    this.timeout(25000);
     fixtureCleanup();
   });
 
