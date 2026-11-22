@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import {
   expect,
+  fixtureCleanup,
   fixtureSync,
   html,
   oneEvent,
@@ -128,7 +129,19 @@ async function clickTrigger(el: EccUtilsDesignDialog) {
   await el.updateComplete;
 }
 
-describe("EccUtilsDesignDialog", () => {
+describe("EccUtilsDesignDialog", function dialogSuite() {
+  // WebKit (Playwright's build) sometimes blocks the page for seconds when a
+  // modal dialog leaves the top layer, on busy CI runners. With the global
+  // 3000 ms, a blocked test times out and its retry can get the key presses of
+  // the blocked attempt, and a blocked hook aborts all remaining tests
+  this.timeout(15000);
+
+  // Removes the fixtures within this suite's timeout (the cleanup of
+  // `@open-wc/testing` runs in the root suite, with the global timeout)
+  afterEach(() => {
+    fixtureCleanup();
+  });
+
   describe("open and close", () => {
     it("is closed by default", async () => {
       const el = await renderDialog();
