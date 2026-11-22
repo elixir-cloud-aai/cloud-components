@@ -49,6 +49,9 @@ export class EccUtilsDesignCollapsible extends LitElement {
       collapsibleState.set(this.collapsibleId, {
         isOpen: this.open,
       });
+      this.querySelectorAll("ecc-utils-design-collapsible-trigger").forEach(
+        (trigger) => (trigger as LitElement).requestUpdate()
+      );
     }
   }
 
