@@ -55,13 +55,16 @@ function relativeEntries(dir) {
     .sort();
 }
 
-test("build entries: root, components, providers, react and utils", (t) => {
+test("build entries: root, components, events, providers, react and utils", (t) => {
   const dir = makeSourceDir(t, [
     "index.ts",
     "components/input/index.ts",
     "components/input/input.ts",
     "components/input/input.test.ts",
     "components/input/tests/helper.ts",
+    "events/index.ts",
+    "events/created.ts",
+    "events/tests/helper.ts",
     "providers/api.ts",
     "providers/tests/mock.ts",
     "react/input.ts",
@@ -72,6 +75,8 @@ test("build entries: root, components, providers, react and utils", (t) => {
   assert.deepStrictEqual(relativeEntries(dir), [
     "components/input/index.ts",
     "components/input/input.ts",
+    "events/created.ts",
+    "events/index.ts",
     "index.ts",
     "providers/api.ts",
     "react/input.ts",
