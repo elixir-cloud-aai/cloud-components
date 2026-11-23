@@ -63,6 +63,7 @@ function getBuildEntries(sourceDir) {
     ...fg.sync(`${dir}/components/**/!(*.(test)).ts`, {
       ignore: ["**/tests/**"],
     }),
+    ...fg.sync(`${dir}/events/**/*.ts`, { ignore: ["**/tests/**"] }),
     ...fg.sync(`${dir}/providers/**/*.ts`, { ignore: ["**/tests/**"] }),
     ...fg.sync(`${dir}/react/**/*.ts`),
     ...fg.sync(`${dir}/utils/index.ts`),

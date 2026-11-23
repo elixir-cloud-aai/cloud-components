@@ -1,5 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { expect, fixture, html, oneEvent, waitUntil } from "@open-wc/testing";
+import {
+  expect,
+  fixtureSync,
+  html,
+  oneEvent,
+  waitUntil,
+} from "@open-wc/testing";
 import { sendKeys } from "@web/test-runner-commands";
 import "../index.js";
 import "../../button/index.js";
@@ -55,7 +61,7 @@ async function renderIn(
   template: ReturnType<typeof html>,
   selector = "ecc-utils-design-dialog"
 ): Promise<{ wrapper: HTMLElement; el: EccUtilsDesignDialog }> {
-  const wrapper = await fixture<HTMLElement>(template);
+  const wrapper = fixtureSync<HTMLElement>(template);
   const el = find<EccUtilsDesignDialog>(wrapper, selector);
   await el.updateComplete;
   return { wrapper, el };
