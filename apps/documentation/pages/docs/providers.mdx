@@ -325,11 +325,11 @@ const RetryableProvider = withRetry(RestWesProvider, 3, 1000);
 const provider = new RetryableProvider('https://api.example.com');
 ```
 
-The provider's request deadline (see [Timeouts](#timeouts)) applies to each attempt through `super.fetch()`, not to the retried call as a whole: that can take up to the number of attempts times the deadline, plus the delays. Retry only requests that are safe to repeat: a timed-out request that creates something may still have succeeded on the server.
+Each attempt has its own [deadline](#timeouts). Don't retry a timed-out request that creates something: the server may already have done it.
 
 #### Timeouts
 
-The REST providers give every request a deadline, 30 seconds by default, so that a server that never answers makes the request reject with a `RequestTimeoutError` instead of leaving the components loading. Set it with the `timeout` option (milliseconds, `0` for none):
+Requests of the REST providers time out after 30 seconds with a `RequestTimeoutError`. Set another deadline with the `timeout` option (milliseconds, `0` for none):
 
 ```tsx copy
 const provider = new RestWesProvider('https://api.example.com', {
@@ -337,7 +337,7 @@ const provider = new RestWesProvider('https://api.example.com', {
 });
 ```
 
-Custom providers that don't extend a REST provider should reject, not stay pending, when a request can't complete. See [Request timeouts](/docs/design/request-timeouts).
+See [Request timeouts](/docs/design/request-timeouts).
 
 ### Caching and Performance
 

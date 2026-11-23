@@ -38,7 +38,7 @@ constructor(baseUrl: string, options?: { timeout?: number })
 
 **Parameters:**
 - `baseUrl`: The base URL of the WES API endpoint (e.g., `https://weskit.example.com/ga4gh/wes/v1`)
-- `options.timeout`: Deadline of each request in milliseconds, until its response has been read (default `30000`, `0` for none). An expired request rejects with a `RequestTimeoutError`, and components show it as an error. See [Request timeouts](/docs/design/request-timeouts). The deadline includes uploading the attachments of `runWorkflow()`: raise it for large attachments.
+- `options.timeout`: request deadline in milliseconds (default 30 s, `0` for none). See [Request timeouts](/docs/design/request-timeouts).
 
 ### Basic Usage
 
@@ -349,8 +349,6 @@ class CustomWesProvider extends RestWesProvider {
   }
 }
 ```
-
-Calling `super.fetch()` keeps the provider's request deadline (`timeout`). A provider that implements `WesProvider` directly sets its own deadlines: its methods should reject, not stay pending, when a request can't complete, or the components keep loading (see [Request timeouts](/docs/design/request-timeouts)).
 
 For comprehensive patterns and examples, see the [Providers Overview](/docs/providers) documentation.
 

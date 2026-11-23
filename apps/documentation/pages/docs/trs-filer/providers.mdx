@@ -84,7 +84,7 @@ constructor(baseUrl: string, options?: { timeout?: number })
 
 **Parameters:**
 - `baseUrl`: The base URL of the TRS Filer API endpoint (e.g., `https://trs-filer.example.com/ga4gh/trs/v2`)
-- `options.timeout`: Deadline of each request in milliseconds, until its response has been read (default `30000`, `0` for none). An expired request rejects with a `RequestTimeoutError`, and components show it as an error. See [Request timeouts](/docs/design/request-timeouts).
+- `options.timeout`: request deadline in milliseconds (default 30 s, `0` for none). See [Request timeouts](/docs/design/request-timeouts).
 
 ### Basic Usage
 
@@ -497,8 +497,6 @@ class CustomTrsFilerProvider extends RestTrsFilerProvider {
   }
 }
 ```
-
-Calling `super.fetch()` keeps the provider's request deadline (`timeout`). A provider that implements `TrsFilerProvider` directly sets its own deadlines: its methods should reject, not stay pending, when a request can't complete, or the components keep loading (see [Request timeouts](/docs/design/request-timeouts)).
 
 For comprehensive patterns and examples, see the [Providers Overview](/docs/providers) documentation.
 
