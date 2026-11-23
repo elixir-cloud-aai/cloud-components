@@ -238,6 +238,7 @@ try {
 }
 ```
 
+For a rejected registration (`400`), Cloud Registry 1.0.0rc2 and later list the invalid fields in `errors` of the problem details. `problem` holds them as received; `mapFieldErrors()` of `@elixir-cloud/design/utils` maps them to fields (see [Field errors](/docs/design/field-errors)), and the [Service Create component](/docs/cloud-registry/components/service-create#field-errors) shows them. Custom providers work the same if their errors carry the response body as `problem`.
 
 
 ## Type Definitions
