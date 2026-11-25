@@ -14,15 +14,6 @@ import "@elixir-cloud/design/components/separator/index.js";
 const MISSING_PROVIDER =
   "Please provide either a base URL for the Service Registry API or a custom provider.";
 
-/**
- * An email address: a local part and a domain, without spaces or control,
- * format (e.g. bidi overrides), private-use or unassigned characters, so that
- * the label shows the address the link goes to. Plain spaces around it are
- * allowed and not part of the captured address; other whitespace (e.g. a
- * line feed) is rejected, not trimmed away.
- */
-const ADDRESS = /^ *([^\s@\p{C}]+@[^\s@\p{C}]+) *$/u;
-
 /** The target of a link and the text it shows. */
 interface Link {
   href: string;
@@ -32,22 +23,17 @@ interface Link {
 /**
  * A link to the URL if it uses one of the protocols, or `null` (e.g. for a
  * missing, relative or `javascript:` URL), so that no dead or unsafe links
- * render. A `mailto:` URL needs recipients in its path (not only in `?to=`)
- * that are all email addresses; its label shows them decoded, without the
- * scheme and options such as `?subject=` or `?cc=`. Other links show their
- * URL.
+ * render. A `mailto:` link shows its recipients, without the scheme and
+ * options such as `?subject=`; other links show their URL.
  */
 const toLink = (url: unknown, protocols: string[]): Link | null => {
-  if (typeof url !== "string" || !url) return null;
+  if (typeof url !== "string") return null;
   try {
     const { protocol, pathname } = new URL(url);
     if (!protocols.includes(protocol)) return null;
-    if (protocol !== "mailto:") return { href: url, label: url };
-    const recipients = decodeURIComponent(pathname)
-      .split(",")
-      .map((recipient) => ADDRESS.exec(recipient)?.[1]);
-    if (!recipients.every((address) => address)) return null;
-    return { href: url, label: recipients.join(", ") };
+    const label =
+      protocol === "mailto:" ? decodeURIComponent(pathname).trim() : url;
+    return label ? { href: url, label } : null;
   } catch {
     // not a URL, or a malformed escape in the recipients
     return null;
@@ -64,39 +50,11 @@ const WEB = ["http:", "https:"];
 const text = (value: unknown): string | null =>
   typeof value === "string" && value.trim() ? value : null;
 
-/**
- * An RFC 3339 date-time without leap seconds (which the browsers can't
- * parse); `T`, `t` or a space between date and time, and the offset is
- * optional, for registries that send local times.
- */
-const TIMESTAMP =
-  /^(\d{4})-(\d{2})-(\d{2})[Tt ](?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)?$/;
-
-/** The number of days in the month (1 to 12) of the year. */
-const daysInMonth = (year: number, month: number): number => {
-  const leap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
-  return [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][
-    month - 1
-  ];
-};
-
-/**
- * A timestamp in the reader's locale, or `null` if it isn't an RFC 3339
- * date-time of a real calendar date, so that dates the browser would
- * guess or roll over (e.g. 30 February) aren't shown.
- */
-const formatDate = (value: unknown): string | null => {
-  if (typeof value !== "string") return null;
-  const match = TIMESTAMP.exec(value);
-  if (!match) return null;
-  const [year, month, day] = match.slice(1, 4).map(Number);
-  if (month < 1 || month > 12 || day < 1 || day > daysInMonth(year, month)) {
-    return null;
-  }
-  // the browsers parse only the ISO form with an uppercase `T` and `Z`
-  const date = new Date(value.toUpperCase().replace(" ", "T"));
-  return Number.isNaN(date.getTime()) ? null : date.toLocaleString();
-};
+/** A timestamp in the reader's locale, or `null` if it isn't a date. */
+const formatDate = (value: unknown): string | null =>
+  typeof value === "string" && !Number.isNaN(Date.parse(value))
+    ? new Date(value).toLocaleString()
+    : null;
 
 /**
  * @summary This component is used to display the service info of a Service Registry itself.
@@ -246,7 +204,7 @@ export class ECCClientGa4ghServiceRegistryServiceInfo extends LitElement {
       href=${link.href}
       target="_blank"
       rel="noopener noreferrer"
-      class="text-primary hover:underline break-all"
+      class="text-primary underline underline-offset-2 hover:text-primary/80 break-all"
       >${label ?? link.label}</a
     >`;
   }
@@ -284,11 +242,6 @@ export class ECCClientGa4ghServiceRegistryServiceInfo extends LitElement {
         id ? html`<span class="font-mono">${id}</span>` : null
       ),
       ECCClientGa4ghServiceRegistryServiceInfo.renderRow(
-        "version",
-        "Version",
-        version
-      ),
-      ECCClientGa4ghServiceRegistryServiceInfo.renderRow(
         "type",
         "Type",
         // only the parts that are set
@@ -303,11 +256,6 @@ export class ECCClientGa4ghServiceRegistryServiceInfo extends LitElement {
               organizationName
             )
           : organizationName
-      ),
-      ECCClientGa4ghServiceRegistryServiceInfo.renderRow(
-        "environment",
-        "Environment",
-        environment
       ),
       ECCClientGa4ghServiceRegistryServiceInfo.renderRow(
         "contact",
@@ -339,7 +287,10 @@ export class ECCClientGa4ghServiceRegistryServiceInfo extends LitElement {
               ${name ?? id ?? "Service Registry"}
             </h2>
             ${version
-              ? html`<ecc-utils-design-badge variant="outline">
+              ? html`<ecc-utils-design-badge
+                  data-badge="version"
+                  variant="outline"
+                >
                   v${version}
                 </ecc-utils-design-badge>`
               : ""}
@@ -356,7 +307,10 @@ export class ECCClientGa4ghServiceRegistryServiceInfo extends LitElement {
                 </ecc-utils-design-badge>`
               : ""}
             ${environment
-              ? html`<ecc-utils-design-badge variant="outline">
+              ? html`<ecc-utils-design-badge
+                  data-badge="environment"
+                  variant="outline"
+                >
                   ${environment}
                 </ecc-utils-design-badge>`
               : ""}
