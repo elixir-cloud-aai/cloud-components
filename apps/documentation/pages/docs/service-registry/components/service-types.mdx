@@ -1,0 +1,137 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import ServiceTypesPreview from '@/components/packages/service-registry/ServiceTypesPreview'
+
+# EccClientGa4ghServiceRegistryServiceTypes Component
+
+<ComponentName
+  tagName='ecc-client-ga4gh-service-registry-service-types'
+  reactTagName='ECCClientGa4ghServiceRegistryServiceTypes'
+  version='2.0.0-alpha.52'
+/>
+
+## Overview
+
+The `ecc-client-ga4gh-service-registry-service-types` component lists the service types of a GA4GH Service Registry (`GET /services/types`), with their group, artifact and version.
+
+## Usage
+
+### Basic Service Type List
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <ServiceTypesPreview />
+    <Callout type="info" emoji="ℹ️">
+      The preview above lists the service types of a public service registry. See [Live previews](/docs/contributing#live-previews) to use another registry.
+    </Callout>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="service-types-basic.tsx"
+    import React from 'react';
+    import { ECCClientGa4ghServiceRegistryServiceTypes } from '@elixir-cloud/service-registry/react';
+    import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+
+    const provider = new RestServiceRegistryProvider(
+      'https://registry.example.com/ga4gh/registry/v1'
+    );
+
+    export default function ServiceTypesBasic() {
+      return (
+        <ECCClientGa4ghServiceRegistryServiceTypes
+          provider={provider}
+          onEccServiceTypesChanged={(event) => {
+            console.log('Service types updated:', event.detail.serviceTypes);
+          }}
+        />
+      );
+    }
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="service-types-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/service-registry@2.0.0-alpha.52"></script>
+      </head>
+      <body>
+        <ecc-client-ga4gh-service-registry-service-types
+          baseurl="https://registry.example.com/ga4gh/registry/v1"
+        ></ecc-client-ga4gh-service-registry-service-types>
+
+        <script type="module">
+          document.addEventListener('ecc-service-types-changed', (event) => {
+            console.log('Service types updated:', event.detail.serviceTypes);
+          });
+        </script>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property   | Attribute | Type                      | Default     | Description                                                                                 |
+|------------|-----------|---------------------------|-------------|---------------------------------------------------------------------------------------------|
+| `baseUrl`  | `baseurl` | `string`                  | `""`        | Base URL of the Service Registry API, used if no `provider` is set                          |
+| `provider` | -         | `ServiceRegistryProvider` | `undefined` | Data provider for fetching service types (see [Providers](/docs/service-registry/providers)) |
+
+Set one of them; without either, the component shows an error. Changing either loads the types again.
+
+### `provider`
+The data provider whose `getServiceTypes()` lists the types. See the [Providers documentation](/docs/service-registry/providers) for the available providers and how to create custom ones.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+
+    const provider = new RestServiceRegistryProvider('https://registry.example.com/ga4gh/registry/v1');
+
+    <ECCClientGa4ghServiceRegistryServiceTypes provider={provider} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <script type="module">
+      import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+
+      const provider = new RestServiceRegistryProvider('https://registry.example.com/ga4gh/registry/v1');
+      document.querySelector('ecc-client-ga4gh-service-registry-service-types').provider = provider;
+    </script>
+    <ecc-client-ga4gh-service-registry-service-types></ecc-client-ga4gh-service-registry-service-types>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Events
+
+| Event Name                  | React Event Name           | Detail Type                         | Description                                 |
+|-----------------------------|----------------------------|-------------------------------------|---------------------------------------------|
+| `ecc-service-types-changed` | `onEccServiceTypesChanged` | `{ serviceTypes: ServiceType[] }`   | Fired when the service types data changes   |
+
+### `ecc-service-types-changed`
+Emitted when the service types are loaded, with all of them. If loading fails, or the provider is removed, `serviceTypes` is empty.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <ECCClientGa4ghServiceRegistryServiceTypes
+      onEccServiceTypesChanged={(event) => {
+        console.log('Service types updated:', event.detail.serviceTypes);
+      }}
+    />
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    element.addEventListener('ecc-service-types-changed', (event) => {
+      console.log('Service types updated:', event.detail.serviceTypes);
+    });
+    ```
+  </Tabs.Tab>
+</Tabs>
