@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import {
   expect,
+  fixtureCleanup,
   fixtureSync,
   html,
   oneEvent,
@@ -128,7 +129,23 @@ async function clickTrigger(el: EccUtilsDesignDialog) {
   await el.updateComplete;
 }
 
-describe("EccUtilsDesignDialog", () => {
+describe("EccUtilsDesignDialog", function dialogSuite() {
+  // WebKit (Playwright's build) sometimes blocks the page for seconds (up to
+  // 20 s seen locally) when a modal dialog leaves the top layer, on busy
+  // runners. With the global 3000 ms (`web-test.runner-config.mjs`), a
+  // blocked test times out, and its retry can get the key presses of the
+  // blocked attempt; a blocked hook isn't retried and aborts all remaining
+  // tests. The longer timeouts make both rare, not impossible. (`this.timeout`
+  // needs a `function`, not an arrow function.)
+  this.timeout(10000);
+
+  // Removes the fixtures with a longer timeout than the tests (the cleanup of
+  // `@open-wc/testing` runs in the root suite, with the global timeout)
+  afterEach(function cleanUp() {
+    this.timeout(25000);
+    fixtureCleanup();
+  });
+
   describe("open and close", () => {
     it("is closed by default", async () => {
       const el = await renderDialog();
