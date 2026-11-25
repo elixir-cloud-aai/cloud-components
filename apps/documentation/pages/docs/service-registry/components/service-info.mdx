@@ -14,7 +14,7 @@ import ServiceInfoPreview from '@/components/packages/service-registry/ServiceIn
 
 The `ecc-client-ga4gh-service-registry-service-info` component shows the service info of a GA4GH Service Registry itself (`GET /service-info`): its name, ID, version, type and organization, and the optional fields that the registry sets.
 
-The version and the environment show as badges next to the name. Optional fields that are missing or invalid are left out: timestamps that aren't dates, and links other than `http:` and `https:` URLs (and `mailto:` for the contact).
+The version shows as a badge next to the name, the environment as a badge next to the type. Optional fields that are missing or invalid are left out: timestamps that the browser can't parse as dates (`Date.parse()`), and links other than `http:` and `https:` URLs (and `mailto:` for the contact).
 
 ## Usage
 

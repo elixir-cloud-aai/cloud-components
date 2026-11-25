@@ -178,7 +178,13 @@ describe("ecc-client-ga4gh-service-registry-service-info", () => {
     expect(field(el, "contact")).to.equal(null);
   });
 
-  ["mailto:%E0%A4%A", "mailto:%20"].forEach((contactUrl) => {
+  [
+    "mailto:%E0%A4%A",
+    "mailto:%20",
+    "mailto:%E2%80%8B",
+    "mailto:%00",
+    "",
+  ].forEach((contactUrl) => {
     it(`leaves out the contact ${contactUrl} without an address`, async () => {
       const el = await render(stubProvider({ ...minimal(), contactUrl }));
       await waitUntil(() => fields(el).length > 0);
@@ -196,6 +202,7 @@ describe("ecc-client-ga4gh-service-registry-service-info", () => {
       "admin@example.org,help@example.org",
     ],
     ["mailto:help@example.org?cc=admin@example.org", "help@example.org"],
+    ["mailto:%20admin@example.org%E2%80%8B%20", "admin@example.org"],
   ].forEach(([contactUrl, label]) => {
     it(`shows the contact ${contactUrl} as its addresses`, async () => {
       const el = await render(stubProvider({ ...minimal(), contactUrl }));

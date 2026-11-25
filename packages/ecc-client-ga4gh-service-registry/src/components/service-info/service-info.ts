@@ -31,8 +31,11 @@ const toLink = (url: unknown, protocols: string[]): Link | null => {
   try {
     const { protocol, pathname } = new URL(url);
     if (!protocols.includes(protocol)) return null;
+    // invisible characters (e.g. a zero-width space) would hide the label
     const label =
-      protocol === "mailto:" ? decodeURIComponent(pathname).trim() : url;
+      protocol === "mailto:"
+        ? decodeURIComponent(pathname).replace(/\p{C}/gu, "").trim()
+        : url;
     return label ? { href: url, label } : null;
   } catch {
     // not a URL, or a malformed escape in the recipients
