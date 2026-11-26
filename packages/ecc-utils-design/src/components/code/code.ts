@@ -601,6 +601,8 @@ function cn(...classes: (string | undefined | false)[]) {
 
 /**
  * Code editor component with syntax highlighting
+ *
+ * @element ecc-utils-design-code
  */
 export class EccUtilsDesignCode extends LitElement {
   static styles = [
