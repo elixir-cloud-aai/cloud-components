@@ -23,7 +23,7 @@ A form for submitting a task to a GA4GH Task Execution Service (TES). It support
     export default function RunCreate() {
       return (
         <ECCClientGa4ghTesRunCreate
-          baseUrl="https://protes.rahtiapp.fi/ga4gh/tes/v1"
+          baseUrl="https://gateway-tes.elixir-on.cloud/ga4gh/tes/v1"
           onEccRunSubmitted={(e) => console.log(e.detail.runId)}
           onEccRunCreateFailed={(e) => console.error(e.detail.error)}
         />
@@ -36,7 +36,7 @@ A form for submitting a task to a GA4GH Task Execution Service (TES). It support
     <script type="module" src="https://esm.sh/@elixir-cloud/tes"></script>
 
     <ecc-client-ga4gh-tes-run-create
-      baseUrl="https://protes.rahtiapp.fi/ga4gh/tes/v1"
+      baseUrl="https://gateway-tes.elixir-on.cloud/ga4gh/tes/v1"
     ></ecc-client-ga4gh-tes-run-create>
     ```
   </Tabs.Tab>

@@ -39,7 +39,7 @@ constructor(baseUrl: string)
 
 **Parameters:**
 
-- `baseUrl`: The base URL of the TES API endpoint (e.g., `https://protes.rahtiapp.fi/ga4gh/tes/v1`)
+- `baseUrl`: The base URL of the TES API endpoint (e.g., `https://gateway-tes.elixir-on.cloud/ga4gh/tes/v1`)
 
 ### Basic Usage
 
@@ -51,7 +51,7 @@ constructor(baseUrl: string)
 
     function TaskApp() {
       const provider = new RestTesProvider(
-        'https://protes.rahtiapp.fi/ga4gh/tes/v1'
+        'https://gateway-tes.elixir-on.cloud/ga4gh/tes/v1'
       );
 
       return (
@@ -77,7 +77,7 @@ constructor(baseUrl: string)
       <script type="module">
         import { RestTesProvider } from 'https://esm.sh/@elixir-cloud/tes@latest/providers';
 
-        const provider = new RestTesProvider('https://protes.rahtiapp.fi/ga4gh/tes/v1');
+        const provider = new RestTesProvider('https://gateway-tes.elixir-on.cloud/ga4gh/tes/v1');
         document.querySelector('ecc-client-ga4gh-tes-runs').provider = provider;
       </script>
     </body>
@@ -93,7 +93,7 @@ constructor(baseUrl: string)
 
     export default function TasksPage() {
       const provider = new RestTesProvider(
-        process.env.NEXT_PUBLIC_TES_URL || 'https://protes.rahtiapp.fi/ga4gh/tes/v1'
+        process.env.NEXT_PUBLIC_TES_URL || 'https://gateway-tes.elixir-on.cloud/ga4gh/tes/v1'
       );
 
       return (
@@ -358,7 +358,7 @@ import { RestTesProvider } from '@elixir-cloud/tes/providers';
 import { ECCClientGa4ghTesRunCreate } from '@elixir-cloud/tes/react';
 
 function TaskSubmitter() {
-  const provider = new RestTesProvider('https://protes.rahtiapp.fi/ga4gh/tes/v1');
+  const provider = new RestTesProvider('https://gateway-tes.elixir-on.cloud/ga4gh/tes/v1');
 
   return (
     <ECCClientGa4ghTesRunCreate
@@ -381,7 +381,7 @@ import { RestTesProvider } from '@elixir-cloud/tes/providers';
 import { ECCClientGa4ghTesRun } from '@elixir-cloud/tes/react';
 
 function TaskMonitor({ runId }) {
-  const provider = new RestTesProvider('https://protes.rahtiapp.fi/ga4gh/tes/v1');
+  const provider = new RestTesProvider('https://gateway-tes.elixir-on.cloud/ga4gh/tes/v1');
 
   return (
     <ECCClientGa4ghTesRun
@@ -445,7 +445,7 @@ class AuthTesProvider extends RestTesProvider {
 }
 
 const provider = new AuthTesProvider(
-  'https://protes.rahtiapp.fi/ga4gh/tes/v1',
+  'https://gateway-tes.elixir-on.cloud/ga4gh/tes/v1',
   'your-access-token'
 );
 ```
@@ -482,7 +482,7 @@ async function testTesProvider(provider) {
 }
 
 // Usage
-const provider = new RestTesProvider('https://protes.rahtiapp.fi/ga4gh/tes/v1');
+const provider = new RestTesProvider('https://gateway-tes.elixir-on.cloud/ga4gh/tes/v1');
 testTesProvider(provider);
 ```
 

@@ -23,7 +23,7 @@ Displays a paginated table of tasks from a GA4GH Task Execution Service (TES), w
     export default function Runs() {
       return (
         <ECCClientGa4ghTesRuns
-          baseUrl="https://protes.rahtiapp.fi/ga4gh/tes/v1"
+          baseUrl="https://gateway-tes.elixir-on.cloud/ga4gh/tes/v1"
           pageSize={10}
           onEccRunsSelected={(e) => console.log(e.detail.runId)}
         />
@@ -36,7 +36,7 @@ Displays a paginated table of tasks from a GA4GH Task Execution Service (TES), w
     <script type="module" src="https://esm.sh/@elixir-cloud/tes"></script>
 
     <ecc-client-ga4gh-tes-runs
-      baseUrl="https://protes.rahtiapp.fi/ga4gh/tes/v1"
+      baseUrl="https://gateway-tes.elixir-on.cloud/ga4gh/tes/v1"
       pageSize="10"
     ></ecc-client-ga4gh-tes-runs>
     ```

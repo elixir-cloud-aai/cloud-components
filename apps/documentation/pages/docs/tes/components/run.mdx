@@ -23,7 +23,7 @@ Displays a single TES task in tabs: Overview, Executors, Inputs / Outputs and Lo
     export default function Run({ id }: { id: string }) {
       return (
         <ECCClientGa4ghTesRun
-          baseUrl="https://protes.rahtiapp.fi/ga4gh/tes/v1"
+          baseUrl="https://gateway-tes.elixir-on.cloud/ga4gh/tes/v1"
           runId={id}
         />
       );
@@ -35,7 +35,7 @@ Displays a single TES task in tabs: Overview, Executors, Inputs / Outputs and Lo
     <script type="module" src="https://esm.sh/@elixir-cloud/tes"></script>
 
     <ecc-client-ga4gh-tes-run
-      baseUrl="https://protes.rahtiapp.fi/ga4gh/tes/v1"
+      baseUrl="https://gateway-tes.elixir-on.cloud/ga4gh/tes/v1"
       runId="TASK_ID"
     ></ecc-client-ga4gh-tes-run>
     ```
