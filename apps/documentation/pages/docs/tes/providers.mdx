@@ -34,12 +34,13 @@ The `RestTesProvider` is the main implementation that communicates with TES APIs
 ### Constructor
 
 ```typescript
-constructor(baseUrl: string)
+constructor(baseUrl: string, options?: { timeout?: number })
 ```
 
 **Parameters:**
 
 - `baseUrl`: The base URL of the TES API endpoint (e.g., `https://protes.rahtiapp.fi/ga4gh/tes/v1`)
+- `options.timeout`: request deadline in milliseconds (default 30 s, `0` for none). See [Request timeouts](/docs/design/request-timeouts).
 
 ### Basic Usage
 

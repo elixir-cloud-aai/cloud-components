@@ -1,6 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { expect } from "@open-wc/testing";
 import sinon from "sinon";
+import {
+  DEFAULT_REQUEST_TIMEOUT,
+  RequestTimeoutError,
+} from "@elixir-cloud/design/utils";
 import { RestServiceRegistryProvider } from "../rest-sr-provider.js";
 
 const BASE_URL = "https://registry.example.org/ga4gh/registry/v1";
@@ -31,6 +35,13 @@ const CALLS: Call[] = [
   ["getServiceTypes", (p) => p.getServiceTypes(), `${BASE_URL}/services/types`],
   ["getServiceInfo", (p) => p.getServiceInfo(), `${BASE_URL}/service-info`],
 ];
+
+/** A `fetch` that settles only when its signal aborts, like a silent server. */
+function neverAnswer(_input: RequestInfo | URL, init: RequestInit = {}) {
+  return new Promise<Response>((_resolve, reject) => {
+    init.signal?.addEventListener("abort", () => reject(init.signal?.reason));
+  });
+}
 
 describe("RestServiceRegistryProvider", () => {
   let fetchStub: sinon.SinonStub;
@@ -79,5 +90,55 @@ describe("RestServiceRegistryProvider", () => {
       const headers = new Headers(fetchStub.firstCall.args[1]?.headers);
       expect(headers.get("Authorization")).to.equal("Bearer test-token");
     });
+  });
+
+  it("times out requests after 30 s by default", () => {
+    expect(new RestServiceRegistryProvider(BASE_URL).timeout).to.equal(
+      DEFAULT_REQUEST_TIMEOUT
+    );
+  });
+
+  it("rejects an invalid timeout", () => {
+    expect(
+      () => new RestServiceRegistryProvider(BASE_URL, { timeout: -1 })
+    ).to.throw(RangeError);
+  });
+
+  CALLS.forEach(([name, call]) => {
+    it(`${name} rejects when the server doesn't answer in time`, async () => {
+      fetchStub.callsFake(neverAnswer);
+
+      let error: unknown;
+      try {
+        await call(new RestServiceRegistryProvider(BASE_URL, { timeout: 20 }));
+      } catch (e) {
+        error = e;
+      }
+
+      expect(error).to.be.instanceOf(RequestTimeoutError);
+    });
+  });
+
+  it("keeps the timeout with an overridden fetch", async () => {
+    fetchStub.callsFake(neverAnswer);
+
+    let error: unknown;
+    try {
+      await new TokenServiceRegistryProvider(BASE_URL, {
+        timeout: 20,
+      }).getServices();
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.be.instanceOf(RequestTimeoutError);
+  });
+
+  it("sends requests without a deadline with a timeout of 0", async () => {
+    await new RestServiceRegistryProvider(BASE_URL, {
+      timeout: 0,
+    }).getServices();
+
+    expect(fetchStub.firstCall.args[1]?.signal).to.equal(undefined);
   });
 });

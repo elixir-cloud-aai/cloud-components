@@ -64,11 +64,12 @@ The `RestTrsProvider` is the main implementation that communicates with TRS APIs
 ### Constructor
 
 ```typescript
-constructor(baseUrl: string)
+constructor(baseUrl: string, options?: { timeout?: number })
 ```
 
 **Parameters:**
 - `baseUrl`: The base URL of the TRS API endpoint (e.g., `https://dockstore.org/api/ga4gh/trs/v2`)
+- `options.timeout`: request deadline in milliseconds (default 30 s, `0` for none). See [Request timeouts](/docs/design/request-timeouts).
 
 ### Basic Usage
 

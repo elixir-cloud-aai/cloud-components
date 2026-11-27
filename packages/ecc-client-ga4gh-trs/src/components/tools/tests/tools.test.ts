@@ -4,6 +4,13 @@ import sinon from "sinon";
 import "../index.js";
 import type { ECCClientGa4ghTrsTools } from "../tools.js";
 import type { Tool, ToolClass, TrsProvider } from "../../../providers/index.js";
+import { RestTrsProvider } from "../../../providers/rest-trs-provider.js";
+
+/** A `fetch` that settles only when its signal aborts, like a silent server. */
+const neverAnswer = (_input: RequestInfo | URL, init: RequestInit = {}) =>
+  new Promise<Response>((_resolve, reject) => {
+    init.signal?.addEventListener("abort", () => reject(init.signal?.reason));
+  });
 
 const BASE_URL = "https://trs.example.org/ga4gh/trs/v2";
 const OTHER_URL = "https://other.example.org/ga4gh/trs/v2";
@@ -268,6 +275,23 @@ describe("ecc-client-ga4gh-trs-tools provider", () => {
     expect(internals(el).tools[0]?.id).to.equal("a");
     expect(el.shadowRoot?.textContent).not.to.contain("Unavailable");
     expect(reported).to.deep.equal([]);
+  });
+
+  it("shows the error of an expired request and reports no tools", async () => {
+    fetchStub.callsFake(neverAnswer);
+    const reported: Tool[][] = [];
+    const el = await fixture<ECCClientGa4ghTrsTools>(
+      html`<ecc-client-ga4gh-trs-tools
+        .provider=${new RestTrsProvider(BASE_URL, { timeout: 20 })}
+        @ecc-tools-changed=${(e: CustomEvent) => reported.push(e.detail.tools)}
+      ></ecc-client-ga4gh-trs-tools>`
+    );
+
+    await waitUntil(() =>
+      el.shadowRoot?.textContent?.includes("Request timed out after 20 ms")
+    );
+    expect(internals(el).tools).to.deep.equal([]);
+    expect(reported).to.deep.equal([[]]);
   });
 
   it("drops the tool class filter of a replaced provider", async () => {

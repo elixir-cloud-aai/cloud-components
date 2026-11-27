@@ -49,11 +49,12 @@ The `RestCloudRegistryProvider` is the main implementation that communicates wit
 ### Constructor
 
 ```typescript
-constructor(baseUrl: string)
+constructor(baseUrl: string, options?: { timeout?: number })
 ```
 
 **Parameters:**
 - `baseUrl`: The base URL of the Cloud Registry API endpoint (e.g., `https://cloud-registry.example.com/ga4gh/registry/v1`)
+- `options.timeout`: request deadline in milliseconds (default 30 s, `0` for none). See [Request timeouts](/docs/design/request-timeouts).
 
 ### Basic Usage
 

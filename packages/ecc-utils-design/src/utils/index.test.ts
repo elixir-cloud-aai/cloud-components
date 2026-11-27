@@ -12,6 +12,13 @@ describe("utils entry point", () => {
     expect(utils.normalizePointer).to.be.a("function");
   });
 
+  it("exports the request timeout utilities", () => {
+    expect(utils.fetchWithTimeout).to.be.a("function");
+    expect(utils.resolveRequestTimeout).to.be.a("function");
+    expect(utils.RequestTimeoutError).to.be.a("function");
+    expect(utils.DEFAULT_REQUEST_TIMEOUT).to.equal(30_000);
+  });
+
   it("registers no components", () => {
     ["input", "checkbox", "code", "select"].forEach((name) => {
       expect(customElements.get(`ecc-utils-design-${name}`)).to.equal(

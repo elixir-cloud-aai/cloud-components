@@ -79,11 +79,12 @@ The `RestTrsFilerProvider` is the main implementation that communicates with TRS
 ### Constructor
 
 ```typescript
-constructor(baseUrl: string)
+constructor(baseUrl: string, options?: { timeout?: number })
 ```
 
 **Parameters:**
 - `baseUrl`: The base URL of the TRS Filer API endpoint (e.g., `https://trs-filer.example.com/ga4gh/trs/v2`)
+- `options.timeout`: request deadline in milliseconds (default 30 s, `0` for none). See [Request timeouts](/docs/design/request-timeouts).
 
 ### Basic Usage
 

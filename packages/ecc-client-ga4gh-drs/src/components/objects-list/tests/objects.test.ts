@@ -3,10 +3,17 @@ import { expect, fixture, html, waitUntil } from "@open-wc/testing";
 import sinon from "sinon";
 import "../index.js";
 import type { ECCClientGa4ghDrsObjects } from "../objects.js";
+import { RestDrsProvider } from "../../../providers/rest-drs-provider.js";
 import type {
   DrsObject,
   DrsProvider,
 } from "../../../providers/drs-provider.js";
+
+/** A `fetch` that settles only when its signal aborts, like a silent server. */
+const neverAnswer = (_input: RequestInfo | URL, init: RequestInit = {}) =>
+  new Promise<Response>((_resolve, reject) => {
+    init.signal?.addEventListener("abort", () => reject(init.signal?.reason));
+  });
 
 const BASE_URL = "https://drs.example.org/ga4gh/drs/v1";
 const OTHER_URL = "https://other.example.org/ga4gh/drs/v1";
@@ -223,5 +230,23 @@ describe("ecc-client-ga4gh-drs-objects provider", () => {
     expect(internals(el).objects[0]?.id).to.equal("a");
     expect(el.shadowRoot?.textContent).not.to.contain("Unavailable");
     expect(reported).to.deep.equal([]);
+  });
+
+  it("shows the error of an expired request and reports no objects", async () => {
+    fetchStub.callsFake(neverAnswer);
+    const reported: DrsObject[][] = [];
+    const el = await fixture<ECCClientGa4ghDrsObjects>(
+      html`<ecc-client-ga4gh-drs-objects
+        .provider=${new RestDrsProvider(BASE_URL, { timeout: 20 })}
+        @ecc-objects-changed=${(e: CustomEvent) =>
+          reported.push(e.detail.objects)}
+      ></ecc-client-ga4gh-drs-objects>`
+    );
+
+    await waitUntil(() =>
+      el.shadowRoot?.textContent?.includes("Request timed out after 20 ms")
+    );
+    expect(internals(el).objects).to.deep.equal([]);
+    expect(reported).to.deep.equal([[]]);
   });
 });

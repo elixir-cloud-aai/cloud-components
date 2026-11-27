@@ -280,6 +280,8 @@ function handleProviderError(error, method, args) {
 #### Retry Logic
 
 ```tsx copy
+import { RequestTimeoutError } from '@elixir-cloud/design/utils';
+
 // Retry wrapper for transient failures
 function withRetry(Provider, maxRetries = 3, delay = 1000) {
   return class extends Provider {
@@ -294,6 +296,16 @@ function withRetry(Provider, maxRetries = 3, delay = 1000) {
           
           // Don't retry on client errors
           if (error.status >= 400 && error.status < 500) {
+            throw error;
+          }
+
+          // Don't repeat a timed-out request that may have changed
+          // something: the server may have done it already
+          const method = (options.method ?? 'GET').toUpperCase();
+          if (
+            error instanceof RequestTimeoutError &&
+            !['GET', 'HEAD'].includes(method)
+          ) {
             throw error;
           }
           
@@ -312,6 +324,20 @@ function withRetry(Provider, maxRetries = 3, delay = 1000) {
 const RetryableProvider = withRetry(RestWesProvider, 3, 1000);
 const provider = new RetryableProvider('https://api.example.com');
 ```
+
+Each attempt has its own [deadline](#timeouts). Don't retry a timed-out request that creates something: the server may already have done it.
+
+#### Timeouts
+
+Requests of the REST providers time out after 30 seconds with a `RequestTimeoutError`. Set another deadline with the `timeout` option (milliseconds, `0` for none):
+
+```tsx copy
+const provider = new RestWesProvider('https://api.example.com', {
+  timeout: 10_000,
+});
+```
+
+See [Request timeouts](/docs/design/request-timeouts).
 
 ### Caching and Performance
 
