@@ -1,6 +1,7 @@
 import { esbuildPlugin } from "@web/dev-server-esbuild";
 import fg from "fast-glob";
 import { playwrightLauncher } from "@web/test-runner-playwright";
+import { a11ySnapshotPlugin } from "@web/test-runner-commands/plugins";
 
 // Packages run tests in parallel (at most three at once, as more overload
 // the browsers on CI runners), so each package's test
@@ -36,6 +37,7 @@ export default {
       // (relative to the working directory: run tests from the package)
       tsconfig: "./tsconfig.json",
     }),
+    a11ySnapshotPlugin(),
   ],
   browsers: [
     playwrightLauncher({ product: "chromium" }),

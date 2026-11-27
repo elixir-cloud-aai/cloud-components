@@ -57,6 +57,7 @@
   "dependencies": {
     "@lit/react": "^1.0.2",
     "ace-builds": "^1.35.0",
+    "dom-accessibility-api": "^0.7.1",
     "lit": "^2.8.0"
   },
   "devDependencies": {
@@ -69,6 +70,7 @@
     "@web/dev-server": "*",
     "@web/dev-server-esbuild": "^2.0.0",
     "@web/test-runner": "^1.0.0",
+    "@web/test-runner-commands": "*",
     "commander": "*",
     "concurrently": "*",
     "custom-element-jet-brains-integration": "*",
