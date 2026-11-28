@@ -1,0 +1,157 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import RunOutputPreview from '@/components/packages/wes/RunOutputPreview'
+
+# EccClientGa4ghWesRunOutput Component
+
+<ComponentName
+  tagName='ecc-client-ga4gh-wes-run-output'
+  reactTagName='ECCClientGa4ghWesRunOutput'
+  version='2.0.0-alpha.52'
+/>
+
+## Overview
+
+The `ecc-client-ga4gh-wes-run-output` component shows one output of a workflow run, as the workflow's [GA4GH IO Schema](https://github.com/elixir-cloud-aai/ga4gh-io-schema) says: its title and description, and its files with the viewer of the output's `x-ga4gh-ui-widget` hint. It follows version 0.3.0 of the profile, which has no release yet; the component and these docs refer to commit [`2c3dc49`](https://github.com/elixir-cloud-aai/ga4gh-io-schema/tree/2c3dc49ad89f0a556272f160369a2a2d7a21dac3) ([UI widgets](https://github.com/elixir-cloud-aai/ga4gh-io-schema/blob/2c3dc49ad89f0a556272f160369a2a2d7a21dac3/docs/specification/widgets.md), [Outputs](https://github.com/elixir-cloud-aai/ga4gh-io-schema/blob/2c3dc49ad89f0a556272f160369a2a2d7a21dac3/docs/specification/outputs.md) and [Rendering schemas and outputs](https://github.com/elixir-cloud-aai/ga4gh-io-schema/blob/2c3dc49ad89f0a556272f160369a2a2d7a21dac3/docs/security.md#rendering-schemas-and-outputs)).
+
+It takes the schema of one output (a property of `outputs` in the IO schema) and its value in the *normalised outputs object* of the run, which a normaliser builds from the engine-specific `RunLog.outputs`. It doesn't normalise outputs itself.
+
+| Output | Shown as |
+|--------|----------|
+| A file with `table-viewer` | A table of the CSV or TSV file: the first row is the header, every cell is text, at most `maxRows` rows |
+| A file with `html-viewer` | The HTML file in an `iframe` with an empty `sandbox` attribute and a Content Security Policy that blocks external loads |
+| Any other file or directory (no viewer, another or unknown viewer, `custom:` viewers) | Its URI as text and a download button |
+| A list of files, or files keyed by name | One entry per file, labelled by its file name or key, each with the viewer of `items` or `additionalProperties` |
+| Any other value (a number, a string, a record) | The value as text |
+
+The component is deliberately minimal: a library of widgets for inputs and outputs may replace or wrap it later.
+
+## Security
+
+Outputs come from the run, which may have processed files supplied by users, and the schema from the workflow's author, so the component treats both as untrusted:
+
+- **Text:** the title, the description (also Markdown) and the cells of tables are shown as text; markup in them stays visible as markup and never reaches the page.
+- **Allow-list:** every URI is checked against `allowedSchemes` and, if the file reference has `schemes`, against those too, before anything is fetched or offered for download. URIs with other schemes, paths, control characters or surrounding whitespace are shown as text, with a note. `javascript`, `data`, `blob`, `file` and the other schemes that run code or refer to local data are never allowed, even if listed.
+- **HTML:** shown only in an `iframe` with an empty `sandbox` attribute (no scripts, forms, pop-ups or navigation, and an opaque origin) and `srcdoc` that starts with a `<meta>` Content Security Policy (`default-src 'none'; img-src data:; style-src 'unsafe-inline'`) before the untrusted markup. If the file can't be fetched or is larger than `maxBytes`, it is offered for download only.
+- **Downloads, never direct links:** stored files can contain active content (HTML, SVG, PDF) whatever their name. The component never links to them; its download button asks the provider for a download URL, which must make the storage or a proxy send `Content-Disposition: attachment` and `X-Content-Type-Options: nosniff`.
+- **Limits:** viewers read at most `maxBytes` bytes of a file and tables show at most `maxRows` rows; the rest is offered for download.
+
+## Usage
+
+### Outputs of a run
+
+This example shows the outputs of the profile's demo workflow (an HTML report, a TSV table and a BAM file) and, from the profile's Example 1, a list of files, files keyed by sample and a number. The report tries to run a script and to load an external image, and a cell of the table contains markup: the viewers block the first two and show the markup as text. The docs serve copies of the report and the tables; the BAM files have no copy, so downloading them shows an error.
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <RunOutputPreview />
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="run-output.tsx"
+    import React from 'react';
+    import { ECCClientGa4ghWesRunOutput } from '@elixir-cloud/wes/react';
+    import type { WesOutputProvider } from '@elixir-cloud/wes/providers';
+
+    // The app decides how output URIs become URLs (e.g. presigned URLs of
+    // its storage, or URLs of a proxy) and adds credentials
+    const provider: WesOutputProvider = {
+      fetchOutput: (uri, init) =>
+        fetch(`/api/outputs?uri=${encodeURIComponent(uri)}`, init),
+      getDownloadUrl: async (uri) =>
+        `/api/outputs?uri=${encodeURIComponent(uri)}&download=1`,
+    };
+
+    const schema = {
+      type: 'string',
+      title: 'Read counts per reference (TSV)',
+      'x-ga4gh-file': { kind: 'file', mediaType: 'text/tab-separated-values' },
+      'x-ga4gh-ui-widget': 'table-viewer',
+    };
+
+    export default function RunOutput() {
+      return (
+        <ECCClientGa4ghWesRunOutput
+          name="read_counts"
+          schema={schema}
+          value="s3://bucket/runs/7/read_counts.tsv"
+          provider={provider}
+          allowedSchemes={['drs', 'https', 's3']}
+        />
+      );
+    }
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="run-output.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/wes@2.0.0-alpha.52"></script>
+      </head>
+      <body>
+        <ecc-client-ga4gh-wes-run-output
+          name="report"
+          allowed-schemes="drs https s3"
+        ></ecc-client-ga4gh-wes-run-output>
+
+        <script type="module">
+          const element = document.querySelector('ecc-client-ga4gh-wes-run-output');
+          element.schema = {
+            type: 'string',
+            title: 'Alignment report (HTML)',
+            'x-ga4gh-file': { kind: 'file', mediaType: 'text/html' },
+            'x-ga4gh-ui-widget': 'html-viewer',
+          };
+          element.value = 's3://bucket/runs/7/report.html';
+          element.provider = {
+            fetchOutput: (uri, init) =>
+              fetch(`/api/outputs?uri=${encodeURIComponent(uri)}`, init),
+            getDownloadUrl: async (uri) =>
+              `/api/outputs?uri=${encodeURIComponent(uri)}&download=1`,
+          };
+        </script>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Output provider
+
+The component fetches and downloads files only through a `WesOutputProvider`, so that the app adds credentials and decides how storage URIs (e.g. `s3://` or `drs://`) become URLs that the browser can use. It calls the provider only for URIs that pass the allow-list.
+
+```typescript
+interface WesOutputProvider {
+  // Content of a file, for a viewer; responses that aren't ok are errors
+  fetchOutput(uri: string, init?: { signal?: AbortSignal }): Promise<Response>;
+  // An http(s) URL whose response has Content-Disposition: attachment
+  // and X-Content-Type-Options: nosniff
+  getDownloadUrl(uri: string): Promise<string>;
+}
+```
+
+<Callout type="warning">
+  The download URL must make the browser save the file, not show it: set `Content-Disposition: attachment` and `X-Content-Type-Options: nosniff` in a proxy, or make the storage set them (e.g. the `response-content-disposition` parameter of a presigned S3 URL). The `download` attribute of the link that the component uses works only for URLs on the page's own origin. The component refuses download URLs that aren't `http:` or `https:`.
+</Callout>
+
+Without a provider, the component shows the URIs of files as text, without viewers or downloads.
+
+## Properties
+
+| Property | Attribute | Type | Default | Description |
+|----------|-----------|------|---------|-------------|
+| `name` | `name` | `string` | `""` | Name of the output, its key in the normalised outputs object; the title if the schema has none. |
+| `schema` | | `object` | `undefined` | Schema of the output: the property of `outputs` of the IO schema. |
+| `value` | | `unknown` | `undefined` | Value of the output in the normalised outputs object. |
+| `provider` | | `WesOutputProvider` | `undefined` | Fetches files for viewers and returns download URLs (see [Output provider](#output-provider)). |
+| `allowedSchemes` | `allowed-schemes` | `string[]` | `["drs", "https"]` | URI schemes that may be fetched or downloaded; the attribute separates them by spaces or commas. Set the deployment's allow-list: `drs`, `https`, the object-store schemes it supports (e.g. `s3`), and `http` only for internal networks. |
+| `maxRows` | `max-rows` | `number` | `1000` | Rows that a table shows at most. |
+| `maxBytes` | `max-bytes` | `number` | `5242880` (5 MiB) | Bytes of a file that a viewer reads at most. |
+
+## CSS Parts
+
+| Part | Description |
+|------|-------------|
+| `base` | The container of the output. |

@@ -320,6 +320,17 @@ function WorkflowMonitor({ runId }) {
 }
 ```
 
+## Output Provider
+
+`ecc-client-ga4gh-wes-run-output` shows the files that a run produced. It doesn't use the `WesProvider`, as the files lie in the storage of the deployment, not in the WES API: the app passes a `WesOutputProvider` that fetches files for viewers and returns download URLs, and decides how storage URIs (e.g. `s3://`) become URLs and which credentials they need. See [Run Output](/docs/wes/components/run-output#output-provider).
+
+```typescript
+interface WesOutputProvider {
+  fetchOutput(uri: string, init?: { signal?: AbortSignal }): Promise<Response>;
+  getDownloadUrl(uri: string): Promise<string>;
+}
+```
+
 ## Custom Providers
 
 For custom use cases, you can extend `RestWesProvider` or implement the `WesProvider` interface directly. This is useful for:
