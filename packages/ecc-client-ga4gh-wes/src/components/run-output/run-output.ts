@@ -73,6 +73,8 @@ const sameSchemes = (a: unknown, b: unknown): boolean =>
  * @property {number} maxBytes - Bytes of a file that a viewer reads at most
  *   (attribute `max-bytes`).
  *
+ * @method reload - Loads the output again, e.g. to retry failed viewers.
+ *
  * @csspart base - The container of the output.
  */
 export class ECCClientGa4ghWesRunOutput extends LitElement {
@@ -124,8 +126,20 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
   @state() private views = new Map<number, View>();
   @state() private downloadErrors = new Map<number, string>();
 
-  /** Milliseconds that a viewer waits for its file at most */
+  /**
+   * Milliseconds that a viewer waits for its file, and a download for its
+   * URL, at most
+   */
   static loadTimeout = 30000;
+
+  /** Table cells that all tables of the element show together at most */
+  static maxCells = 200000;
+
+  /** Cells that tables of the current output may still show */
+  private cellBudget = 0;
+
+  /** Number of the latest download request per entry */
+  private downloadRequests = new Map<number, number>();
 
   private loads?: AbortController;
 
@@ -158,6 +172,40 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
     }
   }
 
+  /**
+   * Loads the output again, e.g. to retry viewers that failed. Setting
+   * equal properties doesn't reload.
+   */
+  reload(): void {
+    this.loadedFor = undefined;
+    this.load();
+  }
+
+  /** Rejects if a promise takes longer than `loadTimeout`. */
+  private static withTimeout<T>(
+    promise: Promise<T>,
+    onTimeout?: () => void
+  ): Promise<T> {
+    const timeout = ECCClientGa4ghWesRunOutput.loadTimeout;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timedOut = new Promise<never>((_resolve, reject) => {
+      timer = setTimeout(() => {
+        onTimeout?.();
+        reject(new Error(`no response within ${timeout / 1000} s`));
+      }, timeout);
+    });
+    return Promise.race([promise, timedOut]).then(
+      (value) => {
+        clearTimeout(timer);
+        return value;
+      },
+      (err) => {
+        clearTimeout(timer);
+        throw err;
+      }
+    );
+  }
+
   private static limit(value: number, fallback: number): number {
     return Number.isFinite(value) && value >= 0 ? Math.floor(value) : fallback;
   }
@@ -174,15 +222,14 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
    * sets equal but new objects on every render).
    */
   private load(): void {
-    const all = outputEntries(this.schema, this.value);
     const maxFiles = ECCClientGa4ghWesRunOutput.limit(
       this.maxFiles,
       DEFAULT_MAX_FILES
     );
-    const entries = all.length > 1 ? all.slice(0, maxFiles) : all;
+    const { entries, total } = outputEntries(this.schema, this.value, maxFiles);
     const key = JSON.stringify({
       entries,
-      total: all.length,
+      total,
       schemes: this.schemes,
       limits: [this.maxRows, this.maxColumns, this.maxFiles, this.maxBytes],
     });
@@ -190,9 +237,7 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
       this.loads &&
       !this.loads.signal.aborted &&
       this.loadedFor?.key === key &&
-      this.loadedFor.provider === this.provider &&
-      // Setting the same output again retries failed viewers
-      ![...this.views.values()].some((view) => view.status === "error")
+      this.loadedFor.provider === this.provider
     ) {
       return;
     }
@@ -201,8 +246,9 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
     const controller = new AbortController();
     this.loads = controller;
     this.entries = entries;
-    this.hiddenEntries = all.length - entries.length;
+    this.hiddenEntries = total - entries.length;
     this.downloadErrors = new Map();
+    this.cellBudget = ECCClientGa4ghWesRunOutput.maxCells;
     const views = new Map<number, View>();
     const jobs: { index: number; entry: FileEntry; viewer: Viewer }[] = [];
     entries.forEach((entry, index) => {
@@ -261,26 +307,17 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
     const job = new AbortController();
     const stop = () => job.abort();
     signal.addEventListener("abort", stop);
-    const timeout = ECCClientGa4ghWesRunOutput.loadTimeout;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const timedOut = new Promise<never>((_resolve, reject) => {
-      timer = setTimeout(() => {
-        job.abort();
-        reject(new Error(`no response within ${timeout / 1000} s`));
-      }, timeout);
-    });
     try {
-      const view = await Promise.race([
+      const view = await ECCClientGa4ghWesRunOutput.withTimeout(
         this.readView(entry, viewer, provider, job.signal),
-        timedOut,
-      ]);
+        stop
+      );
       if (!signal.aborted) this.setView(index, view);
     } catch (err) {
       if (!signal.aborted) {
         this.setView(index, { status: "error", message: errorMessage(err) });
       }
     } finally {
-      clearTimeout(timer);
       signal.removeEventListener("abort", stop);
     }
   }
@@ -327,19 +364,53 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
       ECCClientGa4ghWesRunOutput.limit(this.maxRows, DEFAULT_MAX_ROWS),
       ECCClientGa4ghWesRunOutput.limit(this.maxColumns, DEFAULT_MAX_COLUMNS)
     );
-    return { status: "table", ...table, more: table.more || truncated };
+    // A budget for all tables, so that many files can't add up
+    const width = Math.max(1, table.header.length);
+    const fit = Math.floor(this.cellBudget / width) - 1;
+    if (fit < 0) {
+      return {
+        status: "error",
+        message: "the tables of this output are too large to show together",
+      };
+    }
+    const rows = table.rows.slice(0, fit);
+    this.cellBudget -= width * (rows.length + 1);
+    return {
+      status: "table",
+      ...table,
+      rows,
+      more: table.more || truncated || rows.length < table.rows.length,
+    };
+  }
+
+  /** The URI of the entry at `index` of the output as set now. */
+  private uriAt(index: number): string | undefined {
+    const entry = outputEntries(this.schema, this.value, index + 1).entries[
+      index
+    ];
+    return entry?.type === "file" ? entry.uri : undefined;
   }
 
   private async download(index: number, uri: string): Promise<void> {
     const { loads } = this;
+    const request = (this.downloadRequests.get(index) ?? 0) + 1;
+    this.downloadRequests.set(index, request);
+    // Whether this is still the latest request for the file shown, also if
+    // the output was set again and the update is still pending
+    const current = () =>
+      this.loads === loads &&
+      this.downloadRequests.get(index) === request &&
+      this.uriAt(index) === uri;
     const errors = new Map(this.downloadErrors);
     errors.delete(index);
     this.downloadErrors = errors;
     try {
       if (!this.provider) throw new Error("no output provider is set");
-      const url = await this.provider.getDownloadUrl(uri);
-      // The output changed meanwhile: the click was for another file
-      if (this.loads !== loads) return;
+      const url = await ECCClientGa4ghWesRunOutput.withTimeout(
+        this.provider.getDownloadUrl(uri)
+      );
+      // The output changed meanwhile, or a newer click took over
+      if (!current()) return;
       if (!isHttpUrl(url)) {
         throw new Error("the provider returned no http or https URL");
       }
@@ -351,7 +422,7 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
       anchor.click();
       anchor.remove();
     } catch (err) {
-      if (this.loads !== loads) return;
+      if (!current()) return;
       this.downloadErrors = new Map(this.downloadErrors).set(
         index,
         `Download failed: ${errorMessage(err)}`

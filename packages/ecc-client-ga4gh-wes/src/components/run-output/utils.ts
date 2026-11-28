@@ -149,9 +149,14 @@ function fileName(uri: string): string {
  * Splits an output into the files it has (one, a list, or files keyed by
  * name) and values that aren't files. Viewers go on the schema of the file
  * reference itself: `items` for a list, `additionalProperties` for files
- * keyed by name.
+ * keyed by name. Lists and files keyed by name give at most `limit`
+ * entries; `total` is the number of entries without the limit.
  */
-export function outputEntries(schema: unknown, value: unknown): OutputEntry[] {
+export function outputEntries(
+  schema: unknown,
+  value: unknown,
+  limit = Infinity
+): { entries: OutputEntry[]; total: number } {
   const fileOrValue = (
     fileSchema: OutputSchema,
     item: unknown,
@@ -163,7 +168,9 @@ export function outputEntries(schema: unknown, value: unknown): OutputEntry[] {
       : { type: "file", label, uri: item, schema: fileSchema };
   };
 
-  if (isFileReference(schema)) return [fileOrValue(schema, value)];
+  if (isFileReference(schema)) {
+    return { entries: [fileOrValue(schema, value)], total: 1 };
+  }
   if (isObject(schema)) {
     const { items, additionalProperties } = schema;
     if (
@@ -171,25 +178,39 @@ export function outputEntries(schema: unknown, value: unknown): OutputEntry[] {
       isFileReference(items) &&
       Array.isArray(value)
     ) {
-      return value.map((item) =>
-        fileOrValue(
-          items,
-          item,
-          typeof item === "string" ? fileName(item) : undefined
-        )
-      );
+      return {
+        entries: value
+          .slice(0, limit)
+          .map((item) =>
+            fileOrValue(
+              items,
+              item,
+              typeof item === "string" ? fileName(item) : undefined
+            )
+          ),
+        total: value.length,
+      };
     }
     if (
       schema.type === "object" &&
       isFileReference(additionalProperties) &&
       isObject(value)
     ) {
-      return Object.keys(value).map((key) =>
-        fileOrValue(additionalProperties, value[key], key)
-      );
+      const entries: OutputEntry[] = [];
+      let total = 0;
+      // eslint-disable-next-line no-restricted-syntax, guard-for-in
+      for (const key in value) {
+        if (Object.prototype.hasOwnProperty.call(value, key)) {
+          if (entries.length < limit) {
+            entries.push(fileOrValue(additionalProperties, value[key], key));
+          }
+          total += 1;
+        }
+      }
+      return { entries, total };
     }
   }
-  return [{ type: "value", value }];
+  return { entries: [{ type: "value", value }], total: 1 };
 }
 
 /**
@@ -213,22 +234,31 @@ export function delimiterFor(
 
 /**
  * The records of TSV: lines split at tabs, without quoting; at most
- * `maxFields` fields per record.
+ * `maxFields` fields per record. Blank lines are skipped. Lines are read
+ * one at a time, so that stopping early doesn't split the whole text.
  */
 function* tsvRecords(text: string, maxFields: number): Generator<string[]> {
-  for (const line of text.split("\n")) {
-    yield line.replace(/\r$/, "").split("\t", maxFields);
+  let start = 0;
+  while (start < text.length) {
+    let end = text.indexOf("\n", start);
+    if (end === -1) end = text.length;
+    const line = text.slice(start, end).replace(/\r$/, "");
+    if (line !== "") yield line.split("\t", maxFields);
+    start = end + 1;
   }
 }
 
 /**
  * The records of CSV (RFC 4180): fields may be quoted with `"`; at most
- * `maxFields` fields per record.
+ * `maxFields` fields per record. Blank lines are skipped, but not a record
+ * of one quoted empty field (`""`).
  */
 function* csvRecords(text: string, maxFields: number): Generator<string[]> {
   let record: string[] = [];
   let field = "";
   let quoted = false;
+  // Whether the current line has content (also an empty quoted field)
+  let content = false;
   for (let i = 0; i < text.length; i += 1) {
     const c = text[i];
     if (quoted) {
@@ -237,19 +267,25 @@ function* csvRecords(text: string, maxFields: number): Generator<string[]> {
         field += '"';
         i += 1;
       } else quoted = false;
-    } else if (c === '"' && field === "") quoted = true;
-    else if (c === ",") {
+    } else if (c === '"' && field === "") {
+      quoted = true;
+      content = true;
+    } else if (c === ",") {
       if (record.length < maxFields) record.push(field);
       field = "";
+      content = true;
     } else if (c === "\n" || c === "\r") {
       if (c === "\r" && text[i + 1] === "\n") i += 1;
-      if (record.length < maxFields) record.push(field);
-      yield record;
+      if (content || field !== "") {
+        if (record.length < maxFields) record.push(field);
+        yield record;
+      }
       record = [];
       field = "";
+      content = false;
     } else field += c;
   }
-  if (field !== "" || record.length > 0) {
+  if (content || field !== "") {
     if (record.length < maxFields) record.push(field);
     yield record;
   }
@@ -267,7 +303,7 @@ export interface ParsedTable {
 
 /**
  * Parses CSV or TSV into a header (the first row) and at most `maxRows`
- * rows of at most `maxColumns` cells. Empty lines are skipped.
+ * rows of at most `maxColumns` cells. Blank lines are skipped.
  */
 export function parseDelimited(
   text: string,
@@ -289,10 +325,7 @@ export function parseDelimited(
     return record.slice(0, maxColumns);
   };
   for (const record of records) {
-    const empty = record.length === 1 && record[0] === "";
-    if (empty) {
-      // Skipped
-    } else if (!seenHeader) {
+    if (!seenHeader) {
       header = cut(record);
       seenHeader = true;
     } else if (rows.length >= maxRows) {

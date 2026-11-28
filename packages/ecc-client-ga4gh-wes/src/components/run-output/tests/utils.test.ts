@@ -12,6 +12,9 @@ import {
   viewerOf,
 } from "../utils.js";
 
+const entriesOf = (schema: unknown, value: unknown) =>
+  outputEntries(schema, value).entries;
+
 const fileRef = (extra: Record<string, unknown> = {}) => ({
   type: "string",
   "x-ga4gh-file": { kind: "file" },
@@ -125,14 +128,14 @@ describe("viewerOf", () => {
 describe("outputEntries", () => {
   it("returns one entry for a file", () => {
     const schema = fileRef();
-    expect(outputEntries(schema, "s3://b/a.html")).to.deep.equal([
+    expect(entriesOf(schema, "s3://b/a.html")).to.deep.equal([
       { type: "file", uri: "s3://b/a.html", schema },
     ]);
   });
 
   it("returns one entry per file of a list, labelled by file name", () => {
     const items = fileRef();
-    const entries = outputEntries({ type: "array", items }, [
+    const entries = entriesOf({ type: "array", items }, [
       "s3://b/x/s1.bam",
       "s3://b/x/s%202.bam",
     ]);
@@ -149,7 +152,7 @@ describe("outputEntries", () => {
 
   it("returns one entry per file keyed by name, labelled by key", () => {
     const additionalProperties = fileRef();
-    const entries = outputEntries(
+    const entries = entriesOf(
       { type: "object", additionalProperties },
       {
         s1: "s3://b/s1.tsv",
@@ -162,15 +165,35 @@ describe("outputEntries", () => {
     ]);
   });
 
+  it("gives at most `limit` entries and counts all", () => {
+    const items = fileRef();
+    const list = outputEntries(
+      { type: "array", items },
+      ["a:1", "a:2", "a:3"],
+      2
+    );
+    expect(list.entries.length).to.equal(2);
+    expect(list.total).to.equal(3);
+    const keyed = outputEntries(
+      { type: "object", additionalProperties: items },
+      { x: "a:1", y: "a:2", z: "a:3" },
+      1
+    );
+    expect(keyed.entries).to.deep.equal([
+      { type: "file", label: "x", uri: "a:1", schema: items },
+    ]);
+    expect(keyed.total).to.equal(3);
+  });
+
   it("returns values that aren't files as values", () => {
-    expect(outputEntries({ type: "integer" }, 2)).to.deep.equal([
+    expect(entriesOf({ type: "integer" }, 2)).to.deep.equal([
       { type: "value", value: 2 },
     ]);
     // A file reference whose value isn't a string
-    expect(outputEntries(fileRef(), 3)).to.deep.equal([
+    expect(entriesOf(fileRef(), 3)).to.deep.equal([
       { type: "value", value: 3 },
     ]);
-    expect(outputEntries(undefined, "s3://b/a")).to.deep.equal([
+    expect(entriesOf(undefined, "s3://b/a")).to.deep.equal([
       { type: "value", value: "s3://b/a" },
     ]);
   });
@@ -239,6 +262,16 @@ describe("parseDelimited", () => {
         moreColumns: true,
       });
     });
+  });
+
+  it("skips blank lines, but not a quoted empty CSV field", () => {
+    expect(parseDelimited('h\n\n""\n\r\nx\n', ",", 10, 10).rows).to.deep.equal([
+      [""],
+      ["x"],
+    ]);
+    expect(parseDelimited("h\n\n\r\nx\n", "\t", 10, 10).rows).to.deep.equal([
+      ["x"],
+    ]);
   });
 
   it("returns an empty table for empty text", () => {

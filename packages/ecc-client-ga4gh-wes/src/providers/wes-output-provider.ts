@@ -6,6 +6,12 @@
  * or `drs://`) become URLs that the browser can fetch, and adds
  * credentials. Elements call it only for URIs whose scheme is on their
  * allow-list; they never fetch or link the URIs themselves.
+ *
+ * The allow-list doesn't check hosts, and output URIs come from the run:
+ * an `https` URI can name an internal service. Implementations that fetch
+ * or sign URIs on a server (a proxy, a presigning service) must accept only
+ * the deployment's own storage and DRS hosts, and must not follow
+ * redirects elsewhere.
  */
 export interface WesOutputProvider {
   /**

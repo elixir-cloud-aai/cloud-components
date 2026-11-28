@@ -34,7 +34,7 @@ Outputs come from the run, which may have processed files supplied by users, and
 - **Allow-list:** every URI is checked against `allowedSchemes` and, if the file reference has `schemes`, against those too, before anything is fetched or offered for download. URIs with other schemes, paths, control characters or surrounding whitespace are shown as text, with a note. `javascript`, `data`, `blob`, `file` and the other schemes that run code or refer to local data are never allowed, even if listed.
 - **HTML:** shown only in an `iframe` with an empty `sandbox` attribute (no scripts, forms, pop-ups or navigation of the page, and an opaque origin) and `srcdoc` that starts, before the untrusted markup, with a `<meta>` Content Security Policy (`default-src 'none'; img-src data:; style-src 'unsafe-inline'`), a `no-referrer` referrer policy and `<base target="_blank">`, so that clicked links can't load other pages, which the policy doesn't cover, into the frame (new windows are blocked by the sandbox). The markup's own `<base>` and `<meta>` policies and its `target` and `referrerpolicy` attributes are removed first, as they would override that. If the file can't be fetched or is larger than `maxBytes`, it is offered for download only.
 - **Downloads, never direct links:** stored files can contain active content (HTML, SVG, PDF) whatever their name. The component never links to them; its download button asks the provider for a download URL, which must make the storage or a proxy send `Content-Disposition: attachment` and `X-Content-Type-Options: nosniff`.
-- **Limits:** viewers read at most `maxBytes` bytes of a file, tables show at most `maxRows` rows and `maxColumns` columns, and lists show at most `maxFiles` files; the rest is offered for download. Viewers load one file at a time, and give up on a file after 30 seconds. Setting the same output again retries the viewers that failed.
+- **Limits:** viewers read at most `maxBytes` bytes of a file, tables show at most `maxRows` rows and `maxColumns` columns, and lists show at most `maxFiles` files; the rest is offered for download. All tables of an output show at most 200,000 cells together. Viewers load one file at a time, and give up on a file (and a download on its URL) after 30 seconds; `reload()` retries the viewers that failed.
 
 ## Usage
 
@@ -137,6 +137,10 @@ interface WesOutputProvider {
 ```
 
 <Callout type="warning">
+  The scheme allow-list doesn't check hosts: an `https` output can name any host, including internal services and metadata endpoints such as `169.254.169.254`. A provider that fetches or signs output URIs on a server (a proxy, a presigning service) must accept only the deployment's own storage and DRS hosts, and must not follow redirects elsewhere.
+</Callout>
+
+<Callout type="warning">
   The download URL must make the browser save the file, not show it: set `Content-Disposition: attachment` and `X-Content-Type-Options: nosniff` in a proxy, or make the storage set them (e.g. the `response-content-disposition` parameter of a presigned S3 URL). The `download` attribute of the link that the component uses works only for URLs on the page's own origin. The component refuses download URLs that aren't `http:` or `https:`.
 </Callout>
 
@@ -157,6 +161,12 @@ Without a provider, the component shows the URIs of files as text, without viewe
 | `maxBytes` | `max-bytes` | `number` | `5242880` (5 MiB) | Bytes of a file that a viewer reads at most. |
 
 Invalid limits (negative or not a number) mean the default.
+
+## Methods
+
+| Method | Description |
+|--------|-------------|
+| `reload()` | Loads the output again, e.g. to retry viewers that failed. Setting equal properties doesn't reload. |
 
 ## CSS Parts
 

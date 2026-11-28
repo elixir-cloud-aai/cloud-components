@@ -534,6 +534,93 @@ describe("ecc-client-ga4gh-wes-run-output", () => {
   describe("reloads", () => {
     afterEach(() => {
       ECCClientGa4ghWesRunOutput.loadTimeout = 30000;
+      ECCClientGa4ghWesRunOutput.maxCells = 200000;
+    });
+
+    it("shows at most maxCells cells over all tables", async () => {
+      ECCClientGa4ghWesRunOutput.maxCells = 6;
+      const provider = stubProvider({
+        "s3://bucket/a.tsv": "h\tg\n1\t2\n3\t4\n",
+        "s3://bucket/b.tsv": "h\tg\n5\t6\n",
+        "s3://bucket/c.tsv": "h\tg\n7\t8\n",
+      });
+      const el = await render(
+        { type: "array", items: tableSchema },
+        ["s3://bucket/a.tsv", "s3://bucket/b.tsv", "s3://bucket/c.tsv"],
+        provider
+      );
+      await settled(el);
+
+      // a: header and 2 rows (6 cells); b: none left; c: none left
+      const cells = root(el).querySelectorAll("ecc-utils-design-table-cell");
+      expect(Array.from(cells, (c) => c.textContent?.trim())).to.deep.equal([
+        "1",
+        "2",
+        "3",
+        "4",
+      ]);
+      expect(root(el).textContent).to.contain("too large to show together");
+    });
+
+    it("gives up on a download URL that doesn't arrive", async () => {
+      ECCClientGa4ghWesRunOutput.loadTimeout = 50;
+      const provider = stubProvider();
+      provider.getDownloadUrl.returns(
+        new Promise<string>(() => {
+          // Never settles
+        })
+      );
+      const el = await render(fileRef(), BAM, provider);
+      (downloadButtons(el)[0] as HTMLElement).click();
+      await waitUntil(() => root(el).textContent?.includes("Download failed"));
+
+      expect(root(el).textContent).to.contain("no response within");
+    });
+
+    it("drops a download if the same index now holds another file", async () => {
+      let release: (url: string) => void = () => undefined;
+      const provider = stubProvider();
+      provider.getDownloadUrl.callsFake(
+        () =>
+          new Promise<string>((resolve) => {
+            release = resolve;
+          })
+      );
+      const click = sinon.stub(HTMLAnchorElement.prototype, "click");
+      const el = await render(fileRef(), BAM, provider);
+      (downloadButtons(el)[0] as HTMLElement).click();
+      // Set, but not yet updated
+      el.value = "s3://bucket/run/other.bam";
+      release("https://proxy.example.org/dl?old");
+      await new Promise((resolve) => {
+        setTimeout(resolve, 20);
+      });
+
+      expect(click.callCount).to.equal(0);
+    });
+
+    it("keeps the result of the latest download request", async () => {
+      const releases: ((url: string) => void)[] = [];
+      const provider = stubProvider();
+      provider.getDownloadUrl.callsFake(
+        () =>
+          new Promise<string>((resolve) => {
+            releases.push(resolve);
+          })
+      );
+      const click = sinon.stub(HTMLAnchorElement.prototype, "click");
+      const el = await render(fileRef(), BAM, provider);
+      (downloadButtons(el)[0] as HTMLElement).click();
+      (downloadButtons(el)[0] as HTMLElement).click();
+      releases[1]("https://proxy.example.org/dl?new");
+      releases[0]("javascript:alert(1)");
+      await new Promise((resolve) => {
+        setTimeout(resolve, 20);
+      });
+      await el.updateComplete;
+
+      expect(click.callCount).to.equal(1);
+      expect(root(el).textContent).not.to.contain("Download failed");
     });
 
     it("gives up on a file that doesn't arrive and loads the next", async () => {
@@ -554,7 +641,7 @@ describe("ecc-client-ga4gh-wes-run-output", () => {
       ]);
     });
 
-    it("retries failed viewers when the same output is set again", async () => {
+    it("retries failed viewers on reload()", async () => {
       const provider = stubProvider();
       provider.fetchOutput
         .onFirstCall()
@@ -564,8 +651,7 @@ describe("ecc-client-ga4gh-wes-run-output", () => {
       await settled(el);
       expect(root(el).textContent).to.contain("503");
 
-      el.value = `${COUNTS}`;
-      el.schema = { ...tableSchema };
+      el.reload();
       await el.updateComplete;
       await settled(el);
 
