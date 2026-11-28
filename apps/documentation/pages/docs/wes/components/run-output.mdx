@@ -18,10 +18,10 @@ It takes the schema of one output (a property of `outputs` in the IO schema) and
 
 | Output | Shown as |
 |--------|----------|
-| A file with `table-viewer` | A table of the CSV or TSV file: the first row is the header, every cell is text, at most `maxRows` rows |
+| A file with `table-viewer` | A table of the CSV or TSV file: the first row is the header, every cell is text, at most `maxRows` rows and `maxColumns` columns |
 | A file with `html-viewer` | The HTML file in an `iframe` with an empty `sandbox` attribute and a Content Security Policy that blocks external loads |
 | Any other file or directory (no viewer, another or unknown viewer, `custom:` viewers) | Its URI as text and a download button |
-| A list of files, or files keyed by name | One entry per file, labelled by its file name or key, each with the viewer of `items` or `additionalProperties` |
+| A list of files, or files keyed by name | One entry per file, labelled by its file name or key, each with the viewer of `items` or `additionalProperties`; at most `maxFiles` entries |
 | Any other value (a number, a string, a record) | The value as text |
 
 The component is deliberately minimal: a library of widgets for inputs and outputs may replace or wrap it later.
@@ -32,9 +32,9 @@ Outputs come from the run, which may have processed files supplied by users, and
 
 - **Text:** the title, the description (also Markdown) and the cells of tables are shown as text; markup in them stays visible as markup and never reaches the page.
 - **Allow-list:** every URI is checked against `allowedSchemes` and, if the file reference has `schemes`, against those too, before anything is fetched or offered for download. URIs with other schemes, paths, control characters or surrounding whitespace are shown as text, with a note. `javascript`, `data`, `blob`, `file` and the other schemes that run code or refer to local data are never allowed, even if listed.
-- **HTML:** shown only in an `iframe` with an empty `sandbox` attribute (no scripts, forms, pop-ups or navigation, and an opaque origin) and `srcdoc` that starts with a `<meta>` Content Security Policy (`default-src 'none'; img-src data:; style-src 'unsafe-inline'`) before the untrusted markup. If the file can't be fetched or is larger than `maxBytes`, it is offered for download only.
+- **HTML:** shown only in an `iframe` with an empty `sandbox` attribute (no scripts, forms, pop-ups or navigation of the page, and an opaque origin) and `srcdoc` that starts, before the untrusted markup, with a `<meta>` Content Security Policy (`default-src 'none'; img-src data:; style-src 'unsafe-inline'`), a `no-referrer` referrer policy and `<base target="_blank">`, so that clicked links can't load other pages into the frame (new windows are blocked by the sandbox). If the file can't be fetched or is larger than `maxBytes`, it is offered for download only.
 - **Downloads, never direct links:** stored files can contain active content (HTML, SVG, PDF) whatever their name. The component never links to them; its download button asks the provider for a download URL, which must make the storage or a proxy send `Content-Disposition: attachment` and `X-Content-Type-Options: nosniff`.
-- **Limits:** viewers read at most `maxBytes` bytes of a file and tables show at most `maxRows` rows; the rest is offered for download.
+- **Limits:** viewers read at most `maxBytes` bytes of a file, tables show at most `maxRows` rows and `maxColumns` columns, and lists show at most `maxFiles` files; the rest is offered for download. Viewers load one file at a time.
 
 ## Usage
 
@@ -62,6 +62,10 @@ This example shows the outputs of the profile's demo workflow (an HTML report, a
         `/api/outputs?uri=${encodeURIComponent(uri)}&download=1`,
     };
 
+    // Outside the component: new arrays or objects on every render are
+    // compared by content, but stable ones save the comparison
+    const allowedSchemes = ['drs', 'https', 's3'];
+
     const schema = {
       type: 'string',
       title: 'Read counts per reference (TSV)',
@@ -76,7 +80,7 @@ This example shows the outputs of the profile's demo workflow (an HTML report, a
           schema={schema}
           value="s3://bucket/runs/7/read_counts.tsv"
           provider={provider}
-          allowedSchemes={['drs', 'https', 's3']}
+          allowedSchemes={allowedSchemes}
         />
       );
     }
@@ -146,9 +150,13 @@ Without a provider, the component shows the URIs of files as text, without viewe
 | `schema` | | `object` | `undefined` | Schema of the output: the property of `outputs` of the IO schema. |
 | `value` | | `unknown` | `undefined` | Value of the output in the normalised outputs object. |
 | `provider` | | `WesOutputProvider` | `undefined` | Fetches files for viewers and returns download URLs (see [Output provider](#output-provider)). |
-| `allowedSchemes` | `allowed-schemes` | `string[]` | `["drs", "https"]` | URI schemes that may be fetched or downloaded; the attribute separates them by spaces or commas. Set the deployment's allow-list: `drs`, `https`, the object-store schemes it supports (e.g. `s3`), and `http` only for internal networks. |
+| `allowedSchemes` | `allowed-schemes` | `string[]` | `["drs", "https"]` | URI schemes that may be fetched or downloaded; the attribute separates them by spaces or commas. Anything other than an array, or removing the attribute, means the default. Set the deployment's allow-list: `drs`, `https`, the object-store schemes it supports (e.g. `s3`), and `http` only for internal networks. |
 | `maxRows` | `max-rows` | `number` | `1000` | Rows that a table shows at most. |
+| `maxColumns` | `max-columns` | `number` | `100` | Columns that a table shows at most. |
+| `maxFiles` | `max-files` | `number` | `50` | Files of a list, or of files keyed by name, that are shown at most. |
 | `maxBytes` | `max-bytes` | `number` | `5242880` (5 MiB) | Bytes of a file that a viewer reads at most. |
+
+Invalid limits (negative or not a number) mean the default.
 
 ## CSS Parts
 

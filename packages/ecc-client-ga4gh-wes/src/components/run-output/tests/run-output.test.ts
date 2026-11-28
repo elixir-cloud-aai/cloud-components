@@ -48,7 +48,13 @@ const render = async (
   schema: unknown,
   value: unknown,
   provider?: WesOutputProvider,
-  options: { maxRows?: number; maxBytes?: number; schemes?: string[] } = {}
+  options: {
+    maxRows?: number;
+    maxColumns?: number;
+    maxFiles?: number;
+    maxBytes?: number;
+    schemes?: string[];
+  } = {}
 ) =>
   fixture<ECCClientGa4ghWesRunOutput>(html`<ecc-client-ga4gh-wes-run-output
     name="out"
@@ -57,6 +63,8 @@ const render = async (
     .provider=${provider}
     .allowedSchemes=${options.schemes ?? SCHEMES}
     .maxRows=${options.maxRows ?? 1000}
+    .maxColumns=${options.maxColumns ?? 100}
+    .maxFiles=${options.maxFiles ?? 50}
     .maxBytes=${options.maxBytes ?? 1024 * 1024}
   ></ecc-client-ga4gh-wes-run-output>`);
 
@@ -318,6 +326,7 @@ describe("ecc-client-ga4gh-wes-run-output", () => {
       expect(root(el).querySelector("iframe, a[href]")).to.equal(null);
       expect(downloadButtons(el).length).to.equal(0);
       expect(root(el).textContent).to.contain(REPORT);
+      expect(root(el).textContent).to.contain("Download isn't available");
     });
   });
 
@@ -409,6 +418,190 @@ describe("ecc-client-ga4gh-wes-run-output", () => {
 
       expect(clicked).to.deep.equal([]);
     });
+
+    it("says why a download URL couldn't be got", async () => {
+      const provider = stubProvider();
+      provider.getDownloadUrl.rejects(new Error("expired token"));
+      const el = await render(fileRef(), BAM, provider);
+      (downloadButtons(el)[0] as HTMLElement).click();
+      await waitUntil(() => root(el).textContent?.includes("expired token"));
+
+      expect(root(el).textContent).to.contain("Download failed");
+      expect(clicked).to.deep.equal([]);
+    });
+
+    it("drops a download of an output that changed meanwhile", async () => {
+      let release: (url: string) => void = () => undefined;
+      const provider = stubProvider();
+      provider.getDownloadUrl.callsFake(
+        () =>
+          new Promise<string>((resolve) => {
+            release = resolve;
+          })
+      );
+      const el = await render(fileRef(), BAM, provider);
+      (downloadButtons(el)[0] as HTMLElement).click();
+      el.value = "s3://bucket/run/other.bam";
+      await el.updateComplete;
+      release("https://proxy.example.org/dl?old");
+      await new Promise((resolve) => {
+        setTimeout(resolve, 50);
+      });
+
+      expect(clicked).to.deep.equal([]);
+    });
+  });
+
+  describe("limits", () => {
+    it("offers a table for download if its header exceeds the byte limit", async () => {
+      const provider = stubProvider({ [COUNTS]: "a very long header\n1\n" });
+      const el = await render(tableSchema, COUNTS, provider, { maxBytes: 5 });
+      await settled(el);
+
+      expect(root(el).querySelector("ecc-utils-design-table")).to.equal(null);
+      expect(root(el).textContent).to.contain("too large");
+      expect(downloadButtons(el).length).to.equal(1);
+    });
+
+    it("shows at most maxColumns columns", async () => {
+      const provider = stubProvider({ [COUNTS]: "a\tb\tc\n1\t2\t3\n" });
+      const el = await render(tableSchema, COUNTS, provider, {
+        maxColumns: 2,
+      });
+      await settled(el);
+
+      expect(
+        root(el).querySelectorAll("ecc-utils-design-table-head").length
+      ).to.equal(2);
+      expect(
+        root(el).querySelectorAll("ecc-utils-design-table-cell").length
+      ).to.equal(2);
+      expect(root(el).textContent).to.contain("first 2 columns");
+    });
+
+    it("shows at most maxFiles files of a list, loaded one at a time", async () => {
+      let inFlight = 0;
+      let maxInFlight = 0;
+      const provider = stubProvider();
+      provider.fetchOutput.callsFake(async () => {
+        inFlight += 1;
+        maxInFlight = Math.max(maxInFlight, inFlight);
+        await new Promise((resolve) => {
+          setTimeout(resolve, 5);
+        });
+        inFlight -= 1;
+        return new Response("h\n1\n");
+      });
+      const uris = Array.from(
+        { length: 5 },
+        (_, i) => `s3://bucket/run/s${i}.tsv`
+      );
+      const el = await render(
+        { type: "array", items: tableSchema },
+        uris,
+        provider,
+        { maxFiles: 3 }
+      );
+      await settled(el);
+
+      expect(root(el).querySelectorAll("[data-entry]").length).to.equal(3);
+      expect(provider.fetchOutput.callCount).to.equal(3);
+      expect(maxInFlight).to.equal(1);
+      expect(root(el).textContent).to.contain("2 more not shown");
+    });
+
+    it("uses the default limits for invalid ones", async () => {
+      const provider = stubProvider({ [COUNTS]: "h\n1\n2\n" });
+      const el = await render(tableSchema, COUNTS, provider, {
+        maxRows: Number.NaN,
+        maxColumns: -1,
+        maxBytes: Number.NaN,
+      });
+      await settled(el);
+
+      expect(
+        root(el).querySelectorAll("ecc-utils-design-table-cell").length
+      ).to.equal(2);
+      expect(root(el).querySelector("[data-notice]")).to.equal(null);
+    });
+  });
+
+  describe("reloads", () => {
+    it("doesn't refetch for equal but new properties", async () => {
+      const provider = stubProvider({ [COUNTS]: "h\n1\n" });
+      const el = await render(tableSchema, COUNTS, provider);
+      await settled(el);
+
+      el.schema = JSON.parse(JSON.stringify(tableSchema));
+      el.allowedSchemes = [...SCHEMES];
+      await el.updateComplete;
+
+      expect(provider.fetchOutput.callCount).to.equal(1);
+      expect(root(el).querySelector("ecc-utils-design-table")).not.to.equal(
+        null
+      );
+    });
+
+    it("refetches when the allow-list changes", async () => {
+      const provider = stubProvider({ [COUNTS]: "h\n1\n" });
+      const el = await render(tableSchema, COUNTS, provider);
+      await settled(el);
+
+      el.allowedSchemes = ["https"];
+      await el.updateComplete;
+
+      expect(root(el).textContent).to.contain("not allowed");
+    });
+
+    it("uses the default allow-list for one that isn't an array", async () => {
+      const el = await render(
+        fileRef(),
+        "https://example.org/a.bam",
+        stubProvider(),
+        {
+          schemes: undefined,
+        }
+      );
+      el.allowedSchemes = undefined as unknown as string[];
+      await el.updateComplete;
+
+      expect(downloadButtons(el).length).to.equal(1);
+      el.value = BAM;
+      await el.updateComplete;
+      expect(root(el).textContent).to.contain("not allowed");
+    });
+
+    it("uses the default allow-list when the attribute is removed", async () => {
+      const el = await fixture<ECCClientGa4ghWesRunOutput>(
+        html`<ecc-client-ga4gh-wes-run-output
+          allowed-schemes="s3"
+        ></ecc-client-ga4gh-wes-run-output>`
+      );
+      el.removeAttribute("allowed-schemes");
+      expect(el.allowedSchemes).to.deep.equal(["drs", "https"]);
+    });
+
+    it("aborts loads when removed and loads again when added", async () => {
+      const signals: AbortSignal[] = [];
+      const provider = stubProvider();
+      provider.fetchOutput.callsFake(
+        (_uri: string, init?: { signal?: AbortSignal }) => {
+          signals.push(init?.signal as AbortSignal);
+          return new Promise<Response>(() => {
+            // Never settles
+          });
+        }
+      );
+      const el = await render(tableSchema, COUNTS, provider);
+      const parent = el.parentNode as Node;
+      el.remove();
+      expect(signals[0].aborted).to.equal(true);
+
+      parent.appendChild(el);
+      await el.updateComplete;
+      expect(provider.fetchOutput.callCount).to.equal(2);
+      expect(signals[1].aborted).to.equal(false);
+    });
   });
 
   it("drops results of a value that was replaced while loading", async () => {
@@ -429,7 +622,9 @@ describe("ecc-client-ga4gh-wes-run-output", () => {
     });
     await el.updateComplete;
 
-    expect(root(el).textContent).to.contain("new");
-    expect(root(el).textContent).not.to.contain("old");
+    const cells = root(el).querySelectorAll("ecc-utils-design-table-cell");
+    expect(Array.from(cells, (c) => c.textContent?.trim())).to.deep.equal([
+      "new",
+    ]);
   });
 });

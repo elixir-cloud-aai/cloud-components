@@ -68,6 +68,10 @@ export const isFileReference = (schema: unknown): schema is OutputSchema =>
   schema.type === "string" &&
   isObject(schema["x-ga4gh-file"]);
 
+/** The `x-ga4gh-file` annotation of a file reference. */
+export const fileOf = (schema: OutputSchema): Record<string, unknown> =>
+  schema["x-ga4gh-file"] as Record<string, unknown>;
+
 /**
  * Checks the URI of an output before it is fetched or offered for
  * download.
@@ -124,7 +128,7 @@ export function isHttpUrl(url: unknown): url is string {
  */
 export function viewerOf(schema: unknown): Viewer | null {
   if (!isFileReference(schema)) return null;
-  const file = schema["x-ga4gh-file"] as Record<string, unknown>;
+  const file = fileOf(schema);
   const widget = schema["x-ga4gh-ui-widget"];
   if (file.kind !== "file" || typeof widget !== "string") return null;
   return VIEWERS.includes(widget) ? (widget as Viewer) : null;
@@ -207,15 +211,21 @@ export function delimiterFor(
   return firstLine.includes("\t") ? "\t" : ",";
 }
 
-/** The records of TSV: lines split at tabs, without quoting. */
-function* tsvRecords(text: string): Generator<string[]> {
+/**
+ * The records of TSV: lines split at tabs, without quoting; at most
+ * `maxFields` fields per record.
+ */
+function* tsvRecords(text: string, maxFields: number): Generator<string[]> {
   for (const line of text.split("\n")) {
-    yield line.replace(/\r$/, "").split("\t");
+    yield line.replace(/\r$/, "").split("\t", maxFields);
   }
 }
 
-/** The records of CSV (RFC 4180): fields may be quoted with `"`. */
-function* csvRecords(text: string): Generator<string[]> {
+/**
+ * The records of CSV (RFC 4180): fields may be quoted with `"`; at most
+ * `maxFields` fields per record.
+ */
+function* csvRecords(text: string, maxFields: number): Generator<string[]> {
   let record: string[] = [];
   let field = "";
   let quoted = false;
@@ -229,47 +239,67 @@ function* csvRecords(text: string): Generator<string[]> {
       } else quoted = false;
     } else if (c === '"' && field === "") quoted = true;
     else if (c === ",") {
-      record.push(field);
+      if (record.length < maxFields) record.push(field);
       field = "";
     } else if (c === "\n" || c === "\r") {
       if (c === "\r" && text[i + 1] === "\n") i += 1;
-      record.push(field);
+      if (record.length < maxFields) record.push(field);
       yield record;
       record = [];
       field = "";
     } else field += c;
   }
   if (field !== "" || record.length > 0) {
-    record.push(field);
+    if (record.length < maxFields) record.push(field);
     yield record;
   }
 }
 
+/** A table parsed from CSV or TSV. */
+export interface ParsedTable {
+  header: string[];
+  rows: string[][];
+  /** Whether rows were left out */
+  more: boolean;
+  /** Whether columns were left out */
+  moreColumns: boolean;
+}
+
 /**
  * Parses CSV or TSV into a header (the first row) and at most `maxRows`
- * rows; `more` says whether there are more rows. Empty lines are skipped.
+ * rows of at most `maxColumns` cells. Empty lines are skipped.
  */
 export function parseDelimited(
   text: string,
   delimiter: "\t" | ",",
-  maxRows: number
-): { header: string[]; rows: string[][]; more: boolean } {
-  const records = delimiter === "\t" ? tsvRecords(text) : csvRecords(text);
+  maxRows: number,
+  maxColumns: number
+): ParsedTable {
+  // One more field than shown, to know whether there are more
+  const records =
+    delimiter === "\t"
+      ? tsvRecords(text, maxColumns + 1)
+      : csvRecords(text, maxColumns + 1);
   let header: string[] = [];
   const rows: string[][] = [];
   let seenHeader = false;
+  let moreColumns = false;
+  const cut = (record: string[]) => {
+    if (record.length > maxColumns) moreColumns = true;
+    return record.slice(0, maxColumns);
+  };
   for (const record of records) {
     const empty = record.length === 1 && record[0] === "";
     if (empty) {
       // Skipped
     } else if (!seenHeader) {
-      header = record;
+      header = cut(record);
       seenHeader = true;
     } else if (rows.length >= maxRows) {
-      return { header, rows, more: true };
-    } else rows.push(record);
+      return { header, rows, more: true, moreColumns };
+    } else rows.push(cut(record));
   }
-  return { header, rows, more: false };
+  return { header, rows, more: false, moreColumns };
 }
 
 /**
@@ -312,5 +342,7 @@ export async function readLimitedText(
  * that it applies to all of it.
  */
 export function htmlSrcdoc(markup: string): string {
-  return `<!DOCTYPE html><meta http-equiv="Content-Security-Policy" content="${HTML_OUTPUT_CSP}">${markup}`;
+  // `base` opens links in a new window, which the sandbox doesn't allow,
+  // so that clicked links can't load other pages into the frame
+  return `<!DOCTYPE html><meta http-equiv="Content-Security-Policy" content="${HTML_OUTPUT_CSP}"><meta name="referrer" content="no-referrer"><base target="_blank">${markup}`;
 }

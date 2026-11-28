@@ -7,9 +7,11 @@ import {
   DEFAULT_ALLOWED_SCHEMES,
   OutputEntry,
   OutputSchema,
+  ParsedTable,
   Viewer,
   checkOutputUri,
   delimiterFor,
+  fileOf,
   htmlSrcdoc,
   isHttpUrl,
   outputEntries,
@@ -22,7 +24,11 @@ import "@elixir-cloud/design/components/skeleton/index.js";
 import "@elixir-cloud/design/components/table/index.js";
 
 const DEFAULT_MAX_ROWS = 1000;
+const DEFAULT_MAX_COLUMNS = 100;
+const DEFAULT_MAX_FILES = 50;
 const DEFAULT_MAX_BYTES = 5 * 1024 * 1024;
+
+type FileEntry = Extract<OutputEntry, { type: "file" }>;
 
 /** What an entry of the output shows below its URI. */
 type View =
@@ -31,10 +37,16 @@ type View =
   | { status: "blocked"; message: string }
   | { status: "error"; message: string }
   | { status: "html"; srcdoc: string }
-  | { status: "table"; header: string[]; rows: string[][]; more: boolean };
+  | ({ status: "table" } & ParsedTable);
 
 const errorMessage = (err: unknown) =>
   err instanceof Error ? err.message : String(err);
+
+/** Compares lists of schemes by content, ignoring case. */
+const sameSchemes = (a: unknown, b: unknown): boolean =>
+  Array.isArray(a) && Array.isArray(b)
+    ? a.join(" ").toLowerCase() === b.join(" ").toLowerCase()
+    : a === b;
 
 /**
  * @summary Shows one output of a workflow run, as its viewer hint in the
@@ -50,9 +62,14 @@ const errorMessage = (err: unknown) =>
  * @property {WesOutputProvider} provider - Fetches files for viewers and
  *   returns download URLs; without it, files are shown as URIs only.
  * @property {string[]} allowedSchemes - URI schemes that may be fetched or
- *   downloaded (attribute `allowed-schemes`, separated by spaces or commas).
+ *   downloaded (attribute `allowed-schemes`, separated by spaces or commas);
+ *   anything other than an array, or no attribute, means the default.
  * @property {number} maxRows - Rows that a table shows at most (attribute
  *   `max-rows`).
+ * @property {number} maxColumns - Columns that a table shows at most
+ *   (attribute `max-columns`).
+ * @property {number} maxFiles - Files of a list, or of files keyed by name,
+ *   that are shown at most (attribute `max-files`).
  * @property {number} maxBytes - Bytes of a file that a viewer reads at most
  *   (attribute `max-bytes`).
  *
@@ -76,12 +93,15 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
   @property({ attribute: false }) provider?: WesOutputProvider;
   @property({
     attribute: "allowed-schemes",
+    hasChanged: (value: unknown, old: unknown) => !sameSchemes(value, old),
     converter: {
       fromAttribute: (value: string | null) =>
-        (value ?? "")
-          .split(/[\s,]+/)
-          .filter(Boolean)
-          .map((scheme) => scheme.toLowerCase()),
+        value === null
+          ? [...DEFAULT_ALLOWED_SCHEMES]
+          : value
+              .split(/[\s,]+/)
+              .filter(Boolean)
+              .map((scheme) => scheme.toLowerCase()),
       toAttribute: (value: string[]) => value.join(" "),
     },
   })
@@ -89,14 +109,25 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
 
   @property({ type: Number, attribute: "max-rows" }) maxRows = DEFAULT_MAX_ROWS;
 
+  @property({ type: Number, attribute: "max-columns" }) maxColumns =
+    DEFAULT_MAX_COLUMNS;
+
+  @property({ type: Number, attribute: "max-files" }) maxFiles =
+    DEFAULT_MAX_FILES;
+
   @property({ type: Number, attribute: "max-bytes" }) maxBytes =
     DEFAULT_MAX_BYTES;
 
   @state() private entries: OutputEntry[] = [];
+  /** Entries left out by `maxFiles` */
+  @state() private hiddenEntries = 0;
   @state() private views = new Map<number, View>();
   @state() private downloadErrors = new Map<number, string>();
 
   private loads?: AbortController;
+
+  /** What the current views were loaded for, to skip needless reloads */
+  private loadedFor?: { key: string; provider?: WesOutputProvider };
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
@@ -116,6 +147,8 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
       changed.has("provider") ||
       changed.has("allowedSchemes") ||
       changed.has("maxRows") ||
+      changed.has("maxColumns") ||
+      changed.has("maxFiles") ||
       changed.has("maxBytes")
     ) {
       this.load();
@@ -126,21 +159,52 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
     return Number.isFinite(value) && value >= 0 ? Math.floor(value) : fallback;
   }
 
-  /** Splits the output into entries and starts loading their viewers. */
+  private get schemes(): readonly string[] {
+    return Array.isArray(this.allowedSchemes)
+      ? this.allowedSchemes
+      : DEFAULT_ALLOWED_SCHEMES;
+  }
+
+  /**
+   * Splits the output into entries and loads their viewers, one file at a
+   * time. Skipped if nothing that the views depend on changed (e.g. React
+   * sets equal but new objects on every render).
+   */
   private load(): void {
+    const all = outputEntries(this.schema, this.value);
+    const maxFiles = ECCClientGa4ghWesRunOutput.limit(
+      this.maxFiles,
+      DEFAULT_MAX_FILES
+    );
+    const entries = all.length > 1 ? all.slice(0, maxFiles) : all;
+    const key = JSON.stringify({
+      entries,
+      schemes: this.schemes,
+      limits: [this.maxRows, this.maxColumns, this.maxFiles, this.maxBytes],
+    });
+    if (
+      this.loads &&
+      !this.loads.signal.aborted &&
+      this.loadedFor?.key === key &&
+      this.loadedFor.provider === this.provider
+    ) {
+      return;
+    }
+    this.loadedFor = { key, provider: this.provider };
     this.loads?.abort();
     const controller = new AbortController();
     this.loads = controller;
-    this.entries = outputEntries(this.schema, this.value);
+    this.entries = entries;
+    this.hiddenEntries = all.length - entries.length;
     this.downloadErrors = new Map();
     const views = new Map<number, View>();
-    this.entries.forEach((entry, index) => {
+    const jobs: { index: number; entry: FileEntry; viewer: Viewer }[] = [];
+    entries.forEach((entry, index) => {
       if (entry.type !== "file") return;
-      const file = entry.schema["x-ga4gh-file"] as Record<string, unknown>;
       const refused = checkOutputUri(
         entry.uri,
-        this.allowedSchemes,
-        file.schemes
+        this.schemes,
+        fileOf(entry.schema).schemes
       );
       if (refused) {
         views.set(index, { status: "blocked", message: refused });
@@ -152,9 +216,25 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
         return;
       }
       views.set(index, { status: "loading" });
-      this.loadView(index, entry, viewer, this.provider, controller.signal);
+      jobs.push({ index, entry, viewer });
     });
     this.views = views;
+    if (this.provider && jobs.length > 0) {
+      this.loadViews(jobs, this.provider, controller.signal);
+    }
+  }
+
+  /** Loads viewers one after the other, so a long list can't flood. */
+  private async loadViews(
+    jobs: { index: number; entry: FileEntry; viewer: Viewer }[],
+    provider: WesOutputProvider,
+    signal: AbortSignal
+  ): Promise<void> {
+    for (const { index, entry, viewer } of jobs) {
+      if (signal.aborted) return;
+      // eslint-disable-next-line no-await-in-loop
+      await this.loadView(index, entry, viewer, provider, signal);
+    }
   }
 
   private setView(index: number, view: View): void {
@@ -163,7 +243,7 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
 
   private async loadView(
     index: number,
-    entry: Extract<OutputEntry, { type: "file" }>,
+    entry: FileEntry,
     viewer: Viewer,
     provider: WesOutputProvider,
     signal: AbortSignal
@@ -172,6 +252,10 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
       this.maxBytes,
       DEFAULT_MAX_BYTES
     );
+    const tooLarge: View = {
+      status: "error",
+      message: `the file is too large to show (more than ${maxBytes} bytes)`,
+    };
     try {
       const response = await provider.fetchOutput(entry.uri, { signal });
       if (signal.aborted) return;
@@ -188,12 +272,7 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
         // A cut report would be shown incomplete without a hint
         this.setView(
           index,
-          truncated
-            ? {
-                status: "error",
-                message: `the file is too large to show (more than ${maxBytes} bytes)`,
-              }
-            : { status: "html", srcdoc: htmlSrcdoc(text) }
+          truncated ? tooLarge : { status: "html", srcdoc: htmlSrcdoc(text) }
         );
         return;
       }
@@ -201,11 +280,16 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
       const complete = truncated
         ? text.slice(0, text.lastIndexOf("\n") + 1)
         : text;
-      const file = entry.schema["x-ga4gh-file"] as Record<string, unknown>;
+      if (truncated && !complete) {
+        // Not even the header fits
+        this.setView(index, tooLarge);
+        return;
+      }
       const table = parseDelimited(
         complete,
-        delimiterFor(file.mediaType, entry.uri, complete),
-        ECCClientGa4ghWesRunOutput.limit(this.maxRows, DEFAULT_MAX_ROWS)
+        delimiterFor(fileOf(entry.schema).mediaType, entry.uri, complete),
+        ECCClientGa4ghWesRunOutput.limit(this.maxRows, DEFAULT_MAX_ROWS),
+        ECCClientGa4ghWesRunOutput.limit(this.maxColumns, DEFAULT_MAX_COLUMNS)
       );
       this.setView(index, {
         status: "table",
@@ -219,12 +303,15 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
   }
 
   private async download(index: number, uri: string): Promise<void> {
+    const { loads } = this;
     const errors = new Map(this.downloadErrors);
     errors.delete(index);
     this.downloadErrors = errors;
     try {
       if (!this.provider) throw new Error("no output provider is set");
       const url = await this.provider.getDownloadUrl(uri);
+      // The output changed meanwhile: the click was for another file
+      if (this.loads !== loads) return;
       if (!isHttpUrl(url)) {
         throw new Error("the provider returned no http or https URL");
       }
@@ -236,6 +323,7 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
       anchor.click();
       anchor.remove();
     } catch (err) {
+      if (this.loads !== loads) return;
       this.downloadErrors = new Map(this.downloadErrors).set(
         index,
         `Download failed: ${errorMessage(err)}`
@@ -250,13 +338,18 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
 
   private static renderTable(view: Extract<View, { status: "table" }>) {
     const shown = view.rows.length;
+    const columns = view.header.length;
     return html`
-      ${view.more
+      ${view.more || view.moreColumns
         ? html`<p class="text-muted-foreground" data-notice>
-            ${shown === 1
-              ? "Showing the first row only."
-              : `Showing the first ${shown} rows only.`}
-            Download the file for all rows.
+            ${view.more && shown === 1 ? "Showing the first row only." : ""}
+            ${view.more && shown !== 1
+              ? `Showing the first ${shown} rows only.`
+              : ""}
+            ${view.moreColumns
+              ? `Showing the first ${columns} columns only.`
+              : ""}
+            Download the file for all of it.
           </p>`
         : nothing}
       <div class="max-h-[480px] overflow-auto">
@@ -304,8 +397,10 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
           Can't show the file: ${view.message}. Download it instead.
         </p>`;
       case "html":
-        // Empty sandbox: no scripts, forms, pop-ups or navigation, and an
-        // opaque origin; the CSP in srcdoc blocks external loads
+        // Empty sandbox: no scripts, forms, pop-ups or navigation of the
+        // page, and an opaque origin; the CSP in srcdoc blocks external
+        // loads, and its base element stops links from loading other pages
+        // into the frame
         return html`<iframe
           sandbox=""
           referrerpolicy="no-referrer"
@@ -407,6 +502,12 @@ ${JSON.stringify(value, null, 2)}</pre
             ? this.renderFile(entry, index)
             : ECCClientGa4ghWesRunOutput.renderValue(entry.value)
         )}
+        ${this.hiddenEntries > 0
+          ? html`<p class="text-muted-foreground" data-hidden>
+              ${this.hiddenEntries} more not shown: showing the first
+              ${this.entries.length} only.
+            </p>`
+          : nothing}
       </section>
     `;
   }

@@ -194,37 +194,59 @@ describe("delimiterFor", () => {
 
 describe("parseDelimited", () => {
   it("splits TSV into a header and rows", () => {
-    expect(parseDelimited("a\tb\r\n1\t2\n3\t4\n", "\t", 10)).to.deep.equal({
+    expect(parseDelimited("a\tb\r\n1\t2\n3\t4\n", "\t", 10, 10)).to.deep.equal({
       header: ["a", "b"],
       rows: [
         ["1", "2"],
         ["3", "4"],
       ],
       more: false,
+      moreColumns: false,
     });
   });
 
   it("parses quoted CSV fields", () => {
     const text = 'name,note\n"Smith, J.","said ""hi""\nthen left"\n';
-    expect(parseDelimited(text, ",", 10).rows).to.deep.equal([
+    expect(parseDelimited(text, ",", 10, 10).rows).to.deep.equal([
       ["Smith, J.", 'said "hi"\nthen left'],
     ]);
   });
 
   it("stops at the row limit and says that there are more", () => {
     const text = "h\n1\n2\n3\n4\n";
-    expect(parseDelimited(text, ",", 2)).to.deep.equal({
+    expect(parseDelimited(text, ",", 2, 10)).to.deep.equal({
       header: ["h"],
       rows: [["1"], ["2"]],
       more: true,
+      moreColumns: false,
+    });
+  });
+
+  ["\t", ","].forEach((delimiter) => {
+    it(`cuts rows at the column limit (${JSON.stringify(delimiter)})`, () => {
+      const line = (n: number) =>
+        Array.from({ length: n }, (_, i) => `c${i}`).join(delimiter);
+      const text = `${line(5)}\n${line(3)}\n${line(100000)}\n`;
+      expect(
+        parseDelimited(text, delimiter as "\t" | ",", 10, 3)
+      ).to.deep.equal({
+        header: ["c0", "c1", "c2"],
+        rows: [
+          ["c0", "c1", "c2"],
+          ["c0", "c1", "c2"],
+        ],
+        more: false,
+        moreColumns: true,
+      });
     });
   });
 
   it("returns an empty table for empty text", () => {
-    expect(parseDelimited("", ",", 10)).to.deep.equal({
+    expect(parseDelimited("", ",", 10, 10)).to.deep.equal({
       header: [],
       rows: [],
       more: false,
+      moreColumns: false,
     });
   });
 });
@@ -259,5 +281,19 @@ describe("htmlSrcdoc", () => {
     expect(meta?.getAttribute("http-equiv")).to.equal(
       "Content-Security-Policy"
     );
+  });
+
+  it("keeps links from loading other pages into the frame", () => {
+    const parsed = new DOMParser().parseFromString(
+      htmlSrcdoc('<base target="_self"><a href="https://a.example/">a</a>'),
+      "text/html"
+    );
+    // The first base element wins
+    expect(parsed.querySelector("base")?.getAttribute("target")).to.equal(
+      "_blank"
+    );
+    expect(
+      parsed.querySelector('meta[name="referrer"]')?.getAttribute("content")
+    ).to.equal("no-referrer");
   });
 });

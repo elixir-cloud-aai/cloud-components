@@ -7,6 +7,8 @@ import {
   outputs,
 } from '@/components/packages/wes/runOutputExample';
 
+const allowedSchemes = ['drs', 'https', 's3'];
+
 export default function RunOutputPreview() {
   return (
     <PreviewLayout>
@@ -18,7 +20,7 @@ export default function RunOutputPreview() {
             schema={outputSchemas[name]}
             value={outputs[name]}
             provider={exampleOutputProvider}
-            allowedSchemes={['drs', 'https', 's3']}
+            allowedSchemes={allowedSchemes}
           />
         ))}
       </div>
