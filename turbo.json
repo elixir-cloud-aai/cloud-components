@@ -27,7 +27,8 @@
     "dev": {
       "cache": false,
       "persistent": true,
-      "dependsOn": ["topo"]
+      "dependsOn": ["topo"],
+      "env": ["PORT"]
     }
   }
 }
