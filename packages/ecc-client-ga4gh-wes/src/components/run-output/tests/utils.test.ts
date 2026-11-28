@@ -296,4 +296,23 @@ describe("htmlSrcdoc", () => {
       parsed.querySelector('meta[name="referrer"]')?.getAttribute("content")
     ).to.equal("no-referrer");
   });
+
+  it("removes what would override that from the markup", () => {
+    const parsed = new DOMParser().parseFromString(
+      htmlSrcdoc(
+        '<meta name="referrer" content="unsafe-url">' +
+          '<meta http-equiv="refresh" content="0;url=https://a.example/">' +
+          '<a href="https://a.example/" target="_self">a</a>' +
+          '<a href="https://a.example/" referrerpolicy="unsafe-url">b</a>' +
+          '<svg><a href="https://a.example/" target="_self"><text>c</text></a></svg>'
+      ),
+      "text/html"
+    );
+    expect(parsed.querySelectorAll("base").length).to.equal(1);
+    expect(parsed.querySelectorAll("meta[name]").length).to.equal(1);
+    expect(parsed.querySelectorAll("meta[http-equiv]").length).to.equal(1);
+    expect(parsed.querySelectorAll("[target]").length).to.equal(1);
+    expect(parsed.querySelectorAll("[referrerpolicy]").length).to.equal(0);
+    expect(parsed.querySelectorAll("a").length).to.equal(3);
+  });
 });

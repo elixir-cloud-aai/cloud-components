@@ -339,10 +339,23 @@ export async function readLimitedText(
 /**
  * The `srcdoc` of a sandboxed frame for an HTML output: a Content Security
  * Policy that blocks external loads, placed before the untrusted markup so
- * that it applies to all of it.
+ * that it applies to all of it, and no referrer.
+ *
+ * Links open in a new window (`base`), which the sandbox doesn't allow, so
+ * clicked links can't load other pages, which the CSP doesn't cover, into
+ * the frame. The markup's own `base`, `meta` policies, and `target` and
+ * `referrerpolicy` attributes are removed first, as they would override
+ * that. The markup is parsed by `DOMParser`, which runs no scripts and
+ * loads nothing.
  */
 export function htmlSrcdoc(markup: string): string {
-  // `base` opens links in a new window, which the sandbox doesn't allow,
-  // so that clicked links can't load other pages into the frame
-  return `<!DOCTYPE html><meta http-equiv="Content-Security-Policy" content="${HTML_OUTPUT_CSP}"><meta name="referrer" content="no-referrer"><base target="_blank">${markup}`;
+  const doc = new DOMParser().parseFromString(markup, "text/html");
+  doc
+    .querySelectorAll("base, meta[http-equiv], meta[name]")
+    .forEach((element) => element.remove());
+  doc.querySelectorAll("[target], [referrerpolicy]").forEach((element) => {
+    element.removeAttribute("target");
+    element.removeAttribute("referrerpolicy");
+  });
+  return `<!DOCTYPE html><meta http-equiv="Content-Security-Policy" content="${HTML_OUTPUT_CSP}"><meta name="referrer" content="no-referrer"><base target="_blank">${doc.documentElement.outerHTML}`;
 }

@@ -3,13 +3,18 @@
 import { expect, fixture, html, waitUntil } from "@open-wc/testing";
 import sinon from "sinon";
 import "../index.js";
-import type { ECCClientGa4ghWesRunOutput } from "../run-output.js";
+import { ECCClientGa4ghWesRunOutput } from "../run-output.js";
 import type { WesOutputProvider } from "../../../providers/index.js";
 
 const REPORT = "s3://bucket/run/report.html";
 const COUNTS = "s3://bucket/run/read_counts.tsv";
 const BAM = "s3://bucket/run/filtered.bam";
 const SCHEMES = ["drs", "https", "s3"];
+
+/** A response that never arrives. */
+const NEVER = new Promise<Response>(() => {
+  // Never settles
+});
 
 const fileRef = (extra: Record<string, unknown> = {}) => ({
   type: "string",
@@ -169,7 +174,7 @@ describe("ecc-client-ga4gh-wes-run-output", () => {
       expect(frame.hasAttribute("src")).to.equal(false);
       const srcdoc = frame.getAttribute("srcdoc") as string;
       expect(srcdoc.indexOf("Content-Security-Policy")).to.be.lessThan(
-        srcdoc.indexOf(markup)
+        srcdoc.indexOf("<script>alert(1)</script>Hi")
       );
       expect(srcdoc).to.contain("default-src 'none'");
       expect(frame.title).to.equal("Report");
@@ -527,6 +532,65 @@ describe("ecc-client-ga4gh-wes-run-output", () => {
   });
 
   describe("reloads", () => {
+    afterEach(() => {
+      ECCClientGa4ghWesRunOutput.loadTimeout = 30000;
+    });
+
+    it("gives up on a file that doesn't arrive and loads the next", async () => {
+      ECCClientGa4ghWesRunOutput.loadTimeout = 50;
+      const provider = stubProvider({ "s3://bucket/b.tsv": "h\nb\n" });
+      provider.fetchOutput.withArgs("s3://bucket/a.tsv").returns(NEVER);
+      const el = await render(
+        { type: "array", items: tableSchema },
+        ["s3://bucket/a.tsv", "s3://bucket/b.tsv"],
+        provider
+      );
+      await settled(el);
+
+      expect(root(el).textContent).to.contain("no response within 0.05 s");
+      const cells = root(el).querySelectorAll("ecc-utils-design-table-cell");
+      expect(Array.from(cells, (c) => c.textContent?.trim())).to.deep.equal([
+        "b",
+      ]);
+    });
+
+    it("retries failed viewers when the same output is set again", async () => {
+      const provider = stubProvider();
+      provider.fetchOutput
+        .onFirstCall()
+        .resolves(new Response("busy", { status: 503 }));
+      provider.fetchOutput.onSecondCall().resolves(new Response("h\n1\n"));
+      const el = await render(tableSchema, COUNTS, provider);
+      await settled(el);
+      expect(root(el).textContent).to.contain("503");
+
+      el.value = `${COUNTS}`;
+      el.schema = { ...tableSchema };
+      await el.updateComplete;
+      await settled(el);
+
+      expect(provider.fetchOutput.callCount).to.equal(2);
+      expect(root(el).querySelector("ecc-utils-design-table")).not.to.equal(
+        null
+      );
+    });
+
+    it("counts files left out of a list that grows", async () => {
+      const uris = (n: number) =>
+        Array.from({ length: n }, (_, i) => `s3://bucket/run/s${i}.bam`);
+      const el = await render(
+        { type: "array", items: fileRef() },
+        uris(3),
+        stubProvider(),
+        { maxFiles: 2 }
+      );
+      expect(root(el).textContent).to.contain("1 more not shown");
+
+      el.value = uris(5);
+      await el.updateComplete;
+      expect(root(el).textContent).to.contain("3 more not shown");
+    });
+
     it("doesn't refetch for equal but new properties", async () => {
       const provider = stubProvider({ [COUNTS]: "h\n1\n" });
       const el = await render(tableSchema, COUNTS, provider);

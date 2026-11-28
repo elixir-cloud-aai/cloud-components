@@ -124,6 +124,9 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
   @state() private views = new Map<number, View>();
   @state() private downloadErrors = new Map<number, string>();
 
+  /** Milliseconds that a viewer waits for its file at most */
+  static loadTimeout = 30000;
+
   private loads?: AbortController;
 
   /** What the current views were loaded for, to skip needless reloads */
@@ -179,6 +182,7 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
     const entries = all.length > 1 ? all.slice(0, maxFiles) : all;
     const key = JSON.stringify({
       entries,
+      total: all.length,
       schemes: this.schemes,
       limits: [this.maxRows, this.maxColumns, this.maxFiles, this.maxBytes],
     });
@@ -186,7 +190,9 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
       this.loads &&
       !this.loads.signal.aborted &&
       this.loadedFor?.key === key &&
-      this.loadedFor.provider === this.provider
+      this.loadedFor.provider === this.provider &&
+      // Setting the same output again retries failed viewers
+      ![...this.views.values()].some((view) => view.status === "error")
     ) {
       return;
     }
@@ -241,6 +247,10 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
     this.views = new Map(this.views).set(index, view);
   }
 
+  /**
+   * Loads the viewer of one file; gives up after `loadTimeout` milliseconds,
+   * so that one file that never arrives doesn't hold up the others.
+   */
   private async loadView(
     index: number,
     entry: FileEntry,
@@ -248,6 +258,40 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
     provider: WesOutputProvider,
     signal: AbortSignal
   ): Promise<void> {
+    const job = new AbortController();
+    const stop = () => job.abort();
+    signal.addEventListener("abort", stop);
+    const timeout = ECCClientGa4ghWesRunOutput.loadTimeout;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timedOut = new Promise<never>((_resolve, reject) => {
+      timer = setTimeout(() => {
+        job.abort();
+        reject(new Error(`no response within ${timeout / 1000} s`));
+      }, timeout);
+    });
+    try {
+      const view = await Promise.race([
+        this.readView(entry, viewer, provider, job.signal),
+        timedOut,
+      ]);
+      if (!signal.aborted) this.setView(index, view);
+    } catch (err) {
+      if (!signal.aborted) {
+        this.setView(index, { status: "error", message: errorMessage(err) });
+      }
+    } finally {
+      clearTimeout(timer);
+      signal.removeEventListener("abort", stop);
+    }
+  }
+
+  /** Fetches a file and turns it into the view of its viewer. */
+  private async readView(
+    entry: FileEntry,
+    viewer: Viewer,
+    provider: WesOutputProvider,
+    signal: AbortSignal
+  ): Promise<View> {
     const maxBytes = ECCClientGa4ghWesRunOutput.limit(
       this.maxBytes,
       DEFAULT_MAX_BYTES
@@ -256,50 +300,34 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
       status: "error",
       message: `the file is too large to show (more than ${maxBytes} bytes)`,
     };
-    try {
-      const response = await provider.fetchOutput(entry.uri, { signal });
-      if (signal.aborted) return;
-      if (!response.ok) {
-        throw new Error(
-          `HTTP ${response.status}${
-            response.statusText ? ` ${response.statusText}` : ""
-          }`
-        );
-      }
-      const { text, truncated } = await readLimitedText(response, maxBytes);
-      if (signal.aborted) return;
-      if (viewer === "html-viewer") {
-        // A cut report would be shown incomplete without a hint
-        this.setView(
-          index,
-          truncated ? tooLarge : { status: "html", srcdoc: htmlSrcdoc(text) }
-        );
-        return;
-      }
-      // Drop the partial last line of a cut table
-      const complete = truncated
-        ? text.slice(0, text.lastIndexOf("\n") + 1)
-        : text;
-      if (truncated && !complete) {
-        // Not even the header fits
-        this.setView(index, tooLarge);
-        return;
-      }
-      const table = parseDelimited(
-        complete,
-        delimiterFor(fileOf(entry.schema).mediaType, entry.uri, complete),
-        ECCClientGa4ghWesRunOutput.limit(this.maxRows, DEFAULT_MAX_ROWS),
-        ECCClientGa4ghWesRunOutput.limit(this.maxColumns, DEFAULT_MAX_COLUMNS)
+    const response = await provider.fetchOutput(entry.uri, { signal });
+    if (!response.ok) {
+      throw new Error(
+        `HTTP ${response.status}${
+          response.statusText ? ` ${response.statusText}` : ""
+        }`
       );
-      this.setView(index, {
-        status: "table",
-        ...table,
-        more: table.more || truncated,
-      });
-    } catch (err) {
-      if (signal.aborted) return;
-      this.setView(index, { status: "error", message: errorMessage(err) });
     }
+    const { text, truncated } = await readLimitedText(response, maxBytes);
+    if (viewer === "html-viewer") {
+      // A cut report would be shown incomplete without a hint
+      return truncated
+        ? tooLarge
+        : { status: "html", srcdoc: htmlSrcdoc(text) };
+    }
+    // Drop the partial last line of a cut table
+    const complete = truncated
+      ? text.slice(0, text.lastIndexOf("\n") + 1)
+      : text;
+    // Not even the header fits
+    if (truncated && !complete) return tooLarge;
+    const table = parseDelimited(
+      complete,
+      delimiterFor(fileOf(entry.schema).mediaType, entry.uri, complete),
+      ECCClientGa4ghWesRunOutput.limit(this.maxRows, DEFAULT_MAX_ROWS),
+      ECCClientGa4ghWesRunOutput.limit(this.maxColumns, DEFAULT_MAX_COLUMNS)
+    );
+    return { status: "table", ...table, more: table.more || truncated };
   }
 
   private async download(index: number, uri: string): Promise<void> {
@@ -399,8 +427,8 @@ export class ECCClientGa4ghWesRunOutput extends LitElement {
       case "html":
         // Empty sandbox: no scripts, forms, pop-ups or navigation of the
         // page, and an opaque origin; the CSP in srcdoc blocks external
-        // loads, and its base element stops links from loading other pages
-        // into the frame
+        // loads, and links without targets can't load other pages into the
+        // frame (see htmlSrcdoc)
         return html`<iframe
           sandbox=""
           referrerpolicy="no-referrer"
