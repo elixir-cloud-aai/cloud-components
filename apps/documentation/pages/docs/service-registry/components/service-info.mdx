@@ -1,0 +1,139 @@
+import { Callout, Tabs } from 'nextra/components'
+import ComponentName from '@/components/common/ComponentName'
+import ServiceInfoPreview from '@/components/packages/service-registry/ServiceInfoPreview'
+
+# EccClientGa4ghServiceRegistryServiceInfo Component
+
+<ComponentName
+  tagName='ecc-client-ga4gh-service-registry-service-info'
+  reactTagName='ECCClientGa4ghServiceRegistryServiceInfo'
+  version='2.0.0-alpha.52'
+/>
+
+## Overview
+
+The `ecc-client-ga4gh-service-registry-service-info` component shows the service info of a GA4GH Service Registry itself (`GET /service-info`): its name, ID, version, type and organization, and the optional fields that the registry sets.
+
+The version shows as a badge next to the name, the environment as a badge next to the type. Optional fields that are missing or invalid are left out: timestamps that the browser can't parse as dates (`Date.parse()`), and links other than `http:` and `https:` URLs (and `mailto:` for the contact).
+
+## Usage
+
+### Basic Service Info
+
+<Tabs items={['Preview', 'React', 'HTML']}>
+  <Tabs.Tab>
+    <ServiceInfoPreview />
+    <Callout type="info" emoji="ℹ️">
+      The preview above shows the service info of a public service registry. See [Live previews](/docs/contributing#live-previews) to use another registry.
+    </Callout>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```tsx showLineNumbers copy filename="service-info-basic.tsx"
+    import React from 'react';
+    import { ECCClientGa4ghServiceRegistryServiceInfo } from '@elixir-cloud/service-registry/react';
+    import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+
+    const provider = new RestServiceRegistryProvider(
+      'https://registry.example.com/ga4gh/registry/v1'
+    );
+
+    export default function ServiceInfoBasic() {
+      return (
+        <ECCClientGa4ghServiceRegistryServiceInfo
+          provider={provider}
+          onEccServiceInfoChanged={(event) => {
+            console.log('Service info updated:', event.detail.serviceInfo);
+          }}
+        />
+      );
+    }
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```html showLineNumbers copy filename="service-info-basic.html"
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script type="module" src="https://esm.sh/@elixir-cloud/service-registry@2.0.0-alpha.52"></script>
+      </head>
+      <body>
+        <ecc-client-ga4gh-service-registry-service-info
+          baseurl="https://registry.example.com/ga4gh/registry/v1"
+        ></ecc-client-ga4gh-service-registry-service-info>
+
+        <script type="module">
+          document.addEventListener('ecc-service-info-changed', (event) => {
+            console.log('Service info updated:', event.detail.serviceInfo);
+          });
+        </script>
+      </body>
+    </html>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Properties
+
+| Property   | Attribute | Type                      | Default     | Description                                                                                |
+|------------|-----------|---------------------------|-------------|--------------------------------------------------------------------------------------------|
+| `baseUrl`  | `baseurl` | `string`                  | `""`        | Base URL of the Service Registry API, used if no `provider` is set                         |
+| `provider` | -         | `ServiceRegistryProvider` | `undefined` | Data provider for fetching the service info (see [Providers](/docs/service-registry/providers)) |
+
+Set one of them; without either, the component shows an error. Changing either loads the service info again.
+
+### `provider`
+The data provider whose `getServiceInfo()` returns the service info. See the [Providers documentation](/docs/service-registry/providers) for the available providers and how to create custom ones.
+
+<Tabs items={['React', 'HTML']}>
+  <Tabs.Tab>
+    ```tsx copy
+    import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+
+    const provider = new RestServiceRegistryProvider('https://registry.example.com/ga4gh/registry/v1');
+
+    <ECCClientGa4ghServiceRegistryServiceInfo provider={provider} />
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```html copy
+    <script type="module">
+      import { RestServiceRegistryProvider } from '@elixir-cloud/service-registry/providers';
+
+      const provider = new RestServiceRegistryProvider('https://registry.example.com/ga4gh/registry/v1');
+      document.querySelector('ecc-client-ga4gh-service-registry-service-info').provider = provider;
+    </script>
+    <ecc-client-ga4gh-service-registry-service-info></ecc-client-ga4gh-service-registry-service-info>
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Events
+
+| Event Name                 | React Event Name          | Detail Type                       | Description                                |
+|----------------------------|---------------------------|-----------------------------------|--------------------------------------------|
+| `ecc-service-info-changed` | `onEccServiceInfoChanged` | `{ serviceInfo: Service \| null }` | Fired when the service info data changes   |
+
+### `ecc-service-info-changed`
+Emitted when the service info is loaded. If loading fails, or the provider is removed, `serviceInfo` is `null`.
+
+<Tabs items={['React', 'JavaScript']}>
+  <Tabs.Tab>
+    ```tsx copy
+    <ECCClientGa4ghServiceRegistryServiceInfo
+      onEccServiceInfoChanged={(event) => {
+        document.title = event.detail.serviceInfo?.name ?? 'Service Registry';
+      }}
+    />
+    ```
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ```javascript copy
+    element.addEventListener('ecc-service-info-changed', (event) => {
+      document.title = event.detail.serviceInfo?.name ?? 'Service Registry';
+    });
+    ```
+  </Tabs.Tab>
+</Tabs>
