@@ -10,6 +10,7 @@ const TAGS = [
   "ecc-client-ga4gh-wes-runs",
   "ecc-client-ga4gh-wes-run",
   "ecc-client-ga4gh-wes-run-create",
+  "ecc-client-ga4gh-wes-run-output",
 ];
 
 describe("WES component theming", () => {
